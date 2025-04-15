@@ -1,4 +1,6 @@
 ﻿$(function () {
+    var claimId = $('#claimId').val();
+    var vendorId = $('#vendorId').val();
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/GetEmpanelledVendors',
@@ -112,22 +114,58 @@
                 "mRender": function (data, type, row) {
                     return '<span title="Total number of current cases = ' + row.caseCount + '" data-toggle="tooltip">' + data + '</span>';
                 }
+            },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += '<a id="details' + row.id + '" href="/CreatorAuto/VendorDetail?Id=' + row.id + '&selectedcase=' + claimId + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Agency Info</a>&nbsp;'
+                    return buttons;
+                }
             }],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+            // Preselect the radio button matching vendorId
+            var selectedVendorId = $('#vendorId').val();
+            if (selectedVendorId) {
+                $("input[type='radio'][name='selectedcase'][value='" + selectedVendorId + "']").prop('checked', true);
+                $('#allocatedcase').prop("disabled", false);
+            }
+            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
+                getdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+
+        },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.caseCount > 10) {
-                $('td', nRow).css('background-color', '#ffa');
+                //$('td', nRow).css('background-color', '#ffa');
             }
-        }, error: function (xhr, status, error) { alert('err ' + error) }
+        },
+        error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable').on('draw.dt', function () {
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false);
+        $("#allocatedcase").prop('disabled', true);
+    });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'bottom',
             html: true
         });
     });
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -262,9 +300,12 @@
         if (askConfirmation) {
             e.preventDefault(); $.confirm({
                 title: "Confirm Assign", content: "Are you sure ?",
-                icon: 'fas fa-external-link-alt', type: 'blue', closeIcon: true, buttons: {
+                icon: 'fas fa-external-link-alt',
+                type: 'blue',
+                closeIcon: true, buttons: {
                     confirm: {
-                        text: "Assign <sub>manual</sub>", btnClass: 'btn-info', action: function () {
+                        text: "Assign <sub>manual</sub>",
+                        btnClass: 'btn-info', action: function () {
                             askConfirmation = false;
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
@@ -290,6 +331,7 @@
             });
         }
     })
+    
 });
 function giveRating(img, image) {
     img.attr("src", "/Images/" + image).prevAll("img.rating").attr("src", "/Images/" + image);
@@ -298,18 +340,17 @@ function giveRating(img, image) {
     var img = $(img1).closest('tr').find("img[id='" + parseInt(rt) + "']");
     img.attr("src", "/images/FilledStar.jpeg").prevAll("img.rating").attr("src", "/images/FilledStar.jpeg");
 }
-function showVendor(id) {
+
+function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
-    // can update the spinners    
+    // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    var editbtn = $('a#' + id + '.btn.btn-xs.btn-info')
-    
-    editbtn.html("<i class='fas fa-sync fa-spin'></i> Details");
-    disableAllInteractiveElements();
 
+    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Agency Info");
+    disableAllInteractiveElements()
     var article = document.getElementById("article");
     if (article) {
         var nodes = article.getElementsByTagName('*');
@@ -317,4 +358,9 @@ function showVendor(id) {
             nodes[i].disabled = true;
         }
     }
+}
+if (window.location.search.includes("vendorId")) {
+    const url = new URL(window.location);
+    url.searchParams.delete("vendorId");
+    window.history.replaceState({}, document.title, url.pathname);
 }

@@ -29,6 +29,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly ICreatorService creatorService;
+        private readonly IProgressService progressService;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationReportService investigationReportService;
@@ -38,6 +39,7 @@ namespace risk.control.system.Controllers.Company
             IEmpanelledAgencyService empanelledAgencyService,
             IClaimsInvestigationService claimsInvestigationService,
             ICreatorService creatorService,
+            IProgressService progressService,
             IFtpService ftpService,
             INotyfService notifyService,
             IInvestigationReportService investigationReportService,
@@ -48,6 +50,7 @@ namespace risk.control.system.Controllers.Company
             this.empanelledAgencyService = empanelledAgencyService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.creatorService = creatorService;
+            this.progressService = progressService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.investigationReportService = investigationReportService;
@@ -71,8 +74,8 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(" Assign")]
-        public IActionResult New()
+        [Breadcrumb(" Add/Assign")]
+        public async Task<IActionResult> New()
         {
             try
             {
@@ -90,18 +93,23 @@ namespace risk.control.system.Controllers.Company
                         userCanCreate = false;
                         notifyService.Information($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
                     }
-                    else
-                    {
-                        notifyService.Information($"Limit available = <b>{availableCount}</b>");
-                    }
                 }
-                var createdClaimsStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(s => s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-                var hasClaim = _context.ClaimsInvestigation.Any(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
-                !c.Deleted &&
-                c.InvestigationCaseSubStatus == createdClaimsStatus);
+                var totalReadyToAssign = await creatorService.GetAutoCount(currentUserEmail);
+                var hasClaim = totalReadyToAssign > 0;
                 var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
-                
-                return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate, HasClaims = hasClaim, FileSampleIdentifier = fileIdentifier });
+                userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
+
+                if (!userCanCreate)
+                {
+                    notifyService.Custom($"MAX Assign Case limit = <b>{companyUser.ClientCompany.TotalToAssignMaxAllowed}</b> reached", 5, "#dc3545", "fa fa-upload");
+                }
+                return View(new CreateClaims { 
+                    BulkUpload = companyUser.ClientCompany.BulkUpload, 
+                    UserCanCreate = userCanCreate, 
+                    HasClaims = hasClaim, 
+                    FileSampleIdentifier = fileIdentifier,
+                    AutoAllocation = companyUser.ClientCompany.AutoAllocation
+                });
             }
             catch (Exception ex)
             {
@@ -254,8 +262,8 @@ namespace risk.control.system.Controllers.Company
                         Income = Income.UPPER_INCOME,
                         Name = NameGenerator.GenerateName(),
                         Occupation = Occupation.SELF_EMPLOYED,
-                        CustomerType = CustomerType.HNI,
-                        Description = "DODGY PERSON",
+                        //CustomerType = CustomerType.HNI,
+                        //Description = "DODGY PERSON",
                         Country= pinCode.Country,
                         CountryId = pinCode.CountryId,
                         SelectedCountryId = pinCode.CountryId,
@@ -483,7 +491,7 @@ namespace risk.control.system.Controllers.Company
         }
         [HttpGet]
         [Breadcrumb(" Empanelled Agencies", FromAction = "New")]
-        public async Task<IActionResult> EmpanelledVendors(string id)
+        public async Task<IActionResult> EmpanelledVendors(string id,long vendorId = 0, bool fromEditPage = false)
         {
             try
             {
@@ -496,9 +504,76 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await empanelledAgencyService.GetEmpanelledVendors(id);
+                model.FromEditPage = fromEditPage;
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                if(vendorId > 0)
+                {
+                    model.VendorId = vendorId;
+                }
                 return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [Breadcrumb(" Agency Detail", FromAction = "EmpanelledVendors")]
+        public async Task<IActionResult> VendorDetail(long id, string selectedcase)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (id == 0 || selectedcase is null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var vendor = await _context.Vendor
+                    .Include(v => v.ratings)
+                    .Include(v => v.Country)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)        
+                    .FirstOrDefaultAsync(m => m.VendorId == id);
+                if (vendor == null)
+                {
+                    notifyService.Error("OOPS!!!.Agency Not Found.Try Again");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+                var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+
+                var vendorAllCasesCount = await _context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId &&
+                !c.Deleted &&
+                (c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId));
+
+                var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted && c.Role == AppRoles.AGENT);
+
+                // HACKY
+                var currentCases = claimsInvestigationService.GetAgencyIdsLoad(new List<long> {vendor.VendorId });
+                vendor.SelectedCountryId = vendorUserCount;
+                vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
+                vendor.SelectedDistrictId = vendorAllCasesCount;
+                vendor.MobileAppUrl = selectedcase;
+
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Case");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "CreatorAuto", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { id = selectedcase } };
+                var editPage = new MvcBreadcrumbNode("VendorDetail", "CreatorAuto", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
+
+                return View(vendor);
             }
             catch (Exception ex)
             {

@@ -21,11 +21,6 @@ namespace risk.control.system.Seeds
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
 
-            var ssMailBox = new Mailbox
-            {
-                Name = assessorEmailwithSuffix
-            };
-
             string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
             var assessorImage = File.ReadAllBytes(assessorImagePath);
 
@@ -36,7 +31,6 @@ namespace risk.control.system.Seeds
 
             var clientAssessor = new ClientCompanyApplicationUser()
             {
-                Mailbox = ssMailBox,
                 UserName = assessorEmailwithSuffix,
                 Email = assessorEmailwithSuffix,
                 FirstName = firstName,

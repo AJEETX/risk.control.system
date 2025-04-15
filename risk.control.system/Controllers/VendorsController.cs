@@ -33,6 +33,7 @@ namespace risk.control.system.Controllers
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
+        private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly ICustomApiCLient customApiCLient;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -43,6 +44,7 @@ namespace risk.control.system.Controllers
             UserManager<VendorApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
+            IClaimsInvestigationService claimsInvestigationService,
             ICustomApiCLient customApiCLient,
             ISmsService SmsService,
             IFeatureManager featureManager,
@@ -52,6 +54,7 @@ namespace risk.control.system.Controllers
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.notifyService = notifyService;
+            this.claimsInvestigationService = claimsInvestigationService;
             this.customApiCLient = customApiCLient;
             smsService = SmsService;
             this.featureManager = featureManager;
@@ -180,15 +183,63 @@ namespace risk.control.system.Controllers
         }
         public JsonResult PostRating(int rating, long mid)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            var existingRating = _context.Ratings.FirstOrDefault(r => r.VendorId == mid && r.UserEmail == currentUserEmail);
+            if (existingRating != null)
+            {
+                existingRating.Rate = rating;
+                _context.Ratings.Update(existingRating);
+                _context.SaveChanges();
+                return Json("You rated again " + rating.ToString() + " star(s)");
+            }
+
             var rt = new AgencyRating();
             string ip = "123";
             rt.Rate = rating;
             rt.IpAddress = ip;
             rt.VendorId = mid;
-
+            rt.UserEmail = currentUserEmail;
             _context.Ratings.Add(rt);
             _context.SaveChanges();
             return Json("You rated this " + rating.ToString() + " star(s)");
+        }
+
+        public JsonResult PostDetailRating(int rating, long vendorId)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(currentUserEmail))
+            {
+                return Json(new { success = false, message = "You must be logged in to rate." });
+            }
+
+            var existingRating = _context.Ratings.FirstOrDefault(r => r.VendorId == vendorId && r.UserEmail == currentUserEmail);
+
+            if (existingRating != null)
+            {
+                existingRating.Rate = rating;
+                _context.Ratings.Update(existingRating);
+            }
+            else
+            {
+                var newRating = new AgencyRating
+                {
+                    VendorId = vendorId,
+                    Rate = rating,
+                    UserEmail = currentUserEmail,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                };
+                _context.Ratings.Add(newRating);
+            }
+
+            _context.SaveChanges();
+
+            // Calculate new average rating
+            var ratings = _context.Ratings.Where(r => r.VendorId == vendorId);
+            double avgRating = ratings.Any() ? ratings.Average(r => r.Rate) : 0;
+
+            return Json(new { success = true, message = $"You rated {rating} star(s)", avgRating = avgRating });
         }
 
         // GET: Vendors/Details/5
@@ -211,22 +262,34 @@ namespace risk.control.system.Controllers
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.InvestigationServiceType)
                     .FirstOrDefaultAsync(m => m.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+                var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
 
-                if(superAdminUser.IsSuperAdmin)
+                var vendorAllCases = await _context.ClaimsInvestigation.Where(c => c.VendorId == vendor.VendorId && c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId).ToListAsync();
+
+                var vendorAllCasesCount = await _context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId &&
+                c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId);
+
+                var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted && c.Role == AppRoles.AGENT);
+
+                // HACKY
+                var currentCases = claimsInvestigationService.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
+                vendor.SelectedCountryId = vendorUserCount;
+                vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
+                vendor.SelectedDistrictId = vendorAllCasesCount;
+
+                var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                if (superAdminUser.IsSuperAdmin)
                 {
                     vendor.SelectedByCompany = true;
                 }
@@ -249,7 +312,7 @@ namespace risk.control.system.Controllers
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
             var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage };
             ViewData["BreadcrumbNode"] = editPage;
 
             return View();
@@ -289,9 +352,9 @@ namespace risk.control.system.Controllers
 
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
             var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
             var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("CreateUser", "Vendors", $"Add User") { Parent = usersPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("CreateUser", "Vendors", $"Add User") { Parent = usersPage };
             ViewData["BreadcrumbNode"] = editPage;
 
             return View(model);
@@ -338,7 +401,6 @@ namespace risk.control.system.Controllers
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
-                user.Mailbox = new Mailbox { Name = userFullEmail };
 
                 user.PinCodeId = user.SelectedPincodeId;
                 user.DistrictId = user.SelectedDistrictId;
@@ -451,7 +513,7 @@ namespace risk.control.system.Controllers
                 var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
                 var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
                 var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
-                var editPage = new MvcBreadcrumbNode("EditUser", "Vendors", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
+                var editPage = new MvcBreadcrumbNode("EditUser", "Vendors", $"Edit User") { Parent = usersPage };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 vendorApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
@@ -651,6 +713,14 @@ namespace risk.control.system.Controllers
 
                 var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == model.VendorId);
                 model.HasClaims = hasClaims;
+
+                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
+                var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
+                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = model.VendorId } };
+                var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = model.VendorId } };
+                var editPage = new MvcBreadcrumbNode("DeleteUser", "Vendors", $"Delete User") { Parent = usersPage };
+                ViewData["BreadcrumbNode"] = editPage;
+
                 return View(model);
             }
             catch (Exception ex)
@@ -890,8 +960,10 @@ namespace risk.control.system.Controllers
                 {
                     Role = managerRole,
                     Company = companyUser.ClientCompany,
-                    Symbol = "fa fa-info i-blue",
-                    Message = $"Agency {vendor.Email}: To Empanel."
+                    Symbol = "far fa-hand-point-right i-orangered",
+                    Message = $"Agency {vendor.Email} created",
+                    Status = "Empanel",
+                    NotifierUserEmail = currentUserEmail
                 };
                 _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync();
@@ -1065,7 +1137,7 @@ namespace risk.control.system.Controllers
                 var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == id );
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
-                var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage };
                 ViewData["BreadcrumbNode"] = editPage;
                 vendor.HasClaims = hasClaims;
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);

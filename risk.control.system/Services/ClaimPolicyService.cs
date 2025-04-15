@@ -17,6 +17,8 @@ namespace risk.control.system.Services
 
     public class ClaimPolicyService : IClaimPolicyService
     {
+        private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext _context;
         private readonly INumberSequenceService numberService;
 
@@ -68,11 +70,11 @@ namespace risk.control.system.Services
                 .Where(t => t.ClaimsInvestigationId == id)
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
-            var claimsInvestigation = await _context.ClaimsInvestigation
+            var claim = await _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
-              .Include(c => c.PreviousClaimReports)
+              .Include(c => c.AgencyReport.AgentIdReport)
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.PanIdReport)
               .Include(c => c.AgencyReport.PassportIdReport)
@@ -114,14 +116,32 @@ namespace risk.control.system.Services
                 .Include(c =>c.ClaimNotes)
                 .Include(c =>c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+            
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
 
-            claimsInvestigation.CompanyWithdrawlComment = string.Empty;
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+            claim.CompanyWithdrawlComment = string.Empty;
             var model = new ClaimTransactionModel
             {
-                ClaimsInvestigation = claimsInvestigation,
+                ClaimsInvestigation = claim,
                 Log = caseLogs,
-                Location = claimsInvestigation.BeneficiaryDetail,
-                NotWithdrawable = claimsInvestigation.NotWithdrawable,
+                Location = claim.BeneficiaryDetail,
+                NotWithdrawable = claim.NotWithdrawable,
                 TimeTaken = GetElapsedTime(caseLogs)
             };
             return model;
@@ -143,11 +163,10 @@ namespace risk.control.system.Services
                  .Where(t => t.ClaimsInvestigationId == id)
                  .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
-            var claimsInvestigation = await _context.ClaimsInvestigation
+            var claim = await _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
-              .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.PanIdReport)
               .Include(c => c.AgencyReport.PassportIdReport)
@@ -188,12 +207,30 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
             var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var location = claimsInvestigation.BeneficiaryDetail;
+            var location = claim.BeneficiaryDetail;
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
             if (caseLogs.Any(l => l.UserEmailActioned == companyUser.Email || l.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId))
             {
                 return new ClaimTransactionModel
                 {
-                    ClaimsInvestigation = claimsInvestigation,
+                    ClaimsInvestigation = claim,
                     Log = caseLogs,
                     Location = location,
                     TimeTaken = GetElapsedTime(caseLogs)

@@ -5,10 +5,10 @@
 
 }
 <section class="content">
-        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-        <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-        <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
+    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+    <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title">
@@ -20,7 +20,7 @@
 
                             <i class='far fa-file-powerpoint'></i> Case details.
                         </li>
-                        @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "underwriting")
                         {
                             <li>
                                 <i class='fa fa-user-plus'></i> Customer details
@@ -36,20 +36,20 @@
         </div>
     </div>
 
-        @{
-            var data = new ClaimsInvestigationVendorsModel
+    @{
+        var data = new ClaimsInvestigationVendorsModel
             {
                 Location = Model.Location,
                 ClaimsInvestigation = Model.ClaimsInvestigation,
             };
-            }
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-            <partial name="_AgentSubmittedReport" model="@Model" />
-    @if (@Model.ClaimsInvestigation.AgencyReport != null)
+    }
+    <div class="submit-progress hidden">
+        <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+    </div>
+    <partial name="_AgentSubmittedReport" model="@Model" />
+    @if (@Model.ClaimsInvestigation.AgencyReport.AgentRemarks != null)
     {
-        <div class="card shadow-lg border-1 rounded-lg expanded-card">
+        <div class="card direct-chat direct-chat-warning expanding-card">
             <div class="card-header bg-light text-white text-center">
                 <h3 class="card-title">
                     <i class="fas fa-print nav-icon"></i> Agent: <span class="badge badge-light">@Model.ClaimsInvestigation.AgencyReport.AgentEmail</span>
@@ -76,6 +76,7 @@
             <div class="card-body pb-0">
                 <div class="row">
                     @{
+                        <partial name="_AgentSubmittedAgentdReport" model="@Model" />
                         <partial name="_AgentSubmittedDigitalIdReport" model="@Model" />
                         <partial name="_AgentSubmittedDocumentIdReport" model="@Model" />
                         if (Model.ClaimsInvestigation.EnablePassport)
@@ -88,32 +89,37 @@
                             <partial name="_AgentSubmittedVideoReport" model="@Model" />
                         }
                     }
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
+                        {
+                            var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ?
+                            @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+                            <div class="card  border-success">
 
-                    @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
-                    {
-                        var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ?
-                        @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-
-                        <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
-                            <div class="card bg-light d-flex flex-fill border-success">
+                            <div class="card direct-chat-warning expanded-card">
                                 <div class="card-header text-muted border-bottom-0">
                                     <h3 class="card-title">
-                                        <i class="far fa-comment"></i> Questionnaire
+                                        <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name)
                                         <span class="hover-text">
                                             <i class="fas fa-info-circle"></i>
                                             <span class="tooltip-text" id="information">
                                                 <span>
-                                                    <i class="far fa-comment"></i><b> Questionnaire.</b>
+                                                        <i class="far fa-comment"></i><b> Questionnaire (@Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name)</b>
                                                 </span>
 
                                             </span>
                                         </span>
                                     </h3>
                                     <div class="card-tools">
-                                        <span data-toggle="tooltip" title="Claim #" class="badge badge-light">
+                                        <span data-toggle="tooltip" title="Agent report time" class="badge badge-light">
                                             <i class="nav-icon fas fa-clock"></i>
                                             @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                         </span>
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="card-footer text-muted border-bottom-0">
@@ -122,11 +128,10 @@
                                 <div class="progress">
                                     <i class="far fa-bookmark bookmark-green"></i>
                                     <div class="progress-bar progress-bar-green" role="progressbar">
-                                        questionaaire
+                                            questionaaire (@Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name)
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <partial name="_AgentChat" model="@Model" />
 
                                     <div class="row">
 
@@ -136,28 +141,29 @@
                                                 <br />
                                                 <ul class="ml-4 mb-0 fa-ul text-muted">
                                                     <li class="small">
-                                                        Ownership of residence ?
+                                                        @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question1
                                                         <span class="fa-li">
                                                             <i class="far fa-comment"></i>
                                                         </span>
                                                     </li>
                                                     <br />
                                                     <li class="small">
-                                                        Perceived financial status ?
+                                                                                                                @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question2
                                                         <span class="fa-li">
                                                             <i class="far fa-comment"></i>
                                                         </span>
                                                     </li>
                                                     <br />
                                                     <li class="small">
-                                                        Name of neighbour met ?
+                                                            @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question3
+
                                                         <span class="fa-li">
                                                             <i class="far fa-comment"></i>
                                                         </span>
                                                     </li>
                                                     <br />
                                                     <li class="small">
-                                                        Date when met with neighbour ?
+                                                                                                                    @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question4
                                                         <span class="fa-li">
                                                             <i class="far fa-comment"></i>
                                                         </span>
@@ -213,14 +219,6 @@
                                                         </span>
                                                         @{
                                                             var remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks;
-                                                            if (Model.ClaimsInvestigation.UpdateAgentAnswer)
-                                                            {
-                                                                var edited = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks != Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit;
-                                                                if (edited)
-                                                                {
-                                                                    remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit; ;
-                                                                }
-                                                            }
                                                         }
                                                         @remarks
                                                     </li>
@@ -231,23 +229,28 @@
 
                                 </div>
                             </div>
+                                <div class="text-center">
+                                    <i class='fas fa-check-circle i-green'></i>
+                                </div>
+                            </div>
+                           
+                        }
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <partial name="_AgentChat" model="@Model" />
 
-                        </div>
-                    }
-
-                    <div class="col-12">
                         @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks))
                         {
                             <div class="card bg-light  border-success">
 
                                 <div class="card-header">
                                     <h3 class="card-title">
-                                        <i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</span>
+                                        <i class="fas fa-user-edit"></i> Supervisor comments:
                                         <span class="hover-text">
                                             <i class="fas fa-info-circle"></i>
                                             <span class="tooltip-text" id="information">
                                                 <span>
-                                                    <i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</b> remark.
+                                                    <i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</b> comments.
                                                 </span>
 
                                             </span>
@@ -260,65 +263,73 @@
                                     </div>
 
                                 </div>
-
+                                <div class="progress">
+                                    <i class="far fa-bookmark bookmark-green"></i>
+                                    <div class="progress-bar progress-bar-green" role="progressbar">
+                                        supervisor comments
+                                    </div>
+                                </div>
+                                <div class="card-footer text-muted border-bottom-0">
+                                    <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.ClaimsInvestigation.AgencyReport.SupervisorEmail </span>
+                                </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
                                             <p class="text-muted text-sm">
 
-                                                <span>Supervisor comments: </span>
+                                                <span>comments: </span>
                                             </p>
-                                            <table id="customerTable" class="table-bordered table-hover dt-responsive nowrap w-100">
-                                                <thead>
+                                            <div class="table-responsive">
+                                            <table class="table table-bordered table-sm table-hover align-middle text-center">
+                                                <thead class="thead-light">
                                                     <tr>
-                                                        <th>
-                                                            Time
-                                                        </th>
-                                                        <th>
-                                                            Supervisor Response
-                                                        </th>
-                                                        <th>
-                                                            Document
-                                                        </th>
+                                                        <th class="w-25">Time</th>
+                                                        <th>Supervisor Response</th>
+                                                        <th class="w-25">Document</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
                                                         <td>
                                                             @{
-                                                                string displayTime = string.Empty;
-                                                                var time = @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated;
-                                                                if (time is not null)
-                                                                {
-                                                                    displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
-                                                                }
-                                                                if (time == null)
-                                                                {
-                                                                    displayTime = @Model.ClaimsInvestigation.AgencyReport.Created.ToString("dd-MMM-yyy HH:mm");
-                                                                }
+                                                                var updateTime = Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated
+                                                                                 ?? Model.ClaimsInvestigation.AgencyReport.Created;
+                                                                string displayTime = updateTime.ToString("dd-MMM-yyyy HH:mm");
                                                             }
                                                             <span class="badge badge-light">@displayTime</span>
                                                         </td>
-                                                        <td>
-                                                            @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks
 
+                                                        <td class="text-start">
+                                                            <div class="bg-light rounded p-2 text-muted">
+                                                                @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks
+                                                            </div>
                                                         </td>
+
                                                         <td>
                                                             @if (Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment != null)
                                                             {
-                                                                <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment))">
-                                                                <a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
-                                                                   asp-route-id="@Model.ClaimsInvestigation.AgencyReport.AgencyReportId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> </a>
+                                                                <div class="d-flex flex-column gap-2 align-items-center">
+                                                                    <img class="img-thumbnail mb-2 doc-preview" src="data:image/*;base64,@(Convert.ToBase64String(Model.ClaimsInvestigation.AgencyReport.SupervisorAttachment))" alt="Attachment">
+
+                                                                    <a asp-controller="Download"
+                                                                       asp-action="SupervisorFileAttachment"
+                                                                       asp-route-id="@Model.ClaimsInvestigation.AgencyReport.AgencyReportId"
+                                                                       target="_blank"
+                                                                       class="btn btn-outline-primary btn-sm">
+                                                                        <i class="fas fa-paperclip"></i> View
+                                                                    </a>
+                                                                </div>
                                                             }
                                                             else
                                                             {
-                                                                <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+                                                                <img src="@Applicationsettings.NO_IMAGE" alt="No Document" class="img-thumbnail doc-preview">
                                                             }
                                                         </td>
-
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                        </div>
+
                                         </div>
 
                                     </div>
@@ -327,25 +338,30 @@
 
                         }
                     </div>
-
+                </div>
+                <div class="row">
                     @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
                     {
                         <partial name="_EnquiryReport" model="@Model" />
                     }
                 </div>
-
             </div>
         </div>
     }
     <div class="card-footer">
-        <form id="withdraw-form">
-
+        <form id="withdraw-form" method="post" asp-action="WithdrawCaseFromAgent" asp-controller="ClaimsVendorPost">
+            <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+            <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
             <div class="row">
                 <div class="col-md-12">
                     <a id="back" asp-action="Open" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i>
                         <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
                     </a>
+                    @if (@Model.ClaimsInvestigation.AgencyReport.AgentRemarks == null)
+                    {
+                        <button id="withdraw-case" type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
+                    }
 
                 </div>
             </div>
@@ -358,7 +374,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-     <script src="~/js/common/claim-details.js">
+    <script src="~/js/common/claim-details.js">
     </script>
     <script src="~/js/map.js"></script>
     <script>
@@ -366,5 +382,5 @@
     </script>
     <script src="~/js/supervisor/claims-details.js">
     </script>
-   
+
 }

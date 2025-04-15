@@ -68,8 +68,6 @@ namespace risk.control.system.Models
         [Display(Name = "Active")]
         public bool Active { get; set; } = false;
 
-        public Mailbox? Mailbox { get; set; } = new();
-
         public bool Deleted { get; set; } = false;
 
         public string? SecretPin { get; set; }

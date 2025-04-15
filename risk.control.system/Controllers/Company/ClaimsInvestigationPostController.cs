@@ -1,5 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Hangfire;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -37,25 +39,75 @@ namespace risk.control.system.Controllers.Company
         private readonly ApplicationDbContext _context;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IProgressService progressService;
         private readonly INotyfService notifyService;
+        private readonly IBackgroundJobClient backgroundJobClient;
 
         public ClaimsInvestigationPostController(ApplicationDbContext context,
             IClaimsInvestigationService claimsInvestigationService,
+            IBackgroundJobClient backgroundJobClient,
             IMailboxService mailboxService,
+            IHttpContextAccessor httpContextAccessor,
+            IProgressService progressService,
             INotyfService notifyService)
         {
             _context = context;
             this.claimsInvestigationService = claimsInvestigationService;
+            this.backgroundJobClient = backgroundJobClient;
             this.mailboxService = mailboxService;
+            this.httpContextAccessor = httpContextAccessor;
+            this.progressService = progressService;
             this.notifyService = notifyService;
         }
-
-        [ValidateAntiForgeryToken]
+        
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> Assign(List<string> claims)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignAuto(List<string> claims)
         {
-            if (claims == null || claims.Count == 0)
+            
+            try
+            {
+                if (claims == null || claims.Count == 0)
+                {
+                    notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                }
+                
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+                
+                // AUTO ALLOCATION COUNT
+                var distinctClaims = claims.Distinct().ToList();
+                var affectedRows = await claimsInvestigationService.UpdateCaseAllocationStatus( currentUserEmail, distinctClaims);
+                if(affectedRows <= distinctClaims.Count)
+                {
+                    notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                }
+                var jobId = backgroundJobClient.Enqueue(() => claimsInvestigationService.BackgroundAutoAllocation(distinctClaims, currentUserEmail, baseUrl));
+                progressService.AddAssignmentJob(jobId, currentUserEmail);
+                notifyService.Custom($"Assignment of {distinctClaims.Count} Case(s) started", 3, "orange", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive",new { jobId });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+            }
+            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignAutoSingle(string claims)
+        {
+            if (claims == null || string.IsNullOrWhiteSpace(claims))
             {
                 notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
@@ -63,53 +115,17 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == currentUserEmail);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                var company = _context.ClientCompany
-                    .Include(c => c.EmpanelledVendors)
-                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
-                    .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
-                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-                //IF AUTO ALLOCATION TRUE
-                if (company.AutoAllocation)
+                var allocatedCaseNumber = await claimsInvestigationService.ProcessAutoSingleAllocation(claims, currentUserEmail, baseUrl);
+                if(string.IsNullOrWhiteSpace(allocatedCaseNumber))
                 {
-                    var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(claims, company, currentUserEmail);
-
-                    if (claims.Count == autoAllocatedClaims.Count)
-                    {
-                        notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
-                    }
-
-                    else if (claims.Count > autoAllocatedClaims.Count)
-                    {
-                        if (autoAllocatedClaims.Count > 0)
-                        {
-                            notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
-                        }
-
-                        var notAutoAllocated = claims.Except(autoAllocatedClaims)?.ToList();
-
-                        await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
-
-                        await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
-
-                        notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} case(s) need assign manually", 3, "orange", "far fa-file-powerpoint");
-                        
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                    }
+                    notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                 }
-                else
-                {
-                    await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, claims);
-
-                    await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
-
-                    notifyService.Custom($"{claims.Count}/{claims.Count} case(s) assigned", 3, "green", "far fa-file-powerpoint");
-                }
+                notifyService.Custom($"Case #:{allocatedCaseNumber} Assigned", 3, "green", "far fa-file-powerpoint");
             }
             catch (Exception ex)
             {
@@ -123,27 +139,35 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string claimId)
+        public async Task<IActionResult> AllocateSingle2Vendor(long selectedcase, string caseId)
         {
-            if (selectedcase < 1 || string.IsNullOrWhiteSpace(claimId))
+            if (selectedcase < 1 || string.IsNullOrWhiteSpace(caseId))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
             //set claim as manual assigned
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var policy = await claimsInvestigationService.AllocateToVendor(currentUserEmail, claimId, selectedcase, false);
+                var (policy, status) = await claimsInvestigationService.AllocateToVendor(currentUserEmail, caseId, selectedcase, false);
+
+                if(string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
+                {
+                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                }
 
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
 
-                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(v => v.Email == currentUserEmail);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase);
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendorAndManager(currentUserEmail, policy, caseId, selectedcase, baseUrl));
 
-                notifyService.Custom($"Case #{policy.PolicyDetail.ContractNumber} {policy.InvestigationCaseSubStatus.Name} to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case #{policy} {status} to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
             }
@@ -151,7 +175,7 @@ namespace risk.control.system.Controllers.Company
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
         }
 
@@ -170,33 +194,24 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var company = await claimsInvestigationService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
-               
-                await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
+                var (company, vendorId) = await claimsInvestigationService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
+                //await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
 
                 notifyService.Custom($"Case #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
 
-                if (company.AutoAllocation)
-                {
-                    if (model.ClaimsInvestigation.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                    }
-                }
-                else 
-                {
-                    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-                }
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
         }
 
@@ -218,19 +233,24 @@ namespace risk.control.system.Controllers.Company
 
                 var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
 
-                await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
 
                 if (reportUpdateStatus == AssessorRemarkType.OK)
                 {
-                    notifyService.Custom($"Case #{contract} report approved", 3, "green", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{contract} Approved", 3, "green", "far fa-file-powerpoint");
                 }
                 else if (reportUpdateStatus == AssessorRemarkType.REJECT)
                 {
-                    notifyService.Custom($"Case #{contract} rejected", 3, "red", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{contract} Rejected", 3, "red", "far fa-file-powerpoint");
                 }
                 else
                 {
-                    notifyService.Custom($"Case #{contract} reassigned", 3, "yellow", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{contract} Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
                 }
 
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
@@ -261,8 +281,11 @@ namespace risk.control.system.Controllers.Company
                 var reportUpdateStatus = AssessorRemarkType.REVIEW;
 
                 var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
 
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
@@ -296,8 +319,11 @@ namespace risk.control.system.Controllers.Company
                 if (model != null)
                 {
                     var company = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                    await mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId);
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId, baseUrl));
 
                     notifyService.Success("Query Sent to Agency");
                     return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");

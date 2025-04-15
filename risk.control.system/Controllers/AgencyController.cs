@@ -91,13 +91,6 @@ namespace risk.control.system.Controllers
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.InvestigationServiceType)
                     .FirstOrDefaultAsync(m => m.VendorId == vendorUser.VendorId);
                 if (vendor == null)
                 {
@@ -293,7 +286,6 @@ namespace risk.control.system.Controllers
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
-                user.Mailbox = new Mailbox { Name = userFullEmail };
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.Role = user.Role != null ? user.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());

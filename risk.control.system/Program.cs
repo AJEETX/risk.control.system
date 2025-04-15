@@ -17,6 +17,9 @@ using AspNetCoreHero.ToastNotification.Extensions;
 
 using Google.Api;
 
+using Hangfire;
+using Hangfire.MemoryStorage;
+
 using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -53,9 +56,13 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Hangfire.SQLite;
+using Hangfire.Dashboard;
+using risk.control.system.WorkFlow;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+
 
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
@@ -66,6 +73,18 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.ActiveLiClasses = "breadcrumb-item active";
     //options.SeparatorElement = "<li class=\"separator\">/</li>";
 });
+builder.Services.AddWorkflow();
+builder.Services.AddTransient<InvestigationTaskWorkflow>();
+builder.Services.AddTransient<CaseCreateStep>();
+builder.Services.AddTransient<CaseAssignToAgencyStep>();
+builder.Services.AddTransient<CaseWithdrawStep>();
+builder.Services.AddTransient<CaseDeclineStep>();
+builder.Services.AddTransient<CaseAssignToAgentStep>();
+builder.Services.AddTransient<CaseAgentReportSubmitted>();
+builder.Services.AddTransient<CaseReAssignedToAgentStep>();
+builder.Services.AddTransient<CaseAgencyReportSubmitted>();
+builder.Services.AddTransient<CaseApproved>();
+builder.Services.AddTransient<CaseRejected>();
 
 builder.Services.AddCors(opt =>
 {
@@ -99,9 +118,11 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
-builder.Services.AddScoped<IUnderwritingService, UnderwritingService>();
-builder.Services.AddScoped<ICaseInvestigationService,CaseInvestigationService>();
-builder.Services.AddScoped<IManageCaseService,ManageCaseService>();
+builder.Services.AddScoped<IHangfireJobService, HangfireJobService>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
+builder.Services.AddScoped<ICaseCreationService, CaseCreationService>();
+builder.Services.AddScoped<IPdfReportService, PdfReportService>();
+builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddSingleton<IValidationService,ValidationService>();
 builder.Services.AddScoped<ITokenService,TokenService>();
 builder.Services.AddScoped<IUserService,UserService>();
@@ -132,13 +153,9 @@ builder.Services.AddScoped<IMailboxService, MailboxService>();
 builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
 builder.Services.AddScoped<IGoogleApi, GoogleApi>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
-builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IChatSummarizer, OpenAISummarizer>();
 
-builder.Services.AddScoped<IInboxMailService, InboxMailService>();
-builder.Services.AddScoped<ISentMailService, SentMailService>();
 builder.Services.AddScoped<IHttpClientService, HttpClientService>();
-builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
@@ -173,6 +190,10 @@ builder.Services.AddControllersWithViews()
         Modal = true,
         Type = Enums.NotificationTypesNoty.Info
     })
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    })
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
@@ -184,18 +205,24 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopCenter;
 });
 
+var connectionString = builder.Configuration.GetConnectionString("Database");
+var HangfireConnectionString = builder.Configuration.GetConnectionString("HangfireDatabase");
 var isProd = builder.Configuration.GetSection("IsProd").Value;
 var prod = bool.Parse(isProd);
 if (prod)
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
          options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.Services.AddHangfire(config => config.UseSQLiteStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite(builder.Configuration.GetConnectionString("Database")));
+                        options.UseSqlite(connectionString));
+    builder.Services.AddHangfire(config => config.UseMemoryStorage());
+    //builder.Services.AddHangfire(config => config.UseSQLiteStorage(HangfireConnectionString));
 }
+builder.Services.AddHangfireServer();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -346,6 +373,10 @@ builder.Services.AddMvcCore(config =>
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new BasicAuthAuthorizationFilter() }
+});
 app.UseMiddleware<RequirePasswordChangeMiddleware>();
 app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 //app.UseWebSockets();
@@ -390,9 +421,65 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
+RecurringJob.AddOrUpdate<IHangfireJobService>(
+    "clean-failed-jobs",
+    job => job.CleanFailedJobs(),
+    Cron.Hourly // Runs every hour
+);
+
+int sessionTimeoutMinutes = int.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]) / 60;
+//RecurringJob.AddOrUpdate<IdleUserService>(
+//    "check-idle-users",
+//    service => service.CheckIdleUsers(),
+//    $"*/{sessionTimeoutMinutes} * * * *"); // Check every 5 minutes
+
 app.Run();
-
-public partial class Program
+public class BasicAuthAuthorizationFilter : IDashboardAuthorizationFilter
 {
+    public bool Authorize(DashboardContext context)
+    {
+        var httpContext = context.GetHttpContext();
+        var request = httpContext.Request;
+        var response = httpContext.Response;
+        var authorization = request.Headers["Authorization"].ToString();
 
+        if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
+        {
+            // Send 401 response with WWW-Authenticate to trigger login popup
+            response.Headers["WWW-Authenticate"] = "Basic realm=\"Hangfire Dashboard\"";
+            response.StatusCode = StatusCodes.Status401Unauthorized;
+            return false;
+        }
+
+        try
+        {
+            // Decode Authorization header (Base64 username:password)
+            var encodedCredentials = authorization.Substring(6); // Remove "Basic "
+            var decodedAuthHeader = Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredentials));
+            var credentials = decodedAuthHeader.Split(':');
+
+            if (credentials.Length != 2)
+                return false;
+
+            string username = "admin", password = "admin";
+
+#if !DEBUG
+            username = Environment.GetEnvironmentVariable("SMS_User");
+            password = Environment.GetEnvironmentVariable("SMS_Pwd");
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                Console.WriteLine("Environment variables not set properly!");
+                return false;
+            }
+#endif
+
+            // Check if credentials match
+            return credentials[0] == username && credentials[1] == password;
+        }
+        catch
+        {
+            return false; // Handle malformed authorization header
+        }
+    }
 }

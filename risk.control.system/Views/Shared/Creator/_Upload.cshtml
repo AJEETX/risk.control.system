@@ -1,45 +1,49 @@
 ﻿@model CreateClaims
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="form-group">
-            <span class="input-group-label"> Upload Type:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-file-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+<div class="container mt-3">
+    <form id="upload-claims" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
+        <div class="card shadow-lg border-1 rounded-lg p-3">
+            <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
+            @if (Model.AutoAllocation)
+            {
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input custom-checkbox-lg" type="checkbox" asp-for="UploadAndAssign" id="uploadAssignCheckbox" />
+                    <label class="form-check-label fw-bold ms-2 text-info" for="uploadAssignCheckbox">
+                        <span class="highlighted-text" title="Upload and Assign straight-away" data-toggle="tooltip">
+                            <span class="highlighted-text-assign">
+                            <i class="fas fa-random"></i>Assign Directly</span>
+                        </span>
+                    </label>
                 </div>
-                @if (Model.BulkUpload)
-                {
-                    <select asp-for="Uploadtype" data-toggle="tooltip" title="Select upload type" name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
-                        <option value="" title="SELECT">--- SELECT---</option>
-                    </select>
-                }
-                else
-                {
-                    <select disabled data-toggle="tooltip" title=" --- DISABLED --- " name="uploadtype" id="uploadtype" required class="form-control remarks">
-                        <option value="">--- DISABLED---</option>
-                    </select>
-                }
-            </div>
-        </div>
-    </div>
+            }
+            else
 
-    <div class="col-md-6">
-        <div class="form-group">
-            <span class="input-group-label"> Perform Upload: </span>
-            <div class="input-group mb-3">
-                <img class="form-Image" id="ftpImage" src="/img/upload.png">
-                @if (Model.BulkUpload)
+            {
+                <div class="form-check form-switch mb-3">
+                    <label class="form-check-label fw-bold ms-2 text-info" for="uploadAssignCheckbox">
+                        <span class="highlighted-text" title="Upload case" data-toggle="tooltip"><i class="nav-icon fa fa-upload"></i>Upload</span>
+                    </label>
+                </div>
+            }
+            <div class="input-group">
+                @if (Model.BulkUpload && Model.UserCanCreate)
                 {
-                    <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select file to upload" required/>
-                    <button id="UploadFileButton" type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                    <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select a ZIP file to upload" />
+
+                    <button id="UploadFileButton" type="submit" class="btn btn-info" disabled>
+                        <i class="nav-icon fa fa-upload"></i> File Upload
+                    </button>
                 }
                 else
                 {
-                    <input disabled type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="--- DISABLED --- " />
-                    <button disabled class="btn btn-info"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                    <input type="file" class="form-control remarks" data-toggle="tooltip" title="Upload Disabled" disabled />
+
+                    <button type="submit" class="btn btn-info" disabled>
+                        <i class="nav-icon fa fa-upload"></i> File Upload
+                    </button>
                 }
+
             </div>
         </div>
-    </div>
+    </form>
 </div>

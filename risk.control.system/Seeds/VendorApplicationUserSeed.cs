@@ -19,16 +19,10 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             UserManager<VendorApplicationUser> userManager,
-            Vendor vendor, ICustomApiCLient customApiCLient,
-            IHttpContextAccessor httpAccessor)
+            Vendor vendor, ICustomApiCLient customApiCLient)
         {
             noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
-            //Seed Vendor Admin
-            var vaMailBox = new Mailbox
-            {
-                Name = adminEmailwithSuffix
-            };
 
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.PinCodeId == vendor.PinCodeId);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
@@ -44,7 +38,6 @@ namespace risk.control.system.Seeds
             }
             var vendorAdmin = new VendorApplicationUser()
             {
-                Mailbox = vaMailBox,
                 UserName = adminEmailwithSuffix,
                 Email = adminEmailwithSuffix,
                 FirstName = AGENCY_ADMIN.FIRST_NAME,

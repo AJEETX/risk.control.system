@@ -5,14 +5,14 @@ $(document).ready(function () {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Assign<span class='badge badge-light'>(auto)</span>",
-                content: "Are you sure to Assign<span class='badge badge-light'>(auto)</span> ?",
+                title: "Confirm Assign<sub>auto</sub>",
+                content: "Are you sure to Assign<sub>auto</sub> ?",
                 icon: 'fas fa-random',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign <span class='badge badge-warning'>(auto)</span>",
+                        text: "Assign <sub>auto</sub>",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = false;
@@ -24,7 +24,7 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             
-                            $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-light'>(auto)</span>");
+                            $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<sub>auto</sub>");
                             disableAllInteractiveElements();
 
                             $('#create-form').submit();

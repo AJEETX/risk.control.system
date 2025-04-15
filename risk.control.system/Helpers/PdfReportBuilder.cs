@@ -14,6 +14,7 @@ namespace risk.control.system.Helpers
     public class PdfReportBuilder
     {
         public IdData PhotoIdData { get; internal set; }
+        public IdData AgentIdData { get; internal set; }
         public IdData PanData { get; internal set; }
         public List<string> WhatsNextData { get; internal set; }
         public DetailedReport DetailedReport { get; internal set; }
@@ -69,13 +70,14 @@ namespace risk.control.system.Helpers
             var concertSection = documentBuilder.AddSection();
             IdInfo[,] photoItems = GetPhotoItems();
             IdInfo[,] panItems = GetPanItems();
+            IdInfo[,] agentItems = GetAgentItems();
 
             concertSection
                  .SetOrientation(Orientation)
                  .SetMargins(Margins);
 
             addTopTable(concertSection);
-            FillIdData(concertSection.AddTable(), photoItems, panItems);
+            FillIdData(concertSection.AddTable(), agentItems, photoItems, panItems);
             addAssessorInfoTable(concertSection);
             addFrame(concertSection);
 
@@ -122,7 +124,10 @@ namespace risk.control.system.Helpers
                 .AddColumnPercentToTable("", 25);
 
             var row3Builder = infoTable.AddRow();
-            FillAssessorRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
+            FillAgentRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
+            
+            //FillAssessorRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
+            
             FillReportSummaryule(row3Builder.AddCell("", 2, 0).SetFont(FNT10));
 
             var row4Builder = infoTable.AddRow();
@@ -196,17 +201,26 @@ namespace risk.control.system.Helpers
                               Color.Black, Color.White, false).SetHeight(100);
         }
 
-        private void FillAssessorRemarks(int start, int end, TableCellBuilder cellBuilder)
+        private void FillAgentRemarks(int start, int end, TableCellBuilder cellBuilder)
         {
             cellBuilder.AddParagraph(AgencyDetailData.AgentReportTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
             cellBuilder.SetBorderStroke(strokeLeft: Stroke.Solid, strokeTop: Stroke.Solid, strokeRight: Stroke.None, strokeBottom: Stroke.Solid);
 
             foreach (var item in AgencyDetailData.ReportSummaryDescription)
             {
-                cellBuilder.AddParagraph(item).SetFont(FNT9).SetMargins(20, 0, 10, 2);
+                cellBuilder.AddParagraph(item.Question).SetFont(FNT9).SetMargins(20, 0, 10, 2);
+                cellBuilder.AddParagraph(item.Answer).SetFont(FNT9).SetMargins(20, 0, 10, 2);
             }
         }
 
+        private void FillAssessorRemarks(int start, int end, TableCellBuilder cellBuilder)
+        {
+            cellBuilder.AddParagraph(AgencyDetailData.AgentReportTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
+            cellBuilder.SetBorderStroke(strokeLeft: Stroke.Solid, strokeTop: Stroke.Solid, strokeRight: Stroke.None, strokeBottom: Stroke.Solid);
+
+            cellBuilder.AddParagraph(AgencyDetailData.AssessorSummary).SetFont(FNT9).SetMargins(20, 0, 10, 2);
+
+        }
         private void FillReportSummaryule(TableCellBuilder cellBuilder)
         {
             cellBuilder.AddParagraph(AgencyDetailData.SupervisorCommentsTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
@@ -243,6 +257,7 @@ namespace risk.control.system.Helpers
         {
             cellBuilder.AddParagraph(DetailedReport.PolicyNumTitle).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.ClaimTypeTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.ServiceTypeTitle).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.InsuredAmountTitle).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.PersonOfInterestNameTitle).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.Reason2VerifyTitle).SetLineSpacing(1.4f);
@@ -254,10 +269,14 @@ namespace risk.control.system.Helpers
         {
             cellBuilder.AddParagraph(DetailedReport.PolicyNum).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.ClaimType).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.ServiceType).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.InsuredAmount).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.PersonOfInterestName).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.Reason2Verify).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.VerifyAddress).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph().SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph().SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph().SetLineSpacing(1.4f);
         }
 
         private void SetDisclaimer(TableCellBuilder cellBuilder)
@@ -283,21 +302,22 @@ namespace risk.control.system.Helpers
             cellBuilder.AddParagraph(DetailedReport.PersonOfInterestName).SetLineSpacing(1.4f);
         }
 
-        private void FillIdData(TableBuilder tableBuilder, IdInfo[,] boardingItems, IdInfo[,] boardingItems0)
+        private void FillIdData(TableBuilder tableBuilder, IdInfo[,] agentId, IdInfo[,] photoId, IdInfo[,] pandId)
         {
             tableBuilder
                 .SetWidth(XUnit.FromPercent(100))
                 .SetBorder(Stroke.None)
                 .AddColumnToTable("", 415.5f)
                 .AddColumn("", 138.5f);
-            FillIdTableFirstRow(tableBuilder, boardingItems[0, 0]);
+
+            FillIdTableFirstRow(tableBuilder, agentId[0, 0]);
             var rowBuilder = tableBuilder.AddRow();
             rowBuilder.AddCell().AddTable(builder =>
             {
                 builder.SetWidth(415.5f);
-                FillIdTable(builder, boardingItems, 1);
+                FillIdTable(builder, agentId, 1);
             });
-            rowBuilder.AddCell(FillPhotoMap);
+            rowBuilder.AddCell(FillAgentMap);
 
             var rr = tableBuilder.AddRow();
             rr.AddCell().AddTable(b =>
@@ -311,12 +331,33 @@ namespace risk.control.system.Helpers
             });
             rr.AddCell(FillBlank);
 
-            FillIdTableFirstRow(tableBuilder, boardingItems0[0, 0]);
+            FillIdTableFirstRow(tableBuilder, photoId[0, 0]);
+            rowBuilder = tableBuilder.AddRow();
+            rowBuilder.AddCell().AddTable(builder =>
+            {
+                builder.SetWidth(415.5f);
+                FillIdTable(builder, photoId, 1);
+            });
+            rowBuilder.AddCell(FillPhotoMap);
+
+            rr = tableBuilder.AddRow();
+            rr.AddCell().AddTable(b =>
+            {
+                b.SetWidth(415.5f);
+                b.SetBorder(Stroke.Dashed)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercent("", 25);
+            });
+            rr.AddCell(FillBlank);
+
+            FillIdTableFirstRow(tableBuilder, pandId[0, 0]);
             var rb = tableBuilder.AddRow();
             rb.AddCell().AddTable(builder =>
             {
                 builder.SetWidth(415.5f);
-                FillIdTable(builder, boardingItems0, 1);
+                FillIdTable(builder, pandId, 1);
             });
             rb.AddCell(FillPanMap);
         }
@@ -328,6 +369,19 @@ namespace risk.control.system.Helpers
                 .AddParagraph("-")
                 .SetFont(FNT9)
                 .SetMarginBottom(19);
+        }
+
+        private void FillAgentMap(TableCellBuilder cellBuilder)
+        {
+            cellBuilder
+                .SetPadding(19, 6, 0, 0)
+                .AddParagraph(AgencyDetailData.AddressVisitedTitle)
+                .SetFont(FNT9)
+                .SetMarginBottom(19);
+            cellBuilder.AddImage(AgentIdData.PhotoIdMapPath,
+                XSize.FromHeight(108));
+            cellBuilder.AddParagraph("")
+               .AddUrl(AgentIdData.PhotoIdMapUrl, "map");
         }
 
         private void FillPhotoMap(TableCellBuilder cellBuilder)
@@ -356,6 +410,137 @@ namespace risk.control.system.Helpers
                 .AddUrl(PanData.PanMapUrl, "map");
         }
 
+
+        private IdInfo[,] GetAgentItems()
+        {
+            IdInfo[,] result =
+            {
+                {
+                new IdInfo("Investigation Type", FNT15,
+                    AgentIdData.Passenger, 4),
+                    EMPTY_ITEM,
+                    EMPTY_ITEM,
+                    EMPTY_ITEM
+                },
+                {
+                new IdInfo("Agent Name", new FontText[] {
+                    new FontText (FNT12, AgentIdData.PersonName + " / "),
+                    new FontText (FNT12B, AgentIdData.Salutation)
+                }, 2),
+                EMPTY_ITEM,
+                new IdInfo("Address Visited", new FontText[] {
+                    new FontText (FNT12, AgentIdData.ArrivalAirport + " / "),
+                    new FontText (FNT12B, AgentIdData.ArrivalAbvr)
+                }, 2),
+                EMPTY_ITEM
+                },
+                {
+                new IdInfo("Match", AgentIdData.MatchFont, AgentIdData.FaceMatchStatus),
+                new IdInfo("Photo", FNT16, "",AgentIdData.PhotoIdPath),
+                new IdInfo("", FNT16, ""),
+                new IdInfo("Status", AgentIdData.MatchFont, "", AgentIdData.StatusImagePath)
+                },
+                {
+                new IdInfo("Visit Date", FNT16,
+                    AgentIdData.PhotoIdTime.ToString(
+                                "dd MMMM", DocumentLocale)),
+                new IdInfo("Time", FNT16,
+                    AgentIdData.BoardingTill.ToString(
+                                "HH:mm", DocumentLocale)),
+                new IdInfo("", FNT16, ""),
+                new IdInfo("Weather", FNT8,
+                    AgentIdData.WeatherData)
+                }
+            };
+            return result;
+        }
+        private IdInfo[,] GetPhotoItems()
+        {
+            IdInfo[,] result =
+            {
+                {
+                new IdInfo("Investigation Type", FNT15,
+                    PhotoIdData.Passenger, 4),
+                    EMPTY_ITEM,
+                    EMPTY_ITEM,
+                    EMPTY_ITEM
+                },
+                {
+                new IdInfo("Person Name", new FontText[] {
+                    new FontText (FNT12, PhotoIdData.PersonName + " / "),
+                    new FontText (FNT12B, PhotoIdData.Salutation)
+                }, 2),
+                EMPTY_ITEM,
+                new IdInfo("Address Visited", new FontText[] {
+                    new FontText (FNT12, PhotoIdData.ArrivalAirport + " / "),
+                    new FontText (FNT12B, PhotoIdData.ArrivalAbvr)
+                }, 2),
+                EMPTY_ITEM
+                },
+                {
+                new IdInfo("Match", PhotoIdData.MatchFont, PhotoIdData.FaceMatchStatus),
+                new IdInfo("Photo", FNT16, "",PhotoIdData.PhotoIdPath),
+                new IdInfo("", FNT16, ""),
+                new IdInfo("Status", PhotoIdData.MatchFont, "", PhotoIdData.StatusImagePath)
+                },
+                {
+                new IdInfo("Visit Date", FNT16,
+                    PhotoIdData.PhotoIdTime.ToString(
+                                "dd MMMM", DocumentLocale)),
+                new IdInfo("Time", FNT16,
+                    PhotoIdData.BoardingTill.ToString(
+                                "HH:mm", DocumentLocale)),
+                new IdInfo("", FNT16, ""),
+                new IdInfo("Weather", FNT8,
+                    PhotoIdData.WeatherData)
+                }
+            };
+            return result;
+        }
+
+        private IdInfo[,] GetPanItems()
+        {
+            IdInfo[,] result =
+            {
+                {
+                new IdInfo("Investigation Type", FNT15,
+                    PanData.Passenger, 4),
+                    EMPTY_ITEM,
+                    EMPTY_ITEM,
+                    EMPTY_ITEM
+                },
+                {
+                new IdInfo("Document Name", new FontText[] {
+                    new FontText (FNT12, " / "),
+                    new FontText (FNT12B, PanData.Salutation)
+                }, 2),
+                EMPTY_ITEM,
+                new IdInfo("Address Visited", new FontText[] {
+                    new FontText (FNT12, PanData.ArrivalAirport + " / "),
+                    new FontText (FNT12B, PanData.ArrivalAbvr)
+                }, 2),
+                EMPTY_ITEM
+                },
+                {
+                new IdInfo("Match", PanData.MatchFont, PanData.FaceMatchStatus),
+                new IdInfo("Image", FNT16, "", PanData.PanPhotoPath),
+                new IdInfo("", FNT16, " "),
+                new IdInfo("Status", PanData.MatchFont,"", PanData.StatusImagePath)
+                },
+                {
+                new IdInfo("Visit Date", FNT16,
+                    PanData.PhotoIdTime.ToString(
+                                "dd MMMM", DocumentLocale)),
+                new IdInfo("Time", FNT16,
+                    PanData.BoardingTill.ToString(
+                                "HH:mm", DocumentLocale)),
+                new IdInfo("", FNT16, ""),
+                new IdInfo("Pan Scanned Info", FNT8,
+                    PanData.WeatherData)
+                }
+            };
+            return result;
+        }
         private void FillIdTable(TableBuilder tableBuilder,
          IdInfo[,] boardingItems, int startRow = 0)
         {
@@ -484,93 +669,6 @@ namespace risk.control.system.Helpers
             }
         }
 
-        private IdInfo[,] GetPhotoItems()
-        {
-            IdInfo[,] result =
-            {
-                {
-                new IdInfo("Investigation Type", FNT15,
-                    PhotoIdData.Passenger, 4),
-                    EMPTY_ITEM,
-                    EMPTY_ITEM,
-                    EMPTY_ITEM
-                },
-                {
-                new IdInfo("Person Name", new FontText[] {
-                    new FontText (FNT12, PhotoIdData.PersonName + " / "),
-                    new FontText (FNT12B, PhotoIdData.Salutation)
-                }, 2),
-                EMPTY_ITEM,
-                new IdInfo("Address Visited", new FontText[] {
-                    new FontText (FNT12, PhotoIdData.ArrivalAirport + " / "),
-                    new FontText (FNT12B, PhotoIdData.ArrivalAbvr)
-                }, 2),
-                EMPTY_ITEM
-                },
-                {
-                new IdInfo("Match", PhotoIdData.MatchFont, PhotoIdData.FaceMatchStatus),
-                new IdInfo("Photo", FNT16, "",PhotoIdData.PhotoIdPath),
-                new IdInfo("", FNT16, ""),
-                new IdInfo("Status", PhotoIdData.MatchFont, "", PhotoIdData.StatusImagePath)
-                },
-                {
-                new IdInfo("Visit Date", FNT16,
-                    PhotoIdData.PhotoIdTime.ToString(
-                                "dd MMMM", DocumentLocale)),
-                new IdInfo("Time", FNT16,
-                    PhotoIdData.BoardingTill.ToString(
-                                "HH:mm", DocumentLocale)),
-                new IdInfo("", FNT16, ""),
-                new IdInfo("Weather", FNT8,
-                    PhotoIdData.WeatherData)
-                }
-            };
-            return result;
-        }
-
-        private IdInfo[,] GetPanItems()
-        {
-            IdInfo[,] result =
-            {
-                {
-                new IdInfo("Investigation Type", FNT15,
-                    PanData.Passenger, 4),
-                    EMPTY_ITEM,
-                    EMPTY_ITEM,
-                    EMPTY_ITEM
-                },
-                {
-                new IdInfo("Document Name", new FontText[] {
-                    new FontText (FNT12, " / "),
-                    new FontText (FNT12B, PanData.Salutation)
-                }, 2),
-                EMPTY_ITEM,
-                new IdInfo("Address Visited", new FontText[] {
-                    new FontText (FNT12, PanData.ArrivalAirport + " / "),
-                    new FontText (FNT12B, PanData.ArrivalAbvr)
-                }, 2),
-                EMPTY_ITEM
-                },
-                {
-                new IdInfo("Match", PanData.MatchFont, PanData.FaceMatchStatus),
-                new IdInfo("Image", FNT16, "", PanData.PanPhotoPath),
-                new IdInfo("", FNT16, " "),
-                new IdInfo("Status", PanData.MatchFont,"", PanData.StatusImagePath)
-                },
-                {
-                new IdInfo("Visit Date", FNT16,
-                    PanData.PhotoIdTime.ToString(
-                                "dd MMMM", DocumentLocale)),
-                new IdInfo("Time", FNT16,
-                    PanData.BoardingTill.ToString(
-                                "HH:mm", DocumentLocale)),
-                new IdInfo("", FNT16, ""),
-                new IdInfo("Pan Scanned Info", FNT8,
-                    PanData.WeatherData)
-                }
-            };
-            return result;
-        }
 
         internal struct IdInfo
         {

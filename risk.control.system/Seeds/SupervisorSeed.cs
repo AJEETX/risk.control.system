@@ -24,11 +24,6 @@ namespace risk.control.system.Seeds
 
             string supervisorEmailwithSuffix = emailSuffix + "@" + vendor.Email;
 
-            var vsMailBox = new Mailbox
-            {
-                Name = supervisorEmailwithSuffix
-            };
-
             string supervisorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
             var supervisorImage = File.ReadAllBytes(supervisorImagePath);
 
@@ -38,7 +33,6 @@ namespace risk.control.system.Seeds
             }
             var vendorSupervisor = new VendorApplicationUser()
             {
-                Mailbox = vsMailBox,
                 UserName = supervisorEmailwithSuffix,
                 Email = supervisorEmailwithSuffix,
                 FirstName = firstName,

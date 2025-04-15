@@ -23,7 +23,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
 {
-    [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     [Breadcrumb(" Cases")]
     public class ClaimsLogController : Controller
     {
@@ -31,6 +31,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
+        private readonly ICreatorService creatorService;
         private readonly IInvestigationReportService investigationReportService;
         private readonly IClaimPolicyService claimPolicyService;
 
@@ -38,6 +39,7 @@ namespace risk.control.system.Controllers.Company
             IEmpanelledAgencyService empanelledAgencyService,
             IFtpService ftpService,
             INotyfService notifyService,
+            ICreatorService creatorService,
             IInvestigationReportService investigationReportService,
             IClaimPolicyService claimPolicyService)
         {
@@ -46,6 +48,7 @@ namespace risk.control.system.Controllers.Company
             this.empanelledAgencyService = empanelledAgencyService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
+            this.creatorService = creatorService;
             this.investigationReportService = investigationReportService;
         }
 
@@ -85,34 +88,55 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        [Breadcrumb(" Upload Log")]
-        public async Task<IActionResult> Uploads()
+        [Breadcrumb(" Upload File")]
+        public async Task<IActionResult> Uploads(int uploadId = 0)
         {
             try
             {
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
+                bool userCanCreate = true;
+                int availableCount = 0;
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(u => u.Email == currentUserEmail);
+                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    var totalClaimsCreated = _context.ClaimsInvestigation.Count(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                    availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated;
+                    if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    {
+                        userCanCreate = false;
+                        notifyService.Information($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                    }
                 }
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
-                if (companyUser == null)
+                var totalReadyToAssign = await creatorService.GetAutoCount(currentUserEmail);
+                var hasClaim = totalReadyToAssign > 0;
+                var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
+                var hasFileUploads = _context.FilesOnFileSystem.Any();
+                var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+                userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
+
+                if(!userCanCreate)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Custom($"MAX Assign Case limit = <b>{companyUser.ClientCompany.TotalToAssignMaxAllowed}</b> reached",5, "#dc3545", "fa fa-upload");
                 }
-                var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail).ToListAsync();
-                ViewBag.Message = TempData["Message"];
-                return View(new FileUploadViewModel { FilesOnFileSystem = files });
+                return View(new CreateClaims
+                {
+                    BulkUpload = companyUser.ClientCompany.BulkUpload,
+                    UserCanCreate = userCanCreate,
+                    HasClaims = hasClaim,
+                    FileSampleIdentifier = fileIdentifier,
+                    UploadId = uploadId,
+                    HasFileUploads = hasFileUploads,
+                    IsManager = isManager,
+                    AutoAllocation = companyUser.ClientCompany.AutoAllocation
+                });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(Uploads), "ClaimsLog");
             }
-
         }
     }
 }

@@ -1,13 +1,22 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Notyf;
+
+using Hangfire;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Company;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using System.Buffers.Text;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -15,11 +24,12 @@ namespace risk.control.system.Services
 {
     public interface IClaimsInvestigationService
     {
-        Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
+        Task AssignToAssigner(string userEmail, List<string> claimsInvestigations, string url = "");
+        Task<int> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations);
 
-        Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true);
+        Task<(string, string)> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true);
 
-        Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId, string drivingMap, string drivingDistance, string drivingDuration, string distanceInMeters, string durationInSeconds);
+        Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId);
 
         Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, string claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4);
 
@@ -28,106 +38,255 @@ namespace risk.control.system.Services
         Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary);
 
         List<VendorCaseModel> GetAgencyLoad(List<Vendor> existingVendors);
+        List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
 
         Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId);
+        Task<Vendor> WithdrawCaseFromAgent(string userEmail, ClaimTransactionModel model, string claimId);
 
-        Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail);
-        Task<ClientCompany> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
+        Task<string> ProcessAutoSingleAllocation(string claim, string userEmail, string url = "");
+        Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
         Task<bool> SubmitNotes(string userEmail, string claimId, string notes);
 
         Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument);
         Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
+        Task BackgroundAutoAllocation(List<string> claims, string userEmail, string url = "");
+        Task<List<string>> BackgroundUploadAutoAllocation(List<string> claimIds, string userEmail, string url = "");
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
     {
+        private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext _context;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IHttpContextAccessor accessor;
+        private readonly IPdfReportService reportService;
+        private readonly IBackgroundJobClient backgroundJobClient;
+        private readonly IProgressService progressService;
+        private readonly ICustomApiCLient customApiCLient;
 
         public ClaimsInvestigationService(ApplicationDbContext context,
-            IMailboxService mailboxService, 
+            IHttpContextAccessor accessor,
+            IPdfReportService reportService,
+            IBackgroundJobClient backgroundJobClient,
+            IProgressService progressService,
+            ICustomApiCLient customApiCLient,
+            IMailboxService mailboxService,
             IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
+            this.accessor = accessor;
+            this.reportService = reportService;
+            this.backgroundJobClient = backgroundJobClient;
+            this.progressService = progressService;
+            this.customApiCLient = customApiCLient;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
         }
-
-        public async Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail)
+        [AutomaticRetry(Attempts = 0)]
+        public async Task<List<string>> BackgroundUploadAutoAllocation(List<string> claimIds, string userEmail, string url = "")
         {
-            var autoAllocatedClaims = new List<string>();
-            foreach (var claim in claims)
+            var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail, url); // Run all tasks in parallel
+
+            var notAutoAllocated = claimIds.Except(autoAllocatedCases)?.ToList();
+
+            if (claimIds.Count > autoAllocatedCases.Count)
             {
-                string pinCode2Verify = string.Empty;
-                
-                //1. GET THE PINCODE FOR EACH CLAIM
-                var claimsInvestigation = _context.ClaimsInvestigation
+                await AssignToAssigner(userEmail, notAutoAllocated, url);
+
+            }
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
+
+            return (autoAllocatedCases);
+        }
+        [AutomaticRetry(Attempts = 0)]
+        public async Task BackgroundAutoAllocation(List<string> claimIds, string userEmail, string url = "")
+        {
+            var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail, url); // Run all tasks in parallel
+
+            var notAutoAllocated = claimIds.Except(autoAllocatedCases)?.ToList();
+
+            if (claimIds.Count > autoAllocatedCases.Count)
+            {
+                await AssignToAssigner(userEmail, notAutoAllocated, url);
+
+            }
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
+        }
+        async Task<List<string>> DoAutoAllocation(List<string> claims, string userEmail, string url = "")
+        {
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var uploadedRecordsCount = 0;
+
+            var company = _context.ClientCompany
+                    .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
+                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+            var claimTasks = claims.Select(async claim =>
+            {
+                int progress = (int)(((uploadedRecordsCount + 1) / (double)claims.Count) * 100);
+                progressService.UpdateAssignmentProgress(claim, progress);
+
+                // 1. Fetch Claim Details & Pincode in Parallel
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                    .AsNoTracking()
                     .Include(c => c.PolicyDetail)
+                    .ThenInclude(c => c.LineOfBusiness)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
                     .Include(c => c.BeneficiaryDetail)
+                        .ThenInclude(c => c.PinCode)
+                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
+
+                if (claimsInvestigation == null || !claimsInvestigation.IsValidCaseData()) return null; // Handle missing claim
+
+                string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == UNDERWRITING
+                    ? claimsInvestigation.CustomerDetail?.PinCode?.Code
+                    : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
+
+                var pincodeDistrictState = await _context.PinCode
+                    .AsNoTracking()
+                    .Include(d => d.District)
+                    .Include(s => s.State)
+                    .FirstOrDefaultAsync(p => p.Code == pinCode2Verify);
+
+                // 2. Find Vendors Using LINQ
+                var distinctVendorIds = company.EmpanelledVendors
+                    .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
+                        serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
+                        serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId &&
+                        (serviceType.StateId == pincodeDistrictState.StateId &&
+                         (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
+                    ))
+                    .Select(v => v.VendorId) // Select only VendorId
+                    .Distinct() // Ensure uniqueness
+                    .ToList();
+
+                if (!distinctVendorIds.Any()) return null; // No vendors found, skip this claim
+
+                // 3. Get Vendor Load & Allocate
+                var vendorsWithCaseLoad = GetAgencyIdsLoad(distinctVendorIds)
+                    .OrderBy(o => o.CaseCount)
+                    .ToList();
+
+                var selectedVendorId = vendorsWithCaseLoad.FirstOrDefault();
+                if (selectedVendorId == null) return null; // No vendors available
+
+                var (policy, status) = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId);
+
+                if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
+                {
+                    return null;
+                }
+                var jobId = backgroundJobClient.Enqueue(() =>
+                    mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId, url));
+
+                return claim; // Return allocated claim
+            });
+
+            var results = await Task.WhenAll(claimTasks); // Run all tasks in parallel
+            return results.Where(r => r != null).ToList(); // Remove nulls and return allocated claims
+        }
+        public async Task<string> ProcessAutoSingleAllocation(string claim, string userEmail, string url = "")
+        {
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+
+            var company = _context.ClientCompany
+                    .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
+                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            // 1. Fetch Claim Details & Pincode in Parallel
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .AsNoTracking()
+                .Include(c => c.PolicyDetail)
+                    .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
-                    .First(c => c.ClaimsInvestigationId == claim);
+                .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.PinCode)
+                .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
 
-                if (claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH)
-                {
-                    pinCode2Verify = claimsInvestigation.CustomerDetail?.PinCode?.Code;
-                }
-                else
-                {
-                    pinCode2Verify = claimsInvestigation.BeneficiaryDetail.PinCode?.Code;
-                }
-                var pincodeDistrictState = _context.PinCode.Include(d => d.District).Include(s => s.State).FirstOrDefault(p => p.Code == pinCode2Verify);
-                var vendorsInPincode = new List<Vendor>();
+            string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == UNDERWRITING
+                ? claimsInvestigation.CustomerDetail?.PinCode?.Code
+                : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
 
-                //2. GET THE VENDORID FOR EACH CASE BASED ON PINCODE
-                foreach (var empanelledVendor in company.EmpanelledVendors)
-                {
-                    foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
-                    {
-                        if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                                serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
-                        {
-                            if (serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == null)
-                            {
-                                vendorsInPincode.Add(empanelledVendor);
-                                continue;
-                            }
-                            if (serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == pincodeDistrictState.DistrictId)
-                            {
-                                vendorsInPincode.Add(empanelledVendor);
-                                continue;
-                            }
-                        }
-                        var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
-                        if (added)
-                        {
-                            continue;
-                        }
-                    }
-                }
+            var pincodeDistrictState = await _context.PinCode
+                .AsNoTracking()
+                .Include(d => d.District)
+                .Include(s => s.State)
+                .FirstOrDefaultAsync(p => p.Code == pinCode2Verify);
 
-                var distinctVendors = vendorsInPincode.Distinct()?.ToList();
+            // 2. Find Vendors Using LINQ
+            var distinctVendorIds = company.EmpanelledVendors
+                .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
+                    serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
+                    serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId &&
+                    (serviceType.StateId == pincodeDistrictState.StateId &&
+                     (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
+                ))
+                .Select(v => v.VendorId) // Select only VendorId
+                .Distinct() // Ensure uniqueness
+                .ToList();
 
-                //3. CALL SERVICE WITH VENDOR_ID
-                if (vendorsInPincode is not null && vendorsInPincode.Count > 0)
-                {
-                    var vendorsWithCaseLoad = GetAgencyLoad(distinctVendors).OrderBy(o => o.CaseCount)?.ToList();
+            if (!distinctVendorIds.Any()) return null; // No vendors found, skip this claim
 
-                    if (vendorsWithCaseLoad is not null && vendorsWithCaseLoad.Count > 0)
-                    {
-                        var selectedVendor = vendorsWithCaseLoad.FirstOrDefault();
+            // 3. Get Vendor Load & Allocate
+            var vendorsWithCaseLoad = GetAgencyIdsLoad(distinctVendorIds)
+                .OrderBy(o => o.CaseCount)
+                .ToList();
 
-                        var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
+            var selectedVendorId = vendorsWithCaseLoad.FirstOrDefault();
+            if (selectedVendorId == null) return null; // No vendors available
 
-                        autoAllocatedClaims.Add(claim);
+            var (policy, status) = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId);
 
-                        await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
-                    }
-                }
+            if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
+            {
+                await AssignToAssigner(userEmail, new List<string> { claim });
+                await mailboxService.NotifyClaimAssignmentToAssigner(userEmail, new List<string> { claim }, url);
+                return null;
             }
-            return autoAllocatedClaims;
+
+            // 4. Send Notification
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId, url));
+
+            return claimsInvestigation.PolicyDetail.ContractNumber; // Return allocated claim
+        }
+        public List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors)
+        {
+            // Get relevant status IDs in one query
+            var relevantStatuses = _context.InvestigationCaseSubStatus
+                .Where(i => new[]
+                {
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
+                }.Contains(i.Name.ToUpper()))
+                .Select(i => i.InvestigationCaseSubStatusId)
+                .ToHashSet(); // Improves lookup performance
+
+            // Fetch cases that match the criteria
+            var vendorCaseCount = _context.ClaimsInvestigation
+                .Where(c => !c.Deleted &&
+                            c.VendorId.HasValue &&
+                            c.AssignedToAgency &&
+                            relevantStatuses.Contains(c.InvestigationCaseSubStatusId))
+                .GroupBy(c => c.VendorId.Value)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            // Create the list of VendorIdWithCases
+            return existingVendors
+                .Select(vendorId => new VendorIdWithCases
+                {
+                    VendorId = vendorId,
+                    CaseCount = vendorCaseCount.GetValueOrDefault(vendorId, 0)
+                })
+                .ToList();
         }
 
         public List<VendorCaseModel> GetAgencyLoad(List<Vendor> existingVendors)
@@ -142,72 +301,34 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
 
             var claimsCases = _context.ClaimsInvestigation
-                .Include(c => c.BeneficiaryDetail)
-                .Include(c => c.Vendors)
                 .Where(c =>
+                !c.Deleted &&
                 c.VendorId.HasValue &&
+                c.AssignedToAgency &&
                 (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == requestedByAssessor.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
                 );
 
-            var vendorCaseCount = new Dictionary<long, int>();
+            var vendorCaseCount = claimsCases
+                .Where(c => c.VendorId.HasValue)
+                .GroupBy(c => c.VendorId.Value)
+                .ToDictionary(g => g.Key, g => g.Count());
 
-            int countOfCases = 0;
-            foreach (var claimsCase in claimsCases)
-            {
-                if (claimsCase.BeneficiaryDetail.BeneficiaryDetailId > 0)
+            var vendorWithCaseCounts = existingVendors
+                .Select(vendor => new VendorCaseModel
                 {
-                    if (claimsCase.VendorId.HasValue)
-                    {
-                        if (claimsCase.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
-                                claimsCase.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
-                                claimsCase.InvestigationCaseSubStatusId == requestedByAssessor.InvestigationCaseSubStatusId ||
-                                claimsCase.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
-                                )
-                        {
-                            if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.Value, out countOfCases))
-                            {
-                                vendorCaseCount.Add(claimsCase.VendorId.Value, 1);
-                            }
-                            else
-                            {
-                                int currentCount = vendorCaseCount[claimsCase.VendorId.Value];
-                                ++currentCount;
-                                vendorCaseCount[claimsCase.VendorId.Value] = currentCount;
-                            }
-                        }
-                    }
-                }
-            }
+                    Vendor = vendor,
+                    CaseCount = vendorCaseCount.GetValueOrDefault(vendor.VendorId, 0)
+                })
+                .ToList();
 
-            List<VendorCaseModel> vendorWithCaseCounts = new();
-
-            foreach (var existingVendor in existingVendors)
-            {
-                var vendorCase = vendorCaseCount.FirstOrDefault(v => v.Key == existingVendor.VendorId);
-                if (vendorCase.Key == existingVendor.VendorId)
-                {
-                    vendorWithCaseCounts.Add(new VendorCaseModel
-                    {
-                        CaseCount = vendorCase.Value,
-                        Vendor = existingVendor,
-                    });
-                }
-                else
-                {
-                    vendorWithCaseCounts.Add(new VendorCaseModel
-                    {
-                        CaseCount = 0,
-                        Vendor = existingVendor,
-                    });
-                }
-            }
             return vendorWithCaseCounts;
+
         }
 
-        public async Task AssignToAssigner(string userEmail, List<string> claims)
+        public async Task AssignToAssigner(string userEmail, List<string> claims, string url = "")
         {
             if (claims is not null && claims.Count > 0)
             {
@@ -219,8 +340,7 @@ namespace risk.control.system.Services
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
                 var assigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-                var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
+
                 foreach (var claimsInvestigation in cases2Assign)
                 {
                     claimsInvestigation.Updated = DateTime.Now;
@@ -230,9 +350,19 @@ namespace risk.control.system.Services
                     claimsInvestigation.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
                     claimsInvestigation.CurrentClaimOwner = currentUser.Email;
                     claimsInvestigation.AssignedToAgency = false;
-                    claimsInvestigation.IsReady2Assign = true;
+                    claimsInvestigation.STATUS = claimsInvestigation.IsValidCaseData() ? ALLOCATION_STATUS.READY : ALLOCATION_STATUS.PENDING;
+                    claimsInvestigation.IsReady2Assign = claimsInvestigation.IsValidCaseData() ? true :false;
                     claimsInvestigation.CREATEDBY = CREATEDBY.MANUAL;
                     claimsInvestigation.AutoAllocated = false;
+                    claimsInvestigation.ActiveView = 0;
+                    claimsInvestigation.ManualNew = 0;
+                    claimsInvestigation.AllocateView = 0;
+                    claimsInvestigation.AutoNew = 0;
+                    claimsInvestigation.VendorId = null;
+                    claimsInvestigation.Vendor = null;
+                    claimsInvestigation.AgencyDeclineComment = string.Empty;
+                    claimsInvestigation.CompanyWithdrawlComment = string.Empty;
+                    claimsInvestigation.AgencyWithdrawComment = string.Empty;
                     claimsInvestigation.InvestigationCaseSubStatusId = assigned.InvestigationCaseSubStatusId;
 
 
@@ -253,7 +383,7 @@ namespace risk.control.system.Services
                         Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                         CurrentClaimOwner = currentUser.Email,
                         ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                        InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
+                        InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
                         InvestigationCaseSubStatusId = assigned.InvestigationCaseSubStatusId,
                         UpdatedBy = currentUser.Email,
                         Updated = DateTime.Now
@@ -265,225 +395,336 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<ClientCompany> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId)
+        public async Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId)
         {
-            var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
-            var claimsInvestigation = _context.ClaimsInvestigation
-                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
-
-            var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
-            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-
-            claimsInvestigation.Updated = DateTime.Now;
-            claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
-            claimsInvestigation.CurrentUserEmail = userEmail;
-            claimsInvestigation.AssignedToAgency = false;
-            claimsInvestigation.CurrentClaimOwner = userEmail;
-            claimsInvestigation.UserEmailActioned = userEmail;
-            claimsInvestigation.UserEmailActionedTo = userEmail;
-            claimsInvestigation.UserRoleActionedTo = $"{company.Email}";
-            claimsInvestigation.CompanyWithdrawlComment = $"WITHDRAWN: {currentUser.Email} :{model.ClaimsInvestigation.CompanyWithdrawlComment}";
-            claimsInvestigation.ActiveView = 0;
-            claimsInvestigation.ManualNew = 0;
-            claimsInvestigation.AllocateView = 0;
-            claimsInvestigation.AutoNew = 0;
-            claimsInvestigation.VendorId = null;
-            claimsInvestigation.Vendor = null;
-
-            claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
-            claimsInvestigation.InvestigationCaseSubStatusId = withdrawnByCompany.InvestigationCaseSubStatusId;
-
-
-            var lastLog = _context.InvestigationTransaction
-                .Where(i =>
-                    i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                    .OrderByDescending(o => o.Created)?.FirstOrDefault();
-
-            var lastLogHop = _context.InvestigationTransaction
-                .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                .AsNoTracking().Max(s => s.HopCount);
-
-            var log = new InvestigationTransaction
-            {
-                HopCount = lastLogHop + 1,
-                UserEmailActioned = userEmail,
-                UserEmailActionedTo = userEmail,
-                UserRoleActionedTo = $"{company.Email}",
-                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                CurrentClaimOwner = userEmail,
-                ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = withdrawnByCompany.InvestigationCaseSubStatusId,
-                UpdatedBy = currentUser.Email,
-                Updated = DateTime.Now
-            };
-            _context.InvestigationTransaction.Add(log);
-            _context.ClaimsInvestigation.Update(claimsInvestigation);
             try
             {
+                var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+                var claimsInvestigation = _context.ClaimsInvestigation
+                    .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+                var vendorId = claimsInvestigation.VendorId;
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+
+                var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                           i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
+
+                claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
+                claimsInvestigation.CurrentUserEmail = userEmail;
+                claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
+                claimsInvestigation.AssignedToAgency = false;
+                claimsInvestigation.CurrentClaimOwner = userEmail;
+                claimsInvestigation.UserEmailActioned = userEmail;
+                claimsInvestigation.UserEmailActionedTo = userEmail;
+                claimsInvestigation.UserRoleActionedTo = $"{company.Email}";
+                claimsInvestigation.CompanyWithdrawlComment = $"WITHDRAWN: {currentUser.Email} :{model.ClaimsInvestigation.CompanyWithdrawlComment}";
+                claimsInvestigation.ActiveView = 0;
+                claimsInvestigation.ManualNew = 0;
+                claimsInvestigation.AllocateView = 0;
+                claimsInvestigation.AutoNew = 0;
+                claimsInvestigation.VendorId = null;
+                claimsInvestigation.Vendor = null;
+
+                claimsInvestigation.InvestigationCaseSubStatusId = withdrawnByCompany.InvestigationCaseSubStatusId;
+
+                var lastLog = _context.InvestigationTransaction
+                    .Where(i =>
+                        i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                        .OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+                var lastLogHop = _context.InvestigationTransaction
+                    .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                    .AsNoTracking().Max(s => s.HopCount);
+
+                var log = new InvestigationTransaction
+                {
+                    HopCount = lastLogHop + 1,
+                    UserEmailActioned = userEmail,
+                    UserEmailActionedTo = userEmail,
+                    UserRoleActionedTo = $"{company.Email}",
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                    CurrentClaimOwner = userEmail,
+                    ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = withdrawnByCompany.InvestigationCaseSubStatusId,
+                    UpdatedBy = currentUser.Email,
+                    Updated = DateTime.Now
+                };
+                _context.InvestigationTransaction.Add(log);
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+
                 var rows = await _context.SaveChangesAsync();
+                return (company, vendorId.GetValueOrDefault());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 throw;
             }
-            return company;
+        }
+
+        public async Task<Vendor> WithdrawCaseFromAgent(string userEmail, ClaimTransactionModel model, string claimId)
+        {
+            try
+            {
+                var currentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == userEmail);
+                var claimsInvestigation = _context.ClaimsInvestigation
+                    .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+                var allocatedToAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                           i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+
+                claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
+                claimsInvestigation.CurrentUserEmail = userEmail;
+                claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
+                claimsInvestigation.AssignedToAgency = false;
+                claimsInvestigation.CurrentClaimOwner = currentUser.Email;
+                claimsInvestigation.UserEmailActioned = userEmail;
+                claimsInvestigation.UserEmailActionedTo = string.Empty;
+                claimsInvestigation.AgencyWithdrawComment = $"WITHDRAWN: {currentUser.Email}";
+                claimsInvestigation.UserEmailActioned = userEmail;
+                claimsInvestigation.UserEmailActionedTo = string.Empty;
+                claimsInvestigation.UserRoleActionedTo = currentUser.Vendor.Email;
+                claimsInvestigation.AllocateView = 0;
+                claimsInvestigation.InvestigationCaseSubStatusId = allocatedToAgency.InvestigationCaseSubStatusId;
+                var lastLog = _context.InvestigationTransaction
+                    .Where(i =>
+                        i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                        .OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+                var lastLogHop = _context.InvestigationTransaction
+                    .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                    .AsNoTracking().Max(s => s.HopCount);
+
+                var log = new InvestigationTransaction
+                {
+                    HopCount = lastLogHop + 1,
+                    UserEmailActioned = userEmail,
+                    UserEmailActionedTo = string.Empty,
+                    UserRoleActionedTo = $"{currentUser.Vendor.Email}",
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                    CurrentClaimOwner = currentUser.Email,
+                    ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = allocatedToAgency.InvestigationCaseSubStatusId,
+                    UpdatedBy = currentUser.Email,
+                    Updated = DateTime.Now
+                };
+                _context.InvestigationTransaction.Add(log);
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+
+                var rows = await _context.SaveChangesAsync();
+                return currentUser.Vendor;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
 
         public async Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId)
         {
-            var currentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == userEmail);
-            var claimsInvestigation = _context.ClaimsInvestigation
-                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
-
-            var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
-            var assigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
-
-            claimsInvestigation.Updated = DateTime.Now;
-            claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
-            claimsInvestigation.CurrentUserEmail = userEmail;
-            claimsInvestigation.AssignedToAgency = false;
-            claimsInvestigation.CurrentClaimOwner = currentUser.Email;
-            claimsInvestigation.UserEmailActioned = userEmail;
-            claimsInvestigation.UserEmailActionedTo = string.Empty;
-            claimsInvestigation.AgencyDeclineComment = $"DECLINED: {currentUser.Email} :{model.ClaimsInvestigation.AgencyDeclineComment}";
-            claimsInvestigation.ActiveView = 0;
-            claimsInvestigation.AllocateView = 0;
-            claimsInvestigation.AutoNew = 0;
-            claimsInvestigation.VendorId = null;
-            claimsInvestigation.UserRoleActionedTo = $"{company.Email}";
-            claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
-            claimsInvestigation.InvestigationCaseSubStatusId = withdrawnByAgency.InvestigationCaseSubStatusId;
-            var lastLog = _context.InvestigationTransaction
-                .Where(i =>
-                    i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                    .OrderByDescending(o => o.Created)?.FirstOrDefault();
-
-            var lastLogHop = _context.InvestigationTransaction
-                .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                .AsNoTracking().Max(s => s.HopCount);
-
-            var log = new InvestigationTransaction
-            {
-                HopCount = lastLogHop + 1,
-                UserEmailActioned = userEmail,
-                UserEmailActionedTo = string.Empty,
-                UserRoleActionedTo = $"{company.Email}",
-                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                CurrentClaimOwner = currentUser.Email,
-                ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = withdrawnByAgency.InvestigationCaseSubStatusId,
-                UpdatedBy = currentUser.Email,
-                Updated = DateTime.Now
-            };
-            _context.InvestigationTransaction.Add(log);
-            _context.ClaimsInvestigation.Update(claimsInvestigation);
             try
             {
+                var currentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == userEmail);
+                var claimsInvestigation = _context.ClaimsInvestigation
+                    .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+
+                var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                           i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
+
+                claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
+                claimsInvestigation.CurrentUserEmail = userEmail;
+                claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
+                claimsInvestigation.AssignedToAgency = false;
+                claimsInvestigation.CurrentClaimOwner = currentUser.Email;
+                claimsInvestigation.UserEmailActioned = userEmail;
+                claimsInvestigation.UserEmailActionedTo = string.Empty;
+                claimsInvestigation.AgencyDeclineComment = $"DECLINED: {currentUser.Email} :{model.ClaimsInvestigation.AgencyDeclineComment}";
+                claimsInvestigation.ActiveView = 0;
+                claimsInvestigation.AllocateView = 0;
+                claimsInvestigation.AutoNew = 0;
+                claimsInvestigation.VendorId = null;
+                claimsInvestigation.UserRoleActionedTo = $"{company.Email}";
+                claimsInvestigation.InvestigationCaseSubStatusId = withdrawnByAgency.InvestigationCaseSubStatusId;
+                var lastLog = _context.InvestigationTransaction
+                    .Where(i =>
+                        i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                        .OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+                var lastLogHop = _context.InvestigationTransaction
+                    .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                    .AsNoTracking().Max(s => s.HopCount);
+
+                var log = new InvestigationTransaction
+                {
+                    HopCount = lastLogHop + 1,
+                    UserEmailActioned = userEmail,
+                    UserEmailActionedTo = string.Empty,
+                    UserRoleActionedTo = $"{company.Email}",
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                    CurrentClaimOwner = currentUser.Email,
+                    ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = withdrawnByAgency.InvestigationCaseSubStatusId,
+                    UpdatedBy = currentUser.Email,
+                    Updated = DateTime.Now
+                };
+                _context.InvestigationTransaction.Add(log);
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+
                 var rows = await _context.SaveChangesAsync();
+                return currentUser.Vendor;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 throw;
             }
-            return currentUser.Vendor;
         }
 
-        public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true)
+        public async Task<(string, string)> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool autoAllocated = true)
         {
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
-            var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-
-            var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
-            var allocatedToVendor = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            if (vendor != null)
+            try
             {
-                var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
+                // Fetch vendor & user details
+                var vendor = await _context.Vendor.FindAsync(vendorId);
+                var currentUser = await _context.ClientCompanyApplicationUser
+                    .Include(c => c.ClientCompany)
+                    .FirstOrDefaultAsync(u => u.Email == userEmail);
+
+                if (vendor == null || currentUser == null) return (string.Empty, string.Empty); // Handle missing data
+                var inProgressStatus = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INPROGRESS));
+
+                var subStatuses = await _context.InvestigationCaseSubStatus
+                    .Where(i => new[]
+                    {
+                        CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
+                    }.Contains(i.Name))
+                    .ToDictionaryAsync(i => i.Name, i => i.InvestigationCaseSubStatusId);
+
+                if (!subStatuses.TryGetValue(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR, out var allocatedToVendorId))
+                {
+                    return (string.Empty, string.Empty); // Handle missing status/substatus
+                }
+
+                // Fetch case
+                var claimsCase = await _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
-                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
-                claimsCaseToAllocateToVendor.AssignedToAgency = true;
-                claimsCaseToAllocateToVendor.Updated = DateTime.Now;
-                claimsCaseToAllocateToVendor.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + " (" + currentUser.Email + ")";
-                claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
+                    .FirstOrDefaultAsync(v => v.ClaimsInvestigationId == claimsInvestigationId);
 
-                claimsCaseToAllocateToVendor.EnablePassport = currentUser.ClientCompany.EnablePassport;
-                claimsCaseToAllocateToVendor.AiEnabled = currentUser.ClientCompany.AiEnabled;
-                claimsCaseToAllocateToVendor.EnableMedia = currentUser.ClientCompany.EnableMedia;
+                if (claimsCase == null) return (string.Empty, string.Empty); // Handle missing case
 
-                claimsCaseToAllocateToVendor.InvestigationCaseSubStatusId = allocatedToVendor.InvestigationCaseSubStatusId;
-                claimsCaseToAllocateToVendor.UserEmailActioned = userEmail;
-                claimsCaseToAllocateToVendor.UserEmailActionedTo = string.Empty;
-                claimsCaseToAllocateToVendor.UserRoleActionedTo = $"{vendor.Email}";
-                claimsCaseToAllocateToVendor.Vendors.Add(vendor);
-                claimsCaseToAllocateToVendor.VendorId = vendorId;
-                claimsCaseToAllocateToVendor.AllocateView = 0;
-                claimsCaseToAllocateToVendor.AutoAllocated = AutoAllocated;
-                claimsCaseToAllocateToVendor.AllocatedToAgencyTime = DateTime.Now;
-                claimsCaseToAllocateToVendor.CreatorSla = currentUser.ClientCompany.CreatorSla;
-                claimsCaseToAllocateToVendor.AssessorSla = currentUser.ClientCompany.AssessorSla;
-                claimsCaseToAllocateToVendor.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
-                claimsCaseToAllocateToVendor.AgentSla = currentUser.ClientCompany.AgentSla;
-                claimsCaseToAllocateToVendor.UpdateAgentReport = currentUser.ClientCompany.UpdateAgentReport;
-                claimsCaseToAllocateToVendor.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
-                _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
-                var lastLog = _context.InvestigationTransaction.Where(i =>
-                i.ClaimsInvestigationId == claimsCaseToAllocateToVendor.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+                // Update case details
+                claimsCase.STATUS = ALLOCATION_STATUS.COMPLETED;
+                claimsCase.AssignedToAgency = true;
+                claimsCase.Updated = DateTime.Now;
+                claimsCase.UpdatedBy = $"{currentUser.FirstName} {currentUser.LastName} ({currentUser.Email})";
+                claimsCase.CurrentUserEmail = userEmail;
+                claimsCase.EnablePassport = currentUser.ClientCompany.EnablePassport;
+                claimsCase.AiEnabled = currentUser.ClientCompany.AiEnabled;
+                claimsCase.EnableMedia = currentUser.ClientCompany.EnableMedia;
+                claimsCase.InvestigationCaseSubStatusId = allocatedToVendorId;
+                claimsCase.UserEmailActioned = userEmail;
+                claimsCase.AgencyWithdrawComment = string.Empty;
+                claimsCase.AgencyDeclineComment = string.Empty;
+                claimsCase.CompanyWithdrawlComment = string.Empty;
+                claimsCase.UserEmailActionedTo = string.Empty;
+                claimsCase.UserRoleActionedTo = vendor.Email;
+                claimsCase.VendorId = vendorId;
+                claimsCase.AllocateView = 0;
+                claimsCase.AutoAllocated = autoAllocated;
+                claimsCase.AllocatedToAgencyTime = DateTime.Now;
+                claimsCase.CreatorSla = currentUser.ClientCompany.CreatorSla;
+                claimsCase.AssessorSla = currentUser.ClientCompany.AssessorSla;
+                claimsCase.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
+                claimsCase.AgentSla = currentUser.ClientCompany.AgentSla;
+                claimsCase.UpdateAgentReport = currentUser.ClientCompany.UpdateAgentReport;
+                claimsCase.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
+                claimsCase.InvestigationCaseStatus = inProgressStatus;
+                claimsCase.InvestigationCaseSubStatusId = subStatuses[CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR];
+                claimsCase.Vendors.Add(vendor); // Ensures relationship update
+                _context.ClaimsInvestigation.Update(claimsCase);
 
-                var lastLogHop = _context.InvestigationTransaction
-                        .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
-                        .AsNoTracking().Max(s => s.HopCount);
+                // Get last transaction log
+                var lastLog = await _context.InvestigationTransaction
+                    .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
+                    .OrderByDescending(o => o.Created)
+                    .FirstOrDefaultAsync();
+
+                var lastLogHop = await _context.InvestigationTransaction
+                    .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
+                    .AsNoTracking()
+                    .MaxAsync(s => (int?)s.HopCount) ?? 0;
+
+                // Calculate time elapsed
                 string timeElapsed = GetTimeElaspedFromLog(lastLog);
 
+                // Create new transaction log
                 var log = new InvestigationTransaction
                 {
                     UserEmailActioned = userEmail,
-                    UserRoleActionedTo = $"{vendor.Email}",
-                    UserEmailActionedTo = "",
+                    UserRoleActionedTo = vendor.Email,
+                    UserEmailActionedTo = string.Empty,
                     HopCount = lastLogHop + 1,
-                    ClaimsInvestigationId = claimsCaseToAllocateToVendor.ClaimsInvestigationId,
-                    CurrentClaimOwner = claimsCaseToAllocateToVendor.CurrentClaimOwner,
-                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                    InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
-                    InvestigationCaseSubStatusId = allocatedToVendor.InvestigationCaseSubStatusId,
+                    ClaimsInvestigationId = claimsInvestigationId,
+                    CurrentClaimOwner = claimsCase.CurrentClaimOwner,
+                    Time2Update = lastLog != null ? (DateTime.Now - lastLog.Created).Days : 0,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = allocatedToVendorId,
                     UpdatedBy = currentUser.Email,
                     Updated = DateTime.Now,
                     TimeElapsed = timeElapsed
                 };
+
                 _context.InvestigationTransaction.Add(log);
 
+                // Save changes
                 await _context.SaveChangesAsync();
 
-                return claimsCaseToAllocateToVendor;
+                return (claimsCase.PolicyDetail.ContractNumber, claimsCase.InvestigationCaseSubStatus.Name);
+
             }
-            return null;
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
 
-        public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId, string drivingMap, string drivingDistance, 
-            string drivingDuration, string distanceInMeters, string durationInSeconds)
+        public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId)
         {
-            var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
-            var assignedToAgent = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var claim = _context.ClaimsInvestigation
-                .Include(c=>c.PolicyDetail)
-                .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
-            if (claim != null)
+            try
             {
+
+                var assignedToAgent = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+                var claim = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Include(c => c.AgencyReport)
+                    .Include(c => c.CustomerDetail).ThenInclude(c => c.PinCode).Include(c => c.BeneficiaryDetail)
+                    .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
                 var agentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
+                var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+
+                string drivingDistance, drivingDuration, drivingMap;
+                float distanceInMeters;
+                int durationInSeconds;
+                string LocationLatitude = string.Empty;
+                string LocationLongitude = string.Empty;
+                if (claim.PolicyDetail?.LineOfBusinessId == underWritingLineOfBusiness)
+                {
+                    LocationLatitude = claim.CustomerDetail?.Latitude;
+                    LocationLongitude = claim.CustomerDetail?.Longitude;
+                }
+                else
+                {
+                    LocationLatitude = claim.BeneficiaryDetail?.Latitude;
+                    LocationLongitude = claim.BeneficiaryDetail?.Longitude;
+                }
+                (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(double.Parse(agentUser.AddressLatitude), double.Parse(agentUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
                 claim.UserEmailActioned = currentUser;
                 claim.UserEmailActionedTo = agentUser.Email;
                 claim.UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agentUser.Vendor.Email})";
@@ -494,19 +735,20 @@ namespace risk.control.system.Services
                 claim.NotWithdrawable = true;
                 claim.NotDeclinable = true;
                 claim.CurrentClaimOwner = agentUser.Email;
+                claim.CompanyWithdrawlComment = string.Empty;
+                claim.AgencyWithdrawComment = string.Empty;
+                claim.AgencyDeclineComment = string.Empty;
                 claim.InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId;
                 claim.SelectedAgentDrivingDistance = drivingDistance;
                 claim.SelectedAgentDrivingDuration = drivingDuration;
-                claim.SelectedAgentDrivingDistanceInMetres = float.Parse(distanceInMeters);
-                claim.SelectedAgentDrivingDurationInSeconds = int.Parse(durationInSeconds);
+                claim.SelectedAgentDrivingDistanceInMetres = distanceInMeters;
+                claim.SelectedAgentDrivingDurationInSeconds = durationInSeconds;
                 claim.SelectedAgentDrivingMap = drivingMap;
                 claim.TaskToAgentTime = DateTime.Now;
                 var lastLog = _context.InvestigationTransaction.Where(i =>
                 i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
-                var lastLogHop = _context.InvestigationTransaction
-                                        .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
-                                        .AsNoTracking().Max(s => s.HopCount);
+                var lastLogHop = _context.InvestigationTransaction.Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId).AsNoTracking().Max(s => s.HopCount);
                 string timeElapsed = GetTimeElaspedFromLog(lastLog);
 
                 var log = new InvestigationTransaction
@@ -518,83 +760,111 @@ namespace risk.control.system.Services
                     ClaimsInvestigationId = claim.ClaimsInvestigationId,
                     CurrentClaimOwner = claim.CurrentClaimOwner,
                     Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                    InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId,
                     UpdatedBy = currentUser,
                     Updated = DateTime.Now,
                     TimeElapsed = timeElapsed
                 };
                 _context.InvestigationTransaction.Add(log);
+
+
+                var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+                var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+
+                if (isClaim)
+                {
+                    claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                    claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                    claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                    claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+                }
+                else
+                {
+                    claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                    claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                    claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                    claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+                }
+                _context.ClaimsInvestigation.Update(claim);
+                var rows = await _context.SaveChangesAsync();
+                return claim;
+
             }
-            _context.ClaimsInvestigation.Update(claim);
-            var rows = await _context.SaveChangesAsync();
-            return claim;
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
 
         public async Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, string claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4)
         {
-            var agent = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(a => a.Email.Trim().ToLower() == userEmail.ToLower());
-            var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
-                                   i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
-            var submitted2Supervisor = _context.InvestigationCaseSubStatus
-                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var claim = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
-
-            claim.VerifyView = 0;
-            claim.InvestigateView = 0;
-            claim.UserEmailActioned = userEmail;
-            claim.UserEmailActionedTo = string.Empty;
-            claim.UserRoleActionedTo = $"{agent.Vendor.Email}";
-            claim.Updated = DateTime.Now;
-            claim.UpdatedBy = agent.FirstName + " " + agent.LastName + "(" + agent.Email + ")";
-            claim.CurrentUserEmail = userEmail;
-            claim.CurrentClaimOwner = userEmail;
-            claim.InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId;
-            claim.SubmittedToSupervisorTime = DateTime.Now;
-            var claimReport = claim.AgencyReport;
-
-            claimReport.ReportQuestionaire.Answer1 = answer1;
-
-            Income? income = HtmlHelperExtensions.GetEnumFromDisplayName<Income>(answer2);
-            claimReport.ReportQuestionaire.Answer2 = income.ToString();
-            claimReport.ReportQuestionaire.Answer3 = answer3;
-            claimReport.ReportQuestionaire.Answer4 = answer4;
-            claimReport.AgentRemarks = remarks;
-            claimReport.AgentRemarksUpdated = DateTime.Now;
-            claimReport.AgentEmail = userEmail;
-
-            var lastLog = _context.InvestigationTransaction.Where(i =>
-               i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
-
-            var lastLogHop = _context.InvestigationTransaction
-                                       .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
-                                       .AsNoTracking().Max(s => s.HopCount);
-
-            var log = new InvestigationTransaction
-            {
-                ClaimsInvestigationId = claimsInvestigationId,
-                UserEmailActioned = agent.Email,
-                UserRoleActionedTo = $"{agent.Vendor.Email}",
-                HopCount = lastLogHop + 1,
-                CurrentClaimOwner = userEmail,
-                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId,
-                UpdatedBy = agent.Email,
-                Updated = DateTime.Now,
-                TimeElapsed = GetTimeElaspedFromLog(lastLog)
-            };
-            _context.InvestigationTransaction.Add(log);
-
-            _context.ClaimsInvestigation.Update(claim);
-
             try
             {
+                var agent = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(a => a.Email.Trim().ToLower() == userEmail.ToLower());
+
+                var submitted2Supervisor = _context.InvestigationCaseSubStatus
+                    .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+                var claim = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .ThenInclude(c => c.LineOfBusiness)
+                    .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.ReportQuestionaire)
+                    .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+
+                claim.AgencyDeclineComment = string.Empty;
+                claim.AgencyWithdrawComment = string.Empty;
+                claim.CompanyWithdrawlComment = string.Empty;
+                claim.VerifyView = 0;
+                claim.InvestigateView = 0;
+                claim.UserEmailActioned = userEmail;
+                claim.UserEmailActionedTo = string.Empty;
+                claim.UserRoleActionedTo = $"{agent.Vendor.Email}";
+                claim.Updated = DateTime.Now;
+                claim.UpdatedBy = agent.FirstName + " " + agent.LastName + "(" + agent.Email + ")";
+                claim.CurrentUserEmail = userEmail;
+                claim.CurrentClaimOwner = userEmail;
+                claim.InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId;
+                claim.SubmittedToSupervisorTime = DateTime.Now;
+                var claimReport = claim.AgencyReport;
+
+                claimReport.ReportQuestionaire.Answer1 = answer1;
+                claimReport.ReportQuestionaire.Answer2 = answer2;
+                claimReport.ReportQuestionaire.Answer3 = answer3;
+                claimReport.ReportQuestionaire.Answer4 = answer4;
+                claimReport.AgentRemarks = remarks;
+                claimReport.AgentRemarksUpdated = DateTime.Now;
+                claimReport.AgentEmail = userEmail;
+
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+                   i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+                var lastLogHop = _context.InvestigationTransaction
+                                           .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
+                                           .AsNoTracking().Max(s => s.HopCount);
+
+                var log = new InvestigationTransaction
+                {
+                    ClaimsInvestigationId = claimsInvestigationId,
+                    UserEmailActioned = agent.Email,
+                    UserRoleActionedTo = $"{agent.Vendor.Email}",
+                    HopCount = lastLogHop + 1,
+                    CurrentClaimOwner = userEmail,
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId,
+                    UpdatedBy = agent.Email,
+                    Updated = DateTime.Now,
+                    TimeElapsed = GetTimeElaspedFromLog(lastLog)
+                };
+                _context.InvestigationTransaction.Add(log);
+
+                _context.ClaimsInvestigation.Update(claim);
+
                 var rows = await _context.SaveChangesAsync();
                 return (agent.Vendor, claim.PolicyDetail.ContractNumber);
             }
@@ -645,30 +915,9 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c=>c.PinCode)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
                 .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.DigitalIdReport)
-                .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.PanIdReport)
-                .Include(r => r.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AiSummary = reportAiSummary;
@@ -710,55 +959,11 @@ namespace risk.control.system.Services
 
                 _context.InvestigationTransaction.Add(finalLog);
 
-                //create invoice
-
-                var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == claim.VendorId);
-                var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
-
-                //THIS SHOULD NOT HAPPEN IN PROD : demo purpose
-                if (investigationServiced == null)
-                {
-                    investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault();
-                }
-                //END
-                var investigatService = _context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
-
-                var invoice = new VendorInvoice
-                {
-                    ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
-                    GrandTotal = investigationServiced.Price + investigationServiced.Price * 10,
-                    NoteToRecipient = "Auto generated Invoice",
-                    Updated = DateTime.Now,
-                    Vendor = vendor,
-                    ClientCompany = currentUser.ClientCompany,
-                    UpdatedBy = userEmail,
-                    VendorId = vendor.VendorId,
-                    AgencyReportId = claim.AgencyReport?.AgencyReportId,
-                    SubTotal = investigationServiced.Price,
-                    TaxAmount = investigationServiced.Price * 10,
-                    InvestigationServiceType = investigatService,
-                    ClaimId = claimsInvestigationId
-                };
-
-                _context.VendorInvoice.Add(invoice);
-
-                string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
-
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-
-                var filename = "report" + claimsInvestigationId + ".pdf";
-
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
-
-                (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
-
-                claim.AgencyReport.PdfReportFilePath = filePath;
                 var saveCount = await _context.SaveChangesAsync();
 
+                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
+
+                var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
             catch (Exception ex)
@@ -767,44 +972,20 @@ namespace risk.control.system.Services
             }
             return (null!, string.Empty);
         }
-        
+
         private async Task<(ClientCompany, string)> ApproveCaseReport(string userEmail, string assessorRemarks, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
-            var approved = _context.InvestigationCaseSubStatus
-                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
-            var finished = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
 
             try
             {
+                var approved = _context.InvestigationCaseSubStatus
+                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+                var finished = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
+
                 var claim = _context.ClaimsInvestigation
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
                 .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.DigitalIdReport)
-                .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.PanIdReport)
-                .Include(r => r.Vendor)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-                .Include(r => r.AgencyReport)
-                .Include(r => r.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AiSummary = reportAiSummary;
@@ -846,56 +1027,11 @@ namespace risk.control.system.Services
 
                 _context.InvestigationTransaction.Add(finalLog);
 
-                //create invoice
-
-                var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == claim.VendorId);
-                var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
-
-                //THIS SHOULD NOT HAPPEN IN PROD : demo purpose
-                if (investigationServiced == null)
-                {
-                    investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault();
-                }
-                //END
-                var investigatService = _context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
-
-                var invoice = new VendorInvoice
-                {
-                    ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
-                    GrandTotal = investigationServiced.Price + investigationServiced.Price * 10,
-                    NoteToRecipient = "Auto generated Invoice",
-                    Updated = DateTime.Now,
-                    Vendor = vendor,
-                    ClientCompany = currentUser.ClientCompany,
-                    UpdatedBy = userEmail,
-                    VendorId = vendor.VendorId,
-                    AgencyReportId = claim.AgencyReport?.AgencyReportId,
-                    SubTotal = investigationServiced.Price,
-                    TaxAmount = investigationServiced.Price * 10,
-                    InvestigationServiceType = investigatService,
-                    ClaimId = claimsInvestigationId
-                };
-
-                _context.VendorInvoice.Add(invoice);
-
-                //create and save report
-
-                string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
-
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-
-                var filename = "report" + claimsInvestigationId + ".pdf";
-
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
-
-                (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
-
-                claim.AgencyReport.PdfReportFilePath = filePath;
                 var saveCount = await _context.SaveChangesAsync();
+
+                var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+
+                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
@@ -908,190 +1044,175 @@ namespace risk.control.system.Services
 
         private async Task<(ClientCompany, string)> ReAssignToCreator(string userEmail, string claimsInvestigationId, string assessorRemarks, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
-            var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-
-            var claimsCaseToReassign = _context.ClaimsInvestigation
-                .Include(c => c.PreviousClaimReports)
-                .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.PanIdReport)
-                .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Include(c => c.PolicyDetail)
-                .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
-
-
-            claimsCaseToReassign.AgencyReport.AiSummary = reportAiSummary;
-            claimsCaseToReassign.AgencyReport.AssessorRemarkType = assessorRemarkType;
-            claimsCaseToReassign.AgencyReport.AssessorRemarks = assessorRemarks;
-            claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated = DateTime.Now;
-            claimsCaseToReassign.ReviewByAssessorTime = DateTime.Now;
-            claimsCaseToReassign.AgencyReport.AssessorEmail = userEmail;
-            var reAssigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            var saveReport = new PreviousClaimReport
+            try
             {
-                ClaimsInvestigationId = claimsInvestigationId,
-                AgentEmail = claimsCaseToReassign.AgencyReport.AgentEmail,
-                DigitalIdReport = claimsCaseToReassign.AgencyReport.DigitalIdReport,
-                PanIdReport = claimsCaseToReassign.AgencyReport.PanIdReport,
-                AudioReport = claimsCaseToReassign.AgencyReport.AudioReport,
-                VideoReport = claimsCaseToReassign.AgencyReport.VideoReport,
-                PassportIdReport = claimsCaseToReassign.AgencyReport.PassportIdReport,
-                AgentRemarks = claimsCaseToReassign.AgencyReport.AgentRemarks,
-                AgentRemarksUpdated = claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated,
-                AssessorEmail = claimsCaseToReassign.AgencyReport.AssessorEmail,
-                AssessorRemarks = claimsCaseToReassign.AgencyReport.AssessorRemarks,
-                AssessorRemarkType = claimsCaseToReassign.AgencyReport.AssessorRemarkType,
-                AssessorRemarksUpdated = claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated,
-                ReportQuestionaire = claimsCaseToReassign.AgencyReport.ReportQuestionaire,
-                SupervisorEmail = claimsCaseToReassign.AgencyReport.SupervisorEmail,
-                SupervisorRemarks = claimsCaseToReassign.AgencyReport.SupervisorRemarks,
-                SupervisorRemarksUpdated = claimsCaseToReassign.AgencyReport.SupervisorRemarksUpdated,
-                SupervisorRemarkType = claimsCaseToReassign.AgencyReport.SupervisorRemarkType,
-                Updated = DateTime.Now,
-                UpdatedBy = userEmail,
-            };
-            var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
 
-            var newReport = new AgencyReport
+
+                var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+
+                var claimsCaseToReassign = _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
+                    .Include(c => c.AgencyReport.DigitalIdReport)
+                    .Include(c => c.AgencyReport.PanIdReport)
+                    .Include(c => c.AgencyReport.ReportQuestionaire)
+                    .Include(c => c.PolicyDetail)
+                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+
+
+                claimsCaseToReassign.AgencyReport.AiSummary = reportAiSummary;
+                claimsCaseToReassign.AgencyReport.AssessorRemarkType = assessorRemarkType;
+                claimsCaseToReassign.AgencyReport.AssessorRemarks = assessorRemarks;
+                claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated = DateTime.Now;
+                claimsCaseToReassign.ReviewByAssessorTime = DateTime.Now;
+                claimsCaseToReassign.AgencyReport.AssessorEmail = userEmail;
+                var reAssigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+
+                var newReport = new AgencyReport
+                {
+                    ReportQuestionaire = new ReportQuestionaire(),
+                    PanIdReport = new DocumentIdReport(),
+                    PassportIdReport = new DocumentIdReport(),
+                    DigitalIdReport = new DigitalIdReport()
+                };
+                claimsCaseToReassign.AgencyReport.DigitalIdReport = new DigitalIdReport();
+                claimsCaseToReassign.AgencyReport.PanIdReport = new DocumentIdReport();
+                claimsCaseToReassign.AgencyReport.PassportIdReport = new DocumentIdReport();
+                claimsCaseToReassign.AgencyReport.ReportQuestionaire = new ReportQuestionaire();
+
+                claimsCaseToReassign.AssignedToAgency = false;
+                claimsCaseToReassign.ReviewCount += 1;
+                claimsCaseToReassign.UserEmailActioned = userEmail;
+                claimsCaseToReassign.UserEmailActionedTo = string.Empty;
+                claimsCaseToReassign.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
+                claimsCaseToReassign.Updated = DateTime.Now;
+                claimsCaseToReassign.UpdatedBy = userEmail;
+                claimsCaseToReassign.VendorId = null;
+                claimsCaseToReassign.CurrentUserEmail = userEmail;
+                claimsCaseToReassign.IsReviewCase = true;
+                claimsCaseToReassign.AssessView = 0;
+                claimsCaseToReassign.ActiveView = 0;
+                claimsCaseToReassign.AllocateView = 0;
+                claimsCaseToReassign.VerifyView = 0;
+                claimsCaseToReassign.AssessView = 0;
+                claimsCaseToReassign.ManualNew = 0;
+                claimsCaseToReassign.CurrentClaimOwner = currentUser.Email;
+                claimsCaseToReassign.InvestigationCaseSubStatusId = reAssigned.InvestigationCaseSubStatusId;
+                claimsCaseToReassign.ProcessedByAssessorTime = DateTime.Now;
+                _context.ClaimsInvestigation.Update(claimsCaseToReassign);
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+                                i.ClaimsInvestigationId == claimsCaseToReassign.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+                var lastLogHop = _context.InvestigationTransaction
+                                           .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
+                    .AsNoTracking().Max(s => s.HopCount);
+
+                var log = new InvestigationTransaction
+                {
+                    IsReviewCase = true,
+                    HopCount = lastLogHop + 1,
+                    UserEmailActioned = userEmail,
+                    UserRoleActionedTo = $"{currentUser.ClientCompany.Email}",
+                    ClaimsInvestigationId = claimsCaseToReassign.ClaimsInvestigationId,
+                    Created = DateTime.Now,
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = reAssigned.InvestigationCaseSubStatusId,
+                    UpdatedBy = userEmail,
+                    CurrentClaimOwner = currentUser.Email,
+                    Updated = DateTime.Now,
+                    TimeElapsed = GetTimeElaspedFromLog(lastLog)
+                };
+                _context.InvestigationTransaction.Add(log);
+
+                return await _context.SaveChangesAsync() > 0 ? (currentUser.ClientCompany, claimsCaseToReassign.PolicyDetail.ContractNumber) : (null!, string.Empty);
+            }
+            catch (Exception ex)
             {
-                ReportQuestionaire = new ReportQuestionaire(),
-                PanIdReport = new DocumentIdReport(),
-                PassportIdReport = new DocumentIdReport(),
-                DigitalIdReport = new DigitalIdReport()
-            };
-            claimsCaseToReassign.PreviousClaimReports.Add(saveReport);
-            claimsCaseToReassign.AgencyReport.DigitalIdReport = new DigitalIdReport();
-            claimsCaseToReassign.AgencyReport.PanIdReport = new DocumentIdReport();
-            claimsCaseToReassign.AgencyReport.PassportIdReport = new DocumentIdReport();
-            claimsCaseToReassign.AgencyReport.ReportQuestionaire = new ReportQuestionaire();
-
-            claimsCaseToReassign.AssignedToAgency = false;
-            claimsCaseToReassign.ReviewCount += 1;
-            claimsCaseToReassign.UserEmailActioned = userEmail;
-            claimsCaseToReassign.UserEmailActionedTo = string.Empty;
-            claimsCaseToReassign.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
-            claimsCaseToReassign.Updated = DateTime.Now;
-            claimsCaseToReassign.UpdatedBy = userEmail;
-            claimsCaseToReassign.VendorId = null;
-            claimsCaseToReassign.CurrentUserEmail = userEmail;
-            claimsCaseToReassign.IsReviewCase = true;
-            claimsCaseToReassign.AssessView = 0;
-            claimsCaseToReassign.ActiveView = 0;
-            claimsCaseToReassign.AllocateView = 0;
-            claimsCaseToReassign.VerifyView = 0;
-            claimsCaseToReassign.AssessView = 0;
-            claimsCaseToReassign.ManualNew = 0;
-            claimsCaseToReassign.CurrentClaimOwner = currentUser.Email;
-            claimsCaseToReassign.InvestigationCaseSubStatusId = reAssigned.InvestigationCaseSubStatusId;
-            claimsCaseToReassign.ProcessedByAssessorTime = DateTime.Now;
-            _context.ClaimsInvestigation.Update(claimsCaseToReassign);
-            var lastLog = _context.InvestigationTransaction.Where(i =>
-                            i.ClaimsInvestigationId == claimsCaseToReassign.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
-
-            var lastLogHop = _context.InvestigationTransaction
-                                       .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
-                .AsNoTracking().Max(s => s.HopCount);
-
-            var log = new InvestigationTransaction
-            {
-                IsReviewCase = true,
-                HopCount = lastLogHop + 1,
-                UserEmailActioned = userEmail,
-                UserRoleActionedTo = $"{currentUser.ClientCompany.Email}",
-                ClaimsInvestigationId = claimsCaseToReassign.ClaimsInvestigationId,
-                Created = DateTime.Now,
-                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = reAssigned.InvestigationCaseSubStatusId,
-                UpdatedBy = userEmail,
-                CurrentClaimOwner = currentUser.Email,
-                Updated = DateTime.Now,
-                TimeElapsed = GetTimeElaspedFromLog(lastLog)
-            };
-            _context.InvestigationTransaction.Add(log);
-
-            return await _context.SaveChangesAsync() > 0 ? (currentUser.ClientCompany, claimsCaseToReassign.PolicyDetail.ContractNumber) : (null!, string.Empty);
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
 
-        private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId,  string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
+        private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
         {
-            var claim = _context.ClaimsInvestigation
+            try
+            {
+                var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.AgencyReport)
                 .Include(c => c.Vendor)
                 .Include(c => c.ClientCompany)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
-            var submitted2Assessor = _context.InvestigationCaseSubStatus
-                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var lastLog = _context.InvestigationTransaction.Where(i =>
-                i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
-            claim.AssignedToAgency = false;
-            claim.IsReviewCase = false;
-            claim.UserEmailActioned = userEmail;
-            claim.UserEmailActionedTo = string.Empty;
-            claim.UserRoleActionedTo = $"{claim.ClientCompany.Email}";
-            claim.UserEmailActionedTo = string.Empty;
-            claim.Updated = DateTime.Now;
-            claim.UpdatedBy = userEmail;
-            claim.NotDeclinable = true;
-            claim.CurrentUserEmail = userEmail;
-            claim.CurrentClaimOwner = userEmail;
-            claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
-            claim.InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId;
-            claim.SubmittedToAssessorTime = DateTime.Now;
-            var report = claim.AgencyReport;
-            var edited = report.AgentRemarks.Trim() != editRemarks.Trim();
-            if(edited)
-            {
-                report.AgentRemarksEdit = editRemarks;
-                report.AgentRemarksEditUpdated = DateTime.Now;
-            }
-            
-            report.SupervisorRemarkType = reportUpdateStatus;
-            report.SupervisorRemarks = supervisorRemarks;
-            report.SupervisorRemarksUpdated = DateTime.Now;
-            report.SupervisorEmail = userEmail;
+                var submitted2Assessor = _context.InvestigationCaseSubStatus
+                    .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+                    i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+                claim.AssignedToAgency = false;
+                claim.IsReviewCase = false;
+                claim.UserEmailActioned = userEmail;
+                claim.UserEmailActionedTo = string.Empty;
+                claim.UserRoleActionedTo = $"{claim.ClientCompany.Email}";
+                claim.UserEmailActionedTo = string.Empty;
+                claim.Updated = DateTime.Now;
+                claim.UpdatedBy = userEmail;
+                claim.NotDeclinable = true;
+                claim.CurrentUserEmail = userEmail;
+                claim.CurrentClaimOwner = userEmail;
+                claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
+                claim.InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId;
+                claim.SubmittedToAssessorTime = DateTime.Now;
+                var report = claim.AgencyReport;
+                var edited = report.AgentRemarks.Trim() != editRemarks.Trim();
+                if (edited)
+                {
+                    report.AgentRemarksEdit = editRemarks;
+                    report.AgentRemarksEditUpdated = DateTime.Now;
+                }
 
-            if (claimDocument is not null)
-            {
-                using var dataStream = new MemoryStream();
-                claimDocument.CopyTo(dataStream);
-                report.SupervisorAttachment = dataStream.ToArray();
-                report.SupervisorFileName = Path.GetFileName(claimDocument.FileName);
-                report.SupervisorFileExtension = Path.GetExtension(claimDocument.FileName);
-                report.SupervisorFileType = claimDocument.ContentType;
-            }
+                report.SupervisorRemarkType = reportUpdateStatus;
+                report.SupervisorRemarks = supervisorRemarks;
+                report.SupervisorRemarksUpdated = DateTime.Now;
+                report.SupervisorEmail = userEmail;
 
-            report.Vendor = claim.Vendor;
-            _context.AgencyReport.Update(report);
-            _context.ClaimsInvestigation.Update(claim);
+                if (claimDocument is not null)
+                {
+                    using var dataStream = new MemoryStream();
+                    claimDocument.CopyTo(dataStream);
+                    report.SupervisorAttachment = dataStream.ToArray();
+                    report.SupervisorFileName = Path.GetFileName(claimDocument.FileName);
+                    report.SupervisorFileExtension = Path.GetExtension(claimDocument.FileName);
+                    report.SupervisorFileType = claimDocument.ContentType;
+                }
 
-            var lastLogHop = _context.InvestigationTransaction
-                                       .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
-                .AsNoTracking().Max(s => s.HopCount);
+                report.Vendor = claim.Vendor;
+                _context.AgencyReport.Update(report);
+                _context.ClaimsInvestigation.Update(claim);
 
-            var log = new InvestigationTransaction
-            {
-                HopCount = lastLogHop + 1,
-                ClaimsInvestigationId = claimsInvestigationId,
-                UserEmailActioned = userEmail,
-                UserRoleActionedTo = $"{claim.ClientCompany.Email}",
-                CurrentClaimOwner = userEmail,
-                Created = DateTime.Now,
-                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId,
-                UpdatedBy = userEmail,
-                Updated = DateTime.Now,
-                TimeElapsed = GetTimeElaspedFromLog(lastLog),
-                AgentAnswerEdited = edited
-            };
-            _context.InvestigationTransaction.Add(log);
-            _context.ClaimsInvestigation.Update(claim);
-            try
-            {
+                var lastLogHop = _context.InvestigationTransaction
+                                           .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
+                    .AsNoTracking().Max(s => s.HopCount);
+
+                var log = new InvestigationTransaction
+                {
+                    HopCount = lastLogHop + 1,
+                    ClaimsInvestigationId = claimsInvestigationId,
+                    UserEmailActioned = userEmail,
+                    UserRoleActionedTo = $"{claim.ClientCompany.Email}",
+                    CurrentClaimOwner = userEmail,
+                    Created = DateTime.Now,
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId,
+                    UpdatedBy = userEmail,
+                    Updated = DateTime.Now,
+                    TimeElapsed = GetTimeElaspedFromLog(lastLog),
+                    AgentAnswerEdited = edited
+                };
+                _context.InvestigationTransaction.Add(log);
+                _context.ClaimsInvestigation.Update(claim);
+
                 return await _context.SaveChangesAsync() > 0 ? claim : null;
             }
             catch (Exception ex)
@@ -1103,116 +1224,127 @@ namespace risk.control.system.Services
 
         private async Task<ClaimsInvestigation> ReAllocateToVendorAgent(string userEmail, string claimsInvestigationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
         {
-            var agencyUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(s => s.Email == userEmail);
-
-
-            var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
-                .Include(c => c.AgencyReport)
-                .Include(c => c.PolicyDetail)
-                .Include(p => p.ClientCompany)
-                .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
-
-            var report = claimsCaseToAllocateToVendor.AgencyReport;
-            report.SupervisorRemarkType = reportUpdateStatus;
-            report.SupervisorRemarks = supervisorRemarks;
-
-            claimsCaseToAllocateToVendor.UserEmailActioned = userEmail;
-            claimsCaseToAllocateToVendor.UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agencyUser.Vendor.Email})";
-            claimsCaseToAllocateToVendor.Updated = DateTime.Now;
-            claimsCaseToAllocateToVendor.UpdatedBy = userEmail;
-            claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
-            claimsCaseToAllocateToVendor.IsReviewCase = true;
-            claimsCaseToAllocateToVendor.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
-            claimsCaseToAllocateToVendor.TaskToAgentTime = DateTime.Now;
-            _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
-
-            var lastLog = _context.InvestigationTransaction.Where(i =>
-                 i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
-
-            var lastLogHop = _context.InvestigationTransaction
-                                        .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
-                 .AsNoTracking().Max(s => s.HopCount);
-
-            var log = new InvestigationTransaction
+            try
             {
-                HopCount = lastLogHop + 1,
-                UserEmailActioned = userEmail,
-                UserRoleActionedTo = $"{claimsCaseToAllocateToVendor.ClientCompany.Email}",
-                ClaimsInvestigationId = claimsInvestigationId,
-                Created = DateTime.Now,
-                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId,
-                UpdatedBy = userEmail,
-                Updated = DateTime.Now,
-                TimeElapsed = GetTimeElaspedFromLog(lastLog)
-            };
-            _context.InvestigationTransaction.Add(log);
 
-            return await _context.SaveChangesAsync() > 0 ? claimsCaseToAllocateToVendor : null;
+                var agencyUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(s => s.Email == userEmail);
+
+                var assignedToAgentSubStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
+                var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
+                    .Include(c => c.PolicyDetail)
+                    .Include(p => p.ClientCompany)
+                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+
+                var report = claimsCaseToAllocateToVendor.AgencyReport;
+                report.SupervisorRemarkType = reportUpdateStatus;
+                report.SupervisorRemarks = supervisorRemarks;
+
+                claimsCaseToAllocateToVendor.UserEmailActioned = userEmail;
+                claimsCaseToAllocateToVendor.UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agencyUser.Vendor.Email})";
+                claimsCaseToAllocateToVendor.Updated = DateTime.Now;
+                claimsCaseToAllocateToVendor.UpdatedBy = userEmail;
+                claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
+                claimsCaseToAllocateToVendor.IsReviewCase = true;
+                claimsCaseToAllocateToVendor.InvestigationCaseSubStatusId = assignedToAgentSubStatus;
+                claimsCaseToAllocateToVendor.TaskToAgentTime = DateTime.Now;
+                _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
+
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+                     i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+                var lastLogHop = _context.InvestigationTransaction
+                                            .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
+                     .AsNoTracking().Max(s => s.HopCount);
+
+                var log = new InvestigationTransaction
+                {
+                    HopCount = lastLogHop + 1,
+                    UserEmailActioned = userEmail,
+                    UserRoleActionedTo = $"{claimsCaseToAllocateToVendor.ClientCompany.Email}",
+                    ClaimsInvestigationId = claimsInvestigationId,
+                    Created = DateTime.Now,
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = assignedToAgentSubStatus,
+                    UpdatedBy = userEmail,
+                    Updated = DateTime.Now,
+                    TimeElapsed = GetTimeElaspedFromLog(lastLog)
+                };
+                _context.InvestigationTransaction.Add(log);
+
+                return await _context.SaveChangesAsync() > 0 ? claimsCaseToAllocateToVendor : null;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
 
         public async Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument)
         {
-            var claim = _context.ClaimsInvestigation
+
+            try
+            {
+                var claim = _context.ClaimsInvestigation
                 .Include(c => c.AgencyReport)
                 .Include(c => c.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
 
-            var requestedByAssessor = _context.InvestigationCaseSubStatus
-               .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
-            var lastLog = _context.InvestigationTransaction.Where(i =>
-                i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+                var requestedByAssessor = _context.InvestigationCaseSubStatus
+                   .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+                    i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
-            claim.InvestigationCaseSubStatusId = requestedByAssessor.InvestigationCaseSubStatusId;
-            claim.UpdatedBy = userEmail;
-            claim.UserEmailActioned = userEmail;
-            claim.AssignedToAgency = true;
-            claim.IsQueryCase = true;
-            claim.UserRoleActionedTo = $"{claim.Vendor.Email}";
+                claim.InvestigationCaseSubStatusId = requestedByAssessor.InvestigationCaseSubStatusId;
+                claim.UpdatedBy = userEmail;
+                claim.UserEmailActioned = userEmail;
+                claim.AssignedToAgency = true;
+                claim.IsQueryCase = true;
+                claim.UserRoleActionedTo = $"{claim.Vendor.Email}";
 
-            if (messageDocument != null)
-            {
-                using var ms = new MemoryStream();
-                messageDocument.CopyTo(ms);
-                request.QuestionImageAttachment = ms.ToArray();
-                request.QuestionImageFileName = Path.GetFileName(messageDocument.FileName);
-                request.QuestionImageFileExtension = Path.GetExtension(messageDocument.FileName);
-                request.QuestionImageFileType = messageDocument.ContentType;
-            }
-            claim.AgencyReport.EnquiryRequest = request;
-            claim.AgencyReport.Updated = DateTime.Now;
-            claim.AgencyReport.UpdatedBy = userEmail;
-            claim.AgencyReport.EnquiryRequest.Updated = DateTime.Now;
-            claim.AgencyReport.EnquiryRequest.UpdatedBy = userEmail;
-            claim.EnquiredByAssessorTime = DateTime.Now;
-            _context.QueryRequest.Update(request);
-            _context.ClaimsInvestigation.Update(claim);
+                if (messageDocument != null)
+                {
+                    using var ms = new MemoryStream();
+                    messageDocument.CopyTo(ms);
+                    request.QuestionImageAttachment = ms.ToArray();
+                    request.QuestionImageFileName = Path.GetFileName(messageDocument.FileName);
+                    request.QuestionImageFileExtension = Path.GetExtension(messageDocument.FileName);
+                    request.QuestionImageFileType = messageDocument.ContentType;
+                }
+                claim.AgencyReport.EnquiryRequest = request;
+                claim.AgencyReport.Updated = DateTime.Now;
+                claim.AgencyReport.UpdatedBy = userEmail;
+                claim.AgencyReport.EnquiryRequest.Updated = DateTime.Now;
+                claim.AgencyReport.EnquiryRequest.UpdatedBy = userEmail;
+                claim.EnquiredByAssessorTime = DateTime.Now;
+                _context.QueryRequest.Update(request);
+                _context.ClaimsInvestigation.Update(claim);
 
-            var lastLogHop = _context.InvestigationTransaction
-                                       .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
-                .AsNoTracking().Max(s => s.HopCount);
+                var lastLogHop = _context.InvestigationTransaction
+                                           .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
+                    .AsNoTracking().Max(s => s.HopCount);
 
-            var log = new InvestigationTransaction
-            {
-                HopCount = lastLogHop + 1,
-                ClaimsInvestigationId = claim.ClaimsInvestigationId,
-                UserEmailActioned = userEmail,
-                UserRoleActionedTo = $"{claim.Vendor.Email}",
-                CurrentClaimOwner = userEmail,
-                Created = DateTime.Now,
-                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = requestedByAssessor.InvestigationCaseSubStatusId,
-                UpdatedBy = userEmail,
-                Updated = DateTime.Now,
-                TimeElapsed = GetTimeElaspedFromLog(lastLog)
-            };
-            _context.InvestigationTransaction.Add(log);
+                var log = new InvestigationTransaction
+                {
+                    HopCount = lastLogHop + 1,
+                    ClaimsInvestigationId = claim.ClaimsInvestigationId,
+                    UserEmailActioned = userEmail,
+                    UserRoleActionedTo = $"{claim.Vendor.Email}",
+                    CurrentClaimOwner = userEmail,
+                    Created = DateTime.Now,
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = requestedByAssessor.InvestigationCaseSubStatusId,
+                    UpdatedBy = userEmail,
+                    Updated = DateTime.Now,
+                    TimeElapsed = GetTimeElaspedFromLog(lastLog)
+                };
+                _context.InvestigationTransaction.Add(log);
 
-            try
-            {
                 return await _context.SaveChangesAsync() > 0 ? claim : null;
             }
             catch (Exception ex)
@@ -1224,7 +1356,10 @@ namespace risk.control.system.Services
 
         public async Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault)
         {
-            var claim = _context.ClaimsInvestigation
+
+            try
+            {
+                var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(p => p.ClientCompany)
                 .Include(c => c.AgencyReport)
@@ -1234,81 +1369,79 @@ namespace risk.control.system.Services
                 .Include(c => c.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
 
-            var replyByAgency = _context.InvestigationCaseSubStatus
-               .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
-            var lastLog = _context.InvestigationTransaction.Where(i =>
-                i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+                var replyByAgency = _context.InvestigationCaseSubStatus
+                   .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+                    i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
-            claim.InvestigationCaseSubStatusId = replyByAgency.InvestigationCaseSubStatusId;
-            claim.UpdatedBy = userEmail;
-            claim.UserEmailActioned = userEmail;
-            claim.AssignedToAgency = false;
-            claim.AssessView = 0;
-            claim.UserRoleActionedTo = $"{claim.ClientCompany.Email}";
-            claim.EnquiryReplyByAssessorTime = DateTime.Now;
-            claim.SubmittedToAssessorTime = DateTime.Now;
-            var enquiryRequest = claim.AgencyReport.EnquiryRequest;
-            enquiryRequest.Answer = request.Answer;
-            if (flexRadioDefault[0] == "a")
-            {
-                enquiryRequest.AnswerSelected = enquiryRequest.AnswerA;
-            }
-            else if (flexRadioDefault[0] == "b")
-            {
-                enquiryRequest.AnswerSelected = enquiryRequest.AnswerB;
-            }
-            else if (flexRadioDefault[0] == "c")
-            {
-                enquiryRequest.AnswerSelected = enquiryRequest.AnswerC;
-            }
+                claim.InvestigationCaseSubStatusId = replyByAgency.InvestigationCaseSubStatusId;
+                claim.UpdatedBy = userEmail;
+                claim.UserEmailActioned = userEmail;
+                claim.AssignedToAgency = false;
+                claim.AssessView = 0;
+                claim.UserRoleActionedTo = $"{claim.ClientCompany.Email}";
+                claim.EnquiryReplyByAssessorTime = DateTime.Now;
+                claim.SubmittedToAssessorTime = DateTime.Now;
+                var enquiryRequest = claim.AgencyReport.EnquiryRequest;
+                enquiryRequest.Answer = request.Answer;
+                if (flexRadioDefault[0] == "a")
+                {
+                    enquiryRequest.AnswerSelected = enquiryRequest.AnswerA;
+                }
+                else if (flexRadioDefault[0] == "b")
+                {
+                    enquiryRequest.AnswerSelected = enquiryRequest.AnswerB;
+                }
+                else if (flexRadioDefault[0] == "c")
+                {
+                    enquiryRequest.AnswerSelected = enquiryRequest.AnswerC;
+                }
 
-            else if (flexRadioDefault[0] == "d")
-            {
-                enquiryRequest.AnswerSelected = enquiryRequest.AnswerD;
-            }
+                else if (flexRadioDefault[0] == "d")
+                {
+                    enquiryRequest.AnswerSelected = enquiryRequest.AnswerD;
+                }
 
-            enquiryRequest.Updated = DateTime.Now;
-            enquiryRequest.UpdatedBy = userEmail;
+                enquiryRequest.Updated = DateTime.Now;
+                enquiryRequest.UpdatedBy = userEmail;
 
-            if (messageDocument != null)
-            {
-                using var ms = new MemoryStream();
-                messageDocument.CopyTo(ms);
-                enquiryRequest.AnswerImageAttachment = ms.ToArray();
-                enquiryRequest.AnswerImageFileName = Path.GetFileName(messageDocument.FileName);
-                enquiryRequest.AnswerImageFileExtension = Path.GetExtension(messageDocument.FileName);
-                enquiryRequest.AnswerImageFileType = messageDocument.ContentType;
-            }
+                if (messageDocument != null)
+                {
+                    using var ms = new MemoryStream();
+                    messageDocument.CopyTo(ms);
+                    enquiryRequest.AnswerImageAttachment = ms.ToArray();
+                    enquiryRequest.AnswerImageFileName = Path.GetFileName(messageDocument.FileName);
+                    enquiryRequest.AnswerImageFileExtension = Path.GetExtension(messageDocument.FileName);
+                    enquiryRequest.AnswerImageFileType = messageDocument.ContentType;
+                }
 
-            claim.AgencyReport.EnquiryRequests.Add(enquiryRequest);
+                claim.AgencyReport.EnquiryRequests.Add(enquiryRequest);
 
-            _context.QueryRequest.Update(enquiryRequest);
-            claim.AgencyReport.EnquiryRequests.Add(enquiryRequest);
-            _context.ClaimsInvestigation.Update(claim);
+                _context.QueryRequest.Update(enquiryRequest);
+                claim.AgencyReport.EnquiryRequests.Add(enquiryRequest);
+                _context.ClaimsInvestigation.Update(claim);
 
-            var lastLogHop = _context.InvestigationTransaction
-                                       .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
-                .AsNoTracking().Max(s => s.HopCount);
+                var lastLogHop = _context.InvestigationTransaction
+                                           .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
+                    .AsNoTracking().Max(s => s.HopCount);
 
-            var log = new InvestigationTransaction
-            {
-                HopCount = lastLogHop + 1,
-                ClaimsInvestigationId = claim.ClaimsInvestigationId,
-                UserEmailActioned = userEmail,
-                UserRoleActionedTo = $"{claim.Vendor.Email}",
-                CurrentClaimOwner = userEmail,
-                Created = DateTime.Now,
-                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = replyByAgency.InvestigationCaseSubStatusId,
-                UpdatedBy = userEmail,
-                Updated = DateTime.Now,
-                TimeElapsed = GetTimeElaspedFromLog(lastLog)
-            };
-            _context.InvestigationTransaction.Add(log);
+                var log = new InvestigationTransaction
+                {
+                    HopCount = lastLogHop + 1,
+                    ClaimsInvestigationId = claim.ClaimsInvestigationId,
+                    UserEmailActioned = userEmail,
+                    UserRoleActionedTo = $"{claim.Vendor.Email}",
+                    CurrentClaimOwner = userEmail,
+                    Created = DateTime.Now,
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                    InvestigationCaseStatusId = lastLog.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = replyByAgency.InvestigationCaseSubStatusId,
+                    UpdatedBy = userEmail,
+                    Updated = DateTime.Now,
+                    TimeElapsed = GetTimeElaspedFromLog(lastLog)
+                };
+                _context.InvestigationTransaction.Add(log);
 
-            try
-            {
                 return await _context.SaveChangesAsync() > 0 ? claim : null;
             }
             catch (Exception ex)
@@ -1360,5 +1493,43 @@ namespace risk.control.system.Services
             }
             return timeElapsed;
         }
+
+        public async Task<int> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations)
+        {
+            try
+            {
+                if (claimsInvestigations == null || !claimsInvestigations.Any())
+                    return 0; // No cases to update
+
+                // Fetch all matching cases in one query
+                var cases = await _context.ClaimsInvestigation
+                    .Where(v => claimsInvestigations.Contains(v.ClaimsInvestigationId))
+                    .ToListAsync();
+
+                if (!cases.Any())
+                    return 0; // No matching cases found
+
+                // Update the status only for cases that are not already PENDING
+                foreach (var claimsCase in cases)
+                {
+                    if (claimsCase.STATUS != ALLOCATION_STATUS.PENDING)
+                    {
+                        claimsCase.STATUS = ALLOCATION_STATUS.PENDING;
+                        claimsCase.UpdatedBy = userEmail;
+                        claimsCase.Updated = DateTime.Now;
+                    }
+                }
+
+                _context.ClaimsInvestigation.UpdateRange(cases);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the error properly instead of just rethrowing
+                Console.WriteLine("Error updating case allocation status", ex);
+                throw;
+            }
+        }
+
     }
 }

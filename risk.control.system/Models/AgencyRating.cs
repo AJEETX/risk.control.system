@@ -14,6 +14,7 @@ namespace risk.control.system.Models
         public string IpAddress { get; set; }
         public long VendorId { get; set; }
 
+        public string UserEmail { get; set; }
         public virtual Vendor? Vendor { get; set; }
         public override string ToString()
         {

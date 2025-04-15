@@ -78,8 +78,6 @@ namespace risk.control.system.Models
         public string? AddressMapLocation { get; set; }
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
-        public List<ClientCompanyApplicationUser>? CompanyApplicationUser { get; set; }
-
         public List<Vendor>? EmpanelledVendors { get; set; } = new();
         public bool AutoAllocation { get; set; } = false;
         public bool VerifyPan { get; set; } = false;
@@ -93,7 +91,6 @@ namespace risk.control.system.Models
         public string? PassportApiUrl { get; set; } = "https://document-ocr1.p.rapidapi.com/idr";
         public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
-        public bool EnableMailbox { get; set; } = false;
         public bool CanChangePassword { get; set; } = false;
         public string? MobileAppUrl { get; set; } = Applicationsettings.APP_URL;
         public bool BulkUpload { get; set; } = false;
@@ -103,15 +100,16 @@ namespace risk.control.system.Models
 
         [DataType(DataType.DateTime)]
         public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(10);
-        [Range(5, 50)]
-        public int TotalCreatedClaimAllowed { get; set; } = 10;
+        [Range(10, 50)]
+        public int TotalCreatedClaimAllowed { get; set; } = 50;
+        public int TotalToAssignMaxAllowed { get; set; } = 50;
         public bool Deleted { get; set; } = false;
         public bool HasClaims { get; set; } = false;
         public bool AiEnabled { get; set; } = false;
 
-        public int CreatorSla { get; set; } = 5;
-        public int AssessorSla { get; set; } = 5;
-        public int SupervisorSla { get; set; } = 5;
+        public int CreatorSla { get; set; } = 2;
+        public int AssessorSla { get; set; } = 4;
+        public int SupervisorSla { get; set; } = 2;
         public int AgentSla { get; set; } = 5;
         public bool UpdateAgentReport { get; set; } = false;
         public bool UpdateAgentAnswer { get; set; } = false;
@@ -136,7 +134,6 @@ namespace risk.control.system.Models
                 $"- Activated Date: {ActivatedDate}\n" +
                 $"- Status: {Status}\n" +
                 $"- Document URL: {DocumentUrl}\n" +
-                $"- Company Application User: {CompanyApplicationUser}\n" +
                 $"- Empanelled Vendors: {EmpanelledVendors}\n" +
                 $"- Auto Allocation: {AutoAllocation}\n" +
                 $"- Verify Pan: {VerifyPan}\n" +

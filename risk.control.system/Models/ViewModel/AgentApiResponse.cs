@@ -125,6 +125,7 @@
         public string ClaimId { get; set; }
         public string LocationImage { get; set; }
         public string LocationLongLat { get; set; }
+        public string? Type { get; set; } = "0";
     }
 
     public class DocumentData

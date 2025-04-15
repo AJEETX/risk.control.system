@@ -5,7 +5,7 @@
 
         <div class="small-box bg-danger">
             <div class="inner">
-                <h3 id="new-claims">@Model.FirstBlockCount</h3>
+                <h4 id="new-claims" title="CLAIMS: @Model.FirstBlockCount | UNDERWRITINGS: @Model.UnderwritingCount" data-toggle="tooltip">@Model.FirstBlockCount | @Model.UnderwritingCount</h4>
                 <span>@Model.FirstBlockName</span>
             </div>
             <div class="icon">
@@ -32,7 +32,7 @@
 
         <div class="small-box bg-primary">
             <div class="inner">
-                <h3 id="active-claims">@Model.SecondBBlockCount</h3>
+                <h4 id="active-claims" title="CLAIMS: @Model.SecondBBlockCount | UNDERWRITINGS: @Model.SecondBlockCount" data-toggle="tooltip">@Model.SecondBBlockCount | @Model.SecondBlockCount</h4>
                 <span>@Model.SecondBBlockName</span>
             </div>
             <div class="icon">
@@ -45,7 +45,7 @@
 
         <div class="small-box bg-info">
             <div class="inner">
-                <h3 id="submit-claims">@Model.ThirdBlockCount</h3>
+                <h4 id="submit-claims" title="CLAIMS: @Model.ThirdBlockCount | UNDERWRITINGS: @Model.ApprovedUnderwritingCount" data-toggle="tooltip">@Model.ThirdBlockCount | @Model.ApprovedUnderwritingCount</h4>
                 <span>@Model.ThirdBlockName</span>
             </div>
             <div class="icon">
@@ -59,7 +59,7 @@
 
         <div class="small-box bg-secondary">
             <div class="inner">
-                <h3 id="approved-claims">@Model.LastBlockCount</h3>
+                <h4 id="approved-claims" title="CLAIMS: @Model.LastBlockCount | UNDERWRITINGS: @Model.RejectedUnderwritingCount" data-toggle="tooltip">@Model.LastBlockCount | @Model.RejectedUnderwritingCount</h4>
                 <span>@Model.LastBlockName</span>
             </div>
             <div class="icon">
@@ -102,7 +102,7 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div class="card card-light collapsed-card">
+        <div class="card card-light direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Pie Chart</h3>
                 <div class="card-tools">
@@ -119,7 +119,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card card-light collapsed-card">
+        <div class="card card-light direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Underwritings Pie Chart</h3>
                 <div class="card-tools">
@@ -138,7 +138,7 @@
 </div>
 <div class="row">
     <div class="col-md-6">
-        <div class="card card-light  collapsed-card">
+        <div class="card card-light  direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims(Agency-wise): Pie Chart</h3>
                 <div class="card-tools">
@@ -155,7 +155,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card card-light  collapsed-card">
+        <div class="card card-light  direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Underwritings(Agency-wise): Pie Chart</h3>
                 <div class="card-tools">
@@ -174,7 +174,7 @@
 </div>
 <div class="row">
     <div class="col-md-6">
-        <div class="card card-light collapsed-card">
+        <div class="card card-light direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Cases Bar Chart</h3>
                 <div class="card-tools">
@@ -191,7 +191,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card card-light collapsed-card">
+        <div class="card card-light direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Turn Around Time </h3>
                 <div class="card-tools">

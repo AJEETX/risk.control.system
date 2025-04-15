@@ -17,10 +17,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartBreadcrumbs.Nodes;
 using risk.control.system.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Hangfire;
+using Amazon.Textract;
+using Microsoft.AspNetCore.Http;
 
 namespace risk.control.system.Controllers.Company
 {
-    [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class CreatorPostController : Controller
     {
         private const string CLAIMS = "claims";
@@ -31,7 +34,10 @@ namespace risk.control.system.Controllers.Company
         private readonly ICreatorService creatorService;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IInvestigationReportService investigationReportService;
+        private readonly IProgressService progressService;
+        private readonly IBackgroundJobClient backgroundJobClient;
         private readonly IClaimPolicyService claimPolicyService;
 
         public CreatorPostController(ApplicationDbContext context,
@@ -41,7 +47,10 @@ namespace risk.control.system.Controllers.Company
             ICreatorService creatorService,
             IFtpService ftpService,
             INotyfService notifyService,
+            IHttpContextAccessor httpContextAccessor,
             IInvestigationReportService investigationReportService,
+            IProgressService progressService,
+            IBackgroundJobClient backgroundJobClient,
             IClaimPolicyService claimPolicyService)
         {
             _context = context;
@@ -52,7 +61,10 @@ namespace risk.control.system.Controllers.Company
             this.creatorService = creatorService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
+            this.httpContextAccessor = httpContextAccessor;
             this.investigationReportService = investigationReportService;
+            this.progressService = progressService;
+            this.backgroundJobClient = backgroundJobClient;
         }
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
@@ -61,146 +73,130 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
-                var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
                 if (postedFile == null || model == null ||
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
                 string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
                 Path.GetExtension(Path.GetFileName(postedFile.FileName)) != ".zip"
                 )
                 {
-                    notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
-                    if (model == null)
-                    {
-                        return RedirectToAction(nameof(Index), "Dashboard");
-                    }
-
-                    if (companyUser.ClientCompany.AutoAllocation)
-                    {
-                        if(model.CREATEDBY == CREATEDBY.MANUAL)
-                        {
-                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                        }
-                        else
-                        {
-                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                        }
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-                    }
+                    notifyService.Custom($"Invalid File Upload Error. ", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(ClaimsLogController.Uploads), "ClaimsLog");
                 }
 
-                bool processed = false;
-                if (model.Uploadtype == UploadType.FTP)
-                {
-                    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
-                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                if (model.Uploadtype == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
+                var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, model.UploadAndAssign);
+                var jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId, baseUrl,model.UploadAndAssign));
+                progressService.AddUploadJob(jobId, currentUserEmail);
+                if(!model.UploadAndAssign)
                 {
-
-                    processed = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
-                }
-
-                if (processed)
-                {
-                    notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} complete ", 3, "green", "fa fa-upload");
+                    notifyService.Custom($"Upload in progress ", 3, "#17A2B8", "fa fa-upload");
                 }
                 else
                 {
-                    notifyService.Information($"{model.Uploadtype.GetEnumDisplayName()} Error. Check limit <i class='fa fa-upload' ></i>", 3);
+                    notifyService.Custom($"Direct Assign in progress ", 5, "#dc3545", "fa fa-upload");
+
                 }
-                if(companyUser.ClientCompany.AutoAllocation)
-                {
-                    if (model.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-                }
+
+                return RedirectToAction(nameof(ClaimsLogController.Uploads), "ClaimsLog", new { uploadId = uploadId });
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(ClaimsLogController.Uploads), "ClaimsLog");
             }
+        }
+
+        [HttpGet]
+        public IActionResult GetJobStatus()
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var jobIds = progressService.GetUploadJobIds(currentUserEmail);
+
+            if (jobIds == null || jobIds.Count == 0)
+            {
+                return Json(new { jobId = "", status = "Not Found" });
+            }
+
+            using (var connection = JobStorage.Current.GetConnection())
+            {
+                foreach (var jobId in jobIds)
+                {
+                    var state = connection.GetStateData(jobId);
+                    string jobStatus = state?.Name ?? "Not Found";
+
+                    // Return first active job (Processing or Enqueued)
+                    if (jobStatus == "Processing" || jobStatus == "Enqueued")
+                    {
+                        return Json(new { jobId, status = jobStatus });
+                    }
+                }
+            }
+
+            // If no active jobs are found, return the last completed job
+            return Json(new { jobId = jobIds.Last(), status = "Completed or Failed" });
+        }
+
+        public IActionResult GetJobProgress(int jobId)
+        {
+            int progress = progressService.GetProgress(jobId);
+            return Json(new { progress });
+        }
+
+        public IActionResult GetAssignmentProgress(string jobId)
+        {
+            int progress = progressService.GetAssignmentProgress(jobId);
+            return Json(new { progress });
         }
 
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> CreatePolicy(ClaimsInvestigation model)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                if (model == null)
+                if (model == null || model.PolicyDetail == null || model.PolicyDetail.LineOfBusinessId == 0 || model.PolicyDetail.InvestigationServiceTypeId == 0 || model.PolicyDetail.CostCentreId == 0 ||
+                     string.IsNullOrWhiteSpace(model.PolicyDetail.ContractNumber) || model.PolicyDetail.CaseEnablerId == 0 || string.IsNullOrWhiteSpace(model.PolicyDetail.CauseOfLoss) ||
+                     model.PolicyDetail.SumAssuredValue < 1 || model.PolicyDetail.DateOfIncident == null || model.PolicyDetail.ContractIssueDate == null || model.PolicyDetail?.Document == null && !model.PolicyDetail.IsValidPolicy())
                 {
-                    notifyService.Error("OOPs !!!..Claim Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                IFormFile documentFile = null;
-                var files = Request.Form?.Files;
+                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
 
-                if (files != null && files.Count > 0)
-                {
-                    var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
-                    if (file != null && file.Length > 2000000)
-                    {
-                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto", new { model });
-                    }
-                    if (file != null)
-                    {
-                        documentFile = file;
-                    }
+                    return RedirectToAction(nameof(CreatorAutoController.CreatePolicy), "CreatorAuto");
                 }
-                var claim = await creationService.CreatePolicy(currentUserEmail, model, documentFile);
+                var files = Request.Form?.Files;
+                if (files == null || files.Count == 0)
+                {
+                    notifyService.Warning("No Image Uploaded Error !!! ");
+                    return RedirectToAction(nameof(CreatorAutoController.CreatePolicy), "CreatorAuto");
+                }
+                var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
+                if (file == null)
+                {
+                    notifyService.Warning("Invalid Image Uploaded Error !!! ");
+                    return RedirectToAction(nameof(CreatorAutoController.CreatePolicy), "CreatorAuto");
+                }
+
+                var claim = await creationService.CreatePolicy(currentUserEmail, model, file);
                 if (claim == null)
                 {
-                    notifyService.Error("OOPs !!!..Error creating policy");
-                    if (claim.ClientCompany.AutoAllocation)
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Create), "CreatorManual");
-                    }
+                    notifyService.Error("Error Creating Case detail");
+                    return RedirectToAction(nameof(CreatorAutoController.CreatePolicy), "CreatorAuto");
                 }
                 else
                 {
                     notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
                 }
-
-                if (claim.ClientCompany.AutoAllocation)
-                {
-                    if (model.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -213,16 +209,28 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation model)
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (model == null || string.IsNullOrWhiteSpace(claimsInvestigationId))
+                if (string.IsNullOrWhiteSpace(claimsInvestigationId))
                 {
-                    notifyService.Error("OOPs !!!..Claim Not found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
+
+                    return RedirectToAction(nameof(CreatorAutoController.CreatePolicy), "CreatorAuto");
                 }
+                if (model == null || model.PolicyDetail == null || model.PolicyDetail.LineOfBusinessId == 0 || model.PolicyDetail.InvestigationServiceTypeId == 0 || model.PolicyDetail.CostCentreId == 0 ||
+                    string.IsNullOrWhiteSpace(model.PolicyDetail.ContractNumber) || model.PolicyDetail.CaseEnablerId == 0 || string.IsNullOrWhiteSpace(model.PolicyDetail.CauseOfLoss) ||
+                    model.PolicyDetail.SumAssuredValue < 1 || model.PolicyDetail.DateOfIncident == null || model.PolicyDetail.ContractIssueDate == null &&  !model.PolicyDetail.IsValidPolicy())
+                {
+                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
+
+                    return RedirectToAction(nameof(CreatorAutoController.EditPolicy), "CreatorAuto",new {id = claimsInvestigationId });
+                }
+
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                
                 IFormFile documentFile = null;
                 IFormFile profileFile = null;
                 var files = Request.Form?.Files;
@@ -240,27 +248,10 @@ namespace risk.control.system.Controllers.Company
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error editing policy");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CreatorAutoController.EditPolicy), "CreatorAuto", new { id  = claimsInvestigationId });
                 }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
-                
-                if (claim.ClientCompany.AutoAllocation)
-                {
-                    if (model.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        ViewBag.ActiveTab = "manual";
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
-                    }
-
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -273,51 +264,46 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> CreateCustomer(CustomerDetail customerDetail)
         {
             try
             {
-                if (customerDetail == null || customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1)
+                if (customerDetail == null || string.IsNullOrWhiteSpace(customerDetail.ClaimsInvestigationId))
                 {
-                    notifyService.Error("OOPs !!!..Error creating customer");
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
+                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
+                    return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
+                }
+                if (customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 ||
+                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber) ||
+                    customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null || customerDetail.ProfileImage == null)
+                {
+                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
+                    return RedirectToAction(nameof(CreatorAutoController.CreateCustomer), "CreatorAuto",new {id = customerDetail.ClaimsInvestigationId });
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var files = Request.Form?.Files;
                 if (files == null || files.Count == 0)
                 {
-                    notifyService.Warning("Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Warning("No Image Uploaded Error !!! ");
+                    return RedirectToAction(nameof(CreatorAutoController.CreateCustomer), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
+
                 }
                 var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
                 if (file == null)
                 {
-                    notifyService.Warning("Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Warning("Invalid Image Uploaded Error !!! ");
+                    return RedirectToAction(nameof(CreatorAutoController.CreateCustomer), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
                 }
                 var company = await creationService.CreateCustomer(currentUserEmail, customerDetail, file);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CreatorAutoController.CreateCustomer), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
                 }
                 notifyService.Custom($"Customer {customerDetail.Name} added successfully", 3, "green", "fas fa-user-plus");
-                if(company.AutoAllocation)
-                {
-                    if (customerDetail.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -334,10 +320,17 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (customerDetail == null || customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1)
+                if(customerDetail == null || string.IsNullOrWhiteSpace(claimsInvestigationId))
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
+                    return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
+                }
+                if (customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 || 
+                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber)  ||
+                    customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null)
+                {
+                    notifyService.Error("OOPs !!!..Error creating customer");
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claimsInvestigationId });
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 IFormFile profileFile = null;
@@ -355,24 +348,10 @@ namespace risk.control.system.Controllers.Company
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CreatorAutoController.EditCustomer), "CreatorAuto", new { id = claimsInvestigationId });
                 }
                 notifyService.Custom($"Customer {customerDetail.Name} edited successfully", 3, "orange", "fas fa-user-plus");
-                if ( company.AutoAllocation)
-                {
-                    if (customerDetail.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -389,7 +368,14 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(ClaimsInvestigationId) || beneficiary == null || beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1)
+                if (string.IsNullOrWhiteSpace(ClaimsInvestigationId))
+                {
+                    notifyService.Error("OOPs !!!..Error creating customer");
+                    return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
+                }
+                if (beneficiary == null || beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1 ||
+                    string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelationId < 1 || string.IsNullOrWhiteSpace(beneficiary.ContactNumber) ||
+                    beneficiary.DateOfBirth == null || beneficiary.Income == null || beneficiary.ProfileImage == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
                     return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
@@ -399,37 +385,24 @@ namespace risk.control.system.Controllers.Company
                 var files = Request.Form?.Files;
                 if (files == null || files.Count == 0)
                 {
-                    notifyService.Warning("Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Warning("No Image Uploaded Error !!! ");
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
                 }
 
                 var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
                 if (file == null)
                 {
-                    notifyService.Warning("Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Warning("Invalid Image Error !!! ");
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
                 }
                 var company = await creationService.CreateBeneficiary(currentUserEmail, ClaimsInvestigationId, beneficiary, file);
-                if (company != null)
+                if(company == null)
                 {
-                    notifyService.Custom($"Beneficiary {beneficiary.Name} added successfully", 3, "green", "fas fa-user-tie");
+                    notifyService.Warning("Error creating Beneficiary !!! ");
+                    return RedirectToAction(nameof(CreatorAutoController.CreateBeneficiary), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
                 }
-
-                if(company.AutoAllocation)
-                {
-                    if (beneficiary.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
-                }
+                notifyService.Custom($"Beneficiary {beneficiary.Name} added successfully", 3, "green", "fas fa-user-tie");
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -442,14 +415,22 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> EditBeneficiary(long beneficiaryDetailId, BeneficiaryDetail beneficiary)
         {
             try
             {
-                if (beneficiaryDetailId < 0 || beneficiary == null || beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1)
+                if (beneficiaryDetailId < 0 || beneficiary == null || string.IsNullOrWhiteSpace(beneficiary.ClaimsInvestigationId))
                 {
-                    notifyService.Error("OOPs !!!..Error creating customer");
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
+                    notifyService.Error("OOPs !!!..Error editing customer");
+                    return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
+                }
+                if (beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1 ||
+                    string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelationId < 1 || string.IsNullOrWhiteSpace(beneficiary.ContactNumber) ||
+                    beneficiary.DateOfBirth == null || beneficiary.Income == null)
+                {
+                    notifyService.Error("OOPs !!!..Error editing customer");
+                    return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
@@ -465,26 +446,16 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
                 var company = await creationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
+                if(company == null)
+                {
+                    notifyService.Error("OOPs !!!..Error editing customer");
+
+                }
                 if (company != null)
                 {
                     notifyService.Custom($"Beneficiary {beneficiary.Name} edited successfully", 3, "orange", "fas fa-user-tie");
                 }
-
-                if (company.AutoAllocation)
-                {
-                    if (beneficiary.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -521,14 +492,7 @@ namespace risk.control.system.Controllers.Company
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                if(companyUser.ClientCompany.AutoAllocation)
-                {
-                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-                }
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
             catch (Exception ex)
             {
@@ -537,5 +501,48 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
+        [HttpPost, ActionName("DeleteCases")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> DeleteCases([FromBody] DeleteRequestModel request)
+        {
+            if (request.claims == null || request.claims.Count == 0)
+            {
+                return Json(new { success = false, message = "No cases selected for deletion." });
+            }
+
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                foreach (var claim in request.claims)
+                {
+                    var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(claim);
+                    if (claimsInvestigation == null)
+                    {
+                        notifyService.Error("Not Found!!!..Contact Admin");
+                        return RedirectToAction(nameof(Index), "Dashboard");
+                    }
+
+                    claimsInvestigation.Updated = DateTime.Now;
+                    claimsInvestigation.UpdatedBy = currentUserEmail;
+                    claimsInvestigation.Deleted = true;
+                    _context.ClaimsInvestigation.Update(claimsInvestigation);
+                }
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        public class DeleteRequestModel
+        {
+            public List<string> claims { get; set; }
+        }
+
     }
 }

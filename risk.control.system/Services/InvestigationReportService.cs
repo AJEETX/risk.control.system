@@ -2,6 +2,7 @@
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -18,11 +19,11 @@ namespace risk.control.system.Services
         Task<ClaimsInvestigation> GetAssignDetails(string id);
         EnquiryRequest GetQueryReport(string currentUserEmail, string id);
 
-        PreviousClaimReport GetPreviousReport(long id);
     }
-
     public class InvestigationReportService : IInvestigationReportService
     {
+        private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext _context;
 
         public InvestigationReportService(ApplicationDbContext context)
@@ -44,11 +45,11 @@ namespace risk.control.system.Services
                 .Where(t => t.ClaimsInvestigationId == selectedcase)
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
-            var claimsInvestigation = await _context.ClaimsInvestigation
+            var claim = await _context.ClaimsInvestigation
               .Include(c => c.ClientCompany)
               .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
-              .Include(c => c.PreviousClaimReports)
+              .Include(c => c.AgencyReport.AgentIdReport)
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.PanIdReport)
               .Include(c => c.AgencyReport.PassportIdReport)
@@ -89,20 +90,38 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == selectedcase);
             if (isAgencyUser)
             {
-                var customerContactMasked = new string('*', claimsInvestigation.CustomerDetail.ContactNumber.Length - 4) + claimsInvestigation.CustomerDetail.ContactNumber.Substring(claimsInvestigation.CustomerDetail.ContactNumber.Length - 4);
-                claimsInvestigation.CustomerDetail.ContactNumber = customerContactMasked;
+                var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.Length - 4) + claim.CustomerDetail.ContactNumber.Substring(claim.CustomerDetail.ContactNumber.Length - 4);
+                claim.CustomerDetail.ContactNumber = customerContactMasked;
 
-                var beneficairyContactMasked = new string('*', claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Substring(claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+                var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
 
-                claimsInvestigation.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+                claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
 
                 location.ContactNumber = beneficairyContactMasked;
             }
             
-            var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
+            var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claim.AgencyReport.AgencyReportId);
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
             var model = new ClaimTransactionModel
             {
-                ClaimsInvestigation = claimsInvestigation,
+                ClaimsInvestigation = claim,
                 Log = caseLogs,
                 Location = location,
                 VendorInvoice = invoice,
@@ -139,7 +158,6 @@ namespace risk.control.system.Services
                 .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
-              .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.PanIdReport)
               .Include(c => c.AgencyReport.PassportIdReport)
@@ -188,7 +206,7 @@ namespace risk.control.system.Services
                 .Where(t => t.ClaimsInvestigationId == id)
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
-            var claimsInvestigation = await _context.ClaimsInvestigation
+            var claim = await _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.LineOfBusiness)
                 .Include(c => c.PolicyDetail)
@@ -200,7 +218,6 @@ namespace risk.control.system.Services
                 .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
-                  .Include(c => c.PreviousClaimReports)
                   .Include(c => c.AgencyReport.DigitalIdReport)
                   .Include(c => c.AgencyReport.PanIdReport)
                   .Include(c => c.AgencyReport.PassportIdReport)
@@ -232,17 +249,36 @@ namespace risk.control.system.Services
                 .Include(c=>c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
-            var location = claimsInvestigation.BeneficiaryDetail;
+            var location = claim.BeneficiaryDetail;
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(u=>u.Email == currentUserEmail);
+            
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
 
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
             var model = new ClaimTransactionModel
             {
-                ClaimsInvestigation = claimsInvestigation,
+                ClaimsInvestigation = claim,
+                CaseIsValidToAssign = claim.IsValidCaseData(),
                 Log = caseLogs,
                 Location = location,
-                Assigned = claimsInvestigation.InvestigationCaseSubStatus == assignedStatus,
+                Assigned = claim.InvestigationCaseSubStatus == assignedStatus,
                 AutoAllocation = companyUser.ClientCompany.AutoAllocation
             };
 
@@ -251,13 +287,13 @@ namespace risk.control.system.Services
 
         public ClaimsInvestigationVendorsModel GetInvestigateReport(string currentUserEmail, string selectedcase)
         {
-            var claimsInvestigation = _context.ClaimsInvestigation
+            var claim = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
-                .Include(c => c.PreviousClaimReports)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.EnquiryRequest)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.EnquiryRequests)
+                .Include(c => c.AgencyReport.AgentIdReport)
                 .Include(c => c.AgencyReport.DigitalIdReport)
                 .Include(c => c.AgencyReport.PanIdReport)
                 .Include(c => c.AgencyReport.PassportIdReport)
@@ -303,27 +339,36 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
 
-            if (claimsInvestigation.IsReviewCase)
+            if (claim.IsReviewCase)
             {
-                claimsInvestigation.AgencyReport.AssessorRemarks = null;
+                claim.AgencyReport.AssessorRemarks = null;
             }
-            return (new ClaimsInvestigationVendorsModel { AgencyReport = claimsInvestigation.AgencyReport, Location = claimCase, ClaimsInvestigation = claimsInvestigation, 
-                TrialVersion = companyUser?.ClientCompany?.LicenseType == Standard.Licensing.LicenseType.Trial });
-        }
+            ClaimsInvestigationVendorsModel model = null;
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
 
-        public PreviousClaimReport GetPreviousReport(long id)
-        {
-            var report = _context.PreviousClaimReport
-                .Include(r=>r.Vendor)
-                .Include(r=>r.ClaimsInvestigation)
-                .Include(r=>r.DigitalIdReport)
-                .Include(r=>r.PanIdReport)
-                .Include(r=>r.AudioReport)
-                .Include(r=>r.VideoReport)
-                .Include(r=>r.PassportIdReport)
-                .Include(r=>r.ReportQuestionaire)
-                .FirstOrDefault(r => r.PreviousClaimReportId == id);
-            return report;
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+
+            if (claim.AgencyReport == null)
+            {
+                claim.AgencyReport = new AgencyReport();
+            }
+
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+            return (new ClaimsInvestigationVendorsModel { AgencyReport = claim.AgencyReport, Location = claimCase, ClaimsInvestigation = claim, 
+                TrialVersion = companyUser?.ClientCompany?.LicenseType == Standard.Licensing.LicenseType.Trial });
         }
 
         public EnquiryRequest GetQueryReport(string currentUserEmail, string id)

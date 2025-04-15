@@ -17,19 +17,23 @@ namespace risk.control.system.Seeds
     public class CompanyInsurer
     {
         public static async Task< List<ClientCompany>> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
-                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, 
-                    InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor,
                     ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager)
         {
-            var allianz = new SeedInput { COUNTRY = "us", DOMAIN = "allianz.com", NAME = "Allianz", PHOTO = "/img/allianz.png" };
+            var allianz = new SeedInput { COUNTRY = "au", DOMAIN = "allianz.com", NAME = "Allianz", PHOTO = "/img/allianz.png" };
             var insurer = new SeedInput { COUNTRY = "au", DOMAIN = "insurer.com", NAME = "Insurer", PHOTO = "/img/insurer.jpg" };
             var canara = new SeedInput { COUNTRY = "in", DOMAIN = "canara.com", NAME = "Allianz", PHOTO = "/img/chl.jpg" };
             
-            var companies = new List<SeedInput> { allianz, insurer, canara };
+            var companies = new List<SeedInput> {
+                //allianz
+                //,
+                insurer
+                ,
+                canara
+            };
 
             foreach (var company in companies)
             {
-                _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager, company);
+                _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company);
             }
 
             await context.SaveChangesAsync(null, false);

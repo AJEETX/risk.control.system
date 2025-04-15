@@ -17,10 +17,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
-            var mailBox = new Mailbox
-            {
-                Name = PORTAL_ADMIN.EMAIL
-            };
+            
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(PORTAL_ADMIN.PROFILE_IMAGE));
@@ -34,7 +31,6 @@ namespace risk.control.system.Seeds
             //Seed portal admin
             var portalAdmin = new ApplicationUser()
             {
-                Mailbox = mailBox,
                 UserName = PORTAL_ADMIN.USERNAME,
                 Email = PORTAL_ADMIN.EMAIL,
                 FirstName = PORTAL_ADMIN.FIRST_NAME,

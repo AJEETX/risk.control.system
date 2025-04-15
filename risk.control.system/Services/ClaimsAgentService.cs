@@ -85,5 +85,19 @@ namespace risk.control.system.Services
             var result = await checkifyService.GetFaceId(data);
             return result;
         }
+
+        public async Task<AppiCheckifyResponse> PostAgentId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null)
+        {
+            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
+            var data = new FaceData
+            {
+                Email = userEmail,
+                ClaimId = claimId,
+                LocationImage = Convert.ToBase64String(image),
+                LocationLongLat = locationLongLat
+            };
+            var result = await checkifyService.GetAgentId(data);
+            return result;
+        }
     }
 }

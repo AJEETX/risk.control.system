@@ -91,7 +91,6 @@ namespace risk.control.system.Controllers
             user.EmailConfirmed = true;
             user.Email = user.Email.Trim().ToLower();
             user.UserName = user.Email;
-            user.Mailbox = new Mailbox { Name = user.Email };
             user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
 

@@ -32,6 +32,7 @@ namespace risk.control.system.Controllers
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
         private readonly ICustomApiCLient customApiCLient;
+        private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userAgencyManager;
@@ -46,6 +47,7 @@ namespace risk.control.system.Controllers
             SignInManager<ApplicationUser> signInManager,
             INotyfService notifyService,
             ICustomApiCLient customApiCLient,
+            IClaimsInvestigationService claimsInvestigationService,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
@@ -55,6 +57,7 @@ namespace risk.control.system.Controllers
             this.signInManager = signInManager;
             this.notifyService = notifyService;
             this.customApiCLient = customApiCLient;
+            this.claimsInvestigationService = claimsInvestigationService;
             this.userManager = userManager;
             this.userAgencyManager = userAgencyManager;
             this.roleManager = roleManager;
@@ -311,7 +314,6 @@ namespace risk.control.system.Controllers
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
-                user.Mailbox = new Mailbox { Name = userFullEmail };
 
                 user.CountryId = user.SelectedCountryId;
                 user.StateId = user.SelectedStateId;
@@ -600,22 +602,32 @@ namespace risk.control.system.Controllers
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.VendorInvestigationServiceTypes)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.InvestigationServiceType)
                     .FirstOrDefaultAsync(m => m.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted && c.Role == AppRoles.AGENT);
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
+                var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+                var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+
+                var vendorAllCasesCount = await _context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted &&
+                c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId);
+
+                var vendorAllCases = await _context.ClaimsInvestigation.Where(c => c.VendorId == vendor.VendorId && !c.Deleted &&
+                c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId).ToListAsync();
+                // HACKY
+                var currentCases = claimsInvestigationService.GetAgencyIdsLoad(new List<long> {vendor.VendorId });
+                vendor.SelectedCountryId = vendorUserCount;
+                vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
+                vendor.SelectedDistrictId = vendorAllCasesCount;
                 if (superAdminUser.IsSuperAdmin)
                 {
                     vendor.SelectedByCompany = true;
@@ -648,6 +660,11 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 vendor.SelectedByCompany = true;
+                var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditAgency", "Company", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
                 return View(vendor);
             }
             catch (Exception ex)
@@ -736,10 +753,17 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(AgencyDetail), "Company", new { id = vendorId });
         }
 
-        [Breadcrumb(" Users", FromAction = "AgencyDetail")]
+        [Breadcrumb(" Manage Users", FromAction = "AgencyDetail")]
         public IActionResult AgencyUsers(string id)
         {
             ViewData["vendorId"] = id;
+
+            var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+            var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
+            var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("AgencyUsers", "Company", $"Manage Users") { Parent = detailsPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = editPage;
+
 
             return View();
         }
@@ -771,6 +795,13 @@ namespace risk.control.system.Controllers
                 allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
             }
             var model = new VendorApplicationUser { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles };
+
+            var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+            var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
+            var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("AgencyUsers", "Company", $"Manage Users") { Parent = detailsPage, RouteValues = new { id = id } };
+            var addPage = new MvcBreadcrumbNode("CreateAgencyUser", "Company", $"Add user") { Parent = editPage };
+            ViewData["BreadcrumbNode"] = addPage;
 
             return View(model);
         }
@@ -817,7 +848,6 @@ namespace risk.control.system.Controllers
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
-                user.Mailbox = new Mailbox { Name = userFullEmail };
 
                 user.PinCodeId = user.SelectedPincodeId;
                 user.DistrictId = user.SelectedDistrictId;
@@ -927,6 +957,13 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 vendorApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
+
+                var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = vendorApplicationUser.VendorId } };
+                var editPage = new MvcBreadcrumbNode("AgencyUsers", "Company", $"Manage Users") { Parent = detailsPage, RouteValues = new { id = vendorApplicationUser.VendorId } };
+                var addPage = new MvcBreadcrumbNode("EditAgencyUser", "Company", $"Edit user") { Parent = editPage };
+                ViewData["BreadcrumbNode"] = addPage;
                 return View(vendorApplicationUser);
             }
             catch (Exception ex)
@@ -965,6 +1002,14 @@ namespace risk.control.system.Controllers
 
                 var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == model.VendorId);
                 model.HasClaims = hasClaims;
+
+                var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = model.VendorId } };
+                var editPage = new MvcBreadcrumbNode("AgencyUsers", "Company", $"Manage Users") { Parent = detailsPage, RouteValues = new { id = model.VendorId } };
+                var addPage = new MvcBreadcrumbNode("DeleteAgencyUser", "Company", $"Delete user") { Parent = editPage };
+                ViewData["BreadcrumbNode"] = addPage;
+
                 return View(model);
             }
             catch (Exception ex)
@@ -1023,6 +1068,12 @@ namespace risk.control.system.Controllers
 
             ViewData["vendorId"] = id;
 
+            var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+            var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
+            var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Service", "Company", $"Manage Service") { Parent = detailsPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = editPage;
+
             return View();
         }
         [Breadcrumb(" Add Service", FromAction = "Service")]
@@ -1034,6 +1085,13 @@ namespace risk.control.system.Controllers
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
                 ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
+                var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("Service", "Company", $"Manage Service") { Parent = detailsPage, RouteValues = new { id = id } };
+                var addPage = new MvcBreadcrumbNode("CreateService", "Company", $"Add Service") { Parent = editPage };
+                ViewData["BreadcrumbNode"] = addPage;
 
                 return View(model);
             }
@@ -1175,6 +1233,15 @@ namespace risk.control.system.Controllers
                 {
                     vendorInvestigationServiceType.SelectedDistrictId = -1;
                 }
+
+                var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+                var editPage = new MvcBreadcrumbNode("Service", "Company", $"Manage Service") { Parent = detailsPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+                var addPage = new MvcBreadcrumbNode("EditService", "Company", $"Edit Service") { Parent = editPage };
+                ViewData["BreadcrumbNode"] = addPage;
+
+
                 return View(vendorInvestigationServiceType);
             }
             catch (Exception ex)
@@ -1286,6 +1353,12 @@ namespace risk.control.system.Controllers
                 {
                     return NotFound();
                 }
+                var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+                var editPage = new MvcBreadcrumbNode("Service", "Company", $"Manage Service") { Parent = detailsPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+                var addPage = new MvcBreadcrumbNode("DeleteService", "Company", $"Delete Service") { Parent = editPage };
+                ViewData["BreadcrumbNode"] = addPage;
 
                 return View(vendorInvestigationServiceType);
             }

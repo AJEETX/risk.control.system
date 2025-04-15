@@ -596,4 +596,36 @@
         });
     })
 
+    $('a#assign-manual').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+
+        $('a#assign-manual').html("<i class='fas fa-sync fa-spin'></i> Assign<sub>manual</sub> ");
+
+        // Disable all buttons, submit inputs, and anchors
+        $('button, input[type="submit"], a').prop('disabled', true);
+
+        // Add a class to visually indicate disabled state for anchors
+        $('a').addClass('disabled-anchor').on('click', function (e) {
+            e.preventDefault(); // Prevent default action for anchor clicks
+        });
+        $('a').attr('disabled', 'disabled');
+        $('button').attr('disabled', 'disabled');
+        $('html button').css('pointer-events', 'none');
+        $('html a').css({ 'pointer-events': 'none' }, { 'cursor': 'none' });
+        $('.text').css({ 'pointer-events': 'none' }, { 'cursor': 'none' });
+
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
+        }
     });
+
+});

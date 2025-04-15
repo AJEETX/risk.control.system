@@ -19,21 +19,6 @@ $(document).ready(function () {
         }
         
     });
-    $('#view-type a').on('click', function () {
-        var id = this.id;
-        if (this.id == 'map-type') {
-            $('#checkboxes').css('display', 'none');
-            $('#maps').css('display', 'block');
-            $('#map-type').css('display', 'none');
-            $('#list-type').css('display', 'block');
-        }
-        else {
-            $('#checkboxes').css('display', 'block');
-            $('#maps').css('display', 'none');
-            $('#map-type').css('display', 'block');
-            $('#list-type').css('display', 'none');
-        }
-    });
 
     var table = $("#customerTable").DataTable({
         ajax: {
@@ -76,7 +61,7 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Select Claim" />';
+                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Select Case" />';
                     return img;
                 }
             },
@@ -167,8 +152,10 @@ $(document).ready(function () {
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -186,7 +173,7 @@ $(document).ready(function () {
             $this.find('.full-map').hide();
         });
 
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -246,5 +233,12 @@ $(document).ready(function () {
             }
         });
     });
-    //initMap("/api/ClaimsVendor/GetNewMap");
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false); // false => Retains current page
+        $("#allocatedcase").prop('disabled', true);
+    });
 });

@@ -7,7 +7,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
+        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add ");
 
         // Disable all buttons, submit inputs, and anchors
         $('button, input[type="submit"], a').prop('disabled', true);
@@ -32,9 +32,38 @@
     });
     var table = $("#customerTableAuto").DataTable({
         ajax: {
-            url: '/api/Creator/GetAuto',
-            dataSrc: ''
+            url: window.location.origin + '/api/Creator/GetAuto',
+            type: 'GET',
+            dataType: 'json',
+            dataSrc: function (json) {
+                // Check extraField boolean value from server response
+                if (json.autoAllocatopn) {
+                    $('#allocatedcase').show();  // Show the button
+                } else {
+                    $('#allocatedcase').hide();  // Hide the button
+                }
+
+                return json.data; // Return table data
+            },
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 14, // Default to column 15
+                    orderDir: d.order?.[0]?.dir || "desc"
+                };
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+            }
         },
+        
         columnDefs: [{
             'targets': 0,
             'searchable': false,
@@ -44,27 +73,36 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 6                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 8                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
             },
             {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
+                'targets': 15, // Index for the "Case Type" column
+                'name': 'policy' // Name for the "Case Type" column
             }],
         order: [[14, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        serverSide: true,
         paging: true,
-
         language: {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
@@ -76,18 +114,17 @@
                 "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='Incomplete'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    if (row.ready2Assign && row.autoAllocated) {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to allocate(auto)" />';
-                        return img;
-                    } else if (row.ready2Assign && !row.autoAllocated) {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Allocate manual" />';
+                    if (!row.ready2Assign) {
+                        return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Incomplete"></i>';
+                    }
+                    else {
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Assign/delete" />';
                         return img;
                     }
                 }
             },
             {
                 "data": "policyNum",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
                 }
@@ -100,7 +137,6 @@
             },
             {
                 "data": "pincode",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
                         var img = '<div class="map-thumbnail profile-image doc-profile-image">';
@@ -155,7 +191,7 @@
                 "mRender": function (data, type, row) {
                     if (row.beneficiaryFullName == "?") {
                         var img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image-no-user" data-toggle="tooltip"/>';
-                    return img;
+                        return img;
                     }
                     else {
                         var img = '<div class="map-thumbnail table-profile-image">';
@@ -197,27 +233,51 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
+                    var isPending = row.status === "PENDING"; // Check if status is "READY"
+                    var disabled = isPending ? "disabled" : "";  // Disable buttons if pending
+                    var spinClass = isPending ? "fa-spin" : ""; // Add spin class if pending
                     var buttons = "";
+                    console.log(row.status);
                     if (row.ready2Assign) {
-                        buttons += '<a id="assign' + row.id + '" href="EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
+                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
+                        buttons += '<i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
                     }
-                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
-                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+
+                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;';
+
+                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </a>';
+
                     return buttons;
                 }
             },
-            { "data": "timeElapsed", bVisible: false }
+            { "data": "timeElapsed", bVisible: false },
+            { "data": "policy", bVisible: false }
         ],
-        "drawCallback": function (settings, start, end, max, total, pre) {
+        rowCallback: function (row, data) {
+            if (data.isNewAssigned) {
+                $('td', row).addClass('isNewAssigned');
+                // Remove the class after 3 seconds
+                setTimeout(function () {
+                    $('td', row).removeClass('isNewAssigned');
+                }, 3000);
+            }
+        },
+        "drawCallback": function (settings) {
+            var api = this.api();
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
-            if (rowCount > 0) {
-                $('#allocatedcase').prop('disabled', false);
+            if (rowCount > 0 && hasAssignedRows()) {
+                $('#deletecase').prop('disabled', false);
+                $('.top-info').prop('disabled', false);
+                    $('#allocatedcase').prop('disabled', false);
             }
             else {
+                $('.top-info').prop('disabled', true);
+                $('#deletecase').prop('disabled', true);
                 $('#allocatedcase').prop('disabled', true);
             }
+            
             $('#customerTableAuto tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('assign', ''); // Extract the ID from the button's ID attribute
@@ -236,22 +296,66 @@
                 showedit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
-        },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.isNewAssigned) {
-                $('td', nRow).addClass('isNewAssigned');
-                // Remove the class after 3 seconds
-                setTimeout(function () {
-                    $('td', nRow).removeClass('isNewAssigned');
-                }, 3000);
-            }
-            
+            //checkUploadJobStatus();
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
-    $('#customerTableAuto')
-        .on('mouseenter', '.map-thumbnail', function () {
+    $('#caseTypeFilter').on('change', function () {
+        table.ajax.reload(); // Reload the table when the filter is changed
+    });
+
+    table.on('preDraw.dt', function () {
+        $('input[name="select_all"]').prop('checked', false); // Uncheck checkboxes before rendering new data
+    });
+
+    table.on('length.dt', function () {
+        $('input[name="select_all"]').prop('checked', false);
+    });
+    function hasAssignedRows() {
+        var table = $("#customerTableAuto").DataTable();
+        var assignedExists = false;
+
+        table.rows().every(function () {
+            var data = this.data();
+            if (data.ready2Assign === true) {
+                assignedExists = true;
+                return false; // Stop iterating once an "assigned" row is found
+            }
+        });
+
+        return assignedExists;
+    }
+        // Function to check if there are any "Pending" rows
+    function hasPendingRows() {
+        var table = $("#customerTableAuto").DataTable();
+        var pendingExists = false;
+
+        table.rows().every(function () {
+            var data = this.data();
+            if (data.status != "PENDING") {
+                pendingExists = true;
+                return false; // Stop iterating once a "Pending" row is found
+            }
+        });
+
+        return pendingExists;
+    }
+
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false);
+        $('#checkall').prop('checked', false);
+    });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+    
+    
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -269,7 +373,7 @@
             $this.find('.full-map').hide();
         });
 
-    $('#customerTableAuto').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -335,7 +439,7 @@
                 closeIcon: true,
                 buttons: {
                     cancel: {
-                        text: "SELECT Case<span class='badge badge-danger'>(s)</span>",
+                        text: "OK",
                         btnClass: 'btn-danger'
                     }
                 }
@@ -386,6 +490,93 @@
         }
     });
 
+    $('#deletecase').on('click', function (e) {
+        e.preventDefault(); // Prevent form submission
+
+        var selectedCases = [];
+        $("input[type='checkbox'].vendors:checked").each(function () {
+            selectedCases.push($(this).val()); // Get checked case IDs
+        });
+
+        if (selectedCases.length === 0) {
+            $.alert({
+                title: "Delete !",
+                content: "Please select Case(s) to delete.",
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    cancel: {
+                        text: "OK",
+                        btnClass: 'btn-danger'
+                    }
+                }
+            });
+            return;
+        }
+
+        $.confirm({
+            title: "Confirm Delete",
+            content: "Are you sure you want to <span class='badge badge-light'>delete</span> selected case(s) ?",
+            icon: 'fas fa-trash',
+            type: 'red',
+            closeIcon: true,
+            buttons: {
+                confirm: {
+                    text: "Delete",
+                    btnClass: 'btn-danger',
+                    action: function () {
+                        deleteSelectedCases(selectedCases);
+                    }
+                },
+                cancel: {
+                    text: "Cancel",
+                    btnClass: 'btn-default'
+                }
+            }
+        });
+    });
+    function deleteSelectedCases(claims) {
+        $.ajax({
+            url: "/CreatorPost/DeleteCases", // Update with your actual delete endpoint
+            type: "POST",
+            data: JSON.stringify({ claims: claims }),
+            contentType: "application/json",
+            success: function (response) {
+                if (response.success) {
+                    $.alert({
+                        title: "Deleted!",
+                        content: "Selected case(s) have been deleted.",
+                        type: 'red',
+                        buttons: {
+                            ok: {
+                                text: "OK",
+                                btnClass: 'btn-danger'
+                            }
+                        }
+                    });
+
+                    // Refresh DataTable
+                    $('#customerTableAuto').DataTable().ajax.reload(null, false);
+                    $('#checkall').prop('checked', false);
+
+                } else {
+                    $.alert({
+                        title: "Error!",
+                        content: response.message || "Failed to delete cases.",
+                        type: 'red'
+                    });
+                }
+            },
+            error: function () {
+                $.alert({
+                    title: "Error!",
+                    content: "Something went wrong. Please try again.",
+                    type: 'red'
+                });
+            }
+        });
+    }
+
     $("#postedFile").on('change', function () {
         var MaxSizeInBytes = 1097152;
         //Get count of selected files
@@ -425,7 +616,7 @@
                         title: "Outdated Browser !",
                         content: "This browser does not support FileReader. Try on modern browser!",
                         icon: 'fas fa-exclamation-triangle',
-            
+
                         type: 'red',
                         closeIcon: true,
                         buttons: {
@@ -443,7 +634,7 @@
                     title: "FILE UPLOAD TYPE !!",
                     content: "Pls only select file with extension zip ! ",
                     icon: 'fas fa-exclamation-triangle',
-        
+
                     type: 'red',
                     closeIcon: true,
                     buttons: {
@@ -458,7 +649,6 @@
     });
     let askFileUploadConfirmation = true;
     let askConfirmation = false;
-
     function handleUploadConfirmation(formId, buttonId) {
         $(formId).on('submit', function (event) {
             if (askFileUploadConfirmation) {
@@ -508,6 +698,30 @@
     handleUploadConfirmation("#upload-claims", "#UploadFileButton");
 });
 
+function checkUploadJobStatus() {
+    $.ajax({
+        url: '/CreatorPost/GetJobStatus',
+        type: 'GET',
+        success: function (response) {
+            console.log("Job Status:", response.status);
+
+            if (response.status === "Processing" || response.status === "Enqueued") {
+                setTimeout(function () {
+                    checkUploadJobStatus();
+                }, 2000); // Check every 5 seconds
+            } else if (response.status === "Completed") {
+                console.log("Job Completed:", response.status);
+                $('#refreshTable').click(); // Refresh the table after completion
+            }
+            else {
+                console.error("Errored job status:", response.status);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error checking job status:", error);
+        }
+    });
+}
 function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI

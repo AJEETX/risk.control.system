@@ -1,15 +1,9 @@
 {
   "SupervisorCommentsTitle": "Supervisor Comments",
-  "AgentReportTitle": "Agent Summary report",
+  "AgentReportTitle": "Agent Questionaire",
+  "AssessorSummary": "",
   "ReportSummary": "The customer was able to meet me and provide all the required documents. The customer was able to meet me and provide all the required documents.The customer was able to meet me and provide all the required documents.",
-  "ReportSummaryDescription": [
-    "1. The customer was able to meet me and provide all the required documents.",
-    "2. The customer was able to meet me and provide all the required documents.",
-    "3. The customer was able to meet me and provide all the required documents.",
-    "4. The customer was able to meet me and provide all the required documents.",
-    "5. The customer was able to meet me and provide all the required documents."
-  ],
-
+  "ReportSummaryDescription": [],
   "AssessmentDescriptionTitle": "Assessor comments",
   "WeatherDetail": "Customer has built on Rock n' Roll in Cadott WI, Rock Fest is the true Rock experience you can't miss. In its 26th year, it is THE top venue for people of all ages to come together for one common purpose: to congregate with other rock fans from across the world, in a place where rock music still matters.",
 

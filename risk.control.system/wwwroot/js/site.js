@@ -7,65 +7,9 @@ var showBeneficiaryMap = false;
 var showFaceMap = false;
 var showLocationMap = false;
 var showOcrMap = false;
-const image =
-    "/images/beachflag.png";
+const image = "/images/beachflag.png";
+const MaxSizeInBytes = 5242880; // 5MG for upload
 
-// Function to trigger the print dialog
-//function printInvoice() {
-//    window.print();  // Opens the print dialog
-//    return false;
-//}
-
-//document.addEventListener("DOMContentLoaded", function () {
-//    // Apply blur effect dynamically
-//    document.getElementById("main-container").classList.add("blur-background");
-//});
-// Add event listener to the print button once the DOM is fully loaded
-var moreInfo = "...";
-function loadNotifications() {
-    $.get('/api/Notification/GetNotifications', function (response) {
-        $("#notificationList").html("");
-        var totalCount = response.total;
-        $("#notificationCount").text(totalCount);
-
-        response.data.forEach(function (item) {
-            $("#notificationList").append(
-                `<a href="#" class="dropdown-item notification-item" data-id="${item.id}">
-                            <i class="${item.symbol}"></i> <span class="text-muted text-sm"> ${item.message} </span> :<span class="badge badge-light text-muted text-sm"> ${item.status} </span>
-                            <span class="float-right text-muted text-sm">${item.createdAt}</span>
-                        </a>`
-            );
-        });
-        if (totalCount > response.data.length) {
-            $("#notificationList").append(
-                `<hr><span class="float-right text-muted text-sm">${moreInfo}</span>`
-            );
-        }
-        // Click event to mark as read
-        $(".notification-item").on("click", function () {
-            var notificationId = $(this).data("id");
-            markNotificationAsRead(notificationId);
-            $(this).remove(); // Remove notification from UI
-            let count = totalCount - 1;
-            $("#notificationCount").text(count > 0 ? count : "0");
-        });
-    });
-}
-
-function markNotificationAsRead(notificationId) {
-    $.ajax({
-        url: '/api/Notification/MarkAsRead',
-        type: 'POST',
-        contentType: 'application/json', // Specify JSON format
-        data: JSON.stringify({ Id: notificationId }), // Convert data to JSON
-        success: function () {
-            console.log("Notification marked as read:", notificationId);
-        },
-        error: function (xhr) {
-            console.error("Error:", xhr.responseText);
-        }
-    });
-}
 
 document.addEventListener("DOMContentLoaded", function () {
     var printButton = document.getElementById("printInvoiceButton");
@@ -99,7 +43,8 @@ function checkFormCompletion(formSelector, create = false) {
         }
 
         // Check if the field has a value
-        if (!$(this).val()) {
+        var inputValue = $(this).val();
+        if (!inputValue) {
             isFormComplete = false;
             return false; // Exit loop early if a required field is empty
         }
@@ -293,8 +238,160 @@ function getMobileType() {
     }
 }
 
+var moreInfo = "...";
+
+
+function markNotificationAsRead(notificationId) {
+    $.ajax({
+        url: '/api/Notification/MarkAsRead',
+        type: 'POST',
+        contentType: 'application/json', // Specify JSON format
+        data: JSON.stringify({ Id: notificationId }), // Convert data to JSON
+        success: function () {
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+            loadNotifications(true);
+            console.log("Notification marked as read:", notificationId);
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+        },
+        error: function (xhr) {
+            console.error("Error:", xhr.responseText);
+        }
+    });
+}
+function loadNotifications(keepOpen = false) {
+    $.get('/api/Notification/GetNotifications', function (response) {
+        $("#notificationList").html("");
+        var totalCount = response.total;
+        if (response.maxCountReached) {
+            var maxText = `${response.maxCount}+`;
+            $("#notificationCount").text(maxText);
+        }
+        else {
+            $("#notificationCount").text(totalCount);
+        }
+
+        if (response.data.length > 0) {
+            response.data.forEach(function (item) {
+                $("#notificationList").append(
+                    `<a href="#" class="notification-item" data-id="${item.id}">
+                        <!-- First Row: Icon, Message, Status -->
+                        <div class="notification-content">
+                            <i class="${item.symbol}"></i> 
+                            <span class="notification-message text-muted text-xs">${item.message}</span>
+                            <span class="badge badge-light text-muted text-xs">${item.status}</span>
+                            <div class=".notification-action-content">
+                                <div class="float-right">
+                                    <span class="notification-time text-muted text-xs">
+                                        <i class="far fa-clock"></i> ${item.createdAt}
+                                    </span>
+                                    <span class="delete-notification" data-id="${item.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Second Row: User, Time, Delete Icon -->
+                        
+                    </a>`
+                );
+            });
+
+            // Enable the "Clear All" icon
+            $("#clearNotifications").removeClass("clear-disabled");
+
+        } else {
+            $("#notificationList").append("<div class='text-center text-muted'>No notifications</div>");
+
+            // Disable the "Clear All" icon when no notifications exist
+            $("#clearNotifications").addClass("clear-disabled");
+        }
+        // Click event to mark as read
+        $(".delete-notification").on("click", function (e) {
+            e.stopPropagation(); // Prevent closing the dropdown
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+            $(this).addClass("fa-spin");
+            var notificationId = $(this).data("id");
+            markNotificationAsRead(notificationId);
+            setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+        });
+
+        if (keepOpen) {
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+        }
+    });
+}
+function clearAllNotifications() {
+    $.ajax({
+        url: '/api/Notification/ClearAll', // Backend endpoint to clear notifications
+        type: 'POST',
+        success: function () {
+            $("#notificationList").html('<div class="text-muted text-center">No notifications</div>');
+            $("#notificationCount").text("0");
+            console.log("All notifications cleared.");
+            // Keep dropdown open after clearing
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+        },
+        error: function (xhr) {
+            console.error("Error clearing notifications:", xhr.responseText);
+        }
+    });
+}
+
 $(document).ready(function () {
-    loadNotifications();
+
+    $('#customerTable').on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'top',
+            html: true
+        });
+    });
+
+    $(".delete-notification").on("click", function (e) {
+        e.stopPropagation(); // Prevent closing the dropdown
+        $("#notificationDropdown").addClass("show");
+        $("#notificationToggle").attr("aria-expanded", "true");
+        $(this).addClass("fa-spin");
+        var notificationId = $(this).data("id");
+        markNotificationAsRead(notificationId);
+        setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+    });
+
+    $("#notification-refresh").on("click", function (e) {
+        e.stopPropagation(); // Prevent Bootstrap from closing the dropdown
+        $("#notificationDropdown").addClass("show");
+        $("#notificationToggle").attr("aria-expanded", "true");
+        $(this).addClass("fa-spin");
+
+        loadNotifications(true); // Reload notifications & keep open
+
+        setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+    });
+
+    $("#clearNotifications").on("click", function (e) {
+        if ($(this).hasClass("clear-disabled")) return; // Prevent action when disabled
+
+        e.stopPropagation(); // Prevent Bootstrap from closing the dropdown
+        $("#notificationDropdown").addClass("show");
+        $("#notificationToggle").attr("aria-expanded", "true");
+        $(this).addClass("fa-spin");
+
+        clearAllNotifications(); // Reload notifications & keep open
+
+        setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+    });
+    // Close dropdown when clicking outside
+    $(document).on("click", function (event) {
+        if (!$(event.target).closest("#notificationDropdown, #notificationToggle").length) {
+            $("#notificationDropdown").removeClass("show");
+            $("#notificationToggle").attr("aria-expanded", "false");
+        }
+    });
     $('.print-me').on('click', function () {
         window.print();
         return false;
@@ -357,7 +454,6 @@ $(document).ready(function () {
             }
         });
     });
-
 
     $('#back').on('click', function () {
         refreshSession();
@@ -848,3 +944,6 @@ window.onload = DisableBackButton;
 window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
 
 fetchIpInfo();
+
+    // Load notifications on page load WITHOUT keeping it open
+    loadNotifications(false);

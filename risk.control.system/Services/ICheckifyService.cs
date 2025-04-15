@@ -15,11 +15,14 @@ using System.Text.RegularExpressions;
 using risk.control.system.Controllers.Api.Claims;
 using static Google.Apis.Requests.BatchRequest;
 using System.Threading.Tasks;
+using Google.Api;
+using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Services;
 
 public interface IICheckifyService
 {
+    Task<AppiCheckifyResponse> GetAgentId(FaceData data);
     Task<AppiCheckifyResponse> GetFaceId(FaceData data);
     Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
     Task<AppiCheckifyResponse> GetPassportId(DocumentData data);
@@ -30,6 +33,8 @@ public interface IICheckifyService
 
 public class ICheckifyService : IICheckifyService
 {
+    private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
     private static Regex panRegex = new Regex(@"[A-Z]{5}\d{4}[A-Z]{1}");
     private static Regex passportRegex = new Regex(@"[A-Z]{1,2}[0-9]{6,7}");
     private static Regex dateOfBirthRegex = new Regex(@"^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([12]\d{3})$");
@@ -80,6 +85,142 @@ public class ICheckifyService : IICheckifyService
         return true;
     }
 
+
+    public async Task<AppiCheckifyResponse> GetAgentId(FaceData data)
+    {
+        ClaimsInvestigation claim = null;
+        try
+        {
+            claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.AgentIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+
+            if (claim.AgencyReport == null)
+            {
+                claim.AgencyReport = new AgencyReport();
+            }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
+            claim.AgencyReport.AgentEmail = data.Email;
+            var agent = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == data.Email);
+            claim.AgencyReport.AgentIdReport.Updated = DateTime.Now;
+            claim.AgencyReport.AgentIdReport.UpdatedBy = data.Email;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLongLatTime = DateTime.Now;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat = data.LocationLongLat;
+            var longLat = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
+            var latitude = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+            var longitude = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+            var latLongString = latitude + "," + longitude;
+            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+
+            byte[]? registeredImage = agent.ProfilePicture;
+
+            var expectedLat = string.Empty;
+            var expectedLong = string.Empty;
+            if (claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId)
+            {
+                expectedLat = claim.BeneficiaryDetail.Latitude;
+                expectedLong = claim.BeneficiaryDetail.Longitude;
+            }
+            else
+            {
+
+                expectedLat = claim.CustomerDetail.Latitude;
+                expectedLong = claim.CustomerDetail.Longitude;
+            }
+
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
+
+            #region FACE IMAGE PROCESSING
+
+            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, data.LocationImage);
+            var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+            var addressTask = httpClientService.GetRawAddress(latitude, longitude);
+            #endregion FACE IMAGE PROCESSING
+
+            await Task.WhenAll(faceMatchTask, addressTask, weatherTask, mapTask);
+
+            var (confidence, compressImage, similarity) = await faceMatchTask;
+            var address = await addressTask;
+            var weatherData = await weatherTask;
+            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
+
+
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLocationUrl = map;
+            claim.AgencyReport.AgentIdReport.Duration = duration;
+            claim.AgencyReport.AgentIdReport.Distance = distance;
+            claim.AgencyReport.AgentIdReport.DistanceInMetres = distanceInMetres;
+            claim.AgencyReport.AgentIdReport.DurationInSeconds = durationInSecs;
+
+
+            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                $"\r\n" +
+                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                $"\r\n" +
+                $"\r\nElevation(sea level):{weatherData.elevation} metres";
+
+            claim.AgencyReport.AgentIdReport.DigitalIdImageData = weatherCustomData;
+            claim.AgencyReport.AgentIdReport.DigitalIdImage = compressImage;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageMatchConfidence = confidence;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLocationAddress = address;
+            claim.AgencyReport.AgentIdReport.MatchExecuted = true;
+            claim.AgencyReport.AgentIdReport.Similarity = similarity;
+            var updateClaim = _context.ClaimsInvestigation.Update(claim);
+
+            var rows = await _context.SaveChangesAsync();
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
+                LocationImage = updateClaim.Entity.AgencyReport?.AgentIdReport?.DigitalIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport?.AgentIdReport?.DigitalIdImage) :
+                Convert.ToBase64String(noDataimage),
+                LocationLongLat = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLat,
+                LocationTime = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime,
+                FacePercent = claim.AgencyReport.AgentIdReport?.DigitalIdImageMatchConfidence
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.StackTrace);
+            claim.AgencyReport.AgentIdReport.DigitalIdImageData = "No Weather Data";
+            claim.AgencyReport.AgentIdReport.DigitalIdImage = Convert.FromBase64String(data.LocationImage);
+            claim.AgencyReport.AgentIdReport.DigitalIdImageMatchConfidence = string.Empty;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLocationAddress = "No Address data";
+            claim.AgencyReport.AgentIdReport.MatchExecuted = true;
+            var updateClaim = _context.ClaimsInvestigation.Update(claim);
+            var rows = await _context.SaveChangesAsync();
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+            var noData = await File.ReadAllBytesAsync(noDataImagefilePath);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
+                LocationImage = updateClaim.Entity.AgencyReport?.AgentIdReport?.DigitalIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport?.AgentIdReport?.DigitalIdImage) :
+                Convert.ToBase64String(noData),
+                LocationLongLat = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLat,
+                LocationTime = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime,
+                FacePercent = claim.AgencyReport.AgentIdReport?.DigitalIdImageMatchConfidence
+            };
+        }
+    }
     public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
     {
         ClaimsInvestigation claim = null;
@@ -91,6 +232,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
             claim.AgencyReport.DigitalIdReport.UpdatedBy = data.Email;
@@ -101,17 +260,18 @@ public class ICheckifyService : IICheckifyService
             var longitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
             byte[]? registeredImage = null;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 registeredImage = claim.CustomerDetail.ProfilePicture;
                 expectedLat = claim.CustomerDetail.Latitude ;
                 expectedLong =  claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 registeredImage = claim.BeneficiaryDetail.ProfilePicture;
                 expectedLat = claim.BeneficiaryDetail.Latitude;
@@ -208,6 +368,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.PanIdReport.DocumentIdImageLongLat = data.OcrLongLat;
             claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
@@ -216,15 +394,16 @@ public class ICheckifyService : IICheckifyService
             var longitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 expectedLat = claim.CustomerDetail.Latitude;
                 expectedLong = claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
@@ -394,6 +573,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.AudioReport.DocumentIdImageLongLat = data.LongLat;
             claim.AgencyReport.AudioReport.DocumentIdImageLongLatTime = DateTime.Now;
@@ -401,15 +598,16 @@ public class ICheckifyService : IICheckifyService
             var latitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
             var longitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 expectedLat = claim.CustomerDetail.Latitude;
                 expectedLong = claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
@@ -508,6 +706,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.VideoReport.DocumentIdImageLongLat = data.LongLat;
             claim.AgencyReport.VideoReport.DocumentIdImageLongLatTime = DateTime.Now;
@@ -516,15 +732,16 @@ public class ICheckifyService : IICheckifyService
             var longitude = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
 
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 expectedLat = claim.CustomerDetail.Latitude;
                 expectedLong = claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
@@ -610,6 +827,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat = data.OcrLongLat;
             claim.AgencyReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
@@ -617,16 +852,17 @@ public class ICheckifyService : IICheckifyService
             var latitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
             var longitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 expectedLat = claim.CustomerDetail.Latitude;
                 expectedLong = claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;

@@ -23,6 +23,7 @@ namespace risk.control.system.Services
 {
     public interface INotificationService
     {
+        Task ClearAll(string userEmail);
         Task MarkAsRead(int id, string userEmail);
         Task<List<StatusNotification>> GetNotifications(string userEmail);
         Task<ClaimsInvestigation> SendVerifySchedule(ClientSchedulingMessage message);
@@ -42,6 +43,8 @@ namespace risk.control.system.Services
 
     public class NotificationService : INotificationService
     {
+        private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext context;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -244,13 +247,14 @@ namespace risk.control.system.Services
             string recepientName = string.Empty;
             string recepientPhone = string.Empty;
             int isdCode = claim.CustomerDetail.PinCode.Country.ISDCode;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            var underWritingLineOfBusiness = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 mobile = claim.CustomerDetail.ContactNumber.ToString();
                 recepientName = claim.CustomerDetail.Name;
                 recepientPhone = claim.CustomerDetail.ContactNumber.ToString();
             }
-            else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 mobile = beneficiary.ContactNumber.ToString();
                 recepientName = beneficiary.Name;
@@ -353,16 +357,17 @@ namespace risk.control.system.Services
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var beneficiary = context.BeneficiaryDetail.Include(b=>b.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
+            var underWritingLineOfBusiness = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             string recepientName = string.Empty;
             string recepientPhone = string.Empty;
             int isdCode = claim.CustomerDetail.Country.ISDCode;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 recepientName = claim.CustomerDetail.Name;
                 recepientPhone = claim.CustomerDetail.ContactNumber.ToString();
             }
-            else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 recepientName = beneficiary.Name;
                 recepientPhone = beneficiary.ContactNumber.ToString();
@@ -435,15 +440,16 @@ namespace risk.control.system.Services
                 .Include(c => c.Country)
                 .Include(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
+            var underWritingLineOfBusiness = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             string mobile = string.Empty;
             string recepientName = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 mobile = claim.CustomerDetail.ContactNumber.ToString();
                 recepientName = claim.CustomerDetail.Name;
             }
-            else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else 
             {
                 mobile = beneficiary.ContactNumber.ToString();
                 recepientName = beneficiary.Name;
@@ -629,19 +635,19 @@ namespace risk.control.system.Services
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
                 company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-                var notifications = context.Notifications.Where(n => n.Role == role && n.Company == company && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
+                var notifications = context.Notifications.Where(n => n.Company == company && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
                 if (role.Name == AppRoles.ASSESSOR.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByAssessor);
+                    notifications = notifications.Where(n => n.Role == role  && !n.IsReadByAssessor);
                 }
                 else if (role.Name == AppRoles.MANAGER.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByManager && n.CreatedBy != userEmail);
+                    notifications = notifications.Where(n => !n.IsReadByManager);
                 }
 
                 else if (role.Name == AppRoles.CREATOR.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByCreator);
+                    notifications = notifications.Where(n => n.Role == role && n.NotifierUserEmail == userEmail && !n.IsReadByCreator);
                 }
 
                 var activeNotifications = await notifications
@@ -655,16 +661,23 @@ namespace risk.control.system.Services
                 
                 var notifications = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
 
-                if (role.Name == AppRoles.AGENCY_ADMIN.ToString() || role.Name == AppRoles.SUPERVISOR.ToString())
+                if (role.Name == AppRoles.AGENT.ToString())
+                {
+                    notifications = notifications.Where(n => n.AgenctUserEmail == userEmail);
+                }
+                else
                 {
                     var superRole = context.ApplicationRole.FirstOrDefault(r => r.Name == AppRoles.SUPERVISOR.ToString());
-                    notifications = notifications.Where(n => n.Role == superRole && (!n.IsReadByVendor));
+                    if(role.Name == AppRoles.SUPERVISOR.ToString())
+                    {
+                        notifications = notifications.Where(n => n.NotifierUserEmail == userEmail && (!n.IsReadByVendor));
+                    }
+                    else
+                    {
+                        notifications = notifications.Where(n => (!n.IsReadByVendor));
+                    }
                 }
 
-                else if (role.Name == AppRoles.AGENT.ToString())
-                {
-                    notifications = notifications.Where(n => n.UserEmail == userEmail);
-                }
 
                var activeNotifications = await notifications
                     .OrderByDescending(n => n.CreatedAt).ToListAsync();
@@ -729,6 +742,15 @@ namespace risk.control.system.Services
                 }
                 context.Notifications.Update(notification);
                 var rows = await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task ClearAll(string userEmail)
+        {
+            var notifications = await GetNotifications(userEmail);
+            foreach (var notification in notifications)
+            {
+                await MarkAsRead(notification.StatusNotificationId,userEmail);
             }
         }
     }

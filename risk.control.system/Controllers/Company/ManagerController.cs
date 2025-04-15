@@ -15,8 +15,8 @@ using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers.Company
 {
-    [Breadcrumb(" Claims")]
-        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+    [Breadcrumb(" Cases")]
+    [Authorize(Roles = MANAGER.DISPLAY_NAME)]
     public class ManagerController : Controller
     {
         private readonly INotyfService notifyService;

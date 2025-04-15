@@ -29,6 +29,10 @@ $(document).ready(function () {
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
+            },
+            {
+                'targets': 16, // Index for the "Case Type" column
+                'name': 'policy' // Name for the "Case Type" column
             }],
         order: [[13, 'asc']],
         fixedHeader: true,
@@ -178,7 +182,8 @@ $(document).ready(function () {
                     //}
                     return buttons;
                 }
-            }
+            },
+            { "data": "policy", bVisible: false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
 
@@ -197,8 +202,22 @@ $(document).ready(function () {
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+
+    $('#caseTypeFilter').on('change', function () {
+        table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"
+    });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false); // false => Retains current page
+    });
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -237,7 +256,7 @@ $(document).ready(function () {
         }
 
     });
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -292,8 +311,7 @@ $(document).ready(function () {
             }
         });
     });
-
-    //initMap("/api/CompanyAssessClaims/GetAssessorMap");
+    
 });
 function getdetails(id) {
     $("body").addClass("submit-progress-bg");

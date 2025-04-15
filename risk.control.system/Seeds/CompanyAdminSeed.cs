@@ -16,17 +16,13 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment, 
             UserManager<ClientCompanyApplicationUser> userManager, 
-            ClientCompany clientCompany,
-            IHttpContextAccessor httpAccessor, string companyDomain, PinCode pinCode)
+            ClientCompany clientCompany,string companyDomain, PinCode pinCode)
         {
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             
             string adminEmailwithSuffix = Applicationsettings.COMPANY_ADMIN.CODE + "@" + companyDomain;
-            var asMailBox = new Mailbox
-            {
-                Name = adminEmailwithSuffix
-            };
+            
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE));
 
             var adminImage = File.ReadAllBytes(adminImagePath);
@@ -38,7 +34,6 @@ namespace risk.control.system.Seeds
 
             var admin = new ClientCompanyApplicationUser()
             {
-                Mailbox = asMailBox,
                 UserName = adminEmailwithSuffix,
                 Email = adminEmailwithSuffix,
                 FirstName = MANAGER.FIRST_NAME,

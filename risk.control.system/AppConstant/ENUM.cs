@@ -8,39 +8,39 @@ namespace risk.control.system.Models
     {
         [Display(Name = "UNKNOWN")]
         [Description("Income status is unknown")]
-        UNKNOWN,
+        UNKNOWN = 0,
 
         [Display(Name = "0.0 Lac")]
         [Description("No income or negligible income")]
-        NO_INCOME,
+        NO_INCOME = 1,
 
         [Display(Name = "0 - 2.5 Lac")]
         [Description("Income falls within the tax-free slab")]
-        TAXFREE_SLOT,
+        TAXFREE_SLOT = 2,
 
         [Display(Name = "2.5 - 5 Lac")]
         [Description("Basic income level")]
-        BASIC_INCOME,
+        BASIC_INCOME = 3,
 
         [Display(Name = "5 - 8 Lac")]
         [Description("Medium income level")]
-        MEDIUM_INCOME,
+        MEDIUM_INCOME = 4,
 
         [Display(Name = "8 - 15 Lac")]
         [Description("Upper-middle income level")]
-        UPPER_INCOME,
+        UPPER_INCOME = 5,
 
         [Display(Name = "15 - 30 Lac")]
         [Description("Higher income level")]
-        HIGHER_INCOME,
+        HIGHER_INCOMEv = 6,
 
         [Display(Name = "30 - 50 Lac")]
         [Description("Top higher-income bracket")]
-        TOP_HIGHER_INCOME,
+        TOP_HIGHER_INCOME = 7,
 
         [Display(Name = "50 + Lac")]
         [Description("Premium income category")]
-        PREMIUM_INCOME,
+        PREMIUM_INCOME = 8,
     }
 
     public enum Occupation
@@ -76,6 +76,10 @@ namespace risk.control.system.Models
 
     public enum Education
     {
+        [Display(Name = "UNKNOWN")]
+        [Description("Education is not specified or unknown")]
+        UNKNOWN,
+
         [Display(Name = "PRIMARY SCHOOL")]
         [Description("Completed primary school education")]
         PRIMARY_SCHOOL,
@@ -105,11 +109,12 @@ namespace risk.control.system.Models
     {
         [Display(Name = "File Upload")]
         [Description("Data upload type through file")]
-        FILE,
+        FILE
+        //    ,
 
-        [Display(Name = "FTP Upload")]
-        [Description("Data upload type through ftp")]
-        FTP,
+        //[Display(Name = "FTP Upload")]
+        //[Description("Data upload type through ftp")]
+        //FTP,
     }
 
     public enum ClaimType
@@ -136,6 +141,9 @@ namespace risk.control.system.Models
 
     public enum Gender
     {
+        [Display(Name = "UNKNOWN")]
+        UNKNOWN,
+
         [Display(Name = "Male")]
         MALE,
 
@@ -148,6 +156,8 @@ namespace risk.control.system.Models
 
     public enum CustomerType
     {
+        [Display(Name = "UNKNOWN")]
+        UNKNOWN,
         [Display(Name = "HNI")]
         [Description("High Net Worth Individual")]
         HNI,
@@ -160,21 +170,45 @@ namespace risk.control.system.Models
     {
         [Display(Name = "Mortgaged")]
         [Description("Property is owned with an active mortgage")]
-        MORTGAGED,
+        MORTGAGED = 0,
 
         [Display(Name = "Owned")]
         [Description("Property is fully owned without any mortgage")]
-        OWNED,
+        OWNED = 1,
 
         [Display(Name = "Rented")]
         [Description("Property is rented")]
-        RENTED,
+        RENTED = 2,
 
         [Display(Name = "Shared")]
         [Description("Property is shared with others, such as roommates or family")]
-        SHARED
+        SHARED = 3
     }
 
+    public enum YESNO
+    {
+        [Display(Name = "YES")]
+        [Description("Affirmative response")]
+        YES = 0,
+
+        [Display(Name = "NO")]
+        [Description("Negative response")]
+        NO = 1
+    }
+    public enum DURATION
+    {
+        [Display(Name = "No Time")]
+        [Description("No specific duration assigned")]
+        ZERO = 0,
+
+        [Display(Name = "Less than 6 Months")]
+        [Description("The duration is less than 6 months")]
+        LESS_THAN_6_MONTHS = 1,
+
+        [Display(Name = "More than 6 Months")]
+        [Description("The duration exceeds 6 months")]
+        MORE_THAN_6_MONTHS = 2
+    }
     public enum SupervisorRemarkType
     {
         OK,

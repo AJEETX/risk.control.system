@@ -22,8 +22,8 @@
             documentIdColor = "progress-bar-red";
             documentIdBorderColor = "border-danger";
         }
-        <div class="card bg-light d-flex flex-fill @documentIdBorderColor">
-            <div class="card bg-light d-flex flex-fill collapsed-card">
+        <div class="card @documentIdBorderColor">
+            <div class="card direct-chat-warning collapsed-card">
                 <div class="card-header text-muted border-bottom-0">
                     <h3 class="card-title">
                         <i class="fas fa-mobile-alt"></i> PAN CARD
@@ -55,7 +55,7 @@
                         </span>
                     </h3>
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Agent report # : @Model.AgencyReport.AgentEmail" class="badge badge-light">
+                        <span data-toggle="tooltip" title="Agent report time" class="badge badge-light">
                             <i class="nav-icon fas fa-clock"></i>
                             @Model.AgencyReport?.PanIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                         </span>
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="card collapsed-card">
+                    <div class="card direct-chat-warning collapsed-card">
                         <div class="card-header">
                             <i class="fas fa-film"></i> <h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
 
@@ -125,17 +125,6 @@
                             </p>
                         </div>
                     </div>
-                    <p class="text-center">
-                        <span class="badge badge-light">Valid : </span>
-                        @if (@Model.AgencyReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
-                        {
-                            <i class='fas fa-check-circle i-green'></i>
-                        }
-                        else
-                        {
-                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
-                        }
-                    </p>
                 </div>
 
                 @if (Model.ClaimsInvestigation.UpdateAgentReport)

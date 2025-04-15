@@ -30,7 +30,7 @@
             </span>
         </h3>
     </div>
-    <div class="card shadow-lg border-1 rounded-lg collapsed-card">
+    <div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
         <div class="card-header bg-light text-white text-center">
             <h3 class="card-title">
                 Case: @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
@@ -40,7 +40,7 @@
                         <li>
                             <i class='far fa-file-powerpoint'></i> Case details.
                         </li>
-                        @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "underwriting")
                         {
                             <li>
                                 <i class='fa fa-user-plus'></i> Customer details
@@ -68,11 +68,11 @@
 
             <div class="row">
                 <partial name="_ClaimPolicyDetails" model="@Model" />
-                @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "underwriting")
                 {
                     <partial name="_ClaimCustomerDetails" model="@Model" />
                 }
-                @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.DEATH)
+                else
                 {
                     <partial name="_ClaimBeneficairyDetails" model="@Model" />
                 }

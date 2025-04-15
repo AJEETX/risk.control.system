@@ -12,10 +12,13 @@ using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
+
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
     {
+        private readonly int maxCountReached = 10;
         private readonly INotificationService service;
         private readonly ISmsService smsService;
         private readonly IHttpClientService httpClientService;
@@ -26,6 +29,14 @@ namespace risk.control.system.Controllers.Api
             this.smsService = smsService;
             this.httpClientService = httpClientService;
         }
+        [HttpPost("ClearAll")]
+        public async Task<IActionResult> ClearAllNotifications()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            await service.ClearAll(userEmail); ;
+            return Ok();
+        }
+
         [HttpPost("MarkAsRead")]
         public async Task<IActionResult> MarkAsRead(NotificationRequest request)
         {
@@ -38,8 +49,8 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var notifications = await service.GetNotifications(userEmail);
-            var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, n.Status, CreatedAt = GetTimeAgo(n.CreatedAt) });
-            return Ok(new { Data = activeNotifications?.Take(10).ToList(), total = notifications.Count });
+            var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, n.Status, CreatedAt = GetTimeAgo(n.CreatedAt), user = n.NotifierUserEmail });
+            return Ok(new { Data = activeNotifications?.Take(maxCountReached).ToList(), total = notifications.Count, MaxCountReached = notifications.Count > maxCountReached, MaxCount = maxCountReached });
         }
         [AllowAnonymous]
         [HttpGet("GetClientIp")]

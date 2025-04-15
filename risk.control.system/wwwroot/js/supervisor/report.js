@@ -62,7 +62,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '" data-toggle="tooltip" title="Select Claim to submit (report)" />';
+                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '" data-toggle="tooltip" title="Select Case to submit (report)" />';
                     return img;
                 }
             },
@@ -173,8 +173,20 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false); // false => Retains current page
+        $("#allocatedcase").prop('disabled', true);
+    });
+
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -193,7 +205,7 @@
         });
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -248,6 +260,6 @@
             }
         });
     });
-    //initMap("/api/ClaimsVendor/GetReportMap");
+    
 
 });

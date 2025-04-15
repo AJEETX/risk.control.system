@@ -196,7 +196,9 @@ a.table-link {
 #agentLocationPicture {
     cursor: pointer;
 }
-
+.agentLocationPicture {
+    cursor: pointer;
+}
 #maps {
     height: 600px;
     margin: 0;
@@ -324,8 +326,16 @@ a.table-link {
     height: 300px;
     width: auto;
 }
+#agent-map {
+    height: 300px;
+    width: auto;
+}
 
 #face-map-url {
+    height: 100%;
+    width: 100%;
+}
+#agent-map-url {
     height: 100%;
     width: 100%;
 }
@@ -531,7 +541,7 @@ textarea {
     width: 100%;
     overflow-y: auto;
     resize: both;
-    min-height: 200px;
+    min-height: 100px;
     line-height: 20px;
     border: 1px solid #ddd;
 }
@@ -791,11 +801,6 @@ footer {
     --house-color: #0288D1;
     --shop-color: #7B1FA2;
     --warehouse-color: #558B2F;
-}
-
-.download-file {
-    border: 1px solid #ccc;
-    padding: 5px;
 }
 
 /*
@@ -1348,10 +1353,6 @@ a#back-button {
     min-width: 5rem;
 }
 
-.ziplink {
-    color: #007bff !important;
-}
-
 .remarks {
     background-color: lightgoldenrodyellow;
 }
@@ -1613,9 +1614,9 @@ ul#messagesList {
 
 .max-width-column-picodes {
     max-width: 300px;
-    white-space: nowrap; /* Prevents text wrapping */
-    overflow: hidden; /* Ensures overflow is hidden */
-    text-overflow: ellipsis; /* Adds ellipsis if text overflows */
+    white-space: break-spaces; /* Prevents text wrapping */
+    overflow: auto; /* Ensures overflow is hidden */
+    text-overflow: clip; /* Adds ellipsis if text overflows */
 }
 
 .trash-icon {
@@ -1878,6 +1879,49 @@ select#PinCodeId {
 #country-code-display {
     font-size: small;
 }
+/* Style the info icon */
+.info-toggle i {
+    font-size: 1.2rem;
+    color: #1E548D; /* Bootstrap primary blue */
+}
+
+/* Dropdown Styling */
+.info-dropdown {
+    width: 240px; /* Reduced width */
+    background: #f9fcff; /* Light blue background */
+    border: 1px solid #d1e3f8; /* Light blue border */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+}
+
+/* Dropdown items */
+.info-item-top {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    font-size: 12px;
+    color: #495057; /* Dark gray text */
+}
+
+/* Label Styling */
+.info-label-top {
+    flex-grow: 1;
+    font-weight: 500;
+    color: #6c757d; /* Muted text */
+}
+
+/* Value Styling */
+.info-value {
+    font-weight: bold;
+    color: #1E548D; /* Bootstrap primary blue */
+}
+
+/* Icons */
+.icon {
+    margin-right: 8px;
+    color: #28a745; /* Green */
+}
 
 .flag-icon {
     margin-right: 5px;
@@ -1948,8 +1992,17 @@ select#PinCodeId {
 .i-green {
     color: green;
 }
+.i-upload {
+    color: #17A2B8;
+}
+.i-assign {
+    color: #dc3545;
+}
 .i-blue {
     color: darkblue;
+}
+.i-red {
+    color: crimson;
 }
 .terms-condition {
     margin-top: 0.2em !important;
@@ -2320,4 +2373,407 @@ input#checkall {
 
 .isNewAssigned {
     background-color: #FCFCC4;
+}
+#notificationList{
+    padding:5px;
+}
+/* Notification dropdown styling */
+#notificationDropdown {
+    min-width: 350px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Notification header */
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    background: #f8f9fa;
+}
+
+/* Container for refresh & clear icons */
+.notification-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Notification refresh and clear icons */
+#notification-refresh,
+#clearNotifications {
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+    #notification-refresh:hover {
+        color: #007bff;
+        transform: rotate(15deg);
+    }
+
+    #clearNotifications:hover {
+        color: #dc3545;
+        transform: scale(1.1);
+    }
+
+/* Notification items */
+.notification-item {
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    position: relative;
+}
+
+    .notification-content:hover {
+        background: #f1f1f1;
+    }
+
+/* Notification content */
+.notification-content {
+    display: block;
+    align-items: center;
+    flex-grow: 1;
+    padding: 0 1em;
+    border-top: 1px solid #ddd;
+}
+.notification-action-content {
+    display: block;
+    flex-grow: 1;
+    padding: 0 1em;
+}
+
+/* Notification timestamp */
+.notification-time {
+    font-size: 12px;
+    color: #777;
+}
+
+/* Delete icon */
+.delete-notification {
+    cursor: pointer;
+    font-size: 14px;
+    color: #dc3545;
+    margin-left: 10px;
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+    .delete-notification:hover {
+        color: #b22222;
+        transform: scale(1.2);
+    }
+/* Disabled state for clear all icon */
+.clear-disabled {
+    color: #ccc !important;
+    pointer-events: none;
+    cursor: default;
+}
+.notification-message{
+    margin-left:5px;
+}
+/* Dropdown styling */
+.settings-dropdown {
+    min-width: 230px;
+    padding: 10px;
+}
+
+/* Profile section */
+.profile-section {
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+/* Profile image */
+.sidebar-profile {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 3px solid #fff;
+}
+
+/* Username and email */
+.username {
+    font-size: 16px;
+}
+
+.user-email {
+    font-size: 12px;
+}
+
+/* Logout button */
+.logout-btn {
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+    border:1px solid red;
+}
+
+    .logout-btn:hover {
+        background-color: #f8d7da !important;
+    }
+/* Dropdown menu styling */
+.info-dropdown {
+    min-width: 260px;
+    padding: 10px 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+/* Dropdown items */
+.info-item {
+    font-size: 12px;
+    padding: 8px 12px;
+}
+
+/* Labels */
+.info-label {
+    color: #555;
+}
+
+/* Flag icon */
+.flag-icon {
+    width: 22px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 3px;
+}
+
+/* Hover effects */
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+    transition: 0.2s ease-in-out;
+}
+
+/* Colors */
+.text-primary {
+    color: darkblue !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-dangez {
+    color: #dc3545 !important;
+}
+#agency-rating img.rating {
+    height: 1rem;
+    width: 1rem;
+    border: none;
+}
+
+.timeline-date {
+    margin-left: 1em;
+}
+/* Opacity for the entire row */
+.row-opacity-50 {
+    opacity: 0.5; /* Set the row opacity when pending */
+}
+
+.row-opacity-100 {
+    opacity: 1; /* Full opacity for non-pending rows */
+}
+
+/* Watermark class for pending status */
+.watermarked {
+    position: relative;
+}
+
+    /* Watermark text (opacity, font-size, color) */
+    .watermarked::before {
+        content: "Pending";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 40px;
+        color: rgba(0, 0, 0, 0.1);
+        font-weight: bold;
+        pointer-events: none;
+        user-select: none;
+        z-index: 1000;
+        opacity: 0.3; /* Watermark opacity */
+    }
+
+.watermark-row {
+    position: relative;
+    content: "Uploading...";
+}
+    .watermark-row::after {
+        content: "Processing"; /* Watermark text */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: rgba(200, 200, 200, 0.5); /* Light gray and semi-transparent */
+        pointer-events: none;
+        z-index: 10;
+        white-space: nowrap;
+    }
+    .watermark-row * {
+        opacity: 0.3; /* Fades the text in the background */
+    }
+.watermark-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.2); /* Light watermark effect */
+    pointer-events: none; /* Prevents interference with clicking */
+    text-transform: uppercase;
+}
+
+
+.hidden {
+    display: none;
+}
+
+#progressContainer {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+#progressBar {
+    width: 0%;
+    height: 5px;
+    background-color: green;
+    text-align: center;
+    color: white;
+    line-height: 5px;
+    border-radius: 5px;
+    transition: width 0.3s ease-in-out;
+}
+.custom-checkbox-lg {
+    width: 2rem;
+    height: 1rem;
+    cursor: pointer;
+}
+
+.highlighted-text {
+    padding-left:1em;
+    font-weight: bold;
+    color: #17a2b8; /* Bootstrap Info Blue */
+}
+
+.highlighted-text-assign {
+    font-weight: bold;
+    color: #dc3545; /* Bootstrap Danger Red */
+}
+
+.form-check-label i {
+    font-size: 1.2rem;
+    margin: 0 5px;
+}
+
+.filter-refresh-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: .5rem 0px .5rem .5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    margin-bottom: 1rem;
+    width: 100%; /* Occupies full width */
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1; /* Allows both elements to occupy equal space */
+}
+
+.filter-group-refresh {
+    display: flex;
+    gap: 0.75rem;
+    flex: 1; /* Allows both elements to occupy equal space */
+}
+
+.filter-label {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.custom-select {
+    flex: 1;
+    max-width: 150px;
+}
+
+.refresh-button {
+    flex: 0.1;
+    white-space: nowrap;
+    margin: 0.1rem 1rem 0.1rem 0.1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    border: 1px solid #ccc; /* Keep a subtle border */
+    transition: all 0.3s ease;
+}
+
+    .refresh-button:hover,
+    .refresh-button:active,
+    .refresh-button:focus {
+        box-shadow: none; /* Removes any unwanted shadow */
+        outline: none; /* Removes focus outline */
+    }
+/* Edit Profile Button */
+.edit-profile-btn {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 10px;
+    text-decoration: none;
+    border-radius: 20px;
+    transition: 0.3s;
+    background: white;
+    color: orange;
+}
+
+    /* Hover Effect */
+    .edit-profile-btn:hover {
+        color: white;
+    }
+.edit-profile-btn:active {
+    color: white;
+    transform: scale(0.96); /* Slight shrink effect */
+}
+.max-width-column-status {
+    max-width: 32em;
+    white-space: break-spaces; /* Prevents text wrapping */
+    overflow: auto; /* Ensures overflow is hidden */
+    text-overflow: clip; /* Adds ellipsis if text overflows */
+}
+.custom-message-badge {
+    max-width: 32em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+.doc-preview {
+    width: auto;
+    height: 100px;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 0.25rem;
+}
+
+.processing-row {
+    background-color: #fff3cd !important; /* light yellow */
+    color: #6c757d !important;
 }

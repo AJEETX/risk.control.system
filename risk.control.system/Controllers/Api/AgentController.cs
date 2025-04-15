@@ -5,12 +5,15 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using Hangfire;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
@@ -29,6 +32,8 @@ namespace risk.control.system.Controllers.Api
     [ApiController]
     public class AgentController : ControllerBase
     {
+        private const string CLAIM = "claims";
+        private const string UNDERWRITING = "underwriting";
         private Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
         private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
@@ -39,6 +44,8 @@ namespace risk.control.system.Controllers.Api
         private readonly ICompareFaces compareFaces;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
+        private readonly IFeatureManager featureManager;
+        private readonly IBackgroundJobClient backgroundJobClient;
         private readonly ISmsService smsService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
@@ -55,6 +62,8 @@ namespace risk.control.system.Controllers.Api
             UserManager<VendorApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
             IAgentService agentService,
+            IFeatureManager featureManager,
+            IBackgroundJobClient backgroundJobClient,
             ISmsService SmsService,
             IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
             IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService)
@@ -65,6 +74,8 @@ namespace risk.control.system.Controllers.Api
             this.compareFaces = compareFaces;
             this.userVendorManager = userVendorManager;
             this.agentService = agentService;
+            this.featureManager = featureManager;
+            this.backgroundJobClient = backgroundJobClient;
             smsService = SmsService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
@@ -328,6 +339,20 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
+
+                var agent = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == email);
+
+                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
                 IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)
@@ -386,6 +411,7 @@ namespace risk.control.system.Controllers.Api
                 filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
                 var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
+                var claimLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIM).LineOfBusinessId;
 
                 var claim2Agent = claimsAssigned
                     .Select(c =>
@@ -393,7 +419,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     claimId = c.ClaimsInvestigationId,
                     Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
-                    claimType = c.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                    claimType = c.PolicyDetail.LineOfBusinessId == claimLineOfBusiness ? ClaimType.DEATH : ClaimType.HEALTH,
                     DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
                     CustomerName = c.CustomerDetail.Name,
@@ -436,6 +462,19 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
+                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+
+                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
                 IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.ClientCompany)
@@ -496,6 +535,8 @@ namespace risk.control.system.Controllers.Api
                 filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
                 var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
+                var claimLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIM).LineOfBusinessId;
+                var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
                 var claim2Agent = claimsAssigned
                     .Select(c =>
@@ -505,12 +546,12 @@ namespace risk.control.system.Controllers.Api
                     Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                     Coordinate = new
                     {
-                        Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        Lat = c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ?
                             decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
-                        Lng = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        Lng = c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ?
                              decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
                     },
-                    Address = LocationDetail.GetAddress(c.PolicyDetail.ClaimType, c.CustomerDetail, c.BeneficiaryDetail),
+                    Address = LocationDetail.GetAddress(c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, c.CustomerDetail, c.BeneficiaryDetail),
                     PolicyNumber = c.PolicyDetail.ContractNumber,
                 });
                 return Ok(claim2Agent);
@@ -528,6 +569,19 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
+                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+
+                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
                 var claim = _context.ClaimsInvestigation
                     .Include(c => c.AgencyReport)
                     .Include(c => c.PolicyDetail)
@@ -632,10 +686,12 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        
         [AllowAnonymous]
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
+
             if (data == null ||
                      string.IsNullOrWhiteSpace(data.LocationImage) ||
                      !data.LocationImage.IsBase64String() ||
@@ -645,9 +701,32 @@ namespace risk.control.system.Controllers.Api
             }
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
-            var response = await iCheckifyService.GetFaceId(data);
-            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-            return Ok(response);
+            if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+            {
+                return Unauthorized("Invalid User !!!");
+            }
+            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+            {
+                if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                {
+                    return StatusCode(401, new { message = "Offboarded Agent." });
+                }
+            }
+
+
+            if(data.Type == "0")
+            {
+                var response = await iCheckifyService.GetAgentId(data);
+                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                return Ok(response);
+            }
+            else if (data.Type == "1")
+            {
+                var response = await iCheckifyService.GetFaceId(data);
+                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                return Ok(response);
+            }
+            return BadRequest();
         }
 
         [AllowAnonymous]
@@ -662,9 +741,20 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest();
             }
-
-            var response = await iCheckifyService.GetDocumentId(data);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+
+            if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+            {
+                return Unauthorized("Invalid User !!!");
+            }
+            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+            {
+                if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                {
+                    return StatusCode(401, new { message = "Offboarded Agent." });
+                }
+            }
+            var response = await iCheckifyService.GetDocumentId(data);
             response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
             return Ok(response);
         }
@@ -719,17 +809,27 @@ namespace risk.control.system.Controllers.Api
                 {
                     throw new ArgumentNullException("Argument(s) can't be null");
                 }
+                var agent = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
+                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
                 var (vendor, contract) = await claimsInvestigationService.SubmitToVendorSupervisor(
                     data.Email,
                     data.ClaimId,
                     data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
 
-                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, portal_base_url));
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-
-                return Ok(new { data, Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId) });
+                return Ok(new { data, Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId) });
             }
             catch (Exception ex)
             {

@@ -58,7 +58,7 @@
             <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
             <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-            <div class="card card-light expanded-card">
+            <div class="card card-light direct-chat-warning expanded-card">
                 <div class="card-header">
                     <h3 class="card-title">
                         Status: <span class="badge badge-info">
@@ -129,12 +129,7 @@
                                                 <b>Policy Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name
                                             </p>
                                             <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                <li class="small">
-                                                    <span class="fa-li">
-                                                        <i class="fas fa-money-bill-wave"></i>
-                                                    </span>
-                                                    Claim Type: <i class="fa fa-money"></i>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
-                                                </li>
+                                               
                                                 <li class="small">
                                                     <span class="fa-li">
                                                         <i class="fas fa-money-bill-wave"></i>
@@ -243,12 +238,7 @@
                                                 <b>Occupation: </b> @Model.ClaimsInvestigation?.CustomerDetail?.Occupation
                                             </p>
                                             <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                <li class="small">
-                                                    <span class="fa-li">
-                                                        <i class="fas fa-user-tag"></i>
-                                                    </span>
-                                                    Customer Type: @Model.ClaimsInvestigation?.CustomerDetail?.CustomerType
-                                                </li>
+                                                
                                                 <li class="small">
                                                     <span class="fa-li">
                                                         <i class="fa fa-money"></i>

@@ -113,6 +113,21 @@ namespace risk.control.system.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> KeepAlive()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (userId != null)
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user != null)
+                {
+                    user.LastActivityDate = DateTime.UtcNow;
+                    await _userManager.UpdateAsync(user);
+                }
+            }
+            return Ok();
+        }
         [HttpGet]
         public async Task StreamTypingUpdates(string email, CancellationToken cancellationToken)
         {
@@ -255,7 +270,14 @@ namespace risk.control.system.Controllers
                             var userIsAgent = vendorUser.Role == AppRoles.AGENT;
                             if (userIsAgent)
                             {
-                                vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                                if(await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
+                                {
+                                    vendorIsActive = false;
+                                }
+                                else
+                                {
+                                    vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                                }
                             }
                         }
                     }
@@ -432,7 +454,14 @@ namespace risk.control.system.Controllers
                             var userIsAgent = vendorUser.Role == AppRoles.AGENT;
                             if (userIsAgent)
                             {
-                                vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                                if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
+                                {
+                                    vendorIsActive = false;
+                                }
+                                else
+                                {
+                                    vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                                }
                             }
                         }
                     }

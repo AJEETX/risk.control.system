@@ -18,14 +18,12 @@ namespace risk.control.system.Models
         [Required]
         public string Code { get; set; } = default!;
 
-        public List<InvestigationServiceType>? InvestigationServiceTypes { get; set; } = default!;
         public bool MasterData { get; set; } = false;
         public override string ToString()
         {
             return $"Line Of Business Information:\n" +
            $"- Name: {Name}\n" +
-           $"- Code: {Code}\n" +
-           $"- Investigation Services Type: {InvestigationServiceTypes}";
+           $"- Code: {Code}";
         }
     }
 }

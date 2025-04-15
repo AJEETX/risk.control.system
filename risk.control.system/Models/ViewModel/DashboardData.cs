@@ -27,6 +27,7 @@
 
         public string BulkUploadBlockName { get; set; }
         public int BulkUploadBlockCount { get; set; }
+        public int BulkUploadAssignCount { get; set; }
         public string BulkUploadBlockUrl { get; set; } = string.Empty;
 
         public string? FifthBlockName { get; set; }
@@ -36,5 +37,12 @@
         public string? SixthBlockName { get; set; }
         public int? SixthBlockCount { get; set; }
         public string? SixthBlockUrl { get; set; } = string.Empty;
+
+        public int? UnderwritingCount { get; set; }
+        public int? ApprovedUnderwritingCount { get; set; }
+        public int? ApprovedClaimgCount { get; set; }
+        public int? RejectedUnderwritingCount { get; set; }
+        public int? RejectedClaimCount { get; set; }
+
     }
 }

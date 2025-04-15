@@ -13,11 +13,11 @@
             };
 
             <partial name="_ClaimPolicyDetails" model="@pmodel" />
-            @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+        @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "underwriting")
             {
                 <partial name="_ClaimCustomerDetails" model="@pmodel" />
             }
-            @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 <partial name="_ClaimBeneficairyDetails" model="@pmodel" />
             }

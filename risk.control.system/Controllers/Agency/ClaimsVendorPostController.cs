@@ -3,6 +3,8 @@ using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Hangfire;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -32,10 +34,14 @@ namespace risk.control.system.Controllers.Agency
         private readonly IClaimsVendorService vendorService;
         private readonly IMailboxService mailboxService;
         private readonly ApplicationDbContext _context;
+        private readonly IBackgroundJobClient backgroundJobClient;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public ClaimsVendorPostController(
             IClaimsInvestigationService claimsInvestigationService,
             INotyfService notifyService,
+            IBackgroundJobClient backgroundJobClient,
+            IHttpContextAccessor httpContextAccessor,
             IClaimsVendorService vendorService,
             IMailboxService mailboxService,
             ApplicationDbContext context)
@@ -44,6 +50,8 @@ namespace risk.control.system.Controllers.Agency
             this.notifyService = notifyService;
             this.vendorService = vendorService;
             this.mailboxService = mailboxService;
+            this.backgroundJobClient = backgroundJobClient;
+            this.httpContextAccessor = httpContextAccessor;
             _context = context;
             UserList = new List<UsersViewModel>();
         }
@@ -51,7 +59,7 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId, string drivingMap, string drivingDistance, string drivingDuration, string distanceInMeters, string durationInSeconds)
+        public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId)
         {
             try
             {
@@ -73,14 +81,17 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId, drivingMap,drivingDistance, drivingDuration,distanceInMeters,durationInSeconds);
+                var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error occurred.");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
-                await mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                backgroundJobClient.Enqueue(()=> mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, baseUrl));
 
                 notifyService.Custom($"Case #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
@@ -97,7 +108,7 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENT.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId)
+        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId, string caseType)
         {
             try
             {
@@ -120,19 +131,56 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
                 }
 
-                //END : POST FACE IMAGE AND DOCUMENT
-
-                if (!string.IsNullOrWhiteSpace(question1))
+                if(caseType == "claim")
                 {
-                    DwellType question1Enum = (DwellType)Enum.Parse(typeof(DwellType), question1, true);
-                    question1 = question1Enum.GetEnumDisplayName();
+                    if(int.TryParse(question1, out int intValue))
+                    {
+                        YESNO yesNo = (YESNO)intValue;
+
+                        // Optional: Validate if value is defined in the enum
+                        if (Enum.IsDefined(typeof(YESNO), yesNo))
+                        {
+                            question1 = yesNo.ToString();
+                        }
+                    }
+
+
+                    if (int.TryParse(question2, out int quest2))
+                    {
+                        DURATION duration = (DURATION)quest2;
+
+                        // Optional: Validate if value is defined in the enum
+                        if (Enum.IsDefined(typeof(DURATION), duration))
+                        {
+                            question2 = duration.ToString();
+                        }
+                    }
+                }
+                else
+                {
+                    if (int.TryParse(question1, out int intValue))
+                    {
+                        DwellType dwellType = (DwellType)intValue;
+
+                        // Optional: Validate if value is defined in the enum
+                        if (Enum.IsDefined(typeof(DwellType), dwellType))
+                        {
+                            question1 = dwellType.ToString();
+                        }
+                    }
+
+                    if (int.TryParse(question2, out int quest2))
+                    {
+                        Income income = (Income)quest2;
+
+                        // Optional: Validate if value is defined in the enum
+                        if (Enum.IsDefined(typeof(Income), income))
+                        {
+                            question2 = income.ToString();
+                        }
+                    }
                 }
 
-                if (!string.IsNullOrWhiteSpace(question2))
-                {
-                    Income question2Enum = (Income)Enum.Parse(typeof(Income), question2, true);
-                    question2 = question2Enum.GetEnumDisplayName();
-                }
                 var (vendor , contract )= await claimsInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
                     WebUtility.HtmlDecode(remarks),
                     WebUtility.HtmlDecode(question1),
@@ -144,10 +192,13 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Error submitting.");
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
                 }
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId, baseUrl));
 
-                notifyService.Custom($"Case #{contract}report submitted", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case #{contract} report submitted", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(AgentController.Index), "Agent");
             }
@@ -186,8 +237,12 @@ namespace risk.control.system.Controllers.Agency
                 if (success != null)
                 {
                     var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == userEmail);
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                    await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, baseUrl));
+                    //await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
 
                     notifyService.Custom($"Case #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }
@@ -227,9 +282,53 @@ namespace risk.control.system.Controllers.Agency
                 }
                 var agency = await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
 
-                await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId, baseUrl));
 
                 notifyService.Custom($"Case #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
+
+                return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
+
+            }
+        }
+        [HttpPost]
+        [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> WithdrawCaseFromAgent(ClaimTransactionModel model, string claimId, string policyNumber)
+        {
+            try
+            {
+                if (model == null || string.IsNullOrWhiteSpace(claimId))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
+
+                }
+                string userEmail = HttpContext?.User?.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
+
+                }
+                var agency = await claimsInvestigationService.WithdrawCaseFromAgent(userEmail, model, claimId);
+
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId, baseUrl));
+
+                notifyService.Custom($"Case #{policyNumber} withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
             }
@@ -270,8 +369,11 @@ namespace risk.control.system.Controllers.Agency
                 if (claim != null)
                 {
                     var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                    await mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId);
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId, baseUrl));
 
                     notifyService.Success("Enquiry Reply Sent to Company");
                     return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");

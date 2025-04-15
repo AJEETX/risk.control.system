@@ -46,6 +46,7 @@ namespace risk.control.system.Models
 
     public enum DigitalIdReportType
     {
+        AGENT_FACE,
         SINGLE_FACE,
         DUAL_FACE,
         HOUSE_FRONT,

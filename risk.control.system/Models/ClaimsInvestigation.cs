@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 using risk.control.system.Helpers;
 
@@ -49,15 +50,14 @@ namespace risk.control.system.Models
         public bool AssignedToAgency { get; set; } = false;
 
         public string? CurrentUserEmail { get; set; }
-        public AgencyReport? AgencyReport { get; set; } 
-
-        public List<PreviousClaimReport> PreviousClaimReports { get; set; } = new List<PreviousClaimReport>();
+        public AgencyReport? AgencyReport { get; set; } = new();
 
         public List<ClaimNote>? ClaimNotes { get; set; } = new();
         public string? CurrentClaimOwner { get; set; }
+        [JsonIgnore] 
         public List<ClaimMessage>? ClaimMessages { get; set; } = new();
-        public List<SmsNotification>? SmsNotifications { get; set; } = new();
-        public List<StatusNotification>? Notifications { get; set; } = new();
+        //public List<SmsNotification>? SmsNotifications { get; set; } = new();
+        //public List<StatusNotification>? Notifications { get; set; } = new();
         public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
 
@@ -87,6 +87,7 @@ namespace risk.control.system.Models
         public bool Deleted { get; set; } = false;
         public string? CompanyWithdrawlComment { get; set; }
         public string? AgencyDeclineComment { get; set; }
+        public string? AgencyWithdrawComment { get; set; }
         public string? UserEmailActioned { get; set; }
         public string? UserRoleActionedTo { get; set; }
         public string? UserEmailActionedTo { get; set; }
@@ -125,5 +126,14 @@ namespace risk.control.system.Models
         [Display(Name = "Duration")]
         public string? SelectedAgentDrivingDuration { get; set; } = default!;
         public int? SelectedAgentDrivingDurationInSeconds { get; set; } = default!;
+        public ALLOCATION_STATUS STATUS { get; set; } = ALLOCATION_STATUS.READY;
+    }
+    public enum ALLOCATION_STATUS
+    {
+        READY,
+        PENDING,
+        COMPLETED,
+        ERROR,
+        UNKNOWN
     }
 }

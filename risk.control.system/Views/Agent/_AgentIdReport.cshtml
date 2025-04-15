@@ -1,0 +1,205 @@
+﻿@model ClaimsInvestigationVendorsModel
+
+@{
+    var imageCapturedTime = @Model.AgencyReport?.AgentIdReport?.DigitalIdImageLongLatTime != null ? @Model.AgencyReport?.AgentIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    string digitalIdColor = "progress-bar-grey";
+    var borderColor = "";
+    if (Model.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime == null)
+    {
+        digitalIdColor = "progress-bar-grey";
+        borderColor = "";
+    }
+    else if (Model.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime != null && @Model.AgencyReport?.AgentIdReport?.Similarity < 70)
+    {
+        digitalIdColor = "progress-bar-red";
+        borderColor = "border-danger";
+    }
+    else if (Model.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime != null && @Model.AgencyReport?.AgentIdReport?.Similarity >= 70)
+    {
+        borderColor = "border-success";
+        digitalIdColor = "progress-bar-green";
+    }
+
+
+    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+
+        <div class="card bg-light d-flex flex-fill @borderColor">
+
+            <div class="card-header text-muted border-bottom-0">
+                <h3 class="card-title">
+                    <i class="fas fa-portrait"></i> Agent ID
+
+                    <span class="hover-text">
+                        <i class="fas fa-info-circle"></i>
+                        @if (borderColor == "")
+                        {
+                            <div class="tooltip-text" id="beneficiary-information">
+                                <div>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <b> Upload</b> Max image size 2 MB
+                                </div>
+                                <div>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <button class='btn btn-info btn-xs'>
+                                        <span class='badge badge-info btn-xs'>
+                                            <i class='fa fa-upload'></i> Upload
+                                        </span>
+                                    </button> Agent ID
+                                </div>
+
+                            </div>
+                        }
+                        else if (borderColor == "border-danger")
+                        {
+                            <div class="tooltip-text" id="beneficiary-information">
+                                <div>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <b> Upload</b> Max image size 2 MB
+                                </div>
+                                <div>
+                                    <i class='far fa-thumbs-down'></i> <i class='fa fa-times i-orangered' aria-hidden='true'></i> UnMatched Agent ID
+                                </div>
+                            </div>
+                        }
+                        else if (borderColor == "border-success")
+                        {
+                            <div class="tooltip-text" id="beneficiary-information">
+                                <div>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <b> Upload</b> Max image size 2 MB
+                                </div>
+                                <div>
+                                    <i class='far fa-thumbs-up'></i> <i class='fas fa-check-circlei-green'></i> Matched Agent ID
+                                </div>
+                            </div>
+                        }
+
+                    </span>
+                </h3>
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Agent report # : @Model.AgencyReport.AgentEmail" class="badge badge-light">
+                        <i class="nav-icon fas fa-clock"></i>
+                        @imageCapturedTime
+                    </span>
+
+                </div>
+            </div>
+
+            <div class="card-footer text-center">
+                <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  @Model.AgencyReport?.AgentIdReport?.Similarity</span>
+                @if (@Model.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime == null)
+                {
+                    <i class='fa fa-times i-grey' aria-hidden='true'></i>
+                }
+                else if (@Model.AgencyReport?.AgentIdReport?.Similarity < 70 && @Model.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime != null)
+                {
+                    <i class='fa fa-times i-orangered' aria-hidden='true'></i>
+                }
+
+                else
+                {
+                    <i class='fas fa-check-circle i-green'></i>
+                }
+            </div>
+            <div class="progress">
+                <i class="far fa-bookmark bookmark-green"></i>
+                <div class="progress-bar @digitalIdColor" role="progressbar">
+                    agent-id
+                </div>
+            </div>
+            <div class="card-body">
+                @if (@Model.AgencyReport?.AgentIdReport?.DigitalIdImageLocationUrl != null)
+                {
+                    <div class="card direct-chat direct-chat-warning collapsed-card">
+                        <div class="card-header">
+                            <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                            <div class="card-tools">
+                                <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="agent-map">
+                                <img id="agent-map-url" />
+                                <div id="agent-msg">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-6">
+                        <p class="text-muted text-sm">
+                            <span class="badge badge-light"><i class="far fa-image"></i> Agent Id Image</span>:
+                            <br />
+                            @{
+                                if (Model.AgencyReport?.AgentIdReport?.DigitalIdImage != null)
+                                {
+                                    <img data-toggle="tooltip" title="Face Image" class="img-fluid face-Image agentLocationPicture" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.AgentIdReport?.DigitalIdImage))">
+                                }
+                                else
+                                {
+                                    <img alt="face image" class="img-fluid no-Image agentLocationPicture" src=@Applicationsettings.NO_PHOTO_IMAGE data-toggle="tooltip" title="No Face Image">
+                                }
+                            }
+                        </p>
+
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted text-sm">
+
+                            <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
+                            <br />
+                            <label class="ocr-data img-fluid"> @Model?.AgencyReport?.AgentIdReport?.DigitalIdImageData</label>
+
+                        </p>
+                        <p class="text-muted text-sm">
+
+                            <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
+                            <br />
+                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.AgentIdReport?.DigitalIdImageLocationAddress</label>
+                        </p>
+                    </div>
+                </div>
+                <p class="text-center">
+                    <span class="badge badge-light"><i class="fas fa-portrait"></i> Match : @Model.AgencyReport?.AgentIdReport?.Similarity </span>
+                    @if (@Model.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime == null)
+                    {
+                        <i class='fa fa-times i-grey' aria-hidden='true'></i>
+                    }
+                    else if (@Model.AgencyReport?.AgentIdReport?.Similarity < 70 && @Model.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime != null)
+                    {
+                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
+                    }
+
+                    else
+                    {
+                        <i class='fas fa-check-circle i-green'></i>
+                    }
+                </p>
+            </div>
+
+
+            <form id="upload-agent" asp-controller="Uploads" asp-action="AgentUpload" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="agentIdLatitude" name="agentIdLatitude" />
+                <input type="hidden" id="agentIdLongitude" name="agentIdLongitude" />
+                <input type="hidden" id="selectedcase" name="selectedcase" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <div class="card-footer">
+
+                    <div class="form-group">
+                        <span class="input-group-label"> Upload AGENT ID : </span>
+                        <div class="input-group mb-3">
+                            <img class="form-Image" id="agent-Image" src="@Applicationsettings.NO_USER" title="Agent Id Image" />
+                            <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="agentImage" id="agentImage" data-toggle="tooltip" title="Upload Agent Image" />
+                            <button id="UploadAgentImageButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+}

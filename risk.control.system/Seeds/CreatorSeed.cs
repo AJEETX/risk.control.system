@@ -20,11 +20,6 @@ namespace risk.control.system.Seeds
         {
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", NO_USER);
-            
-            var ccMailBox = new Mailbox
-            {
-                Name = creatorEmailwithSuffix
-            };
 
             string creatorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
 
@@ -36,7 +31,6 @@ namespace risk.control.system.Seeds
             }
             var clientCreator = new ClientCompanyApplicationUser()
             {
-                Mailbox = ccMailBox,
                 UserName = creatorEmailwithSuffix,
                 Email = creatorEmailwithSuffix,
                 FirstName = firstName,

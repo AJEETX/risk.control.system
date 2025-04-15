@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
 
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Assessor/GetReport',
             dataSrc: ''
@@ -21,7 +21,15 @@
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 10                      // Index of the column to style
-        }],
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 11                      // Index of the column to style
+            },
+            {
+                'targets': 17, // Index for the "Case Type" column
+                'name': 'policy' // Name for the "Case Type" column
+            }],
         order: [[16, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -165,7 +173,8 @@
                     return buttons;
                 }
             },
-            { "data": "timeElapsed", "bVisible": false }
+            { "data": "timeElapsed", "bVisible": false },
+            { "data": "policy", bVisible: false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
 
@@ -179,14 +188,20 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-map').show(); // Show full map
-    }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-map').hide(); // Hide full map
+    $('#caseTypeFilter').on('change', function () {
+        table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"
     });
-
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false); // false => Retains current page
+    });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -203,7 +218,6 @@
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    //initMap("/api/CompanyCompletedClaims/GetReportMap");
 });
 
 function getdetails(id) {

@@ -44,26 +44,18 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-
         public async Task<IActionResult> DownloadLog(long id)
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
+                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+                if (file == null)
                 {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    notifyService.Error("OOPs !!!.. Download error");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
-                if (file == null) return null!;
-                var memory = new MemoryStream();
-                using (var stream = new FileStream(file.FilePath, FileMode.Open))
-                {
-                    await stream.CopyToAsync(memory);
-                }
-                memory.Position = 0;
-                return File(memory, file.FileType, file.Name + file.Extension);
+                var fileBytes = file.ByteData;
+                return File(fileBytes, file.FileType, file.Name + file.Extension);
             }
             catch (Exception ex)
             {
@@ -73,18 +65,89 @@ namespace risk.control.system.Controllers
             }
         }
 
-        public async Task<IActionResult> DeleteLog(long id)
+        [HttpPost]
+        public IActionResult DeleteLog(int id)
         {
-            var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
-            if (file == null) return null;
-            if (System.IO.File.Exists(file.FilePath))
+            var file = _context.FilesOnFileSystem.FirstOrDefault(f => f.Id == id);
+            if (file == null)
             {
-                System.IO.File.Delete(file.FilePath);
+                return NotFound(new { success = false, message = "File not found." });
             }
-            _context.FilesOnFileSystem.Remove(file);
-            _context.SaveChanges();
-            TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
-            return RedirectToAction("Uploads");
+
+            try
+            {
+                if (System.IO.File.Exists(file.FilePath))
+                {
+                    System.IO.File.Delete(file.FilePath); // Delete the file from storage
+                }
+                file.Deleted = true; // Mark as deleted in the database
+                _context.FilesOnFileSystem.Update(file); // Remove from database
+                _context.SaveChanges();
+
+                return Ok(new { success = true, message = "File deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = "Error deleting file: " + ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgentUpload(string selectedcase, IFormFile agentImage, string agentIdLatitude, string agentIdLongitude, bool supervisorPhotoIdUpdate = false)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
+                    (agentImage == null) ||
+                    string.IsNullOrWhiteSpace(selectedcase) ||
+                    string.IsNullOrWhiteSpace(agentIdLatitude) ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(agentImage.FileName)) ||
+                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(agentImage.FileName))) ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(agentImage.Name)) ||
+                    string.IsNullOrWhiteSpace(agentIdLongitude))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedcase))
+                {
+                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-portrait");
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
+                }
+
+                using (var ds = new MemoryStream())
+                {
+                    agentImage.CopyTo(ds);
+                    var imageByte = ds.ToArray();
+                    var response = await agentService.PostAgentId(currentUserEmail, selectedcase, agentIdLatitude, agentIdLongitude, imageByte);
+
+                    notifyService.Custom($"Agent Image Uploaded", 3, "green", "fas fa-portrait");
+                    if (supervisorPhotoIdUpdate)
+                    {
+                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedcase);
+                    }
+                    else
+                    {
+                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [HttpPost]

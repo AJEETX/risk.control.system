@@ -1,6 +1,6 @@
 ﻿@model ClaimTransactionModel
 
-<div class="card card-light collapsed-card">
+<div class="card card-light direct-chat direct-chat-warning collapsed-card">
     <div class="card-header">
         <h3 class="card-title">Timeline : <span class="badge badge-light"><i class="fas fa-clock"></i>  @Model.TimeTaken</span>
             <span class="hover-text">
@@ -28,7 +28,7 @@
                             foreach (var log in Model.Log)
                             {
                                 var movedTo = string.IsNullOrWhiteSpace(log.UserEmailActionedTo) ?  log.UserRoleActionedTo :  log.UserEmailActionedTo;
-                                <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
+                                <div class="time-label timeline-date"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
 
                                 <div>
                                     <i class="nav-icon fas fa-envelope bg-blue"></i>

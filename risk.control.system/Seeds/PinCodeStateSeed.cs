@@ -16,7 +16,7 @@ namespace risk.control.system.Seeds
         private static string currenciesFilePath = @"lang-currency.csv";
         private static string currenciesNameFilePath = @"currency.csv";
         private static string countriesFilePath = @"countries.csv";
-        private static string us_stateWisePincodeFilePath = @"us_zipcode.csv";
+        private static string us_stateWisePincodeFilePath = @"america_zipcode.csv";
         private static string au_stateWisePincodeFilePath = @"au_postcodes.csv";
         private static string all_india_pincodes = @"india_pincode.csv";
         private static string NO_DATA = " NO - DATA ";

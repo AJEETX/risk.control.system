@@ -18,16 +18,16 @@ namespace risk.control.system.Seeds
     {
         private const string vendorMapSize = "800x800";
         public static async Task<Vendor> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
-                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, 
-                    LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor, ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input)
+                    ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
             var globalSettings = context.GlobalSettings.FirstOrDefault();
+            var servicesTypes = await ServiceTypeSeed.Seed(context);
 
             //CREATE VENDOR COMPANY
 
-            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
+            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o=>o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
             var checkerAddressline = "1, Nice Road";
 
             var checkerAddress = checkerAddressline + ", " + checkerPinCode.District.Name + ", " + checkerPinCode.State.Name + ", " + checkerPinCode.Country.Code;
@@ -66,8 +66,6 @@ namespace risk.control.system.Seeds
                 DocumentImage = checkerImage,
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
-                EnableMailbox = globalSettings.EnableMailbox,
-                MobileAppUrl = globalSettings.MobileAppUrl,
                 CanChangePassword = globalSettings.CanChangePassword,
                 AddressMapLocation = checkerUrl,
                 AddressLatitude = checkerCoordinates.Latitude,
@@ -76,34 +74,27 @@ namespace risk.control.system.Seeds
 
             var checkerAgency = await context.Vendor.AddAsync(checker);
             await context.SaveChangesAsync(null, false);
-
-            var checkerServices = new List<VendorInvestigationServiceType>
+            var agencyServices = new List<VendorInvestigationServiceType>();
+            foreach (var service in servicesTypes)
             {
-                new VendorInvestigationServiceType{
+                var vendorService = new VendorInvestigationServiceType
+                {
                     VendorId = checkerAgency.Entity.VendorId,
-                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
-                    Price = 199,
-                    LineOfBusiness = lineOfBusiness,
-                    DistrictId = checkerPinCode.DistrictId,
+                    InvestigationServiceTypeId = service.InvestigationServiceTypeId,
+                    Price = 399,
+                    LineOfBusinessId = service.LineOfBusinessId,
+                    DistrictId = null,
                     StateId = checkerPinCode.StateId,
                     CountryId = checkerPinCode.CountryId,
                     Updated = DateTime.Now,
-                },
-                new VendorInvestigationServiceType{
-                    VendorId = checkerAgency.Entity.VendorId,
-                    InvestigationServiceTypeId = docServiceType.InvestigationServiceTypeId,
-                    Price = 99,
-                    DistrictId = checkerPinCode.DistrictId,
-                    StateId = checkerPinCode.StateId,
-                    CountryId = checkerPinCode.CountryId,
-                    LineOfBusiness = lineOfBusiness,
-                    Updated = DateTime.Now,
-                }
-            };
-            checker.VendorInvestigationServiceTypes = checkerServices;
+                };
+                agencyServices.Add(vendorService);
+            }
+
+            checker.VendorInvestigationServiceTypes = agencyServices;
 
             await context.SaveChangesAsync(null, false);
-            await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, checkerAgency.Entity, customApiCLient, httpAccessor);
+            await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, checkerAgency.Entity, customApiCLient);
 
             return checkerAgency.Entity;
         }

@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
 
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/agency/Supervisor/GetOpen',
             dataSrc: ''
@@ -18,7 +18,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 8                      // Index of the column to style
             }],
-        order: [[14, 'desc']],
+        order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -160,8 +160,7 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -178,14 +177,24 @@
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
             html: true
         });
     });
-    //initMap("/api/ClaimsVendor/GetOpenMap");
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false); // false => Retains current page
+    });
 });
 
 function showdetails(id) {

@@ -2,10 +2,28 @@
 $(document).ready(function () {
 
 
-    $("#customerTable").DataTable({
+    var table  = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Manager/GetActive',
-            dataSrc: ''
+            type: 'GET',
+            dataType: 'json',
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 15,
+                    orderDir: d.order?.[0]?.dir || "asc"
+                };
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+            }
         },
         columnDefs: [
             {
@@ -23,10 +41,16 @@ $(document).ready(function () {
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 8                      // Index of the column to style
+            },
+            {
+                'targets': 16, // Index for the "Case Type" column
+                'name': 'policy' // Name for the "Case Type" column
             }],
-        order: [[12, 'desc']],
+        order: [[15, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        serverSide: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -168,7 +192,9 @@ $(document).ready(function () {
                     buttons += '<a id="details' + row.id + '" href="ActiveDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;';
                     return buttons;
                 }
-            }
+            },
+            { "data": "timeElapsed", bVisible: false },
+            { "data": "policy", bVisible: false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
 
@@ -187,8 +213,23 @@ $(document).ready(function () {
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+
+    $('#caseTypeFilter').on('change', function () {
+        table.ajax.reload(); // Reload the table when the filter is changed
+    });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false); // false => Retains current page
+    });
+
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -205,7 +246,7 @@ $(document).ready(function () {
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -214,9 +255,7 @@ $(document).ready(function () {
     });
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
-
-
-    //initMap("/api/CompanyActiveClaims/GetActiveMap");
+    
 });
 
 function getdetails(id) {

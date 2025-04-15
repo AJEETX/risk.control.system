@@ -17,7 +17,7 @@ using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers.Company
 {
-    [Breadcrumb(" Claims")]
+    [Breadcrumb(" Cases")]
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     public class AssessorController : Controller
     {
@@ -86,6 +86,7 @@ namespace risk.control.system.Controllers.Company
                 if(model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+                    model.AgencyReport.AiSummaryUpdated = DateTime.Now;
                     model.ReportAiSummary = investigationSummary;
                 }
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
@@ -136,35 +137,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        [Breadcrumb(title: "Previous Reports", FromAction = "GetInvestigateReport")]
-        public IActionResult PreviousReports(long id)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                
-                if (id == 0)
-                {
-                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var model = investigationReportService.GetPreviousReport(id);
-
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
+        
         [Breadcrumb(title: "Review")]
         public IActionResult Review()
         {

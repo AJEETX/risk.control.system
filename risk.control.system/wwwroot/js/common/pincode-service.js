@@ -1,24 +1,4 @@
 ﻿$("#CountryId").val('');
-function SearchRemainingDistrict(showDefaultOption = true) {
-    var state = document.getElementById('StateId').value;
-    var stateId = document.getElementById('SelectedStateId').value;
-    var lobId = document.getElementById('LineOfBusinessId').value;
-    var serviceId = document.getElementById('InvestigationServiceTypeId').value;
-    var vendorId = document.getElementById('vendorId').value;
-
-    $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService",
-        {
-            stateId: stateId,
-            districtId: districtId,
-            district: district,
-            vendorId: vendorId,
-            lobId: lobId,
-            serviceId: serviceId
-        },
-        function (data) {
-            PopulatePinCode("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
-        });
-}
 
 function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
     $(dropDownId).empty();
@@ -117,33 +97,9 @@ $(document).ready(function () {
             });
         }
     });
-    //function toggleStateAndPinCodeFields() {
-    //    // Check if LineOfBusinessId, InvestigationServiceTypeId, and Price have values
-    //    if (
-    //        !$("#LineOfBusinessId").val() ||
-    //        !$("#InvestigationServiceTypeId").val() ||
-    //        !$("#Price").val()
-    //    ) {
-    //        // Disable StateId and PinCodeId if any of the fields are blank
-    //        $("#StateId").prop("disabled", true).val("").addClass('disabled');
-    //        $("#DistrictId").prop("disabled", true).val("");
-    //        //$("#PinCodeId").prop("disabled", true).val("");
-    //    } else {
-    //        // Enable StateId and PinCodeId if all fields have values
-    //        $("#StateId").prop("disabled", false);
-    //        //$("#PinCodeId").prop("disabled", false);
-    //        $("#DistrictId").prop("disabled", false);
-    //    }
-    //}
-
-    //// Run the function on page load
-    //toggleStateAndPinCodeFields();
-
-    //// Run the function whenever LineOfBusinessId, InvestigationServiceTypeId, or Price changes
-    //$("#LineOfBusinessId, #InvestigationServiceTypeId, #Price").on("change keyup", toggleStateAndPinCodeFields);
+   
     $("#StateId").on("blur change", function () {
         // Call the GetRemainingServicePinCode function with the necessary parameters
-        //SearchRemainingDistrict(false);
         console.log('state changes');
     });
 

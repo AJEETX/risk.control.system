@@ -19,13 +19,15 @@ using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using risk.control.system.Controllers.Api.Claims;
 using Google.Api;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace risk.control.system.Controllers.Api.Company
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class CreatorController : ControllerBase
     {
         private const string UNDERWRITING = "underwriting";
@@ -35,516 +37,163 @@ namespace risk.control.system.Controllers.Api.Company
 
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IManageCaseService manageCaseService;
+        private readonly ICreatorService creatorService;
         private readonly IClaimsService claimsService;
 
         public CreatorController(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment,
-            IManageCaseService manageCaseService,
+            ICreatorService creatorService,
             IClaimsService claimsService)
         {
             hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
-            this.manageCaseService = manageCaseService;
+            this.creatorService = creatorService;
             this.claimsService = claimsService;
         }
-        [HttpGet("GetPre")]
-        public IActionResult GetPre()
-        {
-            IQueryable<CaseVerification> claims = manageCaseService.GetCases();
-
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-            var data = claims.ToList();
-            claims = claims.Where(a =>
-                a.ClientCompanyId == companyUser.ClientCompanyId &&
-                     a.UserEmailActioned == companyUser.Email &&
-                         a.UserEmailActionedTo == companyUser.Email &&
-                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
-                 );
-
-            var claimsAssigned = new List<CaseVerification>();
-            var newClaimsAssigned = new List<CaseVerification>();
-            foreach (var item in claims)
-            {
-                item.AutoNew += 1;
-                if (item.AutoNew <= 1)
-                {
-                    newClaimsAssigned.Add(item);
-                }
-                claimsAssigned.Add(item);
-            }
-
-            if (newClaimsAssigned.Count > 0)
-            {
-                _context.CaseVerification.UpdateRange(newClaimsAssigned);
-                _context.SaveChanges();
-            }
-
-            var response = claimsAssigned
-                .Select(a => new CaseInvestigationResponse
-                {
-                    Id = a.CaseVerificationId,
-                    Amount = String.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                    PolicyId = a.PolicyDetail.ContractNumber,
-                    AssignedToAgency = a.AssignedToAgency,
-                    Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                   a.UserEmailActionedTo : a.UserRoleActionedTo,
-                    Pincode = CaseVerificationExtension.GetPincodePre(a.PolicyDetail.ClaimType, a.CustomerDetail, null),
-                    PincodeName = CaseVerificationExtension.GetPincodePreName(a.PolicyDetail.ClaimType, a.CustomerDetail, null),
-                    Document = a.PolicyDetail?.DocumentImage != null ?
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                    Customer = a.CustomerDetail?.ProfilePicture != null ?
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
-                    Name = a.CustomerDetail?.Name != null ?
-                    a.CustomerDetail?.Name : "<span class=\"badge badge-light\">customer name</span>",
-                    Policy = a.PolicyDetail?.LineOfBusiness?.Name,
-                    Status = a.InvestigationCaseStatus.Name,
-                    SubStatus = a.InvestigationCaseSubStatus.Name,
-                    Ready2Assign = a.IsReady2Assign,
-                    ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
-                    Service = a.PolicyDetail.InvestigationServiceType.Name,
-                    Location = a.ORIGIN.GetEnumDisplayName(),
-                    Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = a.GetCreatorPreTimePending(),
-                    Withdrawable = !a.NotWithdrawable,
-                    PolicyNum = a.GetPolicy(),
-                    BeneficiaryPhoto = Applicationsettings.NO_USER,
-                    BeneficiaryName = "<span class=\"badge badge-light\">beneficiary name</span>",
-                    TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                    IsNewAssigned = a.AutoNew <= 1,
-                    BeneficiaryFullName = "?",
-                    CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
-                    PersonMapAddressUrl = a.CustomerDetail.CustomerLocationMap
-                })?
-                .ToList();
-
-            return Ok(response);
-        }
+        
+        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         [HttpGet("GetAuto")]
-        public IActionResult GetAuto()
+        public async Task<IActionResult> GetAuto(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            IQueryable<ClaimsInvestigation> claims = claimsService.GetClaims();
-
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-
-            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
-            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-
-            claims = claims.Where(a =>
-                a.ClientCompanyId == companyUser.ClientCompanyId &&
-                     (a.UserEmailActioned == companyUser.Email &&
-                         a.UserEmailActionedTo == companyUser.Email &&
-                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
-                         ||
-                         (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
-                        a.UserEmailActionedTo == string.Empty &&
-                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
-                 ||
-                 (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
-                 ||
-                 (a.UserEmailActioned == companyUser.Email &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
-
-                 );
-
-            var claimsAssigned = new List<ClaimsInvestigation>();
-            var newClaimsAssigned = new List<ClaimsInvestigation>();
-            foreach (var item in claims)
-            {
-                item.AutoNew += 1;
-                if (item.AutoNew <= 1)
-                {
-                    newClaimsAssigned.Add(item);
-                }
-                claimsAssigned.Add(item);
-            }
-
-            if (newClaimsAssigned.Count > 0)
-            {
-                _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
-                _context.SaveChanges();
-            }
-
-            var response = claimsAssigned
-                .Select(a => new ClaimsInvestigationResponse
-                {
-                    Id = a.ClaimsInvestigationId,
-                    Amount = String.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                    PolicyId = a.PolicyDetail.ContractNumber,
-                    AssignedToAgency = a.AssignedToAgency,
-                    AutoAllocated = a.AutoAllocated,
-                    Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                   a.UserEmailActionedTo : a.UserRoleActionedTo,
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    Document = a.PolicyDetail?.DocumentImage != null ?
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                    Customer = a.CustomerDetail?.ProfilePicture != null ?
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
-                    Name = a.CustomerDetail?.Name != null ?
-                    a.CustomerDetail?.Name : "<span class=\"badge badge-light\">customer name</span>",
-                    Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                    Status = a.InvestigationCaseStatus.Name,
-                    SubStatus = a.InvestigationCaseSubStatus.Name,
-                    Ready2Assign = a.IsReady2Assign,
-                    ServiceType = $"{a.PolicyDetail?.LineOfBusiness.Name} ( {a.PolicyDetail.InvestigationServiceType.Name})",
-                    Service = a.PolicyDetail.InvestigationServiceType.Name,
-                    Location = a.ORIGIN.GetEnumDisplayName(),
-                    Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = a.GetCreatorTimePending(),
-                    Withdrawable = !a.NotWithdrawable,
-                    PolicyNum = a.GetPolicyNum(),
-                    BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
-                                      Applicationsettings.NO_USER,
-                    BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
-                        "<span class=\"badge badge-light\">beneficiary name</span>" :
-                        a.BeneficiaryDetail.Name,
-                    TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
-                    IsNewAssigned = a.AutoNew <= 1,
-                    BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
-                    CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
-                    PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
-                    a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap : null
-                })?
-                .ToList();
-
-            return Ok(response);
-        }
-
-        [HttpGet("GetUnderwriting")]
-        public IActionResult GetUnderwriting()
-        {
-            var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
-            IQueryable<ClaimsInvestigation> claims = claimsService.GetClaims().Where(c=>c.PolicyDetail.LineOfBusinessId == lineOfBusinessId);
-
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-
-            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
-            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-
-            claims = claims.Where(a =>
-                a.ClientCompanyId == companyUser.ClientCompanyId &&
-                     (a.UserEmailActioned == companyUser.Email &&
-                         a.UserEmailActionedTo == companyUser.Email &&
-                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
-                         ||
-                         (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
-                        a.UserEmailActionedTo == string.Empty &&
-                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
-                 ||
-                 (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
-                 ||
-                 (a.UserEmailActioned == companyUser.Email &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
-
-                 );
-
-            var claimsAssigned = new List<ClaimsInvestigation>();
-            var newClaimsAssigned = new List<ClaimsInvestigation>();
-            foreach (var item in claims)
-            {
-                item.AutoNew += 1;
-                if (item.AutoNew <= 1)
-                {
-                    newClaimsAssigned.Add(item);
-                }
-                claimsAssigned.Add(item);
-            }
-
-            if (newClaimsAssigned.Count > 0)
-            {
-                _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
-                _context.SaveChanges();
-            }
-
-            var response = claimsAssigned
-                .Select(a => new ClaimsInvestigationResponse
-                {
-                    Id = a.ClaimsInvestigationId,
-                    Amount = String.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                    PolicyId = a.PolicyDetail.ContractNumber,
-                    AssignedToAgency = a.AssignedToAgency,
-                    AutoAllocated = a.AutoAllocated,
-                    Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                   a.UserEmailActionedTo : a.UserRoleActionedTo,
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    Document = a.PolicyDetail?.DocumentImage != null ?
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                    Customer = a.CustomerDetail?.ProfilePicture != null ?
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
-                    Name = a.CustomerDetail?.Name != null ?
-                    a.CustomerDetail?.Name : "<span class=\"badge badge-light\">customer name</span>",
-                    Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                    Status = a.InvestigationCaseStatus.Name,
-                    SubStatus = a.InvestigationCaseSubStatus.Name,
-                    Ready2Assign = a.IsReady2Assign,
-                    ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
-                    Service = a.PolicyDetail.InvestigationServiceType.Name,
-                    Location = a.ORIGIN.GetEnumDisplayName(),
-                    Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = a.GetCreatorTimePending(),
-                    Withdrawable = !a.NotWithdrawable,
-                    PolicyNum = a.GetPolicyNum(),
-                    BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
-                                      Applicationsettings.NO_USER,
-                    BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
-                        "<span class=\"badge badge-light\">beneficiary name</span>" :
-                        a.BeneficiaryDetail.Name,
-                    TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                    IsNewAssigned = a.AutoNew <= 1,
-                    BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
-                    CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
-                    PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
-                    a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap : null
-                })?
-                .ToList();
+            
+            var response = await creatorService.GetAuto(currentUserEmail,draw,start,length, search, caseType, orderColumn, orderDir);
 
             return Ok(response);
+            
         }
-        [HttpGet("GetManual")]
-        public IActionResult GetManual()
+
+        private static string GetCreatorAutoTimePending(ClaimsInvestigation a, bool assigned = false)
         {
-            IQueryable<ClaimsInvestigation> claims = claimsService.GetClaims().Include(a =>a.PreviousClaimReports);
+            if (DateTime.Now.Subtract(a.Updated.Value).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Updated.Value).Days} days since created!\"></i>");
 
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-             i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            else if (DateTime.Now.Subtract(a.Updated.Value).Days >= 3 || DateTime.Now.Subtract(a.Updated.Value).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Updated.Value).Days} day since created.\"></i>");
+            if (DateTime.Now.Subtract(a.Updated.Value).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Days} day</span>");
 
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-
-            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
-            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.Country).Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
-
-            claims = claims.Where(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
-                 (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
-                        a.UserEmailActionedTo == string.Empty &&
-                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
-                 ||
-                 (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
-                 ||
-                 (a.UserEmailActioned == companyUser.Email &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
-                        ||
-                        (a.CREATEDBY == CREATEDBY.MANUAL && a.UserEmailActioned == companyUser.Email &&
-                         a.UserEmailActionedTo == companyUser.Email &&
-                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) ||
-                (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
-                a.UserEmailActionedTo == string.Empty &&
-                a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
-                );
-
-            var claimsAssigned = new List<ClaimsInvestigation>();
-            var newClaimsAssigned = new List<ClaimsInvestigation>();
-
-            foreach (var item in claims)
+            if (DateTime.Now.Subtract(a.Updated.Value).Hours < 24 &&
+                DateTime.Now.Subtract(a.Updated.Value).Hours > 0)
             {
-                item.ManualNew += 1;
-                if (item.ManualNew <= 1)
-                {
-                    newClaimsAssigned.Add(item);
-                }
-                claimsAssigned.Add(item);
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Hours} hr </span>");
             }
-            if (newClaimsAssigned.Count > 0)
+            if (DateTime.Now.Subtract(a.Updated.Value).Hours == 0 && DateTime.Now.Subtract(a.Updated.Value).Minutes > 0)
             {
-                _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
-                _context.SaveChanges();
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Minutes} min </span>");
             }
-            var response = claimsAssigned?
-                    .Select(a => new ClaimsInvestigationResponse
-                    {
-                        Id = a.ClaimsInvestigationId,
-                        AutoAllocated = a.AutoAllocated,
-                        AssignedToAgency = a.AssignedToAgency,
-                        PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
-                        Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ? a.CurrentClaimOwner : a.UpdatedBy,
-                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                        Customer = a.CustomerDetail?.ProfilePicture != null ?
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
-                        Name = a.CustomerDetail?.Name != null ? a.CustomerDetail?.Name : "<span class=\"badge badge-light\">customer name</span>",
-                        Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                        Status = a.InvestigationCaseStatus.Name,
-                        ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
-                        Service = a.PolicyDetail.InvestigationServiceType.Name,
-                        Location = a.ORIGIN.GetEnumDisplayName(),
-                        Created = a.Created.ToString("dd-MM-yyyy"),
-                        timePending = a.GetCreatorTimePending(false, a.IsReviewCase),
-                        PolicyNum = a.GetPolicyNum(),
-                        BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
-                                      Applicationsettings.NO_USER,
-                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
-                        "<span class=\"badge badge-light\">beneficiary name</span>" :
-                        a.BeneficiaryDetail.Name,
-                        TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                        IsNewAssigned = a.ManualNew <= 1,
-                        Ready2Assign = a.IsReady2Assign,
-                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
-                        CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
-                        AgencyDeclineComment = a.InvestigationCaseSubStatus == withdrawnByCompany ? 
-                        a.CompanyWithdrawlComment : a.InvestigationCaseSubStatus == withdrawnByAgency ? 
-                        a.AgencyDeclineComment : a.InvestigationCaseSubStatus == reAssignedStatus ? a.CompanyWithdrawlComment : "",
-                        PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
-                    a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap : null
-                    })
-                    ?.ToList();
-
-            return Ok(response);
+            if (DateTime.Now.Subtract(a.Updated.Value).Minutes == 0 && DateTime.Now.Subtract(a.Updated.Value).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
+
+        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         [HttpGet("GetActive")]
-        public IActionResult GetActive()
+        public async Task<IActionResult> GetActive(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Include(a => a.PreviousClaimReports);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.Country).Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
-            applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            var userEmail = HttpContext.User.Identity.Name;
 
-            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var withdrawnByCompanyStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-            var declinedByAgencyStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
-            var claimsSubmitted = new List<ClaimsInvestigation>();
-            var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-
-            var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.ClientCompanyId == companyUser.ClientCompanyId
-            && a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId
-            && a.InvestigationCaseSubStatusId != withdrawnByCompanyStatus.InvestigationCaseSubStatusId
-            && a.InvestigationCaseSubStatusId != declinedByAgencyStatus.InvestigationCaseSubStatusId
-            && a.InvestigationCaseSubStatusId != assigned2AssignerStatus.InvestigationCaseSubStatusId
-            );
-            List<ClaimsInvestigation> newClaims = new List<ClaimsInvestigation>();
-            foreach (var claim in claims)
-            {
-                var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase &&
-                c.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")?.ToList();
-
-                int? reviewLogCount = 0;
-                if (userHasReviewClaimLogs != null && userHasReviewClaimLogs.Count > 0)
-                {
-                    reviewLogCount = userHasReviewClaimLogs.OrderByDescending(o => o.HopCount).First().HopCount;
-                }
-                var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId &&
-                c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
-
-                if (userHasClaimLog)
-                {
-                    claim.ActiveView += 1;
-                    if (claim.ActiveView <= 1)
-                    {
-                        newClaims.Add(claim);
-                    }
-                    claimsSubmitted.Add(claim);
-                }
-            }
-            if (newClaims.Count > 0)
-            {
-                _context.ClaimsInvestigation.UpdateRange(newClaims);
-                _context.SaveChanges();
-            }
-            var profilebuilder = new StringBuilder();
-            profilebuilder.Append("<i class='fas fa-portrait'></i> Profile Image <span class='badge badge-light'></span>");
-
-            var response = claimsSubmitted
-                    .Select(a => new ClaimsInvestigationResponse
-                    {
-                        Id = a.ClaimsInvestigationId,
-                        AutoAllocated = a.AutoAllocated,
-                        CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "" : a.CustomerDetail.Name,
-                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "" : a.BeneficiaryDetail.Name,
-                        PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
-                        AssignedToAgency = a.AssignedToAgency,
-                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
-                        OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
-                        CaseWithPerson = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? true : false,
-                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                        Document = a.PolicyDetail?.DocumentImage != null ?
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : NO_POLICY_IMAGE,
-                        Customer = a.CustomerDetail?.ProfilePicture != null ?
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : NO_USER,
-                        Name = a.CustomerDetail?.Name != null ?
-                        a.CustomerDetail?.Name : "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
-                        Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                        Status = a.ORIGIN.GetEnumDisplayName(),
-                        SubStatus = a.InvestigationCaseSubStatus.Name,
-                        Ready2Assign = a.IsReady2Assign,
-                        ServiceType =  a.PolicyDetail?.LineOfBusiness.Name + "(" + a.PolicyDetail.InvestigationServiceType.Name + ")",
-                        Service = a.PolicyDetail.InvestigationServiceType.Name,
-                        Location = a.InvestigationCaseSubStatus.Name,
-                        Created = a.Created.ToString("dd-MM-yyyy"),
-                        timePending = a.GetCreatorTimePending(true),
-                        Withdrawable = !a.NotWithdrawable,
-                        PolicyNum = a.GetPolicyNum(),
-                        BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
-                                      NO_USER,
-                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
-                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.BeneficiaryDetail.Name,
-                        TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
-                        IsNewAssigned = a.ActiveView <= 1,
-                        PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
-                    })?
-                    .ToList();
+            var response = await creatorService.GetActive(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
             return Ok(response);
+        }
+
+        [HttpGet("GetFilesData/{uploadId?}")]
+        public async Task<IActionResult> GetFilesData(int uploadId = 0)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+
+            var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
+            var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
+
+            if(uploadId > 0 )
+            {
+                var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+                if (file == null)
+                {
+                    return NotFound(new { success = false, message = "File not found." });
+                }
+                if(file.ClaimsId != null && file.ClaimsId.Count > 0)
+                {
+                    totalReadyToAssign = totalReadyToAssign + file.ClaimsId.Count;
+                }
+            }
+            
+
+            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && ((f.UploadedBy == userEmail && !f.Deleted) || isManager)).ToListAsync();
+            var result = files.OrderBy(o=>o.CreatedOn).Select(file => new
+            {
+                file.Id,
+                SequenceNumber = isManager ? file.CompanySequenceNumber : file.UserSequenceNumber,
+                file.Name,
+                file.Description,
+                file.FileType,
+                CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm:ss"),
+                file.UploadedBy,
+                Status = file.Status,
+                file.Message,
+                Icon = file.Icon, // or use some other status representation
+                IsManager = isManager,
+                file.Completed,
+                file.DirectAssign,
+                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
+                TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
+                Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
+            }).ToList();
+
+            return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalReadyToAssign });
+        }
+
+        [HttpGet("GetFileById/{uploadId}")]
+        public async Task<IActionResult> GetFileById(int uploadId)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var file =  await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+            if (file == null)
+            {
+                return NotFound(new { success = false, message = "File not found." });
+            }
+            var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
+            var totalForAssign = totalReadyToAssign + file.ClaimsId?.Count;
+            var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
+
+            var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+            var result =  new
+            {
+                file.Id,
+                SequenceNumber = isManager ? file.CompanySequenceNumber : file.UserSequenceNumber,
+                file.Name,
+                file.Description,
+                file.FileType,
+                CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm:ss"),
+                file.UploadedBy,
+                Status = file.Status,
+                file.Completed,
+                file.Message,
+                Icon = file.Icon, // or use some other status representation
+                IsManager = isManager,
+                file.DirectAssign,
+                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
+                TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 : 
+                Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
+            };//<i class='fas fa-sync fa-spin'></i>
+
+            return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalForAssign });
+        }
+
+        [HttpGet("GetPendingAllocations")]
+        public async Task<IActionResult> GetPendingAllocations()
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+            var pendingCount = await _context.ClaimsInvestigation.CountAsync(c=>c.UpdatedBy == userEmail && c.STATUS == ALLOCATION_STATUS.PENDING);
+            return Ok(new { count = pendingCount });
         }
         private byte[] GetOwner(ClaimsInvestigation a)
         {

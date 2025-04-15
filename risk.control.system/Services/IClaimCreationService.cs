@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Company;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 namespace risk.control.system.Services
 {
     public interface IClaimCreationService
     {
-        Task<CaseVerification> Create(string userEmail, CaseVerification claimsInvestigation, IFormFile? claimDocument);
         Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
 
         Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
@@ -56,6 +56,7 @@ namespace risk.control.system.Services
 
                 claimsInvestigation.PolicyDetail.ClaimType = claimsInvestigation.PolicyDetail.LineOfBusinessId == claimId ? ClaimType.DEATH : ClaimType.HEALTH;
                 claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
                 claimsInvestigation.UserEmailActioned = userEmail;
                 claimsInvestigation.UserEmailActionedTo = userEmail;
                 claimsInvestigation.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
@@ -111,6 +112,7 @@ namespace risk.control.system.Services
                 existingPolicy.PolicyDetail.CauseOfLoss = claimsInvestigation.PolicyDetail.CauseOfLoss;
                 existingPolicy.Updated = DateTime.Now;
                 existingPolicy.UpdatedBy = userEmail;
+                existingPolicy.ORIGIN = ORIGIN.USER;
                 existingPolicy.CurrentUserEmail = userEmail;
                 existingPolicy.CurrentClaimOwner = userEmail;
                 existingPolicy.PolicyDetail.LineOfBusinessId = claimsInvestigation.PolicyDetail.LineOfBusinessId;
@@ -135,70 +137,14 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<ClientCompany> EditCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument)
-        {
-            try
-            {
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-
-                if (customerDocument is not null)
-                {
-                    using var dataStream = new MemoryStream();
-                    await customerDocument.CopyToAsync(dataStream);
-                    customerDetail.ProfilePicture = dataStream.ToArray();
-                }
-                else
-                {
-                    // Fetch existing customer to retain the existing ProfilePicture
-                    var existingCustomer = await context.CustomerDetail
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
-                    customerDetail.ProfilePicture ??= existingCustomer.ProfilePicture;
-                }
-
-                var claimsInvestigation = await context.ClaimsInvestigation
-                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
-                claimsInvestigation.AutoNew = 0;
-                claimsInvestigation.Updated = DateTime.Now;
-
-                customerDetail.CountryId = customerDetail.SelectedCountryId;
-                customerDetail.StateId = customerDetail.SelectedStateId;
-                customerDetail.DistrictId = customerDetail.SelectedDistrictId;
-                customerDetail.PinCodeId = customerDetail.SelectedPincodeId;
-
-                var pincode = context.PinCode
-                        .Include(p => p.District)
-                        .Include(p => p.State)
-                        .Include(p => p.Country)
-                        .FirstOrDefault(p => p.PinCodeId == customerDetail.PinCodeId);
-
-                var address = customerDetail.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
-                var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
-                var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
-                customerDetail.Latitude = latLong.Latitude;
-                customerDetail.Longitude = latLong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                customerDetail.CustomerLocationMap = url;
-
-                // Attach the customerDetail object to the context and mark it as modified
-                context.CustomerDetail.Attach(customerDetail);
-                context.Entry(customerDetail).State = EntityState.Modified;
-                context.ClaimsInvestigation.Update(claimsInvestigation);
-                // Save changes to the database
-                return await context.SaveChangesAsync() > 0 ? currentUser.ClientCompany: null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                return null;
-            }
-        }
-
+        
         public async Task<ClientCompany> CreateCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument)
         {
             try
             {
+                var claimsInvestigation = await context.ClaimsInvestigation.Include(c => c.PolicyDetail)
+                   .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
+                
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 if (customerDocument is not null)
                 {
@@ -207,10 +153,10 @@ namespace risk.control.system.Services
                     customerDetail.ProfilePicture = dataStream.ToArray();
                 }
 
-                var claimsInvestigation = await context.ClaimsInvestigation
-                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
+               
                 claimsInvestigation.AutoNew = 0;
                 claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
 
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
@@ -241,6 +187,68 @@ namespace risk.control.system.Services
                 return null;
             }
         }
+        public async Task<ClientCompany> EditCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument)
+        {
+            try
+            {
+                var claimsInvestigation = await context.ClaimsInvestigation.Include(c => c.PolicyDetail)
+                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
+                
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+
+                if (customerDocument is not null)
+                {
+                    using var dataStream = new MemoryStream();
+                    await customerDocument.CopyToAsync(dataStream);
+                    customerDetail.ProfilePicture = dataStream.ToArray();
+                }
+                else
+                {
+                    // Fetch existing customer to retain the existing ProfilePicture
+                    var existingCustomer = await context.CustomerDetail
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
+                    customerDetail.ProfilePicture ??= existingCustomer.ProfilePicture;
+                }
+
+
+                claimsInvestigation.AutoNew = 0;
+                claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
+
+                customerDetail.CountryId = customerDetail.SelectedCountryId;
+                customerDetail.StateId = customerDetail.SelectedStateId;
+                customerDetail.DistrictId = customerDetail.SelectedDistrictId;
+                customerDetail.PinCodeId = customerDetail.SelectedPincodeId;
+
+                var pincode = context.PinCode
+                        .Include(p => p.District)
+                        .Include(p => p.State)
+                        .Include(p => p.Country)
+                        .FirstOrDefault(p => p.PinCodeId == customerDetail.PinCodeId);
+
+                var address = customerDetail.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+                var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+                var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
+                customerDetail.Latitude = latLong.Latitude;
+                customerDetail.Longitude = latLong.Longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                customerDetail.CustomerLocationMap = url;
+
+                // Attach the customerDetail object to the context and mark it as modified
+                context.CustomerDetail.Attach(customerDetail);
+                context.Entry(customerDetail).State = EntityState.Modified;
+                context.ClaimsInvestigation.Update(claimsInvestigation);
+                // Save changes to the database
+                return await context.SaveChangesAsync() > 0 ? currentUser.ClientCompany : null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                Console.WriteLine(ex.StackTrace);
+                return null;
+            }
+        }
 
         public async Task<ClientCompany> CreateBeneficiary(string userEmail, string ClaimsInvestigationId, BeneficiaryDetail beneficiary, IFormFile? customerDocument)
         {
@@ -256,11 +264,13 @@ namespace risk.control.system.Services
                     customerDocument.CopyTo(dataStream);
                     beneficiary.ProfilePicture = dataStream.ToArray();
                 }
-                var claimsInvestigation = await context.ClaimsInvestigation
+                var claimsInvestigation = await context.ClaimsInvestigation.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == ClaimsInvestigationId);
+               
                 claimsInvestigation.AutoNew = 0;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.IsReady2Assign = true;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
@@ -296,6 +306,9 @@ namespace risk.control.system.Services
         {
             try
             {
+                var claimsInvestigation = await context.ClaimsInvestigation.Include(c => c.PolicyDetail)
+                    .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == beneficiary.ClaimsInvestigationId);
+                
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 if (customerDocument is not null)
                 {
@@ -312,11 +325,11 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var claimsInvestigation = await context.ClaimsInvestigation
-                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == beneficiary.ClaimsInvestigationId);
+                
                 claimsInvestigation.AutoNew = 0;
                 claimsInvestigation.Updated = DateTime.Now;
-
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
+                claimsInvestigation.IsReady2Assign = true;
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
@@ -346,60 +359,6 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 return null;
-            }
-        }
-
-        public async Task<CaseVerification> Create(string userEmail, CaseVerification caseVerification, IFormFile? claimDocument)
-        {
-            try
-            {
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                caseVerification.ClientCompanyId = currentUser.ClientCompanyId;
-
-                if (claimDocument is not null)
-                {
-                    using var dataStream = new MemoryStream();
-                    claimDocument.CopyTo(dataStream);
-                    caseVerification.CustomerDetail.ProfilePicture = dataStream.ToArray();
-                }
-                var initiatedStatusId = context.InvestigationCaseStatus.FirstOrDefault(i =>
-                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
-                var createdSubStatusId = context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
-
-                caseVerification.Updated = DateTime.Now;
-                caseVerification.UserEmailActioned = userEmail;
-                caseVerification.UserEmailActionedTo = userEmail;
-                caseVerification.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
-                caseVerification.UpdatedBy = userEmail;
-                caseVerification.CurrentUserEmail = userEmail;
-                caseVerification.CurrentClaimOwner = currentUser.Email;
-                caseVerification.InvestigationCaseStatusId = initiatedStatusId;
-                caseVerification.InvestigationCaseSubStatusId = createdSubStatusId;
-                caseVerification.CreatorSla = currentUser.ClientCompany.CreatorSla;
-                caseVerification.ClientCompany = currentUser.ClientCompany;
-                var aaddedClaimId = context.CaseVerification.Add(caseVerification);
-                var log = new CaseVerificationTransaction
-                {
-                    CaseVerificationId = caseVerification.CaseVerificationId,
-                    UserEmailActioned = userEmail,
-                    UserEmailActionedTo = userEmail,
-                    UserRoleActionedTo = $"{currentUser.ClientCompany.Email}",
-                    CurrentClaimOwner = currentUser.Email,
-                    HopCount = 0,
-                    Time2Update = 0,
-                    InvestigationCaseStatusId = initiatedStatusId,
-                    InvestigationCaseSubStatusId = createdSubStatusId,
-                    UpdatedBy = userEmail,
-                };
-                context.CaseVerificationTransaction.Add(log);
-
-                return await context.SaveChangesAsync() > 0 ? caseVerification : null!;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return null!;
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿@model ClaimTransactionModel
+﻿@using risk.control.system.Helpers
+@model ClaimTransactionModel
 @{
     string address = string.Empty;
     var imgPath = "/flags/in.png";
@@ -40,17 +41,12 @@
                         <b>Occupation: </b> @Model.ClaimsInvestigation?.CustomerDetail?.Occupation
                     </p>
                     <ul class="ml-4 mb-0 fa-ul text-muted">
-                        <li class="small">
-                            <span class="fa-li">
-                                <i class="fas fa-user-tag"></i>
-                            </span>
-                            Customer Type: @Model.ClaimsInvestigation?.CustomerDetail?.CustomerType
-                        </li>
+                        
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fa fa-money"></i>
                             </span>
-                            Annual Income: (@ViewBag.Currency) @Model.ClaimsInvestigation?.CustomerDetail?.Income
+                            Annual Income: (@ViewBag.Currency) @Model.ClaimsInvestigation?.CustomerDetail?.Income.GetEnumDisplayName()
                         </li>
                         <li class="small">
                             <span class="fa-li">

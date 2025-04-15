@@ -29,6 +29,10 @@ $(document).ready(function () {
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets:11                      // Index of the column to style
+            },
+            {
+                'targets': 17, // Index for the "Case Type" column
+                'name': 'policy' // Name for the "Case Type" column
             }],
         order: [[16, 'asc']],
         fixedHeader: true,
@@ -45,7 +49,7 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Select Claim to assess (report)"/>';
+                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Select Case to assess (report)"/>';
                     return img;
                 }
             },
@@ -173,7 +177,8 @@ $(document).ready(function () {
             },
             { "data": "timePending" },
             
-            { "data": "timeElapsed", "bVisible": false }
+            { "data": "timeElapsed", "bVisible": false },
+            { "data": "policy", bVisible: false }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {
@@ -182,9 +187,22 @@ $(document).ready(function () {
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+    $('#caseTypeFilter').on('change', function () {
+        table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"
+    });
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false); // false => Retains current page
+        $("#allocatedcase").prop('disabled', true);
+    });
 
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -224,7 +242,7 @@ $(document).ready(function () {
         }
 
     });
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -279,6 +297,5 @@ $(document).ready(function () {
             }
         });
     });
-
-    //initMap("/api/CompanyAssessClaims/GetAssessorMap");
+    
 });

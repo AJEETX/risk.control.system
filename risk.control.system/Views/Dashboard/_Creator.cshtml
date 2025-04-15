@@ -2,57 +2,46 @@
 
 <div class="row">
 
-@if(Model.AutoAllocation)
-{
-        <div class="col">
-
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <h3 id="new-claims" title="CLAIMS | UNDERWRITINGS" data-toggle="tooltip">@Model.FirstBlockCount | @Model.SecondBlockCount</h3>
-                    <span>@Model.FirstBlockName</span>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-random"></i>
-                </div>
-                <a href="@Model.FirstBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
-    }
-    else
+    @if(Model.BulkUpload)
     {
         <div class="col">
-
-            <div class="small-box bg-danger">
+            <div class="small-box bg-secondary">
                 <div class="inner">
-                    <h3 id="active-claims" title="CLAIMS | UNDERWRITINGS" data-toggle="tooltip">@Model.FirstBlockCount | @Model.SecondBlockCount</h3>
-                    <span>@Model.SecondBlockName</span>
+                    <h3 id="upload-claims" title="UPLOADS: @Model.BulkUploadBlockCount | DIRECT ASSIGN: @Model.BulkUploadAssignCount" data-toggle="tooltip">@Model.BulkUploadBlockCount | @Model.BulkUploadAssignCount</h3>
+                    <span>@Model.BulkUploadBlockName</span>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-external-link-alt"></i>
+                    <i class="fa fa-upload"></i>
                 </div>
-                <a href="@Model.SecondBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="@Model.BulkUploadBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
+        <div class="col-auto d-flex align-items-center">
+            <i class="fas fa-arrow-right fa-2x text-secondary"></i>
+        </div>
     }
-   
-       @*  <div class="col">
+    <div class="col">
 
-            <div class="small-box bg-danger">
-                <div class="inner">
-                    <h3 id="active2-claims">@Model.SecondBBlockCountBoth</h3>
-                    <span>@Model.SecondBBlockName</span>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-external-link-alt"></i>
-                </div>
-                <a href="@Model.SecondBBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3 id="new-claims" title="CLAIMS: @Model.FirstBlockCount | UNDERWRITINGS: @Model.SecondBlockCount" data-toggle="tooltip">@Model.FirstBlockCount | @Model.SecondBlockCount</h3>
+                <span>@Model.FirstBlockName</span>
             </div>
-        </div> *@
+            <div class="icon">
+                <i class="fas fa-random"></i>
+            </div>
+            <a href="@Model.FirstBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-auto d-flex align-items-center">
+        <i class="fas fa-arrow-right fa-2x text-warning"></i>
+    </div>
+   
         <div class="col">
 
             <div class="small-box bg-primary">
                 <div class="inner">
-                    <h3 id="submit-claims">@Model.ThirdBlockCount</h3>
+                <h3 id="active-claims" title="CLAIMS: @Model.ThirdBlockCount | UNDERWRITINGS: @Model.LastBlockCount" data-toggle="tooltip">@Model.ThirdBlockCount | @Model.LastBlockCount</h3>
                     <span>@Model.ThirdBlockName</span>
                 </div>
                 <div class="icon">
@@ -62,23 +51,12 @@
             </div>
         </div>
 
-    <div class="col">
-        <div class="small-box bg-secondary">
-            <div class="inner">
-                <h3 id="upload-claims">@Model.BulkUploadBlockCount</h3>
-                <span>@Model.BulkUploadBlockName</span>
-            </div>
-            <div class="icon">
-                <i class="fa fa-upload"></i>
-            </div>
-            <a href="@Model.BulkUploadBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
+    
 </div>
 
 <div class="row">
     <div class="col-md-6">
-        <div class="card card-light collapsed-card">
+        <div class="card card-light direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Pie Chart</h3>
                 <div class="card-tools">
@@ -95,7 +73,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card card-light collapsed-card">
+        <div class="card card-light direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Underwritings Pie Chart</h3>
                 <div class="card-tools">
@@ -131,7 +109,7 @@
 </div>
 <div class="row">
     <div class="col-md-6">
-        <div class="card card-light  collapsed-card">
+        <div class="card card-light  direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims(Agency-wise): Pie Chart</h3>
                 <div class="card-tools">
@@ -148,7 +126,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card card-light  collapsed-card">
+        <div class="card card-light  direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Underwritings(Agency-wise): Pie Chart</h3>
                 <div class="card-tools">
@@ -168,7 +146,7 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div class="card card-light collapsed-card">
+        <div class="card card-light direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Cases Bar Chart</h3>
                 <div class="card-tools">
@@ -185,7 +163,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card card-light collapsed-card">
+        <div class="card card-light direct-chat-warning collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Turn Around Time </h3>
                 <div class="card-tools">
