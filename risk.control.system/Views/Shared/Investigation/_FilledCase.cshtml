@@ -1,0 +1,109 @@
+﻿@using risk.control.system.Helpers
+@model CaseTransactionModel
+
+@{
+    ViewData["Title"] = "Details";
+
+}
+
+<div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+    <div class="card bg-light d-flex flex-fill">
+        <!-- Card Header -->
+        <div class="card-header text-muted border-bottom-0">
+            <i class="far fa-file-powerpoint"></i> Case Details
+            <span class="hover-text">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltip-text" id="policy-information">
+                    <i class="far fa-file-powerpoint"></i> Case details.
+                </span>
+            </span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress">
+            <i class="far fa-bookmark bookmark-green"></i>
+            <div class="progress-bar progress-bar-green" role="progressbar">
+                <i class="far fa-file-powerpoint"></i>
+            </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+            <div class="row">
+                <!-- Policy Details Section -->
+                <div class="col-7">
+                    <h2 class="lead">
+                        <b>@Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</b>
+                    </h2>
+                    <p class="text-muted text-sm">
+                        <b>Case Type: </b> @Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType.GetEnumDisplayName()
+                    </p>
+                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                        <li class="small">
+                            <span class="fa-li"><i class="fas fa-tools"></i></span>
+                            Service: @Model.ClaimsInvestigation?.PolicyDetail?.InvestigationServiceType?.Name
+                        </li>
+                        <li class="small">
+                            <span class="fa-li"><i class="fas fa-money-bill-wave"></i></span>
+                            Assured Amount (@ViewBag.Currency):  @Model.ClaimsInvestigation?.PolicyDetail?.SumAssuredValue
+                        </li>
+                        <li class="small">
+                            <span class="fa-li"><i class="fas fa-bolt"></i></span>
+                            Cause: @Model.ClaimsInvestigation?.PolicyDetail?.CauseOfLoss
+                        </li>
+                        
+                        <li class="small">
+                            <span class="fa-li"><i class="fas fa-money-check-alt"></i></span>
+                            Budget center: @Model.ClaimsInvestigation?.PolicyDetail?.CostCentre?.Name
+                        </li>
+                        <li class="small">
+                            <span class="fa-li"><i class="fas fa-sun"></i></span>
+                            Reason: @Model.ClaimsInvestigation?.PolicyDetail?.CaseEnabler?.Name
+                        </li>
+                        <li class="small">
+                            <span class="fa-li"><i class="far fa-clock"></i></span>
+                            Issue Date: @Model.ClaimsInvestigation?.PolicyDetail?.ContractIssueDate.ToString("dd-MMM-yyyy")
+                        </li>
+                        <li class="small">
+                            <span class="fa-li"><i class="far fa-clock"></i></span>
+                            Incidence Date: @Model.ClaimsInvestigation?.PolicyDetail?.DateOfIncident.ToString("dd-MMM-yyyy")
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Document Image Section -->
+                <div class="col-5 text-center">
+                    <p class="text-muted text-sm">
+                        @if (Model.ClaimsInvestigation?.PolicyDetail?.DocumentImage != null)
+                        {
+                            <img id="documentImage" class="img-fluid" src="data:image/*;base64,@(Convert.ToBase64String(Model.ClaimsInvestigation.PolicyDetail.DocumentImage))" data-toggle="tooltip" title="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber Document">
+                        }
+                        else
+                        {
+                            <img id="documentImage" alt="No Document" class="img-circle img-fluid form-Image" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Document" />
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+            <div class="text-right">
+                @if (Model.ClaimsInvestigation != null)
+                {
+                    <input type="hidden" asp-for="ClaimsInvestigation.Id" />
+                    <a id="edit-policy" class="btn btn-warning" asp-action="EditPolicy" asp-route-id="@Model.ClaimsInvestigation.Id">
+                        <i class="far fa-file-powerpoint"></i> Edit Case
+                    </a>
+                }
+                else
+                {
+                    <a class="btn btn-success" asp-action="CreatePolicy">
+                        <i class="far fa-file-powerpoint"></i> Add Case
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

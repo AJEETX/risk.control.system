@@ -4,7 +4,7 @@
     {
         <li class="nav-item">
             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","CompanyProfile") @Url.MakeActiveClass("Company","Users") 
-                            @Url.MakeActiveClass("Company","CreateUser") @Url.MakeActiveClass("Company","Edit") 
+                                    @Url.MakeActiveClass("Company","CreateUser") @Url.MakeActiveClass("Company","Edit")  @Url.MakeActiveClass("Question","")
                                     @Url.MakeActiveClass("Company","Users") @Url.MakeActiveClass("Company","CreateUser")">
                 <i class="nav-icon fas fa-landmark"></i>
                 <p class="sidebar-menu-header-label">
@@ -40,5 +40,17 @@
                 </p>
             </a>
         </li>
+        @if (System.Diagnostics.Debugger.IsAttached)
+        {
+            <li class="nav-item">
+                <a is-active-page asp-controller="Question" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Question","Index")">
+                    <i class="nav-icon fa fa-question"></i>
+                    <p>
+                        <span class="badge badge-success">QUESTION <sub>claim</sub></span>
+
+                    </p>
+                </a>
+            </li>
+        }
     }
 }

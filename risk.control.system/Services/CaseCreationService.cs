@@ -3,6 +3,8 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 
+using Google.Api;
+
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -16,6 +18,7 @@ namespace risk.control.system.Services
     public interface ICaseCreationService
     {
         Task<ClaimsInvestigation> PerformUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model);
+
     }
     public class CaseCreationService : ICaseCreationService
     {
@@ -24,14 +27,14 @@ namespace risk.control.system.Services
         private const string CUSTOMER_IMAGE = "customer.jpg";
         private const string BENEFICIARY_IMAGE = "beneficiary.jpg";
         private const string CLAIMS = "claims";
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
         private readonly ICustomApiCLient customApiCLient;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly Regex regex = new Regex("\"(.*?)\"");
         private const string NO_DATA = "NO DATA";
         public CaseCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient, IWebHostEnvironment webHostEnvironment)
         {
-            _context = context;
+            this.context = context;
             this.customApiCLient = customApiCLient;
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -90,13 +93,13 @@ namespace risk.control.system.Services
             {
                 caseType = UNDERWRITING;
             }
-            var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == caseType).LineOfBusinessId;
+            var lineOfBusinessId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == caseType).LineOfBusinessId;
 
             var servicetype = string.IsNullOrWhiteSpace(uploadCase.ServiceType)
-                ? _context.InvestigationServiceType.FirstOrDefault(i => i.LineOfBusinessId == lineOfBusinessId)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
-                : _context.InvestigationServiceType
+                ? context.InvestigationServiceType.FirstOrDefault(i => i.LineOfBusinessId == lineOfBusinessId)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
+                : context.InvestigationServiceType
                     .FirstOrDefault(b => b.Code.ToLower() == uploadCase.ServiceType.ToLower() && b.LineOfBusinessId == lineOfBusinessId)  // Case 2: Try matching Code + LineOfBusinessId
-                  ?? _context.InvestigationServiceType
+                  ?? context.InvestigationServiceType
                     .FirstOrDefault(b => b.LineOfBusinessId == lineOfBusinessId);  // Case 3: If no match, retry ignoring LineOfBusinessId
 
 
@@ -130,14 +133,14 @@ namespace risk.control.system.Services
             }
 
             var caseEnabler = string.IsNullOrWhiteSpace(uploadCase.Reason) ?
-                _context.CaseEnabler.FirstOrDefault() :
-                _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Reason.Trim().ToLower())
-                ?? _context.CaseEnabler.FirstOrDefault();
+                context.CaseEnabler.FirstOrDefault() :
+                context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Reason.Trim().ToLower())
+                ?? context.CaseEnabler.FirstOrDefault();
 
             var department = string.IsNullOrWhiteSpace(uploadCase.Department) ?
-               _context.CostCentre.FirstOrDefault() :
-               _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
-               ?? _context.CostCentre.FirstOrDefault();
+               context.CostCentre.FirstOrDefault() :
+               context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
+               ?? context.CostCentre.FirstOrDefault();
 
             string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", POLICY_IMAGE);
 
@@ -165,9 +168,9 @@ namespace risk.control.system.Services
             {
                 return null;
             }
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var status = context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var assignedStatus = context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var createdStatus = context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var subStatus = companyUser.ClientCompany.AutoAllocation && model.AutoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
             var claim = new ClaimsInvestigation
             {
@@ -201,7 +204,7 @@ namespace risk.control.system.Services
         }
         private async Task<CustomerDetail> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
-            var pinCode = _context.PinCode
+            var pinCode = context.PinCode
                                     .Include(p => p.District)
                                     .Include(p => p.State)
                                     .Include(p => p.Country)
@@ -300,7 +303,7 @@ namespace risk.control.system.Services
         }
         private async Task<BeneficiaryDetail> AddBeneficiary(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
-            var pinCode = _context.PinCode
+            var pinCode = context.PinCode
                                                 .Include(p => p.District)
                                                 .Include(p => p.State)
                                                 .Include(p => p.Country)
@@ -310,9 +313,9 @@ namespace risk.control.system.Services
                 return null;
             }
             var relation = string.IsNullOrWhiteSpace(uploadCase.Relation)
-                ? _context.BeneficiaryRelation.FirstOrDefault()  // Get first record from the table
-                : _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower())
-                ?? _context.BeneficiaryRelation.FirstOrDefault();  // Get matching record
+                ? context.BeneficiaryRelation.FirstOrDefault()  // Get first record from the table
+                : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower())
+                ?? context.BeneficiaryRelation.FirstOrDefault();  // Get matching record
             var beneficiaryNewImage = GetImagesWithDataInSubfolder(data, uploadCase.CaseId.ToLower(), BENEFICIARY_IMAGE);
             if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryIncome) && Enum.TryParse(typeof(Income), uploadCase.BeneficiaryIncome, out var incomeEnum))
             {
@@ -410,5 +413,6 @@ namespace risk.control.system.Services
             string extension = Path.GetExtension(filePath)?.ToLower();
             return imageExtensions.Contains(extension);
         }
+
     }
 }

@@ -1446,6 +1446,25 @@ a#back-button {
     cursor: pointer;
 }
 
+.question-tooltip {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    transform: translateY(-50%);
+    min-width: 200px;
+    z-index: 100;
+    background: #f8f9fa;
+    color: #212529;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.1);
+}
+
+.question-tooltip-visible {
+    display: block !important;
+}
+
 .tooltip-text {
     visibility: hidden;
     position: absolute;
@@ -2753,13 +2772,13 @@ input#checkall {
     transform: scale(0.96); /* Slight shrink effect */
 }
 .max-width-column-status {
-    max-width: 32em;
+    max-width: 22em;
     white-space: break-spaces; /* Prevents text wrapping */
     overflow: auto; /* Ensures overflow is hidden */
     text-overflow: clip; /* Adds ellipsis if text overflows */
 }
 .custom-message-badge {
-    max-width: 32em;
+    max-width: 22em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2777,3 +2796,54 @@ input#checkall {
     background-color: #fff3cd !important; /* light yellow */
     color: #6c757d !important;
 }
+
+/* General enhancements */
+.questionnaire-form {
+    background-color: #fefefe;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #0d6efd;
+}
+
+/* Question block */
+.question-block {
+    background-color: #f8f9fa;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    position: relative;
+    border-left: 5px solid #0d6efd;
+    transition: box-shadow 0.3s ease;
+}
+
+    .question-block:hover {
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.07);
+    }
+
+    .question-block label {
+        font-size: 1rem;
+        color: #333;
+    }
+.required-asterisk {
+    color: red;
+}
+.position-relative {
+    position: relative;
+}
+
+.btn-clear-date {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: #dc3545;
+    cursor: pointer;
+    z-index: 2;
+}
+
+    .btn-clear-date:hover {
+        color: #a71d2a;
+    }

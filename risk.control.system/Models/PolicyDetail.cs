@@ -31,7 +31,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Claim type")]
         public ClaimType? ClaimType { get; set; } = Models.ClaimType.DEATH;
-        public InsuranceType? InsuranceType { get; set; } = Models.InsuranceType.LIFE;
+        public InsuranceType? InsuranceType { get; set; } = Models.InsuranceType.CLAIM;
 
         [Display(Name = "Date of incident")]
         [DataType(DataType.Date)]

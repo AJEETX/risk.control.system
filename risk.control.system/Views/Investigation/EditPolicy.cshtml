@@ -1,0 +1,19 @@
+﻿@model risk.control.system.Models.InvestigationTask
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<section class="content">
+    <form id="edit-form" method="post" asp-controller="InvestigationPost" asp-action="EditPolicy" enctype="multipart/form-data">
+        <partial name="Investigation/_EditPolicy" model="Model" />
+        
+    </form>
+</section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/creator/policy.js"></script>
+    <script src="~/js/common/profile-image-upload.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
+}

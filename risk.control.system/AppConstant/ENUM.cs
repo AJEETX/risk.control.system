@@ -130,13 +130,13 @@ namespace risk.control.system.Models
 
     public enum InsuranceType
     {
-        [Display(Name = "LIFE")]
-        [Description("Insurance type life")]
-        LIFE,
+        [Display(Name = "CLAIM")]
+        [Description("Insurance Claim")]
+        CLAIM,
 
-        [Display(Name = "Health")]
-        [Description("Insurance type health")]
-        HEALTH
+        [Display(Name = "UNDERWRITING")]
+        [Description("Insurance Pre-Issuance")]
+        UNDERWRITING
     }
 
     public enum Gender

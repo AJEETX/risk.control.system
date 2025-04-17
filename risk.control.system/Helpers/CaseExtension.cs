@@ -20,6 +20,29 @@ namespace risk.control.system.Helpers
                 policyDetail.CaseEnablerId > 0 &&
                 policyDetail.CostCentreId > 0;
         }
+        public static bool IsValidCaseDetail(this PolicyDetail policyDetail)
+        {
+            return policyDetail != null && policyDetail != null &&
+               !string.IsNullOrWhiteSpace(policyDetail.ContractNumber.Trim()) &&
+                policyDetail.InsuranceType != null &&
+                policyDetail.InvestigationServiceTypeId > 0 &&
+               !string.IsNullOrWhiteSpace(policyDetail.CauseOfLoss) &&
+                policyDetail.SumAssuredValue != null &&
+                policyDetail.SumAssuredValue > 0 &&
+                policyDetail.ContractIssueDate != null &&
+                DateTime.Now > policyDetail.ContractIssueDate &&
+                policyDetail.DateOfIncident != null &&
+                policyDetail.DateOfIncident > policyDetail.ContractIssueDate &&
+                policyDetail.CaseEnablerId > 0 &&
+                policyDetail.CostCentreId > 0;
+        }
+        public static bool IsValidCaseData(this InvestigationTask claim)
+        {
+            var validPolicy = claim.PolicyDetail.IsValidCaseDetail();
+            var validCustomer = claim.PolicyDetail.IsValidCustomer(claim.CustomerDetail);
+            var validBeneficiary = claim.PolicyDetail.IsValidBeneficiary(claim.BeneficiaryDetail);
+            return validPolicy && validCustomer && validBeneficiary;
+        }
         public static bool IsValidCaseData(this ClaimsInvestigation claim)
         {
             var validPolicy = claim.PolicyDetail.IsValidPolicy();

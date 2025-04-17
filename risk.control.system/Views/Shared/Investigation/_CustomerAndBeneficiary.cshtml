@@ -1,0 +1,34 @@
+﻿@model CaseTransactionModel
+
+@{
+    bool customerExist = false;
+    bool beneficiaryExist = false;
+
+    if (Model.ClaimsInvestigation.CustomerDetail != null)
+    {
+        customerExist = true;
+    }
+    if (Model.Location?.BeneficiaryDetailId > 0)
+    {
+        beneficiaryExist = true;
+    }
+
+    if (@customerExist)
+    {
+        <partial name="Investigation/_FilledCustomerDetail" model="@Model" />
+    }
+    else
+    {
+        <partial name="Investigation/_BlankCustomerDetail" model="@Model" />
+
+    }
+
+    if (@beneficiaryExist)
+    {
+        <partial name="Investigation/_FilledBeneficiaryDetail" model="@Model" />
+    }
+    else
+    {
+        <partial name="Investigation/_BlankBeneficiaryDetail" model="@Model" />
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using Google.Api;
 
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 namespace risk.control.system.Seeds
@@ -47,6 +48,7 @@ namespace risk.control.system.Seeds
                 Code = "COMP",
                 MasterData = true,
                 Updated = DateTime.Now,
+                InsuranceType = InsuranceType.CLAIM,
                 LineOfBusiness = claimCaseType.Entity
             };
 
@@ -56,6 +58,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "STANDARD",
                 Code = "NON-COMP",
+                InsuranceType = InsuranceType.CLAIM,
                 MasterData = true,
                 Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
@@ -67,6 +70,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "COLLECTION",
                 Code = "DOC",
+                InsuranceType = InsuranceType.CLAIM,
                 MasterData = true,
                 Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
@@ -79,6 +83,7 @@ namespace risk.control.system.Seeds
                 Name = "DISCREET",
                 Code = "DISCREET",
                 MasterData = true,
+                InsuranceType = InsuranceType.CLAIM,
                 Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
             };
@@ -89,6 +94,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "PRE-BOARD",
                 Code = "PRE-OV",
+                InsuranceType = InsuranceType.UNDERWRITING,
                 MasterData = true,
                 Updated = DateTime.Now,
                 LineOfBusiness = underwritingCaseType.Entity
@@ -100,6 +106,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "POST-BOARD",
                 Code = "POST-OV",
+                InsuranceType = InsuranceType.UNDERWRITING,
                 MasterData = true,
                 LineOfBusiness = underwritingCaseType.Entity
             };

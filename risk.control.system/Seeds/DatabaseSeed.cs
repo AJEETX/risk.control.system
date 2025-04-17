@@ -43,6 +43,7 @@ namespace risk.control.system.Seeds
             await PinCodeStateSeed.Currencies(context);
             var countries = await PinCodeStateSeed.Countries(context);
 
+#if !DEBUG
             // seed INDIA
             var india = countries.FirstOrDefault(c => c.Code.ToLower() == "in");
             var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
@@ -54,12 +55,12 @@ namespace risk.control.system.Seeds
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
 
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
-
+#endif
             // seed AUSTRALIA
             var au = countries.FirstOrDefault(c => c.Code.ToLower() == "au");
             var auPincodes = await PinCodeStateSeed.CsvRead_Au();
             var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "nsw" ||
-                s.StateCode.ToLower() == "qld" ||
+                //s.StateCode.ToLower() == "qld" ||
                 s.StateCode.ToLower() == "vic"
                 ).Select(g => g.StateCode).Distinct()?.ToList();
 

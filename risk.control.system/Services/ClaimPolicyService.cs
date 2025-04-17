@@ -46,8 +46,7 @@ namespace risk.control.system.Services
                     InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i=>i.LineOfBusinessId == lineOfBusinessId).InvestigationServiceTypeId,
                     Comments = "SOMETHING FISHY",
                     SumAssuredValue = new Random().Next(10000, 99999),
-                    ContractNumber = contractNumber,
-                    InsuranceType = InsuranceType.LIFE,
+                    ContractNumber = contractNumber
                 },
                 InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
                 UserEmailActioned = userEmail,

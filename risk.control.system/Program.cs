@@ -118,6 +118,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<IInvestigationService, InvestigationService>();
 builder.Services.AddScoped<IHangfireJobService, HangfireJobService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<ICaseCreationService, CaseCreationService>();
@@ -226,7 +227,11 @@ else
     builder.Services.AddHangfire(config => config.UseMemoryStorage());
     //builder.Services.AddHangfire(config => config.UseSQLiteStorage(HangfireConnectionString));
 }
-builder.Services.AddHangfireServer();
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = 5;
+    options.Queues = new[] { "default", "emails", "critical" };
+});
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -377,12 +382,13 @@ builder.Services.AddMvcCore(config =>
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     Authorization = new[] { new BasicAuthAuthorizationFilter() }
 });
 app.UseMiddleware<RequirePasswordChangeMiddleware>();
-app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 //app.UseWebSockets();
 app.UseSwagger();
 
@@ -416,6 +422,7 @@ app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<LicensingMiddleware>();
+app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
 app.UseNToastNotify();
 app.UseNotyf();
