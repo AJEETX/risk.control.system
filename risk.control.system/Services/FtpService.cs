@@ -332,7 +332,7 @@ namespace risk.control.system.Services
             var uploadedUnderWritingCount = claims.Count(c => c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness);
             var assignedUnderWritingCount = claims.Count(c => autoAllocated.Contains(c.ClaimsInvestigationId) && c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness);
 
-            string message = $"Total Uploaded/Assigned Claims: {uploadedClaimCount}/{assignedClaimCount} & Total Uploaded/Assigned Underwritings: {uploadedUnderWritingCount}/{assignedUnderWritingCount})";
+            string message = $"Claims (Uploaded/Assigned) = ({uploadedClaimCount}/{assignedClaimCount}): Underwritings (Uploaded/Assigned) = ({uploadedUnderWritingCount}/{assignedUnderWritingCount})";
             fileData.Completed = true;
             fileData.Icon = "fas fa-check-circle i-green";
             fileData.Status = "Completed";

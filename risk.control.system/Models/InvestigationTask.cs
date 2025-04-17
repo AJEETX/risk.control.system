@@ -20,7 +20,7 @@ namespace risk.control.system.Models
         public bool IsUploaded { get; set; } = false;
         public bool IsReady2Assign { get; set; } = false;
         public bool AssignedToAgency { get; set; } = false;
-        public InvestigationReport InvestigationReport { get; set; }
+        public InvestigationReport? InvestigationReport { get; set; }
         public List<CaseNote>? CaseNotes { get; set; } = new();
         public List<CaseMessage>? CaseMessages { get; set; } = new();
 
@@ -48,5 +48,11 @@ namespace risk.control.system.Models
         [Display(Name = "Duration")]
         public string? SelectedAgentDrivingDuration { get; set; } = default!;
         public int? SelectedAgentDrivingDurationInSeconds { get; set; } = default!;
+    }
+
+    public enum CASETYPE
+    {
+        CLAIM,
+        UNDERWRITING
     }
 }

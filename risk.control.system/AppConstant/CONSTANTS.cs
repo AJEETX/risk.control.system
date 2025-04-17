@@ -2,6 +2,8 @@
 {
     public class CONSTANTS
     {
+        public const string COUNTRY_AU = "au";
+        public const string COUNTRY_IN = "in";
         public class CASE_STATUS
         {
             public const string INITIATED = "INITIATED";
@@ -10,6 +12,7 @@
 
             public class CASE_SUBSTATUS
             {
+                public const string DRAFTED_BY_CREATOR = "DRAFTED";
                 public const string CREATED_BY_CREATOR = "CREATED";
                 public const string EDITED_BY_CREATOR = "EDITED";
                 public const string ASSIGNED_TO_ASSIGNER = "ASSIGNED";
@@ -26,5 +29,7 @@
                 public const string WITHDRAWN_BY_AGENCY= "DECLINED";
             }
         }
+        public const string UNDERWRITING = "underwriting";
+        public const string CLAIMS = "claims";
     }
 }
