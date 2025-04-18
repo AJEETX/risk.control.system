@@ -51,6 +51,7 @@ namespace risk.control.system.Services
         Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
         Task BackgroundAutoAllocation(List<string> claims, string userEmail, string url = "");
         Task<List<string>> BackgroundUploadAutoAllocation(List<string> claimIds, string userEmail, string url = "");
+        Task<bool> SubmitNotes(string userEmail, long claimId, string notes);
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
@@ -1465,6 +1466,22 @@ namespace risk.control.system.Services
                 UpdatedBy = userEmail
             });
             _context.ClaimsInvestigation.Update(claim);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<bool> SubmitNotes(string userEmail, long claimId, string notes)
+        {
+            var claim = _context.Investigations
+               .Include(c => c.ClaimNotes)
+               .FirstOrDefault(c => c.Id == claimId);
+            claim.ClaimNotes.Add(new ClaimNote
+            {
+                Comment = notes,
+                Sender = userEmail,
+                Created = DateTime.Now,
+                Updated = DateTime.Now,
+                UpdatedBy = userEmail
+            });
+            _context.Investigations.Update(claim);
             return await _context.SaveChangesAsync() > 0;
         }
 

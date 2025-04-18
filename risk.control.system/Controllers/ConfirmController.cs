@@ -44,7 +44,31 @@ namespace risk.control.system.Controllers
 
             return Ok(new { message = "Message Sent: Success", customerName = customerName });
         }
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Sms2Customer(long claimId, string name)
+        {
+            var currentUser = HttpContext.User.Identity.Name;
+            var customerName = await notificationService.SendSms2Customer(currentUser, claimId, name);
+            if (string.IsNullOrEmpty(customerName))
+            {
+                return BadRequest("Error !!!");
+            }
 
+            return Ok(new { message = "Message Sent: Success", customerName = customerName });
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Sms2Beneficiary(long claimId, string name)
+        {
+            var currentUser = HttpContext.User.Identity.Name;
+            var customerName = await notificationService.SendSms2Beneficiary(currentUser, claimId, name);
+            if (string.IsNullOrEmpty(customerName))
+            {
+                return BadRequest("Error !!!");
+            }
+            return Ok(new { message = "Message Sent: Success", customerName = customerName });
+        }
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> SendSms2Beneficiary(string claimId, string name)
@@ -82,6 +106,33 @@ namespace risk.control.system.Controllers
             {
                 Console.WriteLine(ex.StackTrace);
                     return Unauthorized("Error !!!");
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> AddNotes(long claimId, string name)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    return Unauthorized("Error !!!");
+                }
+
+
+                var model = await claimsInvestigationService.SubmitNotes(currentUserEmail, claimId, name);
+                if (model)
+                {
+                    return Ok(new { message = "Notes added: Success" });
+                }
+                return BadRequest("Error !!!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return Unauthorized("Error !!!");
             }
         }
     }

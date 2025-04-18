@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class Question
+    public class Question :BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -29,6 +30,20 @@ namespace risk.control.system.Models
 
         // Dictionary to hold answers with question ID as key
         public Dictionary<int, string> Answers { get; set; } = new Dictionary<int, string>();
+    }
+
+    public class CaseQuestionnaire : BaseEntity
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public long ClientCompanyId { get; set; }
+        public ClientCompany ClientCompany { get; set; }
+        public InsuranceType InsuranceType { get; set; } = InsuranceType.CLAIM;
+        public List<Question> Questions { get; set; } = new List<Question>();
+        [NotMapped]
+        public Dictionary<int, string> Answers { get; set; } = new Dictionary<int, string>();
+
     }
 
 }

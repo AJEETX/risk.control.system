@@ -17,16 +17,19 @@ namespace risk.control.system.Models
         public BeneficiaryDetail? BeneficiaryDetail { get; set; }
         public string Status { get; set; }
         public string SubStatus { get; set; }
+        public string CaseOwner { get; set; }
         public bool IsUploaded { get; set; } = false;
         public bool IsReady2Assign { get; set; } = false;
         public bool AssignedToAgency { get; set; } = false;
         public InvestigationReport? InvestigationReport { get; set; }
+        public List<ClaimNote>? ClaimNotes { get; set; } = new();
         public List<CaseNote>? CaseNotes { get; set; } = new();
         public List<CaseMessage>? CaseMessages { get; set; } = new();
 
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
         public bool AiEnabled { get; set; } = false;
         public bool Deleted { get; set; } = false;
+        public string? TaskedAgentEmail { get; set; }
         public DateTime? TaskToAgentTime { get; set; }
         public DateTime? SubmittedToSupervisorTime { get; set; }
         public DateTime? SubmittedToAssessorTime { get; set; }
@@ -34,6 +37,7 @@ namespace risk.control.system.Models
         public DateTime? EnquiredByAssessorTime { get; set; }
         public DateTime? EnquiryReplyByAssessorTime { get; set; }
         public DateTime? ReviewByAssessorTime { get; set; }
+        public DateTime? AllocatedToAgencyTime { get; set; }
 
         public int CreatorSla { get; set; } = 5;
         public int AssessorSla { get; set; } = 5;
@@ -48,6 +52,7 @@ namespace risk.control.system.Models
         [Display(Name = "Duration")]
         public string? SelectedAgentDrivingDuration { get; set; } = default!;
         public int? SelectedAgentDrivingDurationInSeconds { get; set; } = default!;
+        public ICollection<InvestigationTimeline> InvestigationTimeline { get; set; }
     }
 
     public enum CASETYPE

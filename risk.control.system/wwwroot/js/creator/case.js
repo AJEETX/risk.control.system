@@ -109,4 +109,23 @@ $(document).ready(function () {
 
     // Set max dates for contract and incident dates
     $("#ContractIssueDate, #DateOfIncident").attr("max", maxDate);
+    $("#InsuranceType").on("change", function () {
+        // Clear and reset InvestigationServiceTypeId dropdown
+        $('#InvestigationServiceTypeId').empty();
+        $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
+
+        var value = $(this).val();
+
+        if (value != '') {
+            // Fetch investigation services via AJAX and populate the dropdown
+            $.get("/api/MasterData/GetInvestigationServicesByInsuranceType", { InsuranceType: value }, function (data) {
+                PopulateInvestigationServices("#InvestigationServiceTypeId", data);
+            });
+        }
+    });
 });
+function PopulateInvestigationServices(dropDownId, list) {
+    $.each(list, function (index, row) {
+        $(dropDownId).append("<option value='" + row.investigationServiceTypeId + "'>" + row.name + "</option>")
+    });
+}

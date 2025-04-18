@@ -233,13 +233,10 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var isPending = row.status === "PENDING"; // Check if status is "READY"
-                    var disabled = isPending ? "disabled" : "";  // Disable buttons if pending
-                    var spinClass = isPending ? "fa-spin" : ""; // Add spin class if pending
                     var buttons = "";
                     console.log(row.status);
                     if (row.ready2Assign) {
-                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
+                        buttons += '<a id="assign' + row.id + '" href="/Investigation/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
                         buttons += '<i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
@@ -333,7 +330,7 @@
 
         table.rows().every(function () {
             var data = this.data();
-            if (data.status != "PENDING") {
+            if (!data.isUploaded && data.origin == 'file') {
                 pendingExists = true;
                 return false; // Stop iterating once a "Pending" row is found
             }
@@ -537,7 +534,7 @@
     });
     function deleteSelectedCases(claims) {
         $.ajax({
-            url: "/CreatorPost/DeleteCases", // Update with your actual delete endpoint
+            url: "/InvestigationPost/DeleteCases", // Update with your actual delete endpoint
             type: "POST",
             data: JSON.stringify({ claims: claims }),
             contentType: "application/json",

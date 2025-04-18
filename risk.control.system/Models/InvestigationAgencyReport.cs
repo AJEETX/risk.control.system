@@ -13,7 +13,8 @@ namespace risk.control.system.Models
 
         public List<DigitalIdReport>? DigitalIdReports { get; set; } = new();
         public List<DocumentIdReport>? DocumentIdReports { get; set; } = new();
-
+        public long CaseQuestionnaireId { get; set; }
+        public CaseQuestionnaire CaseQuestionnaire { get; set; }
         public long? AgentIdReportId { get; set; }
         public DigitalIdReport? AgentIdReport { get; set; } = new();
 

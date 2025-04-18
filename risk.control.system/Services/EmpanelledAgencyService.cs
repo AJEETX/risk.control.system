@@ -10,6 +10,7 @@ namespace risk.control.system.Services
     public interface IEmpanelledAgencyService
     {
         Task<ClaimsInvestigationVendorsModel> GetEmpanelledVendors(string selectedcase);
+        Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase);
 
         Task<ClaimsInvestigation> GetAllocateToVendor(string selectedcase);
 
@@ -135,6 +136,43 @@ namespace risk.control.system.Services
                 Location = claimCase, 
                 //Vendors = vendorWithCaseCounts, 
                 ClaimsInvestigation = claimsInvestigation };
+        }
+        public async Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase)
+        {
+            var claimsInvestigation = await _context.Investigations
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .FirstOrDefaultAsync(m => m.Id == selectedcase);
+            var claimCase = _context.BeneficiaryDetail
+               .Include(c => c.ClaimsInvestigation)
+               .Include(c => c.PinCode)
+               .Include(c => c.BeneficiaryRelation)
+               .Include(c => c.District)
+               .Include(c => c.State)
+               .Include(c => c.Country)
+               .FirstOrDefault(c => c.InvestigationTaskId == selectedcase );
+            return new CaseInvestigationVendorsModel
+            {
+                Location = claimCase,
+                //Vendors = vendorWithCaseCounts, 
+                ClaimsInvestigation = claimsInvestigation
+            };
         }
 
         public async Task<ClaimsInvestigation> GetReAllocateToVendor(string selectedcase)

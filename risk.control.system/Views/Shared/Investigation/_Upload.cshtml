@@ -1,0 +1,48 @@
+﻿@model CreateClaims
+
+<div class="container mt-3">
+    <form id="upload-claims" asp-controller="InvestigationPost" asp-action="New" method="post" enctype="multipart/form-data">
+        <div class="card shadow-lg border-1 rounded-lg p-3">
+            @if (Model.AutoAllocation)
+            {
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input custom-checkbox-lg" type="checkbox" asp-for="UploadAndAssign" id="uploadAssignCheckbox" />
+                    <label class="form-check-label fw-bold ms-2 text-info" for="uploadAssignCheckbox">
+                        <span class="highlighted-text" title="Upload and Assign straight-away" data-toggle="tooltip">
+                            <span class="highlighted-text-assign">
+                            <i class="fas fa-random"></i>Assign Directly</span>
+                        </span>
+                    </label>
+                </div>
+            }
+            else
+
+            {
+                <div class="form-check form-switch mb-3">
+                    <label class="form-check-label fw-bold ms-2 text-info" for="uploadAssignCheckbox">
+                        <span class="highlighted-text" title="Upload case" data-toggle="tooltip"><i class="nav-icon fa fa-upload"></i>Upload</span>
+                    </label>
+                </div>
+            }
+            <div class="input-group">
+                @if (Model.BulkUpload && Model.UserCanCreate)
+                {
+                    <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select a ZIP file to upload" />
+
+                    <button id="UploadFileButton" type="submit" class="btn btn-info" disabled>
+                        <i class="nav-icon fa fa-upload"></i> File Upload
+                    </button>
+                }
+                else
+                {
+                    <input type="file" class="form-control remarks" data-toggle="tooltip" title="Upload Disabled" disabled />
+
+                    <button type="submit" class="btn btn-info" disabled>
+                        <i class="nav-icon fa fa-upload"></i> File Upload
+                    </button>
+                }
+
+            </div>
+        </div>
+    </form>
+</div>

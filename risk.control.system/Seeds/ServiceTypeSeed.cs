@@ -49,7 +49,7 @@ namespace risk.control.system.Seeds
                 MasterData = true,
                 Updated = DateTime.Now,
                 InsuranceType = InsuranceType.CLAIM,
-                LineOfBusiness = claimCaseType.Entity
+                LineOfBusiness = claimCaseType.Entity,
             };
 
             var claimComprehensiveService = await context.InvestigationServiceType.AddAsync(claimComprehensive);

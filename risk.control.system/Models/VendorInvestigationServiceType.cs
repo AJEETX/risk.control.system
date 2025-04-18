@@ -19,6 +19,8 @@ namespace risk.control.system.Models
         [Display(Name = "Investigation service type")]
         public InvestigationServiceType InvestigationServiceType { get; set; } = default!;
 
+        public InsuranceType? InsuranceType { get; set; } = Models.InsuranceType.CLAIM;
+
         [Display(Name = "Line of business")]
         public long? LineOfBusinessId { get; set; } = default!;
 

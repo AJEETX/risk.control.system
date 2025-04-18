@@ -17,6 +17,7 @@ namespace risk.control.system.Data
         }
         public virtual DbSet<InvestigationTask> Investigations { get; set; }
         public virtual DbSet<Question> Questions { get; set; }
+        public virtual DbSet<CaseQuestionnaire> CaseQuestionnaire { get; set; }
         public virtual DbSet<StatusNotification> Notifications { get; set; }
         public virtual DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
         public virtual DbSet<UserSessionAlive> UserSessionAlive { get; set; }

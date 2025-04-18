@@ -1,0 +1,89 @@
+﻿@model JobStatus
+@{
+    ViewData["Title"] = "Active ";
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <input type="hidden" id="pendingCount" value="@Model.PendingCount" />
+        <input type="hidden" id="jobId" value="@Model.JobId" />
+
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title">
+                <i class="fa fa-toggle-on"></i> Active
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <li>
+                            <i class='far fa-hand-point-right'></i> Active cases.
+                        </li>
+                        <li>
+                            <i class='far fa-thumbs-up'></i> <button class='badge badge-info xs'>
+                                <span class="badge badge-info"><i class='fas fa-search'></i> </span> DETAIL
+                            </button>
+                        </li>
+
+                    </span>
+                </span>
+
+            </h3>
+        </div>
+        <div class="filter-refresh-container shadow-lg border-1 rounded-lg">
+            <div class="filter-group">
+                <label for="caseTypeFilter" class="filter-label">
+                    <i class="bi bi-funnel"></i> Case Type:
+                </label>
+                <select id="caseTypeFilter" class="form-select custom-select">
+                    <option value="">All</option>
+                    <option value="claims">Claim</option>
+                    <option value="underwriting">Underwriting</option>
+                </select>
+            </div>
+            <div class="shadow-lg border-1 rounded-lg">
+
+                <button id="refreshTable" class="btn btn-light refresh-button">
+                    <i id="refreshIcon" class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+        </div>
+        <div id="progressContainer" class="hidden">
+            <div id="progressBar">0%</div>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+
+            <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
+                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th data-toggle="tooltip" title="Case Document" alt="Case Document"><img class="action-image" src="~/headers/policy-doc.gif" /></th>
+                            <th data-toggle="tooltip" title="Case Number" alt="Case Number"><img class="action-image" src="~/headers/policy-num.gif" /></th>
+                            <th data-toggle="tooltip" title="Case Owner"><img class="action-image" src="~/headers/owner.gif" /></th>
+                            <th data-toggle="tooltip" title="Address of Interest" alt="Address of Interest"><img class="action-image" src="~/headers/pincode.gif" /></th>
+
+                            <th data-toggle="tooltip" title="Asssured Amount" alt="Asssured Amount"><img class="action-image" src="~/headers/amount.gif" /></th>
+                            <th data-toggle="tooltip" title="Customer Photo" alt="Customer Photo"><img class="action-image" src="~/headers/portrait.gif" /></th>
+                            <th data-toggle ="tooltip" title="Customer Name" alt="Customer Name"><img class="action-image" src="~/headers/customer.gif" /></th>
+                            <th data-toggle ="tooltip" title="Beneficiary Photo" alt="Beneficiary Photo"><img class="action-image" src="~/headers/portrait.gif" /></th>
+                            <th data-toggle="tooltip" title="Beneficiary Name" alt="Beneficiary Name"><img class="action-image" src="~/headers/customer.gif" /></th>
+                            <th data-toggle="tooltip" title="Claim Type" alt="Claim Type"><img class="action-image" src="~/headers/claim-type.gif" /></th>
+                            <th data-toggle="tooltip" title="Status" alt="Status"><img class="action-image" src="~/headers/status.gif" /></th>
+                            <th data-toggle="tooltip" title="Allocated Date" alt="Allocated Date"><img class="action-image" src="~/headers/created.gif" /></th>
+                            <th data-toggle="tooltip" title="Allocated?"><img class="action-image" src="~/headers/auto.gif" /></th>
+                            <th data-toggle="tooltip" title="Duration since Allocated">
+                                <img class="action-image" src="~/headers/timer.gif" />
+                            </th>
+                                <th data-toggle="tooltip" title="Action"><img class="action-image" src="~/headers/action.gif" /></th>
+                        </tr>
+                    </thead>
+                </table>
+            </form>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script src="~/js/creator/active.js"></script>
+
+}

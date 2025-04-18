@@ -19,6 +19,7 @@ namespace risk.control.system.Services
     {
         Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId);
         Task<List<ClaimsInvestigation>> PerformCustomUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model);
+        Task<List<InvestigationTask>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model);
     }
     public class UploadService : IUploadService
     {
@@ -328,6 +329,38 @@ namespace risk.control.system.Services
                 foreach (var row in customData)
                 {
                     var claimUploaded = await _caseCreationService.PerformUpload(companyUser, row, model);
+                    if (claimUploaded == null)
+                    {
+                        return null;
+                    }
+                    uploadedClaims.Add(claimUploaded);
+                    int progress = (int)(((uploadedRecordsCount + 1) / (double)totalCount) * 100);
+                    uploadProgressService.UpdateProgress(model.Id, progress);
+                    uploadedRecordsCount++;
+                }
+                return uploadedClaims;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return null;
+            }
+        }
+
+        public async Task<List<InvestigationTask>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model)
+        {
+            try
+            {
+                if (customData == null || customData.Count == 0)
+                {
+                    return null; // Return 0 if no CSV data is found
+                }
+                var uploadedClaims = new List<InvestigationTask>();
+                var uploadedRecordsCount = 0;
+                var totalCount = customData.Count;
+                foreach (var row in customData)
+                {
+                    var claimUploaded = await _caseCreationService.FileUpload(companyUser, row, model);
                     if (claimUploaded == null)
                     {
                         return null;

@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var response = await creatorService.GetActive(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+            var response = await service.GetActive(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
             return Ok(response);
         }
@@ -112,7 +112,7 @@ namespace risk.control.system.Controllers.Api.Company
             var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
 
-            var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
+            var totalReadyToAssign = await service.GetAutoCount(userEmail);
             var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
 
             if(uploadId > 0 )
@@ -163,7 +163,7 @@ namespace risk.control.system.Controllers.Api.Company
             {
                 return NotFound(new { success = false, message = "File not found." });
             }
-            var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
+            var totalReadyToAssign = await service.GetAutoCount(userEmail);
             var totalForAssign = totalReadyToAssign + file.ClaimsId?.Count;
             var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
 

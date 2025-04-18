@@ -20,6 +20,7 @@ namespace risk.control.system.Helpers
                 policyDetail.CaseEnablerId > 0 &&
                 policyDetail.CostCentreId > 0;
         }
+
         public static bool IsValidCaseDetail(this PolicyDetail policyDetail)
         {
             return policyDetail != null && policyDetail != null &&

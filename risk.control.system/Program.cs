@@ -118,6 +118,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<ITimelineService, TimelineService>();
+builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.AddScoped<IProcessCaseService, ProcessCaseService>();
 builder.Services.AddScoped<IInvestigationService, InvestigationService>();
 builder.Services.AddScoped<IHangfireJobService, HangfireJobService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();

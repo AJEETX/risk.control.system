@@ -18,6 +18,7 @@ namespace risk.control.system.Services
     public interface ICaseCreationService
     {
         Task<ClaimsInvestigation> PerformUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model);
+        Task<InvestigationTask> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model);
 
     }
     public class CaseCreationService : ICaseCreationService
@@ -202,6 +203,119 @@ namespace risk.control.system.Services
             claim.IsReady2Assign = claim.IsValidCaseData();
             return claim;
         }
+        private async Task<InvestigationTask> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model)
+        {
+
+            var customerTask = AddCustomer(companyUser, uploadCase, model.ByteData);
+            var beneficiaryTask = AddBeneficiary(companyUser, uploadCase, model.ByteData);
+            await Task.WhenAll(customerTask, beneficiaryTask);
+
+            // Get the results
+            var customer = await customerTask;
+            var beneficiary = await beneficiaryTask;
+            InsuranceType caseType = InsuranceType.CLAIM;
+            if (uploadCase.CaseType != "0")
+            {
+                caseType = InsuranceType.UNDERWRITING;
+            }
+            
+            var servicetype = string.IsNullOrWhiteSpace(uploadCase.ServiceType)
+                ? context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == caseType)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
+                : context.InvestigationServiceType
+                    .FirstOrDefault(b => b.Code.ToLower() == uploadCase.ServiceType.ToLower() && b.InsuranceType == caseType)  // Case 2: Try matching Code + LineOfBusinessId
+                  ?? context.InvestigationServiceType
+                    .FirstOrDefault(b => b.InsuranceType == caseType);  // Case 3: If no match, retry ignoring LineOfBusinessId
+
+
+
+            var savedNewImage = GetImagesWithDataInSubfolder(model.ByteData, uploadCase.CaseId.ToLower(), POLICY_IMAGE);
+
+            if (!string.IsNullOrWhiteSpace(uploadCase.Amount) && decimal.TryParse(uploadCase.Amount, out var amount))
+            {
+                uploadCase.Amount = amount.ToString();
+            }
+            else
+            {
+                uploadCase.Amount = "0";
+            }
+
+            if (!string.IsNullOrWhiteSpace(uploadCase.IssueDate) && DateTime.TryParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var issueDate))
+            {
+                uploadCase.IssueDate = issueDate.ToString("dd-MM-yyyy");
+            }
+            else
+            {
+                uploadCase.IssueDate = DateTime.Now.ToString("dd-MM-yyyy");
+            }
+            if (!string.IsNullOrWhiteSpace(uploadCase.IncidentDate) && DateTime.TryParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfIncident))
+            {
+                uploadCase.IncidentDate = dateOfIncident.ToString("dd-MM-yyyy");
+            }
+            else
+            {
+                uploadCase.IncidentDate = DateTime.Now.ToString("dd-MM-yyyy");
+            }
+
+            var caseEnabler = string.IsNullOrWhiteSpace(uploadCase.Reason) ?
+                context.CaseEnabler.FirstOrDefault() :
+                context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Reason.Trim().ToLower())
+                ?? context.CaseEnabler.FirstOrDefault();
+
+            var department = string.IsNullOrWhiteSpace(uploadCase.Department) ?
+               context.CostCentre.FirstOrDefault() :
+               context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
+               ?? context.CostCentre.FirstOrDefault();
+
+            string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", POLICY_IMAGE);
+
+            var policyDetail = new PolicyDetail
+            {
+                ContractNumber = uploadCase.CaseId,
+                SumAssuredValue = Convert.ToDecimal(uploadCase.Amount),
+                ContractIssueDate = DateTime.ParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
+                //ClaimType = (ClaimType.DEATH)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
+                InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
+                DateOfIncident = DateTime.ParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
+                CauseOfLoss = !string.IsNullOrWhiteSpace(uploadCase.Cause.Trim()) ? uploadCase.Cause.Trim() : "UNKNOWN",
+                CaseEnablerId = caseEnabler.CaseEnablerId,
+                CostCentreId = department.CostCentreId,
+                InsuranceType = caseType,
+                DocumentImage = savedNewImage ?? File.ReadAllBytes(noImagePath),
+                Updated = DateTime.Now,
+                UpdatedBy = companyUser.Email
+            };
+            if (!policyDetail.IsValidCaseDetail())
+            {
+                return null;
+            }
+            if (customer is null || !policyDetail.IsValidCustomerForUpload(customer) || beneficiary is null || !policyDetail.IsValidBeneficiaryForUpload(beneficiary))
+            {
+                return null;
+            }
+            var status = context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var assignedStatus = context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var createdStatus = context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var subStatus = companyUser.ClientCompany.AutoAllocation && model.AutoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
+            var claim = new InvestigationTask
+            {
+                Status = CONSTANTS.CASE_STATUS.INITIATED,
+                SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
+                CaseOwner = companyUser.Email,
+                Updated = DateTime.Now,
+                UpdatedBy = companyUser.Email,
+                Deleted = false,
+                AssignedToAgency = false,
+                IsReady2Assign = ValidateDataCase(uploadCase),
+                ORIGIN = model.FileOrFtp,
+                ClientCompanyId = companyUser.ClientCompanyId,
+                CreatorSla = companyUser.ClientCompany.CreatorSla
+            };
+            claim.PolicyDetail = policyDetail;
+            claim.CustomerDetail = customer;
+            claim.BeneficiaryDetail = beneficiary;
+            claim.IsReady2Assign = claim.IsValidCaseData();
+            return claim;
+        }
         private async Task<CustomerDetail> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
             var pinCode = context.PinCode
@@ -209,7 +323,7 @@ namespace risk.control.system.Services
                                     .Include(p => p.State)
                                     .Include(p => p.Country)
                                     .FirstOrDefault(p => p.Code == uploadCase.CustomerPincode);
-            if (pinCode.CountryId != companyUser.ClientCompany.CountryId)
+            if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
             {
                 return null;
             }
@@ -414,5 +528,26 @@ namespace risk.control.system.Services
             return imageExtensions.Contains(extension);
         }
 
+        public async Task<InvestigationTask> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model)
+        {
+            try
+            {
+                if (companyUser is null || uploadCase is null || model is null || !ValidateDataCase(uploadCase))
+                {
+                    return null;
+                }
+                var claimUploaded = await AddCaseDetail(uploadCase, companyUser, model);
+                if (claimUploaded == null)
+                {
+                    return null;
+                }
+                return claimUploaded;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return null;
+            }
+        }
     }
 }

@@ -56,20 +56,6 @@
                 </p>
             </a>
         </li>
-    @if (System.Diagnostics.Debugger.IsAttached)
-    {
-        <li class="nav-item">
-            <a is-active-page asp-controller="Investigation" asp-action="New" class="actual-link nav-link @Url.MakeActiveClass("Investigation","Index")">
-                <i class="fas fa-random nav-icon"></i>
-                <p>
-                    <span class="badge badge-success">ADD <sub>new</sub></span>
-
-                </p>
-            </a>
-        </li>
-    }
-    
-   
     <li class="nav-item">
         <a is-active-page asp-controller="ClaimsActive" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsActive","Active")
                                                 @Url.MakeActiveClass("ClaimsActive","ActiveDetail") ">
@@ -79,16 +65,4 @@
             </p>
         </a>
     </li>
-    @if (System.Diagnostics.Debugger.IsAttached)
-    {
-        <li class="nav-item">
-            <a is-active-page asp-controller="Question" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Question","Index")">
-                <i class="nav-icon fa fa-question"></i>
-                <p>
-                    <span class="badge badge-success">QUESTION <sub>claim</sub></span>
-
-                </p>
-            </a>
-        </li>
-    }
 }

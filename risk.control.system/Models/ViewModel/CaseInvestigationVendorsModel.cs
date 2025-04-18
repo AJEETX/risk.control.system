@@ -1,0 +1,16 @@
+﻿
+namespace risk.control.system.Models.ViewModel
+{
+    public class CaseInvestigationVendorsModel
+    {
+        public InvestigationTask ClaimsInvestigation { get; set; }
+        public BeneficiaryDetail Location { get; set; }
+        public AgencyReport AgencyReport { get; set; }
+        public List<VendorCaseModel> Vendors { get; set; }
+        public AssessorRemarkType AssessorRemarkType { get; set; }
+        public bool TrialVersion { get; set; }
+        public long? VendorId { get; set; }
+        public string? ReportAiSummary { get; set; }
+        public bool FromEditPage { get; set; } = false;
+    }
+}

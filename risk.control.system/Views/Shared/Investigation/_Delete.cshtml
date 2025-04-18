@@ -1,0 +1,43 @@
+﻿@model CaseTransactionModel
+<div class="card-header">
+    <h3 class="card-title">
+        <i class="fas fa-newspaper"></i> Delete
+        <span class="hover-text">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltip-text" id="information">
+                <li>
+                    <i class='far fa-hand-point-right'></i> Deletes the claim info permanently.
+                </li>
+                <li>
+                    <i class='far fa-thumbs-up'></i> Please make sure before you delete.
+                </li>
+            </span>
+        </span>
+
+    </h3>
+</div>
+
+<article>
+    <input type="hidden" id="customerDetailId"  asp-for="ClaimsInvestigation.CustomerDetail.CustomerDetailId" />
+    <input type="hidden" id="beneficiaryId" asp-for="ClaimsInvestigation.BeneficiaryDetail.BeneficiaryDetailId" />
+    <input id="claimId" type="hidden" asp-for="ClaimsInvestigation.Id" />
+    <div class="bb-blog-inner">
+        <div class="card shadow-lg border-1 rounded-lg direct-chat-warning">
+            <div class="card-header bg-light">
+                <h3 class="card-title">Case: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span></h3>
+                
+            </div>
+
+            <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <div class="row">
+                    <partial name="Investigation/_DeletePolicy" model="Model" />
+                    <partial name="Investigation/_DeleteCustomer" model="Model" />
+                    <partial name="Investigation/_DeleteBeneficiary" model="Model" />
+                </div>
+            </div>
+        </div>
+    </div> <!-- class bb-blog-inner -->
+</article>

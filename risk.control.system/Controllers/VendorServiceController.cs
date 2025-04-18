@@ -90,7 +90,6 @@ namespace risk.control.system.Controllers
             try
             {
                 var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
-                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
                 ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
@@ -140,7 +139,7 @@ namespace risk.control.system.Controllers
                        .AsEnumerable() // Switch to client-side evaluation
                        .Where(v =>
                            v.VendorId == VendorId &&
-                           v.LineOfBusinessId == service.LineOfBusinessId &&
+                           v.InsuranceType == service.InsuranceType &&
                            v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                            v.CountryId == (long?)service.SelectedCountryId &&
                            v.StateId == (long?)service.SelectedStateId)?
@@ -234,8 +233,7 @@ namespace risk.control.system.Controllers
                     .Include(v => v.Vendor)
                     .First(v => v.VendorInvestigationServiceTypeId == id);
 
-                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId), "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.InsuranceType == vendorInvestigationServiceType.InsuranceType), "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
 
                 if (vendorInvestigationServiceType.DistrictId == null)
                 {
@@ -278,7 +276,7 @@ namespace risk.control.system.Controllers
                          .AsNoTracking() // Switch to client-side evaluation
                         .Where(v =>
                             v.VendorId == VendorId &&
-                            v.LineOfBusinessId == service.LineOfBusinessId &&
+                            v.InsuranceType == service.InsuranceType &&
                             v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                             v.CountryId == (long?)service.SelectedCountryId &&
                             v.StateId == (long?)service.SelectedStateId &&

@@ -12,6 +12,8 @@
 
             public class CASE_SUBSTATUS
             {
+                public const string UPLOAD_IN_PROGRESS = "PENDING";
+                public const string UPLOAD_COMPLETED = "COMPLETED";
                 public const string DRAFTED_BY_CREATOR = "DRAFTED";
                 public const string CREATED_BY_CREATOR = "CREATED";
                 public const string EDITED_BY_CREATOR = "EDITED";

@@ -83,6 +83,7 @@ namespace risk.control.system.Seeds
                     InvestigationServiceTypeId = service.InvestigationServiceTypeId,
                     Price = 399,
                     LineOfBusinessId = service.LineOfBusinessId,
+                    InsuranceType = service.InsuranceType,
                     DistrictId = null,
                     StateId = checkerPinCode.StateId,
                     CountryId = checkerPinCode.CountryId,

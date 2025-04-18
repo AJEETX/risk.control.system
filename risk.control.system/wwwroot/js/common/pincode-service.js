@@ -69,7 +69,6 @@ function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
             //$('#create').prop('disabled', false);
         });
     }
-     
 }
 function PopulateInvestigationServices(dropDownId, list, option) {
     $(dropDownId).empty();
@@ -81,9 +80,9 @@ function PopulateInvestigationServices(dropDownId, list, option) {
 
 $(document).ready(function () {
     // Trigger change event on page load
-    $("#LineOfBusinessId").trigger("change");
+    $("#InsuranceType").trigger("change");
 
-    $("#LineOfBusinessId").on("change", function () {
+    $("#InsuranceType").on("change", function () {
         var value = $(this).val();
 
         if (value === '') {
@@ -92,7 +91,7 @@ $(document).ready(function () {
             $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
         } else {
             // Fetch investigation services via AJAX and populate the dropdown
-            $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
+            $.get("/api/MasterData/GetInvestigationServicesByInsuranceType", { InsuranceType: value }, function (data) {
                 PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
             });
         }

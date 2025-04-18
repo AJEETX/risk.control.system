@@ -70,7 +70,7 @@ namespace risk.control.system.Services
             var submitted2Supervisor = _context.InvestigationCaseSubStatus
                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
-            var taskCount = _context.ClaimsInvestigation.Count(c => c.VendorId == vendorUser.VendorId &&
+            var taskCount = GetClaims().Count(c => c.VendorId == vendorUser.VendorId &&
             c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId &&
             c.UserEmailActionedTo == userEmail && c.UserRoleActionedTo == $"{AppRoles.AGENT.GetEnumDisplayName()} ({vendorUser.Vendor.Email})");
 
@@ -161,8 +161,14 @@ namespace risk.control.system.Services
 
             data.FirstBlockName = "ADD/ASSIGN";
             //data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
-            data.FirstBlockUrl = "/CreatorAuto/New";
-
+            if(!System.Diagnostics.Debugger.IsAttached)
+            {
+                data.FirstBlockUrl = "/CreatorAuto/New";
+            }
+            else
+            {
+                data.FirstBlockUrl = "/Investigation/New";
+            }
             var claimCount = GetCreatorAssignAuto(userEmail, claimLineOfBusinessId);
             var underWritingCount = GetCreatorAssignAuto(userEmail, underwritingLineOfBusinessId);
             data.FirstBlockCount = claimCount;
@@ -171,7 +177,15 @@ namespace risk.control.system.Services
             var filesUploadCount = _context.FilesOnFileSystem.Count(f => f.CompanyId == company.ClientCompanyId && !f.Deleted && f.UploadedBy == companyUser.Email && !f.DirectAssign);
             var filesUploadAssignCount = _context.FilesOnFileSystem.Count(f => f.CompanyId == company.ClientCompanyId && !f.Deleted && f.UploadedBy == companyUser.Email && f.DirectAssign);
             data.BulkUploadBlockName = "UPLOAD  ";
-            data.BulkUploadBlockUrl = "/ClaimsLog/Uploads";
+            
+            if(!System.Diagnostics.Debugger.IsAttached)
+            {
+                data.BulkUploadBlockUrl = "/ClaimsLog/Uploads";
+            }
+            else
+            {
+                data.BulkUploadBlockUrl = "/CaseUpload/Uploads";
+            }
             data.BulkUploadBlockCount = filesUploadCount;
             data.BulkUploadAssignCount = filesUploadAssignCount;
 
@@ -180,7 +194,14 @@ namespace risk.control.system.Services
             var underWritingActive = GetCreatorActive(userEmail, underwritingLineOfBusinessId);
             data.ThirdBlockCount = claimsActive;
             data.LastBlockCount = underWritingActive;
-            data.ThirdBlockUrl = "/ClaimsActive/Active";
+            if(!System.Diagnostics.Debugger.IsAttached)
+            {
+                data.ThirdBlockUrl = "/ClaimsLog/Active";
+            }
+            else
+            {
+                data.ThirdBlockUrl = "/CaseActive/Active";
+            }
 
             return data;
         }
@@ -355,24 +376,22 @@ namespace risk.control.system.Services
             var replyStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
 
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetAgencyClaims();
+            var claims = GetAgencyClaims();
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             if(vendorUser.IsVendorAdmin)
             {
-                return applicationDbContext.Count(a => a.VendorId == vendorUser.VendorId &&
+                return claims.Count(a => a.VendorId == vendorUser.VendorId &&
             openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
                  (a.InvestigationCaseSubStatus == assignedToAgentStatus ||
                 a.InvestigationCaseSubStatus == replyStatus ||
                  a.InvestigationCaseSubStatus == submittedToAssesssorStatus));
             }
-            var count = applicationDbContext.Count(a => a.VendorId == vendorUser.VendorId &&
+            var count = claims.Count(a => a.VendorId == vendorUser.VendorId &&
             openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
                 a.UserEmailActioned == vendorUser.Email && 
                 (a.InvestigationCaseSubStatus == assignedToAgentStatus ||
                 a.InvestigationCaseSubStatus == replyStatus ||
                  a.InvestigationCaseSubStatus == submittedToAssesssorStatus));
-
-          
             return count;
         }
 
@@ -411,7 +430,7 @@ namespace risk.control.system.Services
         }
         private int GetAssessorAssess(string userEmail, long lineOfBusinessId = 0)
         {
-            IQueryable<ClaimsInvestigation> cases = lineOfBusinessId > 0 ? GetClaims().Where(c => c.PolicyDetail.LineOfBusinessId == lineOfBusinessId) : GetClaims();
+            var cases = lineOfBusinessId > 0 ? GetClaims().Where(c => c.PolicyDetail.LineOfBusinessId == lineOfBusinessId) : GetClaims();
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
@@ -796,6 +815,7 @@ namespace risk.control.system.Services
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderBy(o => o.Created);
         }
+
         private IQueryable<ClaimsInvestigation> GetAgencyClaims()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation

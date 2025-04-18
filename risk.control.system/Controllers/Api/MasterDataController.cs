@@ -35,7 +35,17 @@ namespace risk.control.system.Controllers.Api
             }
             return Ok(subStatuses?.Select(s => new { s.Code, s.InvestigationCaseSubStatusId }));
         }
-
+        [HttpGet("GetInvestigationServicesByInsuranceType")]
+        public async Task<IActionResult> GetInvestigationServicesByInsuranceType(string insuranceType)
+        {
+            InsuranceType type;
+            var services = new List<InvestigationServiceType>();
+            if (!string.IsNullOrWhiteSpace(insuranceType) && Enum.TryParse(insuranceType, out type))
+            {
+                services = await context.InvestigationServiceType.Where(s => s.InsuranceType == type).ToListAsync();
+            }
+            return Ok(services);
+        }
         [HttpGet("GetInvestigationServicesByLineOfBusinessId")]
         public async Task<IActionResult> GetInvestigationServicesByLineOfBusinessId(long LineOfBusinessId)
         {
