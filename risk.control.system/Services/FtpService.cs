@@ -366,7 +366,10 @@ namespace risk.control.system.Services
                 throw;
             }
 
-            uploadedClaims.Select(async u => await timelineService.UpdateTaskStatus(u.Id, userEmail));
+            var updateTasks = uploadedClaims.Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
+
+            await Task.WhenAll(updateTasks);
+
 
             if (uploadAndAssign && uploadedClaims.Any())
             {
@@ -374,6 +377,10 @@ namespace risk.control.system.Services
                 var claimsIds = uploadedClaims.Select(c => c.Id).ToList();
                 
                 var autoAllocated = await processCaseService.BackgroundUploadAutoAllocation(claimsIds, userEmail, url);
+
+                var autoAllocatedTasks = autoAllocated.Select(u => timelineService.UpdateTaskStatus(u, userEmail));
+
+                await Task.WhenAll(autoAllocatedTasks);
 
                 autoAllocated.Select(async u => await timelineService.UpdateTaskStatus(u, userEmail));
 

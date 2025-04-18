@@ -133,7 +133,7 @@ namespace risk.control.system.Services
 
                 if (claimsInvestigation == null || !claimsInvestigation.IsValidCaseData()) return 0; // Handle missing claim
 
-                string pinCode2Verify = claimsInvestigation.PolicyDetail?.InsuranceType.GetEnumDisplayName().ToLower() == CONSTANTS.UNDERWRITING
+                string pinCode2Verify = claimsInvestigation.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
                     ? claimsInvestigation.CustomerDetail?.PinCode?.Code
                     : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
 
@@ -147,7 +147,7 @@ namespace risk.control.system.Services
                 var distinctVendorIds = company.EmpanelledVendors
                     .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
                         serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                        serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId &&
+                        serviceType.InsuranceType == claimsInvestigation.PolicyDetail.InsuranceType &&
                         (serviceType.StateId == pincodeDistrictState.StateId &&
                          (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
                     ))
@@ -201,7 +201,7 @@ namespace risk.control.system.Services
                     .ThenInclude(c => c.PinCode)
             .FirstOrDefaultAsync(c => c.Id == claim);
 
-            string pinCode2Verify = claimsInvestigation.PolicyDetail?.InsuranceType.GetEnumDisplayName().ToLower() == CONSTANTS.UNDERWRITING
+            string pinCode2Verify = claimsInvestigation.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
                 ? claimsInvestigation.CustomerDetail?.PinCode?.Code
                 : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
 

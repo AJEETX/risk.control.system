@@ -539,7 +539,7 @@ namespace risk.control.system.Services
                 .ThenInclude(i => i.Country)
 
                 .Where(a => !a.Deleted &&
-                    a.ClientCompanyId == companyUser.ClientCompanyId && a.CaseOwner == currentUserEmail &&
+                    a.ClientCompanyId == companyUser.ClientCompanyId && a.CreatedUser == currentUserEmail &&
                     (
                          a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED ||
                          a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR ||
@@ -602,7 +602,7 @@ namespace risk.control.system.Services
                 Location = a.ORIGIN.GetEnumDisplayName(),
                 Created = a.Created.ToString("dd-MM-yyyy"),
                 ServiceType = $"{a.PolicyDetail?.InsuranceType.GetEnumDisplayName()} ( {a.PolicyDetail.InvestigationServiceType.Name})",
-                timePending = DateTime.Now.Subtract(a.Created),
+                timePending = GetDraftedTimePending(a),
                 PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-light\">beneficiary name</span>" : a.BeneficiaryDetail.Name,
@@ -695,6 +695,35 @@ namespace risk.control.system.Services
 
             return response;
 
+        }
+        string GetDraftedTimePending(InvestigationTask a)
+        {
+            if (a.CreatorSla == 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} days since created!\"></i>");
+            }
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
+
+            else if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
+
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours < 24 &&
+                DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
         public async Task<object> GetActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {

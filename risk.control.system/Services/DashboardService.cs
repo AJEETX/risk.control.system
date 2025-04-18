@@ -908,15 +908,6 @@ namespace risk.control.system.Services
                     activeCount = creatorActiveClaims.Count;
                 }
 
-                //if (role.Contains(AppRoles.Assigner.ToString()) && !role.Contains(AppRoles.CREATOR.ToString()))
-                //{
-                //    var creatorActiveClaims = _context.ClaimsInvestigation
-                //    .Include(c => c.PolicyDetail)
-                //    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
-                //    c.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId &&
-                //    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
-                //    activeCount = creatorActiveClaims.Count;
-                //}
                 if (role.Contains(AppRoles.ASSESSOR.ToString()))
                 {
                     var creatorActiveClaims = _context.ClaimsInvestigation

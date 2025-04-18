@@ -557,7 +557,7 @@ namespace risk.control.system.Controllers.Company
                 if (claims == null || claims.Count == 0)
                 {
                     notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -571,7 +571,7 @@ namespace risk.control.system.Controllers.Company
                 if (affectedRows <= distinctClaims.Count)
                 {
                     notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
                 }
                 var jobId = backgroundJobClient.Enqueue(() => processCaseService.BackgroundAutoAllocation(distinctClaims, currentUserEmail, baseUrl));
                 progressService.AddAssignmentJob(jobId, currentUserEmail);
@@ -583,7 +583,7 @@ namespace risk.control.system.Controllers.Company
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
             }
-            return RedirectToAction(nameof(InvestigationController.New), "CreatorInvestigationAuto");
+            return RedirectToAction(nameof(InvestigationController.New), "Investigation");
         }
         [ValidateAntiForgeryToken]
         [HttpPost]

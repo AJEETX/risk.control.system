@@ -292,12 +292,10 @@ namespace risk.control.system.Services
             {
                 return null;
             }
-            var status = context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            var assignedStatus = context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var createdStatus = context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var subStatus = companyUser.ClientCompany.AutoAllocation && model.AutoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
+            
             var claim = new InvestigationTask
             {
+                CreatedUser = companyUser.Email,
                 Status = CONSTANTS.CASE_STATUS.INITIATED,
                 SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
                 CaseOwner = companyUser.Email,
