@@ -253,7 +253,7 @@
             { "data": "policy", bVisible: false }
         ],
         rowCallback: function (row, data) {
-            if (data.isNewAssigned) {
+            if (data.isNew) {
                 $('td', row).addClass('isNewAssigned');
                 // Remove the class after 3 seconds
                 setTimeout(function () {

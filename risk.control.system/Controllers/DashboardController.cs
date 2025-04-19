@@ -20,15 +20,18 @@ namespace risk.control.system.Controllers
     public class DashboardController : Controller
     {
         private readonly IDashboardService dashboardService;
+        private readonly IDashboardCountService dashboardCountService;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
 
         public DashboardController(IDashboardService dashboardService,
+            IDashboardCountService dashboardCountService,
             SignInManager<Models.ApplicationUser> signInManager,
             INotyfService notifyService
             )
         {
             this.dashboardService = dashboardService;
+            this.dashboardCountService = dashboardCountService;
             this.signInManager = signInManager;
             this.notifyService = notifyService;
         }
@@ -47,50 +50,50 @@ namespace risk.control.system.Controllers
 
                 if(userRole.Value.Contains(AppRoles.CREATOR.ToString()))
                 {
-                    var model = dashboardService.GetCreatorCount(currentUserEmail, userRole.Value);
+                    var model = dashboardCountService.GetCreatorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()))
                 {
-                    var model = dashboardService.GetSuperAdminCount(currentUserEmail, userRole.Value);
+                    var model = dashboardCountService.GetSuperAdminCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()))
                 {
-                    var model = dashboardService.GetCompanyAdminCount(currentUserEmail, userRole.Value);
+                    var model = dashboardCountService.GetCompanyAdminCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
                 {
-                    var model = dashboardService.GetAssessorCount(currentUserEmail, userRole.Value);
+                    var model = dashboardCountService.GetAssessorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
 
                 else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
                 {
-                    var model = dashboardService.GetManagerCount(currentUserEmail, userRole.Value);
+                    var model = dashboardCountService.GetManagerCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
                 {
-                    var model = dashboardService.GetSupervisorCount(currentUserEmail, userRole.Value);
+                    var model = dashboardCountService.GetSupervisorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
                 {
-                    var model = dashboardService.GetAgentCount(currentUserEmail, userRole.Value);
+                    var model = dashboardCountService.GetAgentCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else
                 {
-                    var model = dashboardService.GetClaimsCount(currentUserEmail, userRole.Value);
+                    var model = dashboardCountService.GetClaimsCount(currentUserEmail, userRole.Value);
 
                     return View(model);
                 }

@@ -261,6 +261,7 @@ namespace risk.control.system.Services
 
             foreach (var claimsInvestigation in cases2Assign)
             {
+                claimsInvestigation.IsNew = true;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
                 claimsInvestigation.AssignedToAgency = false;
@@ -289,6 +290,7 @@ namespace risk.control.system.Services
                 var vendor = await context.Vendor.FindAsync(vendorId);
 
                 // Update case details
+                claimsCase.IsNew = true;
                 claimsCase.AssignedToAgency = true;
                 claimsCase.Updated = DateTime.Now;
                 claimsCase.AllocatedToAgencyTime = DateTime.Now;
@@ -330,6 +332,7 @@ namespace risk.control.system.Services
                 var vendorId = claimsInvestigation.VendorId;
                 var company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
+                claimsInvestigation.IsNew = true;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
                 claimsInvestigation.AssignedToAgency = false;
@@ -358,6 +361,7 @@ namespace risk.control.system.Services
                 var claimsInvestigation = context.Investigations
                     .FirstOrDefault(c => c.Id == claimId);
 
+                claimsInvestigation.IsNewAssignedToAgency = true;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
                 claimsInvestigation.AssignedToAgency = false;
@@ -388,6 +392,9 @@ namespace risk.control.system.Services
                 var withdrawnByAgency = context.InvestigationCaseSubStatus.FirstOrDefault(
                            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
 
+                claimsInvestigation.IsNew = true;
+                claimsInvestigation.IsNewAssignedToAgency = true;
+                claimsInvestigation.IsNewSubmittedToAgent = true;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
                 claimsInvestigation.AssignedToAgency = false;

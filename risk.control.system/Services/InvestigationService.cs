@@ -126,6 +126,7 @@ namespace risk.control.system.Services
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                 }
+                claimsInvestigation.IsNew = true;
                 claimsInvestigation.CreatedUser = userEmail;
                 claimsInvestigation.CaseOwner = userEmail;
                 claimsInvestigation.Updated = DateTime.Now;
@@ -157,6 +158,7 @@ namespace risk.control.system.Services
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.ClientCompany)
                         .FirstOrDefaultAsync(c => c.Id == claimsInvestigation.Id);
+                existingPolicy.IsNew = true;
                 existingPolicy.PolicyDetail.ContractIssueDate = claimsInvestigation.PolicyDetail.ContractIssueDate;
                 existingPolicy.PolicyDetail.InvestigationServiceTypeId = claimsInvestigation.PolicyDetail.InvestigationServiceTypeId;
                 existingPolicy.PolicyDetail.ClaimType = claimsInvestigation.PolicyDetail.ClaimType;
@@ -207,6 +209,7 @@ namespace risk.control.system.Services
                     customerDocument.CopyTo(dataStream);
                     customerDetail.ProfilePicture = dataStream.ToArray();
                 }
+                claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
@@ -231,6 +234,7 @@ namespace risk.control.system.Services
                 customerDetail.CustomerLocationMap = url;
 
                 var addedClaim = context.CustomerDetail.Add(customerDetail);
+
                 context.Investigations.Update(claimsInvestigation);
                 var saved = await context.SaveChangesAsync() > 0;
 
@@ -268,6 +272,7 @@ namespace risk.control.system.Services
                     customerDetail.ProfilePicture ??= existingCustomer.ProfilePicture;
                 }
 
+                claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
@@ -326,6 +331,7 @@ namespace risk.control.system.Services
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == ClaimsInvestigationId);
 
+                claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.IsReady2Assign = true;
@@ -388,6 +394,7 @@ namespace risk.control.system.Services
                     }
                 }
 
+                claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
@@ -584,6 +591,7 @@ namespace risk.control.system.Services
             var transformedData = data.Select(a => new
             {
                 Id = a.Id,
+                IsNew = a.IsNew,
                 Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                 PolicyId = a.PolicyDetail.ContractNumber,
                 AssignedToAgency = a.AssignedToAgency,
@@ -683,6 +691,20 @@ namespace risk.control.system.Services
             // Apply Pagination
             var pagedData = transformedData.Skip(start).Take(length).ToList();
             // Prepare Response
+
+            var idsToMarkViewed = pagedData.Where(x => x.IsNew).Select(x => x.Id).ToList();
+
+            if (idsToMarkViewed.Any())
+            {
+                var entitiesToUpdate = context.Investigations
+                    .Where(x => idsToMarkViewed.Contains(x.Id))
+                    .ToList();
+
+                foreach (var entity in entitiesToUpdate)
+                    entity.IsNew = false;
+
+                await context.SaveChangesAsync(); // mark as viewed
+            }
 
             var response = new
             {
@@ -805,6 +827,7 @@ namespace risk.control.system.Services
             var transformedData = data.Select(a => new
             {
                 Id = a.Id,
+                IsNew = a.IsNew,
                 CustomerFullName = a.CustomerDetail?.Name ?? "",
                 BeneficiaryFullName = a.BeneficiaryDetail?.Name ?? "",
                 PolicyId = a.PolicyDetail.ContractNumber,
@@ -900,6 +923,19 @@ namespace risk.control.system.Services
             var pagedData = transformedData.Skip(start).Take(length).ToList();
             // Prepare Response
 
+            var idsToMarkViewed = pagedData.Where(x => x.IsNew).Select(x => x.Id).ToList();
+
+            if (idsToMarkViewed.Any())
+            {
+                var entitiesToUpdate = context.Investigations
+                    .Where(x => idsToMarkViewed.Contains(x.Id))
+                    .ToList();
+
+                foreach (var entity in entitiesToUpdate)
+                    entity.IsNew = false;
+
+                await context.SaveChangesAsync(); // mark as viewed
+            }
             var response = new
             {
                 draw = draw,

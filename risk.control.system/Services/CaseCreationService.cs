@@ -306,7 +306,8 @@ namespace risk.control.system.Services
                 IsReady2Assign = ValidateDataCase(uploadCase),
                 ORIGIN = model.FileOrFtp,
                 ClientCompanyId = companyUser.ClientCompanyId,
-                CreatorSla = companyUser.ClientCompany.CreatorSla
+                CreatorSla = companyUser.ClientCompany.CreatorSla,
+                IsNew = true,
             };
             claim.PolicyDetail = policyDetail;
             claim.CustomerDetail = customer;

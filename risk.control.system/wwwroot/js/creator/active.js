@@ -206,6 +206,15 @@
             { "data": "timeElapsed", bVisible: false },
             { "data": "policy", bVisible: false }
         ],
+        rowCallback: function (row, data) {
+            if (data.isNew) {
+                $('td', row).addClass('isNewAssigned');
+                // Remove the class after 3 seconds
+                setTimeout(function () {
+                    $('td', row).removeClass('isNewAssigned');
+                }, 3000);
+            }
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
 
             $('#customerTable tbody').on('click', '.btn-info', function (e) {
@@ -215,15 +224,6 @@
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
             
-        },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.isNewAssigned) {
-                $('td', nRow).addClass('isNewAssigned');
-                // Remove the class after 3 seconds
-                setTimeout(function () {
-                    $('td', nRow).removeClass('isNewAssigned');
-                }, 3000);
-            }
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
