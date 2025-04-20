@@ -23,17 +23,33 @@ namespace risk.control.system.Controllers
         }
         public IActionResult Index()
         {
-            var model = new QuestionFormViewModel
+            var currentUserEmail = HttpContext.User.Identity.Name;
+
+            var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(x => x.Email == currentUserEmail);
+
+            var questions = _context.CaseQuestionnaire.Include(c=>c.Questions).FirstOrDefault(x => x.ClientCompanyId == currentUser.ClientCompanyId && x.InsuranceType == InsuranceType.CLAIM);
+            if (questions != null)
             {
-                Questions = _context.Questions.ToList()
+                var model = new QuestionFormViewModel
+                {
+                    Questions = questions.Questions.ToList()
+                };
+                return View(model);
+            }
+            var newmodel = new QuestionFormViewModel
+            {
+                Questions = new List<Question>()
             };
 
-            return View(model);
+            return View(newmodel);
         }
 
         [HttpPost]
         public IActionResult AddQuestion(QuestionFormViewModel model)
         {
+            var currentUserEmail = HttpContext.User.Identity.Name;
+
+            var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(x => x.Email == currentUserEmail);
             if (ModelState.IsValid)
             {
                 var question = new Question
@@ -43,9 +59,25 @@ namespace risk.control.system.Controllers
                     Options = model.Options,
                     IsRequired = model.IsRequired
                 };
-
-                _context.Questions.Add(question);
+                var existingQuestion = _context.CaseQuestionnaire.Include(c=>c.Questions)
+                    .FirstOrDefault(x => x.ClientCompanyId == currentUser.ClientCompanyId && x.InsuranceType == model.InsuranceType);
+                if(existingQuestion != null)
+                {
+                    existingQuestion.Questions.Add(question);
+                }
+                else
+                {
+                    var caseQuestionnaire = new CaseQuestionnaire
+                    {
+                        ClientCompanyId = currentUser.ClientCompanyId,
+                        InsuranceType = model.InsuranceType,
+                        CreatedUser = currentUserEmail
+                    };
+                    caseQuestionnaire.Questions.Add(question);
+                    _context.CaseQuestionnaire.Add(caseQuestionnaire);
+                }
                 _context.SaveChanges();
+
             }
             return RedirectToAction("Index");
         }

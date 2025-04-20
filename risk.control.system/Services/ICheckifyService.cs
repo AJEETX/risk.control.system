@@ -97,9 +97,8 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
             if (isClaim)
             {
                 claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
@@ -131,7 +130,7 @@ public class ICheckifyService : IICheckifyService
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
-            if (claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId)
+            if (claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
             {
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
@@ -232,9 +231,8 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+           
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
             if (isClaim)
             {
                 claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
@@ -368,9 +366,8 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+           
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
             if (isClaim)
             {
                 claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
@@ -573,9 +570,8 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
             if (isClaim)
             {
                 claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
@@ -706,9 +702,8 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
             if (isClaim)
             {
                 claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
@@ -827,9 +822,8 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
             if (isClaim)
             {
                 claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";

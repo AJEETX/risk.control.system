@@ -116,9 +116,8 @@ namespace risk.control.system.Services
                 .Include(c =>c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
             
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
             if (isClaim)
             {
@@ -207,9 +206,8 @@ namespace risk.control.system.Services
             var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var location = claim.BeneficiaryDetail;
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+           
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
             if (isClaim)
             {

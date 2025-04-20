@@ -355,46 +355,30 @@ namespace risk.control.system.Services
             }
 
             _context.Investigations.AddRange(uploadedClaims);
-            try
+            var ros = await _context.SaveChangesAsync();
+            if (ros == 0)
             {
-               var ros =  await _context.SaveChangesAsync();
-
+                SetUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
+                await _context.SaveChangesAsync();
+                await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
+                return;
             }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            // Upload Success
+            SetUploadSuccess(uploadFileData, uploadedClaims);
+            await _context.SaveChangesAsync();
 
             var updateTasks = uploadedClaims.Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
-
             await Task.WhenAll(updateTasks);
-
+            // Notify User
+            await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
 
             if (uploadAndAssign && uploadedClaims.Any())
             {
                 // Auto-Assign Claims if Enabled
                 var claimsIds = uploadedClaims.Select(c => c.Id).ToList();
-                
                 var autoAllocated = await processCaseService.BackgroundUploadAutoAllocation(claimsIds, userEmail, url);
-
-                var autoAllocatedTasks = autoAllocated.Select(u => timelineService.UpdateTaskStatus(u, userEmail));
-
-                await Task.WhenAll(autoAllocatedTasks);
-
-                autoAllocated.Select(async u => await timelineService.UpdateTaskStatus(u, userEmail));
-
                 SetUploadAssignSuccess(uploadFileData, uploadedClaims, autoAllocated);
-
                 await _context.SaveChangesAsync();
-            }
-            else
-            {
-                // Upload Success
-                SetUploadSuccess(uploadFileData, uploadedClaims);
-                await _context.SaveChangesAsync();
-                // Notify User
-                await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
             }
         }
 

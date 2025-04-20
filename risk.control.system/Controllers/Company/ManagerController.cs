@@ -21,16 +21,17 @@ namespace risk.control.system.Controllers.Company
     {
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
-        private readonly IClaimPolicyService claimPolicyService;
+        private readonly IInvestigationService investigativeService;
         private readonly IInvestigationReportService investigationReportService;
 
-        public ManagerController(INotyfService notifyService, IInvoiceService invoiceService,
-            IClaimPolicyService claimPolicyService,
+        public ManagerController(INotyfService notifyService,
+            IInvoiceService invoiceService,
+            IInvestigationService investigativeService,
             IInvestigationReportService investigationReportService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
-            this.claimPolicyService = claimPolicyService;
+            this.investigativeService = investigativeService;
             this.investigationReportService = investigationReportService;
         }
         public IActionResult Index()
@@ -59,7 +60,7 @@ namespace risk.control.system.Controllers.Company
 
         }
         [Breadcrumb(title: " Details", FromAction = "Assessor")]
-        public async Task<IActionResult> AssessorDetail(string id)
+        public async Task<IActionResult> AssessorDetail(long id)
         {
             try
             {
@@ -69,13 +70,13 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (string.IsNullOrWhiteSpace(id))
+                if (id < 1)
                 {
                     notifyService.Error("Claim Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await claimPolicyService.GetClaimDetail(id);
+                var model =await investigativeService.GetClaimDetails(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -108,7 +109,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(title: " Details", FromAction = "Active")]
-        public async Task<IActionResult> ActiveDetail(string id)
+        public async Task<IActionResult> ActiveDetail(long id)
         {
             try
             {
@@ -118,13 +119,13 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (string.IsNullOrWhiteSpace(id))
+                if (id < 1)
                 {
                     notifyService.Error("Claim Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await claimPolicyService.GetClaimDetail(id);
+                var model = await investigativeService.GetClaimDetails(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);

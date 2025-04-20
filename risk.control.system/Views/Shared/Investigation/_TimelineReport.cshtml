@@ -27,18 +27,24 @@
                         @{
                             foreach (var log in Model.ClaimsInvestigation.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt))
                             {
+                                var duration = $"{(log?.Duration.GetValueOrDefault().Days > 0 ? $"{log?.Duration.GetValueOrDefault().Days} day{(log?.Duration.GetValueOrDefault().Days == 1 ? "" : "s")} " : "")}" +
+                                $"{(log?.Duration.GetValueOrDefault().Hours > 0 ? $"{log?.Duration.GetValueOrDefault().Hours} hr " : "")}" +
+                                $"{(log?.Duration.GetValueOrDefault().Minutes > 0 ? $"{log?.Duration.GetValueOrDefault().Minutes} min " : "")}" +
+                                $"{(log?.Duration.GetValueOrDefault().Seconds > 0 ? $"{log?.Duration.GetValueOrDefault().Seconds} sec" : "less than a sec")}";
+                                ;
+
                                 <div class="time-label timeline-date"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
 
                                 <div>
                                     <i class="nav-icon fas fa-envelope bg-blue"></i>
                                     <div class="timeline-item">
                                         <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
-                                        <span class="time"><i class="nav-icon fas fa-stopwatch"></i> @log?.Duration</span>
+                                        <span class="time"><i class="nav-icon fas fa-stopwatch"></i> @duration</span>
                                         <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to:
                                             <span class="badge badge-light i-green"> @log.Status</span> : <span class="badge badge-light i-orangered">@log.SubStatus.</span>
                                         </h3>
                                         <div class="timeline-body">
-                                            Case sent to <span class="badge badge-light i-blue">@log.AssigedTo</span>
+                                            Case with :<span class="badge badge-light i-blue">@log.AssigedTo</span>
                                         </div>
 
                                     </div>

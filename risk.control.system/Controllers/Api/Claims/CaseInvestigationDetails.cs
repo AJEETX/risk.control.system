@@ -21,8 +21,6 @@ namespace risk.control.system.Controllers.Api.Claims
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class CaseInvestigationDetailsController : ControllerBase
     {
-        private const string CLAIM = "claims";
-        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext _context;
         private readonly IClaimsService claimsService;
         private readonly IWebHostEnvironment webHostEnvironment;

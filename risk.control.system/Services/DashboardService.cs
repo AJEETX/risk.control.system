@@ -66,15 +66,6 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             List<Vendor> existingVendors = _context.Vendor
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
                 .ToList();
 
             if (companyUser == null)
@@ -126,6 +117,8 @@ namespace risk.control.system.Services
             }
             return vendorWithCaseCounts;
         }
+        
+        
         public Dictionary<string, int> CalculateAgentCaseStatus(string userEmail)
         {
             var vendorCaseCount = new Dictionary<string, int>();
@@ -133,21 +126,11 @@ namespace risk.control.system.Services
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var existingVendor = _context.Vendor
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
-                .Include(v => v.VendorInvestigationServiceTypes)
                 .FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
             var claimsCases = _context.Investigations
                .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail).Where(c => c.VendorId == vendorUser.VendorId);
+               .Include(c => c.BeneficiaryDetail).Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted);
 
             int countOfCases = 0;
 
@@ -209,7 +192,7 @@ namespace risk.control.system.Services
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
                         (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
-                     d.ClientCompanyId == companyUser.ClientCompanyId);
+                     d.ClientCompanyId == companyUser.ClientCompanyId && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
                 var subStatuses = _context.InvestigationCaseSubStatus;
@@ -256,7 +239,7 @@ namespace risk.control.system.Services
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
                         (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
-                     d.VendorId == vendorUser.VendorId);
+                     d.VendorId == vendorUser.VendorId && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
 
@@ -302,7 +285,7 @@ namespace risk.control.system.Services
                     .Include(i => i.PolicyDetail).Where(d =>
                         (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
                        d.ClientCompanyId == companyUser.ClientCompanyId &&
-                       d.Created > DateTime.Now.AddMonths(-7));
+                       d.Created > DateTime.Now.AddMonths(-7) && !d.Deleted);
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
 
                 var cases = tdetail.GroupBy(g => g.Id);
@@ -341,7 +324,7 @@ namespace risk.control.system.Services
                     .Where(d =>
                         (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
                      d.VendorId == vendorUser.VendorId &&
-                       d.Created > DateTime.Now.AddMonths(-7));
+                       d.Created > DateTime.Now.AddMonths(-7) && !d.Deleted);
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
                 var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
 
@@ -385,7 +368,7 @@ namespace risk.control.system.Services
                     .Where(d =>
                     d.ClientCompanyId == companyUser.ClientCompanyId &&
                     (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
-                    d.Created > DateTime.Now.AddDays(-28));
+                    d.Created > DateTime.Now.AddDays(-28) && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
 
@@ -430,7 +413,7 @@ namespace risk.control.system.Services
                     .Where(d =>
                      d.VendorId == vendorUser.VendorId &&
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
-                    d.Created > DateTime.Now.AddDays(-28));
+                    d.Created > DateTime.Now.AddDays(-28) && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
 
@@ -472,7 +455,7 @@ namespace risk.control.system.Services
 
             var tdetailDays = _context.Investigations
                     .Include(i => i.PolicyDetail)
-                     .Where(d => d.Created > DateTime.Now.AddDays(-28));
+                     .Where(d => d.Created > DateTime.Now.AddDays(-28) && !d.Deleted);
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -522,7 +505,7 @@ namespace risk.control.system.Services
                    );
                 var tdetail = tdetailDays.Where(d =>
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
-                    d.VendorId == vendorUser.VendorId);
+                    d.VendorId == vendorUser.VendorId && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
 
@@ -563,46 +546,39 @@ namespace risk.control.system.Services
         {
             Dictionary<string, int> dictWeeklyCases = new Dictionary<string, int>();
 
-            var tdetailDays = _context.InvestigationTransaction
-                    .Include(i => i.ClaimsInvestigation)
-                    .ThenInclude(i => i.PolicyDetail)
-                    .Include(i => i.ClaimsInvestigation)
-             .ThenInclude(i => i.BeneficiaryDetail)
-             .Where(d =>
-             d.Created > DateTime.Now.AddDays(-28));
+            var tdetailDays = _context.Investigations
+                    .Include(i => i.PolicyDetail)
+                     .Where(d => d.Created > DateTime.Now.AddDays(-28) && !d.Deleted && d.Status == CONSTANTS.CASE_STATUS.INPROGRESS);
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             if (companyUser != null)
             {
-                var statuses = _context.InvestigationCaseStatus;
                 var tdetail = tdetailDays.Where(d =>
                     (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
-                    d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId);
+                    d.ClientCompanyId == companyUser.ClientCompanyId);
 
-                var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
-                var subStatuses = _context.InvestigationCaseSubStatus;
-                var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
 
-                var cases = tdetail.GroupBy(g => g.ClaimsInvestigationId);
+                var cases = tdetail.GroupBy(g => g.Id);
 
-                foreach (var subStatus in filteredCases)
+                foreach (var subStatus in userSubStatuses)
                 {
-                    var casesWithSameStatus = new List<InvestigationTransaction> { };
+                    var casesWithSameStatus = new List<InvestigationTask> { };
                     foreach (var _case in cases)
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
                         if (caseCurrentStatus != null && 
-                            caseCurrentStatus.InvestigationCaseSubStatusId == subStatus.InvestigationCaseSubStatusId && 
-                            !caseCurrentStatus.ClaimsInvestigation.Deleted && 
-                            caseCurrentStatus.ClaimsInvestigation.PolicyDetail.InsuranceType == insuranceType)
+                            caseCurrentStatus.SubStatus == subStatus && 
+                            !caseCurrentStatus.Deleted && 
+                            caseCurrentStatus.PolicyDetail.InsuranceType == insuranceType)
                         {
                             casesWithSameStatus.Add(caseCurrentStatus);
                         }
                     }
-                    dictWeeklyCases.Add(subStatus.Name, casesWithSameStatus.Count);
+                    dictWeeklyCases.Add(subStatus, casesWithSameStatus.Count);
                 }
             }
             else if (vendorUser != null)
@@ -616,26 +592,25 @@ namespace risk.control.system.Services
                 var statuses = _context.InvestigationCaseStatus;
                 var tdetail = tdetailDays.Where(d =>
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
-                    d.ClaimsInvestigation.VendorId == vendorUser.VendorId);
+                    d.VendorId == vendorUser.VendorId);
 
-                var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
-                var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
 
-                var cases = tdetail.GroupBy(g => g.ClaimsInvestigationId);
+                var cases = tdetail.GroupBy(g => g.Id);
 
-                foreach (var subStatus in filteredCases)
+                foreach (var subStatus in userSubStatuses)
                 {
-                    var casesWithSameStatus = new List<InvestigationTransaction> { };
+                    var casesWithSameStatus = new List<InvestigationTask> { };
                     foreach (var _case in cases)
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
-                        if (caseCurrentStatus != null && caseCurrentStatus.InvestigationCaseSubStatusId == subStatus.InvestigationCaseSubStatusId)
+                        if (caseCurrentStatus != null && caseCurrentStatus.SubStatus == subStatus)
                         {
                             casesWithSameStatus.Add(caseCurrentStatus);
                         }
                     }
-                    dictWeeklyCases.Add(subStatus.Name, casesWithSameStatus.Count);
+                    dictWeeklyCases.Add(subStatus, casesWithSameStatus.Count);
                 }
             }
             return dictWeeklyCases;

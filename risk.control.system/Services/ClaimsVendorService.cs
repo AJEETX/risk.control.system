@@ -116,9 +116,7 @@ namespace risk.control.system.Services
 
             claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
 
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
             ClaimsInvestigationVendorsModel model = null;
             if (claim.AgencyReport == null)
@@ -185,10 +183,7 @@ namespace risk.control.system.Services
             {
                 claim.AgencyReport.SupervisorRemarks = null;
             }
-
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
             if (isClaim)
             {
@@ -233,10 +228,7 @@ namespace risk.control.system.Services
             var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
 
             claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
-
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
             if (isClaim)
             {

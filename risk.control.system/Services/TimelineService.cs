@@ -35,12 +35,16 @@ namespace risk.control.system.Services
                 duration = DateTime.Now - lastHistory.StatusChangedAt;
             }
 
+            if(!string.IsNullOrWhiteSpace(subStatus))
+            {
+                task.SubStatus = subStatus;
+            }
             // Add new status history
             var history = new InvestigationTimeline
             {
                 InvestigationTaskId = task.Id,
                 Status = task.Status,
-                SubStatus = subStatus ?? task.SubStatus,
+                SubStatus = task.SubStatus,
                 UpdatedBy = updatedBy,
                 AssigedTo = task.CaseOwner,
                 StatusChangedAt = DateTime.Now,

@@ -196,6 +196,15 @@ $(document).ready(function () {
             { "data": "timeElapsed", bVisible: false },
             { "data": "policy", bVisible: false }
         ],
+        rowCallback: function (row, data) {
+            if (data.isNewAssigned) {
+                $('td', row).addClass('isNewAssigned');
+                // Remove the class after 3 seconds
+                setTimeout(function () {
+                    $('td', row).removeClass('isNewAssigned');
+                }, 3000);
+            }
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
 
             $('#customerTable tbody').on('click', '.btn-info', function (e) {
@@ -205,13 +214,7 @@ $(document).ready(function () {
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
 
-        },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.isNewAssigned) {
-                $('td', nRow).addClass('isNewAssigned');
-            }
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
 
     $('#caseTypeFilter').on('change', function () {

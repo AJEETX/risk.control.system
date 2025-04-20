@@ -34,6 +34,8 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
 
         private const string uploaded = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED;
+        private const string edited = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR;
+        private const string drafted = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR;
         private const string created = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
         private const string assigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
         private const string reAssigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER;
@@ -112,19 +114,19 @@ namespace risk.control.system.Services
             var data = new DashboardData();
             data.FirstBlockName = "Allocate(new)";
             data.FirstBlockCount = claimsAllocate;
-            data.FirstBlockUrl = "/SuperVisor/Allocate";
+            data.FirstBlockUrl = "/VendorInvestigation/Allocate";
 
             data.SecondBlockName = "Submit(report)";
             data.SecondBlockCount = claimsVerified;
-            data.SecondBlockUrl = "/SuperVisor/ClaimReport";
+            data.SecondBlockUrl = "/VendorInvestigation/ClaimReport";
 
             data.ThirdBlockName = "Active";
             data.ThirdBlockCount = claimsActiveCount;
-            data.ThirdBlockUrl = "/SuperVisor/Open";
+            data.ThirdBlockUrl = "/VendorInvestigation/Open";
 
             data.LastBlockName = "Completed";
             data.LastBlockCount = claimsCompleted;
-            data.LastBlockUrl = "/SuperVisor/Completed";
+            data.LastBlockUrl = "/VendorInvestigation/Completed";
 
             return data;
         }
@@ -511,7 +513,7 @@ namespace risk.control.system.Services
         private int GetCreatorActive(string userEmail, InsuranceType insuranceType)
         {
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var count = cases.Count(a => a.Status != finished &&
                      a.CreatedUser == companyUser.Email &&
@@ -521,6 +523,8 @@ namespace risk.control.system.Services
             && a.SubStatus != withdrawnByAgency
             && a.SubStatus != assigned
             && a.SubStatus != uploaded
+            && a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR
+            && a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR
             );
 
             return count;
@@ -528,15 +532,15 @@ namespace risk.control.system.Services
         private int GetManagerActive(string userEmail, InsuranceType insuranceType)
         {
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            var count = cases.Count(a => a.Status != CONSTANTS.CASE_STATUS.FINISHED &&
-            a.ClientCompanyId == companyUser.ClientCompanyId &&
-            a.SubStatus != created &&
-            a.SubStatus != submitted2Assessor &&
-            a.SubStatus != reply2Assessor &&
-            a.SubStatus != assigned
-            );
+            var count = cases.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
+                    a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
+                    (a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
+                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR ||
+                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR ||
+                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR));
 
             return count;
         }
@@ -552,9 +556,11 @@ namespace risk.control.system.Services
                      a.CreatedUser == companyUser.Email &&
                      a.Status != finished &&
                          a.SubStatus == created ||
+                         a.SubStatus == drafted ||
+                         a.SubStatus == edited ||
                          a.SubStatus == uploaded ||
                          a.SubStatus == withdrawnByCompany ||
-                         a.SubStatus == withdrawnByCompany ||
+                         a.SubStatus == withdrawnByAgency ||
                         a.SubStatus == assigned);
             return count;
         }
@@ -591,28 +597,6 @@ namespace risk.control.system.Services
         private IQueryable<InvestigationTask> GetAgencyClaims()
         {
             var applicationDbContext = _context.Investigations
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.Vendor)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderBy(o => o.Created);
         }

@@ -686,14 +686,14 @@ namespace risk.control.system.Controllers.Company
 
                 notifyService.Custom($"Case #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
             }
         }
         public class DeleteRequestModel

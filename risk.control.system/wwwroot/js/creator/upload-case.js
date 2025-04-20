@@ -177,22 +177,6 @@
             if (errorRow) {
                 var title = errorRow.directAssign ? "Direct Assign" : "Upload"; // ✅ Dynamically set title
                 var icon = errorRow.directAssign ? 'fas fa-random' : 'fas fa-upload';
-
-                $.confirm({
-                    title: title,
-                    icon: icon,  // Dynamic icon based on checkbox
-                    content: `${title} completed with error.`,
-                    type: 'red',
-                    buttons: {
-                        ok: {
-                            text: 'OK',
-                            btnClass: 'btn-danger',
-                            action: function () {
-                                // Do nothing, just close the alert
-                            }
-                        }
-                    }
-                });
             }
         }
     });
@@ -216,45 +200,6 @@
                         console.log("Status is Completed, stopping polling and updating row.");
                         clearInterval(pollingTimer); // Stop polling
                         updateProcessingRow(uploadId, updatedRowData.data); // Update the row with completed data
-
-                        if (updatedRowData.directAssign && !updatedRowData.maxAssignReadyAllowed) {
-                            $.confirm({
-                                title: `${title} Error`,
-                                content: 'Maximum allowed assignments reached.',
-                                icon: icon,
-                                closeIcon: true,
-                                type: 'red',
-                                buttons: {
-                                    ok: {
-                                        text: 'OK',
-                                        btnClass: 'btn-danger',
-                                        action: function () {
-                                            // Do nothing, just close the alert
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                        else {
-                            $.confirm({
-                                title: `${title} Error`,
-                                content: ` ${title} completed with error`,
-                                icon: icon,
-                                type: 'red',
-                                closeIcon: true,
-                                buttons: {
-                                    ok: {
-                                        text: 'OK',
-                                        btnClass: 'btn-danger',
-                                        action: function () {
-                                            // Do nothing, just close the alert
-                                        }
-                                    }
-                                }
-                            });
-                        }
-
-
                     }
                     // If status is Processing, keep polling
                     else if (updatedRowData.data.status === "Processing") {
@@ -266,45 +211,6 @@
                         console.log("Status is Completed, stopping polling and updating row.");
                         clearInterval(pollingTimer); // Stop polling
                         updateProcessingRow(uploadId, updatedRowData.data); // Update the row with completed data
-                        if (updatedRowData.data.directAssign && !updatedRowData.maxAssignReadyAllowed) {
-
-                            $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", true);
-                            $.confirm({
-                                title: `${title} completed .`,
-                                icon: icon,
-                                content: `${title} completed and Maximum allowed assignments reached.`,
-                                closeIcon: true,
-                                type: popType,
-                                buttons: {
-                                    ok: {
-                                        text: 'OK',
-                                        btnClass: 'btn-info',
-                                        action: function () {
-                                            // Do nothing, just close the alert
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                        else {
-                            $.confirm({
-                                title: `${title} completed .`,
-                                icon: icon ,
-                                content: `${title} completed successfully.`,
-                                type: popType,
-                                closeIcon: true,
-                                buttons: {
-                                    ok: {
-                                        text: 'OK',
-                                        btnClass: btnClass,
-                                        action: function () {
-                                            // Do nothing, just close the alert
-                                        }
-                                    }
-                                }
-                            });
-                        }
-
                     }
                 },
                 error: function (err) {

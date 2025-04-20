@@ -93,6 +93,90 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(result);
         }
+        [HttpGet("GetEmpanelledAgency")]
+        public async Task<IActionResult> GetEmpanelledAgency()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return BadRequest("User identity is missing.");
+            }
+
+            // Fetch the company user
+            var companyUser = await _context.ClientCompanyApplicationUser
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
+            if (companyUser == null)
+            {
+                return NotFound("Company user not found.");
+            }
+
+            var statuses =new[] {
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
+            };
+
+            // Fetch claims only once and filter them based on status
+            var claimsCases = await _context.Investigations
+                .Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue && statuses.Contains(c.SubStatus))
+                .ToListAsync();
+
+            // Fetch the company with necessary relationships
+            var company = await _context.ClientCompany
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.State)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.District)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.Country)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.PinCode)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.ratings)
+                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            if (company == null)
+            {
+                return NotFound("Company not found.");
+            }
+
+            // Process the vendors
+            var result = company.EmpanelledVendors?
+                .Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
+                .OrderBy(u => u.Name)
+                .Select(u => new
+                {
+                    Id = u.VendorId,
+                    Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
+                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ?
+                        $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>" :
+                        u.Email,
+                    Name = u.Name,
+                    Code = u.Code,
+                    Phone = $"(+{u.Country.ISDCode}) {u.PhoneNumber}",
+                    Address = $"{u.Addressline}",
+                    District = u.District.Name,
+                    State = u.State.Code,
+                    Country = u.Country.Code,
+                    Flag = $"/flags/{u.Country.Code.ToLower()}.png",
+                    Updated = u.Updated?.ToString("dd-MM-yyyy") ?? u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy,
+                    CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
+                    RateCount = u.RateCount,
+                    RateTotal = u.RateTotal,
+                    RawAddress = $"{u.Addressline}, {u.District.Name}, {u.State.Code}, {u.Country.Code}",
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated
+                })
+                .ToArray();
+
+            // Update vendors in the context
+            company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+
+            return Ok(result);
+        }
 
         [HttpGet("GetEmpanelledVendors")]
         public async Task<IActionResult> GetEmpanelledVendors()
@@ -260,8 +344,6 @@ namespace risk.control.system.Controllers.Api.Company
 
             var vendor = _context.Vendor
                 .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.LineOfBusiness)
-                .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
                  .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.State)
@@ -282,26 +364,11 @@ namespace risk.control.system.Controllers.Api.Company
                 var IsAllDistrict = (service.DistrictId == null);
                 string pincodes = $"{ALL_PINCODE}";
                 string rawPincodes = $"{ALL_PINCODE}";
-                //if (!IsAllDistrict)
-                //{
-                //    var allPinCodesForDistrict = await _context.PinCode.CountAsync(p => p.DistrictId == service.DistrictId);
-                //    if (allPinCodesForDistrict == service.PincodeServices.Count)
-                //    {
-                //        pincodes = ALL_PINCODE;
-                //        rawPincodes = ALL_PINCODE;
-                //    }
-                //    else
-                //    {
-                //        pincodes = string.Join(", ", service.PincodeServices.Select(c => c.Pincode).Distinct());
-                //        rawPincodes = string.Join(", ", service.PincodeServices.Select(c => c.Name).Distinct());
-                //    }
-                //}
-
                 serviceResponse.Add(new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
                     Id = service.VendorInvestigationServiceTypeId,
-                    CaseType = service.LineOfBusiness.Name,
+                    CaseType = service.InsuranceType.GetEnumDisplayName(),
                     ServiceType = service.InvestigationServiceType.Name,
                     District = IsAllDistrict ? ALL_DISTRICT : service.District.Name,
                     State = service.State.Code,

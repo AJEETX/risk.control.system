@@ -121,7 +121,7 @@
                         @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                         {
                             <a id="back"
-                               asp-controller="CreatorAuto"
+                               asp-controller="Investigation"
                                asp-action="@(Model.FromEditPage ? "Details" : "New")"
                                asp-route-id="@(Model.FromEditPage ? Model.ClaimsInvestigation.Id : null)"
                                class="btn btn-outline-secondary">
@@ -131,7 +131,7 @@
                         else
                         {
                             <a id="back"
-                               asp-controller="CreatorAuto"
+                               asp-controller="Investigation"
                                asp-action="@(Model.FromEditPage ? "Details" : "New")"
                                asp-route-id="@(Model.FromEditPage ? Model.ClaimsInvestigation.Id : null)"
                                class="btn btn-outline-secondary">
@@ -148,6 +148,6 @@
     </div>
 </section>
 @section Scripts {
-    <script src="~/js/creator/get-empanelled-vendors.js"></script>
-    <script src="~/js/common/claim-details.js"></script>
+    <script src="~/js/creator/get-empanelled-agency.js"></script>
+    <script src="~/js/common/case-details.js"></script>
 }

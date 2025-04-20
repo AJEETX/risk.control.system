@@ -768,12 +768,7 @@ namespace risk.control.system.Services
                     TimeElapsed = timeElapsed
                 };
                 _context.InvestigationTransaction.Add(log);
-
-
-                var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-                var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
-
+                var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
                 if (isClaim)
                 {
                     claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";

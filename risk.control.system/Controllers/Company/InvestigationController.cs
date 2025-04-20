@@ -491,15 +491,13 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS!!!.Agency Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var approvedStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
-                var rejectedStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+                var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
+                var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
 
-                var vendorAllCasesCount = await context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId &&
+                var vendorAllCasesCount = await context.Investigations.CountAsync(c => c.VendorId == vendor.VendorId &&
                 !c.Deleted &&
-                (c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
-                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId));
+                (c.SubStatus == approvedStatus ||
+                c.SubStatus == rejectedStatus));
 
                 var vendorUserCount = await context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted && c.Role == AppRoles.AGENT);
 
@@ -508,7 +506,7 @@ namespace risk.control.system.Controllers.Company
                 vendor.SelectedCountryId = vendorUserCount;
                 vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
                 vendor.SelectedDistrictId = vendorAllCasesCount;
-                vendor.MobileAppUrl = selectedcase.ToString();
+                vendor.SelectedPincodeId = selectedcase;
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Case");
                 var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };

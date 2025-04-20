@@ -419,7 +419,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     claimId = c.ClaimsInvestigationId,
                     Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
-                    claimType = c.PolicyDetail.LineOfBusinessId == claimLineOfBusiness ? ClaimType.DEATH : ClaimType.HEALTH,
+                    claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH : ClaimType.HEALTH,
                     DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
                     CustomerName = c.CustomerDetail.Name,
@@ -546,9 +546,9 @@ namespace risk.control.system.Controllers.Api
                     Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                     Coordinate = new
                     {
-                        Lat = c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ?
+                        Lat = c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
                             decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
-                        Lng = c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ?
+                        Lng = c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
                              decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
                     },
                     Address = LocationDetail.GetAddress(c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, c.CustomerDetail, c.BeneficiaryDetail),
@@ -628,7 +628,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             ClaimId = claim.ClaimsInvestigationId,
                             PolicyNumber = claim.PolicyDetail.ContractNumber,
-                            ClaimType = claim.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                            ClaimType = claim.PolicyDetail.InsuranceType.GetEnumDisplayName(),
                             Document = claim.PolicyDetail.DocumentImage != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.PolicyDetail.DocumentImage)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),

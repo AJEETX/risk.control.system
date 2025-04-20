@@ -40,6 +40,7 @@ namespace risk.control.system.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
         private readonly IFeatureManager featureManager;
+        private readonly IInvestigationService service;
 
         public CompanyController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
@@ -51,6 +52,7 @@ namespace risk.control.system.Controllers
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
+            IInvestigationService service,
             ISmsService SmsService)
         {
             this._context = context;
@@ -64,6 +66,7 @@ namespace risk.control.system.Controllers
             this.featureManager = featureManager;
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
+            this.service = service;
         }
 
         [Breadcrumb("Manage Company")]
@@ -611,20 +614,15 @@ namespace risk.control.system.Controllers
                 var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted && c.Role == AppRoles.AGENT);
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
-                var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
-                var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+                var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
+                var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
 
-                var vendorAllCasesCount = await _context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted &&
-                c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
-                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId);
+                var vendorAllCasesCount = await _context.Investigations.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted &&
+                          (c.SubStatus == approvedStatus ||
+                          c.SubStatus == rejectedStatus));
 
-                var vendorAllCases = await _context.ClaimsInvestigation.Where(c => c.VendorId == vendor.VendorId && !c.Deleted &&
-                c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
-                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId).ToListAsync();
                 // HACKY
-                var currentCases = claimsInvestigationService.GetAgencyIdsLoad(new List<long> {vendor.VendorId });
+                var currentCases = service.GetAgencyIdsLoad(new List<long> {vendor.VendorId });
                 vendor.SelectedCountryId = vendorUserCount;
                 vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
                 vendor.SelectedDistrictId = vendorAllCasesCount;

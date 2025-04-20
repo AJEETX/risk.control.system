@@ -1,0 +1,54 @@
+﻿@using risk.control.system.Helpers;
+
+<li class="nav-item">
+    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("VendorInvestigation","")">
+        <i class="nav-icon far fa-money-bill-alt"></i>
+        <p class="sidebar-menu-header-label">
+            CASES
+            <i class="right fas fa-angle-right"></i>
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="VendorInvestigation" asp-action="Allocate" class="actual-link nav-link @Url.MakeActiveClass("VendorInvestigation","Allocate")
+                                    @Url.MakeActiveClass("VendorInvestigation","SelectVendorAgent")
+                                            @Url.MakeActiveClass("VendorInvestigation","ReplyEnquiry")
+                                            @Url.MakeActiveClass("VendorInvestigation","CaseDetail")
+                                            ">
+        <i class="fas fa-external-link-alt nav-icon"></i>
+        <p>
+            <span class="badge badge-danger">ALLOCATE</span> <sub>new</sub>
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="VendorInvestigation" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("VendorInvestigation","ClaimReport")
+                                                    @Url.MakeActiveClass("VendorInvestigation","GetInvestigateReport")
+                                                    @Url.MakeActiveClass("VendorInvestigation","ReSelectVendorAgent")">
+        <i class="far fa-file-archive nav-icon"></i>
+        <p>
+            <span class="badge badge-info">SUBMIT</span> <sub>report</sub>
+        </p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a is-active-page asp-controller="VendorInvestigation" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("VendorInvestigation","Open")
+                                @Url.MakeActiveClass("VendorInvestigation","Detail")">
+        <i class="fa fa-toggle-on nav-icon"></i>
+        <p>
+            <span class="badge badge-primary">ACTIVE</span>
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="VendorInvestigation" asp-action="Completed" class="actual-link nav-link @Url.MakeActiveClass("VendorInvestigation","Completed")
+                                           @Url.MakeActiveClass("VendorInvestigation","CompletedDetail")
+                                                   @Url.MakeActiveClass("VendorInvestigation","ShowInvoice")
+                                                       @Url.MakeActiveClass("VendorInvestigation","PrintInvoice")">
+        <i class="fas fa-print nav-icon"></i>
+        <p>
+            <span class="badge badge-secondary">COMPLETED</span>
+        </p>
+    </a>
+</li>

@@ -20,6 +20,7 @@ namespace risk.control.system.Models
         public string CaseOwner { get; set; }
         public bool IsUploaded { get; set; } = false;
         public bool IsReady2Assign { get; set; } = false;
+        public bool IsAutoAllocated { get; set; } = false;
         public bool AssignedToAgency { get; set; } = false;
         public InvestigationReport? InvestigationReport { get; set; }
         public List<ClaimNote>? ClaimNotes { get; set; } = new();
@@ -29,6 +30,7 @@ namespace risk.control.system.Models
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
         public bool AiEnabled { get; set; } = false;
         public bool Deleted { get; set; } = false;
+        public bool IsQueryCase { get; set; } = false;
         public string? AllocatingSupervisordEmail { get; set; }
         public string? SubmittingSupervisordEmail { get; set; }
         public string? SubmittedAssessordEmail { get; set; }
@@ -43,11 +45,13 @@ namespace risk.control.system.Models
         public DateTime? ReviewByAssessorTime { get; set; }
         public DateTime? AllocatedToAgencyTime { get; set; }
         public bool IsNew { get; set; } = true;
+        public bool IsNewAssignedToManager { get; set; } = true;
         public bool IsNewAssignedToAgency { get; set; } = true;
         public bool IsNewSubmittedToAgent { get; set; } = true;
         public bool IsNewSubmittedToAgency { get; set; } = true;
         public bool IsNewSubmittedToCompany { get; set; } = true;
         public bool IsNewProcessedByCompany { get; set; } = true;
+        public bool IsNewReviewedByCompany { get; set; } = true;
         public int CreatorSla { get; set; } = 5;
         public int AssessorSla { get; set; } = 5;
         public int SupervisorSla { get; set; } = 5;

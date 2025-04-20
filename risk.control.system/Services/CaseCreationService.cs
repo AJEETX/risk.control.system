@@ -23,11 +23,9 @@ namespace risk.control.system.Services
     }
     public class CaseCreationService : ICaseCreationService
     {
-        private const string UNDERWRITING = "underwriting";
         private const string POLICY_IMAGE = "policy.jpg";
         private const string CUSTOMER_IMAGE = "customer.jpg";
         private const string BENEFICIARY_IMAGE = "beneficiary.jpg";
-        private const string CLAIMS = "claims";
         private readonly ApplicationDbContext context;
         private readonly ICustomApiCLient customApiCLient;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -89,10 +87,10 @@ namespace risk.control.system.Services
             // Get the results
             var customer = await customerTask;
             var beneficiary = await beneficiaryTask;
-            string caseType = CLAIMS;
+            string caseType = CONSTANTS.CLAIM;
             if (uploadCase.CaseType != "0")
             {
-                caseType = UNDERWRITING;
+                caseType = CONSTANTS.UNDERWRITING;
             }
             var lineOfBusinessId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == caseType).LineOfBusinessId;
 

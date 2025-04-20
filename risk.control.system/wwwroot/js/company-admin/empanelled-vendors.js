@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Company/GetEmpanelledVendors',
+            url: '/api/Company/GetEmpanelledAgency',
             dataSrc: ''
         },
         columnDefs: [{

@@ -1,38 +1,5 @@
 ﻿$(document).ready(function () {
     var askConfirmation = true;
-    var remarksElement = $('#remarks');
-    if (remarksElement) {
-        remarksElement.focus();
-    }
-    var report = $('#remarks').val();
-    if ($(this).is(':checked') && report != '') {
-        //Enable the submit button.
-        $('#submit-case').attr("disabled", false);
-    } else {
-        //If it is not checked, disable the button.
-        $('#submit-case').attr("disabled", true);
-    }
-
-    $('#remarks').on('keydown', function () {
-        var report = $('#remarks').val();
-        if (report != '') {
-            //Enable the submit button.
-            $('#submit-case').attr("disabled", false);
-        } else {
-            //If it is not checked, disable the button.
-            $('#submit-case').attr("disabled", true);
-        }
-    })
-    $('#remarks').on('blur', function () {
-        var report = $('#remarks').val();
-        if (report != '') {
-            //Enable the submit button.
-            $('#submit-case').attr("disabled", false);
-        } else {
-            //If it is not checked, disable the button.
-            $('#submit-case').attr("disabled", true);
-        }
-    });
     $('#decline-information-popup').on('click', function (e) {
         $.alert(
             {

@@ -118,6 +118,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<ICaseVendorService, CaseVendorService>();
+builder.Services.AddScoped<IVendorInvestigationService, VendorInvestigationService>();
 builder.Services.AddScoped<IDashboardCountService, DashboardCountService>();
 builder.Services.AddScoped<ITimelineService, TimelineService>();
 builder.Services.AddScoped<IMailService, MailService>();

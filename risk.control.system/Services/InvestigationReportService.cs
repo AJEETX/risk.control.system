@@ -101,10 +101,7 @@ namespace risk.control.system.Services
             }
             
             var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claim.AgencyReport.AgencyReportId);
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
-
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
             if (isClaim)
             {
                 claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
@@ -253,11 +250,7 @@ namespace risk.control.system.Services
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(u=>u.Email == currentUserEmail);
-            
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
-
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
             if (isClaim)
             {
                 claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
@@ -344,9 +337,7 @@ namespace risk.control.system.Services
                 claim.AgencyReport.AssessorRemarks = null;
             }
             ClaimsInvestigationVendorsModel model = null;
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-
-            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
             if (claim.AgencyReport == null)
             {

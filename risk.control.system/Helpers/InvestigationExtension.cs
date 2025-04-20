@@ -22,22 +22,22 @@ namespace risk.control.system.Helpers
         }
         public static string GetPolicyNum(this InvestigationTask a)
         {
-            string title = "Withdrawn by company";
-            string style = "none";
+            string title = $"({a.UpdatedBy}) Withdrawn";
+            string style = "-none";
             if (a is not null)
             {
                 if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY)
                 {
                     style = "";
-                    title = "Withdrawn by company";
+                    title = $"({a.UpdatedBy}) Withdrawn";
                 }
                 if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY)
                 {
                     style = "";
-                    title = "Withdrawn by agency";
+                    title = $"Agency ({a.UpdatedBy}) Declined";
                 }
             }
-            return string.Join("", a.PolicyDetail?.ContractNumber + $"<i class=\"fa fa-asterisk asterik-style-{style}\" title=\"{title}\"></i>");
+            return string.Join("", a.PolicyDetail?.ContractNumber + $"<i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i>");
         }
     }
 }

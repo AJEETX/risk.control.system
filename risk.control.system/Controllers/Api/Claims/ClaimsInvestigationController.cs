@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -21,8 +22,6 @@ namespace risk.control.system.Controllers.Api.Claims
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class ClaimsInvestigationController : ControllerBase
     {
-        private const string CLAIM = "claims";
-        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext _context;
         private readonly IClaimsService claimsService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -451,7 +450,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.AgencyReport)
                 .Include(c => c.AgencyReport.AgentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CONSTANTS.UNDERWRITING).LineOfBusinessId;
 
             if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
@@ -507,7 +506,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.AgencyReport)
                 .Include(c => c.AgencyReport.DigitalIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CONSTANTS.UNDERWRITING).LineOfBusinessId;
 
             if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
@@ -567,7 +566,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.AgencyReport)
                 .Include(c => c.AgencyReport.PanIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CONSTANTS.UNDERWRITING).LineOfBusinessId;
 
             if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
@@ -624,7 +623,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.AgencyReport.PassportIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
 
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CONSTANTS.UNDERWRITING).LineOfBusinessId;
             if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
@@ -679,7 +678,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.AgencyReport)
                 .Include(c => c.AgencyReport.AudioReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CONSTANTS.UNDERWRITING).LineOfBusinessId;
 
             if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
@@ -737,7 +736,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.AgencyReport)
                 .Include(c => c.AgencyReport.VideoReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CONSTANTS.UNDERWRITING).LineOfBusinessId;
 
             if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
