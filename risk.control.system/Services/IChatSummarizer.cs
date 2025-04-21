@@ -11,7 +11,7 @@ public interface IChatSummarizer
 {
     Task<string> SummarizeObjectDataAsync(ClaimsInvestigation claimsInvestigation);
 
-    Task<string> SummarizeDataAsync(ClaimsInvestigation claimsInvestigation, string inputText = "Long text to summarize...");
+    Task<string> SummarizeDataAsync(InvestigationTask claimsInvestigation, string inputText = "Long text to summarize...");
 }
 public class OpenAISummarizer : IChatSummarizer
 {
@@ -53,7 +53,7 @@ public class OpenAISummarizer : IChatSummarizer
         }
     }
 
-    public async Task<string> SummarizeDataAsync(ClaimsInvestigation claimsInvestigation, string inputText = "Long text to summarize...")
+    public async Task<string> SummarizeDataAsync(InvestigationTask claimsInvestigation, string inputText = "Long text to summarize...")
     {
         try
         {

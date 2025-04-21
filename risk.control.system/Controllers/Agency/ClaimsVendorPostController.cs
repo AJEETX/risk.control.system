@@ -108,10 +108,34 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENT.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId, string caseType)
+        public async Task<IActionResult> SubmitReport(CaseInvestigationVendorsModel model, string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId, string caseType)
         {
             try
             {
+                var answers = model.QuestionFormViewModel.Answers;
+
+                foreach (var answer in answers)
+                {
+                    int questionId = answer.Key;
+                    string value = answer.Value;
+
+                    // Process/save answer
+                }
+
+                foreach (var question in model.QuestionFormViewModel.Questions)
+                {
+                    if (question.IsRequired &&
+                        (!model.QuestionFormViewModel.Answers.TryGetValue(question.Id, out var value) || string.IsNullOrWhiteSpace(value)))
+                    {
+                        ModelState.AddModelError($"Answers[{question.Id}]", $"Question '{question.QuestionText}' is required.");
+                    }
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return View("YourView", model); // return with validation errors
+                }
+
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {

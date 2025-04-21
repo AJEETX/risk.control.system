@@ -58,6 +58,6 @@ namespace risk.control.system.Models
         public long? AgencyReportId { get; set; }
         public virtual AgencyReport? AgencyReport { get; set; }
         public virtual InvestigationServiceType? InvestigationServiceType { get; set; }
-        public string? ClaimId { get; set; }
+        public long? ClaimId { get; set; }
     }
 }

@@ -1,7 +1,7 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@model CaseInvestigationVendorsModel
                                 
 @{
-    var questionTime = @Model.AgencyReport.AgentRemarksUpdated != null ? @Model.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var questionTime = @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated != null ? @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
     <div class="card direct-chat direct-chat-warning collapsed-card">
         <div class="card-header">
             <h3 class="card-title">Mobile SMS</h3>
@@ -18,20 +18,20 @@
         <div class="card-body">
             <div class="direct-chat-messages">
                 <div class="direct-chat-msg">
-                    @if (Model.ClaimsInvestigation.ClaimMessages.Count > 0)
+                    @if (Model.ClaimsInvestigation.CaseMessages.Count > 0)
                     {
-                        for (var i = 0; i < Model.ClaimsInvestigation.ClaimMessages.Count; i++)
+                        for (var i = 0; i < Model.ClaimsInvestigation.CaseMessages.Count; i++)
                         {
                             if (i % 2 == 0)
                             {
                                 <div class="direct-chat-msg">
                                     <div class="direct-chat-infos clearfix">
-                                        <span class="direct-chat-name float-left">@Model.ClaimsInvestigation.ClaimMessages[i].SenderEmail</span>
-                                        <span class="direct-chat-timestamp float-right">@Model.ClaimsInvestigation.ClaimMessages[i].Created.ToString("dd MMM hh:mm")</span>
+                                        <span class="direct-chat-name float-left">@Model.ClaimsInvestigation.CaseMessages[i].SenderEmail</span>
+                                        <span class="direct-chat-timestamp float-right">@Model.ClaimsInvestigation.CaseMessages[i].Created.ToString("dd MMM hh:mm")</span>
                                     </div>
                                     <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="sender image">
                                     <div class="direct-chat-text">
-                                        @Model.ClaimsInvestigation.ClaimMessages[i].Message
+                                        @Model.ClaimsInvestigation.CaseMessages[i].Message
                                     </div>
                                 </div>
                             }
@@ -39,12 +39,12 @@
                             {
                                 <div class="direct-chat-msg right">
                                     <div class="direct-chat-infos clearfix">
-                                        <span class="direct-chat-name float-right">@Model.ClaimsInvestigation.ClaimMessages[i].RecepicientEmail</span>
-                                        <span class="direct-chat-timestamp float-left">@Model.ClaimsInvestigation.ClaimMessages[i].Created.ToString("dd MMM hh:mm")</span>
+                                        <span class="direct-chat-name float-right">@Model.ClaimsInvestigation.CaseMessages[i].RecepicientEmail</span>
+                                        <span class="direct-chat-timestamp float-left">@Model.ClaimsInvestigation.CaseMessages[i].Created.ToString("dd MMM hh:mm")</span>
                                     </div>
                                     <img class="direct-chat-img" src="/img/agency-admin.jpeg" alt="recepient image">
                                     <div class="direct-chat-text">
-                                        @Model.ClaimsInvestigation.ClaimMessages[i].Message
+                                        @Model.ClaimsInvestigation.CaseMessages[i].Message
                                     </div>
                                 </div>
                             }

@@ -4,15 +4,8 @@
 @{
     if (User.IsInRole(AppRoles.CREATOR.ToString()))
     {
-        @if (System.Diagnostics.Debugger.IsAttached)
-        {
-            <partial name="AdminLTE/_CompanySidebarCaseCreator" model="@Model" />
-        }
-        else
-        {
-            <partial name="AdminLTE/_CompanySidebarClaimsCreator" model="@Model" />
+        <partial name="AdminLTE/_CompanySidebarCaseCreator" model="@Model" />
 
-        }
     }
     else if (User.IsInRole(AppRoles.ASSESSOR.ToString()))
     {

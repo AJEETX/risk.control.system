@@ -17,7 +17,7 @@ namespace risk.control.system.Services
 {
     public interface IPdfReportService
     {
-        Task Run(string userEmail,string claimsInvestigationId);
+        Task Run(string userEmail,long claimsInvestigationId);
     }
     public class PdfReportService : IPdfReportService
     {
@@ -33,7 +33,7 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task Run(string userEmail,string claimsInvestigationId)
+        public async Task Run(string userEmail,long claimsInvestigationId)
         {
 
             var (builder,filePath) = await CreateReport(userEmail,claimsInvestigationId);
@@ -41,7 +41,7 @@ namespace risk.control.system.Services
             builder.Build(filePath);
 
         }
-        private async Task<(DocumentBuilder builder, string filePath)> CreateReport(string userEmail, string claimsInvestigationId)
+        private async Task<(DocumentBuilder builder, string filePath)> CreateReport(string userEmail, long claimsInvestigationId)
         {
             var imagePath = webHostEnvironment.WebRootPath;
             //var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -49,7 +49,7 @@ namespace risk.control.system.Services
             //var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
             //           i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
             
-            var claim = _context.ClaimsInvestigation
+            var claim = _context.Investigations
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.District)
                     .Include(c => c.CustomerDetail)
@@ -71,15 +71,16 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.LineOfBusiness)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
-                .Include(r => r.AgencyReport)
+                .Include(r => r.InvestigationReport)
                 .ThenInclude(r => r.DigitalIdReport)
-                .Include(r => r.AgencyReport)
+                .Include(r => r.InvestigationReport)
                 .ThenInclude(r => r.PanIdReport)
-                .Include(r => r.AgencyReport)
+                .Include(r => r.InvestigationReport)
                 .ThenInclude(r => r.AgentIdReport)
-                .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.ReportQuestionaire)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+                .Include(r => r.InvestigationReport)
+                .ThenInclude(r => r.CaseQuestionnaire)
+                .ThenInclude(r => r.Questions)
+                .FirstOrDefault(c => c.Id == claimsInvestigationId);
 
             //create invoice
 
@@ -105,7 +106,7 @@ namespace risk.control.system.Services
                 ClientCompany = currentUser.ClientCompany,
                 UpdatedBy = userEmail,
                 VendorId = vendor.VendorId,
-                AgencyReportId = claim.AgencyReport?.AgencyReportId,
+                AgencyReportId = claim.InvestigationReport?.Id,
                 SubTotal = investigationServiced.Price,
                 TaxAmount = investigationServiced.Price * (1 / 10),
                 InvestigationServiceType = investigatService,
@@ -121,7 +122,7 @@ namespace risk.control.system.Services
                 Directory.CreateDirectory(folder);
             }
 
-            var reportFilename = "report" + claim.ClaimsInvestigationId + ".pdf";
+            var reportFilename = "report" + claim.Id + ".pdf";
 
             var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
 
@@ -159,29 +160,29 @@ namespace risk.control.system.Services
             IdData panIdData = JsonConvert.DeserializeObject<IdData>(panIdDataJsonContent);
 
             panIdData.Passenger = "Document Id";
-            var panValid = claim.AgencyReport.PanIdReport.DocumentIdImageValid.GetValueOrDefault();
+            var panValid = claim.InvestigationReport.PanIdReport.DocumentIdImageValid.GetValueOrDefault();
             panIdData.FaceMatchStatus = panValid ? "YES" : "NO";
-            panIdData.PersonName = claim.AgencyReport.PanIdReport.DocumentIdImageData.Length > 30 ?
-                claim.AgencyReport.PanIdReport.DocumentIdImageData.Substring(0, 30) + "..." :
-                claim.AgencyReport.PanIdReport.DocumentIdImageData;
+            panIdData.PersonName = claim.InvestigationReport.PanIdReport.DocumentIdImageData.Length > 30 ?
+                claim.InvestigationReport.PanIdReport.DocumentIdImageData.Substring(0, 30) + "..." :
+                claim.InvestigationReport.PanIdReport.DocumentIdImageData;
             panIdData.Salutation = "PAN/CARD";
             panIdData.PersonContact = contactNumer;
-            panIdData.BoardingTill = claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime.GetValueOrDefault();
-            panIdData.PhotoIdTime = claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime.GetValueOrDefault();
-            panIdData.WeatherData = claim.AgencyReport.PanIdReport.DocumentIdImageData;
+            panIdData.BoardingTill = claim.InvestigationReport.PanIdReport.DocumentIdImageLongLatTime.GetValueOrDefault();
+            panIdData.PhotoIdTime = claim.InvestigationReport.PanIdReport.DocumentIdImageLongLatTime.GetValueOrDefault();
+            panIdData.WeatherData = claim.InvestigationReport.PanIdReport.DocumentIdImageData;
             panIdData.ArrivalAirport = "";
-            panIdData.ArrivalAbvr = claim.AgencyReport.PanIdReport.DocumentIdImageLocationAddress;
+            panIdData.ArrivalAbvr = claim.InvestigationReport.PanIdReport.DocumentIdImageLocationAddress;
             panIdData.PhotoIdRemarks = panValid ? "CONFIRM" : "NOT SURE";
             panIdData.MatchFont = panValid ? Fonts.Helvetica(16f).SetColor(Color.Green) : Fonts.Helvetica(16f).SetColor(Color.Red);
             panIdData.StatusImagePath = panValid ? Path.Combine(imagePath, "img", "yes.png") : Path.Combine(imagePath, "img", "cancel.png");
 
             var panCardFileName = $"pan-card-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
-            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", panCardFileName), claim.AgencyReport.PanIdReport.DocumentIdImage);
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", panCardFileName), claim.InvestigationReport.PanIdReport.DocumentIdImage);
             panIdData.PanPhotoPath = Path.Combine(imagePath, "report", panCardFileName);
 
             string googlePanImagePath = Path.Combine(imagePath, "report", $"google-pan-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
-            var panPath = await DownloadMapImageAsync(claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl, googlePanImagePath);
-            panIdData.PanMapUrl = claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl;
+            var panPath = await DownloadMapImageAsync(claim.InvestigationReport.PanIdReport.DocumentIdImageLocationUrl, googlePanImagePath);
+            panIdData.PanMapUrl = claim.InvestigationReport.PanIdReport.DocumentIdImageLocationUrl;
             panIdData.PanMapPath = panPath;
 
 
@@ -189,35 +190,27 @@ namespace risk.control.system.Services
             string agencyDetailJsonContent = File.ReadAllText(agencyDetailFile);
             AgencyDetailData agencyDetailData = JsonConvert.DeserializeObject<AgencyDetailData>(agencyDetailJsonContent);
 
-            agencyDetailData.ReportSummary = claim.AgencyReport?.SupervisorRemarks;
+            agencyDetailData.ReportSummary = claim.InvestigationReport?.SupervisorRemarks;
             agencyDetailData.AgencyDomain = claim.Vendor.Email;
             agencyDetailData.AgencyContact = claim.Vendor.PhoneNumber;
-            agencyDetailData.SupervisorEmail = claim.AgencyReport?.SupervisorEmail;
+            agencyDetailData.SupervisorEmail = claim.InvestigationReport?.SupervisorEmail;
             agencyDetailData.AddressVisited = detailReport.VerifyAddress;
-            agencyDetailData.WeatherDetail = claim.AgencyReport.AssessorRemarks;
-            agencyDetailData.AssessorSummary = claim.AgencyReport?.AgentRemarks;
+            agencyDetailData.WeatherDetail = claim.InvestigationReport.AssessorRemarks;
+            agencyDetailData.AssessorSummary = claim.InvestigationReport?.AgentRemarks;
 
-            agencyDetailData.ReportSummaryDescription = new List<AgentQuestionAnswer> {
-                new AgentQuestionAnswer
+            var queationAmswers = claim.InvestigationReport.CaseQuestionnaire.Questions;
+
+            var qAns = new List<AgentQuestionAnswer>();
+            foreach (var question in queationAmswers)
+            {
+                qAns.Add(new AgentQuestionAnswer
                 {
-                    Question =  claim.AgencyReport?.ReportQuestionaire.Question1,
-                    Answer = claim.AgencyReport?.ReportQuestionaire.Answer1
-                },
-                new AgentQuestionAnswer
-                {
-                    Question =  claim.AgencyReport?.ReportQuestionaire.Question2,
-                    Answer = claim.AgencyReport?.ReportQuestionaire.Answer2
-                },
-                new AgentQuestionAnswer
-                {
-                    Question =  claim.AgencyReport?.ReportQuestionaire.Question3,
-                    Answer = claim.AgencyReport?.ReportQuestionaire.Answer3
-                },
-                new AgentQuestionAnswer
-                {
-                    Question =  claim.AgencyReport?.ReportQuestionaire.Question4,
-                    Answer = claim.AgencyReport?.ReportQuestionaire.Answer4
-                }};
+                    Question = question.QuestionText,
+                    Answer = question.AnswerText
+                });
+            }
+
+            agencyDetailData.ReportSummaryDescription = qAns;
 
 
             PdfReportBuilder ConcertTicketBuilder = new PdfReportBuilder();
@@ -228,7 +221,7 @@ namespace risk.control.system.Services
             ConcertTicketBuilder.AgentIdData = agentIdData;
             ConcertTicketBuilder.PanData = panIdData;
 
-            claim.AgencyReport.PdfReportFilePath = ReportFilePath;
+            claim.InvestigationReport.PdfReportFilePath = ReportFilePath;
 
             var saveCount = await _context.SaveChangesAsync();
 
@@ -236,14 +229,14 @@ namespace risk.control.system.Services
 
         }
 
-        private static async Task<IdData> SetAgentIdReport(string imagePath, ClaimsInvestigation claim, DetailedReport detailReport)
+        private static async Task<IdData> SetAgentIdReport(string imagePath, InvestigationTask claim, DetailedReport detailReport)
         {
             string photoIdJsonFile = CheckFile(Path.Combine("Files", "photo-id.json"));
             string photoIdJsonContent = File.ReadAllText(photoIdJsonFile);
             IdData photoIdData = JsonConvert.DeserializeObject<IdData>(photoIdJsonContent);
 
             photoIdData.Passenger = "Agent Id";
-            var photoMatch = claim.AgencyReport.AgentIdReport.Similarity > 70;
+            var photoMatch = claim.InvestigationReport.AgentIdReport.Similarity > 70;
             photoIdData.FaceMatchStatus = photoMatch ? "YES" : "NO";
             photoIdData.MatchFont = photoMatch ? Fonts.Helvetica(16f).SetColor(Color.Green) : Fonts.Helvetica(16f).SetColor(Color.Red);
             var photoStatusImage = photoMatch ? "yes.png" : "cancel.png";
@@ -251,7 +244,7 @@ namespace risk.control.system.Services
 
             string personAddressUrl = string.Empty;
             string contactNumer = string.Empty;
-            detailReport.AgentOfInterestName = claim.AgencyReport.AgentEmail;
+            detailReport.AgentOfInterestName = claim.InvestigationReport.AgentEmail;
             contactNumer = string.Empty;
             if (claim.PolicyDetail.LineOfBusiness.Name.ToLower() == UNDERWRITING)
             {
@@ -270,22 +263,22 @@ namespace risk.control.system.Services
             var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);
 
             var photoIdFilename = $"agent-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
-            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.AgencyReport.AgentIdReport.DigitalIdImage);
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.InvestigationReport.AgentIdReport.DigitalIdImage);
             photoIdData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdFilename);
 
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-agent-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
-            var photoPath = await DownloadMapImageAsync(claim.AgencyReport.AgentIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
-            photoIdData.PhotoIdMapUrl = claim.AgencyReport.AgentIdReport.DigitalIdImageLocationUrl;
+            var photoPath = await DownloadMapImageAsync(claim.InvestigationReport.AgentIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
+            photoIdData.PhotoIdMapUrl = claim.InvestigationReport.AgentIdReport.DigitalIdImageLocationUrl;
             photoIdData.PhotoIdMapPath = photoPath;
             photoIdData.PersonAddressImage = addressPath;
-            photoIdData.PersonName = claim.AgencyReport.AgentEmail;
+            photoIdData.PersonName = claim.InvestigationReport.AgentEmail;
             photoIdData.Salutation = "MR/MS";
             photoIdData.PersonContact = contactNumer;
-            photoIdData.BoardingTill = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.PhotoIdTime = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.WeatherData = claim.AgencyReport.AgentIdReport.DigitalIdImageData;
+            photoIdData.BoardingTill = claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
+            photoIdData.PhotoIdTime = claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
+            photoIdData.WeatherData = claim.InvestigationReport.AgentIdReport.DigitalIdImageData;
             photoIdData.ArrivalAirport = "";
-            photoIdData.ArrivalAbvr = claim.AgencyReport.AgentIdReport.DigitalIdImageLocationAddress;
+            photoIdData.ArrivalAbvr = claim.InvestigationReport.AgentIdReport.DigitalIdImageLocationAddress;
             if (photoMatch)
             {
                 photoIdData.PhotoIdRemarks = $"CONFIRM";
@@ -296,14 +289,14 @@ namespace risk.control.system.Services
             }
             return photoIdData;
         }
-        private static async Task<(IdData, DetailedReport, string)> SetFaceIdReport(string imagePath, ClaimsInvestigation claim, DetailedReport detailReport)
+        private static async Task<(IdData, DetailedReport, string)> SetFaceIdReport(string imagePath, InvestigationTask claim, DetailedReport detailReport)
         {
             string photoIdJsonFile = CheckFile(Path.Combine("Files", "photo-id.json"));
             string photoIdJsonContent = File.ReadAllText(photoIdJsonFile);
             IdData photoIdData = JsonConvert.DeserializeObject<IdData>(photoIdJsonContent);
 
             photoIdData.Passenger = "Photo Id";
-            var photoMatch = claim.AgencyReport.DigitalIdReport.Similarity > 70;
+            var photoMatch = claim.InvestigationReport.DigitalIdReport.Similarity > 70;
             photoIdData.FaceMatchStatus = photoMatch ? "YES" : "NO";
             photoIdData.MatchFont = photoMatch ? Fonts.Helvetica(16f).SetColor(Color.Green) : Fonts.Helvetica(16f).SetColor(Color.Red);
             var photoStatusImage = photoMatch ? "yes.png" : "cancel.png";
@@ -325,22 +318,22 @@ namespace risk.control.system.Services
             var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);
 
             var photoIdFilename = $"photo-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
-            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.AgencyReport.DigitalIdReport.DigitalIdImage);
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.InvestigationReport.DigitalIdReport.DigitalIdImage);
             photoIdData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdFilename);
 
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-photo-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
-            var photoPath = await DownloadMapImageAsync(claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
-            photoIdData.PhotoIdMapUrl = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl;
+            var photoPath = await DownloadMapImageAsync(claim.InvestigationReport.DigitalIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
+            photoIdData.PhotoIdMapUrl = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLocationUrl;
             photoIdData.PhotoIdMapPath = photoPath;
             photoIdData.PersonAddressImage = addressPath;
             photoIdData.PersonName = detailReport.PersonOfInterestName;
             photoIdData.Salutation = "MR/MS";
             photoIdData.PersonContact = contactNumer;
-            photoIdData.BoardingTill = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.PhotoIdTime = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.WeatherData = claim.AgencyReport.DigitalIdReport.DigitalIdImageData;
+            photoIdData.BoardingTill = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
+            photoIdData.PhotoIdTime = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
+            photoIdData.WeatherData = claim.InvestigationReport.DigitalIdReport.DigitalIdImageData;
             photoIdData.ArrivalAirport = "";
-            photoIdData.ArrivalAbvr = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress;
+            photoIdData.ArrivalAbvr = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLocationAddress;
             if (photoMatch)
             {
                 photoIdData.PhotoIdRemarks = $"CONFIRM";

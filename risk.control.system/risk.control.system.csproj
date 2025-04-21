@@ -92,12 +92,4 @@
     <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\report\" />
   </ItemGroup>
-
-
-  <ItemGroup>
-    <Content Update="wwwroot\js\case-map.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
 </Project>

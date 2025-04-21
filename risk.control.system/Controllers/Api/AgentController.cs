@@ -41,6 +41,7 @@ namespace risk.control.system.Controllers.Api
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
         private readonly IConfiguration configuration;
+        private readonly IAgentIdService agentIdService;
         private readonly ICompareFaces compareFaces;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
@@ -58,6 +59,7 @@ namespace risk.control.system.Controllers.Api
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
             IConfiguration configuration,
+            IAgentIdService agentIdService,
             ICompareFaces compareFaces,
             UserManager<VendorApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
@@ -71,6 +73,7 @@ namespace risk.control.system.Controllers.Api
             this._context = context;
             this.httpClientService = httpClientService;
             this.configuration = configuration;
+            this.agentIdService = agentIdService;
             this.compareFaces = compareFaces;
             this.userVendorManager = userVendorManager;
             this.agentService = agentService;
@@ -716,13 +719,13 @@ namespace risk.control.system.Controllers.Api
 
             if(data.Type == "0")
             {
-                var response = await iCheckifyService.GetAgentId(data);
+                var response = await agentIdService.GetAgentId(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
             else if (data.Type == "1")
             {
-                var response = await iCheckifyService.GetFaceId(data);
+                var response = await agentIdService.GetFaceId(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
@@ -754,7 +757,7 @@ namespace risk.control.system.Controllers.Api
                     return StatusCode(401, new { message = "Offboarded Agent." });
                 }
             }
-            var response = await iCheckifyService.GetDocumentId(data);
+            var response = await agentIdService.GetDocumentId(data);
             response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
             return Ok(response);
         }

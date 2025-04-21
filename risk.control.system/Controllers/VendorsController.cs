@@ -697,7 +697,7 @@ namespace risk.control.system.Controllers
                 var model =await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
-                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 

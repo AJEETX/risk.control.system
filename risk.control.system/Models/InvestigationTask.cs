@@ -22,6 +22,7 @@ namespace risk.control.system.Models
         public bool IsReady2Assign { get; set; } = false;
         public bool IsAutoAllocated { get; set; } = false;
         public bool AssignedToAgency { get; set; } = false;
+        public long? InvestigationReportId { get; set; }
         public InvestigationReport? InvestigationReport { get; set; }
         public List<ClaimNote>? ClaimNotes { get; set; } = new();
         public List<CaseNote>? CaseNotes { get; set; } = new();

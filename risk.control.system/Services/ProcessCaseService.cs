@@ -28,20 +28,28 @@ namespace risk.control.system.Services
         Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
         Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long claimsInvestigationId, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "");
 
+        Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType reportUpdateStatus, string reportAiSummary);
+        Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long claimId, EnquiryRequest request, IFormFile messageDocument);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
-
+        Task<bool> SubmitNotes(string userEmail, long claimId, string notes);
     }
     public class ProcessCaseService : IProcessCaseService
     {
         private readonly ApplicationDbContext context;
         private readonly IMailService mailboxService;
+        private readonly IPdfReportService reportService;
         private readonly ITimelineService timelineService;
         private readonly IBackgroundJobClient backgroundJobClient;
 
-        public ProcessCaseService(ApplicationDbContext context, IMailService mailboxService, ITimelineService timelineService, IBackgroundJobClient backgroundJobClient)
+        public ProcessCaseService(ApplicationDbContext context,
+            IMailService mailboxService,
+            IPdfReportService reportService,
+            ITimelineService timelineService, 
+            IBackgroundJobClient backgroundJobClient)
         {
             this.context = context;
             this.mailboxService = mailboxService;
+            this.reportService = reportService;
             this.timelineService = timelineService;
             this.backgroundJobClient = backgroundJobClient;
         }
@@ -472,7 +480,6 @@ namespace risk.control.system.Services
                 var claim = context.Investigations
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.InvestigationAgencyReport)
                 .Include(c => c.Vendor)
                 .Include(c => c.ClientCompany)
                 .FirstOrDefault(c => c.Id == claimsInvestigationId);
@@ -484,8 +491,9 @@ namespace risk.control.system.Services
                 claim.Updated = DateTime.Now;
                 claim.UpdatedBy = userEmail;
                 claim.SubStatus = submitted2Assessor;
+                claim.CaseOwner = claim.ClientCompany.Email;
                 claim.SubmittedToAssessorTime = DateTime.Now;
-                var report = claim.InvestigationReport.InvestigationAgencyReport;
+                var report = claim.InvestigationReport;
                 var edited = report.AgentRemarks.Trim() != editRemarks.Trim();
                 if (edited)
                 {
@@ -533,12 +541,11 @@ namespace risk.control.system.Services
                 var assignedToAgentSubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
                 var claimsCaseToAllocateToVendor = context.Investigations
                     .Include(c => c.InvestigationReport)
-                    .ThenInclude(c => c.InvestigationAgencyReport)
                     .Include(c => c.PolicyDetail)
                     .Include(p => p.ClientCompany)
                     .FirstOrDefault(v => v.Id == claimsInvestigationId);
 
-                var report = claimsCaseToAllocateToVendor.InvestigationReport.InvestigationAgencyReport;
+                var report = claimsCaseToAllocateToVendor.InvestigationReport;
                 report.SupervisorRemarkType = reportUpdateStatus;
                 report.SupervisorRemarks = supervisorRemarks;
 
@@ -633,5 +640,175 @@ namespace risk.control.system.Services
             }
         }
 
+        public async Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType reportUpdateStatus, string reportAiSummary)
+        {
+            if (reportUpdateStatus == AssessorRemarkType.OK)
+            {
+                return await ApproveCaseReport(userEmail, assessorRemarks, claimsInvestigationId, reportUpdateStatus, reportAiSummary);
+            }
+            else if (reportUpdateStatus == AssessorRemarkType.REJECT)
+            {
+                //PUT th case back in review list :: Assign back to Agent
+                return await RejectCaseReport(userEmail, assessorRemarks, claimsInvestigationId, reportUpdateStatus, reportAiSummary);
+            }
+            else
+            {
+                return (null!, string.Empty);
+            }
+        }
+
+        private async Task<(ClientCompany, string)> RejectCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
+        {
+            var rejected = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
+            var finished = CONSTANTS.CASE_STATUS.FINISHED;
+
+            try
+            {
+                var claim = context.Investigations
+                .Include(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .Include(r => r.InvestigationReport)
+                .FirstOrDefault(c => c.Id == claimsInvestigationId);
+
+                claim.InvestigationReport.AiSummary = reportAiSummary;
+                claim.InvestigationReport.AssessorRemarkType = assessorRemarkType;
+                claim.InvestigationReport.AssessorRemarks = assessorRemarks;
+                claim.InvestigationReport.AssessorRemarksUpdated = DateTime.Now;
+                claim.InvestigationReport.AssessorEmail = userEmail;
+
+                claim.Status = finished;
+                claim.SubStatus = rejected;
+                claim.Updated = DateTime.Now;
+                claim.UpdatedBy = userEmail;
+                claim.ProcessedByAssessorTime = DateTime.Now;
+                claim.SubmittedAssessordEmail = userEmail;
+                claim.CaseOwner = claim.ClientCompany.Email;
+                context.Investigations.Update(claim);
+
+                var saveCount = await context.SaveChangesAsync();
+
+                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+
+                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
+
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+            return (null!, string.Empty);
+        }
+
+        private async Task<(ClientCompany, string)> ApproveCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
+        {
+
+            try
+            {
+                var approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
+                var finished = CONSTANTS.CASE_STATUS.FINISHED;
+
+                var claim = context.Investigations
+                .Include(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .Include(r => r.InvestigationReport)
+                .FirstOrDefault(c => c.Id == claimsInvestigationId);
+
+                claim.InvestigationReport.AiSummary = reportAiSummary;
+                claim.InvestigationReport.AssessorRemarkType = assessorRemarkType;
+                claim.InvestigationReport.AssessorRemarks = assessorRemarks;
+                claim.InvestigationReport.AssessorRemarksUpdated = DateTime.Now;
+                claim.InvestigationReport.AssessorEmail = userEmail;
+
+                claim.Status = finished;
+                claim.SubStatus = approved;
+                claim.Updated = DateTime.Now;
+                claim.UpdatedBy = userEmail;
+                claim.CaseOwner = claim.ClientCompany.Email;
+                claim.ProcessedByAssessorTime = DateTime.Now;
+                context.Investigations.Update(claim);
+
+                var saveCount = await context.SaveChangesAsync();
+
+                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+
+                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
+
+                return saveCount > 0 ? (claim.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+            return (null!, string.Empty);
+        }
+
+        public async Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long claimId, EnquiryRequest request, IFormFile messageDocument)
+        {
+
+            try
+            {
+                var claim = context.Investigations
+                .Include(c => c.Vendor)
+                .Include(c => c.InvestigationReport)
+                .Include(c => c.Vendor)
+                .FirstOrDefault(c => c.Id == claimId);
+
+                var requestedByAssessor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
+
+                claim.SubStatus= requestedByAssessor;
+                claim.UpdatedBy = userEmail;
+                claim.CaseOwner = claim.Vendor.Email;
+                claim.RequestedAssessordEmail = userEmail;
+                claim.AssignedToAgency = true;
+                claim.IsQueryCase = true;
+                if (messageDocument != null)
+                {
+                    using var ms = new MemoryStream();
+                    messageDocument.CopyTo(ms);
+                    request.QuestionImageAttachment = ms.ToArray();
+                    request.QuestionImageFileName = Path.GetFileName(messageDocument.FileName);
+                    request.QuestionImageFileExtension = Path.GetExtension(messageDocument.FileName);
+                    request.QuestionImageFileType = messageDocument.ContentType;
+                }
+                claim.InvestigationReport.EnquiryRequest = request;
+                claim.InvestigationReport.Updated = DateTime.Now;
+                claim.InvestigationReport.UpdatedBy = userEmail;
+                claim.InvestigationReport.EnquiryRequest.Updated = DateTime.Now;
+                claim.InvestigationReport.EnquiryRequest.UpdatedBy = userEmail;
+                claim.EnquiredByAssessorTime = DateTime.Now;
+                context.QueryRequest.Update(request);
+                context.Investigations.Update(claim);
+
+                var saved = await context.SaveChangesAsync() > 0;
+
+                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+
+                return saved ? claim : null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
+        }
+
+        public async Task<bool> SubmitNotes(string userEmail, long claimId, string notes)
+        {
+            var claim = context.Investigations
+               .Include(c => c.ClaimNotes)
+               .FirstOrDefault(c => c.Id == claimId);
+            claim.ClaimNotes.Add(new ClaimNote
+            {
+                Comment = notes,
+                Sender = userEmail,
+                Created = DateTime.Now,
+                Updated = DateTime.Now,
+                UpdatedBy = userEmail
+            });
+            context.Investigations.Update(claim);
+            return await context.SaveChangesAsync() > 0;
+        }
     }
 }

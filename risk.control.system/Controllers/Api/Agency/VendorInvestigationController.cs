@@ -223,7 +223,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     return agentProfile;
                 }
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)
+            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
             {
                 var companyImage = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId)?.Email;
                 if (companyImage == null)
@@ -252,11 +252,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     return agentProfile;
                 }
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
+            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
             {
-                var agentProfile = _context.Vendor.FirstOrDefault(u => u.VendorId == a.VendorId)?.DocumentImage;
+                var agentProfile = _context.ClientCompany.FirstOrDefault(u => u.ClientCompanyId == a.ClientCompanyId)?.DocumentImage;
                 if (agentProfile != null)
                 {
                     return agentProfile;
@@ -432,9 +430,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(u => u.Vendor)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
-            if (vendorUser == null)
-                return NotFound("Vendor not found.");
-
             // Fetch the required statuses in one query
             var statuses = await _context.InvestigationCaseSubStatus
                 .Where(i => new[]
@@ -449,89 +444,79 @@ namespace risk.control.system.Controllers.Api.Agency
                 return BadRequest("Missing required case statuses.");
 
             // Filter the claims based on the vendor ID and required status
-            var claims = await _context.ClaimsInvestigation
-                .Include(c => c.ClientCompany)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(p => p.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(p => p.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(p => p.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(p => p.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(p => p.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(p => p.State)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(p => p.LineOfBusiness)
+            var claims = await _context.Investigations
+                .Include(a => a.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(p => p.InvestigationServiceType)
-                .Where(i => i.VendorId == vendorUser.VendorId &&
-                            string.IsNullOrEmpty(i.UserEmailActionedTo) &&
-                            i.UserRoleActionedTo == vendorUser.Vendor.Email &&
-                            i.InvestigationCaseSubStatusId == statuses[CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR])
+                .Include(a => a.PolicyDetail)
+                .ThenInclude(a => a.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(p => p.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(p => p.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(p => p.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(p => p.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(p => p.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(p => p.State)
+                .Where(a => a.VendorId == vendorUser.VendorId && 
+                            a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
                 .ToListAsync();
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
-            var claimsSubmitted = claims.Select(a =>
-            {
-                a.VerifyView += 1;
-                bool isNewAssigned = a.VerifyView <= 1;
-
-                if (isNewAssigned)
+                var response = claims.Select(a =>
+                new ClaimsInvestigationAgencyResponse
                 {
-                    // Mark for later saving
-                    _context.ClaimsInvestigation.Update(a);
-                }
-
-                return new ClaimsInvestigationAgencyResponse
-                {
-                    Id = a.ClaimsInvestigationId,
+                    Id = a.Id,
                     PolicyId = a.PolicyDetail.ContractNumber,
                     Amount = string.Format(Extensions.GetCultureByCountry(vendorUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                     AssignedToAgency = a.AssignedToAgency,
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                     Company = a.ClientCompany.Name,
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
                     Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                    Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
-                    Name = a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
-                    Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                    Status = a.InvestigationCaseStatus.Name,
-                    ServiceType = a.PolicyDetail?.LineOfBusiness.Name,
+                    Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
+                    Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
+                    Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
+                    Status = a.SubStatus,
+                    ServiceType = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
                     Service = a.PolicyDetail.InvestigationServiceType.Name,
-                    Location = a.InvestigationCaseSubStatus.Name,
-                    RawStatus = a.InvestigationCaseSubStatus.Name,
+                    Location = a.SubStatus,
+                    RawStatus = a.SubStatus,
                     Created = a.Created.ToString("dd-MM-yyyy"),
                     timePending = GetSupervisorReportTimePending(a),
                     PolicyNum = a.PolicyDetail.ContractNumber,
                     BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
-                                      Applicationsettings.NO_USER,
+                                           string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
+                                          Applicationsettings.NO_USER,
                     BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
-                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" :
-                        a.BeneficiaryDetail.Name,
+                            "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" :
+                            a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
-                    IsNewAssigned = isNewAssigned,
+                    IsNewAssigned = a.IsNewSubmittedToAgency,
                     PersonMapAddressUrl = a.SelectedAgentDrivingMap,
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
-                };
-            }).ToList();
-
-            // Save changes if any new claims were marked
-            if (claimsSubmitted.Any(c => c.IsNewAssigned.HasValue && c.IsNewAssigned.Value))
+                }).ToList();
+            var idsToMarkViewed = response.Where(x => x.IsNewAssigned.GetValueOrDefault()).Select(x => x.Id).ToList();
+            if (idsToMarkViewed.Any())
             {
-                await _context.SaveChangesAsync();
+                var entitiesToUpdate = _context.Investigations
+                    .Where(x => idsToMarkViewed.Contains(x.Id))
+                    .ToList();
+
+                foreach (var entity in entitiesToUpdate)
+                    entity.IsNewSubmittedToAgency = false;
+
+                await _context.SaveChangesAsync(); // mark as viewed
             }
 
-            return Ok(claimsSubmitted);
+            return Ok(response);
         }
-        private string GetSupervisorReportTimePending(ClaimsInvestigation a)
+        private string GetSupervisorReportTimePending(InvestigationTask a)
         {
             DateTime timeToCompare = a.SubmittedToSupervisorTime.Value;
 

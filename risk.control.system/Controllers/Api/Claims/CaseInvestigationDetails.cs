@@ -313,7 +313,6 @@ namespace risk.control.system.Controllers.Api.Claims
         {
             var claim = claimsService.GetCasesWithDetail()
                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.InvestigationAgencyReport)
                 .ThenInclude(c => c.AgentIdReport)
                 .FirstOrDefault(c => c.Id == claimid);
 
@@ -322,20 +321,20 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
 
-                if (claim.InvestigationReport is not null && claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport is not null)
+                if (claim.InvestigationReport is not null && claim.InvestigationReport?.AgentIdReport is not null)
                 {
-                    var longLat = claim.InvestigationReport.InvestigationAgencyReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
-                    var latitude = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
+                    var latitude = claim.InvestigationReport?.AgentIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.InvestigationReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
                         center,
                         dakota,
                         frick,
-                        url = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport.DigitalIdImageLocationUrl,
-                        distance = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport.Distance,
-                        duration = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport.Duration,
+                        url = claim.InvestigationReport?.AgentIdReport.DigitalIdImageLocationUrl,
+                        distance = claim.InvestigationReport?.AgentIdReport.Distance,
+                        duration = claim.InvestigationReport?.AgentIdReport.Duration,
                     });
                 }
             }
@@ -344,20 +343,20 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
-                if (claim.InvestigationReport is not null && claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport?.DigitalIdImageLongLat is not null)
+                if (claim.InvestigationReport is not null && claim.InvestigationReport?.AgentIdReport?.DigitalIdImageLongLat is not null)
                 {
-                    var longLat = claim.InvestigationReport.InvestigationAgencyReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
-                    var latitude = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
+                    var latitude = claim.InvestigationReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.InvestigationReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
                         center,
                         dakota,
                         frick,
-                        url = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport.DigitalIdImageLocationUrl,
-                        distance = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport.Distance,
-                        duration = claim.InvestigationReport?.InvestigationAgencyReport?.AgentIdReport.Duration,
+                        url = claim.InvestigationReport?.AgentIdReport.DigitalIdImageLocationUrl,
+                        distance = claim.InvestigationReport?.AgentIdReport.Distance,
+                        duration = claim.InvestigationReport?.AgentIdReport.Duration,
                     });
                 }
             }

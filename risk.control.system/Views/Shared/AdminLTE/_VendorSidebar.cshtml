@@ -42,14 +42,8 @@
 
                 @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()) || User.IsInRole(AppRoles.SUPERVISOR.ToString()))
                 {
-                    @if (System.Diagnostics.Debugger.IsAttached)
-                    {
-                        <partial name="AdminLTE/_VendorSidebarInvestigation" />
-                    }
-                    else
-                    {
-                        <partial name="AdminLTE/_VendorSidebarSupervisor" />
-                    }
+                    <partial name="AdminLTE/_VendorSidebarInvestigation" />
+
                 }
                 @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
                 {

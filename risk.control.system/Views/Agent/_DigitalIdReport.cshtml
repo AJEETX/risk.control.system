@@ -1,4 +1,4 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@model CaseInvestigationVendorsModel
 
 @{
     var imageCapturedTime = @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null ? @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
@@ -186,7 +186,7 @@
             <form id="upload-face" asp-controller="Uploads" asp-action="FaceUpload" method="post" enctype="multipart/form-data">
                 <input type="hidden" id="digitalIdLatitude" name="digitalIdLatitude" />
                 <input type="hidden" id="digitalIdLongitude" name="digitalIdLongitude" />
-                <input type="hidden" id="selectedcase" name="selectedcase" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <input type="hidden" id="selectedcase" name="selectedcase" value="@Model.ClaimsInvestigation.Id" />
                 <div class="card-footer">
 
                     <div class="form-group">

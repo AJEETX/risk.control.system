@@ -155,6 +155,67 @@ namespace risk.control.system.Helpers
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
+        public static string GetAssessorTimePending(this InvestigationTask a, bool assess = false, bool processed = false, bool enquiry = false, bool review = false)
+        {
+            DateTime time2Compare = a.SubmittedToAssessorTime.Value;
+            if (assess)
+            {
+                time2Compare = a.SubmittedToAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(time2Compare).Days} days since created!\"></i>");
+
+                else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(time2Compare).Days} day since created.\"></i>");
+
+            }
+            else if (processed)
+            {
+                time2Compare = a.ProcessedByAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+                else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+            }
+            else if (enquiry)
+            {
+                time2Compare = a.EnquiredByAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+                else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            }
+            else if (review)
+            {
+                time2Compare = a.ReviewByAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+                else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            }
+
+            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
+                DateTime.Now.Subtract(time2Compare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
+
         public static string GetMap(this InvestigationTask claim, bool caseType, bool tasked2Agent = false, bool submitted2Supervisor = false, bool enquiry = false)
         {
             if (tasked2Agent || submitted2Supervisor || enquiry)

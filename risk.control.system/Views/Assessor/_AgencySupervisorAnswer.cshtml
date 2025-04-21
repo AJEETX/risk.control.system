@@ -1,11 +1,11 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@model CaseInvestigationVendorsModel
+
 
 <div class="col-12 col-md-6">
 
 
-    <partial name="_Chat" model="@Model" />
 
-    <div class="card bg-light  border-success">
+    <div class="card bg-light border-success">
 
         <div class="card-header">
             <h3 class="card-title">
@@ -14,15 +14,15 @@
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <span>
-                            <i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</b> comments.
+                            <i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorEmail</b> comments.
                         </span>
 
                     </span>
                 </span>
             </h3>
             <div class="card-tools">
-                <span data-toggle="tooltip" title=" Supervisor :  @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                <span data-toggle="tooltip" title=" Supervisor :  @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorEmail" class="badge badge-light">
+                    <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                 </span>
             </div>
 
@@ -34,7 +34,7 @@
             </div>
         </div>
         <div class="card-footer text-muted border-bottom-0">
-            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.ClaimsInvestigation.AgencyReport.SupervisorEmail </span>
+            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.ClaimsInvestigation.InvestigationReport.SupervisorEmail </span>
         </div>
         <div class="card-body">
             <div class="row">
@@ -56,8 +56,8 @@
                                 <tr>
                                     <td>
                                         @{
-                                            var updateTime = Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated
-                                            ?? Model.ClaimsInvestigation.AgencyReport.Created;
+                                            var updateTime = Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated
+                                            ?? Model.ClaimsInvestigation.InvestigationReport.Created;
                                             string displayTime = updateTime.ToString("dd-MMM-yyyy HH:mm");
                                         }
                                         <span class="badge badge-light">@displayTime</span>
@@ -65,19 +65,19 @@
 
                                     <td class="text-start">
                                         <div class="bg-light rounded p-2 text-muted">
-                                            @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks
+                                            @Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarks
                                         </div>
                                     </td>
 
                                     <td>
-                                        @if (Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment != null)
+                                        @if (Model.ClaimsInvestigation.InvestigationReport?.SupervisorAttachment != null)
                                         {
                                             <div class="d-flex flex-column gap-2 align-items-center">
-                                                <img class="img-thumbnail mb-2 doc-preview" src="data:image/*;base64,@(Convert.ToBase64String(Model.ClaimsInvestigation.AgencyReport.SupervisorAttachment))" alt="Attachment">
+                                                <img class="img-thumbnail mb-2 doc-preview" src="data:image/*;base64,@(Convert.ToBase64String(Model.ClaimsInvestigation.InvestigationReport.SupervisorAttachment))" alt="Attachment">
 
                                                 <a asp-controller="Download"
                                                    asp-action="SupervisorFileAttachment"
-                                                   asp-route-id="@Model.ClaimsInvestigation.AgencyReport.AgencyReportId"
+                                                   asp-route-id="@Model.ClaimsInvestigation.InvestigationReport.Id"
                                                    target="_blank"
                                                    class="btn btn-outline-primary btn-sm">
                                                     <i class="fas fa-paperclip"></i> View

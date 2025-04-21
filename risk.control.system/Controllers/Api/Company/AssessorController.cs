@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.Controllers.Api.Claims;
 using Microsoft.AspNetCore.Hosting;
+using Google.Api;
 
 namespace risk.control.system.Controllers.Api.Company
 {
@@ -70,46 +71,55 @@ namespace risk.control.system.Controllers.Api.Company
             }
 
             // Fetch claims based on statuses and company
-            var applicationDbContext = claimsService.GetClaims()
-                .Where(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
-                            i.UserEmailActionedTo == string.Empty &&
-                            i.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}" &&
-                            (i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId ||
-                             i.InvestigationCaseSubStatusId == replyByAgency.InvestigationCaseSubStatusId))
-                .ToList();
+            var claims = await _context.Investigations
+                .Include(i => i.Vendor)
+                .Include(i => i.PolicyDetail)
+                .ThenInclude(i => i.InvestigationServiceType)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.PinCode)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.District)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.State)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.Country)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.PinCode)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.District)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.State)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.Country)
+                .Where(i => !i.Deleted && i.ClientCompanyId == companyUser.ClientCompanyId &&
+                            (i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                             i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR))
+                .ToListAsync();
 
-            var newClaimsAssigned = new List<ClaimsInvestigation>();
-            var claimsAssigned = new List<ClaimsInvestigation>();
+            var idsToMarkViewed = claims.Where(x => x.IsNewSubmittedToCompany).Select(x => x.Id).ToList();
 
-            // Update claims and segregate them into new and already assigned
-            foreach (var claim in applicationDbContext)
+            if (idsToMarkViewed.Any())
             {
-                claim.AssessView += 1;
-                if (claim.AssessView <= 1)
-                {
-                    newClaimsAssigned.Add(claim);
-                }
-                claimsAssigned.Add(claim);
-            }
+                var entitiesToUpdate = _context.Investigations
+                    .Where(x => idsToMarkViewed.Contains(x.Id))
+                    .ToList();
 
-            if (newClaimsAssigned.Count > 0)
-            {
-                _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
-                await _context.SaveChangesAsync();
-            }
+                foreach (var entity in entitiesToUpdate)
+                    entity.IsNewSubmittedToCompany = false;
 
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+                await _context.SaveChangesAsync(); // mark as viewed
+            }
             // Prepare the response
-            var response = claimsAssigned
+            var response = claims
                 .Select(a => new ClaimsInvestigationResponse
                 {
-                    Id = a.ClaimsInvestigationId,
-                    AutoAllocated = a.AutoAllocated,
+                    Id = a.Id,
+                    AutoAllocated = a.IsAutoAllocated,
                     PolicyId = a.PolicyDetail.ContractNumber,
                     Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                     AssignedToAgency = a.AssignedToAgency,
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                     Document = a.PolicyDetail.DocumentImage != null ?
                                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) :
                                Applicationsettings.NO_POLICY_IMAGE,
@@ -117,11 +127,11 @@ namespace risk.control.system.Controllers.Api.Company
                                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) :
                                Applicationsettings.NO_USER,
                     Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
-                    Policy = a.PolicyDetail?.LineOfBusiness.Name,
+                    Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
                     Status = a.ORIGIN.GetEnumDisplayName(),
-                    ServiceType = $"{a.PolicyDetail?.LineOfBusiness.Name} ({a.PolicyDetail.InvestigationServiceType.Name})",
+                    ServiceType = $"{a.PolicyDetail?.InsuranceType.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})",
                     Service = a.PolicyDetail.InvestigationServiceType.Name,
-                    Location = a.InvestigationCaseSubStatus.Name,
+                    Location = a.SubStatus,
                     Created = a.Created.ToString("dd-MM-yyyy"),
                     timePending = a.GetAssessorTimePending(true),
                     PolicyNum = a.GetPolicyNum(),
@@ -134,7 +144,7 @@ namespace risk.control.system.Controllers.Api.Company
                     TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds,
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                     Agent = a.Vendor.Name,
-                    IsNewAssigned = a.AssessView <= 1,
+                    IsNewAssigned = a.IsNewSubmittedToCompany,
                     PersonMapAddressUrl = a.SelectedAgentDrivingMap,
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration

@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 if (id < 1)
                 {
-                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 

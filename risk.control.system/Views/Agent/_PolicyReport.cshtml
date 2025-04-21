@@ -1,8 +1,9 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@using risk.control.system.Helpers;
+@model CaseInvestigationVendorsModel
 <div class="card shadow-lg border-1 rounded-lg">
     <div class="card-header bg-light text-white">
         <h3 class="card-title">
-            <i class="fas fa-user-shield"></i> Report (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name): <span class="badge badge-light"> @Model.AgencyReport.AgentEmail </span>
+            <i class="fas fa-user-shield"></i> Report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): <span class="badge badge-light"> @Model.AgencyReport.AgentEmail </span>
             <span class="hover-text">
                 <i class="fas fa-info-circle"></i>
                 <span class="tooltip-text" id="information">
@@ -14,7 +15,7 @@
             </span>
         </h3>
         <div class="card-tools">
-            <span data-toggle="tooltip" title="Agent (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name ) report: @Model.AgencyReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
+            <span data-toggle="tooltip" title="Agent (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName() ) report: @Model.AgencyReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
         </div>
     </div>
 
@@ -28,26 +29,10 @@
             <partial name="_AgentIdReport" model="@Model" />
             <partial name="_DigitalIdReport" model="@Model" />
             <partial name="_DocumentIdReport" model="@Model" />
-            @if (Model.ClaimsInvestigation.EnablePassport)
-            {
-                <partial name="_PassportIdReport" model="@Model" />
-            }
-            @if (Model.ClaimsInvestigation.EnableMedia)
-            {
-                <partial name="_AudioReport" model="@Model" />
-                <partial name="_VideoReport" model="@Model" />
-            }
+            
         </div>
         <div class="row">
-            @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "claims")
-            {
-                <partial name="_ClaimQuestionaire" model="@Model" />
-            }
-            else
-            {
-                <partial name="_Questionaire" model="@Model" />
-            }
-
+            <partial name="_ClaimQuestionaire" model="@Model" />
         </div>
     </div>
 </div>

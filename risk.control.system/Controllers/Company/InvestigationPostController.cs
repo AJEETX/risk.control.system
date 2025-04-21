@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authorization;
 using Hangfire;
 using Amazon.Textract;
 using Microsoft.AspNetCore.Http;
+using System.Web;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -694,6 +695,123 @@ namespace risk.control.system.Controllers.Company
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+            }
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
+        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, long claimId, string reportAiSummary)
+        {
+            if (string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
+            {
+                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+            }
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                AssessorRemarkType reportUpdateStatus = (AssessorRemarkType)Enum.Parse(typeof(AssessorRemarkType), assessorRemarkType, true);
+
+                var (company, contract) = await processCaseService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
+
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
+
+                if (reportUpdateStatus == AssessorRemarkType.OK)
+                {
+                    notifyService.Custom($"Case #{contract} Approved", 3, "green", "far fa-file-powerpoint");
+                }
+                else if (reportUpdateStatus == AssessorRemarkType.REJECT)
+                {
+                    notifyService.Custom($"Case #{contract} Rejected", 3, "red", "far fa-file-powerpoint");
+                }
+                else
+                {
+                    notifyService.Custom($"Case #{contract} Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
+                }
+
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+            }
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
+        public async Task<IActionResult> SubmitQuery(long claimId, string reply, CaseInvestigationVendorsModel request)
+        {
+            try
+            {
+                if (request == null || claimId < 1 || string.IsNullOrWhiteSpace(reply))
+                {
+                    notifyService.Error("Bad Request..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                request.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.AgencyReport.EnquiryRequest.Description);
+
+                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
+
+                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.AgencyReport.EnquiryRequest, messageDocument);
+                if (model != null)
+                {
+                    var company = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId, baseUrl));
+
+                    notifyService.Success("Query Sent to Agency");
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                }
+                notifyService.Error("OOPs !!!..Error sending query");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
+        public async Task<IActionResult> SubmitNotes(long claimId, string name)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                var model = await processCaseService.SubmitNotes(currentUserEmail, claimId, name);
+                if (model)
+                {
+                    notifyService.Success("Notes added");
+                    return Ok();
+                }
+                notifyService.Error("OOPs !!!..Error adding notes");
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return Ok();
             }
         }
         public class DeleteRequestModel

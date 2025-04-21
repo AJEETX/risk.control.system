@@ -45,7 +45,7 @@ namespace risk.control.system.Models
         public List<Question> Questions { get; set; } = new List<Question>();
         [NotMapped]
         public Dictionary<int, string> Answers { get; set; } = new Dictionary<int, string>();
-        public ICollection<InvestigationAgencyReport> Reports { get; set; }
+        public ICollection<InvestigationReport> Reports { get; set; }
 
     }
 

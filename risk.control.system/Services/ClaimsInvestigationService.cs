@@ -957,7 +957,7 @@ namespace risk.control.system.Services
 
                 var saveCount = await _context.SaveChangesAsync();
 
-                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
+                //backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
 
                 var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
@@ -1027,7 +1027,7 @@ namespace risk.control.system.Services
 
                 var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
-                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
+                //backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }

@@ -688,10 +688,14 @@ namespace risk.control.system.Services
             {
                 var assignedToAgent = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
                 var claim = context.Investigations
+                    .Include(c => c.InvestigationReport)
+                    .ThenInclude(c => c.CaseQuestionnaire)
+                    .ThenInclude (c => c.Questions)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
                     .Include(c => c.BeneficiaryDetail)
                     .Where(c => c.Id == claimsInvestigationId).FirstOrDefault();
+
                 var agentUser = context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
 
                 string drivingDistance, drivingDuration, drivingMap;
@@ -723,7 +727,13 @@ namespace risk.control.system.Services
                 claim.SelectedAgentDrivingDurationInSeconds = durationInSeconds;
                 claim.SelectedAgentDrivingMap = drivingMap;
                 claim.TaskToAgentTime = DateTime.Now;
+
+                var questions = context.CaseQuestionnaire.Include(c => c.Questions).FirstOrDefault(x => x.ClientCompanyId == claim.ClientCompanyId && x.InsuranceType == InsuranceType.CLAIM);
                 
+                claim.InvestigationReport = new InvestigationReport();
+                
+                claim.InvestigationReport.CaseQuestionnaire.Questions = questions.Questions.ToList();
+
                 context.Investigations.Update(claim);
                 var rows = await context.SaveChangesAsync();
 
@@ -747,26 +757,34 @@ namespace risk.control.system.Services
 
                 var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
 
-                var claim = GetCases().Include(r=>r.InvestigationReport.InvestigationAgencyReport.CaseQuestionnaire)
+                var claim = GetCases()
+                    .Include(r=>r.InvestigationReport)
+                    .ThenInclude(r=>r.CaseQuestionnaire)
+                    .ThenInclude(r=>r.Questions)
                     .FirstOrDefault(c => c.Id == claimsInvestigationId);
 
                 claim.Updated = DateTime.Now;
-                claim.UpdatedBy = agent.FirstName + " " + agent.LastName + "(" + agent.Email + ")";
+                claim.UpdatedBy = agent.Email;
                 claim.SubStatus = submitted2Supervisor;
                 claim.SubmittedToSupervisorTime = DateTime.Now;
-                var claimReport = claim.InvestigationReport.InvestigationAgencyReport;
+                claim.CaseOwner = agent.Vendor.Email;
+                var claimReport = claim.InvestigationReport;
 
-                claimReport.CaseQuestionnaire.Answers[1] = answer1;
-                claimReport.CaseQuestionnaire.Answers[2] = answer2;
-                claimReport.CaseQuestionnaire.Answers[3] = answer3;
-                claimReport.CaseQuestionnaire.Answers[4] = answer4;
+                claimReport.CaseQuestionnaire.Questions[0].AnswerText = answer1;
+                claimReport.CaseQuestionnaire.Questions[1].AnswerText = answer2;
+                claimReport.CaseQuestionnaire.Questions[2].AnswerText = answer3;
+                claimReport.CaseQuestionnaire.Questions[3].AnswerText = answer4;
+
                 claimReport.AgentRemarks = remarks;
                 claimReport.AgentRemarksUpdated = DateTime.Now;
                 claimReport.AgentEmail = userEmail;
 
-                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+                context.Investigations.Update(claim);
 
                 var rows = await context.SaveChangesAsync();
+
+                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+
                 return (agent.Vendor, claim.PolicyDetail.ContractNumber);
             }
             catch (Exception ex)

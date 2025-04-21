@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENT.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, long claimId, long caseLocationId, string caseType)
+        public async Task<IActionResult> SubmitReport(CaseInvestigationVendorsModel model, string remarks, long claimId)
         {
             try
             {
@@ -116,72 +116,34 @@ namespace risk.control.system.Controllers.Agency
                 if (currentUserEmail == null)
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
+                    return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = model.ClaimsInvestigation.Id });
                 }
-                if (string.IsNullOrWhiteSpace(remarks) ||
-                    claimId < 1 ||
-                    caseLocationId < 1 ||
-                    string.IsNullOrWhiteSpace(question1) ||
-                    string.IsNullOrWhiteSpace(question2) ||
-                    string.IsNullOrWhiteSpace(question3) ||
-                    string.IsNullOrWhiteSpace(question4)
-                    )
+                var answers = model.QuestionFormViewModel.Answers;
+
+                foreach (var answer in answers)
                 {
-                    notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
-                    return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
+                    int questionId = answer.Key;
+                    string value = answer.Value;
+
+                    // Process/save answer
                 }
 
-                if(caseType == "claim")
-                {
-                    if(int.TryParse(question1, out int intValue))
-                    {
-                        YESNO yesNo = (YESNO)intValue;
+                //foreach (var question in model.QuestionFormViewModel.Questions)
+                //{
+                //    if (question.IsRequired &&
+                //        (!model.QuestionFormViewModel.Answers.TryGetValue(question.Id, out var value) || string.IsNullOrWhiteSpace(value)))
+                //    {
+                //        ModelState.AddModelError($"Answers[{question.Id}]", $"Question '{question.QuestionText}' is required.");
+                //    }
+                //    notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
+                //    return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = model.ClaimsInvestigation.Id });
+                //}
+                var question1 = GetSelectedOptionText(model, 1);
+                var question2 = GetSelectedOptionText(model, 2);
+                var question3 = model.QuestionFormViewModel.Answers[3];
+                var question4 = model.QuestionFormViewModel.Answers[4];
 
-                        // Optional: Validate if value is defined in the enum
-                        if (Enum.IsDefined(typeof(YESNO), yesNo))
-                        {
-                            question1 = yesNo.ToString();
-                        }
-                    }
-
-
-                    if (int.TryParse(question2, out int quest2))
-                    {
-                        DURATION duration = (DURATION)quest2;
-
-                        // Optional: Validate if value is defined in the enum
-                        if (Enum.IsDefined(typeof(DURATION), duration))
-                        {
-                            question2 = duration.ToString();
-                        }
-                    }
-                }
-                else
-                {
-                    if (int.TryParse(question1, out int intValue))
-                    {
-                        DwellType dwellType = (DwellType)intValue;
-
-                        // Optional: Validate if value is defined in the enum
-                        if (Enum.IsDefined(typeof(DwellType), dwellType))
-                        {
-                            question1 = dwellType.ToString();
-                        }
-                    }
-
-                    if (int.TryParse(question2, out int quest2))
-                    {
-                        Income income = (Income)quest2;
-
-                        // Optional: Validate if value is defined in the enum
-                        if (Enum.IsDefined(typeof(Income), income))
-                        {
-                            question2 = income.ToString();
-                        }
-                    }
-                }
-
-                var (vendor , contract )= await vendorInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
+                var (vendor, contract) = await vendorInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
                     WebUtility.HtmlDecode(remarks),
                     WebUtility.HtmlDecode(question1),
                     WebUtility.HtmlDecode(question2),
@@ -207,9 +169,20 @@ namespace risk.control.system.Controllers.Agency
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
-
             }
         }
+        private string GetSelectedOptionText(CaseInvestigationVendorsModel model, int questionId)
+        {
+            var question = model.QuestionFormViewModel.Questions.FirstOrDefault(q => q.Id == questionId);
+            if (question == null) return "N/A";
+
+            var selectedValue = model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var value) ? value : "N/A";
+            var options = question.Options?.Split(',') ?? Array.Empty<string>();
+
+            return options.Contains(selectedValue) ? selectedValue : "N/A";
+        }
+
+        // Usage
 
         [HttpPost]
         [ValidateAntiForgeryToken]

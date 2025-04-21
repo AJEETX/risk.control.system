@@ -49,20 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         questionType.addEventListener("change", toggleOptions);
         toggleOptions(); // Run once on load
-
-        //// Tooltip show/hide using classes
-        //const hoverTarget = document.querySelector(".hover-text");
-        //const tooltip = hoverTarget.querySelector(".question-tooltip-text");
-
-        //hoverTarget.addEventListener("mouseenter", () => {
-        //    tooltip.classList.add("question-tooltip-visible");
-        //});
-
-        //hoverTarget.addEventListener("mouseleave", () => {
-        //    tooltip.classList.remove("question-tooltip-visible");
-        //});
     }
-
 });
 
 document.querySelectorAll('.delete-question-btn').forEach(button => {

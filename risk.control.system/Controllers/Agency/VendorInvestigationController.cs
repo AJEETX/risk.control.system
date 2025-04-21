@@ -25,14 +25,14 @@ namespace risk.control.system.Controllers.Agency
         private readonly IInvoiceService invoiceService;
         private readonly IInvestigationService investigationService;
         private readonly IVendorInvestigationService vendorInvestigationService;
-        private readonly IClaimsVendorService vendorService;
+        private readonly ICaseVendorService vendorService;
         private readonly IInvestigationReportService investigationReportService;
 
         public VendorInvestigationController(INotyfService notifyService,
             IInvoiceService invoiceService,
             IInvestigationService investigationService,
             IVendorInvestigationService vendorInvestigationService,
-            IClaimsVendorService vendorService, 
+            ICaseVendorService vendorService, 
             IInvestigationReportService investigationReportService)
         {
             this.notifyService = notifyService;
@@ -116,11 +116,11 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpGet]
         [Breadcrumb("Re-Allocate", FromAction = "ClaimReport")]
-        public async Task<IActionResult> ReSelectVendorAgent(string selectedcase)
+        public async Task<IActionResult> ReSelectVendorAgent(long selectedcase)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(selectedcase))
+                if (selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
                     return RedirectToAction(nameof(SelectVendorAgent), new { selectedcase = selectedcase });
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorService.ReSelectVendorAgent(currentUserEmail, selectedcase);
+                var model = await vendorInvestigationService.SelectVendorAgent(currentUserEmail, selectedcase);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -159,11 +159,11 @@ namespace risk.control.system.Controllers.Agency
 
         [Breadcrumb("Submit", FromAction = "ClaimReport")]
 
-        public async Task<IActionResult> GetInvestigateReport(string selectedcase)
+        public async Task<IActionResult> GetInvestigateReport(long selectedcase)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(selectedcase))
+                if (selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case.");
                     return RedirectToAction(nameof(ClaimReport));
@@ -174,17 +174,6 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                ViewData["DwellTypeList"] = HtmlHelperExtensions.GetEnumSelectList<DwellType>();
-                ViewBag.IncomeList = Enum.GetValues(typeof(Income))
-                    .Cast<Income>()
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.ToString(), // Enum name (e.g., "TAXFREE_SLOT")
-                        Text = x.GetType()
-                               .GetField(x.ToString())
-                               .GetCustomAttribute<DisplayAttribute>()?.Name ?? x.ToString() // Display name or fallback to enum name
-                    })
-                    .ToList();
 
                 var model = await vendorService.GetInvestigateReport(currentUserEmail, selectedcase);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
@@ -311,7 +300,7 @@ namespace risk.control.system.Controllers.Agency
         }
         [Breadcrumb(" Reply Enquiry", FromAction = "Allocate")]
 
-        public async Task<IActionResult> ReplyEnquiry(string id)
+        public async Task<IActionResult> ReplyEnquiry(long id)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(currentUserEmail))
@@ -319,7 +308,7 @@ namespace risk.control.system.Controllers.Agency
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            if (string.IsNullOrWhiteSpace(id))
+            if (id < 1)
             {
                 notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");

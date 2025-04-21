@@ -9,8 +9,34 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        public long? InvestigationAgencyReportId { get; set; }
-        public InvestigationAgencyReport? InvestigationAgencyReport { get; set; }
+        public long? VendorId { get; set; }
+        public Vendor? Vendor { get; set; }
+
+        public long? DigitalIdReportId { get; set; }
+        public DigitalIdReport? DigitalIdReport { get; set; } = new();
+
+        public long? AgentIdReportId { get; set; }
+        public DigitalIdReport? AgentIdReport { get; set; } = new();
+
+        public long? PanIdReportId { get; set; } = new();
+        public DocumentIdReport? PanIdReport { get; set; } = new();
+        public long CaseQuestionnaireId { get; set; }
+        public CaseQuestionnaire CaseQuestionnaire { get; set; } = new();
+
+        public string? AgentEmail { get; set; }
+        public DateTime? AgentRemarksUpdated { get; set; }
+        public string? AgentRemarks { get; set; }
+
+        public DateTime? AgentRemarksEditUpdated { get; set; }
+        public string? AgentRemarksEdit { get; set; }
+        public DateTime? SupervisorRemarksUpdated { get; set; }
+        public string? SupervisorEmail { get; set; }
+        public string? SupervisorRemarks { get; set; }
+        public byte[]? SupervisorAttachment { get; set; }
+        public string? SupervisorFileName { get; set; }
+        public string? SupervisorFileType { get; set; }
+        public string? SupervisorFileExtension { get; set; }
+        public SupervisorRemarkType? SupervisorRemarkType { get; set; }
 
         public DateTime? AssessorRemarksUpdated { get; set; }
         public string? AssessorEmail { get; set; }

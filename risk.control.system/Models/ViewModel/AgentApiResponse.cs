@@ -122,16 +122,16 @@
     public class FaceData
     {
         public string Email { get; set; }
-        public string ClaimId { get; set; }
+        public long ClaimId { get; set; }
         public string LocationImage { get; set; }
         public string LocationLongLat { get; set; }
         public string? Type { get; set; } = "0";
     }
-
+    
     public class DocumentData
     {
         public string Email { get; set; }
-        public string ClaimId { get; set; }
+        public long ClaimId { get; set; }
         public string OcrImage { get; set; }
         public string OcrLongLat { get; set; }
     }

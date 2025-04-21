@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (id < 1)
                 {
-                    notifyService.Error("Claim Not Found !!!..");
+                    notifyService.Error("Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (id < 1)
                 {
-                    notifyService.Error("Claim Not Found !!!..");
+                    notifyService.Error("Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -161,7 +161,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Claim Not Found !!!..");
+                    notifyService.Error("Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -204,7 +204,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Claim Not Found !!!..");
+                    notifyService.Error("Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
@@ -234,7 +234,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (id==0)
                 {
-                    notifyService.Error("Claim Not Found !!!..");
+                    notifyService.Error("Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -270,7 +270,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (id == 0)
                 {
-                    notifyService.Error("Claim Not Found !!!..");
+                    notifyService.Error("Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 

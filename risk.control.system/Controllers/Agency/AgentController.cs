@@ -18,10 +18,10 @@ namespace risk.control.system.Controllers.Agency
     public class AgentController : Controller
     {
         private readonly INotyfService notifyService;
-        private readonly IClaimsVendorService vendorService;
+        private readonly ICaseVendorService vendorService;
         private readonly IInvestigationReportService investigationReportService;
 
-        public AgentController(INotyfService notifyService, IClaimsVendorService vendorService, IInvestigationReportService investigationReportService)
+        public AgentController(INotyfService notifyService, ICaseVendorService vendorService, IInvestigationReportService investigationReportService)
         {
             this.notifyService = notifyService;
             this.vendorService = vendorService;
@@ -45,11 +45,11 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb("Submit",FromAction = "Agent")]
-        public async Task<IActionResult> GetInvestigate(string selectedcase, bool uploaded = false)
+        public async Task<IActionResult> GetInvestigate(long selectedcase, bool uploaded = false)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(selectedcase))
+                if (selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be investigate.");
                     return RedirectToAction(nameof(Index), "Dashboard");

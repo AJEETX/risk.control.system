@@ -22,9 +22,9 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigationVendorAgentModel> ReSelectVendorAgent(string userEmail, string selectedcase);
 
-        Task<ClaimsInvestigationVendorsModel> GetInvestigate(string userEmail, string selectedcase, bool uploaded = false);
+        Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false);
 
-        Task<ClaimsInvestigationVendorsModel> GetInvestigateReport(string userEmail, string selectedcase);
+        Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase);
 
         Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase);
     }
@@ -36,6 +36,7 @@ namespace risk.control.system.Services
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly ApplicationDbContext _context;
         private readonly IDashboardService dashboardService;
+        private readonly IInvestigationService investigationService;
         private readonly IFeatureManager featureManager;
         private readonly IClaimsService claimsService;
 
@@ -46,12 +47,14 @@ namespace risk.control.system.Services
             UserManager<VendorApplicationUser> userManager,
             ApplicationDbContext context,
             IDashboardService dashboardService,
+            IInvestigationService investigationService,
             IFeatureManager featureManager,
             IClaimsService claimsService)
         {
             this.userManager = userManager;
             this._context = context;
             this.dashboardService = dashboardService;
+            this.investigationService = investigationService;
             this.featureManager = featureManager;
             this.claimsService = claimsService;
         }
@@ -91,23 +94,46 @@ namespace risk.control.system.Services
             return model;
         }
 
-        public async Task<ClaimsInvestigationVendorsModel> GetInvestigate(string userEmail, string selectedcase, bool uploaded = false)
+        public async Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false)
         {
-            var claim = claimsService.GetClaims()
-                .Include(c => c.ClaimNotes)
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.AgentIdReport)
-                .Include(c => c.AgencyReport)
+            var claim = await _context.Investigations
+                .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseNotes)
+                .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.CaseQuestionnaire)
+                .ThenInclude(c => c.Questions)
+                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.AgencyReport)
+                .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.PanIdReport)
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.PassportIdReport)
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.AudioReport)
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.VideoReport)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
+                 .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.AgentIdReport)
+                .FirstOrDefaultAsync(c => c.Id == selectedcase);
 
             var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
             claim.CustomerDetail.ContactNumber = customerContactMasked;
@@ -116,61 +142,80 @@ namespace risk.control.system.Services
 
             claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
 
-            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
+            claim.InvestigationReport.AgentEmail = userEmail;
 
-            ClaimsInvestigationVendorsModel model = null;
-            if (claim.AgencyReport == null)
+            var questionModel = new QuestionFormViewModel
             {
-                claim.AgencyReport = new AgencyReport();
-            }
+                Questions = claim.InvestigationReport.CaseQuestionnaire.Questions
+            };
 
-            if (isClaim)
+            var model = new CaseInvestigationVendorsModel 
             {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
-            }
-            else
-            {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
-            }
+                AgencyReport = claim.InvestigationReport, 
+                Location = claim.BeneficiaryDetail, 
+                ClaimsInvestigation = claim ,
+                QuestionFormViewModel = questionModel
+            };
 
-            claim.AgencyReport.AgentEmail = userEmail;
-            model = new ClaimsInvestigationVendorsModel { AgencyReport = claim.AgencyReport, Location = claim.BeneficiaryDetail, ClaimsInvestigation = claim };
 
-            _context.ClaimsInvestigation.Update(claim);
+            _context.Investigations.Update(claim);
             var rows =await _context.SaveChangesAsync();
             return model;
         }
 
-        public async Task<ClaimsInvestigationVendorsModel> GetInvestigateReport(string userEmail, string selectedcase)
+        public async Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
-            var claim = claimsService.GetClaims()
-                .Include(c => c.ClaimMessages)
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c=>c.EnquiryRequest)
-                .Include(c => c.AgencyReport.AgentIdReport)
-                .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Include(c => c.AgencyReport.PanIdReport)
-                .Include(c => c.AgencyReport.PassportIdReport)
-                .Include(c => c.AgencyReport.AudioReport)
-                .Include(c => c.AgencyReport.VideoReport)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
+            var claim = await _context.Investigations
+               .Include(c => c.InvestigationTimeline)
+               .Include(c => c.Vendor)
+               .Include(c => c.ClientCompany)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.BeneficiaryRelation)
+               .Include(c => c.CaseNotes)
+               .Include(c => c.CaseMessages)
+               .Include(c => c.InvestigationReport)
+               .ThenInclude(c => c.CaseQuestionnaire)
+               .ThenInclude(c => c.Questions)
+                .Include(c => c.InvestigationReport)
+               .ThenInclude(c => c.DigitalIdReport)
+               .Include(c => c.InvestigationReport)
+               .ThenInclude(c => c.PanIdReport)
+                .Include(c => c.InvestigationReport)
+               .ThenInclude(c => c.AgentIdReport)
+               .FirstOrDefaultAsync(c => c.Id == selectedcase);
 
 
             var beneficiaryDetails =await _context.BeneficiaryDetail
-                .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
-                .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == selectedcase);
+                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claim.BeneficiaryDetail.BeneficiaryDetailId);
+
             var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
             claim.CustomerDetail.ContactNumber = customerContactMasked;
 
@@ -179,28 +224,10 @@ namespace risk.control.system.Services
             claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
 
             beneficiaryDetails.ContactNumber = beneficairyContactMasked;
-            if (claim.IsReviewCase)
-            {
-                claim.AgencyReport.SupervisorRemarks = null;
-            }
+            
             var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
-            if (isClaim)
-            {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
-            }
-            else
-            {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
-            }
-
-            return (new ClaimsInvestigationVendorsModel { AgencyReport = claim.AgencyReport, Location = beneficiaryDetails, ClaimsInvestigation = claim });
+            return (new CaseInvestigationVendorsModel { AgencyReport = claim.InvestigationReport, Location = beneficiaryDetails, ClaimsInvestigation = claim });
         }
 
         public async Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase)

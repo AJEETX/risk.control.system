@@ -23,19 +23,25 @@ namespace risk.control.system.Controllers.Company
     {
         private readonly INotyfService notifyService;
         private readonly IClaimPolicyService claimPolicyService;
+        private readonly ICaseVendorService caseVendorService;
         private readonly IInvoiceService invoiceService;
+        private readonly IInvestigationService investigationService;
         private readonly IChatSummarizer chatSummarizer;
         private readonly IInvestigationReportService investigationReportService;
 
         public AssessorController(INotyfService notifyService,
             IClaimPolicyService claimPolicyService,
+            ICaseVendorService caseVendorService,
             IInvoiceService invoiceService,
+            IInvestigationService investigationService,
             IChatSummarizer chatSummarizer,
             IInvestigationReportService investigationReportService)
         {
             this.notifyService = notifyService;
             this.claimPolicyService = claimPolicyService;
+            this.caseVendorService = caseVendorService;
             this.invoiceService = invoiceService;
+            this.investigationService = investigationService;
             this.chatSummarizer = chatSummarizer;
             this.investigationReportService = investigationReportService;
         }
@@ -67,7 +73,7 @@ namespace risk.control.system.Controllers.Company
 
         }
         [Breadcrumb(title: "Report", FromAction = "Assessor")]
-        public async Task<IActionResult> GetInvestigateReport(string selectedcase)
+        public async Task<IActionResult> GetInvestigateReport(long selectedcase)
         {
             try
             {
@@ -77,12 +83,12 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (selectedcase == null)
+                if (selectedcase < 1)
                 {
-                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index));
                 }
-                var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
+                var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
                 if(model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
@@ -101,7 +107,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        public IActionResult SendEnquiry(string selectedcase)
+        public async Task<IActionResult> SendEnquiry(long selectedcase)
         {
             try
             {
@@ -111,15 +117,13 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (selectedcase == null)
+                if (selectedcase < 1)
                 {
-                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index));
                 }
-                var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
-                ViewData["claimId"] = selectedcase;
+                var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-
 
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Assess(report)") { Parent = claimsPage, };
@@ -159,7 +163,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(title: " Details", FromAction = "Review")]
-        public async Task<IActionResult> ReviewDetail(string id)
+        public async Task<IActionResult> ReviewDetail(long id)
         {
             try
             {
@@ -169,13 +173,13 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (string.IsNullOrWhiteSpace(id))
+                if (id < 1)
                 {
-                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await claimPolicyService.GetClaimDetail(id);
+                var model = await investigationService.GetClaimDetails(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -194,7 +198,7 @@ namespace risk.control.system.Controllers.Company
             return View();
         }
         [Breadcrumb(" Details",FromAction = "Approved")]
-        public async Task<IActionResult> ApprovedDetail(string id)
+        public async Task<IActionResult> ApprovedDetail(long id)
         {
             try
             {
@@ -204,13 +208,13 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (string.IsNullOrWhiteSpace(id))
+                if (id < 1)
                 {
-                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                var model = await investigationService.GetClaimDetails(currentUserEmail, id);
                 if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
@@ -233,7 +237,7 @@ namespace risk.control.system.Controllers.Company
             return View();
         }
         [Breadcrumb(" Details", FromAction = "Rejected")]
-        public async Task<IActionResult> RejectDetail(string id)
+        public async Task<IActionResult> RejectDetail(long id)
         {
             try
             {
@@ -243,12 +247,12 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (string.IsNullOrWhiteSpace(id))
+                if (id < 1)
                 {
-                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                var model = await investigationService.GetClaimDetails(currentUserEmail, id);
                 if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
@@ -279,7 +283,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (id==0)
                 {
-                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -314,7 +318,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (id == 0)
                 {
-                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 

@@ -994,3 +994,57 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("btn-clear-date")) {
+        const input = e.target.closest(".position-relative").querySelector("input[type='date']");
+        if (input) {
+            input.value = ""; // Clear the value
+            input.blur();     // Remove focus to hide calendar
+        }
+    }
+});
+
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement.type === "date") {
+            activeElement.blur(); // Closes the date picker
+        }
+    }
+});
+
+document.querySelectorAll(".delete-question-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        if (document.activeElement && document.activeElement.type === "date") {
+            document.activeElement.blur();
+        }
+    });
+});
+
+document.addEventListener("click", function (event) {
+    const activeElement = document.activeElement;
+
+    // Check if the active element is a date input
+    if (activeElement && activeElement.type === "date") {
+        // Check if the click was outside of that input
+        if (!activeElement.contains(event.target)) {
+            activeElement.blur(); // This will close the date picker
+        }
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const questionType = document.getElementById("questionType");
+    const optionsGroup = document.getElementById("optionsGroup");
+    if (questionType && optionsGroup) {
+        function toggleOptions() {
+            const shouldShow = questionType.value === "dropdown" || questionType.value === "radio";
+            optionsGroup.classList.toggle("hidden", !shouldShow);
+        }
+
+        questionType.addEventListener("change", toggleOptions);
+        toggleOptions(); // Run once on load
+    }
+});

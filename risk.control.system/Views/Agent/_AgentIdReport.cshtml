@@ -1,4 +1,4 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@model CaseInvestigationVendorsModel
 
 @{
     var imageCapturedTime = @Model.AgencyReport?.AgentIdReport?.DigitalIdImageLongLatTime != null ? @Model.AgencyReport?.AgentIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
@@ -186,7 +186,7 @@
             <form id="upload-agent" asp-controller="Uploads" asp-action="AgentUpload" method="post" enctype="multipart/form-data">
                 <input type="hidden" id="agentIdLatitude" name="agentIdLatitude" />
                 <input type="hidden" id="agentIdLongitude" name="agentIdLongitude" />
-                <input type="hidden" id="selectedcase" name="selectedcase" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <input type="hidden" id="selectedcase" name="selectedcase" value="@Model.ClaimsInvestigation.Id" />
                 <div class="card-footer">
 
                     <div class="form-group">
@@ -200,6 +200,5 @@
                 </div>
             </form>
         </div>
-
     </div>
 }

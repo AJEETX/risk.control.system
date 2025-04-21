@@ -143,14 +143,8 @@ namespace risk.control.system.Services
 
             data.FirstBlockName = "ADD/ASSIGN";
             //data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                data.FirstBlockUrl = "/CreatorAuto/New";
-            }
-            else
-            {
-                data.FirstBlockUrl = "/Investigation/New";
-            }
+            data.FirstBlockUrl = "/Investigation/New";
+
             var claimCount = GetCreatorAssignAuto(userEmail, InsuranceType.CLAIM);
             var underWritingCount = GetCreatorAssignAuto(userEmail, InsuranceType.UNDERWRITING);
             data.FirstBlockCount = claimCount;
@@ -160,14 +154,8 @@ namespace risk.control.system.Services
             var filesUploadAssignCount = _context.FilesOnFileSystem.Count(f => f.CompanyId == company.ClientCompanyId && !f.Deleted && f.UploadedBy == companyUser.Email && f.DirectAssign);
             data.BulkUploadBlockName = "UPLOAD  ";
 
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                data.BulkUploadBlockUrl = "/ClaimsLog/Uploads";
-            }
-            else
-            {
-                data.BulkUploadBlockUrl = "/CaseUpload/Uploads";
-            }
+            data.BulkUploadBlockUrl = "/CaseUpload/Uploads";
+
             data.BulkUploadBlockCount = filesUploadCount;
             data.BulkUploadAssignCount = filesUploadAssignCount;
 
@@ -176,14 +164,8 @@ namespace risk.control.system.Services
             var underWritingActive = GetCreatorActive(userEmail, InsuranceType.UNDERWRITING);
             data.ThirdBlockCount = claimsActive;
             data.LastBlockCount = underWritingActive;
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                data.ThirdBlockUrl = "/ClaimsLog/Active";
-            }
-            else
-            {
-                data.ThirdBlockUrl = "/CaseActive/Active";
-            }
+            data.ThirdBlockUrl = "/CaseActive/Active";
+
 
             return data;
         }
@@ -191,8 +173,8 @@ namespace risk.control.system.Services
         public DashboardData GetManagerCount(string userEmail, string role)
         {
 
-            var claimsAssessor = GetManagerAssess(userEmail, InsuranceType.CLAIM);
-            var underwritingAssessor = GetManagerAssess(userEmail, InsuranceType.UNDERWRITING);
+            //var claimsAssessor = GetManagerAssess(userEmail, InsuranceType.CLAIM);
+            //var underwritingAssessor = GetManagerAssess(userEmail, InsuranceType.UNDERWRITING);
             //var claimsReview = GetManagerReview(userEmail);
 
             var claimsReject = GetManagerReject(userEmail, InsuranceType.CLAIM);
@@ -208,12 +190,12 @@ namespace risk.control.system.Services
             var availableAgenciesCount = GetAvailableAgencies(userEmail);
 
             var data = new DashboardData();
-            data.FirstBlockName = "Assess (new)";
-            data.FirstBlockCount = claimsAssessor;
-            data.FirstBlockUrl = "/Manager/Assessor";
+            //data.FirstBlockName = "Assess (new)";
+            //data.FirstBlockCount = claimsAssessor;
+            //data.FirstBlockUrl = "/Manager/Assessor";
 
-            //data.SecondBlockName = "Review";
-            data.UnderwritingCount = underwritingAssessor;
+            ////data.SecondBlockName = "Review";
+            //data.UnderwritingCount = underwritingAssessor;
             //data.SecondBlockUrl = "/ClaimsInvestigation/ManagerReview";
 
             data.SecondBBlockName = "Active";
@@ -538,9 +520,7 @@ namespace risk.control.system.Services
                     a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                     (a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
                     a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR ||
-                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR ||
-                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR));
+                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR));
 
             return count;
         }

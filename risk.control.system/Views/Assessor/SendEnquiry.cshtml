@@ -1,11 +1,11 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@model CaseInvestigationVendorsModel
 
 @{
     ViewData["Title"] = " Send Enquiry";
 }
 <section class="content">
-    <form id="query-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="SubmitQuery" enctype="multipart/form-data" autocomplete="off">
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+    <form id="query-form" method="post" asp-controller="InvestigationPost" asp-action="SubmitQuery" enctype="multipart/form-data" autocomplete="off">
+        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
         <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
         <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
         <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
@@ -175,7 +175,7 @@
                                             <span class="help-block">Max. 2MB</span>
 
                                             <div class="float-right">
-                                                <a asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-secondary">
+                                                <a asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-secondary">
                                                     <i class="fas fa-times"></i> @Applicationsettings.CANCEL
                                                 </a>
                                                 <button id="send-query" type="submit" class="btn btn-warning">
@@ -202,7 +202,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/map.js"></script>
+    <script src="~/js/case-map.js"></script>
     <script>
         initReportMap();
     </script>

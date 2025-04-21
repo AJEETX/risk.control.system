@@ -38,6 +38,26 @@ namespace risk.control.system.Controllers.Company
             this.service = service;
             this.empanelledAgencyService = empanelledAgencyService;
         }
+        public IActionResult Index()
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                return RedirectToAction("New");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+        [Breadcrumb(" Add/Assign")]
         public async Task<IActionResult> New()
         {
             try
@@ -82,6 +102,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(New));
             }
         }
+        [Breadcrumb(" Add New", FromAction = "New")]
         public IActionResult Create()
         {
             try
@@ -108,6 +129,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Create));
             }
         }
+        [Breadcrumb(title: " Add Case", FromAction = "Create")]
         public async Task<IActionResult> CreatePolicy()
         {
             try
@@ -138,6 +160,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(CreatePolicy));
             }
         }
+        [Breadcrumb(title: " Edit Case", FromAction = "Details")]
         public async Task<IActionResult> EditPolicy(long id)
         {
             if (id < 0)
@@ -167,10 +190,10 @@ namespace risk.control.system.Controllers.Company
                 ViewData["CaseEnablerId"] = new SelectList(context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
                 ViewData["CostCentreId"] = new SelectList(context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("EditPolicy", "CreatorAuto", $"Edit Case") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditPolicy", "Investigation", $"Edit Case") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(claimsInvestigation);
@@ -182,6 +205,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(CreatePolicy));
             }
         }
+        [Breadcrumb(title: " Add Customer", FromAction = "Details")]
         public async Task<IActionResult> CreateCustomer(long id)
         {
             if (id < 1)
@@ -193,10 +217,10 @@ namespace risk.control.system.Controllers.Company
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateCustomer", "CreatorAuto", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateCustomer", "Investigation", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
@@ -240,6 +264,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(CreatePolicy));
             }
         }
+        [Breadcrumb(title: " Edit Customer", FromAction = "Details")]
         public async Task<IActionResult> EditCustomer(long id)
         {
             if (id < 1)
@@ -266,10 +291,10 @@ namespace risk.control.system.Controllers.Company
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("EditCustomer", "CreatorAuto", $"Edit Customer") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditCustomer", "Investigation", $"Edit Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 return View(customer);
             }
@@ -282,6 +307,7 @@ namespace risk.control.system.Controllers.Company
 
         }
 
+        [Breadcrumb("Add Beneficiary", FromAction = "Details")]
         public async Task<IActionResult> CreateBeneficiary(long id)
         {
             if (id < 1)
@@ -295,10 +321,10 @@ namespace risk.control.system.Controllers.Company
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorAuto", $"Add beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "Investigation", $"Add beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 ViewBag.ClaimId = id;
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
@@ -345,6 +371,7 @@ namespace risk.control.system.Controllers.Company
             }
 
         }
+        [Breadcrumb("Edit Beneficiary", FromAction = "Details")]
         public IActionResult EditBeneficiary(long? id)
         {
             if (id == null || id < 1)
@@ -366,10 +393,10 @@ namespace risk.control.system.Controllers.Company
                 var currentUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorAuto", $"Edit beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "Investigation", $"Edit beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(beneficiary);
@@ -382,6 +409,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
+        [Breadcrumb(title: " Delete", FromAction = "New")]
         public async Task<IActionResult> Delete(long id)
         {
             try
@@ -414,6 +442,7 @@ namespace risk.control.system.Controllers.Company
 
         }
 
+        [Breadcrumb(" Empanelled Agencies", FromAction = "New")]
         public async Task<IActionResult> EmpanelledVendors(long id, long vendorId = 0, bool fromEditPage = false)
         {
             try
@@ -444,6 +473,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
+        [Breadcrumb("Details", FromAction = "New")]
         public async Task<IActionResult> Details(long id)
         {
             if (id < 1)
@@ -466,6 +496,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+        [Breadcrumb(" Agency Detail", FromAction = "EmpanelledVendors")]
         public async Task<IActionResult> VendorDetail(long id, long selectedcase)
         {
             try
@@ -508,10 +539,10 @@ namespace risk.control.system.Controllers.Company
                 vendor.SelectedDistrictId = vendorAllCasesCount;
                 vendor.SelectedPincodeId = selectedcase;
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Case");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "CreatorAuto", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { id = selectedcase } };
-                var editPage = new MvcBreadcrumbNode("VendorDetail", "CreatorAuto", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Case");
+                var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Investigation", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { id = selectedcase } };
+                var editPage = new MvcBreadcrumbNode("VendorDetail", "Investigation", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
 

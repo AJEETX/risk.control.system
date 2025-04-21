@@ -1,4 +1,4 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@model CaseInvestigationVendorsModel
 
 @{
     ViewData["Title"] = "Report ";
@@ -6,8 +6,8 @@
 }
 
 <section class="content">
-    <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="ProcessCaseReport">
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+    <form id="create-form" method="post" asp-controller="InvestigationPost" asp-action="ProcessCaseReport">
+        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
         <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
         <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
         <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
@@ -58,9 +58,9 @@
 
             
         <partial name="_AgencyReport" model="@Model" />
-        @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
+        @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest != null)
         {
-            var data = new ClaimTransactionModel
+            var data = new CaseTransactionModel
                 {
                     ClaimsInvestigation = Model.ClaimsInvestigation,
                 };
@@ -110,7 +110,7 @@
                                             <div class="form-check form-switch">
 
                                                 <label class="form-check-label" for="flexRadioDefault2">
-                                                    @if (@Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.Similarity <= 70)
+                                                    @if (@Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.Similarity <= 70)
                                                     {
                                                         <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                                     }
@@ -127,7 +127,7 @@
                                             <div class="form-check form-switch">
 
                                                 <label class="form-check-label" for="flexRadioDefault2">
-                                                    @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity <= 70)
+                                                    @if (@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.Similarity <= 70)
                                                     {
                                                         <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                                     }
@@ -144,7 +144,7 @@
                                             <div class="form-check form-switch">
 
                                                 <label class="form-check-label" for="flexRadioDefault1">
-                                                    @if (@Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
+                                                    @if (@Model.ClaimsInvestigation.InvestigationReport.PanIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.InvestigationReport.PanIdReport.DocumentIdImageValid.Value)
                                                     {
                                                         <i class='fas fa-check-circle  i-green'></i>
                                                     }
@@ -156,61 +156,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        @if(Model.ClaimsInvestigation.EnablePassport)
-                                        {
-                                            <div class="form-group">
-                                                <div class="form-check form-switch">
-
-                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                        @if (@Model.ClaimsInvestigation.AgencyReport.PassportIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.PassportIdReport.DocumentIdImageValid.Value)
-                                                        {
-                                                            <i class='fas fa-check-circle  i-green'></i>
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
-                                                        } <span class="process-case"></span>
-                                                        <i class="far fa-image"></i>  <b>  Passport Valid </b>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        }
                                         
-                                        @if (Model.ClaimsInvestigation.EnableMedia)
-                                        {
-                                            <div class="form-group">
-                                                <div class="form-check form-switch">
-
-                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                        @if (@Model.ClaimsInvestigation.AgencyReport.AudioReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.AudioReport.DocumentIdImageValid.Value)
-                                                        {
-                                                            <i class='fas fa-check-circle  i-green'></i>
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
-                                                        } <span class="process-case"></span>
-                                                        <i class="far fa-image"></i>  <b>  Audio Valid </b>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="form-check form-switch">
-
-                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                        @if (@Model.ClaimsInvestigation.AgencyReport.VideoReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.VideoReport.DocumentIdImageValid.Value)
-                                                        {
-                                                            <i class='fas fa-check-circle  i-green'></i>
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
-                                                        } <span class="process-case"></span>
-                                                        <i class="far fa-image"></i>  <b>  Video Valid </b>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        }
                                         <div class="form-group">
                                             <div class="form-check form-switch">
 
@@ -244,10 +190,10 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 ||
-                                        @Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.Similarity < 70 ||
-                                        @Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid == null ||
-                                        !@Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
+                                        @if (@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.Similarity < 70 ||
+                                        @Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.Similarity < 70 ||
+                                        @Model.ClaimsInvestigation.InvestigationReport.PanIdReport?.DocumentIdImageValid == null ||
+                                        !@Model.ClaimsInvestigation.InvestigationReport.PanIdReport.DocumentIdImageValid.Value)
                                         {
                                             <div class="form-group">
                                                 <div class="form-check form-switch">
@@ -299,7 +245,7 @@
                                                     </div>
                                                     <input data-toggle="tooltip" title="Enter remarks" required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required placeholder="enter remarks to submit" />
 
-                                                    <span asp-validation-for="ClaimsInvestigation.AgencyReport.SupervisorRemarks" class="text-danger"></span>
+                                                    <span asp-validation-for="ClaimsInvestigation.InvestigationReport.SupervisorRemarks" class="text-danger"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -318,7 +264,7 @@
                             <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
                         </a>
                         <a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
-                           asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-warning">
+                           asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-warning">
                             <i class="fa fa-edit"></i>  ENQUIRE
                         </a>
                         <button id="approve-case" type="submit" class="btn btn-info">
@@ -337,7 +283,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/common/claim-details.js"></script>
-    <script src="~/js/map.js"></script>
+    <script src="~/js/case-map.js"></script>
     <script>
         initReportMap();
     </script>
