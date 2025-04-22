@@ -1,4 +1,5 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@using risk.control.system.Helpers
+@model ClaimsInvestigationVendorsModel
 
 @{
     var questionTime = @Model.AgencyReport.AgentRemarksUpdated != null ? @Model.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
@@ -13,12 +14,12 @@
             <div class="card-header text-muted border-bottom-0">
 
                 <h3 class="card-title">
-                    <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)
+                    <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
                             <span>
-                                <i class="fas fa-comment"></i> Fill-up Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)
+                                <i class="fas fa-comment"></i> Fill-up Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                             </span>
 
                         </span>

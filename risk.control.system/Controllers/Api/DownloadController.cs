@@ -55,7 +55,8 @@ namespace risk.control.system.Controllers.Api
                 return NotFound();
             }
 
-            var fileAttachment = _context.AgencyReport.FirstOrDefault(q => q.AgencyReportId == id);
+            var investigation = _context.Investigations.Include(i=>i.InvestigationReport).FirstOrDefault(q => q.InvestigationReport.Id == id);
+            var fileAttachment = investigation.InvestigationReport;
 
             return fileAttachment != null ? File(fileAttachment.SupervisorAttachment, fileAttachment.SupervisorFileType, fileAttachment.SupervisorFileName + fileAttachment.SupervisorFileName) : null;
         }

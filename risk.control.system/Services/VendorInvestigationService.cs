@@ -179,7 +179,6 @@ namespace risk.control.system.Services
                 query = query.Where(a =>
                     a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
                     a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.LineOfBusiness.Name.ToLower().Contains(search) ||
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
@@ -416,7 +415,6 @@ namespace risk.control.system.Services
                 query = query.Where(a =>
                     a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
                      a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.LineOfBusiness.Name.ToLower().Contains(search) ||
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||

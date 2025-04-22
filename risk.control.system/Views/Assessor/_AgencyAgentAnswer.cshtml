@@ -56,6 +56,13 @@
                                     <br />
                                 }
                                 <li class="small">
+                                    Agent Remarks?
+                                    <span class="fa-li">
+                                        <i class="far fa-comment"></i>
+                                    </span>
+                                </li>
+                                <br />
+                                <li class="small">
                                     Edited Remarks?
                                     <span class="fa-li">
                                         <i class="far fa-comment"></i>
@@ -86,9 +93,9 @@
                                     </span>
                                     @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
                                 </li>
+                                <br />
                                 @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
                                 {
-                                    <br />
                                     <li class="small">
                                         <span class="fa-li">
                                             <i class="far fa-comment"></i>

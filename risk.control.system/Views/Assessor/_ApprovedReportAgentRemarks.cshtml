@@ -1,4 +1,5 @@
-﻿@model ClaimTransactionModel
+﻿@using risk.control.system.Helpers
+@model ClaimTransactionModel
 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
 {
     var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ? @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
@@ -7,7 +8,7 @@
         <div class="card bg-light  border-success">
             ">
             <div class="card-header text-muted border-bottom-0">
-                <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)<span class="badge badge-light">checkify</span> <span class="badge badge-light"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
+                <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())<span class="badge badge-light">checkify</span> <span class="badge badge-light"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
             </div>
             <div class="card-footer text-muted border-bottom-0">
                 <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.AgencyReport.AgentEmail </span>

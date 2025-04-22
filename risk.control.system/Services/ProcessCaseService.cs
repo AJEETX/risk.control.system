@@ -727,6 +727,7 @@ namespace risk.control.system.Services
                 claim.UpdatedBy = userEmail;
                 claim.CaseOwner = claim.ClientCompany.Email;
                 claim.ProcessedByAssessorTime = DateTime.Now;
+                claim.SubmittedAssessordEmail = userEmail;
                 context.Investigations.Update(claim);
 
                 var saveCount = await context.SaveChangesAsync();
@@ -752,6 +753,7 @@ namespace risk.control.system.Services
                 var claim = context.Investigations
                 .Include(c => c.Vendor)
                 .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.EnquiryRequest)
                 .Include(c => c.Vendor)
                 .FirstOrDefault(c => c.Id == claimId);
 

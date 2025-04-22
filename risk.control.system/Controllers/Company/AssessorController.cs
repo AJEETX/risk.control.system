@@ -179,7 +179,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigationService.GetClaimDetails(currentUserEmail, id);
+                var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);

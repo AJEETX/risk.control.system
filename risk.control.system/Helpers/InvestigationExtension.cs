@@ -23,7 +23,7 @@ namespace risk.control.system.Helpers
         }
         public static string GetPolicyNum(this InvestigationTask a)
         {
-            string title = $"({a.UpdatedBy}) Withdrawn";
+            string title = $"";
             string style = "-none";
             if (a is not null)
             {
@@ -32,10 +32,15 @@ namespace risk.control.system.Helpers
                     style = "";
                     title = $"({a.UpdatedBy}) Withdrawn";
                 }
-                if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY)
+                else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY)
                 {
                     style = "";
                     title = $"Agency ({a.UpdatedBy}) Declined";
+                }
+                else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
+                {
+                    style = "";
+                    title = $"Agency ({a.UpdatedBy}) Reply";
                 }
             }
             return string.Join("", a.PolicyDetail?.ContractNumber + $"<i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i>");

@@ -295,12 +295,6 @@ namespace risk.control.system.Controllers.Api.Company
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
-                .Include(v => v.VendorInvestigationServiceTypes)
                 .OrderBy(u => u.Name)
                 .AsQueryable();
 

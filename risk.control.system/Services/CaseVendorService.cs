@@ -167,6 +167,10 @@ namespace risk.control.system.Services
         {
             var claim = await _context.Investigations
                .Include(c => c.InvestigationTimeline)
+               .Include(c => c.InvestigationReport)
+               .ThenInclude(c => c.EnquiryRequest)
+               .Include(c => c.InvestigationReport)
+               .ThenInclude(c => c.EnquiryRequests)
                .Include(c => c.Vendor)
                .Include(c => c.ClientCompany)
                .ThenInclude(c => c.Country)

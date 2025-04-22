@@ -1,4 +1,5 @@
-﻿@model ClaimTransactionModel
+﻿@using risk.control.system.Helpers
+@model ClaimTransactionModel
 <article>
     <div class="bb-blog-inner">
         <div class="card card-light direct-chat-warning expanded-card">
@@ -28,7 +29,7 @@
                 </div>
                 <div class="row">
                     <div class="col-7">
-                        <h2 class="lead"><b>Insurance Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name</h2>
+                        <h2 class="lead"><b>Insurance Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()</h2>
                         
                         <ul class="ml-4 mb-0 fa-ul text-muted">
                             <li class="small">

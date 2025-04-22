@@ -133,7 +133,7 @@ namespace risk.control.system.Services
             detailReport.PolicyNum = claim.PolicyDetail.ContractNumber;
             detailReport.ServiceType = claim.PolicyDetail.InvestigationServiceType.Name;
             detailReport.AgencyName = claim.Vendor.Email;
-            detailReport.ClaimType = claim.PolicyDetail.LineOfBusiness.Name;
+            detailReport.ClaimType = claim.PolicyDetail.InsuranceType.GetEnumDisplayName();
             var currency = Extensions.GetCultureByCountry(claim.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
             detailReport.InsuredAmount = $"{currency} {claim.PolicyDetail.SumAssuredValue.ToString()}";
             detailReport.Reason2Verify = claim.PolicyDetail.CaseEnabler.Name.ToLower();
@@ -246,7 +246,7 @@ namespace risk.control.system.Services
             string contactNumer = string.Empty;
             detailReport.AgentOfInterestName = claim.InvestigationReport.AgentEmail;
             contactNumer = string.Empty;
-            if (claim.PolicyDetail.LineOfBusiness.Name.ToLower() == UNDERWRITING)
+            if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 detailReport.VerifyAddress = claim.CustomerDetail.Addressline + ", " + claim.CustomerDetail.District.Name + ", " + claim.CustomerDetail.State.Name + ", (" + claim.CustomerDetail.Country.Code + "), " + claim.CustomerDetail.PinCode.Code;
                 contactNumer = claim.CustomerDetail.ContactNumber;
@@ -304,7 +304,7 @@ namespace risk.control.system.Services
 
             string personAddressUrl = string.Empty;
             string contactNumer = string.Empty;
-            if (claim.PolicyDetail.LineOfBusiness.Name.ToLower() == UNDERWRITING)
+            if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 contactNumer = new string('*', claim.CustomerDetail.ContactNumber.Length - 4) + claim.CustomerDetail.ContactNumber.Substring(claim.CustomerDetail.ContactNumber.Length - 4);
                 personAddressUrl = claim.CustomerDetail.CustomerLocationMap;

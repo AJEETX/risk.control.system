@@ -297,8 +297,6 @@ namespace risk.control.system.Controllers.Api
                  .Include(c => c.AgencyReport.DigitalIdReport)
                  .Include(c => c.AgencyReport.PanIdReport)
                  .Include(c => c.PolicyDetail)
-                 .ThenInclude(c => c.LineOfBusiness)
-                 .Include(c => c.PolicyDetail)
                  .ThenInclude(c => c.CostCentre)
                  .Include(c => c.PolicyDetail)
                  .ThenInclude(c => c.CaseEnabler)

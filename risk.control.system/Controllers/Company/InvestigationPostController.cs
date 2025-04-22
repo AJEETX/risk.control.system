@@ -24,55 +24,43 @@ using System.Web;
 
 namespace risk.control.system.Controllers.Company
 {
-    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class InvestigationPostController : Controller
     {
         private const string CLAIMS = "claims";
         private readonly ApplicationDbContext _context;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly ICustomApiCLient customApiCLient;
-        private readonly IClaimCreationService creationService;
         private readonly IProcessCaseService processCaseService;
-        private readonly ICreatorService creatorService;
         private readonly IMailService mailboxService;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService service;
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly IInvestigationReportService investigationReportService;
         private readonly IProgressService progressService;
         private readonly IBackgroundJobClient backgroundJobClient;
-        private readonly IClaimPolicyService claimPolicyService;
 
         public InvestigationPostController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
             ICustomApiCLient customApiCLient,
-            IClaimCreationService creationService,
             IProcessCaseService processCaseService,
-            ICreatorService creatorService,
             IMailService mailboxService,
             IFtpService ftpService,
             INotyfService notifyService,
             IInvestigationService service,
             IHttpContextAccessor httpContextAccessor,
-            IInvestigationReportService investigationReportService,
             IProgressService progressService,
-            IBackgroundJobClient backgroundJobClient,
-            IClaimPolicyService claimPolicyService)
+            IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
-            this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
             this.customApiCLient = customApiCLient;
-            this.creationService = creationService;
             this.processCaseService = processCaseService;
-            this.creatorService = creatorService;
             this.mailboxService = mailboxService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.service = service;
             this.httpContextAccessor = httpContextAccessor;
-            this.investigationReportService = investigationReportService;
             this.progressService = progressService;
             this.backgroundJobClient = backgroundJobClient;
         }
@@ -761,7 +749,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                request.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.AgencyReport.EnquiryRequest.Description);
+                request.AgencyReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.AgencyReport.EnquiryRequest.Description);
 
                 IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 

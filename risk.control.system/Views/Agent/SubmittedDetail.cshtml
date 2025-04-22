@@ -1,4 +1,5 @@
-﻿@model ClaimTransactionModel
+﻿@using risk.control.system.Helpers
+@model ClaimTransactionModel
 
 @{
     ViewData["Title"] = "Details";
@@ -19,7 +20,7 @@
                         <li>
                             <i class='far fa-file-powerpoint'></i> Policy details.
                         </li>
-                        @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        @if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
                         {
                             <li>
                                 <i class='fa fa-user-plus'></i> Customer details
@@ -29,7 +30,7 @@
                         {
                             <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
                         }
-                        <li> <i class="fas fa-newspaper"></i> Agent report (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)</li>
+                        <li> <i class="fas fa-newspaper"></i> Agent report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())</li>
                     </span>
                 </span>
             </h3>

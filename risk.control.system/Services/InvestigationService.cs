@@ -36,6 +36,7 @@ namespace risk.control.system.Services
         Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
+        Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
     }
     public class InvestigationService : IInvestigationService
     {
@@ -480,6 +481,71 @@ namespace risk.control.system.Services
 
             return model;
         }
+        public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
+        {
+            var claim = await context.Investigations
+                .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.AgentIdReport)
+                .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.DigitalIdReport)
+                .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.PanIdReport)
+                .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.CaseQuestionnaire)
+                .ThenInclude(c => c.Questions)
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.InvestigationTimeline)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+
+            var timeTaken = DateTime.Now - claim.Created;
+            var totalTimeTaken = timeTaken != TimeSpan.Zero
+                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
+              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
+              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
+              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
+            : "-";
+            var model = new CaseTransactionModel
+            {
+                ClaimsInvestigation = claim,
+                CaseIsValidToAssign = claim.IsValidCaseData(),
+                Location = claim.BeneficiaryDetail,
+                Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                AutoAllocation = companyUser.ClientCompany.AutoAllocation,
+                TimeTaken = totalTimeTaken,
+                Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+            };
+
+            return model;
+        }
         public List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors)
         {
             // Get relevant status IDs in one query
@@ -562,7 +628,7 @@ namespace risk.control.system.Services
                 query = query.Where(a =>
                     a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
                     a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.LineOfBusiness.Name.ToLower().Contains(search) ||
+                    a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
@@ -800,7 +866,6 @@ namespace risk.control.system.Services
                 query = query.Where(a =>
                     a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
                      a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.LineOfBusiness.Name.ToLower().Contains(search) ||
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
@@ -1005,7 +1070,6 @@ namespace risk.control.system.Services
                 query = query.Where(a =>
                     a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
                     a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.LineOfBusiness.Name.ToLower().Contains(search) ||
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
