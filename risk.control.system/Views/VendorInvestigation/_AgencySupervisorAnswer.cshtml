@@ -9,7 +9,7 @@
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <span>
-                            <i class="fas fa-user-shield"></i><b> @Model?.AgencyReport?.SupervisorEmail</b> comments
+                            <i class="fas fa-user-shield"></i><b> @Model?.InvestigationReport?.SupervisorEmail</b> comments
                         </span>
 
                     </span>
@@ -17,7 +17,7 @@
             </h3>
             <div class="card-tools">
                 <span data-toggle="tooltip" title=" Supervisor report time" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i> @Model.AgencyReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                    <i class="nav-icon fas fa-clock"></i> @Model.InvestigationReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                 </span>
             </div>
 
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="card-footer text-muted border-bottom-0">
-            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model.AgencyReport.SupervisorEmail </span>
+            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model.InvestigationReport.SupervisorEmail </span>
         </div>
        
         <div class="card-body">
@@ -58,28 +58,28 @@
                                 <td>
                                     @{
                                         string displayTime = string.Empty;
-                                        var time = @Model.AgencyReport?.SupervisorRemarksUpdated;
+                                        var time = @Model.InvestigationReport?.SupervisorRemarksUpdated;
                                         if (time is not null)
                                         {
                                             displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
                                         }
                                         if (time == null)
                                         {
-                                            displayTime = @Model.AgencyReport.Created.ToString("dd-MMM-yyy HH:mm");
+                                            displayTime = @Model.InvestigationReport.Created.ToString("dd-MMM-yyy HH:mm");
                                         }
                                     }
                                     <span class="badge badge-light">@displayTime</span>
                                 </td>
                                 <td>
-                                    @Model.AgencyReport?.SupervisorRemarks
+                                    @Model.InvestigationReport?.SupervisorRemarks
 
                                 </td>
                                 <td>
-                                    @if (Model.AgencyReport?.SupervisorAttachment != null)
+                                    @if (Model.InvestigationReport?.SupervisorAttachment != null)
                                     {
-                                        <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.SupervisorAttachment))">
+                                        <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.InvestigationReport?.SupervisorAttachment))">
                                         <a asp-controller="Download" asp-action="SupervisorFileAttachment"
-                                           asp-route-id="@Model.AgencyReport.Id" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> </a>
+                                           asp-route-id="@Model.InvestigationReport.Id" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> </a>
                                     }
                                     else
                                     {

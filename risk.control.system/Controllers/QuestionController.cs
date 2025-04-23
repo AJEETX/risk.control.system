@@ -21,23 +21,29 @@ namespace risk.control.system.Controllers
             this._context = context;
             this.webHostEnvironment = webHostEnvironment;
         }
-        public IActionResult Index()
+        public IActionResult Index(InsuranceType insuranceType = InsuranceType.CLAIM)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
 
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(x => x.Email == currentUserEmail);
 
-            var questions = _context.CaseQuestionnaire.Include(c=>c.Questions).FirstOrDefault(x => x.ClientCompanyId == currentUser.ClientCompanyId && x.InsuranceType == InsuranceType.CLAIM);
+            var questions = _context.CaseQuestionnaire.Include(c=>c.Questions).FirstOrDefault(x => 
+            x.ClientCompanyId == currentUser.ClientCompanyId && 
+            x.InsuranceType == insuranceType && 
+            x.Questions.Count > 0);
+
             if (questions != null)
             {
                 var model = new QuestionFormViewModel
                 {
+                    InsuranceType = insuranceType,
                     Questions = questions.Questions.ToList()
                 };
                 return View(model);
             }
             var newmodel = new QuestionFormViewModel
             {
+                InsuranceType = insuranceType,
                 Questions = new List<Question>()
             };
 
@@ -64,6 +70,7 @@ namespace risk.control.system.Controllers
                 if(existingQuestion != null)
                 {
                     existingQuestion.Questions.Add(question);
+                    _context.CaseQuestionnaire.Update(existingQuestion);
                 }
                 else
                 {

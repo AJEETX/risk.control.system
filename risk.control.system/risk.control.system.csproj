@@ -92,4 +92,12 @@
     <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\report\" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <Content Update="Views\VendorInvestigation\_ApprovedPolicyDetails.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

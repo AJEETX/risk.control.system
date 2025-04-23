@@ -19,7 +19,7 @@ namespace risk.control.system.Services
 {
     public interface IDashboardCountService
     {
-        DashboardData GetClaimsCount(string userEmail, string role);
+        //DashboardData GetClaimsCount(string userEmail, string role);
         DashboardData GetCreatorCount(string userEmail, string role);
         DashboardData GetAssessorCount(string userEmail, string role);
         DashboardData GetCompanyAdminCount(string userEmail, string role);
@@ -445,18 +445,11 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var count = cases.Count(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+                c.SubmittedAssessordEmail == userEmail &&
                 c.Status == finished &&
-                (c.SubStatus == approved || c.SubStatus == rejectd)
+                (c.SubStatus == approved)
                 );
-            if (companyUser.UserRole == CompanyRole.CREATOR)
-            {
-                cases = cases.Where(c => c.SubStatus == approved
-                || c.SubStatus == rejectd);
-            }
-            else
-            {
-                cases = cases.Where(c => c.SubStatus == approved);
-            }
+            
             return count;
         }
         private int GetAssessorReject(string userEmail, InsuranceType insuranceType)
@@ -580,121 +573,121 @@ namespace risk.control.system.Services
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderBy(o => o.Created);
         }
-        public DashboardData GetClaimsCount(string userEmail, string role)
-        {
-            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED))?.ToList();
+        //public DashboardData GetClaimsCount(string userEmail, string role)
+        //{
+        //    var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED))?.ToList();
 
-            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+        //    var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+        //    var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+        //    var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+        //    var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
-            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+        //    var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+        //    var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
 
-            var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
-            var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+        //    var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+        //        i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+        //    var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
 
-            var companyUser = _context.ClientCompanyApplicationUser
-                .Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = _context.VendorApplicationUser
-                .Include(v => v.Vendor).FirstOrDefault(c => c.Email == userEmail);
+        //    var companyUser = _context.ClientCompanyApplicationUser
+        //        .Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+        //    var vendorUser = _context.VendorApplicationUser
+        //        .Include(v => v.Vendor).FirstOrDefault(c => c.Email == userEmail);
 
-            var data = new DashboardData();
+        //    var data = new DashboardData();
 
-            if (companyUser != null)
-            {
-                var pendinClaims = _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
-                    .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
-                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId).ToList();
+        //    if (companyUser != null)
+        //    {
+        //        var pendinClaims = _context.ClaimsInvestigation
+        //            .Include(c => c.PolicyDetail)
+        //            .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
+        //            c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId).ToList();
 
-                var approvedClaims = _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
-                    .Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId &&
-                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+        //        var approvedClaims = _context.ClaimsInvestigation
+        //            .Include(c => c.PolicyDetail)
+        //            .Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId &&
+        //            c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
 
-                var rejectedClaims = _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
-                    .Where(c => c.IsReviewCase && openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
-                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+        //        var rejectedClaims = _context.ClaimsInvestigation
+        //            .Include(c => c.PolicyDetail)
+        //            .Where(c => c.IsReviewCase && openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
+        //            c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
 
-                var activeCount = 0;
+        //        var activeCount = 0;
 
-                if (role.Contains(AppRoles.COMPANY_ADMIN.ToString()) || role.Contains(AppRoles.CREATOR.ToString()))
-                {
-                    var creatorActiveClaims = _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
-                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
-                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
-                    activeCount = creatorActiveClaims.Count;
-                }
+        //        if (role.Contains(AppRoles.COMPANY_ADMIN.ToString()) || role.Contains(AppRoles.CREATOR.ToString()))
+        //        {
+        //            var creatorActiveClaims = _context.ClaimsInvestigation
+        //            .Include(c => c.PolicyDetail)
+        //            .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
+        //            c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+        //            activeCount = creatorActiveClaims.Count;
+        //        }
 
-                if (role.Contains(AppRoles.ASSESSOR.ToString()))
-                {
-                    var creatorActiveClaims = _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
-                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
-                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
-                    c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
-                    )?.ToList();
-                    activeCount = creatorActiveClaims.Count;
-                }
+        //        if (role.Contains(AppRoles.ASSESSOR.ToString()))
+        //        {
+        //            var creatorActiveClaims = _context.ClaimsInvestigation
+        //            .Include(c => c.PolicyDetail)
+        //            .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
+        //            c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
+        //            c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
+        //            )?.ToList();
+        //            activeCount = creatorActiveClaims.Count;
+        //        }
 
-                data.FirstBlockName = "Active Claims";
-                data.FirstBlockCount = activeCount;
+        //        data.FirstBlockName = "Active Claims";
+        //        data.FirstBlockCount = activeCount;
 
-                data.SecondBlockName = "Pending Claims";
-                data.SecondBlockCount = pendinClaims.Count;
+        //        data.SecondBlockName = "Pending Claims";
+        //        data.SecondBlockCount = pendinClaims.Count;
 
-                data.ThirdBlockName = "Approved Claims";
-                data.ThirdBlockCount = approvedClaims.Count;
+        //        data.ThirdBlockName = "Approved Claims";
+        //        data.ThirdBlockCount = approvedClaims.Count;
 
-                data.LastBlockName = "Review Claims";
-                data.LastBlockCount = rejectedClaims.Count;
-            }
-            else if (vendorUser != null)
-            {
-                var activeClaims = _context.ClaimsInvestigation.Include(c => c.BeneficiaryDetail)
-                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted)?.ToList();
-                var agencyActiveClaims = activeClaims.Where(c =>
-                (c.VendorId == vendorUser.VendorId) &&
-                (c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ||
-                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
-                c.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId))?.ToList();
+        //        data.LastBlockName = "Review Claims";
+        //        data.LastBlockCount = rejectedClaims.Count;
+        //    }
+        //    else if (vendorUser != null)
+        //    {
+        //        var activeClaims = _context.ClaimsInvestigation.Include(c => c.BeneficiaryDetail)
+        //            .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted)?.ToList();
+        //        var agencyActiveClaims = activeClaims.Where(c =>
+        //        (c.VendorId == vendorUser.VendorId) &&
+        //        (c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ||
+        //        c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+        //        c.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId))?.ToList();
 
-                data.FirstBlockName = "Draft Claims";
-                data.FirstBlockCount = agencyActiveClaims.Count;
+        //        data.FirstBlockName = "Draft Claims";
+        //        data.FirstBlockCount = agencyActiveClaims.Count;
 
-                var pendinClaims = _context.ClaimsInvestigation
-                     .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId)).ToList();
+        //        var pendinClaims = _context.ClaimsInvestigation
+        //             .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId)).ToList();
 
-                data.SecondBlockName = "Pending Claims";
-                data.SecondBlockCount = pendinClaims.Count;
+        //        data.SecondBlockName = "Pending Claims";
+        //        data.SecondBlockCount = pendinClaims.Count;
 
-                var agentActiveClaims = _context.ClaimsInvestigation.Include(c => c.VendorId == vendorUser.VendorId &&
-                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId && !c.Deleted)?.ToList();
+        //        var agentActiveClaims = _context.ClaimsInvestigation.Include(c => c.VendorId == vendorUser.VendorId &&
+        //        c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId && !c.Deleted)?.ToList();
 
-                data.ThirdBlockName = "Allocated Claims";
-                data.ThirdBlockCount = agentActiveClaims.Count;
+        //        data.ThirdBlockName = "Allocated Claims";
+        //        data.ThirdBlockCount = agentActiveClaims.Count;
 
-                var submitClaims = _context.ClaimsInvestigation.Include(c => c.VendorId == vendorUser.VendorId &&
-                    c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId && !c.Deleted)?.ToList();
-                data.LastBlockName = "Submitted Claims";
-                data.LastBlockCount = submitClaims.Count;
-            }
+        //        var submitClaims = _context.ClaimsInvestigation.Include(c => c.VendorId == vendorUser.VendorId &&
+        //            c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId && !c.Deleted)?.ToList();
+        //        data.LastBlockName = "Submitted Claims";
+        //        data.LastBlockCount = submitClaims.Count;
+        //    }
 
-            return data;
-        }
+        //    return data;
+        //}
 
     }
 }

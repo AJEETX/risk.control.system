@@ -125,12 +125,14 @@ namespace risk.control.system.Services
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            var existingVendor = _context.Vendor
-                .FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+            var existingVendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
             var claimsCases = _context.Investigations
                .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail).Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted);
+               .Include(c => c.BeneficiaryDetail).Where(c => c.VendorId == vendorUser.VendorId &&
+               !c.Deleted &&
+               c.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
+               c.Status == assignedToAgentStatus);
 
             int countOfCases = 0;
 
@@ -145,29 +147,17 @@ namespace risk.control.system.Services
 
                 foreach (var claimsCase in claimsCases)
                 {
-                    if (claimsCase.BeneficiaryDetail?.BeneficiaryDetailId > 0)
+                    if (claimsCase.TaskedAgentEmail?.Trim()?.ToLower() == vendorNonAdminUser.Email.Trim().ToLower())
                     {
-                        if (claimsCase.VendorId.HasValue && claimsCase.TaskedAgentEmail?.Trim()?.ToLower() == vendorNonAdminUser.Email.Trim().ToLower())
+                        if (!vendorCaseCount.TryGetValue(vendorNonAdminUser.Email, out countOfCases))
                         {
-                            if (claimsCase.SubStatus == allocatedStatus ||
-                                    claimsCase.SubStatus == submitted2SuperStatus
-                                    )
-                            {
-                                vendorCaseCount[vendorNonAdminUser.Email] += 1;
-                            }
-                            else
-                            {
-                                if (!vendorCaseCount.TryGetValue(vendorNonAdminUser.Email, out countOfCases))
-                                {
-                                    vendorCaseCount.Add(vendorNonAdminUser.Email, 1);
-                                }
-                                else
-                                {
-                                    int currentCount = vendorCaseCount[vendorNonAdminUser.Email];
-                                    ++currentCount;
-                                    vendorCaseCount[vendorNonAdminUser.Email] = currentCount;
-                                }
-                            }
+                            vendorCaseCount.Add(vendorNonAdminUser.Email, 1);
+                        }
+                        else
+                        {
+                            int currentCount = vendorCaseCount[vendorNonAdminUser.Email];
+                            ++currentCount;
+                            vendorCaseCount[vendorNonAdminUser.Email] = currentCount;
                         }
                     }
                 }

@@ -336,62 +336,46 @@ namespace risk.control.system.Controllers.Api.Company
                 return NotFound("User not found.");
             }
 
-            var rejectStatus = await _context.InvestigationCaseSubStatus
-                .FirstOrDefaultAsync(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+            var rejectStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
 
-            if (rejectStatus == null)
-            {
-                return NotFound("Rejected status not found.");
-            }
+            var claims = await _context.Investigations
+                .Include(i => i.Vendor)
+                .Include(i => i.PolicyDetail)
+                .ThenInclude(i => i.InvestigationServiceType)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.PinCode)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.District)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.State)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.Country)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.PinCode)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.District)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.State)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.Country)
+                .Where(i => !i.Deleted && i.ClientCompanyId == companyUser.ClientCompanyId &&
+                            i.SubmittedAssessordEmail == userEmail &&
+                            i.Status== CONSTANTS.CASE_STATUS.FINISHED &&
+                            i.SubStatus== rejectStatus
+                            ).ToListAsync();
 
-            var claimsQuery = claimsService.GetClaims()
-                .Where(c => c.CustomerDetail != null && c.AgencyReport != null &&
-                            c.ClientCompanyId == companyUser.ClientCompanyId &&
-                            c.InvestigationCaseSubStatusId == rejectStatus.InvestigationCaseSubStatusId);
-
-            // Extracted common logic for review claim log check
-            async Task<bool> HasReviewClaimLogAsync(ClaimsInvestigation claim)
-            {
-                var userHasReviewClaimLogs = await _context.InvestigationTransaction
-                    .Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId &&
-                                c.IsReviewCase && c.UserEmailActioned == companyUser.Email &&
-                                c.UserEmailActionedTo == companyUser.Email)
-                    .OrderByDescending(o => o.HopCount)
-                    .FirstOrDefaultAsync();
-
-                int? reviewLogCount = userHasReviewClaimLogs?.HopCount ?? 0;
-
-                return await _context.InvestigationTransaction
-                    .AnyAsync(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId &&
-                                   c.HopCount >= reviewLogCount &&
-                                   c.UserEmailActioned == companyUser.Email);
-            }
-
-            var claimsSubmitted = new List<ClaimsInvestigation>();
-
-            // Filter claims based on review log status
-            foreach (var claim in await claimsQuery.ToListAsync())
-            {
-                if (await HasReviewClaimLogAsync(claim))
-                {
-                    claimsSubmitted.Add(claim);
-                }
-            }
-
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
-            var response = claimsSubmitted
+            
+            var response = claims
                 .Select(a => new ClaimsInvestigationResponse
                 {
-                    Id = a.ClaimsInvestigationId,
-                    AutoAllocated = a.AutoAllocated,
+                    Id = a.Id,
+                    AutoAllocated = a.IsAutoAllocated,
                     PolicyId = a.PolicyDetail.ContractNumber,
                     Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                     AssignedToAgency = a.AssignedToAgency,
-                    Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                        $"<span class='badge badge-light'>{a.UserEmailActionedTo}</span>" :
-                        $"<span class='badge badge-light'>{a.UserRoleActionedTo}</span>",
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    Agent = a.Vendor.Email,
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                     Document = a.PolicyDetail?.DocumentImage != null ?
                         $"data:image/*;base64,{Convert.ToBase64String(a.PolicyDetail.DocumentImage)}" :
                         Applicationsettings.NO_POLICY_IMAGE,
@@ -400,11 +384,11 @@ namespace risk.control.system.Controllers.Api.Company
                         Applicationsettings.NO_USER,
                     Name = a.CustomerDetail?.Name ??
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /></span>",
-                    Policy = a.PolicyDetail?.LineOfBusiness.Name,
+                    Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
                     Status = a.ORIGIN.GetEnumDisplayName(),
-                    ServiceType = $"{a.PolicyDetail?.LineOfBusiness.Name} ({a.PolicyDetail.InvestigationServiceType.Name})",
+                    ServiceType = $"{a.PolicyDetail?.InsuranceType.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})",
                     Service = a.PolicyDetail.InvestigationServiceType.Name,
-                    Location = a.InvestigationCaseSubStatus.Name,
+                    Location = a.SubStatus,
                     Created = a.Created.ToString("dd-MM-yyyy"),
                     timePending = a.GetAssessorTimePending(false, true),
                     PolicyNum = a.GetPolicyNum(),

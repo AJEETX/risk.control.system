@@ -72,10 +72,12 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(p => p.District)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(p => p.State)
-                .Where(a => a.VendorId == vendorUser.VendorId &&
-                 (a.SubmittingSupervisordEmail == currentUserEmail || a.AllocatingSupervisordEmail == currentUserEmail) && 
-                            (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
-                            a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
+                .Where(a=> a.Status == CONSTANTS.CASE_STATUS.INPROGRESS)
+                .Where(a=> a.VendorId == vendorUser.VendorId)
+                .Where(a => (a.AllocatingSupervisordEmail == currentUserEmail) && 
+                            (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ))
+                .Where(a => (a.SubmittingSupervisordEmail == currentUserEmail) &&
+                            (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
                              a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)).ToListAsync();
             }
             else
@@ -96,6 +98,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(p => p.District)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(p => p.State)
+                .Where(a=> a.Status == CONSTANTS.CASE_STATUS.INPROGRESS)
                 .Where(a => a.VendorId == vendorUser.VendorId &&
                             (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
@@ -430,21 +433,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(u => u.Vendor)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
-            // Fetch the required statuses in one query
-            var statuses = await _context.InvestigationCaseSubStatus
-                .Where(i => new[]
-                {
-            CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-            CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
-            CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
-                }.Contains(i.Name.ToUpper()))
-                .ToDictionaryAsync(i => i.Name.ToUpper(), i => i.InvestigationCaseSubStatusId);
-
-            if (statuses.Count < 3)
-                return BadRequest("Missing required case statuses.");
-
             // Filter the claims based on the vendor ID and required status
-            var claims = await _context.Investigations
+            var claims = _context.Investigations
                 .Include(a => a.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(p => p.InvestigationServiceType)
@@ -463,10 +453,9 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(p => p.State)
                 .Where(a => a.VendorId == vendorUser.VendorId && 
-                            a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
-                .ToListAsync();
-
-                var response = claims.Select(a =>
+                            a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            var responseData = await claims.ToListAsync();
+            var response = responseData.Select(a =>
                 new ClaimsInvestigationAgencyResponse
                 {
                     Id = a.Id,
@@ -542,11 +531,8 @@ namespace risk.control.system.Controllers.Api.Agency
         public async Task<IActionResult> GetCompleted()
         {
             var finishedStatus = CONSTANTS.CASE_STATUS.FINISHED;
-            var inprogressStatus = CONSTANTS.CASE_STATUS.INPROGRESS;
             var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
             var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
-            var reassignedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER;
-            var submittedToAssessorStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR;
 
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -560,25 +546,33 @@ namespace risk.control.system.Controllers.Api.Agency
 
             if (agencyUser == null)
                 return NotFound("Agency user not found.");
-            var claims = GetClaims();
+            var claims = _context.Investigations
+                .Include(a => a.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(p => p.InvestigationServiceType)
+                .Include(a => a.PolicyDetail)
+                .ThenInclude(a => a.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(p => p.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(p => p.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(p => p.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(p => p.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(p => p.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(p => p.State)
+                .Where(a => a.VendorId == agencyUser.VendorId && a.Status == finishedStatus && (a.SubStatus == approvedStatus || a.SubStatus == rejectedStatus));
 
-            if (agencyUser.IsVendorAdmin)
+            if(agencyUser.Role.ToString() == AppRoles.SUPERVISOR.ToString())
             {
-                claims = claims.Where(claim =>  claim.Status == finishedStatus &&
-                claim.VendorId == agencyUser.VendorId &&
-                claim.SubStatus == approvedStatus ||
-                        claim.SubStatus == rejectedStatus);
+                claims = claims
+                    .Where(a => a.SubmittedAssessordEmail == currentUserEmail);
             }
-            else
-            {
-                claims = claims.Where(claim => claim.Status == finishedStatus &&
-                claim.VendorId == agencyUser.VendorId &&
-                claim.SubmittingSupervisordEmail == agencyUser.Email &&
-                claim.SubStatus == approvedStatus ||
-                        claim.SubStatus == rejectedStatus);
-            }
-
-            var response = claims
+            var responseData = await claims.ToListAsync();
+            var response = responseData
                 .Select(a => new ClaimsInvestigationAgencyResponse
                 {
                     Id = a.Id,

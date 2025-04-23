@@ -95,11 +95,99 @@ namespace risk.control.system.Seeds
             };
 
             var insurerCompany = await context.ClientCompany.AddAsync(insurer);
+
+
+
             await context.SaveChangesAsync(null, false);
 
-            await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, insurerCompany.Entity);
+            var creator = await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, insurerCompany.Entity);
+
+            QuestionsCLAIM(context, insurer, creator);
+            QuestionsUNDERWRITING(context, insurer, creator);
+            await context.SaveChangesAsync(null, false);
 
             return insurerCompany.Entity;
         }
+
+        private static void QuestionsUNDERWRITING(ApplicationDbContext context, ClientCompany company, ClientCompanyApplicationUser creator)
+        {
+            var question1 = new Question
+            {
+                QuestionText = "Ownership status of the home visited",
+                QuestionType = "dropdown",
+                Options = "SOLE- OWNED, OWNED-JOINTLY, RENTED, FANILY - OWNED",
+                IsRequired = true
+            };
+            var question2 = new Question
+            {
+                QuestionText = "Neighbour Financial Status",
+                QuestionType = "dropdown",
+                Options = "Rs. 0 - 10,000, Rs. 10,000 - 1,00,000, Rs. 1,00,000 +",
+                IsRequired = true
+            };
+            var question3 = new Question
+            {
+                QuestionText = "Name of the Person Met",
+                QuestionType = "text",
+                IsRequired = true
+            };
+            var question4 = new Question
+            {
+                QuestionText = "date and time met with Person",
+                QuestionType = "date",
+                IsRequired = true
+            };
+
+            var caseQuestionnaire = new CaseQuestionnaire
+            {
+                ClientCompanyId = company.ClientCompanyId,
+                InsuranceType = InsuranceType.UNDERWRITING,
+                CreatedUser = creator.Email,
+                Questions = new List<Question> {question1, question2, question3,question4 }
+            };
+
+            context.CaseQuestionnaire.Add(caseQuestionnaire);
+        }
+
+        private static void QuestionsCLAIM(ApplicationDbContext context, ClientCompany company, ClientCompanyApplicationUser creator)
+        {
+            var question1 = new Question
+            {
+                QuestionText = "Injury/Illness prior to commencement/revival ?",
+                QuestionType = "dropdown",
+                Options = "YES, NO",
+                IsRequired = true
+            };
+            var question2 = new Question
+            {
+                QuestionText = "Duration of treatment ?",
+                QuestionType = "dropdown",
+                Options = "0 , Less Than 6 months, More Than 6 months",
+                IsRequired = true
+            };
+            var question3 = new Question
+            {
+                QuestionText = "Name of person met at the cemetery",
+                QuestionType = "text",
+                IsRequired = true
+            };
+            var question4 = new Question
+            {
+                QuestionText = "Date and time of death",
+                QuestionType = "date",
+                IsRequired = true
+            };
+
+            var caseQuestionnaire = new CaseQuestionnaire
+            {
+                ClientCompanyId = company.ClientCompanyId,
+                InsuranceType = InsuranceType.CLAIM,
+                CreatedUser = creator.Email,
+                Questions = new List<Question> { question1, question2, question3, question4 }
+            };
+
+            context.CaseQuestionnaire.Add(caseQuestionnaire);
+        }
+
     }
 }

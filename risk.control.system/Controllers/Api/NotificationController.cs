@@ -94,29 +94,29 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [HttpPost("schedule")]
-        public async Task<IActionResult> Schedule(ClientSchedulingMessage message)
-        {
-            string baseUrl = HttpContext.Request.GetDisplayUrl().Replace(HttpContext.Request.Path, "");
-            message.BaseUrl = baseUrl;
-            var claim = await service.SendVerifySchedule(message);
-            if (claim == null)
-            {
-                return BadRequest();
-            }
-            return Ok(claim);
-        }
+        //[HttpPost("schedule")]
+        //public async Task<IActionResult> Schedule(ClientSchedulingMessage message)
+        //{
+        //    string baseUrl = HttpContext.Request.GetDisplayUrl().Replace(HttpContext.Request.Path, "");
+        //    message.BaseUrl = baseUrl;
+        //    var claim = await service.SendVerifySchedule(message);
+        //    if (claim == null)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    return Ok(claim);
+        //}
 
-        [HttpGet("ConfirmSchedule")]
-        public async Task<IActionResult> ConfirmSchedule(string id, string confirm = "N")
-        {
-            var claim = await service.ReplyVerifySchedule(id, confirm);
-            if (claim == null)
-            {
-                return BadRequest();
-            }
-            return Redirect("/page/confirm.html");
-        }
+        //[HttpGet("ConfirmSchedule")]
+        //public async Task<IActionResult> ConfirmSchedule(string id, string confirm = "N")
+        //{
+        //    var claim = await service.ReplyVerifySchedule(id, confirm);
+        //    if (claim == null)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    return Redirect("/page/confirm.html");
+        //}
 
         [HttpPost("sms")]
         public async Task<IActionResult> SendSingleSMS(string mobile = "61432854196", string message = "SMS fom iCheckify team")

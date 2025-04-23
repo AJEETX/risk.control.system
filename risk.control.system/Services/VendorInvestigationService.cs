@@ -658,7 +658,6 @@ namespace risk.control.system.Services
             var claimsAllocate2Agent = GetCases().FirstOrDefault(v => v.Id == selectedcase);
 
             var beneficiaryDetail = await context.BeneficiaryDetail
-                .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
@@ -726,11 +725,11 @@ namespace risk.control.system.Services
                 claim.SelectedAgentDrivingMap = drivingMap;
                 claim.TaskToAgentTime = DateTime.Now;
 
-                var questions = context.CaseQuestionnaire.Include(c => c.Questions).FirstOrDefault(x => x.ClientCompanyId == claim.ClientCompanyId && x.InsuranceType == InsuranceType.CLAIM);
+                var CaseQuestionnaire = context.CaseQuestionnaire.Include(c => c.Questions).FirstOrDefault(x =>  x.ClientCompanyId == claim.ClientCompanyId  && x.InsuranceType == claim.PolicyDetail.InsuranceType);
                 
                 claim.InvestigationReport = new InvestigationReport();
                 
-                claim.InvestigationReport.CaseQuestionnaire.Questions = questions.Questions.ToList();
+                claim.InvestigationReport.CaseQuestionnaire = CaseQuestionnaire;
 
                 context.Investigations.Update(claim);
                 var rows = await context.SaveChangesAsync();

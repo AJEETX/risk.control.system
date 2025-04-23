@@ -1,8 +1,8 @@
 ﻿@using risk.control.system.Helpers
-@model ClaimTransactionModel
-@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
+@model CaseTransactionModel
+@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks))
 {
-    var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ? @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var questionTime = @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated != null ? @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
     <div class="col-12 col-md-6">
         <div class="card bg-light  border-success">
@@ -11,7 +11,7 @@
                 <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())<span class="badge badge-light">checkify</span> <span class="badge badge-light"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
             </div>
             <div class="card-footer text-muted border-bottom-0">
-                <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.AgencyReport.AgentEmail </span>
+                <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.InvestigationReport.AgentEmail </span>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -20,34 +20,16 @@
                             <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
                             <br />
                             <ul class="ml-4 mb-0 fa-ul text-muted">
-                                <li class="small">
-                                    @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question1
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                </li>
-                                <br />
-                                <li class="small">
-                                    @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question2
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                </li>
-                                <br />
-                                <li class="small">
-                                    @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question3
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                </li>
-                                <br />
-                                <li class="small">
-                                    @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question4
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                </li>
-                                <br />
+                                @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire.Questions)
+                                {
+                                    <li class="small">
+                                        @question.QuestionText
+                                        <span class="fa-li">
+                                            <i class="far fa-comment"></i>
+                                        </span>
+                                    </li>
+                                    <br />
+                                }
                                 <li class="small">
                                     Remarks?
                                     <span class="fa-li">
@@ -63,40 +45,21 @@
                             <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
                             <br />
                             <ul class="ml-4 mb-0 fa-ul text-muted">
+                                @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire.Questions)
+                                {
+                                    <li class="small">
+                                        @question.AnswerText
+                                        <span class="fa-li">
+                                            <i class="far fa-comment"></i>
+                                        </span>
+                                    </li>
+                                    <br />
+                                }
                                 <li class="small">
                                     <span class="fa-li">
                                         <i class="far fa-comment"></i>
                                     </span>
-                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer1
-                                </li>
-                                <br />
-                                <li class="small">
-
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer2
-                                </li>
-                                <br />
-                                <li class="small">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer3
-                                </li>
-                                <br />
-                                <li class="small">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer4
-                                </li>
-                                <br />
-                                <li class="small">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                    @Model.ClaimsInvestigation.AgencyReport?.AgentRemarks
+                                    @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
                                 </li>
                             </ul>
                         </p>

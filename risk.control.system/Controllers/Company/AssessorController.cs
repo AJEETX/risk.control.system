@@ -22,28 +22,22 @@ namespace risk.control.system.Controllers.Company
     public class AssessorController : Controller
     {
         private readonly INotyfService notifyService;
-        private readonly IClaimPolicyService claimPolicyService;
         private readonly ICaseVendorService caseVendorService;
         private readonly IInvoiceService invoiceService;
         private readonly IInvestigationService investigationService;
         private readonly IChatSummarizer chatSummarizer;
-        private readonly IInvestigationReportService investigationReportService;
 
         public AssessorController(INotyfService notifyService,
-            IClaimPolicyService claimPolicyService,
             ICaseVendorService caseVendorService,
             IInvoiceService invoiceService,
             IInvestigationService investigationService,
-            IChatSummarizer chatSummarizer,
-            IInvestigationReportService investigationReportService)
+            IChatSummarizer chatSummarizer)
         {
             this.notifyService = notifyService;
-            this.claimPolicyService = claimPolicyService;
             this.caseVendorService = caseVendorService;
             this.invoiceService = invoiceService;
             this.investigationService = investigationService;
             this.chatSummarizer = chatSummarizer;
-            this.investigationReportService = investigationReportService;
         }
         public IActionResult Index()
         {
@@ -92,7 +86,7 @@ namespace risk.control.system.Controllers.Company
                 if(model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
-                    model.AgencyReport.AiSummaryUpdated = DateTime.Now;
+                    model.InvestigationReport.AiSummaryUpdated = DateTime.Now;
                     model.ReportAiSummary = investigationSummary;
                 }
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
@@ -214,7 +208,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigationService.GetClaimDetails(currentUserEmail, id);
+                var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
                 if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
@@ -252,7 +246,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationService.GetClaimDetails(currentUserEmail, id);
+                var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
                 if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);

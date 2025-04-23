@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
@@ -93,9 +94,8 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    var model = dashboardCountService.GetClaimsCount(currentUserEmail, userRole.Value);
 
-                    return View(model);
+                    return View();
                 }
                
             }

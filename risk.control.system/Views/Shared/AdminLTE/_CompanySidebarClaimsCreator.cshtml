@@ -5,7 +5,7 @@
     <li class="nav-item">
         <a is-active-page class="navlink-border nav-link  @Url.MakeActiveClass("CreatorAuto","")
                                                                 @Url.MakeActiveClass("CreatorManual","")  @Url.MakeActiveClass("Question","")
-                                                                @Url.MakeActiveClass("ClaimsActive","") @Url.MakeActiveClass("ClaimsLog","")">
+                                                                    @Url.MakeActiveClass("ClaimsActive","") @Url.MakeActiveClass("CaseUpload","")">
             <i class="nav-icon far fa-money-bill-alt"></i>
             <p class="sidebar-menu-header-label">
                 CASES
@@ -16,7 +16,7 @@
     if (Model.BulkUpload)
     {
         <li class="nav-item">
-            <a is-active-page asp-controller="ClaimsLog" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("ClaimsLog","Uploads")">
+            <a is-active-page asp-controller="CaseUpload" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("CaseUpload","Uploads")">
                 <i class="nav-icon fa fa-upload"></i>
                 <p>
                     <span class="badge badge-secondary"> UPLOAD <sub>file</sub></span>

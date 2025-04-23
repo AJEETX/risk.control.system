@@ -37,21 +37,18 @@ namespace risk.control.system.Controllers.Api.Company
 
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly ICreatorService creatorService;
         private readonly IClaimsService claimsService;
         private readonly IInvestigationService service;
 
         public InvestigationController(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment,
             IInvestigationService service,
-            ICreatorService creatorService,
             IClaimsService claimsService)
         {
             hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.service = service;
             this.webHostEnvironment = webHostEnvironment;
-            this.creatorService = creatorService;
             this.claimsService = claimsService;
         }
         
@@ -65,32 +62,6 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(response);
             
-        }
-
-        private static string GetCreatorAutoTimePending(ClaimsInvestigation a, bool assigned = false)
-        {
-            if (DateTime.Now.Subtract(a.Updated.Value).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Updated.Value).Days} days since created!\"></i>");
-
-            else if (DateTime.Now.Subtract(a.Updated.Value).Days >= 3 || DateTime.Now.Subtract(a.Updated.Value).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Updated.Value).Days} day since created.\"></i>");
-            if (DateTime.Now.Subtract(a.Updated.Value).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Days} day</span>");
-
-            if (DateTime.Now.Subtract(a.Updated.Value).Hours < 24 &&
-                DateTime.Now.Subtract(a.Updated.Value).Hours > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Hours} hr </span>");
-            }
-            if (DateTime.Now.Subtract(a.Updated.Value).Hours == 0 && DateTime.Now.Subtract(a.Updated.Value).Minutes > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Minutes} min </span>");
-            }
-            if (DateTime.Now.Subtract(a.Updated.Value).Minutes == 0 && DateTime.Now.Subtract(a.Updated.Value).Seconds > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.Value).Seconds} sec </span>");
-            }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
         [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
@@ -189,65 +160,6 @@ namespace risk.control.system.Controllers.Api.Company
             };//<i class='fas fa-sync fa-spin'></i>
 
             return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalForAssign });
-        }
-
-        [HttpGet("GetPendingAllocations")]
-        public async Task<IActionResult> GetPendingAllocations()
-        {
-            var userEmail = HttpContext.User.Identity.Name;
-            var pendingCount = await _context.ClaimsInvestigation.CountAsync(c=>c.UpdatedBy == userEmail && c.STATUS == ALLOCATION_STATUS.PENDING);
-            return Ok(new { count = pendingCount });
-        }
-        private byte[] GetOwner(ClaimsInvestigation a)
-        {
-            string ownerEmail = string.Empty;
-            string ownerDomain = string.Empty;
-            string profileImage = string.Empty;
-            var allocated2agent = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-            if (!string.IsNullOrWhiteSpace(a.UserEmailActionedTo) && a.InvestigationCaseSubStatusId == allocated2agent.InvestigationCaseSubStatusId)
-            {
-                ownerEmail = a.UserEmailActionedTo;
-                var agentProfile = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail)?.ProfilePicture;
-                if (agentProfile == null)
-                {
-                    var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
-
-                    var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
-                    return noDataimage;
-                }
-                return agentProfile;
-            }
-            else if (string.IsNullOrWhiteSpace(a.UserEmailActionedTo) &&
-                !string.IsNullOrWhiteSpace(a.UserRoleActionedTo)
-                && a.AssignedToAgency)
-            {
-                ownerDomain = a.UserRoleActionedTo;
-                var vendorImage = _context.Vendor.FirstOrDefault(v => v.Email == ownerDomain)?.DocumentImage;
-                if (vendorImage == null)
-                {
-                    var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
-
-                    var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
-                    return noDataimage;
-                }
-                return vendorImage;
-            }
-            else
-            {
-                ownerDomain = a.UserRoleActionedTo;
-                var companyImage = _context.ClientCompany.FirstOrDefault(v => v.Email == ownerDomain)?.DocumentImage;
-                if (companyImage == null)
-                {
-                    var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
-
-                    var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
-                    return noDataimage;
-                }
-                return companyImage;
-            }
-
         }
 
     }

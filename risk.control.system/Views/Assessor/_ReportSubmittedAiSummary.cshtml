@@ -1,6 +1,6 @@
-﻿@model ClaimTransactionModel
+﻿@model CaseTransactionModel
 
-@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AiSummary))
+@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport?.AiSummary))
 {
     <div class="col-12">
         <div class="card bg-light  border-success">
@@ -20,7 +20,7 @@
                 </h3>
                 <div class="card-tools">
                     <span data-toggle="tooltip" title=" AI comments" class="badge badge-light">
-                        <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.AgencyReport?.AiSummaryUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                        <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport?.AiSummaryUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                     </span>
                 </div>
 
@@ -49,14 +49,14 @@
                                     <td>
                                         @{
                                             string displayTime = string.Empty;
-                                            var time = @Model.ClaimsInvestigation.AgencyReport?.AiSummaryUpdated;
+                                            var time = @Model.ClaimsInvestigation.InvestigationReport?.AiSummaryUpdated;
                                             if (time is not null)
                                             {
                                                 displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
                                             }
                                             if (time == null)
                                             {
-                                                displayTime = @Model.ClaimsInvestigation.AgencyReport.Created.ToString("dd-MMM-yyy HH:mm");
+                                                displayTime = @Model.ClaimsInvestigation.InvestigationReport.Created.ToString("dd-MMM-yyy HH:mm");
                                             }
                                         }
                                         <span class="badge badge-light">@displayTime</span>

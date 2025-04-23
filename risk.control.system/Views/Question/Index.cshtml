@@ -1,4 +1,5 @@
-﻿@model QuestionFormViewModel
+﻿@using risk.control.system.Helpers;
+@model QuestionFormViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -30,12 +31,22 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <div class="row">
-
-
                 <div class="col-md-6 mt-4">
+                    <ul class="nav nav-pills mb-3 justify-content-center" id="insuranceTypeTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @(Model.InsuranceType == InsuranceType.CLAIM ? "active" : "")"
+                               href="@Url.Action("Index", new { insuranceType = "CLAIM" })">Claim</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @(Model.InsuranceType == InsuranceType.UNDERWRITING ? "active" : "")"
+                               href="@Url.Action("Index", new { insuranceType = "UNDERWRITING" })">Underwriting</a>
+                        </li>
+                    </ul>
+
                     <form id="answers" method="post" action="/Question/SubmitAnswers" enctype="multipart/form-data" class="p-4 bg-white border rounded shadow-sm questionnaire-form">
-                        <h4 class="mb-4 text-primary text-center">CLAIM Investigation Questionnaire</h4>
-                        <input type="hidden" asp-for="InsuranceType" value="@InsuranceType.CLAIM" />
+                        <h4 class="mb-4 text-primary text-center"><i> @Model.InsuranceType.GetEnumDisplayName()</i> Questionnaire</h4>
+                        <input type="hidden" name="InsuranceType" value="@Model.InsuranceType" />
+
                         @if (Model != null && Model.Questions.Count > 0)
                         {
                             @for (int i = 0; i < Model.Questions.Count; i++)
@@ -113,7 +124,7 @@
                                 </div>
                             }
 
-                            <button id="submit-answer" type="submit" class="btn btn-success w-100 mt-3">Submit Answers</button>
+                            @* <button id="submit-answer" type="submit" class="btn btn-success w-100 mt-3">Submit Answers</button> *@
                         }
                         else
                         {

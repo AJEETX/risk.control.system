@@ -24,7 +24,7 @@
                     <span class="input-group-label"> Additional Document:</span>
                     <div class="input-group mb-3">
                         <img class="form-Image" id="policyImage" src=@Applicationsettings.NO_POLICY_IMAGE data-toggle="tooltip" title="No additional document">
-                        <input accept="image/*" asp-for="AgencyReport.SupervisorAttachment" type="file" class="form-control remarks" id="documentImageInput" data-toggle="tooltip" title="Add additional document">
+                        <input accept="image/*" asp-for="InvestigationReport.SupervisorAttachment" type="file" class="form-control remarks" id="documentImageInput" data-toggle="tooltip" title="Add additional document">
                     </div>
                 </div>
 
@@ -32,10 +32,10 @@
                     <span class="input-group-label"> Remarks :</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="AgencyReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" asp-for="InvestigationReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <textarea required name="supervisorRemarks" id="supervisorRemarks" asp-for="AgencyReport.SupervisorRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter Remarks" rows="2"></textarea>
-                        <span asp-validation-for="AgencyReport.SupervisorRemarks" class="text-danger"></span>
+                        <textarea required name="supervisorRemarks" id="supervisorRemarks" asp-for="InvestigationReport.SupervisorRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter Remarks" rows="2"></textarea>
+                        <span asp-validation-for="InvestigationReport.SupervisorRemarks" class="text-danger"></span>
                     </div>
                 </div>
             </div>

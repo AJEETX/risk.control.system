@@ -749,11 +749,11 @@ namespace risk.control.system.Controllers.Company
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                request.AgencyReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.AgencyReport.EnquiryRequest.Description);
+                request.InvestigationReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.Description);
 
                 IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 
-                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.AgencyReport.EnquiryRequest, messageDocument);
+                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, messageDocument);
                 if (model != null)
                 {
                     var company = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);

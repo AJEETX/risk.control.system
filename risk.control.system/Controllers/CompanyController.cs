@@ -32,7 +32,6 @@ namespace risk.control.system.Controllers
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
         private readonly ICustomApiCLient customApiCLient;
-        private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userAgencyManager;
@@ -48,7 +47,6 @@ namespace risk.control.system.Controllers
             SignInManager<ApplicationUser> signInManager,
             INotyfService notifyService,
             ICustomApiCLient customApiCLient,
-            IClaimsInvestigationService claimsInvestigationService,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
@@ -59,7 +57,6 @@ namespace risk.control.system.Controllers
             this.signInManager = signInManager;
             this.notifyService = notifyService;
             this.customApiCLient = customApiCLient;
-            this.claimsInvestigationService = claimsInvestigationService;
             this.userManager = userManager;
             this.userAgencyManager = userAgencyManager;
             this.roleManager = roleManager;
@@ -990,15 +987,14 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var agencySubStatuses = _context.InvestigationCaseSubStatus.Where(i =>
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR) ||
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR) ||
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT) ||
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR) ||
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)
-                    ).Select(s => s.InvestigationCaseSubStatusId).ToList();
+                var agencySubStatuses = new[]{
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR};
 
-                var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == model.VendorId);
+                var hasClaims = _context.Investigations.Any(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == model.VendorId);
                 model.HasClaims = hasClaims;
 
                 var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");

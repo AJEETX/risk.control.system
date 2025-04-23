@@ -32,7 +32,7 @@
             </div>
             <partial name="_PolicyDetails" model="@Model" />
 
-            <partial name="_AgencyReport" model="@Model" />
+            <partial name="_InvestigationReport" model="@Model" />
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
@@ -71,11 +71,11 @@
                                                 <span class="input-group-label"> Multiple choice question:</span>
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
-                                                        <span class="input-group-text" asp-for="AgencyReport.QueryRequest.Subject"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.Subject"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                     </div>
-                                                    <input id="enquiryinput" class="form-control remarks" asp-for="AgencyReport.EnquiryRequest.Subject" placeholder="Enter Enquiry subject detail" required value="What is your greatest concern about the person ?">
+                                                    <input id="enquiryinput" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.Subject" placeholder="Enter Enquiry subject detail" required value="What is your greatest concern about the person ?">
 
-                                                    <span asp-validation-for="AgencyReport.EnquiryRequest.Subject" class="text-danger"></span>
+                                                    <span asp-validation-for="InvestigationReport.EnquiryRequest.Subject" class="text-danger"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -89,9 +89,9 @@
                                                             <span class="input-group-label"> Choice 1:</span>
                                                             <div class="input-group mb-3">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" asp-for="AgencyReport.QueryRequest.AnswerA"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                    <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.AnswerA"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                                 </div>
-                                                                <input class="form-control remarks" asp-for="AgencyReport.EnquiryRequest.AnswerA" placeholder="Answer A" required value="The person is genuine.">
+                                                                <input class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.AnswerA" placeholder="Answer A" required value="The person is genuine.">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -101,9 +101,9 @@
                                                             <span class="input-group-label"> Choice 2:</span>
                                                             <div class="input-group mb-3">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" asp-for="AgencyReport.QueryRequest.AnswerB"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                    <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.AnswerB"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                                 </div>
-                                                                <input class="form-control remarks" asp-for="AgencyReport.EnquiryRequest.AnswerB" placeholder="Answer B" required value="The person seems to be dodgy.">
+                                                                <input class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.AnswerB" placeholder="Answer B" required value="The person seems to be dodgy.">
 
                                                             </div>
                                                         </div>
@@ -115,9 +115,9 @@
                                                             <span class="input-group-label"> Choice 3:</span>
                                                             <div class="input-group mb-3">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" asp-for="AgencyReport.QueryRequest.AnswerB"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                    <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.AnswerB"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                                 </div>
-                                                                <input class="form-control remarks" asp-for="AgencyReport.EnquiryRequest.AnswerC" placeholder="Answer C" required value="The person is temperamental.">
+                                                                <input class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.AnswerC" placeholder="Answer C" required value="The person is temperamental.">
 
                                                             </div>
                                                         </div>
@@ -128,9 +128,9 @@
                                                             <span class="input-group-label"> Choice 4:</span>
                                                             <div class="input-group mb-3">
                                                                 <div class="input-group-prepend">
-                                                                    <span class="input-group-text" asp-for="AgencyReport.QueryRequest.AnswerB"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                    <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.AnswerB"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                                 </div>
-                                                                <input class="form-control remarks" asp-for="AgencyReport.EnquiryRequest.AnswerD" placeholder="Answer D" required value="Not sure about the person.">
+                                                                <input class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.AnswerD" placeholder="Answer D" required value="Not sure about the person.">
 
                                                             </div>
                                                         </div>
@@ -156,7 +156,7 @@
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <div class="col-lg-12">
-                                                    <textarea id="description" class="form-control remarks" asp-for="AgencyReport.EnquiryRequest.Description"
+                                                    <textarea id="description" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.Description"
                                                               placeholder="Enquiry Description" rows="3" required>this is test
 
                                                 </textarea>
@@ -170,7 +170,7 @@
                                             <div class="btn btn-default btn-file">
                                                 <i class="fas fa-paperclip"></i> Attachment
                                                 <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
-                                                <input id="document" name="document" asp-for="AgencyReport.EnquiryRequest.QuestionImageAttachment" type="file" accept="*.png,*.jpeg" class="form-control remarks" />
+                                                <input id="document" name="document" asp-for="InvestigationReport.EnquiryRequest.QuestionImageAttachment" type="file" accept="*.png,*.jpeg" class="form-control remarks" />
                                             </div>
                                             <span class="help-block">Max. 2MB</span>
 

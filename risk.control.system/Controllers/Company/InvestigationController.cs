@@ -183,7 +183,6 @@ namespace risk.control.system.Controllers.Company
                 }
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                ViewData["lineOfBusinessId"] = new SelectList(context.LineOfBusiness.OrderBy(s => s.Code), "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
                 ViewData["InvestigationServiceTypeId"] = new SelectList(context.InvestigationServiceType.Where(i =>
                         i.InsuranceType == claimsInvestigation.PolicyDetail.InsuranceType).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);

@@ -26,7 +26,7 @@ namespace risk.control.system.Services
     public interface IFtpService
     {
         Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, bool uploadAndAssign = false);
-        Task StartUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false);
+        //Task StartUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false);
         Task StartFileUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false);
 
     }
@@ -41,13 +41,13 @@ namespace risk.control.system.Services
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ITimelineService timelineService;
         private readonly ICustomApiCLient customApiCLient;
-        private readonly ICreatorService creatorService;
+        //private readonly ICreatorService creatorService;
         private readonly IInvestigationService investigationService;
-        private readonly IMailboxService mailboxService;
+        //private readonly IMailboxService mailboxService;
         private readonly IMailService mailService;
         private readonly IProcessCaseService processCaseService;
         private readonly IBackgroundJobClient backgroundJobClient;
-        private readonly IClaimsInvestigationService claimsInvestigationService;
+        //private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IProgressService progressService;
         private readonly IUploadService uploadService;
         private static WebClient client = new WebClient
@@ -58,13 +58,13 @@ namespace risk.control.system.Services
             IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
             ICustomApiCLient customApiCLient,
-            ICreatorService creatorService,
+            //ICreatorService creatorService,
             IInvestigationService investigationService,
-            IMailboxService mailboxService,
+            //IMailboxService mailboxService,
             IMailService mailService,
             IProcessCaseService processCaseService,
             IBackgroundJobClient backgroundJobClient,
-            IClaimsInvestigationService claimsInvestigationService,
+            //IClaimsInvestigationService claimsInvestigationService,
             IProgressService progressService,
             IUploadService uploadService)
         {
@@ -72,13 +72,13 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
             this.timelineService = timelineService;
             this.customApiCLient = customApiCLient;
-            this.creatorService = creatorService;
+            //this.creatorService = creatorService;
             this.investigationService = investigationService;
-            this.mailboxService = mailboxService;
+            //this.mailboxService = mailboxService;
             this.mailService = mailService;
             this.processCaseService = processCaseService;
             this.backgroundJobClient = backgroundJobClient;
-            this.claimsInvestigationService = claimsInvestigationService;
+            //this.claimsInvestigationService = claimsInvestigationService;
             this.progressService = progressService;
             this.uploadService = uploadService;
         }
@@ -135,102 +135,102 @@ namespace risk.control.system.Services
             return uploadData.Entity.Id;
         }
 
-        [AutomaticRetry(Attempts = 0)]
-        public async Task StartUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false)
-        {
-            try
-            {
-                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
-                var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
-                var customData = ReadFirstCsvFromZipToObject(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
-                var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+        //[AutomaticRetry(Attempts = 0)]
+        //public async Task StartUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false)
+        //{
+        //    try
+        //    {
+        //        var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+        //        var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+        //        var customData = ReadFirstCsvFromZipToObject(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
+        //        var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
 
-                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
-                {
-                    if (totalClaimsCreated > companyUser.ClientCompany.TotalCreatedClaimAllowed)
-                    {
-                        SetUploadFailure(uploadFileData, $"Case limit reached of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).", uploadAndAssign);
-                        await _context.SaveChangesAsync();
-                        await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
-                        return;
-                    }
-                }
+        //        if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+        //        {
+        //            if (totalClaimsCreated > companyUser.ClientCompany.TotalCreatedClaimAllowed)
+        //            {
+        //                SetUploadFailure(uploadFileData, $"Case limit reached of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).", uploadAndAssign);
+        //                await _context.SaveChangesAsync();
+        //                await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
+        //                return;
+        //            }
+        //        }
 
-                var uploadedClaims = await uploadService.PerformCustomUpload(companyUser, customData, uploadFileData);
-                if (uploadedClaims == null || uploadedClaims.Count == 0)
-                {
-                    SetUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
-                    await _context.SaveChangesAsync();
-                    await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
-                    return;
-                }
-                var totalAddedAndExistingCount = uploadedClaims.Count + totalClaimsCreated;
-                // License Check (if Trial)
-                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
-                {
-                    if (totalAddedAndExistingCount > companyUser.ClientCompany.TotalCreatedClaimAllowed)
-                    {
-                        SetUploadFailure(uploadFileData, $"Case limit exceeded of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).", uploadAndAssign);
-                        await _context.SaveChangesAsync();
-                        await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
-                        return;
-                    }
-                }
-                var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
+        //        var uploadedClaims = await uploadService.PerformCustomUpload(companyUser, customData, uploadFileData);
+        //        if (uploadedClaims == null || uploadedClaims.Count == 0)
+        //        {
+        //            SetUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
+        //            await _context.SaveChangesAsync();
+        //            await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
+        //            return;
+        //        }
+        //        var totalAddedAndExistingCount = uploadedClaims.Count + totalClaimsCreated;
+        //        // License Check (if Trial)
+        //        if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+        //        {
+        //            if (totalAddedAndExistingCount > companyUser.ClientCompany.TotalCreatedClaimAllowed)
+        //            {
+        //                SetUploadFailure(uploadFileData, $"Case limit exceeded of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).", uploadAndAssign);
+        //                await _context.SaveChangesAsync();
+        //                await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
+        //                return;
+        //            }
+        //        }
+        //        var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
 
-                if (uploadedClaims.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
-                {
-                    SetUploadFailure(uploadFileData, $"Max count of {companyUser.ClientCompany.TotalToAssignMaxAllowed} Assign-Ready Case(s) limit reached.", uploadAndAssign, uploadedClaims.Select(c => c.ClaimsInvestigationId).ToList());
-                    await _context.SaveChangesAsync();
-                    await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
-                    return;
-                }
+        //        if (uploadedClaims.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
+        //        {
+        //            SetUploadFailure(uploadFileData, $"Max count of {companyUser.ClientCompany.TotalToAssignMaxAllowed} Assign-Ready Case(s) limit reached.", uploadAndAssign, uploadedClaims.Select(c => c.ClaimsInvestigationId).ToList());
+        //            await _context.SaveChangesAsync();
+        //            await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
+        //            return;
+        //        }
 
-                _context.ClaimsInvestigation.AddRange(uploadedClaims);
-                var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-                var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+        //        _context.ClaimsInvestigation.AddRange(uploadedClaims);
+        //        var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+        //        var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
 
-                var logs = uploadedClaims.Select(claim => new InvestigationTransaction
-                {
-                    ClaimsInvestigationId = claim.ClaimsInvestigationId,
-                    UserEmailActioned = claim.UserEmailActioned,
-                    UserRoleActionedTo = claim.UserRoleActionedTo,
-                    CurrentClaimOwner = companyUser.Email,
-                    HopCount = 0,
-                    Time2Update = 0,
-                    InvestigationCaseStatusId = status.InvestigationCaseStatusId,
-                    InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
-                    UpdatedBy = companyUser.Email
-                });
+        //        var logs = uploadedClaims.Select(claim => new InvestigationTransaction
+        //        {
+        //            ClaimsInvestigationId = claim.ClaimsInvestigationId,
+        //            UserEmailActioned = claim.UserEmailActioned,
+        //            UserRoleActionedTo = claim.UserRoleActionedTo,
+        //            CurrentClaimOwner = companyUser.Email,
+        //            HopCount = 0,
+        //            Time2Update = 0,
+        //            InvestigationCaseStatusId = status.InvestigationCaseStatusId,
+        //            InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
+        //            UpdatedBy = companyUser.Email
+        //        });
 
-                _context.InvestigationTransaction.AddRange(logs);
-                await _context.SaveChangesAsync();
+        //        _context.InvestigationTransaction.AddRange(logs);
+        //        await _context.SaveChangesAsync();
 
-                if (uploadAndAssign && uploadedClaims.Any())
-                {
-                    // Auto-Assign Claims if Enabled
-                    var claimsIds = uploadedClaims.Select(c => c.ClaimsInvestigationId).ToList();
-                    var autoAllocated = await claimsInvestigationService.BackgroundUploadAutoAllocation(claimsIds, userEmail, url);
-                    SetUploadAssignSuccess(uploadFileData, uploadedClaims, autoAllocated);
-                    await _context.SaveChangesAsync();
-                    // Notify User
-                    //await mailboxService.NotifyFileUploadAutoAssign(userEmail, uploadFileData, url);
-                }
-                else
-                {
-                    // Upload Success
-                    SetUploadSuccess(uploadFileData, uploadedClaims);
-                    await _context.SaveChangesAsync();
-                    // Notify User
-                    await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                throw;
-            }
-        }
+        //        if (uploadAndAssign && uploadedClaims.Any())
+        //        {
+        //            // Auto-Assign Claims if Enabled
+        //            var claimsIds = uploadedClaims.Select(c => c.ClaimsInvestigationId).ToList();
+        //            var autoAllocated = await claimsInvestigationService.BackgroundUploadAutoAllocation(claimsIds, userEmail, url);
+        //            SetUploadAssignSuccess(uploadFileData, uploadedClaims, autoAllocated);
+        //            await _context.SaveChangesAsync();
+        //            // Notify User
+        //            //await mailboxService.NotifyFileUploadAutoAssign(userEmail, uploadFileData, url);
+        //        }
+        //        else
+        //        {
+        //            // Upload Success
+        //            SetUploadSuccess(uploadFileData, uploadedClaims);
+        //            await _context.SaveChangesAsync();
+        //            // Notify User
+        //            await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.StackTrace);
+        //        throw;
+        //    }
+        //}
         void SetUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<string> claimsIds = null)
         {
             fileData.Completed = false;
@@ -242,44 +242,6 @@ namespace risk.control.system.Services
             fileData.ClaimsId = claimsIds;
         }
 
-        void SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<ClaimsInvestigation> claims, List<string> autoAllocated)
-        {
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
-
-            var uploadedClaimCount = claims.Count(c => c.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId);
-
-            var assignedClaimCount = claims.Count(c => autoAllocated.Contains(c.ClaimsInvestigationId) && c.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId);
-
-            var uploadedUnderWritingCount = claims.Count(c => c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness);
-            var assignedUnderWritingCount = claims.Count(c => autoAllocated.Contains(c.ClaimsInvestigationId) && c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness);
-
-            string message = $"Claims (Uploaded/Assigned) = ({uploadedClaimCount}/{assignedClaimCount}): Underwritings (Uploaded/Assigned) = ({uploadedUnderWritingCount}/{assignedUnderWritingCount})";
-            fileData.Completed = true;
-            fileData.Icon = "fas fa-check-circle i-green";
-            fileData.Status = "Completed";
-            fileData.Message = message;
-            fileData.DirectAssign = true;
-            fileData.RecordCount = claims.Count;
-            fileData.ClaimsId = claims.Select(c => c.ClaimsInvestigationId).ToList();
-            fileData.CompletedOn = DateTime.Now;
-        }
-        void SetUploadSuccess(FileOnFileSystemModel fileData, List<ClaimsInvestigation> claims)
-        {
-            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
-            var claimCount = claims.Count(c => c.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId);
-            var underWritingCount = claims.Count(c => c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness);
-
-            string message = $"Total Uploaded Claims: {claimCount} & Underwritings: {underWritingCount}";
-            fileData.Completed = true;
-            fileData.Icon = "fas fa-check-circle i-green";
-            fileData.Status = "Completed";
-            fileData.Message = message;
-            fileData.RecordCount = claims.Count;
-            fileData.ClaimsId = claims.Select(c => c.ClaimsInvestigationId).ToList();
-            fileData.CompletedOn = DateTime.Now;
-        }
         private static List<UploadCase>? ReadFirstCsvFromZipToObject(byte[] zipData)
         {
             using (MemoryStream zipStream = new MemoryStream(zipData))
@@ -312,7 +274,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
             var customData = ReadFirstCsvFromZipToObject(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
-            var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+            var totalClaimsCreated = await _context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
 
             try
             {
@@ -322,7 +284,7 @@ namespace risk.control.system.Services
                     {
                         SetFileUploadFailure(uploadFileData, $"Case limit reached of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).", uploadAndAssign);
                         await _context.SaveChangesAsync();
-                        await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
+                        await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
                         return;
                     }
                 }

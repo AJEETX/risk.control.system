@@ -113,6 +113,12 @@ document.querySelectorAll('.delete-question-btn').forEach(button => {
     });
 });
 
+document.querySelectorAll('#insuranceTypeTabs .nav-link').forEach(tab => {
+    tab.addEventListener('click', function () {
+        const value = this.getAttribute('data-value');
+        document.getElementById('insuranceTypeInput').value = value;
+    });
+});
 $(document).ready(function () {
     var askConfirmation = true;
     $('#create-form').submit(function (e) {

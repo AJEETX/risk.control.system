@@ -27,7 +27,7 @@ namespace risk.control.system.WorkFlow
             .Then<CaseAgentReportSubmitted>()
             .If(data => data.InvestigationReport != null)
                 .Do(then => then
-                    .StartWith<CaseAgencyReportSubmitted>())
+                    .StartWith<CaseInvestigationReportSubmitted>())
                 .If(data => data.InvestigationReport == null)
                 .Do(elsePath => elsePath
                     .StartWith<CaseReAssignedToAgentStep>())

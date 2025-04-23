@@ -34,24 +34,18 @@ namespace risk.control.system.Controllers.Company
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService investigationService;
-        private readonly IInvestigationReportService investigationReportService;
-        private readonly IClaimPolicyService claimPolicyService;
 
         public CaseActiveController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
             IFtpService ftpService,
             INotyfService notifyService,
-            IInvestigationService investigationService,
-            IInvestigationReportService investigationReportService,
-            IClaimPolicyService claimPolicyService)
+            IInvestigationService investigationService)
         {
             _context = context;
-            this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.investigationService = investigationService;
-            this.investigationReportService = investigationReportService;
         }
 
         public IActionResult Index()
@@ -113,7 +107,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var userEmail = HttpContext.User.Identity.Name;
-                var pendingCount = await _context.ClaimsInvestigation.CountAsync(c => c.UpdatedBy == userEmail && c.STATUS == ALLOCATION_STATUS.PENDING);
+                var pendingCount = await _context.Investigations.CountAsync(c => c.UpdatedBy == userEmail && c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS);
                 return View(new JobStatus { JobId = jobId, PendingCount = pendingCount });
             }
             catch (Exception ex)

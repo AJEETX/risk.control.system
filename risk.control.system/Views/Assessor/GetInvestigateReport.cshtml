@@ -57,7 +57,7 @@
         <partial name="_PolicyDetails" model="@Model" />
 
             
-        <partial name="_AgencyReport" model="@Model" />
+        <partial name="_InvestigationReport" model="@Model" />
         @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest != null)
         {
             var data = new CaseTransactionModel
@@ -241,7 +241,7 @@
                                                 <span class="input-group-label"> Remarks :</span>
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
-                                                        <span class="input-group-text" asp-for="ClaimsInvestigation.AgencyReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        <span class="input-group-text" asp-for="ClaimsInvestigation.InvestigationReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                     </div>
                                                     <input data-toggle="tooltip" title="Enter remarks" required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required placeholder="enter remarks to submit" />
 

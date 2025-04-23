@@ -26,21 +26,18 @@ namespace risk.control.system.Controllers.Agency
         private readonly IInvestigationService investigationService;
         private readonly IVendorInvestigationService vendorInvestigationService;
         private readonly ICaseVendorService vendorService;
-        private readonly IInvestigationReportService investigationReportService;
 
         public VendorInvestigationController(INotyfService notifyService,
             IInvoiceService invoiceService,
             IInvestigationService investigationService,
             IVendorInvestigationService vendorInvestigationService,
-            ICaseVendorService vendorService, 
-            IInvestigationReportService investigationReportService)
+            ICaseVendorService vendorService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
             this.investigationService = investigationService;
             this.vendorInvestigationService = vendorInvestigationService;
             this.vendorService = vendorService;
-            this.investigationReportService = investigationReportService;
         }
         public IActionResult Index()
         {
@@ -271,9 +268,9 @@ namespace risk.control.system.Controllers.Agency
 
         [Breadcrumb(" Details", FromAction = "Completed")]
 
-        public async Task<IActionResult> CompletedDetail(string id)
+        public async Task<IActionResult> CompletedDetail(long id)
         {
-            if (id == null)
+            if (id < 1)
             {
                 notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -286,7 +283,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);

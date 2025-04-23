@@ -26,8 +26,8 @@ public interface IICheckifyService
     //Task<AppiCheckifyResponse> GetFaceId(FaceData data);
     //Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
     //Task<AppiCheckifyResponse> GetPassportId(DocumentData data);
-    Task<AppiCheckifyResponse> GetAudio(AudioData data);
-    Task<AppiCheckifyResponse> GetVideo(VideoData data);
+    //Task<AppiCheckifyResponse> GetAudio(AudioData data);
+    //Task<AppiCheckifyResponse> GetVideo(VideoData data);
     Task<bool> WhitelistIP(IPWhitelistRequest request);
 }
 
@@ -90,38 +90,38 @@ public class ICheckifyService : IICheckifyService
     //    ClaimsInvestigation claim = null;
     //    try
     //    {
-    //        claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.AgentIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+    //        claim = claimsService.GetClaims().Include(c => c.InvestigationReport).ThenInclude(c => c.AgentIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
-    //        if (claim.AgencyReport == null)
+    //        if (claim.InvestigationReport == null)
     //        {
-    //            claim.AgencyReport = new AgencyReport();
+    //            claim.InvestigationReport = new InvestigationReport();
     //        }
             
     //        var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
     //        if (isClaim)
     //        {
-    //            claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date and time of death ?";
     //        }
     //        else
     //        {
-    //            claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
     //        }
 
-    //        claim.AgencyReport.AgentEmail = data.Email;
+    //        claim.InvestigationReport.AgentEmail = data.Email;
     //        var agent = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == data.Email);
-    //        claim.AgencyReport.AgentIdReport.Updated = DateTime.Now;
-    //        claim.AgencyReport.AgentIdReport.UpdatedBy = data.Email;
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImageLongLatTime = DateTime.Now;
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat = data.LocationLongLat;
-    //        var longLat = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
-    //        var latitude = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-    //        var longitude = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+    //        claim.InvestigationReport.AgentIdReport.Updated = DateTime.Now;
+    //        claim.InvestigationReport.AgentIdReport.UpdatedBy = data.Email;
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLatTime = DateTime.Now;
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLat = data.LocationLongLat;
+    //        var longLat = claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
+    //        var latitude = claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+    //        var longitude = claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
     //        var latLongString = latitude + "," + longitude;
     //        var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
 
@@ -158,11 +158,11 @@ public class ICheckifyService : IICheckifyService
     //        var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
 
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImageLocationUrl = map;
-    //        claim.AgencyReport.AgentIdReport.Duration = duration;
-    //        claim.AgencyReport.AgentIdReport.Distance = distance;
-    //        claim.AgencyReport.AgentIdReport.DistanceInMetres = distanceInMetres;
-    //        claim.AgencyReport.AgentIdReport.DurationInSeconds = durationInSecs;
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImageLocationUrl = map;
+    //        claim.InvestigationReport.AgentIdReport.Duration = duration;
+    //        claim.InvestigationReport.AgentIdReport.Distance = distance;
+    //        claim.InvestigationReport.AgentIdReport.DistanceInMetres = distanceInMetres;
+    //        claim.InvestigationReport.AgentIdReport.DurationInSeconds = durationInSecs;
 
 
     //        string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
@@ -171,12 +171,12 @@ public class ICheckifyService : IICheckifyService
     //            $"\r\n" +
     //            $"\r\nElevation(sea level):{weatherData.elevation} metres";
 
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImageData = weatherCustomData;
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImage = compressImage;
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImageMatchConfidence = confidence;
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImageLocationAddress = address;
-    //        claim.AgencyReport.AgentIdReport.MatchExecuted = true;
-    //        claim.AgencyReport.AgentIdReport.Similarity = similarity;
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImageData = weatherCustomData;
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImage = compressImage;
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImageMatchConfidence = confidence;
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImageLocationAddress = address;
+    //        claim.InvestigationReport.AgentIdReport.MatchExecuted = true;
+    //        claim.InvestigationReport.AgentIdReport.Similarity = similarity;
     //        var updateClaim = _context.ClaimsInvestigation.Update(claim);
 
     //        var rows = await _context.SaveChangesAsync();
@@ -187,22 +187,22 @@ public class ICheckifyService : IICheckifyService
     //        return new AppiCheckifyResponse
     //        {
     //            BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-    //            LocationImage = updateClaim.Entity.AgencyReport?.AgentIdReport?.DigitalIdImage != null ?
-    //            Convert.ToBase64String(claim.AgencyReport?.AgentIdReport?.DigitalIdImage) :
+    //            LocationImage = updateClaim.Entity.InvestigationReport?.AgentIdReport?.DigitalIdImage != null ?
+    //            Convert.ToBase64String(claim.InvestigationReport?.AgentIdReport?.DigitalIdImage) :
     //            Convert.ToBase64String(noDataimage),
-    //            LocationLongLat = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLat,
-    //            LocationTime = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime,
-    //            FacePercent = claim.AgencyReport.AgentIdReport?.DigitalIdImageMatchConfidence
+    //            LocationLongLat = claim.InvestigationReport.AgentIdReport?.DigitalIdImageLongLat,
+    //            LocationTime = claim.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime,
+    //            FacePercent = claim.InvestigationReport.AgentIdReport?.DigitalIdImageMatchConfidence
     //        };
     //    }
     //    catch (Exception ex)
     //    {
     //        Console.WriteLine(ex.StackTrace);
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImageData = "No Weather Data";
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImage = Convert.FromBase64String(data.LocationImage);
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImageMatchConfidence = string.Empty;
-    //        claim.AgencyReport.AgentIdReport.DigitalIdImageLocationAddress = "No Address data";
-    //        claim.AgencyReport.AgentIdReport.MatchExecuted = true;
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImageData = "No Weather Data";
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImage = Convert.FromBase64String(data.LocationImage);
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImageMatchConfidence = string.Empty;
+    //        claim.InvestigationReport.AgentIdReport.DigitalIdImageLocationAddress = "No Address data";
+    //        claim.InvestigationReport.AgentIdReport.MatchExecuted = true;
     //        var updateClaim = _context.ClaimsInvestigation.Update(claim);
     //        var rows = await _context.SaveChangesAsync();
     //        var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
@@ -210,12 +210,12 @@ public class ICheckifyService : IICheckifyService
     //        return new AppiCheckifyResponse
     //        {
     //            BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-    //            LocationImage = updateClaim.Entity.AgencyReport?.AgentIdReport?.DigitalIdImage != null ?
-    //            Convert.ToBase64String(claim.AgencyReport?.AgentIdReport?.DigitalIdImage) :
+    //            LocationImage = updateClaim.Entity.InvestigationReport?.AgentIdReport?.DigitalIdImage != null ?
+    //            Convert.ToBase64String(claim.InvestigationReport?.AgentIdReport?.DigitalIdImage) :
     //            Convert.ToBase64String(noData),
-    //            LocationLongLat = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLat,
-    //            LocationTime = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime,
-    //            FacePercent = claim.AgencyReport.AgentIdReport?.DigitalIdImageMatchConfidence
+    //            LocationLongLat = claim.InvestigationReport.AgentIdReport?.DigitalIdImageLongLat,
+    //            LocationTime = claim.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime,
+    //            FacePercent = claim.InvestigationReport.AgentIdReport?.DigitalIdImageMatchConfidence
     //        };
     //    }
     //}
@@ -224,37 +224,37 @@ public class ICheckifyService : IICheckifyService
     //    ClaimsInvestigation claim = null;
     //    try
     //    {
-    //        claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.DigitalIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+    //        claim = claimsService.GetClaims().Include(c => c.InvestigationReport).ThenInclude(c => c.DigitalIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
-    //        if (claim.AgencyReport == null)
+    //        if (claim.InvestigationReport == null)
     //        {
-    //            claim.AgencyReport = new AgencyReport();
+    //            claim.InvestigationReport = new InvestigationReport();
     //        }
            
     //        var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
     //        if (isClaim)
     //        {
-    //            claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date and time of death ?";
     //        }
     //        else
     //        {
-    //            claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
     //        }
 
-    //        claim.AgencyReport.AgentEmail = data.Email;
-    //        claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
-    //        claim.AgencyReport.DigitalIdReport.UpdatedBy = data.Email;
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat = data.LocationLongLat;
-    //        var longLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
-    //        var latitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-    //        var longitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+    //        claim.InvestigationReport.AgentEmail = data.Email;
+    //        claim.InvestigationReport.DigitalIdReport.Updated = DateTime.Now;
+    //        claim.InvestigationReport.DigitalIdReport.UpdatedBy = data.Email;
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImageLongLat = data.LocationLongLat;
+    //        var longLat = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+    //        var latitude = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+    //        var longitude = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
     //        var latLongString = latitude + "," + longitude;
     //        var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
     //        var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
@@ -292,11 +292,11 @@ public class ICheckifyService : IICheckifyService
     //        var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
 
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = map;
-    //        claim.AgencyReport.DigitalIdReport.Duration = duration;
-    //        claim.AgencyReport.DigitalIdReport.Distance = distance;
-    //        claim.AgencyReport.DigitalIdReport.DistanceInMetres = distanceInMetres;
-    //        claim.AgencyReport.DigitalIdReport.DurationInSeconds = durationInSecs;
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImageLocationUrl = map;
+    //        claim.InvestigationReport.DigitalIdReport.Duration = duration;
+    //        claim.InvestigationReport.DigitalIdReport.Distance = distance;
+    //        claim.InvestigationReport.DigitalIdReport.DistanceInMetres = distanceInMetres;
+    //        claim.InvestigationReport.DigitalIdReport.DurationInSeconds = durationInSecs;
 
 
     //        string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
@@ -305,12 +305,12 @@ public class ICheckifyService : IICheckifyService
     //            $"\r\n" +
     //            $"\r\nElevation(sea level):{weatherData.elevation} metres";
 
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImage = compressImage;
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = confidence;
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = address;
-    //        claim.AgencyReport.DigitalIdReport.MatchExecuted = true;
-    //        claim.AgencyReport.DigitalIdReport.Similarity = similarity;
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImage = compressImage;
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImageMatchConfidence = confidence;
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImageLocationAddress = address;
+    //        claim.InvestigationReport.DigitalIdReport.MatchExecuted = true;
+    //        claim.InvestigationReport.DigitalIdReport.Similarity = similarity;
     //       var updateClaim = _context.ClaimsInvestigation.Update(claim);
 
     //        var rows = await _context.SaveChangesAsync();
@@ -321,22 +321,22 @@ public class ICheckifyService : IICheckifyService
     //        return new AppiCheckifyResponse
     //        {
     //            BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-    //            LocationImage = updateClaim.Entity.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
-    //            Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage) :
+    //            LocationImage = updateClaim.Entity.InvestigationReport?.DigitalIdReport?.DigitalIdImage != null ?
+    //            Convert.ToBase64String(claim.InvestigationReport?.DigitalIdReport?.DigitalIdImage) :
     //            Convert.ToBase64String(noDataimage),
-    //            LocationLongLat = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat,
-    //            LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
-    //            FacePercent = claim.AgencyReport.DigitalIdReport?.DigitalIdImageMatchConfidence
+    //            LocationLongLat = claim.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLat,
+    //            LocationTime = claim.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLatTime,
+    //            FacePercent = claim.InvestigationReport.DigitalIdReport?.DigitalIdImageMatchConfidence
     //        };
     //    }
     //    catch (Exception ex)
     //    {
     //        Console.WriteLine(ex.StackTrace);
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImageData = "No Weather Data";
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImage = Convert.FromBase64String(data.LocationImage);
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
-    //        claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = "No Address data";
-    //        claim.AgencyReport.DigitalIdReport.MatchExecuted = true;
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImageData = "No Weather Data";
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImage = Convert.FromBase64String(data.LocationImage);
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
+    //        claim.InvestigationReport.DigitalIdReport.DigitalIdImageLocationAddress = "No Address data";
+    //        claim.InvestigationReport.DigitalIdReport.MatchExecuted = true;
     //        var updateClaim = _context.ClaimsInvestigation.Update(claim);
     //        var rows = await _context.SaveChangesAsync();
     //        var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
@@ -344,12 +344,12 @@ public class ICheckifyService : IICheckifyService
     //        return new AppiCheckifyResponse
     //        {
     //            BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-    //            LocationImage = updateClaim.Entity.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
-    //            Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage) :
+    //            LocationImage = updateClaim.Entity.InvestigationReport?.DigitalIdReport?.DigitalIdImage != null ?
+    //            Convert.ToBase64String(claim.InvestigationReport?.DigitalIdReport?.DigitalIdImage) :
     //            Convert.ToBase64String(noData),
-    //            LocationLongLat = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat,
-    //            LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
-    //            FacePercent = claim.AgencyReport.DigitalIdReport?.DigitalIdImageMatchConfidence
+    //            LocationLongLat = claim.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLat,
+    //            LocationTime = claim.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLatTime,
+    //            FacePercent = claim.InvestigationReport.DigitalIdReport?.DigitalIdImageMatchConfidence
     //        };
     //    }
     //}
@@ -360,34 +360,34 @@ public class ICheckifyService : IICheckifyService
     //    Task<string> addressTask = null;
     //    try
     //    {
-    //        claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.PanIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
-    //        if (claim.AgencyReport == null)
+    //        claim = claimsService.GetClaims().Include(c => c.InvestigationReport).ThenInclude(c => c.PanIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+    //        if (claim.InvestigationReport == null)
     //        {
-    //            claim.AgencyReport = new AgencyReport();
+    //            claim.InvestigationReport = new InvestigationReport();
     //        }
            
     //        var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
     //        if (isClaim)
     //        {
-    //            claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date and time of death ?";
     //        }
     //        else
     //        {
-    //            claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
     //        }
 
-    //        claim.AgencyReport.AgentEmail = data.Email;
-    //        claim.AgencyReport.PanIdReport.DocumentIdImageLongLat = data.OcrLongLat;
-    //        claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-    //        var longLat = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.IndexOf("/");
-    //        var latitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-    //        var longitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+    //        claim.InvestigationReport.AgentEmail = data.Email;
+    //        claim.InvestigationReport.PanIdReport.DocumentIdImageLongLat = data.OcrLongLat;
+    //        claim.InvestigationReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+    //        var longLat = claim.InvestigationReport.PanIdReport.DocumentIdImageLongLat.IndexOf("/");
+    //        var latitude = claim.InvestigationReport.PanIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+    //        var longitude = claim.InvestigationReport.PanIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
     //        var latLongString = latitude + "," + longitude;
     //        var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
     //        var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
@@ -421,11 +421,11 @@ public class ICheckifyService : IICheckifyService
     //        await Task.WhenAll(googleDetecTask, addressTask, mapTask);
 
     //        var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
-    //        claim.AgencyReport.PanIdReport.DistanceInMetres = distanceInMetres;
-    //        claim.AgencyReport.PanIdReport.DurationInSeconds = durationInSecs;
-    //        claim.AgencyReport.PanIdReport.Duration = duration;
-    //        claim.AgencyReport.PanIdReport.Distance = distance;
-    //        claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl = map;
+    //        claim.InvestigationReport.PanIdReport.DistanceInMetres = distanceInMetres;
+    //        claim.InvestigationReport.PanIdReport.DurationInSeconds = durationInSecs;
+    //        claim.InvestigationReport.PanIdReport.Duration = duration;
+    //        claim.InvestigationReport.PanIdReport.Distance = distance;
+    //        claim.InvestigationReport.PanIdReport.DocumentIdImageLocationUrl = map;
 
     //        var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
     //        var imageReadOnly = await googleDetecTask;
@@ -461,26 +461,26 @@ public class ICheckifyService : IICheckifyService
     //                    if (panResponse != null && panResponse.valid)
     //                    {
     //                        var panMatch = panRegex.Match(maskedImage.DocumentId);
-    //                        claim.AgencyReport.PanIdReport.DocumentIdImageValid = panMatch.Success && panResponse.valid ? true : false;
+    //                        claim.InvestigationReport.PanIdReport.DocumentIdImageValid = panMatch.Success && panResponse.valid ? true : false;
     //                    }
     //                }
     //                else
     //                {
     //                    var panMatch = panRegex.Match(maskedImage.DocumentId);
-    //                    claim.AgencyReport.PanIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
+    //                    claim.InvestigationReport.PanIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
     //                }
 
     //                #endregion PAN IMAGE PROCESSING
 
     //                var image = Convert.FromBase64String(maskedImage.MaskedImage);
     //                var savedMaskedImage = CompressImage.ProcessCompress(image);
-    //                claim.AgencyReport.PanIdReport.DocumentIdImage = savedMaskedImage;
-    //                claim.AgencyReport.PanIdReport.DocumentIdImageType = maskedImage.DocType;
-    //                claim.AgencyReport.PanIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
+    //                claim.InvestigationReport.PanIdReport.DocumentIdImage = savedMaskedImage;
+    //                claim.InvestigationReport.PanIdReport.DocumentIdImageType = maskedImage.DocType;
+    //                claim.InvestigationReport.PanIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
 
     //                if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
     //                {
-    //                    claim.AgencyReport.PanIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
+    //                    claim.InvestigationReport.PanIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
     //                        "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
     //                }
     //            }
@@ -488,9 +488,9 @@ public class ICheckifyService : IICheckifyService
     //            {
     //                Console.WriteLine(ex.StackTrace);
     //                var image = Convert.FromBase64String(maskedImage.MaskedImage);
-    //                claim.AgencyReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
-    //                claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-    //                claim.AgencyReport.PanIdReport.DocumentIdImageData = "no data: ";
+    //                claim.InvestigationReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+    //                claim.InvestigationReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+    //                claim.InvestigationReport.PanIdReport.DocumentIdImageData = "no data: ";
     //            }
     //        }
     //        //=================END GOOGLE VISION  API =========================
@@ -498,16 +498,16 @@ public class ICheckifyService : IICheckifyService
     //        else
     //        {
     //            var image = Convert.FromBase64String(data.OcrImage);
-    //            claim.AgencyReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
-    //            claim.AgencyReport.PanIdReport.DocumentIdImageValid = false;
-    //            claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-    //            claim.AgencyReport.PanIdReport.DocumentIdImageData = "no data: ";
+    //            claim.InvestigationReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+    //            claim.InvestigationReport.PanIdReport.DocumentIdImageValid = false;
+    //            claim.InvestigationReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+    //            claim.InvestigationReport.PanIdReport.DocumentIdImageData = "no data: ";
     //        }
 
     //        #endregion PAN IMAGE PROCESSING
     //        var rawAddress = await addressTask;
-    //        claim.AgencyReport.PanIdReport.DocumentIdImageLocationAddress = rawAddress;
-    //        claim.AgencyReport.PanIdReport.ValidationExecuted = true;
+    //        claim.InvestigationReport.PanIdReport.DocumentIdImageLocationAddress = rawAddress;
+    //        claim.InvestigationReport.PanIdReport.ValidationExecuted = true;
 
     //        _context.ClaimsInvestigation.Update(claim);
 
@@ -519,24 +519,24 @@ public class ICheckifyService : IICheckifyService
     //        return new AppiCheckifyResponse
     //        {
     //            BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
-    //            OcrImage = claim.AgencyReport.PanIdReport?.DocumentIdImage != null ?
-    //            Convert.ToBase64String(claim.AgencyReport.PanIdReport?.DocumentIdImage) :
+    //            OcrImage = claim.InvestigationReport.PanIdReport?.DocumentIdImage != null ?
+    //            Convert.ToBase64String(claim.InvestigationReport.PanIdReport?.DocumentIdImage) :
     //            Convert.ToBase64String(noDataimage),
-    //            OcrLongLat = claim.AgencyReport.PanIdReport?.DocumentIdImageLongLat,
-    //            OcrTime = claim.AgencyReport.PanIdReport?.DocumentIdImageLongLatTime,
-    //            PanValid = claim.AgencyReport.PanIdReport?.DocumentIdImageValid
+    //            OcrLongLat = claim.InvestigationReport.PanIdReport?.DocumentIdImageLongLat,
+    //            OcrTime = claim.InvestigationReport.PanIdReport?.DocumentIdImageLongLatTime,
+    //            PanValid = claim.InvestigationReport.PanIdReport?.DocumentIdImageValid
     //        };
     //    }
     //    catch (Exception ex)
     //    {
     //        Console.WriteLine(ex.StackTrace);
     //        var image = Convert.FromBase64String(data.OcrImage);
-    //        claim.AgencyReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
-    //        claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-    //        claim.AgencyReport.PanIdReport.DocumentIdImageData = "no data: ";
+    //        claim.InvestigationReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+    //        claim.InvestigationReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+    //        claim.InvestigationReport.PanIdReport.DocumentIdImageData = "no data: ";
     //        var rawAddress = await addressTask;
-    //        claim.AgencyReport.PanIdReport.DocumentIdImageLocationAddress = rawAddress;
-    //        claim.AgencyReport.PanIdReport.DocumentIdImageValid = false;
+    //        claim.InvestigationReport.PanIdReport.DocumentIdImageLocationAddress = rawAddress;
+    //        claim.InvestigationReport.PanIdReport.DocumentIdImageValid = false;
     //        _context.ClaimsInvestigation.Update(claim);
 
     //        var rows = await _context.SaveChangesAsync();
@@ -546,304 +546,304 @@ public class ICheckifyService : IICheckifyService
     //        return new AppiCheckifyResponse
     //        {
     //            BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
-    //            OcrImage = claim.AgencyReport.PanIdReport?.DocumentIdImage != null ?
-    //            Convert.ToBase64String(claim.AgencyReport.PanIdReport?.DocumentIdImage) :
+    //            OcrImage = claim.InvestigationReport.PanIdReport?.DocumentIdImage != null ?
+    //            Convert.ToBase64String(claim.InvestigationReport.PanIdReport?.DocumentIdImage) :
     //            Convert.ToBase64String(noDataimage),
-    //            OcrLongLat = claim.AgencyReport.PanIdReport?.DocumentIdImageLongLat,
-    //            OcrTime = claim.AgencyReport.PanIdReport?.DocumentIdImageLongLatTime,
-    //            PanValid = claim.AgencyReport.PanIdReport?.DocumentIdImageValid
+    //            OcrLongLat = claim.InvestigationReport.PanIdReport?.DocumentIdImageLongLat,
+    //            OcrTime = claim.InvestigationReport.PanIdReport?.DocumentIdImageLongLatTime,
+    //            PanValid = claim.InvestigationReport.PanIdReport?.DocumentIdImageValid
     //        };
     //    }
     //}
 
-    public async Task<AppiCheckifyResponse> GetAudio(AudioData data)
-    {
-        try
-        {
-
-            var claim = claimsService.GetClaims()
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.AudioReport)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
-            if (claim.AgencyReport == null)
-            {
-                claim.AgencyReport = new AgencyReport();
-            }
-            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
-
-            if (isClaim)
-            {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
-            }
-            else
-            {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
-            }
-
-            claim.AgencyReport.AgentEmail = data.Email;
-            claim.AgencyReport.AudioReport.DocumentIdImageLongLat = data.LongLat;
-            claim.AgencyReport.AudioReport.DocumentIdImageLongLatTime = DateTime.Now;
-            var longLat = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.IndexOf("/");
-            var latitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-            var longitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-            var latLongString = latitude + "," + longitude;
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
-
-            var expectedLat = string.Empty;
-            var expectedLong = string.Empty;
-            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
-            {
-                expectedLat = claim.CustomerDetail.Latitude;
-                expectedLong = claim.CustomerDetail.Longitude;
-            }
-            else
-            {
-                expectedLat = claim.BeneficiaryDetail.Latitude;
-                expectedLong = claim.BeneficiaryDetail.Longitude;
-            }
-            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A","X", "300", "300", "green", "red");
-
-
-            var rawAddressTask = httpClientService.GetRawAddress(latitude, longitude);
-            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-            var weatherDataTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-
-            claim.AgencyReport.AudioReport.ValidationExecuted = true;
-            claim.AgencyReport.AudioReport.DocumentIdImageValid = true;
-
-            claim.AgencyReport.AudioReport.DocumentIdImage = data.Mediabytes;
-
-            //TO-DO: AWS : SPEECH TO TEXT;
-            string audioDirectory = Path.Combine(webHostEnvironment.WebRootPath, "audio");
-            if (!Directory.Exists(audioDirectory))
-            {
-                Directory.CreateDirectory(audioDirectory);
-            }
-            string audioFileName = "audio"+ DateTime.Now.ToString("ddMMMyyyy") + data.Name;
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "audio", audioFileName);
-            var audioFileTask = File.WriteAllBytesAsync(filePath, data.Mediabytes);
-
-            var audio2Texttask = httpClientService.TranscribeAsync(audioS3FolderName, audioFileName, filePath);
-
-            await Task.WhenAll(rawAddressTask, weatherDataTask, audioFileTask, audio2Texttask, weatherDataTask);
-            var rawAddress = await rawAddressTask;
-            claim.AgencyReport.AudioReport.DocumentIdImageLocationAddress = rawAddress;
-            await audioFileTask;
-            var weatherData = await weatherDataTask;
-            await audio2Texttask;
-            var audioResult = await audio2Texttask;
-            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
-
-            claim.AgencyReport.AudioReport.DistanceInMetres = distanceInMetres;
-            claim.AgencyReport.AudioReport.DurationInSeconds = durationInSecs;
-            claim.AgencyReport.AudioReport.Duration = duration;
-            claim.AgencyReport.AudioReport.Distance = distance;
-            claim.AgencyReport.AudioReport.DocumentIdImageLocationUrl = map;
-            string audioData = "No data";
-            if (weatherData != null && weatherData.current != null && weatherData.current.temperature_2m != null)
-            {
-                audioData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                $"\r\n" +
-                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                $"\r\n" +
-                $"\r\nElevation(sea level):{weatherData.elevation} metres";
-            }
-            if (audioResult != null && audioResult.results != null && audioResult.results.audio_segments != null && audioResult.results.audio_segments.Count > 0)
-            {
-                audioData = audioData +  $"\r\n" +
-                    $"\r\n" +
-                $"\r\nAudio Text:  :{string.Join(" ", audioResult.results.audio_segments.Select(s => s.transcript))}";
-            }
-
-            claim.AgencyReport.AudioReport.DocumentIdImageData = audioData;
-            claim.AgencyReport.AudioReport.DocumentIdImagePath = filePath;
-            //END :: TO-DO: AWS : SPEECH TO TEXT;
-
-            var updatedClaim = _context.ClaimsInvestigation.Update(claim);
-            await _context.SaveChangesAsync();
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
-
-            var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
-            return new AppiCheckifyResponse
-            {
-                BeneficiaryId = updatedClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-                OcrImage = claim.AgencyReport.AudioReport?.DocumentIdImage != null ?
-                Convert.ToBase64String(claim.AgencyReport.AudioReport?.DocumentIdImage) :
-                Convert.ToBase64String(noDataimage),
-                OcrLongLat = claim.AgencyReport.AudioReport?.DocumentIdImageLongLat,
-                OcrTime = claim.AgencyReport.AudioReport?.DocumentIdImageLongLatTime,
-                PanValid = claim.AgencyReport.AudioReport?.DocumentIdImageValid
-            };
-
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.StackTrace);
-            throw;
-        }
-    }
-
-    public async Task<AppiCheckifyResponse> GetVideo(VideoData data)
-    {
-        try
-        {
-            var claim = claimsService.GetClaims()
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.VideoReport)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
-            if (claim.AgencyReport == null)
-            {
-                claim.AgencyReport = new AgencyReport();
-            }
-            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
-
-            if (isClaim)
-            {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
-            }
-            else
-            {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
-            }
-
-            claim.AgencyReport.AgentEmail = data.Email;
-            claim.AgencyReport.VideoReport.DocumentIdImageLongLat = data.LongLat;
-            claim.AgencyReport.VideoReport.DocumentIdImageLongLatTime = DateTime.Now;
-            var longLat = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.IndexOf("/");
-            var latitude = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-            var longitude = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-            var latLongString = latitude + "," + longitude;
-
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
-
-            var expectedLat = string.Empty;
-            var expectedLong = string.Empty;
-            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
-            {
-                expectedLat = claim.CustomerDetail.Latitude;
-                expectedLong = claim.CustomerDetail.Longitude;
-            }
-            else
-            {
-                expectedLat = claim.BeneficiaryDetail.Latitude;
-                expectedLong = claim.BeneficiaryDetail.Longitude;
-            }
-            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
-
-
-            var rawAddressTask = httpClientService.GetRawAddress(latitude, longitude);
-            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-
-            var weatherDataTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-
-            await Task.WhenAll(rawAddressTask, weatherDataTask, mapTask);
-
-            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
-            var rawAddress = await rawAddressTask;
-            var weatherData = await weatherDataTask;
-
-
-            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                $"\r\n" +
-                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                $"\r\n" +
-                $"\r\nElevation(sea level):{weatherData.elevation} metres";
-
-
-            claim.AgencyReport.VideoReport.DistanceInMetres = distanceInMetres;
-            claim.AgencyReport.VideoReport.DurationInSeconds = durationInSecs;
-            claim.AgencyReport.VideoReport.DocumentIdImageLocationUrl = map;
-            claim.AgencyReport.VideoReport.Duration = duration;
-            claim.AgencyReport.VideoReport.Distance = distance;
-            claim.AgencyReport.VideoReport.DocumentIdImageData = weatherCustomData;
-            claim.AgencyReport.VideoReport.DocumentIdImageLocationAddress = rawAddress;
-
-            claim.AgencyReport.VideoReport.ValidationExecuted = true;
-            claim.AgencyReport.VideoReport.DocumentIdImageValid = true;
-            claim.AgencyReport.VideoReport.DocumentIdImage = data.Mediabytes;
-
-            //TO-DO: AWS : SPEECH TO TEXT;
-
-            string videooDirectory = Path.Combine(webHostEnvironment.WebRootPath, "video");
-            if (!Directory.Exists(videooDirectory))
-            {
-                Directory.CreateDirectory(videooDirectory);
-            }
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "video", data.Email + DateTime.Now.ToString("ddMMMyyyy") + data.Name);
-            await File.WriteAllBytesAsync(filePath, data.Mediabytes);
-            claim.AgencyReport.VideoReport.DocumentIdImagePath = filePath;
-            //END :: TO-DO: AWS : SPEECH TO TEXT;
-
-
-            _context.ClaimsInvestigation.Update(claim);
-            await _context.SaveChangesAsync();
-
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
-
-            var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
-            return new AppiCheckifyResponse
-            {
-                BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
-                OcrImage = claim.AgencyReport.VideoReport?.DocumentIdImage != null ?
-                Convert.ToBase64String(claim.AgencyReport.VideoReport?.DocumentIdImage) :
-                Convert.ToBase64String(noDataimage),
-                OcrLongLat = claim.AgencyReport.VideoReport?.DocumentIdImageLongLat,
-                OcrTime = claim.AgencyReport.VideoReport?.DocumentIdImageLongLatTime,
-                PanValid = claim.AgencyReport.VideoReport?.DocumentIdImageValid
-            };
-
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.StackTrace);
-            throw;
-        }
-    }
-
-    //public async Task<AppiCheckifyResponse> GetPassportId(DocumentData data)
+    //public async Task<AppiCheckifyResponse> GetAudio(AudioData data)
     //{
     //    try
     //    {
-    //        var claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.PassportIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
-    //        if (claim.AgencyReport == null)
+
+    //        var claim = claimsService.GetClaims()
+    //            .Include(c => c.InvestigationReport)
+    //            .ThenInclude(c => c.AudioReport)
+    //            .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+    //        if (claim.InvestigationReport == null)
     //        {
-    //            claim.AgencyReport = new AgencyReport();
+    //            claim.InvestigationReport = new InvestigationReport();
     //        }
     //        var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
     //        if (isClaim)
     //        {
-    //            claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date and time of death ?";
     //        }
     //        else
     //        {
-    //            claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
-    //            claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
     //        }
 
-    //        claim.AgencyReport.AgentEmail = data.Email;
-    //        claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat = data.OcrLongLat;
-    //        claim.AgencyReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-    //        var longLat = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.IndexOf("/");
-    //        var latitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-    //        var longitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+    //        claim.InvestigationReport.AgentEmail = data.Email;
+    //        claim.InvestigationReport.AudioReport.DocumentIdImageLongLat = data.LongLat;
+    //        claim.InvestigationReport.AudioReport.DocumentIdImageLongLatTime = DateTime.Now;
+    //        var longLat = claim.InvestigationReport.AudioReport.DocumentIdImageLongLat.IndexOf("/");
+    //        var latitude = claim.InvestigationReport.AudioReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+    //        var longitude = claim.InvestigationReport.AudioReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+    //        var latLongString = latitude + "," + longitude;
+    //        var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+
+    //        var expectedLat = string.Empty;
+    //        var expectedLong = string.Empty;
+    //        if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
+    //        {
+    //            expectedLat = claim.CustomerDetail.Latitude;
+    //            expectedLong = claim.CustomerDetail.Longitude;
+    //        }
+    //        else
+    //        {
+    //            expectedLat = claim.BeneficiaryDetail.Latitude;
+    //            expectedLong = claim.BeneficiaryDetail.Longitude;
+    //        }
+    //        var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A","X", "300", "300", "green", "red");
+
+
+    //        var rawAddressTask = httpClientService.GetRawAddress(latitude, longitude);
+    //        var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+    //        var weatherDataTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+
+    //        claim.InvestigationReport.AudioReport.ValidationExecuted = true;
+    //        claim.InvestigationReport.AudioReport.DocumentIdImageValid = true;
+
+    //        claim.InvestigationReport.AudioReport.DocumentIdImage = data.Mediabytes;
+
+    //        //TO-DO: AWS : SPEECH TO TEXT;
+    //        string audioDirectory = Path.Combine(webHostEnvironment.WebRootPath, "audio");
+    //        if (!Directory.Exists(audioDirectory))
+    //        {
+    //            Directory.CreateDirectory(audioDirectory);
+    //        }
+    //        string audioFileName = "audio"+ DateTime.Now.ToString("ddMMMyyyy") + data.Name;
+    //        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "audio", audioFileName);
+    //        var audioFileTask = File.WriteAllBytesAsync(filePath, data.Mediabytes);
+
+    //        var audio2Texttask = httpClientService.TranscribeAsync(audioS3FolderName, audioFileName, filePath);
+
+    //        await Task.WhenAll(rawAddressTask, weatherDataTask, audioFileTask, audio2Texttask, weatherDataTask);
+    //        var rawAddress = await rawAddressTask;
+    //        claim.InvestigationReport.AudioReport.DocumentIdImageLocationAddress = rawAddress;
+    //        await audioFileTask;
+    //        var weatherData = await weatherDataTask;
+    //        await audio2Texttask;
+    //        var audioResult = await audio2Texttask;
+    //        var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
+
+    //        claim.InvestigationReport.AudioReport.DistanceInMetres = distanceInMetres;
+    //        claim.InvestigationReport.AudioReport.DurationInSeconds = durationInSecs;
+    //        claim.InvestigationReport.AudioReport.Duration = duration;
+    //        claim.InvestigationReport.AudioReport.Distance = distance;
+    //        claim.InvestigationReport.AudioReport.DocumentIdImageLocationUrl = map;
+    //        string audioData = "No data";
+    //        if (weatherData != null && weatherData.current != null && weatherData.current.temperature_2m != null)
+    //        {
+    //            audioData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+    //            $"\r\n" +
+    //            $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+    //            $"\r\n" +
+    //            $"\r\nElevation(sea level):{weatherData.elevation} metres";
+    //        }
+    //        if (audioResult != null && audioResult.results != null && audioResult.results.audio_segments != null && audioResult.results.audio_segments.Count > 0)
+    //        {
+    //            audioData = audioData +  $"\r\n" +
+    //                $"\r\n" +
+    //            $"\r\nAudio Text:  :{string.Join(" ", audioResult.results.audio_segments.Select(s => s.transcript))}";
+    //        }
+
+    //        claim.InvestigationReport.AudioReport.DocumentIdImageData = audioData;
+    //        claim.InvestigationReport.AudioReport.DocumentIdImagePath = filePath;
+    //        //END :: TO-DO: AWS : SPEECH TO TEXT;
+
+    //        var updatedClaim = _context.ClaimsInvestigation.Update(claim);
+    //        await _context.SaveChangesAsync();
+    //        var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+    //        var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+    //        return new AppiCheckifyResponse
+    //        {
+    //            BeneficiaryId = updatedClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
+    //            OcrImage = claim.InvestigationReport.AudioReport?.DocumentIdImage != null ?
+    //            Convert.ToBase64String(claim.InvestigationReport.AudioReport?.DocumentIdImage) :
+    //            Convert.ToBase64String(noDataimage),
+    //            OcrLongLat = claim.InvestigationReport.AudioReport?.DocumentIdImageLongLat,
+    //            OcrTime = claim.InvestigationReport.AudioReport?.DocumentIdImageLongLatTime,
+    //            PanValid = claim.InvestigationReport.AudioReport?.DocumentIdImageValid
+    //        };
+
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Console.WriteLine(ex.StackTrace);
+    //        throw;
+    //    }
+    //}
+
+    //public async Task<AppiCheckifyResponse> GetVideo(VideoData data)
+    //{
+    //    try
+    //    {
+    //        var claim = claimsService.GetClaims()
+    //            .Include(c => c.InvestigationReport)
+    //            .ThenInclude(c => c.VideoReport)
+    //            .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+    //        if (claim.InvestigationReport == null)
+    //        {
+    //            claim.InvestigationReport = new InvestigationReport();
+    //        }
+    //        var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
+
+    //        if (isClaim)
+    //        {
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+    //        }
+    //        else
+    //        {
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+    //        }
+
+    //        claim.InvestigationReport.AgentEmail = data.Email;
+    //        claim.InvestigationReport.VideoReport.DocumentIdImageLongLat = data.LongLat;
+    //        claim.InvestigationReport.VideoReport.DocumentIdImageLongLatTime = DateTime.Now;
+    //        var longLat = claim.InvestigationReport.VideoReport.DocumentIdImageLongLat.IndexOf("/");
+    //        var latitude = claim.InvestigationReport.VideoReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+    //        var longitude = claim.InvestigationReport.VideoReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+    //        var latLongString = latitude + "," + longitude;
+
+    //        var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+
+    //        var expectedLat = string.Empty;
+    //        var expectedLong = string.Empty;
+    //        if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
+    //        {
+    //            expectedLat = claim.CustomerDetail.Latitude;
+    //            expectedLong = claim.CustomerDetail.Longitude;
+    //        }
+    //        else
+    //        {
+    //            expectedLat = claim.BeneficiaryDetail.Latitude;
+    //            expectedLong = claim.BeneficiaryDetail.Longitude;
+    //        }
+    //        var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
+
+
+    //        var rawAddressTask = httpClientService.GetRawAddress(latitude, longitude);
+    //        var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+
+    //        var weatherDataTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+
+    //        await Task.WhenAll(rawAddressTask, weatherDataTask, mapTask);
+
+    //        var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
+    //        var rawAddress = await rawAddressTask;
+    //        var weatherData = await weatherDataTask;
+
+
+    //        string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+    //            $"\r\n" +
+    //            $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+    //            $"\r\n" +
+    //            $"\r\nElevation(sea level):{weatherData.elevation} metres";
+
+
+    //        claim.InvestigationReport.VideoReport.DistanceInMetres = distanceInMetres;
+    //        claim.InvestigationReport.VideoReport.DurationInSeconds = durationInSecs;
+    //        claim.InvestigationReport.VideoReport.DocumentIdImageLocationUrl = map;
+    //        claim.InvestigationReport.VideoReport.Duration = duration;
+    //        claim.InvestigationReport.VideoReport.Distance = distance;
+    //        claim.InvestigationReport.VideoReport.DocumentIdImageData = weatherCustomData;
+    //        claim.InvestigationReport.VideoReport.DocumentIdImageLocationAddress = rawAddress;
+
+    //        claim.InvestigationReport.VideoReport.ValidationExecuted = true;
+    //        claim.InvestigationReport.VideoReport.DocumentIdImageValid = true;
+    //        claim.InvestigationReport.VideoReport.DocumentIdImage = data.Mediabytes;
+
+    //        //TO-DO: AWS : SPEECH TO TEXT;
+
+    //        string videooDirectory = Path.Combine(webHostEnvironment.WebRootPath, "video");
+    //        if (!Directory.Exists(videooDirectory))
+    //        {
+    //            Directory.CreateDirectory(videooDirectory);
+    //        }
+    //        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "video", data.Email + DateTime.Now.ToString("ddMMMyyyy") + data.Name);
+    //        await File.WriteAllBytesAsync(filePath, data.Mediabytes);
+    //        claim.InvestigationReport.VideoReport.DocumentIdImagePath = filePath;
+    //        //END :: TO-DO: AWS : SPEECH TO TEXT;
+
+
+    //        _context.ClaimsInvestigation.Update(claim);
+    //        await _context.SaveChangesAsync();
+
+    //        var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+    //        var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+    //        return new AppiCheckifyResponse
+    //        {
+    //            BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
+    //            OcrImage = claim.InvestigationReport.VideoReport?.DocumentIdImage != null ?
+    //            Convert.ToBase64String(claim.InvestigationReport.VideoReport?.DocumentIdImage) :
+    //            Convert.ToBase64String(noDataimage),
+    //            OcrLongLat = claim.InvestigationReport.VideoReport?.DocumentIdImageLongLat,
+    //            OcrTime = claim.InvestigationReport.VideoReport?.DocumentIdImageLongLatTime,
+    //            PanValid = claim.InvestigationReport.VideoReport?.DocumentIdImageValid
+    //        };
+
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Console.WriteLine(ex.StackTrace);
+    //        throw;
+    //    }
+    //}
+
+    //public async Task<AppiCheckifyResponse> GetPassportId(DocumentData data)
+    //{
+    //    try
+    //    {
+    //        var claim = claimsService.GetClaims().Include(c => c.InvestigationReport).ThenInclude(c => c.PassportIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+    //        if (claim.InvestigationReport == null)
+    //        {
+    //            claim.InvestigationReport = new InvestigationReport();
+    //        }
+    //        var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
+
+    //        if (isClaim)
+    //        {
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+    //        }
+    //        else
+    //        {
+    //            claim.InvestigationReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+    //            claim.InvestigationReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+    //        }
+
+    //        claim.InvestigationReport.AgentEmail = data.Email;
+    //        claim.InvestigationReport.PassportIdReport.DocumentIdImageLongLat = data.OcrLongLat;
+    //        claim.InvestigationReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+    //        var longLat = claim.InvestigationReport.PassportIdReport.DocumentIdImageLongLat.IndexOf("/");
+    //        var latitude = claim.InvestigationReport.PassportIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+    //        var longitude = claim.InvestigationReport.PassportIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
     //        var latLongString = latitude + "," + longitude;
     //        var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
@@ -915,25 +915,25 @@ public class ICheckifyService : IICheckifyService
     //                    //to-do
     //                    var passportResponse = await httpClientService.VerifyPassport(maskedImage.DocumentId, maskedImage.DateOfBirth);
     //                    var panMatch = passportRegex.Match(maskedImage.DocumentId);
-    //                    claim.AgencyReport.PassportIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
+    //                    claim.InvestigationReport.PassportIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
     //                }
     //                else
     //                {
     //                    var panMatch = passportRegex.Match(maskedImage.DocumentId);
-    //                    claim.AgencyReport.PassportIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
+    //                    claim.InvestigationReport.PassportIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
     //                }
 
     //                #endregion PAN IMAGE PROCESSING
 
     //                var image = Convert.FromBase64String(maskedImage.MaskedImage);
     //                var savedMaskedImage = CompressImage.ProcessCompress(image);
-    //                claim.AgencyReport.PassportIdReport.DocumentIdImage = savedMaskedImage;
-    //                claim.AgencyReport.PassportIdReport.DocumentIdImageType = maskedImage.DocType;
-    //                claim.AgencyReport.PassportIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
+    //                claim.InvestigationReport.PassportIdReport.DocumentIdImage = savedMaskedImage;
+    //                claim.InvestigationReport.PassportIdReport.DocumentIdImageType = maskedImage.DocType;
+    //                claim.InvestigationReport.PassportIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
 
     //                if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
     //                {
-    //                    claim.AgencyReport.PassportIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
+    //                    claim.InvestigationReport.PassportIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
     //                        "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
     //                }
     //            }
@@ -941,9 +941,9 @@ public class ICheckifyService : IICheckifyService
     //            {
     //                Console.WriteLine(ex.StackTrace);
     //                var image = Convert.FromBase64String(maskedImage.MaskedImage);
-    //                claim.AgencyReport.PassportIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
-    //                claim.AgencyReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-    //                claim.AgencyReport.PassportIdReport.DocumentIdImageData = "no data: ";
+    //                claim.InvestigationReport.PassportIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+    //                claim.InvestigationReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+    //                claim.InvestigationReport.PassportIdReport.DocumentIdImageData = "no data: ";
     //            }
     //        }
     //        //=================END GOOGLE VISION  API =========================
@@ -951,21 +951,21 @@ public class ICheckifyService : IICheckifyService
     //        else
     //        {
     //            var image = Convert.FromBase64String(data.OcrImage);
-    //            claim.AgencyReport.PassportIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
-    //            claim.AgencyReport.PassportIdReport.DocumentIdImageValid = false;
-    //            claim.AgencyReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-    //            claim.AgencyReport.PassportIdReport.DocumentIdImageData = "no data: ";
+    //            claim.InvestigationReport.PassportIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+    //            claim.InvestigationReport.PassportIdReport.DocumentIdImageValid = false;
+    //            claim.InvestigationReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+    //            claim.InvestigationReport.PassportIdReport.DocumentIdImageData = "no data: ";
     //        }
 
     //        #endregion PAN IMAGE PROCESSING
     //        var rawAddress = await addressTask;
     //        var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
-    //        claim.AgencyReport.PassportIdReport.DistanceInMetres = distanceInMetres;
-    //        claim.AgencyReport.PassportIdReport.DurationInSeconds = durationInSecs;
-    //        claim.AgencyReport.PassportIdReport.Duration = duration;
-    //        claim.AgencyReport.PassportIdReport.Distance = distance;
-    //        claim.AgencyReport.PassportIdReport.DocumentIdImageLocationAddress = rawAddress;
-    //        claim.AgencyReport.PassportIdReport.ValidationExecuted = true;
+    //        claim.InvestigationReport.PassportIdReport.DistanceInMetres = distanceInMetres;
+    //        claim.InvestigationReport.PassportIdReport.DurationInSeconds = durationInSecs;
+    //        claim.InvestigationReport.PassportIdReport.Duration = duration;
+    //        claim.InvestigationReport.PassportIdReport.Distance = distance;
+    //        claim.InvestigationReport.PassportIdReport.DocumentIdImageLocationAddress = rawAddress;
+    //        claim.InvestigationReport.PassportIdReport.ValidationExecuted = true;
 
     //        _context.ClaimsInvestigation.Update(claim);
 
@@ -977,12 +977,12 @@ public class ICheckifyService : IICheckifyService
     //        return new AppiCheckifyResponse
     //        {
     //            BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
-    //            OcrImage = claim.AgencyReport.PassportIdReport?.DocumentIdImage != null ?
-    //            Convert.ToBase64String(claim.AgencyReport.PassportIdReport?.DocumentIdImage) :
+    //            OcrImage = claim.InvestigationReport.PassportIdReport?.DocumentIdImage != null ?
+    //            Convert.ToBase64String(claim.InvestigationReport.PassportIdReport?.DocumentIdImage) :
     //            Convert.ToBase64String(noDataimage),
-    //            OcrLongLat = claim.AgencyReport.PassportIdReport?.DocumentIdImageLongLat,
-    //            OcrTime = claim.AgencyReport.PassportIdReport?.DocumentIdImageLongLatTime,
-    //            PanValid = claim.AgencyReport.PassportIdReport?.DocumentIdImageValid
+    //            OcrLongLat = claim.InvestigationReport.PassportIdReport?.DocumentIdImageLongLat,
+    //            OcrTime = claim.InvestigationReport.PassportIdReport?.DocumentIdImageLongLatTime,
+    //            PanValid = claim.InvestigationReport.PassportIdReport?.DocumentIdImageValid
     //        };
     //    }
     //    catch (Exception ex)

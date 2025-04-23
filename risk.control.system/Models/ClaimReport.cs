@@ -28,9 +28,6 @@ namespace risk.control.system.Models
         public string? AssessorEmail { get; set; }
         public string? AssessorRemarks { get; set; }
         public AssessorRemarkType? AssessorRemarkType { get; set; }
-
-        public string ClaimsInvestigationId { get; set; }
-        public ClaimsInvestigation ClaimsInvestigation { get; set; }
         public virtual ServiceReportTemplate? ServiceReportTemplate { get; set; }
 
         public override string ToString()
@@ -44,8 +41,7 @@ namespace risk.control.system.Models
                 $"- Supervisor Remarks: {SupervisorRemarks}\n" +
                 $"- Assessor Remarks Updated time: {AssessorRemarksUpdated}\n" +
                 $"- Assessor Email: {AssessorEmail}\n" +
-                $"- Assessor Remarks: {AssessorRemarks}\n" +
-                $"- Claim Id: {ClaimsInvestigationId}";
+                $"- Assessor Remarks: {AssessorRemarks}\n";
         }
     }
 }

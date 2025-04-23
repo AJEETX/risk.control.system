@@ -2,8 +2,8 @@
 @model CaseInvestigationVendorsModel
 
 @{
-    var questionTime = @Model.AgencyReport.AgentRemarksUpdated != null ?
-    @Model.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var questionTime = @Model.InvestigationReport.AgentRemarksUpdated != null ?
+    @Model.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 }
 
 <div class="card border-success">
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="card-footer text-muted border-bottom-0">
-            <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.AgencyReport.AgentEmail </span>
+            <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.InvestigationReport.AgentEmail </span>
         </div>
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
@@ -45,7 +45,7 @@
                         <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
                         <br />
                         <ul class="ml-4 mb-0 fa-ul text-muted">
-                            @foreach (var question in Model.AgencyReport.CaseQuestionnaire.Questions)
+                            @foreach (var question in Model.InvestigationReport.CaseQuestionnaire.Questions)
                             {
                                 <li class="small">
                                     @question.QuestionText
@@ -63,7 +63,7 @@
                         <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
                         <br />
                         <ul class="ml-4 mb-0 fa-ul text-muted">
-                            @foreach (var question in Model.AgencyReport.CaseQuestionnaire.Questions)
+                            @foreach (var question in Model.InvestigationReport.CaseQuestionnaire.Questions)
                             {
                                 <li class="small">
                                     @question.AnswerText
@@ -87,12 +87,12 @@
 
                         @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
                         {
-                            <textarea asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks" rows="2"></textarea>
-                            <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
+                            <textarea asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks" rows="2"></textarea>
+                            <span asp-validation-for="InvestigationReport.AgentRemarks" class="text-danger"></span>
                         }
                         else
                         {
-                            @Model.AgencyReport?.AgentRemarks
+                            @Model.InvestigationReport?.AgentRemarks
 
                         }
                     </p>

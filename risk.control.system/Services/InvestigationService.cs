@@ -266,7 +266,7 @@ namespace risk.control.system.Services
                     // Fetch existing customer to retain the existing ProfilePicture
                     var existingCustomer = await context.CustomerDetail
                         .AsNoTracking()
-                        .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
+                        .FirstOrDefaultAsync(c => c.InvestigationTaskId == customerDetail.InvestigationTaskId);
                     customerDetail.ProfilePicture ??= existingCustomer.ProfilePicture;
                 }
                 claimsInvestigation.IsNew = true;
@@ -533,14 +533,18 @@ namespace risk.control.system.Services
               $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
+
+            var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+
             var model = new CaseTransactionModel
             {
                 ClaimsInvestigation = claim,
                 CaseIsValidToAssign = claim.IsValidCaseData(),
                 Location = claim.BeneficiaryDetail,
                 Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = companyUser.ClientCompany.AutoAllocation,
+                AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
                 TimeTaken = totalTimeTaken,
+                VendorInvoice = invoice,
                 Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
             };
 

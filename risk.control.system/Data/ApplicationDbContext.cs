@@ -33,7 +33,6 @@ namespace risk.control.system.Data
         public virtual DbSet<PermissionType> PermissionType { get; set; }
         public virtual DbSet<ClaimMessage> ClaimMessage { get; set; }
         public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }
-        public virtual DbSet<InvestigationTransaction> InvestigationTransaction { get; set; }
         public virtual DbSet<ClientCompanyApplicationUser> ClientCompanyApplicationUser { get; set; }
         public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
 
@@ -55,7 +54,6 @@ namespace risk.control.system.Data
         public virtual DbSet<VendorApplicationUser> VendorApplicationUser { get; set; } = default!;
         public virtual DbSet<EnquiryRequest> QueryRequest { get; set; } = default!;
         public virtual DbSet<FileOnFileSystemModel> FilesOnFileSystem { get; set; }
-        public DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; } = default!;
         public DbSet<PolicyDetail> PolicyDetail { get; set; } = default!;
         public DbSet<CustomerDetail> CustomerDetail { get; set; } = default!;
         public DbSet<BeneficiaryDetail> BeneficiaryDetail { get; set; } = default!;
@@ -63,6 +61,6 @@ namespace risk.control.system.Data
         public DbSet<DigitalIdReport> DigitalIdReport { get; set; } = default!;
         public DbSet<DocumentIdReport> PanIdReport { get; set; } = default!;
         public DbSet<DocumentIdReport> PassportIdReport { get; set; } = default!;
-        public DbSet<AgencyReport> AgencyReport { get; set; } = default!;
+        public DbSet<InvestigationReport> InvestigationReport { get; set; } = default!;
     }
 }

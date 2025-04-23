@@ -8,7 +8,6 @@ namespace risk.control.system.Helpers
         {
             return policyDetail != null && policyDetail != null &&
                !string.IsNullOrWhiteSpace(policyDetail.ContractNumber.Trim()) &&
-                policyDetail.LineOfBusinessId > 0 &&
                 policyDetail.InvestigationServiceTypeId > 0 &&
                !string.IsNullOrWhiteSpace(policyDetail.CauseOfLoss) &&
                 policyDetail.SumAssuredValue != null &&
@@ -40,13 +39,6 @@ namespace risk.control.system.Helpers
         public static bool IsValidCaseData(this InvestigationTask claim)
         {
             var validPolicy = claim.PolicyDetail.IsValidCaseDetail();
-            var validCustomer = claim.PolicyDetail.IsValidCustomer(claim.CustomerDetail);
-            var validBeneficiary = claim.PolicyDetail.IsValidBeneficiary(claim.BeneficiaryDetail);
-            return validPolicy && validCustomer && validBeneficiary;
-        }
-        public static bool IsValidCaseData(this ClaimsInvestigation claim)
-        {
-            var validPolicy = claim.PolicyDetail.IsValidPolicy();
             var validCustomer = claim.PolicyDetail.IsValidCustomer(claim.CustomerDetail);
             var validBeneficiary = claim.PolicyDetail.IsValidBeneficiary(claim.BeneficiaryDetail);
             return validPolicy && validCustomer && validBeneficiary;

@@ -1,16 +1,16 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@* @model ClaimsInvestigationVendorsModel
 
 @{
-    var imageCapturedTime = @Model.AgencyReport?.VideoReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.VideoReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var imageCapturedTime = @Model.InvestigationReport?.VideoReport?.DocumentIdImageLongLatTime != null ? @Model.InvestigationReport?.VideoReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
     string videoIdColor = "progress-bar-grey";
     var videoIdColorBorderColor = "";
-    if (Model.AgencyReport.VideoReport?.DocumentIdImageLongLat == null)
+    if (Model.InvestigationReport.VideoReport?.DocumentIdImageLongLat == null)
     {
 
     }
-    else if (Model.AgencyReport.VideoReport?.DocumentIdImageLongLat != null && (
-    Model.AgencyReport?.VideoReport?.DocumentIdImageValid != null && Model.AgencyReport?.VideoReport?.DocumentIdImageValid == true))
+    else if (Model.InvestigationReport.VideoReport?.DocumentIdImageLongLat != null && (
+    Model.InvestigationReport?.VideoReport?.DocumentIdImageValid != null && Model.InvestigationReport?.VideoReport?.DocumentIdImageValid == true))
     {
         videoIdColor = "progress-bar-green";
         videoIdColorBorderColor = "border-success";
@@ -75,7 +75,7 @@
                     </span>
                 </h3>
                 <div class="card-tools">
-                    <span data-toggle="tooltip" title="Agent report # : @Model.AgencyReport.AgentEmail" class="badge badge-light">
+                    <span data-toggle="tooltip" title="Agent report # : @Model.InvestigationReport.AgentEmail" class="badge badge-light">
                         <i class="nav-icon fas fa-clock"></i>
                         @imageCapturedTime
                     </span>
@@ -90,7 +90,7 @@
                 {
                     <i class='fa fa-times i-grey' aria-hidden='true'></i>
                 }
-                else if (@Model.AgencyReport?.VideoReport?.DocumentIdImageValid.Value ?? false)
+                else if (@Model.InvestigationReport?.VideoReport?.DocumentIdImageValid.Value ?? false)
                 {
                     <i class='fas fa-check-circle i-green'></i>
                 }
@@ -113,10 +113,10 @@
                             <span class="badge badge-light"><i class="fas fa-film"></i> Video File</span>:
                             <br />
                             @{
-                                if (Model.AgencyReport?.VideoReport?.DocumentIdImage != null)
+                                if (Model.InvestigationReport?.VideoReport?.DocumentIdImage != null)
                                 {
                                     <video id="videoPlayer" controls class="img-fluid video-Image" data-toggle="tooltip" title="Video File">
-                                        <source src="/Uploads/GetVideoFile?fileName=@Model.AgencyReport.VideoReport.DocumentIdImagePath" type="video/mp4">
+                                        <source src="/Uploads/GetVideoFile?fileName=@Model.InvestigationReport.VideoReport.DocumentIdImagePath" type="video/mp4">
                                         Your browser does not support the video element.
                                     </video>
                                 }
@@ -131,7 +131,7 @@
 
                             <span class="badge badge-light"><i class="fas fa-info"></i> Video Scan Info</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.VideoReport?.DocumentIdImageData</label>
+                            <label class="img-fluid ocr-data"> @Model.InvestigationReport?.VideoReport?.DocumentIdImageData</label>
                         </p>
                     </div>
                     <div class="col-6 text">
@@ -139,9 +139,9 @@
                         <p class="text-muted text-sm">
                             <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                             <br />
-                            @if (@Model.AgencyReport?.VideoReport?.DocumentIdImageLocationUrl != null)
+                            @if (@Model.InvestigationReport?.VideoReport?.DocumentIdImageLocationUrl != null)
                             {
-                                <img class="img-fluid videolocationImage" src="@Model.AgencyReport?.VideoReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
+                                <img class="img-fluid videolocationImage" src="@Model.InvestigationReport?.VideoReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
                             }
                             else
                             {
@@ -153,13 +153,13 @@
 
                             <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.VideoReport?.DocumentIdImageLocationAddress</label>
+                            <label class="img-fluid ocr-data"> @Model.InvestigationReport?.VideoReport?.DocumentIdImageLocationAddress</label>
                         </p>
                     </div>
                 </div>
             </div>
         </div>
-        @if (@Model.AgencyReport?.VideoReport?.DocumentIdImageLocationUrl != null)
+        @if (@Model.InvestigationReport?.VideoReport?.DocumentIdImageLocationUrl != null)
         {
             <div class="card direct-chat direct-chat-warning collapsed-card">
                 <div class="card-header">
@@ -182,4 +182,4 @@
 
         }
     </div>
-}
+} *@

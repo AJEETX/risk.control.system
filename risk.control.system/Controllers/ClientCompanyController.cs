@@ -145,7 +145,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
 
             }
-            var hasClaims = _context.ClaimsInvestigation.Any(c => c.ClientCompanyId == id && !c.Deleted);
+            var hasClaims = _context.Investigations.Any(c => c.ClientCompanyId == id && !c.Deleted);
             clientCompany.HasClaims = hasClaims;
             return View(clientCompany);
         }

@@ -2,10 +2,10 @@
 @model CaseInvestigationVendorsModel
 
 @{
-    var questionTime = @Model.AgencyReport.AgentRemarksUpdated != null ? @Model.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var questionTime = @Model.InvestigationReport.AgentRemarksUpdated != null ? @Model.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
     string questionaire = "progress-bar-grey";
-    if (Model.AgencyReport.AgentRemarks != null)
+    if (Model.InvestigationReport.AgentRemarks != null)
     {
         questionaire = "progress-bar-green";
     }
@@ -32,7 +32,7 @@
                 
             </div>
             <div class="card-footer text-muted border-bottom-0">
-                <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.AgencyReport.AgentEmail </span>
+                <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.InvestigationReport.AgentEmail </span>
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
@@ -114,11 +114,11 @@
                                 <span class="input-group-label"> Remarks :</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="AgencyReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" asp-for="InvestigationReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <textarea required name="remarks" id="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter remarks"
+                                    <textarea required name="remarks" id="remarks" asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter remarks"
                                               type="text" placeholder="Remarks" rows="2"></textarea>
-                                    <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
+                                    <span asp-validation-for="InvestigationReport.AgentRemarks" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 d-flex justify-content-center align-items-center">
@@ -138,8 +138,8 @@
 
                     <div class="text-right">
                         <a id="back" asp-controller="Agent" asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
-                        @if (@Model.AgencyReport?.AgentIdReport?.DigitalIdImageLocationUrl != null && @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && 
-                            @Model.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl != null)
+                        @if (@Model.InvestigationReport?.AgentIdReport?.DigitalIdImageLocationUrl != null && @Model.InvestigationReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && 
+                            @Model.InvestigationReport?.PanIdReport?.DocumentIdImageLocationUrl != null)
                         {
                             <button disabled id="submit-case" type="submit" class="btn btn-danger">
                                 <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT

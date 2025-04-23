@@ -16,17 +16,17 @@ namespace risk.control.system.Services
 {
     public interface ICaseVendorService
     {
-        Task<ClaimsInvestigation> AllocateToVendorAgent(string userEmail, string selectedcase);
+        //Task<ClaimsInvestigation> AllocateToVendorAgent(string userEmail, string selectedcase);
 
-        Task<ClaimsInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, string selectedcase);
+        //Task<ClaimsInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, string selectedcase);
 
-        Task<ClaimsInvestigationVendorAgentModel> ReSelectVendorAgent(string userEmail, string selectedcase);
+        //Task<ClaimsInvestigationVendorAgentModel> ReSelectVendorAgent(string userEmail, string selectedcase);
 
         Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false);
 
         Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase);
 
-        Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase);
+        //Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase);
     }
 
     public class CaseVendorService : ICaseVendorService
@@ -58,41 +58,41 @@ namespace risk.control.system.Services
             this.featureManager = featureManager;
             this.claimsService = claimsService;
         }
-        public async Task<ClaimsInvestigation> AllocateToVendorAgent(string userEmail, string selectedcase)
-        {
-            var vendorUser =await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+        //public async Task<ClaimsInvestigation> AllocateToVendorAgent(string userEmail, string selectedcase)
+        //{
+        //    var vendorUser =await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var claimsInvestigation = claimsService.GetClaims().FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase && m.VendorId == vendorUser.VendorId);
+        //    var claimsInvestigation = claimsService.GetClaims().FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase && m.VendorId == vendorUser.VendorId);
 
-            return claimsInvestigation;
-        }
+        //    return claimsInvestigation;
+        //}
 
-        public async Task<ClaimsInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, string selectedcase)
-        {
-            var claimsAllocate2Agent = claimsService.GetClaims().Include(c=>c.AgencyReport).FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
+        //public async Task<ClaimsInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, string selectedcase)
+        //{
+        //    var claimsAllocate2Agent = claimsService.GetClaims().Include(c=>c.InvestigationReport).FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
             
-            var beneficiaryDetail = await _context.BeneficiaryDetail
-                .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.PinCode)
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.Country)
-                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claimsAllocate2Agent.BeneficiaryDetail.BeneficiaryDetailId);
+        //    var beneficiaryDetail = await _context.BeneficiaryDetail
+        //        .Include(c => c.ClaimsInvestigation)
+        //        .Include(c => c.PinCode)
+        //        .Include(c => c.BeneficiaryRelation)
+        //        .Include(c => c.District)
+        //        .Include(c => c.State)
+        //        .Include(c => c.Country)
+        //        .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claimsAllocate2Agent.BeneficiaryDetail.BeneficiaryDetailId);
 
-            var maskedCustomerContact = new string('*', claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4) + claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Substring(claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claimsAllocate2Agent.CustomerDetail.ContactNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', beneficiaryDetail.ContactNumber.ToString().Length - 4) + beneficiaryDetail.ContactNumber.ToString().Substring(beneficiaryDetail.ContactNumber.ToString().Length - 4);
-            claimsAllocate2Agent.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
-            beneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+        //    var maskedCustomerContact = new string('*', claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4) + claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Substring(claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4);
+        //    claimsAllocate2Agent.CustomerDetail.ContactNumber = maskedCustomerContact;
+        //    var maskedBeneficiaryContact = new string('*', beneficiaryDetail.ContactNumber.ToString().Length - 4) + beneficiaryDetail.ContactNumber.ToString().Substring(beneficiaryDetail.ContactNumber.ToString().Length - 4);
+        //    claimsAllocate2Agent.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+        //    beneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
             
-            var model = new ClaimsInvestigationVendorAgentModel
-            {
-                CaseLocation = beneficiaryDetail,
-                ClaimsInvestigation = claimsAllocate2Agent,
-            };
-            return model;
-        }
+        //    var model = new ClaimsInvestigationVendorAgentModel
+        //    {
+        //        CaseLocation = beneficiaryDetail,
+        //        ClaimsInvestigation = claimsAllocate2Agent,
+        //    };
+        //    return model;
+        //}
 
         public async Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false)
         {
@@ -151,7 +151,7 @@ namespace risk.control.system.Services
 
             var model = new CaseInvestigationVendorsModel 
             {
-                AgencyReport = claim.InvestigationReport, 
+                InvestigationReport = claim.InvestigationReport, 
                 Location = claim.BeneficiaryDetail, 
                 ClaimsInvestigation = claim ,
                 QuestionFormViewModel = questionModel
@@ -231,128 +231,128 @@ namespace risk.control.system.Services
             
             var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
-            return (new CaseInvestigationVendorsModel { AgencyReport = claim.InvestigationReport, Location = beneficiaryDetails, ClaimsInvestigation = claim });
+            return (new CaseInvestigationVendorsModel { InvestigationReport = claim.InvestigationReport, Location = beneficiaryDetails, ClaimsInvestigation = claim });
         }
 
-        public async Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase)
-        {
-            var agencyUser =await _context.VendorApplicationUser.FirstOrDefaultAsync(u=>u.Email == userEmail);
+        //public async Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase)
+        //{
+        //    var agencyUser =await _context.VendorApplicationUser.FirstOrDefaultAsync(u=>u.Email == userEmail);
 
-            var claim = claimsService.GetClaims()
-                .Include(c=>c.Vendor)
-                .Include(c=>c.AgencyReport)
-                .ThenInclude(c=>c.EnquiryRequest)
-                .Include(c=>c.AgencyReport.AgentIdReport)
-                .Include(c=>c.AgencyReport.DigitalIdReport)
-                .Include(c=>c.AgencyReport.PanIdReport)
-                .Include(c=>c.AgencyReport.PassportIdReport)
-                .Include(c=>c.AgencyReport.AudioReport)
-                .Include(c=>c.AgencyReport.VideoReport)
-                .Include(c=>c.AgencyReport.ReportQuestionaire)
-                .Include(c=>c.ClaimNotes)
-                .Include(c=>c.ClaimMessages)
-                .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase);
+        //    var claim = claimsService.GetClaims()
+        //        .Include(c=>c.Vendor)
+        //        .Include(c=>c.InvestigationReport)
+        //        .ThenInclude(c=>c.EnquiryRequest)
+        //        .Include(c=>c.InvestigationReport.AgentIdReport)
+        //        .Include(c=>c.InvestigationReport.DigitalIdReport)
+        //        .Include(c=>c.InvestigationReport.PanIdReport)
+        //        .Include(c=>c.InvestigationReport.PassportIdReport)
+        //        .Include(c=>c.InvestigationReport.AudioReport)
+        //        .Include(c=>c.InvestigationReport.VideoReport)
+        //        .Include(c=>c.InvestigationReport.ReportQuestionaire)
+        //        .Include(c=>c.ClaimNotes)
+        //        .Include(c=>c.ClaimMessages)
+        //        .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase);
 
-            var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claim.CustomerDetail.ContactNumber = customerContactMasked;
+        //    var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+        //    claim.CustomerDetail.ContactNumber = customerContactMasked;
 
-            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+        //    var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
 
-            claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
-            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
+        //    claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+        //    var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
 
-            if (isClaim)
-            {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
-            }
-            else
-            {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
-            }
-            claim.AgencyDeclineComment = string.Empty;
-            return new ClaimTransactionModel
-            {
-                ClaimsInvestigation = claim,
-                Location = claim.BeneficiaryDetail,
-                NotWithdrawable = claim.NotDeclinable,
-            };
-        }
+        //    if (isClaim)
+        //    {
+        //        claim.InvestigationReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+        //        claim.InvestigationReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+        //        claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+        //        claim.InvestigationReport.ReportQuestionaire.Question4 = "Date and time of death ?";
+        //    }
+        //    else
+        //    {
+        //        claim.InvestigationReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+        //        claim.InvestigationReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+        //        claim.InvestigationReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+        //        claim.InvestigationReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+        //    }
+        //    claim.AgencyDeclineComment = string.Empty;
+        //    return new ClaimTransactionModel
+        //    {
+        //        ClaimsInvestigation = claim,
+        //        Location = claim.BeneficiaryDetail,
+        //        NotWithdrawable = claim.NotDeclinable,
+        //    };
+        //}
 
-        public async Task<ClaimsInvestigationVendorAgentModel> ReSelectVendorAgent(string userEmail, string selectedcase)
-        {
-            var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+        //public async Task<ClaimsInvestigationVendorAgentModel> ReSelectVendorAgent(string userEmail, string selectedcase)
+        //{
+        //    var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+        //    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
-            var claimsCaseToAllocateToVendorAgent = claimsService.GetClaims().FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
+        //    var claimsCaseToAllocateToVendorAgent = claimsService.GetClaims().FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
 
-            var location = claimsCaseToAllocateToVendorAgent.BeneficiaryDetail;
+        //    var location = claimsCaseToAllocateToVendorAgent.BeneficiaryDetail;
 
-            var claimsCaseLocation = _context.BeneficiaryDetail
-                .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.PinCode)
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.Country)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == location.BeneficiaryDetailId);
+        //    var claimsCaseLocation = _context.BeneficiaryDetail
+        //        .Include(c => c.ClaimsInvestigation)
+        //        .Include(c => c.PinCode)
+        //        .Include(c => c.BeneficiaryRelation)
+        //        .Include(c => c.District)
+        //        .Include(c => c.State)
+        //        .Include(c => c.Country)
+        //        .FirstOrDefault(c => c.BeneficiaryDetailId == location.BeneficiaryDetailId);
 
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+        //    var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
-            var vendorUsers = _context.VendorApplicationUser
-                .Include(u => u.District)
-                .Include(u => u.State)
-                .Include(u => u.Country)
-                .Include(u => u.PinCode)
-                .Where(u => u.VendorId == claimsCaseToAllocateToVendorAgent.VendorId && u.Active);
+        //    var vendorUsers = _context.VendorApplicationUser
+        //        .Include(u => u.District)
+        //        .Include(u => u.State)
+        //        .Include(u => u.Country)
+        //        .Include(u => u.PinCode)
+        //        .Where(u => u.VendorId == claimsCaseToAllocateToVendorAgent.VendorId && u.Active);
 
-            List<VendorUserClaim> agents = new List<VendorUserClaim>();
-            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
+        //    List<VendorUserClaim> agents = new List<VendorUserClaim>();
+        //    var result = dashboardService.CalculateAgentCaseStatus(userEmail);
 
-            foreach (var vendorUser in vendorUsers)
-            {
-                var isTrue = await userManager.IsInRoleAsync(vendorUser, agentRole?.Name);
-                if (isTrue)
-                {
-                    int claimCount = 0;
-                    if (result.TryGetValue(vendorUser.Email, out claimCount))
-                    {
-                        var agentData = new VendorUserClaim
-                        {
-                            AgencyUser = vendorUser,
-                            CurrentCaseCount = claimCount,
-                        };
-                        agents.Add(agentData);
-                    }
-                    else
-                    {
-                        var agentData = new VendorUserClaim
-                        {
-                            AgencyUser = vendorUser,
-                            CurrentCaseCount = 0,
-                        };
-                        agents.Add(agentData);
-                    }
-                }
-            }
+        //    foreach (var vendorUser in vendorUsers)
+        //    {
+        //        var isTrue = await userManager.IsInRoleAsync(vendorUser, agentRole?.Name);
+        //        if (isTrue)
+        //        {
+        //            int claimCount = 0;
+        //            if (result.TryGetValue(vendorUser.Email, out claimCount))
+        //            {
+        //                var agentData = new VendorUserClaim
+        //                {
+        //                    AgencyUser = vendorUser,
+        //                    CurrentCaseCount = claimCount,
+        //                };
+        //                agents.Add(agentData);
+        //            }
+        //            else
+        //            {
+        //                var agentData = new VendorUserClaim
+        //                {
+        //                    AgencyUser = vendorUser,
+        //                    CurrentCaseCount = 0,
+        //                };
+        //                agents.Add(agentData);
+        //            }
+        //        }
+        //    }
 
-            var model = new ClaimsInvestigationVendorAgentModel
-            {
-                CaseLocation = claimsCaseLocation,
-                ClaimsInvestigation = claimsCaseToAllocateToVendorAgent,
-                VendorUserClaims = agents
-            };
+        //    var model = new ClaimsInvestigationVendorAgentModel
+        //    {
+        //        CaseLocation = claimsCaseLocation,
+        //        ClaimsInvestigation = claimsCaseToAllocateToVendorAgent,
+        //        VendorUserClaims = agents
+        //    };
 
-            claimsCaseToAllocateToVendorAgent.AgencyReport = null;
+        //    claimsCaseToAllocateToVendorAgent.InvestigationReport = null;
 
-            _context.SaveChanges();
+        //    _context.SaveChanges();
 
-            return model;
-        }
+        //    return model;
+        //}
     }
 }

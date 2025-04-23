@@ -32,27 +32,18 @@ namespace risk.control.system.Controllers.Company
         private readonly IFtpService ftpService;
         private readonly IInvestigationService service;
         private readonly INotyfService notifyService;
-        private readonly ICreatorService creatorService;
-        private readonly IInvestigationReportService investigationReportService;
-        private readonly IClaimPolicyService claimPolicyService;
 
         public CaseUploadController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
             IFtpService ftpService,
             IInvestigationService service,
-            INotyfService notifyService,
-            ICreatorService creatorService,
-            IInvestigationReportService investigationReportService,
-            IClaimPolicyService claimPolicyService)
+            INotyfService notifyService)
         {
             _context = context;
-            this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
             this.ftpService = ftpService;
             this.service = service;
             this.notifyService = notifyService;
-            this.creatorService = creatorService;
-            this.investigationReportService = investigationReportService;
         }
 
         public IActionResult Index()

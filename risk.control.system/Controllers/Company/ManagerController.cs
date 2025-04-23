@@ -22,17 +22,14 @@ namespace risk.control.system.Controllers.Company
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
         private readonly IInvestigationService investigativeService;
-        private readonly IInvestigationReportService investigationReportService;
 
         public ManagerController(INotyfService notifyService,
             IInvoiceService invoiceService,
-            IInvestigationService investigativeService,
-            IInvestigationReportService investigationReportService)
+            IInvestigationService investigativeService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
             this.investigativeService = investigativeService;
-            this.investigationReportService = investigationReportService;
         }
         public IActionResult Index()
         {
@@ -76,7 +73,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model =await investigativeService.GetClaimDetails(currentUserEmail, id);
+                var model =await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -125,7 +122,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigativeService.GetClaimDetails(currentUserEmail, id);
+                var model = await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -149,7 +146,7 @@ namespace risk.control.system.Controllers.Company
             return View();
         }
         [Breadcrumb(title: " Details",FromAction = "Approved")]
-        public async Task<IActionResult> ApprovedDetail(string id)
+        public async Task<IActionResult> ApprovedDetail(long id)
         {
             try
             {
@@ -159,13 +156,13 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (string.IsNullOrWhiteSpace(id))
+                if (id < 1)
                 {
                     notifyService.Error("Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                var model = await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -192,7 +189,7 @@ namespace risk.control.system.Controllers.Company
 
 
         [Breadcrumb(" Details", FromAction = "Rejected")]
-        public async Task<IActionResult> RejectDetail(string id)
+        public async Task<IActionResult> RejectDetail(long id)
         {
             try
             {
@@ -202,12 +199,12 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (string.IsNullOrWhiteSpace(id))
+                if (id < 1)
                 {
                     notifyService.Error("Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                var model = await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -232,7 +229,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (id==0)
+                if (id < 1)
                 {
                     notifyService.Error("Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");

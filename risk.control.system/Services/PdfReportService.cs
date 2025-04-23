@@ -106,7 +106,7 @@ namespace risk.control.system.Services
                 ClientCompany = currentUser.ClientCompany,
                 UpdatedBy = userEmail,
                 VendorId = vendor.VendorId,
-                AgencyReportId = claim.InvestigationReport?.Id,
+                InvestigationReportId = claim.InvestigationReport?.Id,
                 SubTotal = investigationServiced.Price,
                 TaxAmount = investigationServiced.Price * (1 / 10),
                 InvestigationServiceType = investigatService,

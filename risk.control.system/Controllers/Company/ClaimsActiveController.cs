@@ -33,22 +33,16 @@ namespace risk.control.system.Controllers.Company
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
-        private readonly IInvestigationReportService investigationReportService;
-        private readonly IClaimPolicyService claimPolicyService;
 
         public ClaimsActiveController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
             IFtpService ftpService,
-            INotyfService notifyService,
-            IInvestigationReportService investigationReportService,
-            IClaimPolicyService claimPolicyService)
+            INotyfService notifyService)
         {
             _context = context;
-            this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
-            this.investigationReportService = investigationReportService;
         }
 
         public IActionResult Index()
@@ -110,7 +104,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var userEmail = HttpContext.User.Identity.Name;
-                var pendingCount = await _context.ClaimsInvestigation.CountAsync(c => c.UpdatedBy == userEmail && c.STATUS == ALLOCATION_STATUS.PENDING);
+                var pendingCount = await _context.Investigations.CountAsync(c => c.UpdatedBy == userEmail && c.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS);
                 return View(new JobStatus { JobId = jobId, PendingCount = pendingCount });
             }
             catch (Exception ex)
@@ -122,20 +116,20 @@ namespace risk.control.system.Controllers.Company
         }
 
         [Breadcrumb(title: " Details", FromAction = "Active")]
-        public async Task<IActionResult> ActiveDetail(string id)
+        public async Task<IActionResult> ActiveDetail(long id)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                if (string.IsNullOrWhiteSpace(id))
+                if (id < 1)
                 {
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await claimPolicyService.GetClaimDetail(id);
+                var model = await _context.Investigations.FindAsync(id);
 
                 return View(model);
             }

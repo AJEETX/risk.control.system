@@ -19,13 +19,11 @@ namespace risk.control.system.Controllers.Agency
     {
         private readonly INotyfService notifyService;
         private readonly ICaseVendorService vendorService;
-        private readonly IInvestigationReportService investigationReportService;
 
-        public AgentController(INotyfService notifyService, ICaseVendorService vendorService, IInvestigationReportService investigationReportService)
+        public AgentController(INotyfService notifyService, ICaseVendorService vendorService)
         {
             this.notifyService = notifyService;
             this.vendorService = vendorService;
-            this.investigationReportService = investigationReportService;
         }
         public IActionResult Index()
         {
@@ -87,7 +85,7 @@ namespace risk.control.system.Controllers.Agency
             return View();
         }
         [Breadcrumb(title: " Detail", FromAction = "Submitted")]
-        public async Task<IActionResult> SubmittedDetail(string id)
+        public async Task<IActionResult> SubmittedDetail(long id)
         {
             if (id == null)
             {
@@ -102,7 +100,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                var model = await vendorService.GetInvestigateReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
