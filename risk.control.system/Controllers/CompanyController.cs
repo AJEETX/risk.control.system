@@ -1517,8 +1517,6 @@ namespace risk.control.system.Controllers
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.District)
                     .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
-                    .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.InvestigationServiceType)
                     .FirstOrDefaultAsync(m => m.VendorId == id);
                 if (vendor == null)

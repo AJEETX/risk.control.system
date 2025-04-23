@@ -120,35 +120,19 @@ namespace risk.control.system.Controllers.Agency
                 }
                 var answers = model.QuestionFormViewModel.Answers;
 
+                var questinAnswer = new List<string>();
                 foreach (var answer in answers)
                 {
-                    int questionId = answer.Key;
-                    string value = answer.Value;
-
-                    // Process/save answer
+                    var questionAnswer = GetSelectedOptionText(model, answer.Key);
+                    questinAnswer.Add(questionAnswer);
                 }
-
-                //foreach (var question in model.QuestionFormViewModel.Questions)
-                //{
-                //    if (question.IsRequired &&
-                //        (!model.QuestionFormViewModel.Answers.TryGetValue(question.Id, out var value) || string.IsNullOrWhiteSpace(value)))
-                //    {
-                //        ModelState.AddModelError($"Answers[{question.Id}]", $"Question '{question.QuestionText}' is required.");
-                //    }
-                //    notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
-                //    return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = model.ClaimsInvestigation.Id });
-                //}
-                var question1 = GetSelectedOptionText(model, 1);
-                var question2 = GetSelectedOptionText(model, 2);
-                var question3 = model.QuestionFormViewModel.Answers[3];
-                var question4 = model.QuestionFormViewModel.Answers[4];
 
                 var (vendor, contract) = await vendorInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
                     WebUtility.HtmlDecode(remarks),
-                    WebUtility.HtmlDecode(question1),
-                    WebUtility.HtmlDecode(question2),
-                    WebUtility.HtmlDecode(question3),
-                    WebUtility.HtmlDecode(question4));
+                    WebUtility.HtmlDecode(questinAnswer[0]),
+                    WebUtility.HtmlDecode(questinAnswer[1]),
+                    WebUtility.HtmlDecode(questinAnswer[2]),
+                    WebUtility.HtmlDecode(questinAnswer[3]));
                 if (vendor == null)
                 {
                     notifyService.Error("OOPs !!!..Error submitting.");
@@ -175,11 +159,24 @@ namespace risk.control.system.Controllers.Agency
         {
             var question = model.QuestionFormViewModel.Questions.FirstOrDefault(q => q.Id == questionId);
             if (question == null) return "N/A";
+            if(question.QuestionType == "text")
+                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
 
-            var selectedValue = model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var value) ? value : "N/A";
-            var options = question.Options?.Split(',') ?? Array.Empty<string>();
-
-            return options.Contains(selectedValue) ? selectedValue : "N/A";
+            if(question.QuestionType == "file")
+                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
+            if(question.QuestionType == "date")
+                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
+            if (question.QuestionType == "checkbox")
+                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
+            if (question.QuestionType == "radio")
+                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
+            if (question.QuestionType == "dropdown")
+            {
+                var selectedValue = model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var value) ? value : "N/A";
+                var options = question.Options?.Split(',') ?? Array.Empty<string>();
+                return options.Contains(selectedValue) ? selectedValue : "N/A";
+            }
+            return "N/A";
         }
 
         // Usage

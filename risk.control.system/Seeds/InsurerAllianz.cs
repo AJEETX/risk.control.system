@@ -115,14 +115,14 @@ namespace risk.control.system.Seeds
             {
                 QuestionText = "Ownership status of the home visited",
                 QuestionType = "dropdown",
-                Options = "SOLE- OWNED, OWNED-JOINTLY, RENTED, FANILY - OWNED",
+                Options = "SOLE- OWNER, JOINT-OWNER, RENTED, UNKNOWN",
                 IsRequired = true
             };
             var question2 = new Question
             {
-                QuestionText = "Neighbour Financial Status",
+                QuestionText = "Person Financial Status",
                 QuestionType = "dropdown",
-                Options = "Rs. 0 - 10,000, Rs. 10,000 - 1,00,000, Rs. 1,00,000 +",
+                Options = "Rs. 0 - 10000, Rs. 10000 - 100000, Rs. 100000 +, UNKNOWN",
                 IsRequired = true
             };
             var question3 = new Question
@@ -133,7 +133,7 @@ namespace risk.control.system.Seeds
             };
             var question4 = new Question
             {
-                QuestionText = "date and time met with Person",
+                QuestionText = "Date and time met with Person",
                 QuestionType = "date",
                 IsRequired = true
             };

@@ -282,8 +282,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(a => a.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(p => p.InvestigationServiceType)
-                .Include(a => a.PolicyDetail)
-                .ThenInclude(a => a.LineOfBusiness)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(p => p.PinCode)
                 .Include(c => c.CustomerDetail)
@@ -438,8 +436,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(a => a.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(p => p.InvestigationServiceType)
-                .Include(a => a.PolicyDetail)
-                .ThenInclude(a => a.LineOfBusiness)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(p => p.PinCode)
                 .Include(c => c.CustomerDetail)
@@ -550,8 +546,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(a => a.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(p => p.InvestigationServiceType)
-                .Include(a => a.PolicyDetail)
-                .ThenInclude(a => a.LineOfBusiness)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(p => p.PinCode)
                 .Include(c => c.CustomerDetail)
@@ -633,41 +627,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
-        }
-
-
-        private IQueryable<InvestigationTask> GetClaims()
-        {
-            IQueryable<InvestigationTask> applicationDbContext = _context.Investigations
-               .Include(c => c.PolicyDetail)
-               .Include(c => c.ClientCompany)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(b => b.BeneficiaryRelation)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-                .Where(c => !c.Deleted);
-            return applicationDbContext.OrderByDescending(o => o.Created);
         }
     }
 }

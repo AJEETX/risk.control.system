@@ -74,8 +74,6 @@ namespace risk.control.system.Controllers.Api.Claims
             IQueryable<InvestigationTask> applicationDbContext = _context.Investigations
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
                 .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)

@@ -42,7 +42,6 @@ namespace risk.control.system.Controllers
         {
             var applicationDbContext = _context.VendorInvestigationServiceType
                 .Include(v => v.InvestigationServiceType)
-                .Include(v => v.LineOfBusiness)
                 .Include(v => v.State)
                 .Include(v => v.Vendor);
             return View(await applicationDbContext.ToListAsync());
@@ -61,7 +60,6 @@ namespace risk.control.system.Controllers
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
-                    .Include(v => v.LineOfBusiness)
                     .Include(v => v.District)
                     .Include(v => v.Country)
                     .Include(v => v.State)
@@ -225,7 +223,6 @@ namespace risk.control.system.Controllers
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
-                    .Include(v => v.LineOfBusiness)
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
                     .Include(v => v.District)
@@ -355,7 +352,6 @@ namespace risk.control.system.Controllers
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
-                    .Include(v => v.LineOfBusiness)
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.Country)

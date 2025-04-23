@@ -152,8 +152,6 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.District)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)

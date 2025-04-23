@@ -44,7 +44,6 @@
                     </ul>
 
                     <form id="answers" method="post" action="/Question/SubmitAnswers" enctype="multipart/form-data" class="p-4 bg-white border rounded shadow-sm questionnaire-form">
-                        <h4 class="mb-4 text-primary text-center"><i> @Model.InsuranceType.GetEnumDisplayName()</i> Questionnaire</h4>
                         <input type="hidden" name="InsuranceType" value="@Model.InsuranceType" />
 
                         @if (Model != null && Model.Questions.Count > 0)

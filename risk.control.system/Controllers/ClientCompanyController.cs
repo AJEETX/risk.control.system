@@ -348,8 +348,6 @@ namespace risk.control.system.Controllers
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
-                .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .AsQueryable();
@@ -373,8 +371,6 @@ namespace risk.control.system.Controllers
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
@@ -400,8 +396,6 @@ namespace risk.control.system.Controllers
                     .Include(v => v.State)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.InvestigationServiceType)
                     .Include(v => v.VendorInvestigationServiceTypes);
@@ -438,8 +432,6 @@ namespace risk.control.system.Controllers
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
-                .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes);
             foreach (var v in empanelledVendors)
@@ -474,8 +466,6 @@ namespace risk.control.system.Controllers
                 .ThenInclude(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
                 .FirstOrDefaultAsync(m => m.VendorId == id);

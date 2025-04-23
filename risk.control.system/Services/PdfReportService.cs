@@ -67,8 +67,6 @@ namespace risk.control.system.Services
                     .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.PinCode)
                     .Include(c => c.ClientCompany)
-                    .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                 .Include(r => r.InvestigationReport)

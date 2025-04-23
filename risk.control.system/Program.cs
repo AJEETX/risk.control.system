@@ -391,11 +391,19 @@ app.UseMiddleware<RequirePasswordChangeMiddleware>();
 //app.UseWebSockets();
 app.UseSwagger();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
+    // Show detailed error page for devs
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // Redirect to custom error page in production
     app.UseExceptionHandler("/Home/Error");
+    app.UseStatusCodePagesWithRedirects("/Home/HTTP?statusCode={0}");
     app.UseHsts();
 }
+
 app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
 
 //app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");

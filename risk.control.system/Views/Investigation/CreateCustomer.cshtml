@@ -5,7 +5,7 @@
 }
 <section class="content">
     <form id="create-form" asp-controller="InvestigationPost" asp-action="CreateCustomer" method="post" enctype="multipart/form-data">
-        <partial name="Investigation/_CreateCustomer" model="Model" />
+        <partial name="Investigation/_CreateCustomer" model="@Model" />
     </form>
 </section>
 

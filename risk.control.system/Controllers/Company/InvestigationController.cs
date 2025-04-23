@@ -325,7 +325,6 @@ namespace risk.control.system.Controllers.Company
                 var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "Investigation", $"Add beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
-                ViewBag.ClaimId = id;
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
