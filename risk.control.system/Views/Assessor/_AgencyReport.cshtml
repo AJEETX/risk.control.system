@@ -1,4 +1,5 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@using risk.control.system.Helpers;
+@model CaseInvestigationVendorsModel
 
 
 <article>
@@ -7,7 +8,7 @@
         <div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
             <div class="card-header bg-light text-white text-center">
                 <h3 class="card-title">
-                    <i class="fas fa-print nav-icon"></i> Agency Report (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name): <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span>
+                    <i class="fas fa-print nav-icon"></i> Agency Report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span>
 
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
@@ -22,7 +23,7 @@
                 </h3>
 
                 <div class="card-tools">
-                    <span data-toggle="tooltip" title="Agency report (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name): @Model.ClaimsInvestigation.Vendor.Email" class="badge badge-light">
+                    <span data-toggle="tooltip" title="Agency report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): @Model.ClaimsInvestigation.Vendor.Email" class="badge badge-light">
                         <i class='far fa-hand-point-right'></i>
                         </span>
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -37,15 +38,6 @@
                     <partial name="_AgencyAgentReport" model="@Model" />
                     <partial name="_AgencyDigitalReport" model="@Model" />
                     <partial name="_AgencyDocumentReport" model="@Model" />
-                    @if(Model.ClaimsInvestigation.EnablePassport)
-                    {
-                        <partial name="_AgencyPassportReport" model="@Model" />
-                    }
-                    @if (Model.ClaimsInvestigation.EnableMedia)
-                    {
-                        <partial name="_AgencyAudioReport" model="@Model" />
-                        <partial name="_AgencyVideoReport" model="@Model" />
-                    }
                     
                 </div>
                 <div class="row">

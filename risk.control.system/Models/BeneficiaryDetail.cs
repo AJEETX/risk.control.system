@@ -82,8 +82,8 @@ namespace risk.control.system.Models
 
         public string? AddressLocationInfo { get; set; }
 
-        public string? ClaimsInvestigationId { get; set; }
-        public ClaimsInvestigation? ClaimsInvestigation { get; set; }
+        public long? InvestigationTaskId { get; set; }
+        public InvestigationTask? InvestigationTask { get; set; }
 
         public override string ToString()
         {

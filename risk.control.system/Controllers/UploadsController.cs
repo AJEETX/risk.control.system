@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AgentUpload(string selectedcase, IFormFile agentImage, string agentIdLatitude, string agentIdLongitude, bool supervisorPhotoIdUpdate = false)
+        public async Task<IActionResult> AgentUpload(long selectedcase, IFormFile agentImage, string agentIdLatitude, string agentIdLongitude, bool supervisorPhotoIdUpdate = false)
         {
             try
             {
@@ -109,7 +109,7 @@ namespace risk.control.system.Controllers
 
                 if (string.IsNullOrWhiteSpace(currentUserEmail) ||
                     (agentImage == null) ||
-                    string.IsNullOrWhiteSpace(selectedcase) ||
+                    selectedcase < 1 ||
                     string.IsNullOrWhiteSpace(agentIdLatitude) ||
                     string.IsNullOrWhiteSpace(Path.GetFileName(agentImage.FileName)) ||
                     string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(agentImage.FileName))) ||
@@ -118,11 +118,6 @@ namespace risk.control.system.Controllers
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (string.IsNullOrWhiteSpace(selectedcase))
-                {
-                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-portrait");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
                 }
 
                 using (var ds = new MemoryStream())
@@ -153,7 +148,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude, bool supervisorPhotoIdUpdate = false)
+        public async Task<IActionResult> FaceUpload(long selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude, bool supervisorPhotoIdUpdate = false)
         {
             try
             {
@@ -166,7 +161,7 @@ namespace risk.control.system.Controllers
 
                 if (string.IsNullOrWhiteSpace(currentUserEmail) ||
                     (digitalImage == null) ||
-                    string.IsNullOrWhiteSpace(selectedcase) ||
+                    selectedcase < 1 ||
                     string.IsNullOrWhiteSpace(digitalIdLatitude) ||
                     string.IsNullOrWhiteSpace(Path.GetFileName(digitalImage.FileName)) ||
                     string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(digitalImage.FileName))) ||
@@ -175,11 +170,6 @@ namespace risk.control.system.Controllers
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (string.IsNullOrWhiteSpace(selectedcase))
-                {
-                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-portrait");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
                 }
 
                 using (var ds = new MemoryStream())
@@ -210,7 +200,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PanUpload(string selectedclaim, IFormFile panImage, string documentIdLatitude, string documentIdLongitude, bool supervisorPanUpdate = false)
+        public async Task<IActionResult> PanUpload(long selectedclaim, IFormFile panImage, string documentIdLatitude, string documentIdLongitude, bool supervisorPanUpdate = false)
         {
             try
             {
@@ -224,6 +214,7 @@ namespace risk.control.system.Controllers
 
                 if (string.IsNullOrWhiteSpace(currentUserEmail) ||
                     (panImage == null) ||
+                    selectedclaim < 1 ||
                     string.IsNullOrWhiteSpace(documentIdLatitude) ||
                     string.IsNullOrWhiteSpace(documentIdLongitude) ||
                     Path.GetInvalidFileNameChars() == null ||
@@ -234,11 +225,6 @@ namespace risk.control.system.Controllers
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (string.IsNullOrWhiteSpace(selectedclaim))
-                {
-                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
                 }
 
                 using (var ds = new MemoryStream())
@@ -266,197 +252,197 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PassportUpload(string selectedclaim, IFormFile passportImage, string passportIdLatitude, string passportIdLongitude, bool supervisorPassportUpdate = false)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+        //[HttpPost]
+        //[RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> PassportUpload(string selectedclaim, IFormFile passportImage, string passportIdLatitude, string passportIdLongitude, bool supervisorPassportUpdate = false)
+        //{
+        //    try
+        //    {
+        //        var currentUserEmail = HttpContext.User?.Identity?.Name;
+        //        if (currentUserEmail == null)
+        //        {
+        //            notifyService.Error("OOPs !!!..Unauthenticated Access");
+        //            return RedirectToAction(nameof(Index), "Dashboard");
+        //        }
 
-                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-                    (passportImage == null) ||
-                    string.IsNullOrWhiteSpace(passportIdLatitude) ||
-                    string.IsNullOrWhiteSpace(passportIdLongitude) ||
-                    Path.GetInvalidFileNameChars() == null ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(passportImage.FileName)) ||
-                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(passportImage.FileName))) ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(passportImage.Name))
-                    )
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (string.IsNullOrWhiteSpace(selectedclaim))
-                {
-                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-                }
+        //        if (string.IsNullOrWhiteSpace(currentUserEmail) ||
+        //            (passportImage == null) ||
+        //            string.IsNullOrWhiteSpace(passportIdLatitude) ||
+        //            string.IsNullOrWhiteSpace(passportIdLongitude) ||
+        //            Path.GetInvalidFileNameChars() == null ||
+        //            string.IsNullOrWhiteSpace(Path.GetFileName(passportImage.FileName)) ||
+        //            string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(passportImage.FileName))) ||
+        //            string.IsNullOrWhiteSpace(Path.GetFileName(passportImage.Name))
+        //            )
+        //        {
+        //            notifyService.Error("OOPs !!!..Contact Admin");
+        //            return RedirectToAction(nameof(Index), "Dashboard");
+        //        }
+        //        if (string.IsNullOrWhiteSpace(selectedclaim))
+        //        {
+        //            notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
+        //            return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+        //        }
 
-                using (var ds = new MemoryStream())
-                {
-                    passportImage.CopyTo(ds);
-                    var imageByte = ds.ToArray();
-                    var response = await agentService.PostPassportId(currentUserEmail, selectedclaim, passportIdLatitude, passportIdLongitude, imageByte);
+        //        using (var ds = new MemoryStream())
+        //        {
+        //            passportImage.CopyTo(ds);
+        //            var imageByte = ds.ToArray();
+        //            var response = await agentService.PostPassportId(currentUserEmail, selectedclaim, passportIdLatitude, passportIdLongitude, imageByte);
 
-                    notifyService.Custom($"Passport Image Uploaded", 3, "green", "fas fa-mobile-alt");
-                    if (supervisorPassportUpdate)
-                    {
-                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
-                    }
-                    else
-                    {
-                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
+        //            notifyService.Custom($"Passport Image Uploaded", 3, "green", "fas fa-mobile-alt");
+        //            if (supervisorPassportUpdate)
+        //            {
+        //                return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
+        //            }
+        //            else
+        //            {
+        //                return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.StackTrace);
+        //        notifyService.Error("OOPs !!!..Contact Admin");
+        //        return RedirectToAction(nameof(Index), "Dashboard");
+        //    }
+        //}
 
-        [HttpPost]
-        [RequestSizeLimit(5_000_000)] // Checking for 5 MB
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AudioUpload(string selectedclaim, IFormFile audioFile, string audioLatitude, string audioLongitude, bool supervisorAudioUpdate = false)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+        //[HttpPost]
+        //[RequestSizeLimit(5_000_000)] // Checking for 5 MB
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> AudioUpload(string selectedclaim, IFormFile audioFile, string audioLatitude, string audioLongitude, bool supervisorAudioUpdate = false)
+        //{
+        //    try
+        //    {
+        //        var currentUserEmail = HttpContext.User?.Identity?.Name;
+        //        if (currentUserEmail == null)
+        //        {
+        //            notifyService.Error("OOPs !!!..Unauthenticated Access");
+        //            return RedirectToAction(nameof(Index), "Dashboard");
+        //        }
 
-                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-                    (audioFile == null) ||
-                    string.IsNullOrWhiteSpace(audioLatitude) ||
-                    string.IsNullOrWhiteSpace(audioLongitude) ||
-                    Path.GetInvalidFileNameChars() == null ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(audioFile.FileName)) ||
-                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(audioFile.FileName))) ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(audioFile.Name))
-                    )
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (string.IsNullOrWhiteSpace(selectedclaim))
-                {
-                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-                    if (supervisorAudioUpdate)
-                    {
-                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
-                    }
-                    else
-                    {
-                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-                    }
-                }
+        //        if (string.IsNullOrWhiteSpace(currentUserEmail) ||
+        //            (audioFile == null) ||
+        //            string.IsNullOrWhiteSpace(audioLatitude) ||
+        //            string.IsNullOrWhiteSpace(audioLongitude) ||
+        //            Path.GetInvalidFileNameChars() == null ||
+        //            string.IsNullOrWhiteSpace(Path.GetFileName(audioFile.FileName)) ||
+        //            string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(audioFile.FileName))) ||
+        //            string.IsNullOrWhiteSpace(Path.GetFileName(audioFile.Name))
+        //            )
+        //        {
+        //            notifyService.Error("OOPs !!!..Contact Admin");
+        //            return RedirectToAction(nameof(Index), "Dashboard");
+        //        }
+        //        if (string.IsNullOrWhiteSpace(selectedclaim))
+        //        {
+        //            notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
+        //            if (supervisorAudioUpdate)
+        //            {
+        //                return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
+        //            }
+        //            else
+        //            {
+        //                return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+        //            }
+        //        }
 
-                using (var ds = new MemoryStream())
-                {
-                    audioFile.CopyTo(ds);
-                    var imageByte = ds.ToArray();
-                    var response = await agentService.PostAudio(currentUserEmail, selectedclaim, audioLatitude, audioLongitude, Path.GetFileName(audioFile.FileName), imageByte);
+        //        using (var ds = new MemoryStream())
+        //        {
+        //            audioFile.CopyTo(ds);
+        //            var imageByte = ds.ToArray();
+        //            var response = await agentService.PostAudio(currentUserEmail, selectedclaim, audioLatitude, audioLongitude, Path.GetFileName(audioFile.FileName), imageByte);
 
-                    notifyService.Custom($"Audio Uploaded", 3, "green", "fas fa-mobile-alt");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
+        //            notifyService.Custom($"Audio Uploaded", 3, "green", "fas fa-mobile-alt");
+        //            return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.StackTrace);
+        //        notifyService.Error("OOPs !!!..Contact Admin");
+        //        return RedirectToAction(nameof(Index), "Dashboard");
+        //    }
+        //}
 
-        public IActionResult GetAudioFile(string fileName)
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (currentUserEmail == null)
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
+        //public IActionResult GetAudioFile(string fileName)
+        //{
+        //    var currentUserEmail = HttpContext.User?.Identity?.Name;
+        //    if (currentUserEmail == null)
+        //    {
+        //        notifyService.Error("OOPs !!!..Unauthenticated Access");
+        //        return RedirectToAction(nameof(Index), "Dashboard");
+        //    }
 
-            var filePath = Path.Combine("wwwroot/audio", fileName);
-            if (!System.IO.File.Exists(filePath))
-            {
-                return NotFound();
-            }
+        //    var filePath = Path.Combine("wwwroot/audio", fileName);
+        //    if (!System.IO.File.Exists(filePath))
+        //    {
+        //        return NotFound();
+        //    }
 
-            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            return File(fileStream, "audio/mpeg"); // MIME type for MP3
-        }
-        [HttpPost]
-        [RequestSizeLimit(5_000_000)] // Checking for 5 MB
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> VideoUpload(string selectedclaim, IFormFile videoFile, string videoLatitude, string videoLongitude, bool supervisorVideoUpdate = false)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+        //    var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        //    return File(fileStream, "audio/mpeg"); // MIME type for MP3
+        //}
+        //[HttpPost]
+        //[RequestSizeLimit(5_000_000)] // Checking for 5 MB
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> VideoUpload(string selectedclaim, IFormFile videoFile, string videoLatitude, string videoLongitude, bool supervisorVideoUpdate = false)
+        //{
+        //    try
+        //    {
+        //        var currentUserEmail = HttpContext.User?.Identity?.Name;
+        //        if (currentUserEmail == null)
+        //        {
+        //            notifyService.Error("OOPs !!!..Unauthenticated Access");
+        //            return RedirectToAction(nameof(Index), "Dashboard");
+        //        }
 
-                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-                    (videoFile == null) ||
-                    string.IsNullOrWhiteSpace(videoLatitude) ||
-                    string.IsNullOrWhiteSpace(videoLongitude) ||
-                    Path.GetInvalidFileNameChars() == null ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(videoFile.FileName)) ||
-                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(videoFile.FileName))) ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(videoFile.Name))
-                    )
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (string.IsNullOrWhiteSpace(selectedclaim))
-                {
-                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-                }
+        //        if (string.IsNullOrWhiteSpace(currentUserEmail) ||
+        //            (videoFile == null) ||
+        //            string.IsNullOrWhiteSpace(videoLatitude) ||
+        //            string.IsNullOrWhiteSpace(videoLongitude) ||
+        //            Path.GetInvalidFileNameChars() == null ||
+        //            string.IsNullOrWhiteSpace(Path.GetFileName(videoFile.FileName)) ||
+        //            string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(videoFile.FileName))) ||
+        //            string.IsNullOrWhiteSpace(Path.GetFileName(videoFile.Name))
+        //            )
+        //        {
+        //            notifyService.Error("OOPs !!!..Contact Admin");
+        //            return RedirectToAction(nameof(Index), "Dashboard");
+        //        }
+        //        if (string.IsNullOrWhiteSpace(selectedclaim))
+        //        {
+        //            notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
+        //            return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+        //        }
 
-                using (var ds = new MemoryStream())
-                {
-                    videoFile.CopyTo(ds);
-                    var imageByte = ds.ToArray();
-                    var response = await agentService.PostVideo(currentUserEmail, selectedclaim, videoLatitude, videoLongitude, Path.GetFileName(videoFile.FileName), imageByte);
+        //        using (var ds = new MemoryStream())
+        //        {
+        //            videoFile.CopyTo(ds);
+        //            var imageByte = ds.ToArray();
+        //            var response = await agentService.PostVideo(currentUserEmail, selectedclaim, videoLatitude, videoLongitude, Path.GetFileName(videoFile.FileName), imageByte);
 
-                    notifyService.Custom($"Video Uploaded", 3, "green", "fas fa-mobile-alt");
-                    if (supervisorVideoUpdate)
-                    {
-                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
-                    }
-                    else
-                    {
-                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
+        //            notifyService.Custom($"Video Uploaded", 3, "green", "fas fa-mobile-alt");
+        //            if (supervisorVideoUpdate)
+        //            {
+        //                return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
+        //            }
+        //            else
+        //            {
+        //                return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.StackTrace);
+        //        notifyService.Error("OOPs !!!..Contact Admin");
+        //        return RedirectToAction(nameof(Index), "Dashboard");
+        //    }
+        //}
 
         public IActionResult GetVideoFile(string fileName)
         {

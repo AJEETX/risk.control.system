@@ -3,7 +3,14 @@ $(document).ready(function () {
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Assessor/Get',
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         columnDefs: [{
             'targets': 0,
@@ -180,12 +187,11 @@ $(document).ready(function () {
             { "data": "timeElapsed", "bVisible": false },
             { "data": "policy", bVisible: false }
         ],
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.isNewAssigned) {
+        "rowCallback": function (row, data, index) {
+            if (data.isNewAssigned) {
                 $('td', nRow).addClass('isNewAssigned');
             }
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     $('#caseTypeFilter').on('change', function () {
         table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"

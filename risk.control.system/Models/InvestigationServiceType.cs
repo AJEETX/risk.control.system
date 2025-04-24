@@ -18,11 +18,7 @@ namespace risk.control.system.Models
         public string Code { get; set; } = default!;
         public InsuranceType? InsuranceType { get; set; }
 
-        [Display(Name = "Line Of Business")]
-        public long LineOfBusinessId { get; set; } = default!;
-
-        public LineOfBusiness LineOfBusiness { get; set; } = default!;
-        public bool MasterData { get; set; } = false;
+       public bool MasterData { get; set; } = false;
 
         public override string ToString()
         {

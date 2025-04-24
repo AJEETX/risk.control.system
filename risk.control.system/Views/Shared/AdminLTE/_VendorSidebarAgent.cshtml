@@ -1,0 +1,29 @@
+﻿@using risk.control.system.Helpers;
+<li class="nav-item">
+    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Agent","")">
+        <i class="nav-icon far fa-money-bill-alt"></i>
+        <p class="sidebar-menu-header-label">
+            CASES
+            <i class="right fas fa-angle-right"></i>
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="Agent" asp-action="Agent" class="actual-link nav-link
+                                                @Url.MakeActiveClass("Agent","Agent")
+                                                @Url.MakeActiveClass("Agent","GetInvestigate")">
+        <i class="fa fa-binoculars nav-icon"></i>
+        <p>
+            <span class="badge badge-danger">TASKS</span>
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="Agent" asp-action="Submitted" class="actual-link nav-link @Url.MakeActiveClass("Agent","Submitted")
+                                                            @Url.MakeActiveClass("Agent","SubmittedDetail")">
+        <i class="fas fa-print nav-icon"></i>
+        <p>
+            <span class="badge badge-secondary">SUBMITTED</span>
+        </p>
+    </a>
+</li>

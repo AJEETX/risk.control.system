@@ -1,16 +1,16 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@* @model ClaimsInvestigationVendorsModel
 
 @{
-    var imageCapturedTime = @Model.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var imageCapturedTime = @Model.InvestigationReport?.AudioReport?.DocumentIdImageLongLatTime != null ? @Model.InvestigationReport?.AudioReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
     string audioIdColor = "progress-bar-grey";
     var audioIdColorBorderColor = "";
-    if (Model.AgencyReport.AudioReport?.DocumentIdImageLongLat == null)
+    if (Model.InvestigationReport.AudioReport?.DocumentIdImageLongLat == null)
     {
 
     }
-    else if (Model.AgencyReport.AudioReport?.DocumentIdImageLongLat != null && (
-    Model.AgencyReport?.AudioReport?.DocumentIdImageValid != null && Model.AgencyReport?.AudioReport?.DocumentIdImageValid == true))
+    else if (Model.InvestigationReport.AudioReport?.DocumentIdImageLongLat != null && (
+    Model.InvestigationReport?.AudioReport?.DocumentIdImageValid != null && Model.InvestigationReport?.AudioReport?.DocumentIdImageValid == true))
     {
         audioIdColor = "progress-bar-green";
         audioIdColorBorderColor = "border-success";
@@ -75,7 +75,7 @@
                     </span>
                 </h3>
                 <div class="card-tools">
-                    <span data-toggle="tooltip" title="Agent report # : @Model.AgencyReport.AgentEmail" class="badge badge-light">
+                    <span data-toggle="tooltip" title="Agent report # : @Model.InvestigationReport.AgentEmail" class="badge badge-light">
                         <i class="nav-icon fas fa-clock"></i>
                         @imageCapturedTime
                     </span>
@@ -90,7 +90,7 @@
                 {
                     <i class='fa fa-times i-grey' aria-hidden='true'></i>
                 }
-                else if (@Model.AgencyReport?.AudioReport?.DocumentIdImageValid.Value ?? false)
+                else if (@Model.InvestigationReport?.AudioReport?.DocumentIdImageValid.Value ?? false)
                 {
                     <i class='fas fa-check-circle i-green'></i>
                 }
@@ -113,10 +113,10 @@
                             <span class="badge badge-light"><i class="fas fa-film"></i> Audio File</span>:
                             <br />
                             @{
-                                if (Model.AgencyReport?.AudioReport?.DocumentIdImage != null)
+                                if (Model.InvestigationReport?.AudioReport?.DocumentIdImage != null)
                                 {
                                     <audio id="audioPlayer" controls class="img-fluid audio-Image" data-toggle="tooltip" title="Audio File">
-                                        <source src="/Uploads/GetAudioFile?fileName=@Model.AgencyReport.AudioReport.DocumentIdImagePath" type="audio/mpeg">
+                                        <source src="/Uploads/GetAudioFile?fileName=@Model.InvestigationReport.AudioReport.DocumentIdImagePath" type="audio/mpeg">
                                         Your browser does not support the audio element.
                                     </audio>
                                 }
@@ -131,7 +131,7 @@
 
                             <span class="badge badge-light"><i class="fas fa-info"></i> Audio Scan Info</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.AudioReport?.DocumentIdImageData</label>
+                            <label class="img-fluid ocr-data"> @Model.InvestigationReport?.AudioReport?.DocumentIdImageData</label>
                         </p>
                     </div>
                     <div class="col-6 text">
@@ -139,9 +139,9 @@
                         <p class="text-muted text-sm">
                             <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                             <br />
-                            @if (@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl != null)
+                            @if (@Model.InvestigationReport?.AudioReport?.DocumentIdImageLocationUrl != null)
                             {
-                                <img class="img-fluid audiolocationImage" src="@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
+                                <img class="img-fluid audiolocationImage" src="@Model.InvestigationReport?.AudioReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
                             }
                             else
                             {
@@ -153,13 +153,13 @@
 
                             <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.AudioReport?.DocumentIdImageLocationAddress</label>
+                            <label class="img-fluid ocr-data"> @Model.InvestigationReport?.AudioReport?.DocumentIdImageLocationAddress</label>
                         </p>
                     </div>
                 </div>
             </div>
         </div>
-        @if (@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl != null)
+        @if (@Model.InvestigationReport?.AudioReport?.DocumentIdImageLocationUrl != null)
         {
             <div class="card direct-chat direct-chat-warning collapsed-card">
                 <div class="card-header">
@@ -182,4 +182,4 @@
 
         }
     </div>
-}
+} *@

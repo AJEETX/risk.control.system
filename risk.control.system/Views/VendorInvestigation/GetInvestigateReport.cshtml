@@ -1,0 +1,69 @@
+﻿@model CaseInvestigationVendorsModel
+
+@{
+    ViewData["Title"] = "Claim: Report ";
+
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title">
+                <i class="far fa-file-alt"></i> Submit
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <li>
+                            <i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Photo ID Image
+                        </li>
+                        <li>
+                            <i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> PAN card
+                        </li>
+                        <li>
+                            <i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Questionnaire
+                        </li>
+                        <li>
+                            <i class='far fa-hand-point-right'></i> Complete <i class='fas fa-check-circle'></i> remark
+                        </li>
+                        <li>
+                            <i class='far fa-hand-point-right'></i> Check T&C <input type="checkbox"> checkbox
+                        </li>
+                        <li>
+                            <i class='far fa-thumbs-up'></i> <button class='badge badge-success btn-lg'><i class='far fa-file-alt'></i> <b>SUBMIT</b> </button>  to <b>@Model.ClaimsInvestigation.ClientCompany.Email</b>
+                        </li>
+                        <li>
+                            <i class='far fa-thumbs-down'></i> Review ? <button class='badge badge-danger btn-lg'><i class='fas fa-sync'></i> <b>REVIEW</b> </button>
+                        </li>
+                    </span>
+                </span>
+            </h3>
+        </div>
+
+        <partial name="_PolicyDetails" model="@Model" />
+
+        <form id="supervisor-form" method="post" asp-action="ProcessReport" asp-controller="CaseVendorPost" enctype="multipart/form-data">
+            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
+            <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
+            <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+            <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+            <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+            <partial name="_AgentReport" model="@Model" />
+            <partial name="_Submit" model="@Model" />
+        </form>
+    </div>
+</section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/common/claim-details.js"></script>
+    <script src="~/js/case-map.js"></script>
+    <script>
+        initReportMap();
+    </script>
+    <script src="~/js/supervisor/get-investigate-report.js"></script>
+    @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+    {
+        <script src="~/js/agent/get-investigate.js"></script>
+    }
+}

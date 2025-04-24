@@ -541,7 +541,7 @@ textarea {
     width: 100%;
     overflow-y: auto;
     resize: both;
-    min-height: 100px;
+    min-height: 200px;
     line-height: 20px;
     border: 1px solid #ddd;
 }
@@ -2833,8 +2833,8 @@ input#checkall {
 
 .btn-clear-date {
     position: absolute;
-    right: 10px;
-    top: 50%;
+    right: 1em;
+    top: 60%;
     transform: translateY(-50%);
     background: transparent;
     border: none;

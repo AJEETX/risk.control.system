@@ -1,14 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class Question
+    public class Question :BaseEntity
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
         public string QuestionText { get; set; }
+        public string? AnswerText { get; set; }
 
         [Required]
         public string QuestionType { get; set; } // Stores type: "text", "dropdown", "checkbox", "date", "file", "radio"
@@ -16,9 +19,13 @@ namespace risk.control.system.Models
         public string? Options { get; set; } // Stores comma-separated values for dropdown/radio
 
         public bool IsRequired { get; set; } // New property to mark if the question is required or optional
+
+        public long CaseQuestionnaireId { get; set; }
+        public CaseQuestionnaire CaseQuestionnaire { get; set; }
     }
     public class QuestionFormViewModel
     {
+        public InsuranceType InsuranceType { get; set; }
         public List<Question> Questions { get; set; } = new List<Question>();
 
         // Fields for adding a new question
@@ -29,6 +36,18 @@ namespace risk.control.system.Models
 
         // Dictionary to hold answers with question ID as key
         public Dictionary<int, string> Answers { get; set; } = new Dictionary<int, string>();
+    }
+
+    public class CaseQuestionnaire : BaseEntity
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long Id { get; set; }
+
+        public long? ClientCompanyId { get; set; }
+        public ClientCompany? ClientCompany { get; set; }
+        public InsuranceType InsuranceType { get; set; } = InsuranceType.CLAIM;
+        public List<Question> Questions { get; set; } = new List<Question>();
     }
 
 }

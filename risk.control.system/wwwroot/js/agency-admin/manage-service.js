@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    $("#LineOfBusinessId").focus();
+    $("#InsuranceType").focus();
 
     // Common form submission handler to avoid duplication
     function handleFormSubmission(formId, buttonId, confirmationText, confirmCallback) {

@@ -1,24 +1,24 @@
 ﻿
-@model ClaimTransactionModel
+@model CaseTransactionModel
 
 @{
-    if (@Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.DigitalIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.DigitalIdImageLongLatTime != null)
+    if (@Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.DigitalIdImageData != null && @Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.DigitalIdImageLongLatTime != null)
     {
         string digitalIdColor = "progress-bar-grey";
         var borderColor = "";
-        if (Model.ClaimsInvestigation.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime == null)
+        if (Model.ClaimsInvestigation.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime == null)
         {
             digitalIdColor = "progress-bar-grey";
             borderColor = "";
         }
-        else if (Model.ClaimsInvestigation.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime != null &&
-        @Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.Similarity < 70)
+        else if (Model.ClaimsInvestigation.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime != null &&
+        @Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.Similarity < 70)
         {
             digitalIdColor = "progress-bar-red";
             borderColor = "border-danger";
         }
-        else if (Model.ClaimsInvestigation.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime != null &&
-        @Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.Similarity >= 70)
+        else if (Model.ClaimsInvestigation.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime != null &&
+        @Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.Similarity >= 70)
         {
             borderColor = "border-success";
             digitalIdColor = "progress-bar-green";
@@ -60,7 +60,7 @@
                     <div class="card-tools">
                         <span data-toggle="tooltip" title="Agent report time" class="badge badge-light">
                             <i class="nav-icon fas fa-clock"></i>
-                            @Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                            @Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                         </span>
 
                     </div>
@@ -69,7 +69,7 @@
                 </div>
                 <div class="card-footer text-center">
                     <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                    @if (@Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.Similarity < 70 && Model.ClaimsInvestigation.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime != null)
+                    @if (@Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.Similarity < 70 && Model.ClaimsInvestigation.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime != null)
                     {
                         <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                     }
@@ -110,10 +110,10 @@
                                 <span class="badge badge-light"><i class="far fa-image"></i> Agent Id Image</span>:
                                 <br />
                                 @{
-                                    if (Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.DigitalIdImage != null)
+                                    if (Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.DigitalIdImage != null)
                                     {
                                         <img id="agentLocationPicture" class="img-fluid face-Image @borderColor" data-toggle="tooltip" title="Face Image"
-                                             src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.DigitalIdImage))">
+                                             src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.DigitalIdImage))">
                                     }
                                     else
                                     {
@@ -128,21 +128,21 @@
 
                                 <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
                                 <br />
-                                <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.DigitalIdImageData</label>
+                                <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.DigitalIdImageData</label>
 
                             </p>
                             <p class="text-muted text-sm">
 
                                 <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                                 <br />
-                                <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.DigitalIdImageLocationAddress</label>
+                                <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.DigitalIdImageLocationAddress</label>
                             </p>
                         </div>
 
                     </div>
                     <p class="text-center">
                         <span class="badge badge-light"> Match :  </span>
-                        @if (@Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.Similarity < 70 && Model.ClaimsInvestigation.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime != null)
+                        @if (@Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.Similarity < 70 && Model.ClaimsInvestigation.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime != null)
                         {
                             <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                         }

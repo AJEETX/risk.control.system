@@ -50,16 +50,6 @@
                             @Html.DisplayFor(model => model.Branch)
                         </dd>
 
-
-                        <dt class="col-sm-5">
-                            line of business
-                        </dt>
-                        <dd class="col-sm-5">
-                            @foreach (var service in Model.VendorInvestigationServiceTypes)
-                            {
-                                <span class="badge badge-light">@service.LineOfBusiness.Name</span>
-                            }
-                        </dd>
                         <dt class="col-sm-5">
                             Document
                         </dt>

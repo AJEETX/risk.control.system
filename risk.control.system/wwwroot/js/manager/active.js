@@ -1,7 +1,6 @@
 ﻿
 $(document).ready(function () {
 
-
     var table  = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Manager/GetActive',
@@ -23,6 +22,9 @@ $(document).ready(function () {
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
             }
         },
         columnDefs: [
@@ -196,6 +198,15 @@ $(document).ready(function () {
             { "data": "timeElapsed", bVisible: false },
             { "data": "policy", bVisible: false }
         ],
+        rowCallback: function (row, data, index) {
+            if (data.isNewAssigned) {
+                $('td', row).addClass('isNewAssigned');
+                // Remove the class after 3 seconds
+                setTimeout(function () {
+                    $('td', row).removeClass('isNewAssigned');
+                }, 3000);
+            }
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
 
             $('#customerTable tbody').on('click', '.btn-info', function (e) {
@@ -205,13 +216,7 @@ $(document).ready(function () {
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
 
-        },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.isNewAssigned) {
-                $('td', nRow).addClass('isNewAssigned');
-            }
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
 
     $('#caseTypeFilter').on('change', function () {

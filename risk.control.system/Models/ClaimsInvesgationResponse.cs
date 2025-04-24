@@ -2,7 +2,7 @@
 {
     public class ClaimsInvestigationResponse
     {
-        public string Id { get; set; }
+        public object Id { get; set; }
         public bool AssignedToAgency { get; set; }
         public string? Agent { get; set; }
         public string Pincode { get; set; }

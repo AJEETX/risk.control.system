@@ -10,12 +10,6 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long PolicyDetailId { get; set; }
 
-        [Display(Name = "Line of Business")]
-        public long? LineOfBusinessId { get; set; } = default!;
-
-        [Display(Name = "Line of Business")]
-        public LineOfBusiness? LineOfBusiness { get; set; } = default!;
-
         [Display(Name = "Investigation type")]
         public long? InvestigationServiceTypeId { get; set; } = default!;
 
@@ -69,7 +63,6 @@ namespace risk.control.system.Models
         {
             return $"Case Information:\n" +
            $"- Contract Number: {ContractNumber}\n" +
-           $"- Line Of Business: {LineOfBusiness}\n" +
            $"- Investigation Service Type: {InvestigationServiceType}\n" +
            $"- Case Issue Date: ${ContractIssueDate}\n" +
            $"- Claim Type: {ClaimType.GetEnumDisplayName()}\n" +

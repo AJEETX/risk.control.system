@@ -8,7 +8,6 @@ namespace risk.control.system.Helpers
         {
             return policyDetail != null && policyDetail != null &&
                !string.IsNullOrWhiteSpace(policyDetail.ContractNumber.Trim()) &&
-                policyDetail.LineOfBusinessId > 0 &&
                 policyDetail.InvestigationServiceTypeId > 0 &&
                !string.IsNullOrWhiteSpace(policyDetail.CauseOfLoss) &&
                 policyDetail.SumAssuredValue != null &&
@@ -20,6 +19,7 @@ namespace risk.control.system.Helpers
                 policyDetail.CaseEnablerId > 0 &&
                 policyDetail.CostCentreId > 0;
         }
+
         public static bool IsValidCaseDetail(this PolicyDetail policyDetail)
         {
             return policyDetail != null && policyDetail != null &&
@@ -39,13 +39,6 @@ namespace risk.control.system.Helpers
         public static bool IsValidCaseData(this InvestigationTask claim)
         {
             var validPolicy = claim.PolicyDetail.IsValidCaseDetail();
-            var validCustomer = claim.PolicyDetail.IsValidCustomer(claim.CustomerDetail);
-            var validBeneficiary = claim.PolicyDetail.IsValidBeneficiary(claim.BeneficiaryDetail);
-            return validPolicy && validCustomer && validBeneficiary;
-        }
-        public static bool IsValidCaseData(this ClaimsInvestigation claim)
-        {
-            var validPolicy = claim.PolicyDetail.IsValidPolicy();
             var validCustomer = claim.PolicyDetail.IsValidCustomer(claim.CustomerDetail);
             var validBeneficiary = claim.PolicyDetail.IsValidBeneficiary(claim.BeneficiaryDetail);
             return validPolicy && validCustomer && validBeneficiary;
@@ -122,6 +115,106 @@ namespace risk.control.system.Helpers
                 beneficiaryDetail.StateId > 0 &&
                 beneficiaryDetail.CountryId > 0 &&
                 !string.IsNullOrWhiteSpace(beneficiaryDetail.Addressline);
+        }
+
+        public static string GetCreatorTimePending(this InvestigationTask a)
+        {
+            if (a.CreatorSla == 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} days since created!\"></i>");
+            }
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+
+            else if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours < 24 &&
+                DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
+
+        public static string GetAssessorTimePending(this InvestigationTask a, bool assess = false, bool processed = false, bool enquiry = false, bool review = false)
+        {
+            DateTime time2Compare = a.SubmittedToAssessorTime.Value;
+            if (assess)
+            {
+                time2Compare = a.SubmittedToAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(time2Compare).Days} days since created!\"></i>");
+
+                else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(time2Compare).Days} day since created.\"></i>");
+
+            }
+            else if (processed)
+            {
+                time2Compare = a.ProcessedByAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+                else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+            }
+            else if (enquiry)
+            {
+                time2Compare = a.EnquiredByAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+                else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            }
+            else if (review)
+            {
+                time2Compare = a.ReviewByAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+                else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            }
+
+            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
+                DateTime.Now.Subtract(time2Compare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
+
+        public static string GetMap(this InvestigationTask claim, bool caseType, bool tasked2Agent = false, bool submitted2Supervisor = false, bool enquiry = false)
+        {
+            if (tasked2Agent || submitted2Supervisor || enquiry)
+            {
+                return claim.SelectedAgentDrivingMap;
+            }
+            return caseType ? claim.CustomerDetail.CustomerLocationMap : claim.BeneficiaryDetail.BeneficiaryLocationMap;
         }
     }
 }

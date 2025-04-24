@@ -2,7 +2,14 @@ $(document).ready(function () {
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/User/AllUsers',
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         fixedHeader: true,
         processing: true,
@@ -138,7 +145,7 @@ $(document).ready(function () {
                 bVisible: false
             }
         ],
-        drawCallback: function () {
+        "drawCallback": function (settings, start, end, max, total, pre) {
             // Event delegation for .btn-danger elements
             
             $('#customerTable tbody').on('click', '.btn-warning', function (e) {
@@ -147,8 +154,7 @@ $(document).ready(function () {
                 showedit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     table.on('draw', function () {
         table.rows().every(function () {
@@ -160,9 +166,6 @@ $(document).ready(function () {
 
                 // Highlight the row
                 $(rowNode).addClass('highlight-new-user');
-
-                // Scroll the row into view
-                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                 // Optionally, remove the highlight after a delay
                 setTimeout(function () {

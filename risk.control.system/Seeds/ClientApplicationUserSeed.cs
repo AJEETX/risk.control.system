@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
 {
     public static class ClientApplicationUserSeed
     {
-        public static async Task Seed(ApplicationDbContext context, 
+        public static async Task<ClientCompanyApplicationUser> Seed(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment, 
             UserManager<ClientCompanyApplicationUser> userManager, 
             ClientCompany clientCompany)
@@ -30,7 +30,7 @@ namespace risk.control.system.Seeds
             string firstName = CREATOR.FIRST_NAME;
             string lastName = CREATOR.LAST_NAME;
             string photo = CREATOR.PROFILE_IMAGE;
-            await CreatorSeed.Seed(context, webHostEnvironment, userManager, clientCompany, pinCode, creatorEmailwithSuffix, photo, firstName, lastName);
+            var creator = await CreatorSeed.Seed(context, webHostEnvironment, userManager, clientCompany, pinCode, creatorEmailwithSuffix, photo, firstName, lastName);
 
             //Seed client assigner
             string managerEmailwithSuffix = MANAGER.CODE + "@" + company.Email;
@@ -45,6 +45,8 @@ namespace risk.control.system.Seeds
             lastName = ASSESSOR.LAST_NAME;
             photo = ASSESSOR.PROFILE_IMAGE;
             await AssessorSeed.Seed(context, webHostEnvironment, userManager, clientCompany, pinCode, assessorEmailwithSuffix, photo, firstName, lastName);
+
+            return creator;
         }
     }
 }

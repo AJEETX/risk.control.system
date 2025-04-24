@@ -133,7 +133,7 @@
             </div>
 
         </div>
-        <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="AssignAutoSingle">
+        <form id="create-form" method="post" asp-controller="InvestigationPost" asp-action="AssignAutoSingle">
             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
             <input type="hidden" id="claims" name="claims" value="@Model.ClaimsInvestigation.Id" />

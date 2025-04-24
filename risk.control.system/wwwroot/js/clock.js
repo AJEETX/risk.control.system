@@ -21,7 +21,7 @@ async function refreshSession() {
             body: JSON.stringify({ currentPage: currentPageUrl }), // Include the current page URL
         });
 
-        if (response.status === 401) {
+        if (response.status === 401 || response.status === 403) {
             console.warn("Session expired or user is unauthorized. Redirecting to login page...");
             window.location.href = "/Account/Login"; // Redirect to the login page
             return;

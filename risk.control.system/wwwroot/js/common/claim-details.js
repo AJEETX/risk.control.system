@@ -48,7 +48,7 @@
     });
 
     // Load the bdeneficiary details
-        $('#beneficiaryGoogleMap').click(function () {
+     $('#beneficiaryGoogleMap').click(function () {
         var data;
         $.confirm({
             type: 'green',

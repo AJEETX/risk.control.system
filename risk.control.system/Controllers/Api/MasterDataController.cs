@@ -21,34 +21,19 @@ namespace risk.control.system.Controllers.Api
             this.context = context;
         }
 
-        [HttpGet("GetSubstatusBystatusId")]
-        public async Task<IActionResult> GetSubstatusBystatusId(string InvestigationCaseStatusId)
+        
+        [HttpGet("GetInvestigationServicesByInsuranceType")]
+        public async Task<IActionResult> GetInvestigationServicesByInsuranceType(string insuranceType)
         {
-            string lId;
-            var subStatuses = new List<InvestigationCaseSubStatus>();
-            if (!string.IsNullOrEmpty(InvestigationCaseStatusId))
-            {
-                lId = InvestigationCaseStatusId;
-                subStatuses = await context.InvestigationCaseSubStatus
-                    .Include(i => i.InvestigationCaseStatus).Where(s =>
-                    s.InvestigationCaseStatus.InvestigationCaseStatusId.Equals(lId)).ToListAsync();
-            }
-            return Ok(subStatuses?.Select(s => new { s.Code, s.InvestigationCaseSubStatusId }));
-        }
-
-        [HttpGet("GetInvestigationServicesByLineOfBusinessId")]
-        public async Task<IActionResult> GetInvestigationServicesByLineOfBusinessId(long LineOfBusinessId)
-        {
-            long lId;
+            InsuranceType type;
             var services = new List<InvestigationServiceType>();
-            if (LineOfBusinessId > 0)
+            if (!string.IsNullOrWhiteSpace(insuranceType) && Enum.TryParse(insuranceType, out type))
             {
-                lId = LineOfBusinessId;
-                services = await context.InvestigationServiceType.Where(s => s.LineOfBusiness.LineOfBusinessId.Equals(lId)).ToListAsync();
+                services = await context.InvestigationServiceType.Where(s => s.InsuranceType == type).ToListAsync();
             }
             return Ok(services);
         }
-
+        
         [HttpGet("GetStatesByCountryId")]
         public async Task<IActionResult> GetStatesByCountryId(long countryId)
         {

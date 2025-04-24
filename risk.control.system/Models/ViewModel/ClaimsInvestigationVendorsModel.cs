@@ -2,9 +2,9 @@
 {
     public class ClaimsInvestigationVendorsModel
     {
-        public ClaimsInvestigation ClaimsInvestigation { get; set; }
+        //public ClaimsInvestigation ClaimsInvestigation { get; set; }
         public BeneficiaryDetail Location { get; set; }
-        public AgencyReport AgencyReport { get; set; }
+        public InvestigationReport InvestigationReport { get; set; }
         public List<VendorCaseModel> Vendors { get; set; }
         public AssessorRemarkType AssessorRemarkType { get; set; }
         public bool TrialVersion { get; set; }

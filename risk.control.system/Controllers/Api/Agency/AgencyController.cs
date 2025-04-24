@@ -191,8 +191,6 @@ namespace risk.control.system.Controllers.Api.Agency
 
             var vendor = _context.Vendor
                 .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.LineOfBusiness)
-                .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
                  .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.State)
@@ -213,26 +211,12 @@ namespace risk.control.system.Controllers.Api.Agency
                 var IsAllDistrict = (service.DistrictId == null);
                 string pincodes = $"{ALL_PINCODE}";
                 string rawPincodes = $"{ALL_PINCODE}";
-                //if (!IsAllDistrict)
-                //{
-                //    var allPinCodesForDistrict = await _context.PinCode.CountAsync(p => p.DistrictId == service.DistrictId);
-                //    if(allPinCodesForDistrict == service.PincodeServices.Count && allPinCodesForDistrict > 1)
-                //    {
-                //        pincodes = ALL_PINCODE;
-                //        rawPincodes = ALL_PINCODE;
-                //    }
-                //    else
-                //    {
-                //        pincodes = string.Join(", ", service.PincodeServices.Select(c => c.Pincode).Distinct());
-                //        rawPincodes = string.Join(", ", service.PincodeServices.Select(c => c.Name).Distinct());
-                //    }
-                //}   
 
                 serviceResponse.Add(new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
                     Id = service.VendorInvestigationServiceTypeId,
-                    CaseType = service.LineOfBusiness.Name,
+                    CaseType = service.InsuranceType.GetEnumDisplayName(),
                     ServiceType = service.InvestigationServiceType.Name,
                     District = IsAllDistrict ? ALL_DISTRICT : service.District.Name,
                     State = service.State.Code,
@@ -270,8 +254,9 @@ namespace risk.control.system.Controllers.Api.Agency
             return Ok(agentWithLoad);
         }
 
-        [HttpGet("GetAgentLoad")]
-        public async Task<IActionResult> GetAgentLoad(string id)
+
+        [HttpGet("GetAgentWithCases")]
+        public async Task<IActionResult> GetAgentWithCases(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = await _context.VendorApplicationUser
@@ -301,25 +286,23 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenBy(u => u.LastName)
                 .ToListAsync();
 
-            var result =  dashboardService.CalculateAgentCaseStatus(userEmail);  // Assume this is async
+            var result = dashboardService.CalculateAgentCaseStatus(userEmail);  // Assume this is async
 
-            var claim = await _context.ClaimsInvestigation
+            var claim = await _context.Investigations
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
                 .Include(c => c.BeneficiaryDetail)
-                .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == id);
+                .FirstOrDefaultAsync(c => c.Id == id);
 
             if (claim == null)
             {
                 return NotFound("Claim not found.");
             }
-            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
-
-            string LocationLatitude = claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness
+            string LocationLatitude = claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
                 ? claim.CustomerDetail.Latitude
                 : claim.BeneficiaryDetail.Latitude;
 
-            string LocationLongitude = claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness
+            string LocationLongitude = claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
                 ? claim.CustomerDetail.Longitude
                 : claim.BeneficiaryDetail.Longitude;
 
@@ -375,7 +358,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     DistanceInMetres = distanceInMetre,
                     Duration = duration,
                     DurationInSeconds = durationInSec,
-                    AddressLocationInfo = claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness
+                    AddressLocationInfo = claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
                         ? claim.CustomerDetail.AddressLocationInfo
                         : claim.BeneficiaryDetail.AddressLocationInfo
                 };
@@ -385,7 +368,6 @@ namespace risk.control.system.Controllers.Api.Agency
 
             return Ok(agentList);
         }
-
     }
 
     public class AgentData

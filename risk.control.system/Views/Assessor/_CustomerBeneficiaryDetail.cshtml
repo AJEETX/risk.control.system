@@ -1,4 +1,4 @@
-﻿@model ClaimTransactionModel
+﻿@model CaseTransactionModel
 
 @{
     var address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
@@ -13,12 +13,6 @@
     {
         var bage = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
         beneficaryAge = (int)bage / 365;
-    }
-    string timeTaken = "< 1";
-    var totalTime = @Model.Log.FirstOrDefault().Created.Subtract(Model.Log.LastOrDefault().Created).Days;
-    if (totalTime > 0)
-    {
-        timeTaken = totalTime.ToString();
     }
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
         <div class="card bg-light d-flex flex-fill">

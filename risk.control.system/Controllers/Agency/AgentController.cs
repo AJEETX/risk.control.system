@@ -18,14 +18,12 @@ namespace risk.control.system.Controllers.Agency
     public class AgentController : Controller
     {
         private readonly INotyfService notifyService;
-        private readonly IClaimsVendorService vendorService;
-        private readonly IInvestigationReportService investigationReportService;
+        private readonly ICaseVendorService vendorService;
 
-        public AgentController(INotyfService notifyService, IClaimsVendorService vendorService, IInvestigationReportService investigationReportService)
+        public AgentController(INotyfService notifyService, ICaseVendorService vendorService)
         {
             this.notifyService = notifyService;
             this.vendorService = vendorService;
-            this.investigationReportService = investigationReportService;
         }
         public IActionResult Index()
         {
@@ -45,11 +43,11 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb("Submit",FromAction = "Agent")]
-        public async Task<IActionResult> GetInvestigate(string selectedcase, bool uploaded = false)
+        public async Task<IActionResult> GetInvestigate(long selectedcase, bool uploaded = false)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(selectedcase))
+                if (selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be investigate.");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -87,7 +85,7 @@ namespace risk.control.system.Controllers.Agency
             return View();
         }
         [Breadcrumb(title: " Detail", FromAction = "Submitted")]
-        public async Task<IActionResult> SubmittedDetail(string id)
+        public async Task<IActionResult> SubmittedDetail(long id)
         {
             if (id == null)
             {
@@ -102,7 +100,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                var model = await vendorService.GetInvestigateReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);

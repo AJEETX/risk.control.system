@@ -20,7 +20,8 @@ namespace risk.control.system.Controllers.Api.Claims
 {
     public interface IClaimsService
     {
-        IQueryable<ClaimsInvestigation> GetClaims();
+        //IQueryable<ClaimsInvestigation> GetClaims();
+        IQueryable<InvestigationTask> GetCasesWithDetail();
     }
     public class ClaimsService : IClaimsService
     {
@@ -30,13 +31,11 @@ namespace risk.control.system.Controllers.Api.Claims
         {
             _context = context;
         }
-        public IQueryable<ClaimsInvestigation> GetClaims()
+        public IQueryable<InvestigationTask> GetCasesWithDetail()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+            IQueryable<InvestigationTask> applicationDbContext = _context.Investigations
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
                 .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
@@ -61,13 +60,10 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.District)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
                .Include(c => c.Vendor)
-               .Include(c => c.ClaimNotes)
+               .Include(c => c.CaseNotes)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);
         }
-
     }
 }

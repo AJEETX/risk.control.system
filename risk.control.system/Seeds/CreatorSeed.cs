@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
 {
     public static class CreatorSeed
     {
-        public static async Task Seed(ApplicationDbContext context, 
+        public static async Task<ClientCompanyApplicationUser> Seed(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment, 
             UserManager<ClientCompanyApplicationUser> userManager, 
             ClientCompany clientCompany, PinCode pinCode, string creatorEmailwithSuffix, string photo, string firstName, string lastName)
@@ -68,6 +68,7 @@ namespace risk.control.system.Seeds
                     //clientCreator.ApplicationRoles.Add(clientCreatorRole);
                 }
             }
+            return clientCreator;
         }
     }
 }

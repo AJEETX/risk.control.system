@@ -2,8 +2,15 @@
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/agency/Supervisor/GetCompleted',
-            dataSrc: ''
+            url: '/api/agency/VendorInvestigation/GetCompleted',
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         columnDefs: [
             {
@@ -18,7 +25,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
             }],
-        order: [[12, 'desc']],
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -124,7 +131,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" href="/Supervisor/CompletedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/CompletedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>&nbsp;'
                     return buttons;
                 }
@@ -140,8 +147,7 @@
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
 
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element

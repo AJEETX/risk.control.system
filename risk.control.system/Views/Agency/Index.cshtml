@@ -1,4 +1,5 @@
-﻿@model risk.control.system.Models.Vendor
+﻿@using risk.control.system.Helpers;
+@model risk.control.system.Models.Vendor
 
 @{
     ViewData["Title"] = @Applicationsettings.DETAILS;
@@ -138,7 +139,7 @@
                                 {
                                     <tr>
                                         <td>
-                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                            @Html.DisplayFor(modelItem => item.InsuranceType.GetEnumDisplayName())
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)

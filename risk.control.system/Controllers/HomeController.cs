@@ -24,25 +24,25 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(int code)
+        public IActionResult Error()
         {
-            var statusCodeReExecuteFeature = HttpContext.Features.Get<
-                                           IStatusCodeReExecuteFeature>();
-            if (statusCodeReExecuteFeature != null)
-            {
-                ViewBag.OriginalURL =
-                    statusCodeReExecuteFeature.OriginalPathBase
-                    + statusCodeReExecuteFeature.OriginalPath
-                    + statusCodeReExecuteFeature.OriginalQueryString;
-            }
-
-            ViewBag.RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-            ViewBag.ShowRequestId = !string.IsNullOrEmpty(ViewBag.RequestId);
-            ViewBag.ShowOriginalURL = !string.IsNullOrEmpty(ViewBag.OriginalURL);
-            ViewBag.ErrorStatusCode = code;
-
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View();
         }
+        public IActionResult HTTP(int statusCode)
+        {
+            ViewBag.StatusCode = statusCode;
+
+            string message = statusCode switch
+            {
+                404 => "Page not found.",
+                500 => "Server error.",
+                403 => "Access denied.",
+                _ => "An unexpected error occurred."
+            };
+
+            ViewBag.Message = message;
+            return View();
+        }
+
     }
 }

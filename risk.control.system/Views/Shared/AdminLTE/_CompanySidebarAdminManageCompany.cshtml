@@ -40,17 +40,14 @@
                 </p>
             </a>
         </li>
-        @if (System.Diagnostics.Debugger.IsAttached)
-        {
-            <li class="nav-item">
-                <a is-active-page asp-controller="Question" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Question","Index")">
-                    <i class="nav-icon fa fa-question"></i>
-                    <p>
-                        <span class="badge badge-success">QUESTION <sub>claim</sub></span>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Question" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Question","Index")">
+                <i class="nav-icon fa fa-question"></i>
+                <p>
+                    <span class="badge badge-success">QUESTION <sub>claim</sub></span>
 
-                    </p>
-                </a>
-            </li>
-        }
+                </p>
+            </a>
+        </li>
     }
 }

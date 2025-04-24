@@ -1,0 +1,15 @@
+﻿@model CaseInvestigationVendorAgentModel
+
+@{
+    ViewData["Title"] = @Applicationsettings.SERVICE;
+}
+
+<section class="content">
+    <partial name="_ReviewClaimsPolicy" model="@Model" />
+ 
+</section>
+
+@section Scripts {
+    <script src="~/js/agency/select-agent.js"></script>
+    <script src="~/js/common/claim-details.js"></script>
+}

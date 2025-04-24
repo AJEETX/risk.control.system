@@ -4,7 +4,7 @@
 }
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
-        <partial name="Creator/_ClaimTitle" model="Model" />
+        <partial name="Investigation/_UploadTitle" model="Model" />
 
         <div class="filter-refresh-container shadow-lg border-1 rounded-lg">
             <div class="filter-group">
@@ -13,8 +13,8 @@
                 </label>
                 <select id="caseTypeFilter" class="form-select custom-select">
                     <option value="">All</option>
-                    <option value="claims">Claim</option>
-                    <option value="underwriting">Underwriting</option>
+                    <option value="@InsuranceType.CLAIM">@CONSTANTS.CLAIM</option>
+                    <option value="@InsuranceType.UNDERWRITING">@CONSTANTS.UNDERWRITING</option>
                 </select>
             </div>
             <div class="shadow-lg border-1 rounded-lg">
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <form id="checkboxes" asp-action="AssignAuto" asp-controller="ClaimsInvestigationPost" method="post">
+        <form id="checkboxes" asp-action="AssignAuto" asp-controller="InvestigationPost" method="post">
             <div class="card-body">
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>

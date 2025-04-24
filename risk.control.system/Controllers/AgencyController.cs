@@ -589,19 +589,18 @@ namespace risk.control.system.Controllers
                 var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
-                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var agencySubStatuses = _context.InvestigationCaseSubStatus.Where(i =>
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR) ||
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR) ||
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT) ||
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR) ||
-                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)
-                    ).Select(s => s.InvestigationCaseSubStatusId).ToList();
+                var agencySubStatuses = new[] {
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR};
 
-                var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == model.VendorId);
+                var hasClaims = _context.Investigations.Any(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == model.VendorId);
                 model.HasClaims = hasClaims;
                 return View(model);
             }
@@ -767,8 +766,6 @@ namespace risk.control.system.Controllers
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
-                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-
                 ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
@@ -817,7 +814,7 @@ namespace risk.control.system.Controllers
                         .AsEnumerable() // Switch to client-side evaluation
                         .Where(v =>
                             v.VendorId == vendorUser.VendorId.Value &&
-                            v.LineOfBusinessId == service.LineOfBusinessId &&
+                            v.InsuranceType == service.InsuranceType &&
                             v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                             v.CountryId == (long?)service.SelectedCountryId &&
                             v.StateId == (long?)service.SelectedStateId)?
@@ -910,8 +907,7 @@ namespace risk.control.system.Controllers
                     .Include(v => v.Vendor)
                     .First(v => v.VendorInvestigationServiceTypeId == id);
 
-                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId), "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.InsuranceType == vendorInvestigationServiceType.InsuranceType), "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
 
                 if (vendorInvestigationServiceType.DistrictId == null)
                 {
@@ -948,7 +944,7 @@ namespace risk.control.system.Controllers
                        .AsNoTracking() // Switch to client-side evaluation
                        .Where(v =>
                            v.VendorId == vendorUser.VendorId.Value &&
-                           v.LineOfBusinessId == service.LineOfBusinessId &&
+                           v.InsuranceType == service.InsuranceType &&
                            v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                            v.CountryId == (long?)service.SelectedCountryId &&
                            v.StateId == (long?)service.SelectedStateId && 
@@ -1026,7 +1022,6 @@ namespace risk.control.system.Controllers
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
-                    .Include(v => v.LineOfBusiness)
                     .Include(v => v.Country)
                     .Include(v => v.State)
                     .Include(v => v.District)
@@ -1095,7 +1090,6 @@ namespace risk.control.system.Controllers
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
-                    .Include(v => v.LineOfBusiness)
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.Country)

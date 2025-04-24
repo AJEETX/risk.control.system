@@ -46,6 +46,9 @@ namespace risk.control.system.Seeds
             var investigatoz = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigatoz.com", NAME = "Investigatoz", PHOTO = "/img/investigation.png" };
 
 
+            var servicesTypes = await ServiceTypeSeed.Seed(context);
+
+
             var agencies = new List<SeedInput> { 
                 checker, verify, investigate, investigator, greatez
                 , proper, honest, greater, investigatoz
@@ -55,7 +58,7 @@ namespace risk.control.system.Seeds
 
             foreach (var agency in agencies)
             {
-                var vendor = await AgencyCheckerSeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency);
+                var vendor = await AgencyCheckerSeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes);
                 vendors.Add(vendor);
             }
             return vendors;

@@ -3,7 +3,14 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Assessor/GetReject',
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         columnDefs: [
             {
@@ -186,8 +193,7 @@
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
 
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     $('#caseTypeFilter').on('change', function () {
         table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"

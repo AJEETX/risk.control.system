@@ -24,7 +24,7 @@ namespace risk.control.system.Models
         public bool AiEnabled { get; set; } = false;
 
         public bool UpdateAgentReport { get; set; } = false;
-        public bool UpdateAgentAnswer { get; set; } = false;
+        public bool UpdateAgentAnswer { get; set; } = true;
 
         public bool HasSampleData { get; set; } = true;
         public bool ShowTimer { get; set; } = false;

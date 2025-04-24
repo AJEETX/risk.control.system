@@ -5,14 +5,14 @@ using WorkflowCore.Models;
 
 namespace risk.control.system.WorkFlow
 {
-    public class CaseAgencyReportSubmitted : StepBody
+    public class CaseInvestigationReportSubmitted : StepBody
     {
         public override ExecutionResult Run(IStepExecutionContext context)
         {
             var data = context.Workflow.Data as InvestigationTask;
             if (data != null)
             {
-                data.Status = "CaseAgencyReportSubmitted"; // ✅ This now works
+                data.Status = "CaseInvestigationReportSubmitted"; // ✅ This now works
             }
             return ExecutionResult.Next();
         }

@@ -32,8 +32,6 @@ namespace risk.control.system.Controllers.Api
     [ApiController]
     public class AgentController : ControllerBase
     {
-        private const string CLAIM = "claims";
-        private const string UNDERWRITING = "underwriting";
         private Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
         private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
@@ -41,16 +39,16 @@ namespace risk.control.system.Controllers.Api
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
         private readonly IConfiguration configuration;
+        private readonly IAgentIdService agentIdService;
+        private readonly IVendorInvestigationService service;
         private readonly ICompareFaces compareFaces;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
         private readonly IFeatureManager featureManager;
         private readonly IBackgroundJobClient backgroundJobClient;
         private readonly ISmsService smsService;
-        private readonly IClaimsInvestigationService claimsInvestigationService;
-        private readonly IMailboxService mailboxService;
+        private readonly IMailService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IICheckifyService iCheckifyService;
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         private static Random randomNumber = new Random();
         private string portal_base_url = string.Empty;
@@ -58,6 +56,8 @@ namespace risk.control.system.Controllers.Api
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
             IConfiguration configuration,
+            IAgentIdService agentIdService,
+            IVendorInvestigationService service,
             ICompareFaces compareFaces,
             UserManager<VendorApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
@@ -65,22 +65,22 @@ namespace risk.control.system.Controllers.Api
             IFeatureManager featureManager,
             IBackgroundJobClient backgroundJobClient,
             ISmsService SmsService,
-            IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
-            IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService)
+            IMailService mailboxService,
+            IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
             this.httpClientService = httpClientService;
             this.configuration = configuration;
+            this.agentIdService = agentIdService;
+            this.service = service;
             this.compareFaces = compareFaces;
             this.userVendorManager = userVendorManager;
             this.agentService = agentService;
             this.featureManager = featureManager;
             this.backgroundJobClient = backgroundJobClient;
             smsService = SmsService;
-            this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
-            this.iCheckifyService = iCheckifyService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -282,56 +282,6 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [AllowAnonymous]
-        [HttpGet("GetImage")]
-        public IActionResult GetImage(string claimId, string type)
-        {
-            try
-            {
-                var claim = _context.ClaimsInvestigation
-                 .Include(c => c.AgencyReport)
-                 .Include(c => c.AgencyReport.DigitalIdReport)
-                 .Include(c => c.AgencyReport.PanIdReport)
-                 .Include(c => c.PolicyDetail)
-                 .ThenInclude(c => c.LineOfBusiness)
-                 .Include(c => c.PolicyDetail)
-                 .ThenInclude(c => c.CostCentre)
-                 .Include(c => c.PolicyDetail)
-                 .ThenInclude(c => c.CaseEnabler)
-                 .Include(c => c.CustomerDetail)
-                 .ThenInclude(c => c.District)
-                 .Include(c => c.CustomerDetail)
-                 .ThenInclude(c => c.State)
-                 .Include(c => c.CustomerDetail)
-                 .ThenInclude(c => c.Country)
-                 .Include(c => c.CustomerDetail)
-                 .ThenInclude(c => c.PinCode)
-                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
-                if (claim != null)
-                {
-                    if (type.ToLower() == "face")
-                    {
-                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage));
-                        return Ok(new { Image = image, Valid = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence ?? "00.00" });
-                    }
-
-                    if (type.ToLower() == "ocr")
-                    {
-                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.PanIdReport?.DocumentIdImage));
-                        return Ok(new { Image = image, Valid = claim.AgencyReport.PanIdReport?.DocumentIdImageValid.ToString() });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                return BadRequest();
-            }
-
-            return Ok();
-        }
-
         [AllowAnonymous]
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("agent")]
@@ -339,8 +289,7 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-
-                var agent = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == email);
+                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -353,100 +302,69 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State);
-
-                var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+                var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
 
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
                 if (vendorUser == null)
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
-                var claimsAssigned = new List<ClaimsInvestigation>();
+                var claims = await _context.Investigations
+                .Include(c => c.PolicyDetail)
+               .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+               .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Where(i => i.VendorId == vendorUser.VendorId &&
+                i.SubStatus == assignedToAgentStatus &&
+                i.TaskedAgentEmail == vendorUser.Email).ToListAsync();
 
-                foreach (var item in applicationDbContext)
-                {
-                    if (item.VendorId == vendorUser.VendorId
-                        && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
-                    {
-                        claimsAssigned.Add(item);
-                    }
-                }
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
-
-                var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
-
-                var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
-                var claimLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIM).LineOfBusinessId;
-
-                var claim2Agent = claimsAssigned
+                var claim2Agent = claims
                     .Select(c =>
-                new
-                {
-                    claimId = c.ClaimsInvestigationId,
-                    Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
-                    claimType = c.PolicyDetail.LineOfBusinessId == claimLineOfBusiness ? ClaimType.DEATH : ClaimType.HEALTH,
-                    DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
-                    CustomerName = c.CustomerDetail.Name,
-                    CustomerEmail = email,
-                    PolicyNumber = c.PolicyDetail.ContractNumber,
-                    Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
-                    c.CustomerDetail.Addressline,
-                    c.CustomerDetail.PinCode.Code,
-                    CustomerPhoto = c?.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c?.CustomerDetail.ProfilePicture)) :
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
-                    Country = c.CustomerDetail.Country.Name,
-                    State = c.CustomerDetail.State.Name,
-                    District = c.CustomerDetail.District.Name,
-                    c.CustomerDetail.Description,
-                    Locations = new
+                    new
                     {
-                        c.BeneficiaryDetail.BeneficiaryDetailId,
-                        Photo = c.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.BeneficiaryDetail.ProfilePicture)) :
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
-                        c.BeneficiaryDetail.Country.Name,
-                        BeneficiaryName = c.BeneficiaryDetail.Name,
-                        c.BeneficiaryDetail.Addressline,
-                        c.BeneficiaryDetail.PinCode.Code,
-                        District = c.BeneficiaryDetail.District.Name,
-                        State = c.BeneficiaryDetail.State.Name
-                    }
-                });
+                        claimId = c.Id,
+                        Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
+                        claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
+                        DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
+                        Applicationsettings.NO_POLICY_IMAGE,
+                        CustomerName = c.CustomerDetail.Name,
+                        CustomerEmail = email,
+                        PolicyNumber = c.PolicyDetail.ContractNumber,
+                        Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
+                        c.CustomerDetail.Addressline,
+                        c.CustomerDetail.PinCode.Code,
+                        CustomerPhoto = c?.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c?.CustomerDetail.ProfilePicture)) :
+                        Applicationsettings.USER_PHOTO,
+                        Country = c.CustomerDetail.Country.Name,
+                        State = c.CustomerDetail.State.Name,
+                        District = c.CustomerDetail.District.Name,
+                        c.CustomerDetail.Description,
+                        Locations = new
+                        {
+                            c.BeneficiaryDetail.BeneficiaryDetailId,
+                            Photo = c.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.BeneficiaryDetail.ProfilePicture)) :
+                            Applicationsettings.USER_PHOTO,
+                            c.BeneficiaryDetail.Country.Name,
+                            BeneficiaryName = c.BeneficiaryDetail.Name,
+                            c.BeneficiaryDetail.Addressline,
+                            c.BeneficiaryDetail.PinCode.Code,
+                            District = c.BeneficiaryDetail.District.Name,
+                            State = c.BeneficiaryDetail.State.Name
+                        }
+                    })?.ToList();
                 return Ok(claim2Agent);
             }
             catch (Exception ex)
@@ -475,13 +393,13 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
+                if (vendorUser == null)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                var claims = await _context.Investigations
                     .Include(c => c.PolicyDetail)
-                    .Include(c => c.ClientCompany)
-                    .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c.CaseEnabler)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.BeneficiaryRelation)
                     .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.PinCode)
                     .Include(c => c.BeneficiaryDetail)
@@ -490,68 +408,32 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.State)
                     .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.Country)
-                    .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c.CostCentre)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.District)
-                    .Include(c => c.InvestigationCaseStatus)
-                    .Include(c => c.InvestigationCaseSubStatus)
-                    .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c.InvestigationServiceType)
-                    .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c.LineOfBusiness)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State);
+                    .ThenInclude(c => c.State)
+                    .Where(i => i.VendorId == vendorUser.VendorId &&
+                    i.TaskedAgentEmail == vendorUser.Email &&
+                    i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).ToListAsync();
 
-                var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-                var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
-                if (vendorUser == null)
-                {
-                    return Unauthorized("Invalid User !!!");
-                }
-                applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
-                var claimsAssigned = new List<ClaimsInvestigation>();
-
-                foreach (var item in applicationDbContext)
-                {
-                    if (item.VendorId == vendorUser.VendorId
-                        && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
-                    {
-                        claimsAssigned.Add(item);
-                    }
-                }
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
-
-                var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
-
-                var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
-                var claimLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIM).LineOfBusinessId;
-                var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
-
-                var claim2Agent = claimsAssigned
+                var claim2Agent = claims
                     .Select(c =>
                 new
                 {
-                    ClaimId = c.ClaimsInvestigationId,
+                    ClaimId = c.Id,
                     Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                     Coordinate = new
                     {
-                        Lat = c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ?
+                        Lat = c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
                             decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
-                        Lng = c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ?
+                        Lng = c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
                              decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
                     },
-                    Address = LocationDetail.GetAddress(c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, c.CustomerDetail, c.BeneficiaryDetail),
+                    Address = LocationDetail.GetAddress(c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, c.CustomerDetail, c.BeneficiaryDetail),
                     PolicyNumber = c.PolicyDetail.ContractNumber,
                 });
                 return Ok(claim2Agent);
@@ -582,10 +464,11 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var claim = _context.ClaimsInvestigation
-                    .Include(c => c.AgencyReport)
-                    .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c.LineOfBusiness)
+                var claim = _context.Investigations
+                    .Include(c => c.InvestigationReport)
+                    .ThenInclude(c => c.DigitalIdReport)
+                    .Include(c => c.InvestigationReport)
+                    .ThenInclude(c => c.PanIdReport)
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(c => c.CostCentre)
                     .Include(c => c.PolicyDetail)
@@ -598,7 +481,7 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
-                    .FirstOrDefault(c => c.ClaimsInvestigationId == claimId
+                    .FirstOrDefault(c => c.Id == int.Parse(claimId)
                     );
                 var beneficiary = _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
@@ -606,19 +489,8 @@ namespace risk.control.system.Controllers.Api
                     .Include(c => c.District)
                     .Include(c => c.State)
                     .Include(c => c.Country)
-                    .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+                    .FirstOrDefault(c => c.InvestigationTaskId == int.Parse(claimId));
 
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
-
-                var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
-
-                var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.png");
-
-                var noDataimage = await System.IO.File.ReadAllBytesAsync(filePath);
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
 
                 return Ok(
@@ -626,12 +498,12 @@ namespace risk.control.system.Controllers.Api
                     {
                         Policy = new
                         {
-                            ClaimId = claim.ClaimsInvestigationId,
+                            ClaimId = claim.Id,
                             PolicyNumber = claim.PolicyDetail.ContractNumber,
-                            ClaimType = claim.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                            ClaimType = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                             Document = claim.PolicyDetail.DocumentImage != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.PolicyDetail.DocumentImage)) :
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
+                            Applicationsettings.NO_POLICY_IMAGE,
                             IssueDate = claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
                             IncidentDate = claim.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
                             Amount = claim.PolicyDetail.SumAssuredValue,
@@ -644,7 +516,7 @@ namespace risk.control.system.Controllers.Api
                             Name = beneficiary.Name,
                             Photo = beneficiary.ProfilePicture != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture)) :
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
+                            Applicationsettings.USER_PHOTO,
                             Relation = beneficiary.BeneficiaryRelation.Name,
                             Income = beneficiary.Income.GetEnumDisplayName(),
                             Phone = beneficiary.ContactNumber,
@@ -657,7 +529,7 @@ namespace risk.control.system.Controllers.Api
                             Occupation = claim.CustomerDetail.Occupation.GetEnumDisplayName(),
                             Photo = claim.CustomerDetail.ProfilePicture != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.CustomerDetail.ProfilePicture)) :
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
+                            Applicationsettings.USER_PHOTO,
                             Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
                             Phone = claim.CustomerDetail.ContactNumber,
                             DateOfBirth = claim.CustomerDetail.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
@@ -665,17 +537,17 @@ namespace risk.control.system.Controllers.Api
                         },
                         InvestigationData = new
                         {
-                            LocationImage = claim?.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.AgencyReport?.DigitalIdReport?.DigitalIdImage)) :
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                            OcrImage = claim?.AgencyReport?.PanIdReport?.DocumentIdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.AgencyReport?.PanIdReport?.DocumentIdImage)) :
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                            OcrData = claim?.AgencyReport?.PanIdReport?.DocumentIdImageData,
-                            LocationLongLat = claim?.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat,
-                            OcrLongLat = claim?.AgencyReport?.PanIdReport?.DocumentIdImageLongLat,
+                            LocationImage = claim?.InvestigationReport?.DigitalIdReport?.DigitalIdImage != null ?
+                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.DigitalIdReport?.DigitalIdImage)) :
+                            Applicationsettings.NO_PHOTO_IMAGE,
+                            OcrImage = claim?.InvestigationReport?.PanIdReport?.DocumentIdImage != null ?
+                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.PanIdReport?.DocumentIdImage)) :
+                            Applicationsettings.NO_PHOTO_IMAGE,
+                            OcrData = claim?.InvestigationReport?.PanIdReport?.DocumentIdImageData,
+                            LocationLongLat = claim?.InvestigationReport?.DigitalIdReport?.DigitalIdImageLongLat,
+                            OcrLongLat = claim?.InvestigationReport?.PanIdReport?.DocumentIdImageLongLat,
                         },
-                        Remarks = claim?.AgencyReport?.AgentRemarks,
+                        Remarks = claim?.InvestigationReport?.AgentRemarks,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)
                     });
             }
@@ -686,7 +558,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        
+
         [AllowAnonymous]
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
@@ -714,15 +586,15 @@ namespace risk.control.system.Controllers.Api
             }
 
 
-            if(data.Type == "0")
+            if (data.Type == "0")
             {
-                var response = await iCheckifyService.GetAgentId(data);
+                var response = await agentIdService.GetAgentId(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
             else if (data.Type == "1")
             {
-                var response = await iCheckifyService.GetFaceId(data);
+                var response = await agentIdService.GetFaceId(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
@@ -754,50 +626,50 @@ namespace risk.control.system.Controllers.Api
                     return StatusCode(401, new { message = "Offboarded Agent." });
                 }
             }
-            var response = await iCheckifyService.GetDocumentId(data);
+            var response = await agentIdService.GetDocumentId(data);
             response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
             return Ok(response);
         }
 
-        [AllowAnonymous]
-        [HttpPost("audio")]
-        public async Task<IActionResult> Audio(AudioData data)
-        {
-            if (data == null)
-            {
-                return BadRequest();
-            }
-            if (!string.IsNullOrWhiteSpace(Path.GetFileName(data.MediaFile.Name)))
-            {
-                data.Name = Path.GetFileName(data.MediaFile.Name);
-                using (var ds = new MemoryStream())
-                {
-                    data.MediaFile.CopyTo(ds);
-                    data.Mediabytes = ds.ToArray();
-                };
-            }
+        //[AllowAnonymous]
+        //[HttpPost("audio")]
+        //public async Task<IActionResult> Audio(AudioData data)
+        //{
+        //    if (data == null)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(Path.GetFileName(data.MediaFile.Name)))
+        //    {
+        //        data.Name = Path.GetFileName(data.MediaFile.Name);
+        //        using (var ds = new MemoryStream())
+        //        {
+        //            data.MediaFile.CopyTo(ds);
+        //            data.Mediabytes = ds.ToArray();
+        //        };
+        //    }
 
-            var response = await iCheckifyService.GetAudio(data);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-            return Ok(response);
-        }
+        //    var response = await iCheckifyService.GetAudio(data);
+        //    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+        //    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+        //    return Ok(response);
+        //}
 
-        [AllowAnonymous]
-        [HttpPost("video")]
-        public async Task<IActionResult> Video(VideoData data)
-        {
-            if (data == null)
-            {
-                return BadRequest();
-            }
+        //[AllowAnonymous]
+        //[HttpPost("video")]
+        //public async Task<IActionResult> Video(VideoData data)
+        //{
+        //    if (data == null)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            var response = await iCheckifyService.GetVideo(data);
+        //    var response = await iCheckifyService.GetVideo(data);
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-            return Ok(response);
-        }
+        //    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+        //    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+        //    return Ok(response);
+        //}
 
         [AllowAnonymous]
         [HttpPost("submit")]
@@ -822,12 +694,12 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var (vendor, contract) = await claimsInvestigationService.SubmitToVendorSupervisor(
+                var (vendor, contract) = await service.SubmitToVendorSupervisor(
                     data.Email,
-                    data.ClaimId,
+                    int.Parse(data.ClaimId),
                     data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, portal_base_url));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, int.Parse(data.ClaimId), portal_base_url));
 
                 return Ok(new { data, Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId) });
             }
@@ -838,43 +710,5 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
-        [HttpPost("ip")]
-        public async Task<IActionResult> WhitelistIP(string domain = "insurer.com", string ipaddress = "222.222.222.222", string url = "https://icheckify.azurewebsites.net/")
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(ipaddress) || string.IsNullOrWhiteSpace(url))
-                {
-                    return BadRequest($"EMPTY INPUT(s)");
-                }
-                var ipSet = await httpClientService.WhitelistIP(url, domain, ipaddress);
-
-                return Ok(ipSet);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
-            }
-        }
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [AllowAnonymous]
-        [HttpPost("setip")]
-        public async Task<IActionResult> SetWhitelistIP(IPWhitelistRequest request)
-        {
-            try
-            {
-                var ipSet = await iCheckifyService.WhitelistIP(request);
-
-                return Ok(ipSet);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                throw;
-            }
-        }
     }
 }

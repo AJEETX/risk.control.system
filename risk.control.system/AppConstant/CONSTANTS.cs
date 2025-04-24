@@ -12,6 +12,8 @@
 
             public class CASE_SUBSTATUS
             {
+                public const string UPLOAD_IN_PROGRESS = "PENDING";
+                public const string UPLOAD_COMPLETED = "UPLOADED";
                 public const string DRAFTED_BY_CREATOR = "DRAFTED";
                 public const string CREATED_BY_CREATOR = "CREATED";
                 public const string EDITED_BY_CREATOR = "EDITED";
@@ -30,6 +32,6 @@
             }
         }
         public const string UNDERWRITING = "underwriting";
-        public const string CLAIMS = "claims";
+        public const string CLAIM = "claim";
     }
 }

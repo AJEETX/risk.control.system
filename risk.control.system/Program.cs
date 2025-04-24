@@ -56,14 +56,14 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using Hangfire.SQLite;
 using Hangfire.Dashboard;
 using risk.control.system.WorkFlow;
+//using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
-
+//QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
     options.TagName = "nav";
@@ -82,7 +82,7 @@ builder.Services.AddTransient<CaseDeclineStep>();
 builder.Services.AddTransient<CaseAssignToAgentStep>();
 builder.Services.AddTransient<CaseAgentReportSubmitted>();
 builder.Services.AddTransient<CaseReAssignedToAgentStep>();
-builder.Services.AddTransient<CaseAgencyReportSubmitted>();
+builder.Services.AddTransient<CaseInvestigationReportSubmitted>();
 builder.Services.AddTransient<CaseApproved>();
 builder.Services.AddTransient<CaseRejected>();
 
@@ -118,6 +118,13 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<IAgentIdService, AgentIdService>();
+builder.Services.AddScoped<ICaseVendorService, CaseVendorService>();
+builder.Services.AddScoped<IVendorInvestigationService, VendorInvestigationService>();
+builder.Services.AddScoped<IDashboardCountService, DashboardCountService>();
+builder.Services.AddScoped<ITimelineService, TimelineService>();
+builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.AddScoped<IProcessCaseService, ProcessCaseService>();
 builder.Services.AddScoped<IInvestigationService, InvestigationService>();
 builder.Services.AddScoped<IHangfireJobService, HangfireJobService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
@@ -127,30 +134,23 @@ builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddSingleton<IValidationService,ValidationService>();
 builder.Services.AddScoped<ITokenService,TokenService>();
 builder.Services.AddScoped<IUserService,UserService>();
-builder.Services.AddScoped<IClaimCreationService,ClaimCreationService>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<ICustomApiCLient, CustomApiClient>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
 builder.Services.AddScoped<IClaimsAgentService, ClaimsAgentService>();
 builder.Services.AddScoped<ICompareFaces, CompareFaces>();
 builder.Services.AddScoped<ISmsService, SmsService>();
-builder.Services.AddScoped<ICreatorService, CreatorService>();
+//builder.Services.AddScoped<ICreatorService, CreatorService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<INumberSequenceService, NumberSequenceService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
-builder.Services.AddScoped<IInvestigationReportService, InvestigationReportService>();
-builder.Services.AddScoped<IClaimsVendorService, ClaimsVendorService>();
 builder.Services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
-builder.Services.AddScoped<IClaimPolicyService, ClaimPolicyService>();
 builder.Services.AddScoped<IClaimsService, ClaimsService>();
-builder.Services.AddScoped<IICheckifyService, ICheckifyService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IFtpService, FtpService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-builder.Services.AddScoped<IMailboxService, MailboxService>();
 builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
 builder.Services.AddScoped<IGoogleApi, GoogleApi>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
@@ -207,14 +207,13 @@ builder.Services.AddNotyf(config =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("Database");
-var HangfireConnectionString = builder.Configuration.GetConnectionString("HangfireDatabase");
+//var HangfireConnectionString = builder.Configuration.GetConnectionString("HangfireDatabase");
 var isProd = builder.Configuration.GetSection("IsProd").Value;
 var prod = bool.Parse(isProd);
 if (prod)
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
          options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-    builder.Services.AddHangfire(config => config.UseSQLiteStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 else
 {
@@ -225,7 +224,6 @@ else
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostGresConnection")));
 
     builder.Services.AddHangfire(config => config.UseMemoryStorage());
-    //builder.Services.AddHangfire(config => config.UseSQLiteStorage(HangfireConnectionString));
 }
 builder.Services.AddHangfireServer(options =>
 {
@@ -392,11 +390,19 @@ app.UseMiddleware<RequirePasswordChangeMiddleware>();
 //app.UseWebSockets();
 app.UseSwagger();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
+    // Show detailed error page for devs
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // Redirect to custom error page in production
     app.UseExceptionHandler("/Home/Error");
+    app.UseStatusCodePagesWithRedirects("/Home/HTTP?statusCode={0}");
     app.UseHsts();
 }
+
 app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
 
 //app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");

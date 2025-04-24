@@ -61,6 +61,9 @@
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
             }
         },
         
@@ -233,13 +236,10 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var isPending = row.status === "PENDING"; // Check if status is "READY"
-                    var disabled = isPending ? "disabled" : "";  // Disable buttons if pending
-                    var spinClass = isPending ? "fa-spin" : ""; // Add spin class if pending
                     var buttons = "";
                     console.log(row.status);
                     if (row.ready2Assign) {
-                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
+                        buttons += '<a id="assign' + row.id + '" href="/Investigation/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
                         buttons += '<i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
@@ -255,8 +255,8 @@
             { "data": "timeElapsed", bVisible: false },
             { "data": "policy", bVisible: false }
         ],
-        rowCallback: function (row, data) {
-            if (data.isNewAssigned) {
+        rowCallback: function (row, data, index) {
+            if (data.isNew) {
                 $('td', row).addClass('isNewAssigned');
                 // Remove the class after 3 seconds
                 setTimeout(function () {
@@ -297,8 +297,7 @@
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
             //checkUploadJobStatus();
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
 
     $('#caseTypeFilter').on('change', function () {
@@ -333,7 +332,7 @@
 
         table.rows().every(function () {
             var data = this.data();
-            if (data.status != "PENDING") {
+            if (!data.isUploaded && data.origin == 'file') {
                 pendingExists = true;
                 return false; // Stop iterating once a "Pending" row is found
             }
@@ -537,7 +536,7 @@
     });
     function deleteSelectedCases(claims) {
         $.ajax({
-            url: "/CreatorPost/DeleteCases", // Update with your actual delete endpoint
+            url: "/InvestigationPost/DeleteCases", // Update with your actual delete endpoint
             type: "POST",
             data: JSON.stringify({ claims: claims }),
             contentType: "application/json",
