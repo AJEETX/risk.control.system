@@ -87,8 +87,6 @@ namespace risk.control.system.Seeds
                 PanAPIHost = globalSettings.PanAPIHost,
                 PanAPIKey = globalSettings.PanAPIKey,
                 UpdateAgentAnswer = globalSettings.UpdateAgentAnswer,
-                UpdateAgentReport = globalSettings.UpdateAgentReport,
-
                 AddressMapLocation = companyAddressUrl,
                 AddressLatitude = companyAddressCoordinates.Latitude,
                 AddressLongitude = companyAddressCoordinates.Longitude

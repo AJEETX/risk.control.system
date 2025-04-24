@@ -40,54 +40,47 @@
         <div class="card-body">
 
             <div class="row">
-                <div class="col-7">
-                    <p class="text-muted text-sm">
-                        <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
-                        <br />
-                        <ul class="ml-4 mb-0 fa-ul text-muted">
-                            @foreach (var question in Model.InvestigationReport.CaseQuestionnaire.Questions)
-                            {
-                                <li class="small">
-                                    @question.QuestionText
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                </li>
-                                <br />
-                            }
-                        </ul>
-                    </p>
+                <!-- Questions -->
+                <div class="col-md-6">
+                    <h6 class="text-success">
+                        <i class="fas fa-film me-1"></i> Questions
+                    </h6>
+                    <ul class="fa-ul text-muted small">
+                        @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
+                        {
+                            <li class="mb-2">
+                                <span class="fa-li"><i class="far fa-comment text-primary"></i></span>
+                                @question.QuestionText
+                            </li>
+                        }
+                        
+                    </ul>
                 </div>
-                <div class="col-5">
-                    <p class="text-muted text-sm">
-                        <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
-                        <br />
-                        <ul class="ml-4 mb-0 fa-ul text-muted">
-                            @foreach (var question in Model.InvestigationReport.CaseQuestionnaire.Questions)
-                            {
-                                <li class="small">
-                                    @question.AnswerText
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                </li>
-                                <br />
-                            }
-
-                        </ul>
-                    </p>
+                <div class="col-md-6">
+                    <h6 class="text-success">
+                        <i class="fas fa-film me-1"></i> Answers
+                    </h6>
+                    <ul class="fa-ul text-muted small">
+                        @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
+                        {
+                            <li class="mb-2">
+                                <span class="fa-li"><i class="far fa-comment text-success"></i></span>
+                                @question.AnswerText
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-12">
                     <p class="text-muted text-sm">
-                        <span class="badge badge-light"><i class="fas fa-film"></i>Agent Remarks</span>:
+                        <span class="badge badge-light"><i class="fas fa-film"></i> Agent Remarks</span>:
                         <br />
 
                         @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
                         {
-                            <textarea asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks" rows="2"></textarea>
+                            <textarea name="remarks" id="remarks" asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks" rows="2"></textarea>
                             <span asp-validation-for="InvestigationReport.AgentRemarks" class="text-danger"></span>
                         }
                         else

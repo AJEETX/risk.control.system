@@ -541,7 +541,7 @@ textarea {
     width: 100%;
     overflow-y: auto;
     resize: both;
-    min-height: 100px;
+    min-height: 200px;
     line-height: 20px;
     border: 1px solid #ddd;
 }

@@ -278,14 +278,20 @@ namespace risk.control.system.Controllers.Api.Company
 
             var serviceType = selectedCase.PolicyDetail.InvestigationServiceTypeId;
 
+            long? countryId;
+            long? stateId;
             long? districtId;
 
             if (selectedCase.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
+                countryId = selectedCase.CustomerDetail.CountryId;
+                stateId = selectedCase.CustomerDetail.StateId;
                 districtId = selectedCase.CustomerDetail.DistrictId;
             }
             else
             {
+                countryId = selectedCase.BeneficiaryDetail.CountryId;
+                stateId = selectedCase.BeneficiaryDetail.StateId;
                 districtId = selectedCase.BeneficiaryDetail.DistrictId;
             }
 
@@ -294,8 +300,16 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(v => v.VendorId == vendorId);
 
             var hasService = vendor?.VendorInvestigationServiceTypes
-                .Any(v => v.InvestigationServiceTypeId == serviceType && v.InsuranceType  == selectedCase.PolicyDetail.InsuranceType &&
-                            (v.DistrictId == 0 || v.DistrictId == null || v.DistrictId == districtId));
+                .Any(v => v.InvestigationServiceTypeId == serviceType && 
+                    v.InsuranceType  == selectedCase.PolicyDetail.InsuranceType &&
+                            (
+                            v.DistrictId == 0 || 
+                            v.DistrictId == null || 
+                            v.DistrictId == districtId
+                            ) && 
+                            v.StateId == stateId && 
+                            v.CountryId == countryId
+                            );
             return hasService ?? false;
 
         }

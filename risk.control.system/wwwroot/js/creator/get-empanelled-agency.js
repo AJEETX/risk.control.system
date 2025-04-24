@@ -114,7 +114,7 @@
                 "mRender": function (data, type, row) {
                     let statusText = row.hasService
                         ? '<span class="text-success fw-bold small">SERVICE AVAILABLE</span>'
-                        : '<span class="text-danger fw-bold small">NO SERVICE AVAILABLE</span>';
+                        : '<span class="i-red fw-bold small">NO SERVICE AVAILABLE</span>';
 
                     let tooltipText = row.hasService
                         ? 'SERVICE AVAILABLE\r\n  Total number of current cases = ' + row.caseCount

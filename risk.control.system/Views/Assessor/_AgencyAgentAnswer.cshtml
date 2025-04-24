@@ -39,76 +39,87 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-6">
-                        <p class="text-muted text-sm">
-                            <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
-                            <br />
-                            <ul class="ml-4 mb-0 fa-ul text-muted">
-                                @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
-                                {
-                                    <li class="small">
-                                        <span class="fa-li">
-                                            <i class="far fa-comment"></i>
-                                        </span>
-                                        @question.QuestionText
+                    <!-- Questions Section -->
+                    <div class="col-md-7">
+                        <h6 class="text-success mb-3">
+                            <span class="badge badge-light">
+                                <i class="fas fa-film"></i> Questions
+                            </span>
+                        </h6>
+                        <ul class="fa-ul text-muted list-unstyled">
+                            @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
+                            {
+                                <li class="mb-2">
+                                    <span class="fa-li">
+                                        <i class="far fa-comment text-primary"></i>
+                                    </span>
+                                    @question.QuestionText
+                                </li>
+                            }
 
-                                    </li>
-                                    <br />
-                                }
-                                <li class="small">
-                                    Agent Remarks?
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                </li>
-                                <br />
-                                <li class="small">
-                                    Edited Remarks?
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                </li>
-                            </ul>
-                        </p>
+                            <li class="mb-2">
+                                <span class="fa-li">
+                                    <i class="far fa-comment text-info"></i>
+                                </span>
+                                Agent Remarks?
+                            </li>
+
+
+                        </ul>
+
                     </div>
-                    <div class="col-6">
-                        <p class="text-muted text-sm">
-                            <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
-                            <br />
-                            <ul class="ml-4 mb-0 fa-ul text-muted">
-                                @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
-                                {
-                                    <li class="small">
-                                        <span class="fa-li">
-                                            <i class="far fa-comment"></i>
-                                        </span>
-                                        @question.AnswerText
 
-                                    </li>
-                                    <br />
-                                }
-                                <li class="small">
+                    <!-- Answers Section -->
+                    <div class="col-md-5">
+                        <h6 class="text-success mb-3">
+                            <span class="badge badge-light">
+                                <i class="fas fa-film"></i> Answers
+                            </span>
+                        </h6>
+                        <ul class="fa-ul text-muted list-unstyled">
+                            @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
+                            {
+                                <li class="mb-2">
                                     <span class="fa-li">
-                                        <i class="far fa-comment"></i>
+                                        <i class="far fa-comment text-success"></i>
                                     </span>
-                                    @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
+                                    @question.AnswerText
                                 </li>
-                                <br />
-                                @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
-                                {
-                                    <li class="small">
-                                        <span class="fa-li">
-                                            <i class="far fa-comment"></i>
-                                        </span>
-                                        @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
-                                    </li>
-                                }
+                            }
 
-                            </ul>
-                        </p>
+                            <li class="mb-2">
+                                <span class="fa-li">
+                                    <i class="far fa-comment text-secondary"></i>
+                                </span>
+                                @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
+                            </li>
+
+
+                        </ul>
                     </div>
                 </div>
+
+                @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ul class="fa-ul text-muted list-unstyled">
+
+                                <li class="mb-2">
+                                    <span class="fa-li">
+                                        <i class="far fa-comment text-warning"></i>
+                                    </span>
+                                    Edited Remarksz?
+                                </li>
+                                
+                                @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
+                            </ul>
+                            
+                        </div>
+                    </div>
+                }
             </div>
+
         </div>
         <partial name="_Chat" model="@Model" />
 

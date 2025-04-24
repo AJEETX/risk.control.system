@@ -101,13 +101,7 @@
                                                         <i class="far fa-comment"></i>
                                                     </span>
                                                 </li>
-                                                <br />
-                                                <li class="small">
-                                                    Edit Remarks?
-                                                    <span class="fa-li">
-                                                        <i class="far fa-comment"></i>
-                                                    </span>
-                                                </li>
+
                                             </ul>
                                         </p>
                                     </div>
@@ -134,18 +128,26 @@
                                                     </span>
                                                     @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
                                                 </li>
-                                                <br />
-                                                <li class="small">
-                                                    <span class="fa-li">
-                                                        <i class="far fa-comment"></i>
-                                                    </span>
-                                                    @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
-                                                </li>
                                             </ul>
                                         </p>
                                     </div>
                                 </div>
-
+                                @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+                                {
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                <li class="mb-2">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment text-warning"></i>
+                                                    </span>
+                                                    Edited Remarks?
+                                                </li>
+                                                @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
+                                            </ul>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                         <div class="text-center">

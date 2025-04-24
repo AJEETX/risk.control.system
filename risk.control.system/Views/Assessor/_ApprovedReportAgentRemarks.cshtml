@@ -15,54 +15,54 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-6">
-                        <p class="text-muted text-sm">
-                            <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
-                            <br />
-                            <ul class="ml-4 mb-0 fa-ul text-muted">
-                                @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire.Questions)
-                                {
-                                    <li class="small">
-                                        @question.QuestionText
-                                        <span class="fa-li">
-                                            <i class="far fa-comment"></i>
-                                        </span>
-                                    </li>
-                                    <br />
-                                }
-                                <li class="small">
-                                    Remarks?
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
+                    <div class="col-md-6">
+                        <h6 class="text-success">
+                            <i class="fas fa-film me-1"></i> Questions
+                        </h6>
+                        <ul class="fa-ul text-muted small">
+                            @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
+                            {
+                                <li class="mb-2">
+                                    <span class="fa-li"><i class="far fa-comment text-primary"></i></span>
+                                    @question.QuestionText
                                 </li>
-                            </ul>
-                        </p>
+                            }
+                            <li class="mb-2">
+                                <span class="fa-li"><i class="far fa-comment text-secondary"></i></span>
+                                Agent Remarks?
+                            </li>
+                            <li>
+                                <span class="fa-li"><i class="far fa-comment text-secondary"></i></span>
+                                Edited Remarks?
+                            </li>
+                        </ul>
                     </div>
 
-                    <div class="col-6">
-                        <p class="text-muted text-sm">
-                            <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
-                            <br />
-                            <ul class="ml-4 mb-0 fa-ul text-muted">
-                                @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire.Questions)
-                                {
-                                    <li class="small">
-                                        @question.AnswerText
-                                        <span class="fa-li">
-                                            <i class="far fa-comment"></i>
-                                        </span>
-                                    </li>
-                                    <br />
-                                }
-                                <li class="small">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                    @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
+                    <!-- Answers -->
+                    <div class="col-md-6">
+                        <h6 class="text-success">
+                            <i class="fas fa-film me-1"></i> Answers
+                        </h6>
+                        <ul class="fa-ul text-muted small">
+                            @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
+                            {
+                                <li class="mb-2">
+                                    <span class="fa-li"><i class="far fa-comment text-success"></i></span>
+                                    @question.AnswerText
                                 </li>
-                            </ul>
-                        </p>
+                            }
+                            <li class="mb-2">
+                                <span class="fa-li"><i class="far fa-comment text-warning"></i></span>
+                                @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
+                            </li>
+                            @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+                            {
+                                <li>
+                                    <span class="fa-li"><i class="far fa-comment text-info"></i></span>
+                                    @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
+                                </li>
+                            }
+                        </ul>
                     </div>
                 </div>
             </div>
