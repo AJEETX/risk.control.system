@@ -59,11 +59,12 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using Hangfire.SQLite;
 using Hangfire.Dashboard;
 using risk.control.system.WorkFlow;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
-
+QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
     options.TagName = "nav";
@@ -148,12 +149,9 @@ builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
 builder.Services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
 builder.Services.AddScoped<IClaimsService, ClaimsService>();
-builder.Services.AddScoped<IICheckifyService, ICheckifyService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-//builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IFtpService, FtpService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-//builder.Services.AddScoped<IMailboxService, MailboxService>();
 builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
 builder.Services.AddScoped<IGoogleApi, GoogleApi>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();

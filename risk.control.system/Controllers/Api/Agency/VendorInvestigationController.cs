@@ -27,10 +27,6 @@ namespace risk.control.system.Controllers.Api.Agency
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class VendorInvestigationController : ControllerBase
     {
-        private const string CLAIM = "claims";
-        private const string UNDERWRITING = "underwriting";
-        private static CultureInfo hindi = new CultureInfo("hi-IN");
-        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<VendorApplicationUser> userManager;
@@ -40,7 +36,6 @@ namespace risk.control.system.Controllers.Api.Agency
              IWebHostEnvironment webHostEnvironment,
              UserManager<VendorApplicationUser> userManager)
         {
-            hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.userManager = userManager;

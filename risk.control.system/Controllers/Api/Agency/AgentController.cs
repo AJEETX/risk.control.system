@@ -34,7 +34,10 @@ namespace risk.control.system.Controllers.Api.Agency
         private readonly IDashboardService dashboardService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public AgentController(ApplicationDbContext context, UserManager<VendorApplicationUser> userManager, IWebHostEnvironment webHostEnvironment, IDashboardService dashboardService)
+        public AgentController(ApplicationDbContext context, 
+            UserManager<VendorApplicationUser> userManager, 
+            IWebHostEnvironment webHostEnvironment, 
+            IDashboardService dashboardService)
         {
             hindiNFO.CurrencySymbol = string.Empty;
             this.userManager = userManager;

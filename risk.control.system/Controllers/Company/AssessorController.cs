@@ -14,7 +14,7 @@ using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.Helpers;
-
+using QuestPDF.Fluent;
 namespace risk.control.system.Controllers.Company
 {
     [Breadcrumb(" Cases")]
@@ -224,6 +224,19 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
+        }
+        public async Task<IActionResult> DownloadReportPdf(long id)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var report = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
+
+            if (report == null)
+                return NotFound();
+
+            var document = new InvestigationReportPdfService(report.ClaimsInvestigation.InvestigationReport);
+            var pdfBytes = document.GeneratePdf();
+
+            return File(pdfBytes, "application/pdf", $"InvestigationReport_{id}.pdf");
         }
         [Breadcrumb(title: " Rejected")]
         public IActionResult Rejected()
