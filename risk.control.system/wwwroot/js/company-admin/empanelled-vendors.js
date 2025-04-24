@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Company/GetEmpanelledAgency',
+            url: '/api/Company/GetEmpanelledVendors',
             dataSrc: ''
         },
         columnDefs: [{
@@ -164,9 +164,6 @@
 
                 // Highlight the row
                 $(rowNode).addClass('highlight-new-user');
-
-                // Scroll the row into view
-                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                 // Optionally, remove the highlight after a delay
                 setTimeout(function () {

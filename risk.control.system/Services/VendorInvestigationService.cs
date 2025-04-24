@@ -53,6 +53,8 @@ namespace risk.control.system.Services
         public async Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id)
         {
             var claim = await context.Investigations
+                .Include(c => c.CaseMessages)
+                .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
@@ -655,7 +657,7 @@ namespace risk.control.system.Services
 
         public async Task<CaseInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, long selectedcase)
         {
-            var claimsAllocate2Agent = GetCases().FirstOrDefault(v => v.Id == selectedcase);
+            var claimsAllocate2Agent = GetCases().Include(c=>c.CaseNotes).FirstOrDefault(v => v.Id == selectedcase);
 
             var beneficiaryDetail = await context.BeneficiaryDetail
                 .Include(c => c.PinCode)

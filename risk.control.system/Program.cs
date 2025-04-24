@@ -145,7 +145,7 @@ builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<INumberSequenceService, NumberSequenceService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
-//builder.Services.AddScoped<IClaimsVendorService, ClaimsVendorService>();
+builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
 builder.Services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
 builder.Services.AddScoped<IClaimsService, ClaimsService>();
 builder.Services.AddScoped<IICheckifyService, ICheckifyService>();

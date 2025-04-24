@@ -338,9 +338,6 @@ namespace risk.control.system.Services
 
         private int GetAgencyVerifiedCount(string userEmail)
         {
-            var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
             var applicationDbContext = GetAgencyClaims();
 
             var vendorUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(c => c.Email == userEmail);

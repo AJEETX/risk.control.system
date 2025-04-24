@@ -85,7 +85,7 @@
                                     }
                                     else if (question.QuestionType == "date")
                                     {
-                                        <input type="date" name="QuestionFormViewModel.Answers[@question.Id]" class="form-control remarks date-input pe-5" @required placeholder="@question.QuestionText" @required />
+                                        <input max="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" name="QuestionFormViewModel.Answers[@question.Id]" class="form-control remarks date-input pe-5" @required placeholder="@question.QuestionText" @required />
                                         <button type="button" class="btn btn-sm btn-clear-date" title="Clear date">
                                             &times;
                                         </button>

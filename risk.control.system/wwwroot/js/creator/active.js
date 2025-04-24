@@ -280,7 +280,7 @@
                 progressContainer.classList.remove("hidden");
 
                 let interval = setInterval(() => {
-                    fetch(`/CreatorPost/GetAssignmentProgress?jobId=${uploadId}`)
+                    fetch(`/InvestigationPost/GetAssignmentProgress?jobId=${uploadId}`)
                         .then(response => response.json())
                         .then(data => {
                             let progress = data.progress;
@@ -339,7 +339,7 @@ function checkJobStatus(jobId) {
         return;
     }
     $.ajax({
-        url: '/ClaimsActive/GetJobStatus?jobId=' + jobId,
+        url: '/CaseActive/GetJobStatus?jobId=' + jobId,
         type: 'GET',
         success: function (response) {
             console.log("Job Status:", response.status);

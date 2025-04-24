@@ -18,12 +18,11 @@ namespace risk.control.system.Seeds
     {
         private const string vendorMapSize = "800x800";
         public static async Task<Vendor> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
-                    ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input)
+                    ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input, List<InvestigationServiceType> servicesTypes)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
             var globalSettings = context.GlobalSettings.FirstOrDefault();
-            var servicesTypes = await ServiceTypeSeed.Seed(context);
 
             //CREATE VENDOR COMPANY
 
@@ -82,7 +81,6 @@ namespace risk.control.system.Seeds
                     VendorId = checkerAgency.Entity.VendorId,
                     InvestigationServiceTypeId = service.InvestigationServiceTypeId,
                     Price = 399,
-                    LineOfBusinessId = service.LineOfBusinessId,
                     InsuranceType = service.InsuranceType,
                     DistrictId = null,
                     StateId = checkerPinCode.StateId,

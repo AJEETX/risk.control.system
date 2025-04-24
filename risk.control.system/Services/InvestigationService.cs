@@ -94,8 +94,6 @@ namespace risk.control.system.Services
         }
         public InvestigationTask AddCasePolicy(string userEmail)
         {
-            var createdStatus = context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var contractNumber = numberService.GetNumberSequence("PX");
             var model = new InvestigationTask
             {
@@ -428,6 +426,8 @@ namespace risk.control.system.Services
         public async Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id)
         {
             var claim = await context.Investigations
+                .Include(c => c.CaseMessages)
+                .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
@@ -484,6 +484,8 @@ namespace risk.control.system.Services
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
         {
             var claim = await context.Investigations
+                .Include(c => c.CaseMessages)
+                .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.AgentIdReport)
                 .Include(c => c.InvestigationReport)

@@ -21,11 +21,6 @@ namespace risk.control.system.Models
 
         public InsuranceType? InsuranceType { get; set; } = Models.InsuranceType.CLAIM;
 
-        [Display(Name = "Line of business")]
-        public long? LineOfBusinessId { get; set; } = default!;
-
-        public LineOfBusiness? LineOfBusiness { get; set; } = default!;
-
         [Display(Name = "Country name")]
         public long? CountryId { get; set; } = default!;
 
@@ -51,13 +46,6 @@ namespace risk.control.system.Models
         [Column(TypeName = "decimal(10,2)")]
         public decimal Price { get; set; }
 
-        //[NotMapped]
-        //[Display(Name = "Choose Multiple Pincodes")]
-        //public List<long> SelectedMultiPincodeId { get; set; } = new List<long> { }!;
-
-        //[Display(Name = "Serviced pincodes")]
-        //public List<ServicedPinCode> PincodeServices { get; set; } = default!;
-
         public long VendorId { get; set; }
         public Vendor Vendor { get; set; }
         public bool Deleted { get; set; } = false;
@@ -65,7 +53,6 @@ namespace risk.control.system.Models
         {
             return $"Agency Investigation Service Type Information:\n" +
                 $"- Investigation Service Type: {InvestigationServiceType}\n" +
-                $"- Line Of Business: {LineOfBusiness}\n" +
                 $"- Country: {Country}\n" +
                 $"- State: {State}\n" +
                 $"- District: {District}\n" +

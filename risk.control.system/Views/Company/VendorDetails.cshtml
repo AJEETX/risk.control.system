@@ -1,4 +1,5 @@
-﻿@model risk.control.system.Models.Vendor
+﻿@using risk.control.system.Helpers;
+@model risk.control.system.Models.Vendor
 
 @{
     ViewData["Title"] = @Applicationsettings.DETAILS;
@@ -62,7 +63,7 @@
                         <dd class="col-sm-5">
                             @foreach (var service in Model.VendorInvestigationServiceTypes)
                             {
-                                <span class="badge badge-light">@service.LineOfBusiness.Name</span>
+                                <span class="badge badge-light">@service.InsuranceType.GetEnumDisplayName()</span>
                             }
                         </dd>
 
@@ -72,7 +73,7 @@
                         <dd class="col-sm-5">
                             @foreach (var service in Model.VendorInvestigationServiceTypes)
                             {
-                                <span class="badge badge-light">@service.LineOfBusiness.Name</span>
+                                <span class="badge badge-light">@service.InsuranceType.GetEnumDisplayName()</span>
                             }
                         </dd>
 
@@ -82,7 +83,7 @@
                         <dd class="col-sm-5">
                             @foreach (var service in Model.VendorInvestigationServiceTypes)
                             {
-                                <span class="badge badge-light">@service.LineOfBusiness.Name</span>
+                                <span class="badge badge-light">@service.InsuranceType.GetEnumDisplayName()</span>
                             }
                         </dd>
                     </dl>

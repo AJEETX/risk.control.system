@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.Vendor)
-               .Include(c => c.ClaimNotes)
+               .Include(c => c.CaseNotes)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);
         }

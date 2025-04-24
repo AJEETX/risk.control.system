@@ -185,7 +185,6 @@ namespace risk.control.system.Services
                      d.ClientCompanyId == companyUser.ClientCompanyId && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
-                var subStatuses = _context.InvestigationCaseSubStatus;
 
                 var cases = tdetail.GroupBy(g => g.Id);
 
@@ -218,13 +217,6 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
-                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
-                s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
-                s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
-                s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
-                );
-
                 var tdetail = _context.Investigations
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
@@ -264,7 +256,6 @@ namespace risk.control.system.Services
 
         public Dictionary<string, (int count1, int count2)> CalculateMonthlyCaseStatus(string userEmail)
         {
-            var statuses = _context.InvestigationCaseStatus;
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
@@ -303,12 +294,6 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
-                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
-                    s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
-                    s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                    s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
-                    s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
-                    );
                 var tdetail = _context.Investigations
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
@@ -316,7 +301,6 @@ namespace risk.control.system.Services
                      d.VendorId == vendorUser.VendorId &&
                        d.Created > DateTime.Now.AddMonths(-7) && !d.Deleted);
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
-                var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
 
                 var cases = tdetail.GroupBy(g => g.Id);
 
@@ -392,12 +376,6 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
-                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
-                   );
                 var tdetail = _context.Investigations
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
@@ -452,7 +430,6 @@ namespace risk.control.system.Services
 
             if (companyUser != null)
             {
-                var statuses = _context.InvestigationCaseStatus;
                 var tdetail = tdetailDays.Where(d =>
                     (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                     d.ClientCompanyId == companyUser.ClientCompanyId);
@@ -486,13 +463,6 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
-                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
-                   );
                 var tdetail = tdetailDays.Where(d =>
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
                     d.VendorId == vendorUser.VendorId && !d.Deleted);
@@ -573,13 +543,6 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
-                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
-                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
-                   );
-                var statuses = _context.InvestigationCaseStatus;
                 var tdetail = tdetailDays.Where(d =>
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
                     d.VendorId == vendorUser.VendorId);

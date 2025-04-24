@@ -161,9 +161,6 @@ $(document).ready(function () {
                 // Highlight the row
                 $(rowNode).addClass('highlight-new-user');
 
-                // Scroll the row into view
-                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
                 // Optionally, remove the highlight after a delay
                 setTimeout(function () {
                     $(rowNode).removeClass('highlight-new-user');

@@ -797,9 +797,9 @@ namespace risk.control.system.Services
         public async Task<bool> SubmitNotes(string userEmail, long claimId, string notes)
         {
             var claim = context.Investigations
-               .Include(c => c.ClaimNotes)
+               .Include(c => c.CaseNotes)
                .FirstOrDefault(c => c.Id == claimId);
-            claim.ClaimNotes.Add(new ClaimNote
+            claim.CaseNotes.Add(new CaseNote
             {
                 Comment = notes,
                 Sender = userEmail,

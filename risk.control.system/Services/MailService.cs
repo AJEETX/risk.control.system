@@ -84,8 +84,6 @@ namespace risk.control.system.Services
         {
             try
             {
-                var created = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
                 var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
 
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
@@ -98,7 +96,7 @@ namespace risk.control.system.Services
                         Company = applicationUser.ClientCompany,
                         Symbol = "fa fa-info i-blue",
                         Message = $"Assign of {file.RecordCount} cases finished",
-                        Status = $"{created.Name}",
+                        Status = $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR}",
                         NotifierUserEmail = senderUserEmail
                     };
                     _context.Notifications.Add(notification);
@@ -121,7 +119,7 @@ namespace risk.control.system.Services
                         Company = applicationUser.ClientCompany,
                         Symbol = "fa fa-times i-orangered",
                         Message = $"Assign Error",
-                        Status = $"{created.Name}",
+                        Status = $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR}",
                         NotifierUserEmail = senderUserEmail
                     };
                     _context.Notifications.Add(notification);
@@ -150,8 +148,6 @@ namespace risk.control.system.Services
         {
             try
             {
-                var created = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
                 var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
 
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
@@ -164,7 +160,7 @@ namespace risk.control.system.Services
                         Company = applicationUser.ClientCompany,
                         Symbol = "fa fa-info i-blue",
                         Message = $"Upload of {file.RecordCount} cases finished",
-                        Status = $"{created.Name}",
+                        Status = $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR}",
                         NotifierUserEmail = senderUserEmail
                     };
                     _context.Notifications.Add(notification);
@@ -187,7 +183,7 @@ namespace risk.control.system.Services
                         Company = applicationUser.ClientCompany,
                         Symbol = "fa fa-times i-orangered",
                         Message = $"Upload Error",
-                        Status = $"{created.Name}",
+                        Status = $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR}",
                         NotifierUserEmail = senderUserEmail
                     };
                     _context.Notifications.Add(notification);
@@ -464,8 +460,6 @@ namespace risk.control.system.Services
         {
             try
             {
-                var assigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
                 var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
 
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
@@ -476,7 +470,7 @@ namespace risk.control.system.Services
                     Company = applicationUser.ClientCompany,
                     Symbol = "fa fa-info i-blue",
                     Message = $"Assigning of {autoAllocatedCases.Count + notAutoAllocatedCases.Count} cases finshed",
-                    Status = $"{assigned.Name}={autoAllocatedCases.Count}",
+                    Status = $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER}={autoAllocatedCases.Count}",
                     NotifierUserEmail = senderUserEmail
                 };
 

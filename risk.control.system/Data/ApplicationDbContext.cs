@@ -25,21 +25,13 @@ namespace risk.control.system.Data
         public virtual DbSet<NumberSequence> NumberSequence { get; set; }
         public virtual DbSet<IpApiResponse> IpApiResponse { get; set; }
         public virtual DbSet<AgencyRating> Ratings { get; set; }
-        public virtual DbSet<ServiceReportTemplate> ServiceReportTemplate { get; set; }
-        public virtual DbSet<ReportTemplate> ReportTemplate { get; set; }
-        public virtual DbSet<ReportQuestionaire> ReportQuestionaire { get; set; }
         public virtual DbSet<VendorInvoice> VendorInvoice { get; set; }
         public virtual DbSet<PermissionModule> PermissionModule { get; set; }
         public virtual DbSet<PermissionType> PermissionType { get; set; }
-        public virtual DbSet<ClaimMessage> ClaimMessage { get; set; }
         public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }
         public virtual DbSet<ClientCompanyApplicationUser> ClientCompanyApplicationUser { get; set; }
         public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
 
-        public virtual DbSet<LineOfBusiness> LineOfBusiness { get; set; }
-
-        public virtual DbSet<InvestigationCaseStatus> InvestigationCaseStatus { get; set; }
-        public virtual DbSet<InvestigationCaseSubStatus> InvestigationCaseSubStatus { get; set; }
         public virtual DbSet<CostCentre> CostCentre { get; set; }
         public virtual DbSet<CaseEnabler> CaseEnabler { get; set; }
         public virtual DbSet<BeneficiaryRelation> BeneficiaryRelation { get; set; }
@@ -60,7 +52,6 @@ namespace risk.control.system.Data
         public DbSet<DigitalIdReport> AgentIdReport { get; set; } = default!;
         public DbSet<DigitalIdReport> DigitalIdReport { get; set; } = default!;
         public DbSet<DocumentIdReport> PanIdReport { get; set; } = default!;
-        public DbSet<DocumentIdReport> PassportIdReport { get; set; } = default!;
         public DbSet<InvestigationReport> InvestigationReport { get; set; } = default!;
     }
 }

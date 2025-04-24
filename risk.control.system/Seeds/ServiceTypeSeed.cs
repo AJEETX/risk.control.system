@@ -10,36 +10,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task<List<InvestigationServiceType>> Seed(ApplicationDbContext context)
         {
-            var lobExist = context.LineOfBusiness.Any();
-
-            if (lobExist)
-            {
-                return context.InvestigationServiceType.ToList();
-            }
-            #region LINE OF BUSINESS
-
-            var claims = new LineOfBusiness
-            {
-                Name = "CLAIMS",
-                Code = "CLAIMS",
-                MasterData = true,
-                Updated = DateTime.Now,
-            };
-
-            var claimCaseType = await context.LineOfBusiness.AddAsync(claims);
-
-            var underwriting = new LineOfBusiness
-            {
-                Name = "UNDERWRITING",
-                Code = "UNDERWRITING",
-                MasterData = true,
-                Updated = DateTime.Now,
-            };
-
-            var underwritingCaseType = await context.LineOfBusiness.AddAsync(underwriting);
-
-            #endregion LINE OF BUSINESS
-
+           
             #region INVESTIGATION SERVICE TYPES
 
             var claimComprehensive = new InvestigationServiceType
@@ -48,8 +19,7 @@ namespace risk.control.system.Seeds
                 Code = "COMP",
                 MasterData = true,
                 Updated = DateTime.Now,
-                InsuranceType = InsuranceType.CLAIM,
-                LineOfBusiness = claimCaseType.Entity,
+                InsuranceType = InsuranceType.CLAIM
             };
 
             var claimComprehensiveService = await context.InvestigationServiceType.AddAsync(claimComprehensive);
@@ -60,8 +30,7 @@ namespace risk.control.system.Seeds
                 Code = "NON-COMP",
                 InsuranceType = InsuranceType.CLAIM,
                 MasterData = true,
-                Updated = DateTime.Now,
-                LineOfBusiness = claimCaseType.Entity
+                Updated = DateTime.Now
             };
 
             var claimNonComprehensiveService = await context.InvestigationServiceType.AddAsync(claimNonComprehensive);
@@ -72,8 +41,7 @@ namespace risk.control.system.Seeds
                 Code = "DOC",
                 InsuranceType = InsuranceType.CLAIM,
                 MasterData = true,
-                Updated = DateTime.Now,
-                LineOfBusiness = claimCaseType.Entity
+                Updated = DateTime.Now
             };
 
             var claimDocumentCollectionService = await context.InvestigationServiceType.AddAsync(claimDocumentCollection);
@@ -84,8 +52,7 @@ namespace risk.control.system.Seeds
                 Code = "DISCREET",
                 MasterData = true,
                 InsuranceType = InsuranceType.CLAIM,
-                Updated = DateTime.Now,
-                LineOfBusiness = claimCaseType.Entity
+                Updated = DateTime.Now
             };
 
             var claimDiscreetService = await context.InvestigationServiceType.AddAsync(claimDiscreet);
@@ -96,8 +63,7 @@ namespace risk.control.system.Seeds
                 Code = "PRE-OV",
                 InsuranceType = InsuranceType.UNDERWRITING,
                 MasterData = true,
-                Updated = DateTime.Now,
-                LineOfBusiness = underwritingCaseType.Entity
+                Updated = DateTime.Now
             };
 
             var underWritingPreVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPreVerification);
@@ -107,8 +73,7 @@ namespace risk.control.system.Seeds
                 Name = "POST-BOARD",
                 Code = "POST-OV",
                 InsuranceType = InsuranceType.UNDERWRITING,
-                MasterData = true,
-                LineOfBusiness = underwritingCaseType.Entity
+                MasterData = true
             };
 
             var underWritingPostVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPostVerification);

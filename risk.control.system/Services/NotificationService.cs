@@ -36,10 +36,10 @@ namespace risk.control.system.Services
         //Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
 
         //Task<string> SendSms2Customer(string currentUser, string claimId, string sms);
-        //Task<string> SendSms2Customer(string currentUser, long claimId, string sms);
+        Task<string> SendSms2Customer(string currentUser, long claimId, string sms);
 
         //Task<string> SendSms2Beneficiary(string currentUser, string claimId, string sms);
-        //Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms);
+        Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms);
         bool IsWhiteListIpAddress(IPAddress remoteIp);
     }
 
@@ -356,7 +356,7 @@ namespace risk.control.system.Services
         //               i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
         //    var beneficiary = context.BeneficiaryDetail.Include(b=>b.Country)
         //        .FirstOrDefault(c => c.ClaimsInvestigationId == id);
-           
+
         //    string recepientName = string.Empty;
         //    string recepientPhone = string.Empty;
         //    int isdCode = claim.CustomerDetail.Country.ISDCode;
@@ -438,7 +438,7 @@ namespace risk.control.system.Services
         //        .Include(c => c.Country)
         //        .Include(c => c.State)
         //        .FirstOrDefault(c => c.ClaimsInvestigationId == id);
-          
+
         //    string mobile = string.Empty;
         //    string recepientName = string.Empty;
         //    if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
@@ -488,67 +488,67 @@ namespace risk.control.system.Services
         //    return (scheduleMessage, yesUrl, noUrl);
         //}
 
-        //public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)
-        //{
-        //    var claim = await context.Investigations
-        //    .Include(c => c.CaseMessages)
-        //    .Include(c => c.PolicyDetail)
-        //    .Include(c => c.CustomerDetail)
-        //       .ThenInclude(c => c.PinCode)
-        //        .Include(c => c.CustomerDetail)
-        //       .ThenInclude(c => c.Country)
-        //    .FirstOrDefaultAsync(c => c.Id == claimId);
+        public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)
+        {
+            var claim = await context.Investigations
+            .Include(c => c.CaseMessages)
+            .Include(c => c.PolicyDetail)
+            .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+            .FirstOrDefaultAsync(c => c.Id == claimId);
 
-        //    var mobile = claim.CustomerDetail.ContactNumber.ToString();
-        //    var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
-        //    var isdCode = claim.CustomerDetail.Country.ISDCode;
-        //    var isInsurerUser = user is ClientCompanyApplicationUser;
-        //    var isVendorUser = user is VendorApplicationUser;
+            var mobile = claim.CustomerDetail.ContactNumber.ToString();
+            var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
+            var isdCode = claim.CustomerDetail.Country.ISDCode;
+            var isInsurerUser = user is ClientCompanyApplicationUser;
+            var isVendorUser = user is VendorApplicationUser;
 
-        //    string company = string.Empty;
-        //    ClientCompanyApplicationUser insurerUser;
-        //    VendorApplicationUser agencyUser;
-        //    if (isInsurerUser)
-        //    {
-        //        insurerUser = (ClientCompanyApplicationUser)user;
-        //        company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == insurerUser.ClientCompanyId)?.Name;
-        //    }
-        //    else if (isVendorUser)
-        //    {
-        //        agencyUser = (VendorApplicationUser)user;
-        //        company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
-        //    }
-        //    if (!isInsurerUser && !isVendorUser)
-        //    {
-        //        return string.Empty;
-        //    }
-        //    var message = $"Dear {claim.CustomerDetail.Name}";
-        //    message += "                                                                                ";
-        //    message += $"{sms}";
-        //    message += "                                                                                ";
-        //    message += $"Thanks";
-        //    message += "                                                                                ";
-        //    message += $"{user.FirstName} {user.LastName}";
-        //    message += "                                                                                ";
-        //    message += $"Policy #:{claim.PolicyDetail.ContractNumber}";
-        //    message += "                                                                                ";
-        //    message += $"{company}";
-        //    message += "                                                                                ";
-        //    message += $"{logo}";
+            string company = string.Empty;
+            ClientCompanyApplicationUser insurerUser;
+            VendorApplicationUser agencyUser;
+            if (isInsurerUser)
+            {
+                insurerUser = (ClientCompanyApplicationUser)user;
+                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == insurerUser.ClientCompanyId)?.Name;
+            }
+            else if (isVendorUser)
+            {
+                agencyUser = (VendorApplicationUser)user;
+                company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
+            }
+            if (!isInsurerUser && !isVendorUser)
+            {
+                return string.Empty;
+            }
+            var message = $"Dear {claim.CustomerDetail.Name}";
+            message += "                                                                                ";
+            message += $"{sms}";
+            message += "                                                                                ";
+            message += $"Thanks";
+            message += "                                                                                ";
+            message += $"{user.FirstName} {user.LastName}";
+            message += "                                                                                ";
+            message += $"Policy #:{claim.PolicyDetail.ContractNumber}";
+            message += "                                                                                ";
+            message += $"{company}";
+            message += "                                                                                ";
+            message += $"{logo}";
 
-        //    var scheduleMessage = new CaseMessage
-        //    {
-        //        Message = message,
-        //        InvestigationTaskId = claimId,
-        //        SenderEmail = user.Email,
-        //        UpdatedBy = user.Email,
-        //        Updated = DateTime.Now
-        //    };
-        //    claim.CaseMessages.Add(scheduleMessage);
-        //    context.SaveChanges();
-        //    await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
-        //    return claim.CustomerDetail.Name;
-        //}
+            var scheduleMessage = new CaseMessage
+            {
+                Message = message,
+                InvestigationTaskId = claimId,
+                SenderEmail = user.Email,
+                UpdatedBy = user.Email,
+                Updated = DateTime.Now
+            };
+            claim.CaseMessages.Add(scheduleMessage);
+            context.SaveChanges();
+            await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
+            return claim.CustomerDetail.Name;
+        }
         //public async Task<string> SendSms2Customer(string currentUser, string claimId, string sms)
         //{
         //    var claim = await context.ClaimsInvestigation
@@ -612,72 +612,72 @@ namespace risk.control.system.Services
         //    return claim.CustomerDetail.Name;
         //}
 
-        //public async Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms)
-        //{
-        //    var beneficiary = await context.BeneficiaryDetail
-        //        .Include(b => b.Country)
-        //        .Include(b => b.InvestigationTask)
-        //        .ThenInclude(c => c.PolicyDetail)
-        //       .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
+        public async Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms)
+        {
+            var beneficiary = await context.BeneficiaryDetail
+                .Include(b => b.Country)
+                .Include(b => b.InvestigationTask)
+                .ThenInclude(c => c.PolicyDetail)
+               .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
 
-        //    var mobile = beneficiary.ContactNumber.ToString();
-        //    var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
-        //    var isdCode = beneficiary.Country.ISDCode;
+            var mobile = beneficiary.ContactNumber.ToString();
+            var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
+            var isdCode = beneficiary.Country.ISDCode;
 
-        //    var isInsurerUser = user is ClientCompanyApplicationUser;
-        //    var isVendorUser = user is VendorApplicationUser;
+            var isInsurerUser = user is ClientCompanyApplicationUser;
+            var isVendorUser = user is VendorApplicationUser;
 
-        //    string company = string.Empty;
-        //    ClientCompanyApplicationUser insurerUser;
-        //    VendorApplicationUser agencyUser;
-        //    if (isInsurerUser)
-        //    {
-        //        insurerUser = (ClientCompanyApplicationUser)user;
-        //        company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == insurerUser.ClientCompanyId)?.Name;
-        //    }
-        //    else if (isVendorUser)
-        //    {
-        //        agencyUser = (VendorApplicationUser)user;
-        //        company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
-        //    }
-        //    if (!isInsurerUser && !isVendorUser)
-        //    {
-        //        return string.Empty;
-        //    }
-        //    var message = $"Dear {beneficiary.Name}";
-        //    message += "                                                                                ";
-        //    message += $"{sms}";
-        //    message += "                                                                                ";
-        //    message += $"Thanks";
-        //    message += "                                                                                ";
-        //    message += $"{user.FirstName} {user.LastName}";
-        //    message += "                                                                                ";
-        //    message += $"Policy #:{beneficiary.ClaimsInvestigation.PolicyDetail.ContractNumber}";
-        //    message += "                                                                                ";
-        //    message += $"{company}";
-        //    message += "                                                                                ";
-        //    message += $"{logo}";
+            string company = string.Empty;
+            ClientCompanyApplicationUser insurerUser;
+            VendorApplicationUser agencyUser;
+            if (isInsurerUser)
+            {
+                insurerUser = (ClientCompanyApplicationUser)user;
+                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == insurerUser.ClientCompanyId)?.Name;
+            }
+            else if (isVendorUser)
+            {
+                agencyUser = (VendorApplicationUser)user;
+                company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
+            }
+            if (!isInsurerUser && !isVendorUser)
+            {
+                return string.Empty;
+            }
+            var message = $"Dear {beneficiary.Name}";
+            message += "                                                                                ";
+            message += $"{sms}";
+            message += "                                                                                ";
+            message += $"Thanks";
+            message += "                                                                                ";
+            message += $"{user.FirstName} {user.LastName}";
+            message += "                                                                                ";
+            message += $"Policy #:{beneficiary.InvestigationTask.PolicyDetail.ContractNumber}";
+            message += "                                                                                ";
+            message += $"{company}";
+            message += "                                                                                ";
+            message += $"{logo}";
 
-        //    var scheduleMessage = new CaseMessage
-        //    {
-        //        Message = message,
-        //        InvestigationTaskId = claimId,
-        //        RecepicientEmail = beneficiary.Name,
-        //        SenderEmail = user.Email,
-        //        UpdatedBy = user.Email,
-        //        Updated = DateTime.Now
-        //    };
-        //    var claim = context.Investigations
-        //    .Include(c => c.CaseMessages)
-        //    .Include(c => c.PolicyDetail)
-        //    .Include(c => c.CustomerDetail)
-        //       .ThenInclude(c => c.PinCode)
-        //    .FirstOrDefault(c => c.Id == claimId);
-        //    claim.CaseMessages.Add(scheduleMessage);
-        //    context.SaveChanges();
-        //    await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
-        //    return beneficiary.Name;
-        //}
+            var scheduleMessage = new CaseMessage
+            {
+                Message = message,
+                InvestigationTaskId = claimId,
+                RecepicientEmail = beneficiary.Name,
+                SenderEmail = user.Email,
+                UpdatedBy = user.Email,
+                Updated = DateTime.Now
+            };
+            var claim = context.Investigations
+            .Include(c => c.CaseMessages)
+            .Include(c => c.PolicyDetail)
+            .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+            .FirstOrDefault(c => c.Id == claimId);
+            claim.CaseMessages.Add(scheduleMessage);
+            context.SaveChanges();
+            await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
+            return beneficiary.Name;
+        }
         //public async Task<string> SendSms2Beneficiary(string currentUser, string claimId, string sms)
         //{
         //    var beneficiary = await context.BeneficiaryDetail
@@ -771,7 +771,7 @@ namespace risk.control.system.Services
 
                 else if (role.Name == AppRoles.CREATOR.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && n.NotifierUserEmail == userEmail && !n.IsReadByCreator);
+                    notifications = notifications.Where(n => (n.Role == role && n.NotifierUserEmail == userEmail || n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY) && !n.IsReadByCreator);
                 }
 
                 var activeNotifications = await notifications

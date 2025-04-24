@@ -129,8 +129,6 @@
             if (data.isUpdated) {
 
                 $(rowNode).addClass('highlight-new-user');
-                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
                 setTimeout(() => {
                     $(rowNode).removeClass('highlight-new-user');
                 }, 3000);

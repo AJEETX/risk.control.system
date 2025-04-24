@@ -997,7 +997,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("click", function (e) {
     if (e.target.classList.contains("btn-clear-date")) {
-        const input = e.target.closest(".position-relative").querySelector("input[type='date']");
+        const input = e.target.closest(".question-block").querySelector("input[type='date']");
         if (input) {
             input.value = ""; // Clear the value
             input.blur();     // Remove focus to hide calendar

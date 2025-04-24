@@ -3,7 +3,7 @@
     var vendorId = $('#vendorId').val();
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Company/GetEmpanelledAgency',
+            url: '/api/Company/GetEmpanelledAgency?claimId=' + claimId,
             dataSrc: ''
         },
         columnDefs: [
@@ -112,7 +112,20 @@
             {
                 "data": "caseCount",
                 "mRender": function (data, type, row) {
-                    return '<span title="Total number of current cases = ' + row.caseCount + '" data-toggle="tooltip">' + data + '</span>';
+                    let statusText = row.hasService
+                        ? '<span class="text-success fw-bold small">SERVICE AVAILABLE</span>'
+                        : '<span class="text-danger fw-bold small">NO SERVICE AVAILABLE</span>';
+
+                    let tooltipText = row.hasService
+                        ? 'SERVICE AVAILABLE\r\n  Total number of current cases = ' + row.caseCount
+                        : 'NO SERVICE AVAILABLE\r\n Total number of current cases = ' + row.caseCount;
+
+                    return `
+            <span data-toggle="tooltip" data-html="true" title="${tooltipText}">
+                ${statusText}
+                <span>(${data})</span>
+            </span>
+        `;
                 }
             },
             {
@@ -124,6 +137,14 @@
                     return buttons;
                 }
             }],
+        rowCallback: function (row, data) {
+            if (data.hasService) {
+                $(row).addClass('highlight-new-user');
+                setTimeout(function () {
+                    $(row).removeClass('highlight-new-user');
+                }, 3000);
+            }
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Preselect the radio button matching vendorId
             var selectedVendorId = $('#vendorId').val();
@@ -138,13 +159,7 @@
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
 
-        },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.caseCount > 10) {
-                //$('td', nRow).css('background-color', '#ffa');
-            }
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     $('#refreshTable').click(function () {
         var $icon = $('#refreshIcon');

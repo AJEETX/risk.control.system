@@ -74,12 +74,12 @@ namespace risk.control.system.Controllers.Api.Claims
         public IActionResult GetPolicyNotes(long claimId)
         {
             var claim = claimsService.GetCasesWithDetail()
-                .Include(c => c.ClaimNotes)
+                .Include(c => c.CaseNotes)
                 .FirstOrDefault(c => c.Id == claimId);
 
             var response = new
             {
-                notes = claim.ClaimNotes.ToList()
+                notes = claim.CaseNotes.ToList()
             };
             return Ok(response);
         }

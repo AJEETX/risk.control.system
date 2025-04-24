@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.ComponentModel;
+using System.Data;
 using System.Globalization;
 
 using Google.Api;
@@ -93,8 +94,8 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(result);
         }
-        [HttpGet("GetEmpanelledAgency")]
-        public async Task<IActionResult> GetEmpanelledAgency()
+        [HttpGet("GetEmpanelledVendors")]
+        public async Task<IActionResult> GetEmpanelledVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrEmpty(userEmail))
@@ -110,7 +111,7 @@ namespace risk.control.system.Controllers.Api.Company
                 return NotFound("Company user not found.");
             }
 
-            var statuses =new[] {
+            var statuses = new[] {
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
@@ -121,6 +122,8 @@ namespace risk.control.system.Controllers.Api.Company
             var claimsCases = await _context.Investigations
                 .Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue && statuses.Contains(c.SubStatus))
                 .ToListAsync();
+
+
 
             // Fetch the company with necessary relationships
             var company = await _context.ClientCompany
@@ -177,7 +180,125 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(result);
         }
+        [HttpGet("GetEmpanelledAgency")]
+        public async Task<IActionResult> GetEmpanelledAgency(long claimId)
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return BadRequest("User identity is missing.");
+            }
 
+            // Fetch the company user
+            var companyUser = await _context.ClientCompanyApplicationUser
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
+            if (companyUser == null)
+            {
+                return NotFound("Company user not found.");
+            }
+
+            var statuses =new[] {
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
+            };
+
+            // Fetch claims only once and filter them based on status
+            var claimsCases = await _context.Investigations
+                .Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue && statuses.Contains(c.SubStatus))
+                .ToListAsync();
+
+            
+
+            // Fetch the company with necessary relationships
+            var company = await _context.ClientCompany
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.State)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.District)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.Country)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.PinCode)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.ratings)
+                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            if (company == null)
+            {
+                return NotFound("Company not found.");
+            }
+
+            // Process the vendors
+            var result = company.EmpanelledVendors?
+                .Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
+                .OrderBy(u => u.Name)
+                .Select(u => new
+                {
+                    Id = u.VendorId,
+                    Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
+                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ?
+                        $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>" :
+                        u.Email,
+                    Name = u.Name,
+                    Code = u.Code,
+                    Phone = $"(+{u.Country.ISDCode}) {u.PhoneNumber}",
+                    Address = $"{u.Addressline}",
+                    District = u.District.Name,
+                    State = u.State.Code,
+                    Country = u.Country.Code,
+                    Flag = $"/flags/{u.Country.Code.ToLower()}.png",
+                    Updated = u.Updated?.ToString("dd-MM-yyyy") ?? u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy,
+                    CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
+                    RateCount = u.RateCount,
+                    RateTotal = u.RateTotal,
+                    RawAddress = $"{u.Addressline}, {u.District.Name}, {u.State.Code}, {u.Country.Code}",
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated,
+                    HasService = GetPinCodeAndServiceForTheCase(claimId, u.VendorId),
+                })
+                .ToArray();
+
+            // Update vendors in the context
+            company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+
+            return Ok(result);
+        }
+
+        private bool GetPinCodeAndServiceForTheCase(long claimId, long vendorId)
+        {
+            var selectedCase = _context.Investigations
+                .Include(p => p.PolicyDetail)
+                .Include(p => p.CustomerDetail)
+                .Include(p => p.BeneficiaryDetail)
+                .FirstOrDefault(c => c.Id == claimId);
+
+            var serviceType = selectedCase.PolicyDetail.InvestigationServiceTypeId;
+
+            long? districtId;
+
+            if (selectedCase.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+            {
+                districtId = selectedCase.CustomerDetail.DistrictId;
+            }
+            else
+            {
+                districtId = selectedCase.BeneficiaryDetail.DistrictId;
+            }
+
+            var vendor = _context.Vendor
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .FirstOrDefault(v => v.VendorId == vendorId);
+
+            var hasService = vendor?.VendorInvestigationServiceTypes
+                .Any(v => v.InvestigationServiceTypeId == serviceType && v.InsuranceType  == selectedCase.PolicyDetail.InsuranceType &&
+                            (v.DistrictId == 0 || v.DistrictId == null || v.DistrictId == districtId));
+            return hasService ?? false;
+
+        }
 
         [HttpGet("GetAvailableVendors")]
         public async Task<IActionResult> GetAvailableVendors()

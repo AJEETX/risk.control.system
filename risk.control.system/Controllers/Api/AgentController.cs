@@ -453,11 +453,6 @@ namespace risk.control.system.Controllers.Api
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.State);
 
-                var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-                var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
                 if (vendorUser == null)
                 {
