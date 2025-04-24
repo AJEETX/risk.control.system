@@ -56,7 +56,6 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using Hangfire.SQLite;
 using Hangfire.Dashboard;
 using risk.control.system.WorkFlow;
 //using QuestPDF.Infrastructure;
@@ -215,14 +214,12 @@ if (prod)
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
          options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-    builder.Services.AddHangfire(config => config.UseSQLiteStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
                         options.UseSqlite(connectionString));
     builder.Services.AddHangfire(config => config.UseMemoryStorage());
-    //builder.Services.AddHangfire(config => config.UseSQLiteStorage(HangfireConnectionString));
 }
 builder.Services.AddHangfireServer(options =>
 {
