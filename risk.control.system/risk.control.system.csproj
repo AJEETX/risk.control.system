@@ -43,7 +43,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="Net8.Licensing" Version="1.0.0" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
-    <PackageReference Include="QuestPDF" Version="2025.4.0" />
     <PackageReference Include="SixLabors.Fonts" Version="2.1.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.5" />
@@ -80,9 +79,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="lang-currency.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="america_zipcode.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

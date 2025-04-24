@@ -59,12 +59,12 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using Hangfire.SQLite;
 using Hangfire.Dashboard;
 using risk.control.system.WorkFlow;
-using QuestPDF.Infrastructure;
+//using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
-QuestPDF.Settings.License = LicenseType.Community;
+//QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
     options.TagName = "nav";
@@ -208,7 +208,7 @@ builder.Services.AddNotyf(config =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("Database");
-var HangfireConnectionString = builder.Configuration.GetConnectionString("HangfireDatabase");
+//var HangfireConnectionString = builder.Configuration.GetConnectionString("HangfireDatabase");
 var isProd = builder.Configuration.GetSection("IsProd").Value;
 var prod = bool.Parse(isProd);
 if (prod)
