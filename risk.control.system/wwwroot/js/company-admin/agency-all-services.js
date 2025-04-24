@@ -78,7 +78,14 @@
     const table = $("#customerTable").DataTable({
         ajax: {
             url: `/api/Company/AllServices?id=${$('#vendorId').val()}`,
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         order: [[10, 'desc'], [11, 'desc']],
         columnDefs: [
@@ -145,7 +152,7 @@
             { data: "isUpdated", visible: false },
             { data: "lastModified", visible: false }
         ],
-        drawCallback: function () {
+        "drawCallback": function (settings, start, end, max, total, pre) {
             $('[data-toggle="tooltip"]').tooltip({
                 animated: 'fade',
                 placement: 'bottom',

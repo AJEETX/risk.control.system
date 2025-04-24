@@ -24,7 +24,14 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetReport',
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         columnDefs: [{
             'targets': 0,
@@ -166,12 +173,11 @@
             
             { "data": "timeElapsed", "bVisible": false }
         ],
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+        "rowCallback": function (row, data, index) {
             if (aData.isNewAssigned) {
                 $('td', nRow).addClass('isNewAssigned');
             }
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');

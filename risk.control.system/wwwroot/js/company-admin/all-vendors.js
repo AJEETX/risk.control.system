@@ -3,7 +3,14 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Agency/AllAgencies',
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         columnDefs: [
             {
@@ -118,7 +125,7 @@
                 bVisible: false
             }
         ],
-        drawCallback: function () {
+        "drawCallback": function (settings, start, end, max, total, pre) {
             // Event delegation for .btn-danger elements
             $('#customerTable tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
@@ -132,8 +139,7 @@
                 showdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
 
     table.on('draw', function () {

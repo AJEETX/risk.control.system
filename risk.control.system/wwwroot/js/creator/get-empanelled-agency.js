@@ -4,7 +4,14 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/GetEmpanelledAgency?claimId=' + claimId,
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         columnDefs: [
             {
@@ -137,7 +144,7 @@
                     return buttons;
                 }
             }],
-        rowCallback: function (row, data) {
+        rowCallback: function (row, data, index) {
             if (data.hasService) {
                 $(row).addClass('highlight-new-user');
                 setTimeout(function () {

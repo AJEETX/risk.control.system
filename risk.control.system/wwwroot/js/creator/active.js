@@ -22,6 +22,9 @@
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
             }
         },
         columnDefs: [
@@ -206,7 +209,7 @@
             { "data": "timeElapsed", bVisible: false },
             { "data": "policy", bVisible: false }
         ],
-        rowCallback: function (row, data) {
+        rowCallback: function (row, data, index) {
             if (data.isNew) {
                 $('td', row).addClass('isNewAssigned');
                 // Remove the class after 3 seconds
@@ -224,8 +227,7 @@
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
             
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     // Case Type Filter
     $('#caseTypeFilter').on('change', function () {

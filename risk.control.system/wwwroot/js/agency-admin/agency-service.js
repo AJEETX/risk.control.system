@@ -66,7 +66,16 @@
 
     // Initialize DataTable with enhanced configurations
     const table = $("#customerTable").DataTable({
-        ajax: { url: '/api/Agency/AllServices', dataSrc: '' },
+        ajax: {
+            url: '/api/Agency/AllServices',
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            } },
         order: [[10, 'desc'], [11, 'desc']],
         columnDefs: [
             { className: 'max-width-column', targets: 7 },
@@ -100,10 +109,7 @@
             },
             { data: "isUpdated", bVisible: false },
             { data: "lastModified", bVisible: false }
-        ],
-        error: function (xhr, status, error) {
-            alert(`Error: ${error}`);
-        }
+        ]
     });
 
     // Highlight rows based on `isUpdated` flag

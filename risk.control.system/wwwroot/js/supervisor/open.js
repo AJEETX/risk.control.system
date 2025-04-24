@@ -3,7 +3,14 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetOpen',
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         columnDefs: [
             
@@ -157,8 +164,7 @@
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
 
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element

@@ -29,7 +29,14 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Agency/GetCompanyAgencyUser?id=' + $('#vendorId').val(),
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
@@ -170,14 +177,14 @@
                 bVisible: false
             }
         ],
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (!aData.agentOnboarded || !aData.active || !aData.loginVerified) {
+        "rowCallback": function (row, data, index) {
+            if (!data.agentOnboarded || !data.active || !data.loginVerified) {
                 $('td', nRow).addClass('lightgrey');
             } else {
                 $('td', nRow).removeClass('lightgrey');
             }
         },
-        drawCallback: function () {
+        drawCallback: function (settings, start, end, max, total, pre) {
             // Event delegation for .btn-danger elements
             $('#customerTable tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior

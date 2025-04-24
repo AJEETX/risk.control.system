@@ -29,7 +29,14 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/CompanyUsers?id=' + id,
-            dataSrc: ''
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
+            dataSrc: '',
         },
         fixedHeader: true,
         processing: true,
@@ -154,8 +161,8 @@
                 }
             }
         ],
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (!aData.active || !aData.loginVerified) {
+        "rowCallback": function (row, data, index) {
+            if (!data.active || !data.loginVerified) {
                 $('td', nRow).addClass('lightgrey');
             } else {
                 $('td', nRow).removeClass('lightgrey');
@@ -169,8 +176,7 @@
                 showedit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({

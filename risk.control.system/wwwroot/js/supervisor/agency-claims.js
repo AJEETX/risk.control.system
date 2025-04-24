@@ -43,7 +43,14 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/agency/supervisor/GetNew',
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         columnDefs: [{
             'targets': 0,
@@ -199,27 +206,26 @@
             },
             { "data":"timeElapsed","bVisible":false}
         ],
-        "drawCallback": function (settings, start, end, max, total, pre) {
+        "drawCallback": function (settings) {
+            $('#customerTable tbody').off('click', '.btn-info').on('click', '.btn-info', function (e) {
+                e.preventDefault();
+                var id = $(this).attr('id').replace('details', '');
+                showdetails(id);
+                window.location.href = $(this).attr('href');
+            });
 
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                showdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
-            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                showenquiry(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the edit page
+            $('#customerTable tbody').off('click', '.btn-warning').on('click', '.btn-warning', function (e) {
+                e.preventDefault();
+                var id = $(this).attr('id').replace('details', '');
+                showenquiry(id);
+                window.location.href = $(this).attr('href');
             });
         },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.isNewAssigned) {
-                $('td', nRow).addClass('isNewAssigned');
+        "rowCallback": function (row, data, index) {
+            if (data.isNewAssigned) {
+                $('td', row).addClass('isNewAssigned');
             }
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
 
     table.on('xhr.dt', function () {

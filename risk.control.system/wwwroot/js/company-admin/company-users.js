@@ -3,7 +3,14 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/AllUsers',
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         order: [[1, 'desc'],[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [{
@@ -165,6 +172,13 @@
                 bVisible: false
             }
         ],
+        "rowCallback": function (row, data, index) {
+            if (!data.active || !data.loginVerified) {
+                $('td', nRow).addClass('lightgrey');
+            } else {
+                $('td', nRow).removeClass('lightgrey');
+            }
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
 
             $('#customerTable tbody').on('click', '.btn-danger', function (e) {
@@ -179,15 +193,8 @@
                 showedit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
-        },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (!aData.active || !aData.loginVerified) {
-                $('td', nRow).addClass('lightgrey');
-            } else {
-                $('td', nRow).removeClass('lightgrey');
-            }
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
+        
     });
 
     table.on('draw', function () {

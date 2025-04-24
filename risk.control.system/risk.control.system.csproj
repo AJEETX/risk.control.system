@@ -18,7 +18,6 @@
     <PackageReference Include="Google.Cloud.Vision.V1" Version="3.7.0" />
     <PackageReference Include="Hangfire" Version="1.8.18" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.1" />
-    <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.4.6.5" />
     <PackageReference Include="MetadataExtractor" Version="2.8.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />

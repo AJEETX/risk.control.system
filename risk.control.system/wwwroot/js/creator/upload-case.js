@@ -35,6 +35,13 @@
                     });
                 }
                 return json.data;
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
             }
         },
         fixedHeader: true,
@@ -142,7 +149,7 @@
                 targets: 9                      // Index of the column to style
             }
         ],
-        rowCallback: function (row, data) {
+        rowCallback: function (row, data, index) {
             var $row = $(row);
             
             if (data.status === "Processing" && data.id == uploadId) {

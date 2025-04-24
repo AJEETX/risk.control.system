@@ -8,7 +8,13 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Agency/GetUsers',
-            dataSrc: ''
+            dataSrc: '', error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
@@ -150,14 +156,13 @@
                 bVisible: false
             }
         ],
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (!aData.agentOnboarded || !aData.active || !aData.loginVerified) {
-                $('td', nRow).addClass('lightgrey');
+        "rowCallback": function (row, data, index) {
+            if (!data.agentOnboarded || !data.active || !data.loginVerified) {
+                $('td', row).addClass('lightgrey');
             } else {
-                $('td', nRow).removeClass('lightgrey');
+                $('td', row).removeClass('lightgrey');
             }
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
 
     table.on('draw', function () {

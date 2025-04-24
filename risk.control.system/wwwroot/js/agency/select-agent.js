@@ -2,7 +2,14 @@
     var table = $('#customerTable').DataTable({
         ajax: {
             url: '/api/Agency/GetAgentWithCases?id=' + $('#claimId').val(),
-            dataSrc: ''
+            dataSrc: '',
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+            }
         },
         columnDefs: [{
             'targets': 0,
