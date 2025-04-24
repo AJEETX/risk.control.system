@@ -337,7 +337,7 @@ namespace risk.control.system.Controllers.Api
                     {
                         claimId = c.Id,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
-                        claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH : ClaimType.HEALTH,
+                        claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
                         Applicationsettings.NO_POLICY_IMAGE,
                         CustomerName = c.CustomerDetail.Name,
@@ -500,7 +500,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             ClaimId = claim.Id,
                             PolicyNumber = claim.PolicyDetail.ContractNumber,
-                            ClaimType = claim.PolicyDetail.InsuranceType.GetEnumDisplayName(),
+                            ClaimType = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                             Document = claim.PolicyDetail.DocumentImage != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.PolicyDetail.DocumentImage)) :
                             Applicationsettings.NO_POLICY_IMAGE,
