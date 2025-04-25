@@ -78,7 +78,7 @@
                         <span class="badge badge-light"><i class="fas fa-film"></i> Agent Remarks</span>:
                         <br />
 
-                        @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+                        @if (Model.ClaimsInvestigation.UpdateAgentAnswer && Model.ClaimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
                         {
                             <textarea name="remarks" id="remarks" asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks" rows="2"></textarea>
                             <span asp-validation-for="InvestigationReport.AgentRemarks" class="text-danger"></span>

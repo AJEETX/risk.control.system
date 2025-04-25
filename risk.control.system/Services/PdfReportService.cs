@@ -207,6 +207,18 @@ namespace risk.control.system.Services
                     Answer = question.AnswerText
                 });
             }
+            
+            qAns.Add(new AgentQuestionAnswer
+            {
+                Question = "Remarks",
+                Answer = claim.InvestigationReport.AgentRemarks 
+            });
+
+            qAns.Add(new AgentQuestionAnswer
+            {
+                Question = "Edited Remarks",
+                Answer = claim.InvestigationReport.AgentRemarksEdit
+            });
 
             agencyDetailData.ReportSummaryDescription = qAns;
 
