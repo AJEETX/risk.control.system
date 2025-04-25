@@ -174,7 +174,7 @@
             { "data": "timeElapsed", "bVisible": false }
         ],
         "rowCallback": function (row, data, index) {
-            if (aData.isNewAssigned) {
+            if (data.isNewAssigned) {
                 $('td', nRow).addClass('isNewAssigned');
             }
         }
