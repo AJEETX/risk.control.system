@@ -29,6 +29,8 @@ namespace risk.control.system.Seeds
             var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o=>o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
             var checkerAddressline = "1, Nice Road";
 
+            var states = context.State.Include(s => s.Country).Where(s => s.Country.Code.ToLower() == input.COUNTRY).ToList();
+
             var checkerAddress = checkerAddressline + ", " + checkerPinCode.District.Name + ", " + checkerPinCode.State.Name + ", " + checkerPinCode.Country.Code;
             var checkerCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(checkerAddress);
             var checkerLatLong = checkerCoordinates.Latitude + "," + checkerCoordinates.Longitude;
@@ -74,20 +76,23 @@ namespace risk.control.system.Seeds
             var checkerAgency = await context.Vendor.AddAsync(checker);
             await context.SaveChangesAsync(null, false);
             var agencyServices = new List<VendorInvestigationServiceType>();
-            foreach (var service in servicesTypes)
+            foreach(var state in states)
             {
-                var vendorService = new VendorInvestigationServiceType
+                foreach (var service in servicesTypes)
                 {
-                    VendorId = checkerAgency.Entity.VendorId,
-                    InvestigationServiceTypeId = service.InvestigationServiceTypeId,
-                    Price = 399,
-                    InsuranceType = service.InsuranceType,
-                    DistrictId = null,
-                    StateId = checkerPinCode.StateId,
-                    CountryId = checkerPinCode.CountryId,
-                    Updated = DateTime.Now,
-                };
-                agencyServices.Add(vendorService);
+                    var vendorService = new VendorInvestigationServiceType
+                    {
+                        VendorId = checkerAgency.Entity.VendorId,
+                        InvestigationServiceTypeId = service.InvestigationServiceTypeId,
+                        Price = 399,
+                        InsuranceType = service.InsuranceType,
+                        DistrictId = null,
+                        StateId = state.StateId,
+                        CountryId = state.CountryId,
+                        Updated = DateTime.Now,
+                    };
+                    agencyServices.Add(vendorService);
+                }
             }
 
             checker.VendorInvestigationServiceTypes = agencyServices;
