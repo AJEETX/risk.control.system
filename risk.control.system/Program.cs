@@ -73,18 +73,18 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.ActiveLiClasses = "breadcrumb-item active";
     //options.SeparatorElement = "<li class=\"separator\">/</li>";
 });
-builder.Services.AddWorkflow();
-builder.Services.AddTransient<InvestigationTaskWorkflow>();
-builder.Services.AddTransient<CaseCreateStep>();
-builder.Services.AddTransient<CaseAssignToAgencyStep>();
-builder.Services.AddTransient<CaseWithdrawStep>();
-builder.Services.AddTransient<CaseDeclineStep>();
-builder.Services.AddTransient<CaseAssignToAgentStep>();
-builder.Services.AddTransient<CaseAgentReportSubmitted>();
-builder.Services.AddTransient<CaseReAssignedToAgentStep>();
-builder.Services.AddTransient<CaseInvestigationReportSubmitted>();
-builder.Services.AddTransient<CaseApproved>();
-builder.Services.AddTransient<CaseRejected>();
+//builder.Services.AddWorkflow();
+//builder.Services.AddTransient<InvestigationTaskWorkflow>();
+//builder.Services.AddTransient<CaseCreateStep>();
+//builder.Services.AddTransient<CaseAssignToAgencyStep>();
+//builder.Services.AddTransient<CaseWithdrawStep>();
+//builder.Services.AddTransient<CaseDeclineStep>();
+//builder.Services.AddTransient<CaseAssignToAgentStep>();
+//builder.Services.AddTransient<CaseAgentReportSubmitted>();
+//builder.Services.AddTransient<CaseReAssignedToAgentStep>();
+//builder.Services.AddTransient<CaseInvestigationReportSubmitted>();
+//builder.Services.AddTransient<CaseApproved>();
+//builder.Services.AddTransient<CaseRejected>();
 
 builder.Services.AddCors(opt =>
 {
@@ -207,20 +207,9 @@ builder.Services.AddNotyf(config =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("Database");
-//var HangfireConnectionString = builder.Configuration.GetConnectionString("HangfireDatabase");
-var isProd = builder.Configuration.GetSection("IsProd").Value;
-var prod = bool.Parse(isProd);
-if (prod)
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
-else
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
                         options.UseSqlite(connectionString));
-    builder.Services.AddHangfire(config => config.UseMemoryStorage());
-}
+builder.Services.AddHangfire(config => config.UseMemoryStorage());
 builder.Services.AddHangfireServer(options =>
 {
     options.WorkerCount = 5;
@@ -383,7 +372,6 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
     Authorization = new[] { new BasicAuthAuthorizationFilter() }
 });
 app.UseMiddleware<RequirePasswordChangeMiddleware>();
-//app.UseWebSockets();
 app.UseSwagger();
 
 if (app.Environment.IsDevelopment())
