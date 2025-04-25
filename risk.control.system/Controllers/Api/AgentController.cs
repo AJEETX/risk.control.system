@@ -447,7 +447,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("get")]
-        public async Task<IActionResult> Get(string claimId, string email = "agentx@verify.com")
+        public async Task<IActionResult> Get(long claimId, string email = "agentx@verify.com")
         {
             try
             {
@@ -481,15 +481,15 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
-                    .FirstOrDefault(c => c.Id == int.Parse(claimId)
-                    );
+                    .FirstOrDefault(c => c.Id == claimId);
+
                 var beneficiary = _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
                     .Include(c => c.PinCode)
                     .Include(c => c.District)
                     .Include(c => c.State)
                     .Include(c => c.Country)
-                    .FirstOrDefault(c => c.InvestigationTaskId == int.Parse(claimId));
+                    .FirstOrDefault(c => c.InvestigationTaskId == claimId);
 
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
 
@@ -677,7 +677,7 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-                if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || string.IsNullOrWhiteSpace(data.ClaimId) || data.BeneficiaryId < 1)
+                if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || data.ClaimId < 1 || data.BeneficiaryId < 1)
                 {
                     throw new ArgumentNullException("Argument(s) can't be null");
                 }
@@ -695,11 +695,9 @@ namespace risk.control.system.Controllers.Api
                     }
                 }
                 var (vendor, contract) = await service.SubmitToVendorSupervisor(
-                    data.Email,
-                    int.Parse(data.ClaimId),
-                    data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
+                    data.Email, data.ClaimId, data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, int.Parse(data.ClaimId), portal_base_url));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, portal_base_url));
 
                 return Ok(new { data, Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId) });
             }
