@@ -74,32 +74,26 @@ namespace risk.control.system.Services
             }
 
             var claimsCases = _context.Investigations
-               .Include(c => c.PolicyDetail)
-               .Include(c => c.BeneficiaryDetail).Where(c=>c.PolicyDetail.InsuranceType == insuranceType && !c.Deleted);
+               .Include(c => c.PolicyDetail).Where(c=>c.PolicyDetail.InsuranceType == insuranceType && 
+               !c.Deleted && c.VendorId.HasValue  && 
+                                (c.SubStatus == allocatedStatus ||
+                                c.SubStatus == assignedToAgentStatus ||
+                                c.SubStatus == enquiryStatus ||
+                                c.SubStatus == submitted2SuperStatus));
 
            
             int countOfCases = 0;
             foreach (var claimsCase in claimsCases)
             {
-                if (claimsCase.BeneficiaryDetail?.BeneficiaryDetailId > 0)
+                if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.Value.ToString(), out countOfCases))
                 {
-                    if (claimsCase.VendorId.HasValue && (claimsCase.SubStatus == allocatedStatus ||
-                                claimsCase.SubStatus == assignedToAgentStatus ||
-                                claimsCase.SubStatus == enquiryStatus ||
-                                claimsCase.SubStatus == submitted2SuperStatus)
-                                )
-                    {
-                        if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.Value.ToString(), out countOfCases))
-                        {
-                            vendorCaseCount.Add(claimsCase.VendorId.Value.ToString(), 1);
-                        }
-                        else
-                        {
-                            int currentCount = vendorCaseCount[claimsCase.VendorId.Value.ToString()];
-                            ++currentCount;
-                            vendorCaseCount[claimsCase.VendorId.Value.ToString()] = currentCount;
-                        }
-                    }
+                    vendorCaseCount.Add(claimsCase.VendorId.Value.ToString(), 1);
+                }
+                else
+                {
+                    int currentCount = vendorCaseCount[claimsCase.VendorId.Value.ToString()];
+                    ++currentCount;
+                    vendorCaseCount[claimsCase.VendorId.Value.ToString()] = currentCount;
                 }
             }
 
@@ -181,7 +175,7 @@ namespace risk.control.system.Services
                 var tdetail = _context.Investigations
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
-                        (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
+                        (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                      d.ClientCompanyId == companyUser.ClientCompanyId && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
@@ -264,7 +258,7 @@ namespace risk.control.system.Services
             {
                 var tdetail = _context.Investigations
                     .Include(i => i.PolicyDetail).Where(d =>
-                        (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
+                        (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                        d.ClientCompanyId == companyUser.ClientCompanyId &&
                        d.Created > DateTime.Now.AddMonths(-7) && !d.Deleted);
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
@@ -341,7 +335,7 @@ namespace risk.control.system.Services
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
                     d.ClientCompanyId == companyUser.ClientCompanyId &&
-                    (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                    (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                     d.Created > DateTime.Now.AddDays(-28) && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
@@ -356,8 +350,7 @@ namespace risk.control.system.Services
 
                     foreach (var caseWithSameStatus in caseLogs)
                     {
-                        var casesWithCurrentStatus = caseWithSameStatus
-                                                      .Where(c => c.SubStatus == userCaseStatus);
+                        var casesWithCurrentStatus = caseWithSameStatus.Where(c => c.SubStatus == userCaseStatus);
                         for (int i = 0; i < workDays.Count; i++)
                         {
                             var caseWithCurrentWorkDay = casesWithCurrentStatus.Where(c => DateTime.Now.Subtract(c.Updated.GetValueOrDefault()).TotalDays >= i && DateTime.Now.Subtract(c.Updated.GetValueOrDefault()).TotalDays < i + 1);
@@ -431,7 +424,7 @@ namespace risk.control.system.Services
             if (companyUser != null)
             {
                 var tdetail = tdetailDays.Where(d =>
-                    (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                    (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                     d.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
@@ -516,7 +509,7 @@ namespace risk.control.system.Services
             if (companyUser != null)
             {
                 var tdetail = tdetailDays.Where(d =>
-                    (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                    (companyUser.Role == AppRoles.ASSESSOR ||  companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                     d.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();

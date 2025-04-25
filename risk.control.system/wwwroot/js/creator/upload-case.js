@@ -167,9 +167,9 @@
                 return value === true;
             });
 
-            //if (!isManager) {
-            //    api.column(7).visible(false); // ✅ Hide 'uploadedBy' if all are managers
-            //}
+            if (!isManager) {
+                api.column(5).visible(false); // ✅ Hide 'uploadedBy' if all are managers
+            }
 
             var tableData = api.rows().data().toArray(); // ✅ Get all rows' data
 

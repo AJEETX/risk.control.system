@@ -5,48 +5,6 @@
     GetWeeklyPie('Underwriting', 'GetWeeklyPieUnderwriting', 'container-underwriting-pie');
     GetWeeklyAgencyPie('Agency-wise Claim ', 'GetAgentClaim', 'container-agency-claim-pie');
     GetWeeklyAgencyPie('Agency-wise Underwriting ', 'GetAgentUnderwriting', 'container-agency-underwriting-pie');
-
-    //GetChart('Case', 'GetClaimChart', 'container-monthly-claim')
-
-    //$("#btnWeeklyReport").click(function () {
-    //    GetWeekly('Case', 'GetWeeklyClaim', 'container-claim');
-    //})
-
-    //$("#btnMonthlyReport").click(function () {
-    //    GetMonthly('Case', 'GetMonthlyClaim', 'container-claim');
-    //})
-    //$("#btnWeeklyPie").click(function () {
-    //    GetWeeklyPie('Case', 'GetWeeklyClaim', 'container-claim-pie');
-    //})
-    //$("#btnMonthlyPie").click(function () {
-    //    GetMonthlyPie('Case', 'GetMonthlyClaim', 'container-claim-pie');
-    //})
-    //$("#btnWeeklyTat").click(function () {
-    //    GetWeeklyTat('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
-    //})
-    //$("#btnMonthlyTat").click(function () {
-    //    //GetMonthly('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
-    //})
-
-    //$('.details-page').on('click', function () {
-    //    $("body").addClass("submit-progress-bg");
-    //    // Wrap in setTimeout so the UI
-    //    // can update the spinners
-    //    setTimeout(function () {
-    //        $(".submit-progress").removeClass("hidden");
-    //    }, 1);
-
-    //    $('.details-page').attr('disabled', 'disabled');
-    //    $('html').css('cursor', 'not-allowed');
-
-    //    var section = document.getElementById("section");
-    //    if (section) {
-    //        var nodes = section.getElementsByTagName('*');
-    //        for (var i = 0; i < nodes.length; i++) {
-    //            nodes[i].disabled = true;
-    //        }
-    //    }
-    //});
 });
 
 

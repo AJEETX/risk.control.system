@@ -19,7 +19,7 @@ namespace risk.control.system.Models
         [Display(Name = "Investigation service type")]
         public InvestigationServiceType InvestigationServiceType { get; set; } = default!;
 
-        public InsuranceType? InsuranceType { get; set; } = Models.InsuranceType.CLAIM;
+        public InsuranceType? InsuranceType { get; set; }
 
         [Display(Name = "Country name")]
         public long? CountryId { get; set; } = default!;
