@@ -175,7 +175,7 @@
         ],
         "rowCallback": function (row, data, index) {
             if (data.isNewAssigned) {
-                $('td', nRow).addClass('isNewAssigned');
+                $('td', row).addClass('isNewAssigned');
             }
         }
     });
