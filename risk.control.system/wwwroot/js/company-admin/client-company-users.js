@@ -163,9 +163,9 @@
         ],
         "rowCallback": function (row, data, index) {
             if (!data.active || !data.loginVerified) {
-                $('td', nRow).addClass('lightgrey');
+                $('td', row).addClass('lightgrey');
             } else {
-                $('td', nRow).removeClass('lightgrey');
+                $('td', row).removeClass('lightgrey');
             }
         },
         "drawCallback": function (settings, start, end, max, total, pre) {

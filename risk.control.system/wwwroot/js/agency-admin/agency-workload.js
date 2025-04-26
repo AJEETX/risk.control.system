@@ -8,7 +8,8 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Agency/GetUsers',
-            dataSrc: '', error: function (xhr, status, error) {
+            dataSrc: '',
+            error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {

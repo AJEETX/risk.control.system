@@ -28,15 +28,16 @@
                 </button>
             </div>
         </div>
-        <div class="card-footer text-muted border-bottom-0">
-            <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.InvestigationReport.AgentEmail </span>
-        </div>
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
             <div class="progress-bar progress-bar-green" role="progressbar">
                 questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
             </div>
         </div>
+        <div class="card-footer text-muted border-bottom-0">
+            <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.InvestigationReport.AgentEmail </span>
+        </div>
+        
         <div class="card-body">
 
             <div class="row">
@@ -78,7 +79,7 @@
                         <span class="badge badge-light"><i class="fas fa-film"></i> Agent Remarks</span>:
                         <br />
 
-                        @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+                        @if (Model.ClaimsInvestigation.UpdateAgentAnswer && Model.ClaimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
                         {
                             <textarea name="remarks" id="remarks" asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks" rows="2"></textarea>
                             <span asp-validation-for="InvestigationReport.AgentRemarks" class="text-danger"></span>

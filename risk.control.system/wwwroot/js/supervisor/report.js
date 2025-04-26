@@ -175,10 +175,9 @@
         ],
         "rowCallback": function (row, data, index) {
             if (data.isNewAssigned) {
-                $('td', nRow).addClass('isNewAssigned');
+                $('td', row).addClass('isNewAssigned');
             }
-        },
-        error: function (xhr, status, error) { alert('err ' + error) }
+        }
     });
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');

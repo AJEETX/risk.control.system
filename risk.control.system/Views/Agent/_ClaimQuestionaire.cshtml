@@ -138,8 +138,8 @@
 
                     <div class="text-right">
                         <a id="back" asp-controller="Agent" asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
-                        @if (@Model.InvestigationReport?.AgentIdReport?.DigitalIdImageLocationUrl != null && @Model.InvestigationReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && 
-                            @Model.InvestigationReport?.PanIdReport?.DocumentIdImageLocationUrl != null)
+                        @if (@Model.InvestigationReport?.AgentIdReport?.IdImageLocationUrl != null && @Model.InvestigationReport?.DigitalIdReport?.IdImageLocationUrl != null && 
+                            @Model.InvestigationReport?.PanIdReport?.IdImageLocationUrl != null)
                         {
                             <button disabled id="submit-case" type="submit" class="btn btn-danger">
                                 <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT

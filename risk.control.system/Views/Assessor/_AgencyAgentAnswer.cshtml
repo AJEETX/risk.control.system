@@ -28,16 +28,17 @@
                     <span data-toggle="tooltip" title="Agent report time" class="badge badge-light"> <i class="nav-icon fas fa-clock"></i> @questionTime </span>
                 </div>
             </div>
-            <div class="card-footer text-muted border-bottom-0">
-                <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.ClaimsInvestigation.InvestigationReport.AgentEmail </span>
-            </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
                 <div class="progress-bar progress-bar-green" role="progressbar">
                     questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-footer text-muted border-bottom-0">
+                <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.ClaimsInvestigation.InvestigationReport.AgentEmail </span>
+            </div>
+            
+            <div class="card-body text-muted text-sm">
                 <div class="row">
                     <!-- Questions Section -->
                     <div class="col-md-7">
@@ -76,7 +77,7 @@
                                 <i class="fas fa-film"></i> Answers
                             </span>
                         </h6>
-                        <ul class="fa-ul text-muted list-unstyled">
+                        <ul class="fa-ul list-unstyled">
                             @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
                             {
                                 <li class="mb-2">
