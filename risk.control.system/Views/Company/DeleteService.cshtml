@@ -3,6 +3,9 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.DELETE;
+    var data = Model.Price;
+    var district = Model.District == null ? "ALL DISTRICTS" : Model.District.Name;
+    var type = Model.InsuranceType.GetEnumDisplayName();
 }
 <section class="content">
     <div class="card shadow-lg border-1 rounded-lg">
@@ -20,7 +23,7 @@
                             @Html.DisplayNameFor(model => model.InsuranceType)
                         </dt>
                         <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.InsuranceType.GetEnumDisplayName())
+                            @Html.DisplayFor(model => @type)
                         </dd>
                         <dt class="col-sm-5">
                             @Html.DisplayNameFor(model => model.InvestigationServiceType)
@@ -32,9 +35,6 @@
                         <dt class="col-sm-5">
                             @Html.DisplayNameFor(model => model.District)
                         </dt>
-                        @{
-                            var district = Model.District == null ? "ALL DISTRICTS" : Model.District.Name;
-                        }
                         <dd class="col-sm-5">
                             @Html.DisplayFor(model => @district)
                         </dd>

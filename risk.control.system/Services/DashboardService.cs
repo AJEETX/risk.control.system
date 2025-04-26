@@ -126,7 +126,7 @@ namespace risk.control.system.Services
                .Include(c => c.BeneficiaryDetail).Where(c => c.VendorId == vendorUser.VendorId &&
                !c.Deleted &&
                c.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
-               c.Status == assignedToAgentStatus);
+               c.SubStatus == assignedToAgentStatus);
 
             int countOfCases = 0;
 

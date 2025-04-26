@@ -674,7 +674,7 @@ namespace risk.control.system.Services
                 IsUploaded = a.IsUploaded,
                 Origin = a.ORIGIN.GetEnumDisplayName().ToLower(),
                 SubStatus = a.SubStatus,
-                Ready2Assign = a.IsReady2Assign,
+                Ready2Assign = a.IsValidCaseData(),
                 Service = a.PolicyDetail.InvestigationServiceType.Name,
                 Location = a.ORIGIN.GetEnumDisplayName(),
                 Created = a.Created.ToString("dd-MM-yyyy"),

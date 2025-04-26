@@ -2,6 +2,10 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/GetAvailableVendors',
+            dataSrc:'',
+            data: function (result) {
+                console.log("Data before sending:", result); // Debugging
+            },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
@@ -31,7 +35,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 11                      // Index of the column to style
             }],
-        order: [[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
