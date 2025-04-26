@@ -112,98 +112,51 @@ document.querySelectorAll('.delete-question-btn').forEach(button => {
         });
     });
 });
+$.validator.setDefaults({
+    submitHandler: function (form) {
+        $.confirm({
+            title: "Confirm SUBMIT",
+            content: "Are you sure to SUBMIT?",
+            icon: 'fa fa-question',
 
+            closeIcon: true,
+            type: 'green',
+            buttons: {
+                confirm: {
+                    text: "SUBMIT",
+                    btnClass: 'btn-success',
+                    action: function () {
+                        askConfirmation = false;
+                        $("body").addClass("submit-progress-bg");
+                        // Wrap in setTimeout so the UI
+                        // can update the spinners
+                        setTimeout(function () {
+                            $(".submit-progress").removeClass("hidden");
+                        }, 1);
+
+                        $('#submit-answer').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Submit Answers");
+                        disableAllInteractiveElements();
+
+                        form.submit();
+                        var createForm = document.getElementById("answers");
+                        if (createForm) {
+
+                            var nodes = createForm.getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                        }
+                    }
+                },
+                cancel: {
+                    text: "Cancel",
+                    btnClass: 'btn-default'
+                }
+            }
+        });
+    }
+});
 $(document).ready(function () {
-    var askConfirmation = true;
-    $('#create-form').submit(function (e) {
-        if (askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm ADD",
-                content: "Are you sure to add?",
-                icon: 'fa fa-question',
+    $("#answers").validate();
 
-                closeIcon: true,
-                type: 'green',
-                buttons: {
-                    confirm: {
-                        text: "ADD",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-
-                            $('#add-question').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Question");
-                            disableAllInteractiveElements();
-
-                            $('#create-form').submit();
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-    })
-
-    $('#answers').submit(function (e) {
-        if (askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm SUBMIT",
-                content: "Are you sure to SUBMIT?",
-                icon: 'fa fa-question',
-
-                closeIcon: true,
-                type: 'green',
-                buttons: {
-                    confirm: {
-                        text: "SUBMIT",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-
-                            $('#submit-answer').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Submit Answers");
-                            disableAllInteractiveElements();
-
-                            $('#answers').submit();
-                            var createForm = document.getElementById("answers");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-    })
 });

@@ -160,27 +160,27 @@ namespace risk.control.system.Services
             panIdData.Passenger = "Document Id";
             var panValid = claim.InvestigationReport.PanIdReport.DocumentIdImageValid.GetValueOrDefault();
             panIdData.FaceMatchStatus = panValid ? "YES" : "NO";
-            panIdData.PersonName = claim.InvestigationReport.PanIdReport.DocumentIdImageData.Length > 30 ?
-                claim.InvestigationReport.PanIdReport.DocumentIdImageData.Substring(0, 30) + "..." :
-                claim.InvestigationReport.PanIdReport.DocumentIdImageData;
+            panIdData.PersonName = claim.InvestigationReport.PanIdReport.IdImageData.Length > 30 ?
+                claim.InvestigationReport.PanIdReport.IdImageData.Substring(0, 30) + "..." :
+                claim.InvestigationReport.PanIdReport.IdImageData;
             panIdData.Salutation = "PAN/CARD";
             panIdData.PersonContact = contactNumer;
-            panIdData.BoardingTill = claim.InvestigationReport.PanIdReport.DocumentIdImageLongLatTime.GetValueOrDefault();
-            panIdData.PhotoIdTime = claim.InvestigationReport.PanIdReport.DocumentIdImageLongLatTime.GetValueOrDefault();
-            panIdData.WeatherData = claim.InvestigationReport.PanIdReport.DocumentIdImageData;
+            panIdData.BoardingTill = claim.InvestigationReport.PanIdReport.IdImageLongLatTime.GetValueOrDefault();
+            panIdData.PhotoIdTime = claim.InvestigationReport.PanIdReport.IdImageLongLatTime.GetValueOrDefault();
+            panIdData.WeatherData = claim.InvestigationReport.PanIdReport.IdImageData;
             panIdData.ArrivalAirport = "";
-            panIdData.ArrivalAbvr = claim.InvestigationReport.PanIdReport.DocumentIdImageLocationAddress;
+            panIdData.ArrivalAbvr = claim.InvestigationReport.PanIdReport.IdImageLocationAddress;
             panIdData.PhotoIdRemarks = panValid ? "CONFIRM" : "NOT SURE";
             panIdData.MatchFont = panValid ? Fonts.Helvetica(16f).SetColor(Color.Green) : Fonts.Helvetica(16f).SetColor(Color.Red);
             panIdData.StatusImagePath = panValid ? Path.Combine(imagePath, "img", "yes.png") : Path.Combine(imagePath, "img", "cancel.png");
 
             var panCardFileName = $"pan-card-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
-            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", panCardFileName), claim.InvestigationReport.PanIdReport.DocumentIdImage);
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", panCardFileName), claim.InvestigationReport.PanIdReport.IdImage);
             panIdData.PanPhotoPath = Path.Combine(imagePath, "report", panCardFileName);
 
             string googlePanImagePath = Path.Combine(imagePath, "report", $"google-pan-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
-            var panPath = await DownloadMapImageAsync(claim.InvestigationReport.PanIdReport.DocumentIdImageLocationUrl, googlePanImagePath);
-            panIdData.PanMapUrl = claim.InvestigationReport.PanIdReport.DocumentIdImageLocationUrl;
+            var panPath = await DownloadMapImageAsync(claim.InvestigationReport.PanIdReport.IdImageLocationUrl, googlePanImagePath);
+            panIdData.PanMapUrl = claim.InvestigationReport.PanIdReport.IdImageLocationUrl;
             panIdData.PanMapPath = panPath;
 
 
@@ -273,22 +273,22 @@ namespace risk.control.system.Services
             var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);
 
             var photoIdFilename = $"agent-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
-            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.InvestigationReport.AgentIdReport.DigitalIdImage);
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.InvestigationReport.AgentIdReport.IdImage);
             photoIdData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdFilename);
 
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-agent-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
-            var photoPath = await DownloadMapImageAsync(claim.InvestigationReport.AgentIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
-            photoIdData.PhotoIdMapUrl = claim.InvestigationReport.AgentIdReport.DigitalIdImageLocationUrl;
+            var photoPath = await DownloadMapImageAsync(claim.InvestigationReport.AgentIdReport.IdImageLocationUrl, googlePhotoImagePath);
+            photoIdData.PhotoIdMapUrl = claim.InvestigationReport.AgentIdReport.IdImageLocationUrl;
             photoIdData.PhotoIdMapPath = photoPath;
             photoIdData.PersonAddressImage = addressPath;
             photoIdData.PersonName = claim.InvestigationReport.AgentEmail;
             photoIdData.Salutation = "MR/MS";
             photoIdData.PersonContact = contactNumer;
-            photoIdData.BoardingTill = claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.PhotoIdTime = claim.InvestigationReport.AgentIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.WeatherData = claim.InvestigationReport.AgentIdReport.DigitalIdImageData;
+            photoIdData.BoardingTill = claim.InvestigationReport.AgentIdReport.IdImageLongLatTime.GetValueOrDefault();
+            photoIdData.PhotoIdTime = claim.InvestigationReport.AgentIdReport.IdImageLongLatTime.GetValueOrDefault();
+            photoIdData.WeatherData = claim.InvestigationReport.AgentIdReport.IdImageData;
             photoIdData.ArrivalAirport = "";
-            photoIdData.ArrivalAbvr = claim.InvestigationReport.AgentIdReport.DigitalIdImageLocationAddress;
+            photoIdData.ArrivalAbvr = claim.InvestigationReport.AgentIdReport.IdImageLocationAddress;
             if (photoMatch)
             {
                 photoIdData.PhotoIdRemarks = $"CONFIRM";
@@ -328,22 +328,22 @@ namespace risk.control.system.Services
             var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);
 
             var photoIdFilename = $"photo-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
-            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.InvestigationReport.DigitalIdReport.DigitalIdImage);
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.InvestigationReport.DigitalIdReport.IdImage);
             photoIdData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdFilename);
 
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-photo-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
-            var photoPath = await DownloadMapImageAsync(claim.InvestigationReport.DigitalIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
-            photoIdData.PhotoIdMapUrl = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLocationUrl;
+            var photoPath = await DownloadMapImageAsync(claim.InvestigationReport.DigitalIdReport.IdImageLocationUrl, googlePhotoImagePath);
+            photoIdData.PhotoIdMapUrl = claim.InvestigationReport.DigitalIdReport.IdImageLocationUrl;
             photoIdData.PhotoIdMapPath = photoPath;
             photoIdData.PersonAddressImage = addressPath;
             photoIdData.PersonName = detailReport.PersonOfInterestName;
             photoIdData.Salutation = "MR/MS";
             photoIdData.PersonContact = contactNumer;
-            photoIdData.BoardingTill = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.PhotoIdTime = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.WeatherData = claim.InvestigationReport.DigitalIdReport.DigitalIdImageData;
+            photoIdData.BoardingTill = claim.InvestigationReport.DigitalIdReport.IdImageLongLatTime.GetValueOrDefault();
+            photoIdData.PhotoIdTime = claim.InvestigationReport.DigitalIdReport.IdImageLongLatTime.GetValueOrDefault();
+            photoIdData.WeatherData = claim.InvestigationReport.DigitalIdReport.IdImageData;
             photoIdData.ArrivalAirport = "";
-            photoIdData.ArrivalAbvr = claim.InvestigationReport.DigitalIdReport.DigitalIdImageLocationAddress;
+            photoIdData.ArrivalAbvr = claim.InvestigationReport.DigitalIdReport.IdImageLocationAddress;
             if (photoMatch)
             {
                 photoIdData.PhotoIdRemarks = $"CONFIRM";

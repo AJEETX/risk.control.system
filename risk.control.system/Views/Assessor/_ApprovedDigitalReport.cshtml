@@ -1,9 +1,9 @@
 ﻿@model CaseTransactionModel
 
-@if (@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+@if (@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.IdImageData != null && @Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.IdImageLongLatTime != null)
 {
     string digitalIdColor = "grey";
-    if (Model.ClaimsInvestigation.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+    if (Model.ClaimsInvestigation.InvestigationReport.DigitalIdReport?.IdImageLongLatTime != null)
     {
         digitalIdColor = "green";
     }
@@ -26,7 +26,7 @@
             <div class="card-header text-muted border-bottom-0 float-right">
 
                 <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span class="badge badge-light"><i class="nav-icon fas fa-clock"></i> 
-                    @Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                    @Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.IdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
             </div>
             <div class="card-footer text-center">
                 <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
@@ -65,10 +65,10 @@
                             <span class="badge badge-light"><i class="far fa-image"></i> Photo Id Image</span>:
                             <br />
                             @{
-                                if (Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.DigitalIdImage != null)
+                                if (Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.IdImage != null)
                                 {
                                     <img id="agentLocationPicture" class="img-fluid face-Image @borderColor" data-toggle="tooltip" title="Face Image"
-                                         src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.DigitalIdImage))">
+                                         src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.IdImage))">
                                 }
                                 else
                                 {
@@ -82,19 +82,19 @@
 
                             <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
                             <br />
-                            <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.DigitalIdImageData</label>
+                            <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.IdImageData</label>
                         </p>
                         <p class="text-muted text-sm">
 
                             <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
+                            <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.IdImageLocationAddress</label>
                         </p>
                     </div>
                 </div>
                 <p class="text-center">
                     <span class="badge badge-light"> Match :  </span>
-                    @if (@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.Similarity < 70 && Model.ClaimsInvestigation.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                    @if (@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.Similarity < 70 && Model.ClaimsInvestigation.InvestigationReport.DigitalIdReport?.IdImageLongLatTime != null)
                     {
                         <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                     }

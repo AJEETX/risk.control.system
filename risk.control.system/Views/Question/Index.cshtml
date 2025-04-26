@@ -43,7 +43,7 @@
                         </li>
                     </ul>
 
-                    <form id="answers" method="post" action="/Question/SubmitAnswers" enctype="multipart/form-data" class="p-4 bg-white border rounded shadow-sm questionnaire-form">
+                    <form id="answers" method="post" asp-controller="Question" asp-action="SubmitAnswers" enctype="multipart/form-data" class="p-4 bg-white border rounded shadow-sm questionnaire-form">
                         <input type="hidden" name="InsuranceType" value="@Model.InsuranceType" />
 
                         @if (Model != null && Model.Questions.Count > 0)

@@ -537,15 +537,15 @@ namespace risk.control.system.Controllers.Api
                         },
                         InvestigationData = new
                         {
-                            LocationImage = claim?.InvestigationReport?.DigitalIdReport?.DigitalIdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.DigitalIdReport?.DigitalIdImage)) :
+                            LocationImage = claim?.InvestigationReport?.DigitalIdReport?.IdImage != null ?
+                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.DigitalIdReport?.IdImage)) :
                             Applicationsettings.NO_PHOTO_IMAGE,
-                            OcrImage = claim?.InvestigationReport?.PanIdReport?.DocumentIdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.PanIdReport?.DocumentIdImage)) :
+                            OcrImage = claim?.InvestigationReport?.PanIdReport?.IdImage != null ?
+                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.PanIdReport?.IdImage)) :
                             Applicationsettings.NO_PHOTO_IMAGE,
-                            OcrData = claim?.InvestigationReport?.PanIdReport?.DocumentIdImageData,
-                            LocationLongLat = claim?.InvestigationReport?.DigitalIdReport?.DigitalIdImageLongLat,
-                            OcrLongLat = claim?.InvestigationReport?.PanIdReport?.DocumentIdImageLongLat,
+                            OcrData = claim?.InvestigationReport?.PanIdReport?.IdImageData,
+                            LocationLongLat = claim?.InvestigationReport?.DigitalIdReport?.IdImageLongLat,
+                            OcrLongLat = claim?.InvestigationReport?.PanIdReport?.IdImageLongLat,
                         },
                         Remarks = claim?.InvestigationReport?.AgentRemarks,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)

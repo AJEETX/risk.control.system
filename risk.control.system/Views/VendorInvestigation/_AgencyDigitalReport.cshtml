@@ -3,23 +3,23 @@
 @{
     string digitalIdColor = "progress-bar-grey";
     var borderColor = "";
-    if (Model.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
+    if (Model.InvestigationReport.DigitalIdReport?.IdImageLongLatTime == null)
     {
         digitalIdColor = "grey";
         borderColor = "";
     }
-    else if (Model.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && @Model.InvestigationReport?.DigitalIdReport?.Similarity < 70)
+    else if (Model.InvestigationReport.DigitalIdReport?.IdImageLongLatTime != null && @Model.InvestigationReport?.DigitalIdReport?.Similarity < 70)
     {
         digitalIdColor = "progress-bar-red";
         borderColor = "border-danger";
     }
-    else if (Model.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && @Model.InvestigationReport?.DigitalIdReport?.Similarity >= 70)
+    else if (Model.InvestigationReport.DigitalIdReport?.IdImageLongLatTime != null && @Model.InvestigationReport?.DigitalIdReport?.Similarity >= 70)
     {
         borderColor = "border-success";
         digitalIdColor = "progress-bar-green";
     }
 
-    if (@Model.InvestigationReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.InvestigationReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+    if (@Model.InvestigationReport?.DigitalIdReport?.IdImageData != null && @Model.InvestigationReport?.DigitalIdReport?.IdImageLongLatTime != null)
     {
         <div class="card @borderColor">
             <div class="card direct-chat-warning collapsed-card">
@@ -57,7 +57,7 @@
                     <div class="card-tools">
                         <span data-toggle="tooltip" title="Agent report time" class="badge badge-light">
                             <i class="nav-icon fas fa-clock"></i>
-                            @Model.InvestigationReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                            @Model.InvestigationReport?.DigitalIdReport?.IdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                         </span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                             <i class="fas fa-plus"></i>
@@ -98,10 +98,10 @@
                                 <span class="badge badge-light"><i class="far fa-image"></i> Photo Id Image</span>:
                                 <br />
                                 @{
-                                    if (Model.InvestigationReport?.DigitalIdReport?.DigitalIdImage != null)
+                                    if (Model.InvestigationReport?.DigitalIdReport?.IdImage != null)
                                     {
                                         <img id="agentLocationPicture" class="img-fluid face-Image @borderColor" data-toggle="tooltip" title="Face Image"
-                                             src="data:image/*;base64,@(Convert.ToBase64String(@Model.InvestigationReport?.DigitalIdReport?.DigitalIdImage))">
+                                             src="data:image/*;base64,@(Convert.ToBase64String(@Model.InvestigationReport?.DigitalIdReport?.IdImage))">
                                     }
                                     else
                                     {
@@ -116,14 +116,14 @@
 
                                 <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
                                 <br />
-                                <label class="ocr-data img-fluid"> @Model.InvestigationReport?.DigitalIdReport?.DigitalIdImageData</label>
+                                <label class="ocr-data img-fluid"> @Model.InvestigationReport?.DigitalIdReport?.IdImageData</label>
 
                             </p>
                             <p class="text-muted text-sm">
 
                                 <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                                 <br />
-                                <label class="img-fluid ocr-data"> @Model.InvestigationReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
+                                <label class="img-fluid ocr-data"> @Model.InvestigationReport?.DigitalIdReport?.IdImageLocationAddress</label>
                             </p>
                         </div>
 
@@ -134,7 +134,7 @@
             </div>
             <div class="text-muted text-center">
                 <span class="badge badge-light"> Match :  </span>
-                @if (@Model.InvestigationReport?.DigitalIdReport?.Similarity < 70 && Model.InvestigationReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                @if (@Model.InvestigationReport?.DigitalIdReport?.Similarity < 70 && Model.InvestigationReport.DigitalIdReport?.IdImageLongLatTime != null)
                 {
                     <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                 }

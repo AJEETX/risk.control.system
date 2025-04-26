@@ -1,20 +1,20 @@
 ﻿@model CaseInvestigationVendorsModel
 
 @{
-    var imageCapturedTime = @Model.InvestigationReport?.AgentIdReport?.DigitalIdImageLongLatTime != null ? @Model.InvestigationReport?.AgentIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var imageCapturedTime = @Model.InvestigationReport?.AgentIdReport?.IdImageLongLatTime != null ? @Model.InvestigationReport?.AgentIdReport?.IdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
     string digitalIdColor = "progress-bar-grey";
     var borderColor = "";
-    if (Model.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime == null)
+    if (Model.InvestigationReport.AgentIdReport?.IdImageLongLatTime == null)
     {
         digitalIdColor = "progress-bar-grey";
         borderColor = "";
     }
-    else if (Model.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime != null && @Model.InvestigationReport?.AgentIdReport?.Similarity < 70)
+    else if (Model.InvestigationReport.AgentIdReport?.IdImageLongLatTime != null && @Model.InvestigationReport?.AgentIdReport?.Similarity < 70)
     {
         digitalIdColor = "progress-bar-red";
         borderColor = "border-danger";
     }
-    else if (Model.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime != null && @Model.InvestigationReport?.AgentIdReport?.Similarity >= 70)
+    else if (Model.InvestigationReport.AgentIdReport?.IdImageLongLatTime != null && @Model.InvestigationReport?.AgentIdReport?.Similarity >= 70)
     {
         borderColor = "border-success";
         digitalIdColor = "progress-bar-green";
@@ -87,11 +87,11 @@
 
             <div class="card-footer text-center">
                 <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  @Model.InvestigationReport?.AgentIdReport?.Similarity</span>
-                @if (@Model.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime == null)
+                @if (@Model.InvestigationReport.AgentIdReport?.IdImageLongLatTime == null)
                 {
                     <i class='fa fa-times i-grey' aria-hidden='true'></i>
                 }
-                else if (@Model.InvestigationReport?.AgentIdReport?.Similarity < 70 && @Model.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime != null)
+                else if (@Model.InvestigationReport?.AgentIdReport?.Similarity < 70 && @Model.InvestigationReport.AgentIdReport?.IdImageLongLatTime != null)
                 {
                     <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                 }
@@ -108,7 +108,7 @@
                 </div>
             </div>
             <div class="card-body">
-                @if (@Model.InvestigationReport?.AgentIdReport?.DigitalIdImageLocationUrl != null)
+                @if (@Model.InvestigationReport?.AgentIdReport?.IdImageLocationUrl != null)
                 {
                     <div class="card direct-chat direct-chat-warning collapsed-card">
                         <div class="card-header">
@@ -136,9 +136,9 @@
                             <span class="badge badge-light"><i class="far fa-image"></i> Agent Id Image</span>:
                             <br />
                             @{
-                                if (Model.InvestigationReport?.AgentIdReport?.DigitalIdImage != null)
+                                if (Model.InvestigationReport?.AgentIdReport?.IdImage != null)
                                 {
-                                    <img data-toggle="tooltip" title="Face Image" class="img-fluid face-Image agentLocationPicture" src="data:image/*;base64,@(Convert.ToBase64String(@Model.InvestigationReport?.AgentIdReport?.DigitalIdImage))">
+                                    <img data-toggle="tooltip" title="Face Image" class="img-fluid face-Image agentLocationPicture" src="data:image/*;base64,@(Convert.ToBase64String(@Model.InvestigationReport?.AgentIdReport?.IdImage))">
                                 }
                                 else
                                 {
@@ -153,24 +153,24 @@
 
                             <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
                             <br />
-                            <label class="ocr-data img-fluid"> @Model?.InvestigationReport?.AgentIdReport?.DigitalIdImageData</label>
+                            <label class="ocr-data img-fluid"> @Model?.InvestigationReport?.AgentIdReport?.IdImageData</label>
 
                         </p>
                         <p class="text-muted text-sm">
 
                             <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.InvestigationReport?.AgentIdReport?.DigitalIdImageLocationAddress</label>
+                            <label class="img-fluid ocr-data"> @Model.InvestigationReport?.AgentIdReport?.IdImageLocationAddress</label>
                         </p>
                     </div>
                 </div>
                 <p class="text-center">
                     <span class="badge badge-light"><i class="fas fa-portrait"></i> Match : @Model.InvestigationReport?.AgentIdReport?.Similarity </span>
-                    @if (@Model.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime == null)
+                    @if (@Model.InvestigationReport.AgentIdReport?.IdImageLongLatTime == null)
                     {
                         <i class='fa fa-times i-grey' aria-hidden='true'></i>
                     }
-                    else if (@Model.InvestigationReport?.AgentIdReport?.Similarity < 70 && @Model.InvestigationReport.AgentIdReport?.DigitalIdImageLongLatTime != null)
+                    else if (@Model.InvestigationReport?.AgentIdReport?.Similarity < 70 && @Model.InvestigationReport.AgentIdReport?.IdImageLongLatTime != null)
                     {
                         <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                     }
