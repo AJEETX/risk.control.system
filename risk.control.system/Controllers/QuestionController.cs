@@ -63,7 +63,7 @@ namespace risk.control.system.Controllers
                     QuestionText = model.QuestionText,
                     QuestionType = model.QuestionType,
                     Options = model.Options,
-                    IsRequired = model.IsRequired
+                    IsRequired = model.IsRequired.GetValueOrDefault(),
                 };
                 var existingQuestion = _context.CaseQuestionnaire.Include(c=>c.Questions)
                     .FirstOrDefault(x => x.ClientCompanyId == currentUser.ClientCompanyId && x.InsuranceType == model.InsuranceType);

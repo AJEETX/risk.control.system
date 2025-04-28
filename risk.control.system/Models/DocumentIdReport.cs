@@ -5,15 +5,10 @@ namespace risk.control.system.Models
 {
     public class DocumentIdReport : IdReportBase
     {
+        public byte[]? IdImageBack { get; set; }
+        public bool HasBackImage { get; set; } = true;
         public bool? DocumentIdImageValid { get; set; } = false;
-        public string? DocumentIdImageType { get; set; }
-
         public DocumentIdReportType DocumentIdReportType { get; set; } = DocumentIdReportType.PAN;
-        public override string ToString()
-        {
-            return $"Report Information: \n" +
-                $"- Valid: {ValidationExecuted}";
-        }
     }
 
     public enum DocumentIdReportType
@@ -21,6 +16,12 @@ namespace risk.control.system.Models
         ADHAAR,
         PAN,
         DRIVING_LICENSE,
-        PASSPORT
+        PASSPORT,
+        VOTER_CARD,
+        DEATH_CERTIFICATE,
+        BIRTH_CERTIFICATE,
+        MARRIAGE_CERTIFICATE,
+        MEDICAL_CERTIFICATE,
+        POLICE_REPORT
     }
 }

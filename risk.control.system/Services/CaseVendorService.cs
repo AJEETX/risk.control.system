@@ -1,4 +1,6 @@
-﻿using Highsoft.Web.Mvc.Charts;
+﻿using Google.Api;
+
+using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -104,17 +106,28 @@ namespace risk.control.system.Services
                 Questions = claim.InvestigationReport.CaseQuestionnaire.Questions
             };
 
-            var model = new CaseInvestigationVendorsModel 
-            {
-                InvestigationReport = claim.InvestigationReport, 
-                Location = claim.BeneficiaryDetail, 
-                ClaimsInvestigation = claim ,
-                QuestionFormViewModel = questionModel
-            };
+            
 
+            var templates = await _context.ReportTemplates
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.FaceIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.DocumentIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Questions)
+                   .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 
             _context.Investigations.Update(claim);
             var rows =await _context.SaveChangesAsync();
+
+            claim.InvestigationReport.ReportTemplate = templates;
+            var model = new CaseInvestigationVendorsModel
+            {
+                InvestigationReport = claim.InvestigationReport,
+                Location = claim.BeneficiaryDetail,
+                ClaimsInvestigation = claim,
+                QuestionFormViewModel = questionModel
+            };
             return model;
         }
 

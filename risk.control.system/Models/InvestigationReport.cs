@@ -8,10 +8,8 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-
-        public long? VendorId { get; set; }
-        public Vendor? Vendor { get; set; }
-
+        public long? ReportTemplateId { get; set; }
+        public ReportTemplate? ReportTemplate { get; set; }
         public long? DigitalIdReportId { get; set; }
         public DigitalIdReport? DigitalIdReport { get; set; } = new();
 

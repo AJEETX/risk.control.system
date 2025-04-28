@@ -33,5 +33,25 @@
         }
         public const string UNDERWRITING = "underwriting";
         public const string CLAIM = "claim";
+
+        public class LOCATIONS
+        {
+            public const string AGENT_PHOTO = "AGENT_PHOTO";
+            public const string VERIFIER_ADDRESS = "VERIFIER_ADDRESS";
+            public const string VERIFIER_PHOTO = "VERIFIER_PHOTO";
+
+            public const string CUSTOMER_ADDRESS = "CUSTOMER_ADDRESS";
+            public const string CUSTOMER_PHOTO = "CUSTOMER_PHOTO";
+            public const string AGENT_CUSTOMER_PHOTO = "AGENT_CUSTOMER_PHOTO";
+            
+            public const string BENEFICIARY_ADDRESS = "BENEFICIARY_ADDRESS";
+            public const string BENEFICIARY_PHOTO = "BENEFICIARY_PHOTO";
+            public const string AGENT_BENEFICIARY_PHOTO = "AGENT_BENEFICIARY_PHOTO";
+            
+            public const string HOSPITAL_ADDRESS = "HOSPITAL_ADDRESS";
+            public const string CEMETERY_ADDRESS = "CEMETERY_ADDRESS";
+            public const string POLICE_ADDRESS = "POLICE_ADDRESS";
+            public const string ANGANWAADI_ADDRESS = "ANGANWAADI_ADDRESS";
+        }
     }
 }

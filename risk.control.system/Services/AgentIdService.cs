@@ -476,7 +476,6 @@ public class AgentIdService : IAgentIdService
                     var image = Convert.FromBase64String(maskedImage.MaskedImage);
                     var savedMaskedImage = CompressImage.ProcessCompress(image);
                     claim.InvestigationReport.PanIdReport.IdImage = savedMaskedImage;
-                    claim.InvestigationReport.PanIdReport.DocumentIdImageType = maskedImage.DocType;
                     claim.InvestigationReport.PanIdReport.IdImageData = maskedImage.DocType + " data: ";
 
                     if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))

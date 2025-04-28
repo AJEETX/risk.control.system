@@ -12,6 +12,11 @@ namespace risk.control.system.Models
         public ClientCompany? ClientCompany { get; set; }
         public long? VendorId { get; set; }
         public Vendor? Vendor { get; set; }
+        public long? InvestigationReportId { get; set; }
+        public InvestigationReport? InvestigationReport { get; set; }
+        public long? ReportTemplateId { get; set; }
+        public ReportTemplate? ReportTemplate { get; set; }
+
         public PolicyDetail? PolicyDetail { get; set; }
         public CustomerDetail? CustomerDetail { get; set; }
         public BeneficiaryDetail? BeneficiaryDetail { get; set; }
@@ -22,8 +27,7 @@ namespace risk.control.system.Models
         public bool IsReady2Assign { get; set; } = false;
         public bool IsAutoAllocated { get; set; } = false;
         public bool AssignedToAgency { get; set; } = false;
-        public long? InvestigationReportId { get; set; }
-        public InvestigationReport? InvestigationReport { get; set; }
+
         public List<CaseNote>? CaseNotes { get; set; } = new();
         public List<CaseMessage>? CaseMessages { get; set; } = new();
 

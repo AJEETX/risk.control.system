@@ -173,11 +173,11 @@ namespace risk.control.system.Seeds
             }
         }
        
-        public static async Task<List<PinCodeState>> CsvRead_Au()
+        public static async Task<List<PinCodeState>> CsvRead_Au(int maxCount = 0)
         {
             var pincodes = new List<PinCodeState>();
             string csvData = await File.ReadAllTextAsync(au_stateWisePincodeFilePath);
-
+            int rowCount = 0;
             bool firstRow = true;
             foreach (string row in csvData.Split('\n'))
             {
@@ -206,6 +206,11 @@ namespace risk.control.system.Seeds
                             };
                             var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
                             pincodes.Add(pincodeState);
+                            rowCount++;
+                            if (maxCount > 0 && rowCount >= maxCount)
+                            {
+                                break;
+                            }
                         }
                     }
                 }

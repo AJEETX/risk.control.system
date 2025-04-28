@@ -299,6 +299,15 @@ namespace risk.control.system.Services
                 // Fetch case
                 var claimsCase = await context.Investigations
                     .Include(c => c.PolicyDetail)
+                    .Include(c => c.ReportTemplate)
+                    .ThenInclude(c => c.LocationTemplate)
+                    .ThenInclude(c => c.FaceIds)
+                    .Include(c => c.ReportTemplate)
+                    .ThenInclude(c => c.LocationTemplate)
+                    .ThenInclude(c => c.DocumentIds)
+                    .Include(c => c.ReportTemplate)
+                    .ThenInclude(c => c.LocationTemplate)
+                    .ThenInclude(c => c.Questions)
                     .FirstOrDefaultAsync(v => v.Id == claimsInvestigationId);
 
                 var vendor = await context.Vendor.FindAsync(vendorId);
@@ -321,6 +330,23 @@ namespace risk.control.system.Services
                 claimsCase.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
                 claimsCase.AgentSla = currentUser.ClientCompany.AgentSla;
                 claimsCase.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
+
+                //REPORT TEMPLATE
+                var investigationReport = new InvestigationReport
+                {
+                    ReportTemplateId = claimsCase.ReportTemplateId,
+                    ReportTemplate = claimsCase.ReportTemplate, // Optional
+                };
+
+                // Save InvestigationReport
+                context.InvestigationReport.Add(investigationReport);
+                await context.SaveChangesAsync();
+
+                // Link the InvestigationReport back to the InvestigationTask
+                claimsCase.InvestigationReportId = investigationReport.Id;
+                claimsCase.InvestigationReport = investigationReport;
+
+
                 context.Investigations.Update(claimsCase);
                 // Save changes
                 await context.SaveChangesAsync();
@@ -337,7 +363,6 @@ namespace risk.control.system.Services
                 throw;
             }
         }
-
         public async Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long claimId)
         {
             try
@@ -514,7 +539,6 @@ namespace risk.control.system.Services
                     report.SupervisorFileType = claimDocument.ContentType;
                 }
 
-                report.Vendor = claim.Vendor;
                 context.Investigations.Update(claim);
                 var rowsAffected = await context.SaveChangesAsync() > 0;
 

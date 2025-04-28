@@ -42,18 +42,21 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext context;
         private readonly INumberSequenceService numberService;
+        private readonly ICloneReportService cloneService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ITimelineService timelineService;
         private readonly ICustomApiCLient customApiCLient;
 
         public InvestigationService(ApplicationDbContext context, 
-            INumberSequenceService numberService, 
+            INumberSequenceService numberService,
+            ICloneReportService cloneService,
             IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
             ICustomApiCLient customApiCLient)
         {
             this.context = context;
             this.numberService = numberService;
+            this.cloneService = cloneService;
             this.webHostEnvironment = webHostEnvironment;
             this.timelineService = timelineService;
             this.customApiCLient = customApiCLient;
@@ -127,6 +130,8 @@ namespace risk.control.system.Services
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                 }
+                var reportTemplate = await CloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
+
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.CreatedUser = userEmail;
                 claimsInvestigation.CaseOwner = userEmail;
@@ -137,6 +142,9 @@ namespace risk.control.system.Services
                 claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR;
                 claimsInvestigation.CreatorSla = currentUser.ClientCompany.CreatorSla;
                 claimsInvestigation.ClientCompany = currentUser.ClientCompany;
+                claimsInvestigation.ClientCompanyId = currentUser.ClientCompanyId;
+                claimsInvestigation.ReportTemplate = reportTemplate;
+                claimsInvestigation.ReportTemplateId = reportTemplate.Id;
                 var aaddedClaimId = context.Investigations.Add(claimsInvestigation);
 
                 var saved = await context.SaveChangesAsync() > 0;
@@ -150,6 +158,21 @@ namespace risk.control.system.Services
                 Console.WriteLine(ex.StackTrace);
                 return null!;
             }
+        }
+        private async Task<ReportTemplate> CloneReportTemplate(long clientCompanyId, InsuranceType insuranceType)
+        {
+            var masterTemplate = await context.ReportTemplates
+                .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.FaceIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.DocumentIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Questions)
+            .FirstOrDefaultAsync(r => r.ClientCompanyId == clientCompanyId && r.InsuranceType == insuranceType && r.Basetemplate);
+            var cloned = cloneService.DeepCloneReportTemplate(masterTemplate);
+            context.ReportTemplates.Add(cloned);
+            await context.SaveChangesAsync();
+            return cloned;
         }
         public async Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument)
         {

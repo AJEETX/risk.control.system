@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Globalization;
 using System.IO.Compression;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 using Google.Api;
@@ -27,13 +28,15 @@ namespace risk.control.system.Services
         private const string BENEFICIARY_IMAGE = "beneficiary.jpg";
         private readonly ApplicationDbContext context;
         private readonly ICustomApiCLient customApiCLient;
+        private readonly ICloneReportService cloneService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly Regex regex = new Regex("\"(.*?)\"");
         private const string NO_DATA = "NO DATA";
-        public CaseCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient, IWebHostEnvironment webHostEnvironment)
+        public CaseCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient, ICloneReportService cloneService, IWebHostEnvironment webHostEnvironment)
         {
             this.context = context;
             this.customApiCLient = customApiCLient;
+            this.cloneService = cloneService;
             this.webHostEnvironment = webHostEnvironment;
         }
 
@@ -144,7 +147,7 @@ namespace risk.control.system.Services
             {
                 return null;
             }
-            
+            var reportTemplate = await CloneReportTemplate(companyUser.ClientCompanyId.Value, caseType);
             var claim = new InvestigationTask
             {
                 CreatedUser = companyUser.Email,
@@ -160,6 +163,8 @@ namespace risk.control.system.Services
                 ClientCompanyId = companyUser.ClientCompanyId,
                 CreatorSla = companyUser.ClientCompany.CreatorSla,
                 IsNew = true,
+                ReportTemplateId = reportTemplate.Id,
+                ReportTemplate = reportTemplate
             };
             claim.PolicyDetail = policyDetail;
             claim.CustomerDetail = customer;
@@ -378,7 +383,39 @@ namespace risk.control.system.Services
             string extension = Path.GetExtension(filePath)?.ToLower();
             return imageExtensions.Contains(extension);
         }
+        private async Task<ReportTemplate> CloneReportTemplate(long clientCompanyId, InsuranceType insuranceType)
+        {
+            var masterTemplate = await context.ReportTemplates
+                .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.FaceIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.DocumentIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Questions)
+            .FirstOrDefaultAsync(r => r.ClientCompanyId == clientCompanyId && r.InsuranceType == insuranceType && r.Basetemplate);
+            var cloned = cloneService.DeepCloneReportTemplate(masterTemplate);
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                await SaveReportTemplatesAsync(cloned);
+            }
+            context.ReportTemplates.Add(cloned);
+            await context.SaveChangesAsync();
+            return cloned;
+        }
+        private async Task SaveReportTemplatesAsync(ReportTemplate template)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
 
+            string jsonString = JsonSerializer.Serialize(template, options);
+
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "report", "reportTemplate.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)); // Ensure folder exists
+
+            await File.WriteAllTextAsync(filePath, jsonString);
+        }
         public async Task<InvestigationTask> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model)
         {
             try

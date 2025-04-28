@@ -1,0 +1,108 @@
+﻿<!-- FaceId Update Modal -->
+<div class="modal fade" id="faceIdUpdateModal" tabindex="-1" aria-labelledby="faceIdUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="faceIdUpdateModalLabel">Update FaceId</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="faceIdUpdateForm">
+                <div class="modal-body">
+                    <input type="hidden" name="FaceId" />
+                    <input type="hidden" name="LocationId" />
+                    <div class="mb-3">
+                        <label for="NewFaceIdName" class="form-label">FaceId Name</label>
+                        <input type="text" class="form-control" id="NewFaceIdName" name="NewFaceIdName" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="NewReportType" class="form-label">Report Type</label>
+                        <select class="form-control" id="NewReportType" name="NewReportType">
+                            <option value="AGENT_FACE">Agent Face</option>
+                            <option value="OTHER_TYPE">Other Type</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update FaceId</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal for DocumentId Update -->
+<div class="modal fade" id="documentIdUpdateModal" tabindex="-1" aria-labelledby="documentIdUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentIdUpdateModalLabel">Update Document ID</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="documentIdUpdateForm">
+                    <!-- Hidden Fields for Ids -->
+                    <input type="hidden" name="DocumentId">
+                    <input type="hidden" name="LocationId">
+                    <!-- New Document Name -->
+                    <div class="mb-3">
+                        <label for="newDocumentIdName" class="form-label">Document ID Name</label>
+                        <input type="text" class="form-control" id="newDocumentIdName" name="NewDocumentIdName" required>
+                    </div>
+
+                    <!-- New Document Type -->
+                    <div class="mb-3">
+                        <label for="newDocumentType" class="form-label">Document Type</label>
+                        <select class="form-select" id="newDocumentType" name="NewDocumentType" required>
+                            <option value="0">Select Document Type</option>
+                            <option value="REPORT_TYPE_1">Report Type 1</option>
+                            <option value="REPORT_TYPE_2">Report Type 2</option>
+                            <option value="REPORT_TYPE_3">Report Type 3</option>
+                        </select>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Question Update -->
+<div class="modal fade" id="questionUpdateModal" tabindex="-1" aria-labelledby="questionUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionUpdateModalLabel">Update Question</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="questionUpdateForm">
+                    <!-- Hidden Fields for Question ID and Location ID -->
+                    <input type="hidden" name="QuestionId">
+                    <input type="hidden" name="LocationId">
+
+                    <!-- Question Text -->
+                    <div class="mb-3">
+                        <label for="newQuestionText" class="form-label">Question Text</label>
+                        <input type="text" class="form-control" id="newQuestionText" name="NewQuestionText" required>
+                    </div>
+
+                    <!-- Question Type -->
+                    <div class="mb-3">
+                        <label for="newQuestionType" class="form-label">Question Type</label>
+                        <select class="form-select" id="newQuestionType" name="NewQuestionType" required>
+                            <option value="0">Select Question Type</option>
+                            <option value="TEXT">Text</option>
+                            <option value="YESNO">Yes/No</option>
+                            <option value="MULTIPLE">Multiple Choice</option>
+                        </select>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

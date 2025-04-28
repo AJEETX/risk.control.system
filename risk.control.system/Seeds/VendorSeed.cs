@@ -50,9 +50,13 @@ namespace risk.control.system.Seeds
 
 
             var agencies = new List<SeedInput> { 
-                checker, verify, investigate, investigator, greatez
+                checker,
+#if !DEBUG
+
+                verify, investigate, investigator, greatez
                 , proper, honest, greater, investigatoz
                 , nicer, demoz, investigatos, greates
+#endif
             };
             var vendors = new List<Vendor> { };
 

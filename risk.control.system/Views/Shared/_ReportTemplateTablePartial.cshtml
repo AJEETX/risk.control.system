@@ -1,0 +1,137 @@
+﻿@model List<ReportTemplate>
+
+<table id="templateTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+    <thead>
+        <tr>
+            <th>Location</th>
+            <th>Face IDs</th>
+            <th>Document IDs</th>
+            <th>Questions</th>
+            <th>Actions</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var template in Model)
+        {
+            @foreach (var location in template.LocationTemplate)
+            {
+                <tr>
+                    <!-- Location Name -->
+                    <td>@location.LocationName</td>
+                    <!-- FaceIds with Checkbox -->
+                    <td>
+                        @if (location.FaceIds != null && location.FaceIds.Any())
+                        {
+                            <ul class="list-unstyled">
+                                @foreach (var face in location.FaceIds)
+                                {
+                                    <li class="d-flex align-items-center p-2 mb-2 border rounded">
+                                        <div class="form-check">
+                                            <input class="form-check-input faceid-checkbox" type="checkbox" value="@face.Id" id="faceid_@face.Id" @(face.Selected ? "checked" : "")>
+                                            <label class="form-check-label" for="faceid_@face.Id">
+                                                @if (face.Has2Face)
+                                                {
+                                                    <i class="fas fa-users text-primary"
+                                                       title="This Image has 2 person" data-toggle="tooltip"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-user text-primary" title="This Image has single person" data-toggle="tooltip"></i>
+                                                }
+                                                 @face.IdIName
+                                            </label>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        
+                    </td>
+
+                    <!-- DocumentIds with Checkbox -->
+                    <td>
+                        @if (location.DocumentIds != null && location.DocumentIds.Any())
+                        {
+                            <ul class="list-unstyled">
+                                @foreach (var doc in location.DocumentIds)
+                                {
+                                    <li class="d-flex align-items-center p-2 mb-2 border rounded">
+                                        <div class="form-check">
+                                            <input class="form-check-input documentid-checkbox" type="checkbox" value="@doc.Id" id="docid_@doc.Id" @(doc.Selected ? "checked" : "")>
+                                            <label class="form-check-label" for="docid_@doc.Id">
+                                                @if (doc.HasBackImage)
+                                                {
+                                                    <i class="fas fa-copy text-muted ms-2"
+                                                    title="This document has a back page as well" data-toggle="tooltip"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-file text-muted ms-2" title="This document has only front page" data-toggle="tooltip"></i>
+                                                }
+                                                 @doc.IdIName
+                                                
+                                            </label>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        
+                    </td>
+
+                    <!-- Questions -->
+                    <td>
+                        @if (location.Questions != null && location.Questions.Any())
+                        {
+                            <ul class="list-unstyled">
+                                @foreach (var question in location.Questions)
+                                {
+                                    <li class="d-flex flex-column p-2 mb-2 border rounded">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <i class="fas fa-question-circle text-warning"></i>
+                                                <strong>@question.QuestionText</strong>
+                                                <span class="badge bg-info ms-2">@question.QuestionType</span>
+                                                @if (question.IsRequired)
+                                                {
+                                                    <span class="badge bg-danger ms-1">Required</span>
+                                                }
+                                            </div>
+                                            <div>
+                                                <button class="btn btn-sm btn-warning update-question-btn" data-questionid="@question.Id">
+                                                    <i class="fas fa-edit"></i> Update
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        @if (question.QuestionType != "Text" && !string.IsNullOrEmpty(question.Options))
+                                        {
+                                            var optionList = question.Options.Split(',').Select(o => o.Trim()).ToList();
+                                            <div class="mt-2 ms-4 d-flex flex-wrap gap-2">
+                                                @foreach (var option in optionList)
+                                                {
+                                                    <span class="badge bg-light text-dark border">@option</span>
+                                                }
+                                            </div>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+
+                    </td>
+
+                    <!-- Actions -->
+                    <td>
+                        <button class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+
+        }
+    </tbody>
+</table>
+<partial name="_ReportTemplateTableModal" />

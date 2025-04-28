@@ -32,7 +32,6 @@
 		<ExcludeAssets>runtime; build; native; contentfiles; analyzers;buildtransitive;</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
       <PrivateAssets>all</PrivateAssets>
 		<ExcludeAssets>runtime; build; native; contentfiles; analyzers;buildtransitive;</ExcludeAssets>

@@ -58,10 +58,20 @@ namespace risk.control.system.Seeds
 #endif
             // seed AUSTRALIA
             var au = countries.FirstOrDefault(c => c.Code.ToLower() == "au");
-            var auPincodes = await PinCodeStateSeed.CsvRead_Au();
-            var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "nsw" ||
-                //s.StateCode.ToLower() == "qld" ||
-                s.StateCode.ToLower() == "vic"
+
+            int maxRowCountForDebug = 0;
+//#if DEBUG
+//            maxRowCountForDebug = 10000;
+//#endif
+
+            var auPincodes = await PinCodeStateSeed.CsvRead_Au(maxRowCountForDebug);
+            var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "vic"
+#if !DEBUG
+
+                //|| s.StateCode.ToLower() == "qld" 
+                //|| s.StateCode.ToLower() == "nsw"
+#endif
+
                 ).Select(g => g.StateCode).Distinct()?.ToList();
 
             var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
@@ -81,7 +91,10 @@ namespace risk.control.system.Seeds
 
             await context.SaveChangesAsync(null, false);
 
-            await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager);
+
+            var randomPinCode = filteredAuPincodes.FirstOrDefault();
+
+            await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode.Code);
 
             await DataSeed.SeedDetails(context, webHostEnvironment, clientUserManager, vendorUserManager, customApiCLient, httpAccessor);
         }

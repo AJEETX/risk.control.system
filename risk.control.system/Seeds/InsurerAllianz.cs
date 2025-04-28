@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -144,6 +145,97 @@ namespace risk.control.system.Seeds
                 Questions = new List<Question> {question1, question2, question3,question4 }
             };
 
+            var template = new ReportTemplate
+            {
+                Name = InsuranceType.UNDERWRITING.GetEnumDisplayName() + " TEMPLATE",
+                InsuranceType = InsuranceType.UNDERWRITING,
+                ClientCompanyId = company.ClientCompanyId,
+                Basetemplate = true,
+                LocationTemplate = new List<LocationTemplate>
+                {
+                    new LocationTemplate
+                    {
+                        LocationName = CONSTANTS.LOCATIONS.VERIFIER_ADDRESS,
+                        Agent = new DigitalIdReport
+                        {
+                            Selected = true,
+                            ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
+                            IdIName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                          // You can set other properties of Agent here if needed
+                        },
+                        FaceIds = new List<DigitalIdReport>
+                        {
+                            new DigitalIdReport
+                            {
+                                Selected = true,
+                                IdIName = CONSTANTS.LOCATIONS.CUSTOMER_PHOTO,
+                                ReportType = DigitalIdReportType.SINGLE_FACE
+                            },
+                            new DigitalIdReport
+                            {
+                                Selected = true,
+                                IdIName = CONSTANTS.LOCATIONS.AGENT_CUSTOMER_PHOTO,
+                                Has2Face = true,
+                                ReportType = DigitalIdReportType.DUAL_FACE
+                            },
+                            new DigitalIdReport
+                            {
+                                IdIName = CONSTANTS.LOCATIONS.BENEFICIARY_PHOTO,
+                                ReportType = DigitalIdReportType.SINGLE_FACE
+                            },
+                            new DigitalIdReport
+                            {
+                                IdIName = CONSTANTS.LOCATIONS.AGENT_BENEFICIARY_PHOTO,
+                                Has2Face = true,
+                                ReportType = DigitalIdReportType.DUAL_FACE
+                            }
+                        },
+                        DocumentIds = new List<DocumentIdReport>
+                        {
+                            new DocumentIdReport
+                            {
+                                Selected = true,
+                                IdIName = DocumentIdReportType.ADHAAR.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.ADHAAR
+                            },
+                            new DocumentIdReport
+                            {
+                                Selected = true,
+                                IdIName = DocumentIdReportType.DRIVING_LICENSE.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.DRIVING_LICENSE
+                            },
+                            new DocumentIdReport
+                            {
+                                HasBackImage = false,
+                                IdIName = DocumentIdReportType.PAN.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.PAN
+                            },
+                            new DocumentIdReport
+                            {
+                                HasBackImage = false,
+                                IdIName = DocumentIdReportType.BIRTH_CERTIFICATE.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.BIRTH_CERTIFICATE
+                            },
+                            new DocumentIdReport
+                            {
+                                HasBackImage = false,
+                                IdIName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
+                            },
+                            new DocumentIdReport
+                            {
+                                IdIName = DocumentIdReportType.VOTER_CARD.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.VOTER_CARD
+                            }
+                        },
+
+                        Questions = new List<Question> {question1,question2,question3,question4 }
+                    }
+                }
+            };
+
+            // Add the new template to the database
+            context.ReportTemplates.Add(template);
+
             context.CaseQuestionnaire.Add(caseQuestionnaire);
         }
 
@@ -183,7 +275,191 @@ namespace risk.control.system.Seeds
                 CreatedUser = creator.Email,
                 Questions = new List<Question> { question1, question2, question3, question4 }
             };
+            var template = new ReportTemplate
+            {
+                Name = InsuranceType.CLAIM.GetEnumDisplayName() + " TEMPLATE",
+                InsuranceType = InsuranceType.CLAIM,
+                ClientCompanyId = company.ClientCompanyId,
+                Basetemplate = true,
+                LocationTemplate = new List<LocationTemplate>
+                {
+                    new LocationTemplate
+                    {
+                        Agent = new DigitalIdReport
+                        {
+                            Selected = true,
+                            ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
+                            IdIName = "AGENT PHOTO"                                            // You can set other properties of Agent here if needed
+                        },
+                        LocationName = CONSTANTS.LOCATIONS.VERIFIER_ADDRESS,
+                        FaceIds = new List<DigitalIdReport>
+                        {
+                            new DigitalIdReport
+                            {
+                                Selected = true,
+                                IdIName = CONSTANTS.LOCATIONS.CUSTOMER_PHOTO,
+                                ReportType = DigitalIdReportType.SINGLE_FACE
+                            },
+                            new DigitalIdReport
+                            {
+                                Selected = true,
+                                IdIName = CONSTANTS.LOCATIONS.AGENT_CUSTOMER_PHOTO,
+                                Has2Face = true,
+                                ReportType = DigitalIdReportType.DUAL_FACE
+                            },
+                            new DigitalIdReport
+                            {
+                                IdIName = CONSTANTS.LOCATIONS.BENEFICIARY_PHOTO,
+                                ReportType = DigitalIdReportType.SINGLE_FACE
+                            },
+                            new DigitalIdReport
+                            {
+                                IdIName = CONSTANTS.LOCATIONS.AGENT_BENEFICIARY_PHOTO,
+                                Has2Face = true,
+                                ReportType = DigitalIdReportType.DUAL_FACE
+                            }
+                        },
+                        DocumentIds = new List<DocumentIdReport>
+                        {
+                            new DocumentIdReport
+                            {
+                                HasBackImage = false,
+                                Selected = true,
+                                IdIName = DocumentIdReportType.DEATH_CERTIFICATE.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.DEATH_CERTIFICATE
+                            },
+                            new DocumentIdReport
+                            {
+                                Selected = true,
+                                IdIName = DocumentIdReportType.ADHAAR.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.ADHAAR
+                            },
+                            new DocumentIdReport
+                            {
+                                Selected = true,
+                                IdIName = DocumentIdReportType.DRIVING_LICENSE.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.DRIVING_LICENSE
+                            },
+                            new DocumentIdReport
+                            {
+                                IdIName = DocumentIdReportType.PAN.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.PAN
+                            },
+                            new DocumentIdReport
+                            {
+                                HasBackImage = false,
+                                IdIName = DocumentIdReportType.BIRTH_CERTIFICATE.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.BIRTH_CERTIFICATE
+                            },
+                            new DocumentIdReport
+                            {
+                                HasBackImage = false,
+                                IdIName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
+                            },
+                            new DocumentIdReport
+                            {
+                                IdIName = DocumentIdReportType.VOTER_CARD.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.VOTER_CARD
+                            }
+                        },
+                        Questions = new List<Question> { question1, question2, question3, question4 }
+                    },
+                    new LocationTemplate
+                    {
+                        LocationName = CONSTANTS.LOCATIONS.POLICE_ADDRESS,
+                        Agent = new DigitalIdReport
+                        {
+                            ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
+                            IdIName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                            
+                        },
+                        DocumentIds = new List<DocumentIdReport>
+                        {
+                            new DocumentIdReport
+                            {
+                                IdIName = DocumentIdReportType.POLICE_REPORT.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.POLICE_REPORT
+                            }
+                        },
+                        Questions = new List<Question> 
+                        { 
+                            new Question 
+                            {
+                                QuestionText = "Cause of Death ?",
+                                QuestionType = "text",
+                                IsRequired = true 
+                            },
+                            new Question
+                            {
+                                QuestionText = "Name of Policeman met ?",
+                                QuestionType = "text",
+                                IsRequired = true
+                            },
+                            new Question
+                            {
+                                QuestionText = "Was there any foul play ?",
+                                QuestionType = "dropdown",
+                                Options = "YES, NO",
+                                IsRequired = true
+                            },
+                            new Question
+                            {
+                                QuestionText = "Date time of Policeman met ?",
+                                QuestionType = "date",
+                                IsRequired = true
+                            } 
+                        }
+                    },
+                    new LocationTemplate
+                    {
+                        LocationName = CONSTANTS.LOCATIONS.HOSPITAL_ADDRESS,
+                        Agent = new DigitalIdReport
+                        {
+                            ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
+                            IdIName = "AGENT PHOTO"                                            // You can set other properties of Agent here if needed
+                        },
+                        DocumentIds = new List<DocumentIdReport>
+                        {
+                            new DocumentIdReport
+                            {
+                                IdIName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
+                                DocumentIdReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
+                            }
+                        },
+                        Questions = new List<Question>
+                        {
+                            new Question
+                            {
+                                QuestionText = "Nature of death ?",
+                                QuestionType = "text",
+                                IsRequired = true
+                            },
+                            new Question
+                            {
+                                QuestionText = "Name of Medical staff met ?",
+                                QuestionType = "text",
+                                IsRequired = true
+                            },
+                            new Question
+                            {
+                                QuestionText = "Was there any foul play ?",
+                                QuestionType = "dropdown",
+                                Options = "YES, NO",
+                                IsRequired = true
+                            },
+                            new Question
+                            {
+                                QuestionText = "Date time of Medical staff  met ?",
+                                QuestionType = "date",
+                                IsRequired = true
+                            }
+                        }
+                    }
+                }
+            };
 
+            // Add the new template to the database
+            context.ReportTemplates.Add(template);
             context.CaseQuestionnaire.Add(caseQuestionnaire);
         }
 

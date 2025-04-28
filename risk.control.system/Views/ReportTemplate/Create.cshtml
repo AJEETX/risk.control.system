@@ -1,0 +1,254 @@
+﻿@model ReportTemplateCreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title">
+                <i class="far fa-file-powerpoint"></i> Add Report <sub>template</sub>
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <li>
+                            <i class='far fa-thumbs-up'></i> Add Report <sub>template</sub>
+                        </li>
+                        <li>
+                            <i class='fa fa-hand-peace-o'></i> <b> Save</b> Report <sub>template</sub>
+                        </li>
+                    </span>
+                </span>
+            </h3>
+        </div>
+
+        <div class="card-body">
+            <input type="hidden" id="digitalIdReportTypes" value="@(Model.DigitalIdReportItems != null ? string.Join(",", Model.DigitalIdReportItems.Select(x => x.Value)) : "")" />
+            <input type="hidden" id="documentIdReportTypes" value="@(Model.DocumentIdReportItems != null ? string.Join(",", Model.DocumentIdReportItems.Select(x => x.Value)) : "")" />
+
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <ul class="nav nav-pills mb-3 justify-content-center" id="insuranceTypeTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @(Model.InsuranceType == InsuranceType.CLAIM ? "active" : "")" href="@Url.Action("Index", new { insuranceType = "CLAIM" })">Claim</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @(Model.InsuranceType == InsuranceType.UNDERWRITING ? "active" : "")" href="@Url.Action("Index", new { insuranceType = "UNDERWRITING" })">Underwriting</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <form asp-action="Create" method="post" class="p-4 bg-white border rounded shadow-sm questionnaire-form">
+                <input type="hidden" asp-for="ReportTemplateId" value="@Model.ReportTemplateId" />
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-4 question-block border-start border-4 border-primary ps-3 pt-2 pb-3 bg-light rounded">
+                            @{
+                                var faceIds = Model.FaceIds;
+                            }
+
+                            <div class="form-group">
+                                <label>Face IDs</label>
+                                <div id="faceIdsContainer">
+                                    @for (int i = 0; i < faceIds.Count; i++)
+                                    {
+                                        <div class="faceId-entry d-flex justify-content-between align-items-center">
+                                            <div class="d-flex w-100">
+                                            <input name="FaceIds[@i].FaceIdName" class="form-control mt-2" value="@faceIds[i].FaceIdName" placeholder="Face ID Name" />
+                                            <select name="FaceIds[@i].DigitalIdReportType" class="form-control mt-2">
+                                                <option value="">-- Select Digital ID Type --</option>
+                                                @foreach (var item in Model.DigitalIdReportItems)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-danger delete-question-btn btn-sm mt-2 deleteFaceIdButton text-sm"><i class="fa fa-trash"> </i></button>
+                                        </div>
+                                    }
+                                </div>
+
+                                <button type="button" id="addFaceIdButton" class="btn btn-secondary">Add Face ID</button>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-4 question-block border-start border-4 border-primary ps-3 pt-2 pb-3 bg-light rounded">
+
+                            @{
+                                var documentIds = Model.DocumentIds;
+                            }
+
+                            <div class="form-group">
+                                <label>Document IDs</label>
+                                <div id="documentIdsContainer">
+                                    @for (int i = 0; i < documentIds.Count; i++)
+                                    {
+                                        <div class="documentId-entry d-flex justify-content-between align-items-center">
+                                            <div class="d-flex w-100">
+                                                <input name="DocumentIds[@i].DocumentIdName" class="form-control mt-2" value="@documentIds[i].DocumentIdName" placeholder="Document ID Name" />
+                                                <select name="DocumentIds[@i].DocumentIdReportType" class="form-control mt-2">
+                                                    <option value="">-- Select Document ID Type --</option>
+                                                    @foreach (var item in Model.DocumentIdReportItems)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-danger delete-question-btn btn-sm mt-2 deleteDocumentIdButton text-sm"><i class="fa fa-trash"> </i></button>
+
+                                        </div>
+                                    }
+                                </div>
+                                <button type="button" id="addDocumentIdButton" class="btn btn-secondary">Add Document ID</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="submit-answer" type="submit" class="btn btn-success w-100 mt-3">Save template</button>
+
+            </form>
+            <div class="row">
+                <div class="col-md-6 mt-4">
+                    <form id="answers" method="post" asp-controller="Question" asp-action="SubmitAnswers" enctype="multipart/form-data" class="p-4 bg-white border rounded shadow-sm questionnaire-form">
+                        <input type="hidden" name="InsuranceType" value="@Model.InsuranceType" />
+
+                        @if (Model != null && Model.Questions.Questions.Count > 0)
+                        {
+                            @for (int i = 0; i < Model.Questions.Questions.Count; i++)
+                            {
+                                var question = Model.Questions.Questions[i];
+                                var required = question.IsRequired ? "required" : "";
+                                <input type="hidden" name="Answers[@question.Id].Key" value="@question.Id" />
+
+                                <div class="mb-4 question-block border-start border-4 border-primary ps-3 pt-2 pb-3 bg-light rounded" id="question-@question.Id">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <label class="form-label fw-semibold mb-0">
+                                            @question.QuestionText
+                                            @if (question.IsRequired)
+                                            {
+                                                <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                            }
+                                        </label>
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-question-btn ms-3" data-question-id="@question.Id">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+
+                                    @if (question.QuestionType == "text")
+                                    {
+                                        <input type="text" name="answers[@question.Id]" class="form-control" placeholder="Enter the answer " @required />
+                                    }
+                                    else if (question.QuestionType == "dropdown")
+                                    {
+                                        var options = question.Options?.Split(',') ?? new string[] { "Yes", "No" };
+                                        <select name="answers[@question.Id]" class="form-select  form-control" @required>
+                                            <option value="">--- SELECT ---</option>
+                                            @foreach (var option in options)
+                                            {
+                                                <option value="@option">@option</option>
+                                            }
+                                        </select>
+                                    }
+                                    else if (question.QuestionType == "checkbox")
+                                    {
+                                        <div class="form-check">
+                                            <input type="checkbox" name="answers[@question.Id]" value="true" class="form-check-input" @required />
+                                            <label class="form-check-label">Select</label>
+                                        </div>
+                                    }
+                                    else if (question.QuestionType == "date")
+                                    {
+                                        <div class="position-relative">
+                                            <input max="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" name="answers[@question.Id]" class="form-control date-input pe-5" @required placeholder="@question.QuestionText" />
+                                            <button type="button" class="btn btn-sm btn-clear-date" title="Clear date">
+                                                &times;
+                                            </button>
+                                        </div>
+                                    }
+                                    else if (question.QuestionType == "file")
+                                    {
+                                        <input type="file" name="answers[@question.Id]" class="form-control" @required />
+                                    }
+                                    else if (question.QuestionType == "radio")
+                                    {
+                                        var options = question.Options?.Split(',') ?? new string[] { "Option 1", "Option 2" };
+                                        for (int j = 0; j < options.Length; j++)
+                                        {
+                                            var option = options[j];
+                                            <div class="form-check">
+                                                <input type="radio"
+                                                       name="answers[@question.Id]"
+                                                       value="@option"
+                                                       class="form-check-input"
+                                                @(j == 0 && question.IsRequired ? "required" : "") />
+                                                <label class="form-check-label">@option</label>
+                                            </div>
+                                        }
+                                    }
+
+                                </div>
+                            }
+
+                        }
+                        else
+                        {
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="alert alert-light bg-white border shadow-sm text-center px-4 py-3 rounded w-100">
+                                    No CLAIM Investigation questions available at the moment.
+                                </div>
+                            </div>
+                        }
+
+                        <div id="alert-no-question"></div>
+                    </form>
+                </div>
+                <div class="col-md-6 mt-4">
+
+                    <form id="create-form" asp-action="AddQuestion" method="post" class="p-4 bg-white border rounded shadow-sm questionnaire-form">
+                        <h4 class="mb-4 text-primary text-center">Questionnaire</h4>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Enter Question</label>
+                            <input id="QuestionText" asp-for="Questions.QuestionText" type="text" name="questionText" required class="form-control" placeholder="Enter your question" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Input Type</label>
+                            <select asp-for="Questions.QuestionType" name="questionType" id="questionType" required class="form-select form-control">
+                                <option value="">--- SELECT ---</option>
+                                <option value="text">Text</option>
+                                <option value="dropdown">Dropdown (Yes/No or Custom)</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="date">Date Picker</option>
+                                <option value="file">File Upload</option>
+                                <option value="radio">Radio Button</option>
+                            </select>
+                        </div>
+
+                        <div id="optionsGroup" class="mb-3 hidden">
+                            <label class="form-label fw-bold">Options (comma-separated)</label>
+                            <input asp-for="Questions.Options" type="text" name="options" id="optionsInput" class="form-control" placeholder="e.g. Yes,No,Maybe" />
+                        </div>
+                        <div class="form-check mb-3">
+                            <input asp-for="Questions.IsRequired" class="form-check-input remarks" id="isRequired" />
+                            <label class="form-check-label" for="isRequired">Required ?</label>
+                        </div>
+                        <button id="add-question" type="submit" class="btn btn-success w-100">Add Question</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/company/report-template.js"></script>
+
+}

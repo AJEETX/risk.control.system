@@ -727,11 +727,11 @@ namespace risk.control.system.Services
                 claim.SelectedAgentDrivingMap = drivingMap;
                 claim.TaskToAgentTime = DateTime.Now;
 
-                var CaseQuestionnaire = context.CaseQuestionnaire.Include(c => c.Questions).FirstOrDefault(x =>  x.ClientCompanyId == claim.ClientCompanyId  && x.InsuranceType == claim.PolicyDetail.InsuranceType);
+                //var CaseQuestionnaire = context.CaseQuestionnaire.Include(c => c.Questions).FirstOrDefault(x =>  x.ClientCompanyId == claim.ClientCompanyId  && x.InsuranceType == claim.PolicyDetail.InsuranceType);
                 
-                claim.InvestigationReport = new InvestigationReport();
+                //claim.InvestigationReport = new InvestigationReport();
                 
-                claim.InvestigationReport.CaseQuestionnaire = CaseQuestionnaire;
+                //claim.InvestigationReport.CaseQuestionnaire = CaseQuestionnaire;
 
                 context.Investigations.Update(claim);
                 var rows = await context.SaveChangesAsync();

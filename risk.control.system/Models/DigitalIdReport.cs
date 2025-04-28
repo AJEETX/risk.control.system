@@ -7,14 +7,9 @@ namespace risk.control.system.Models
     {
         public string? DigitalIdImageMatchConfidence { get; set; } = string.Empty;
         public float Similarity { get; set; } = 0;
-
-        public DigitalIdReportType ReportType { get; set; } = DigitalIdReportType.SINGLE_FACE;
-
-        public override string ToString()
-        {
-            return $"Digital Id Information: \n" +
-                $"- Valid: {ValidationExecuted}";
-        }
+        public bool Has2Face { get; set; } = false;
+        public bool? IdImageValid { get; set; } = false;
+        public DigitalIdReportType ReportType { get; set; }
     }
 
     public enum DigitalIdReportType

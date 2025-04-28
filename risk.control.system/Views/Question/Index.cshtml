@@ -52,56 +52,56 @@
                             {
                                 var question = Model.Questions[i];
                                 var required = question.IsRequired ? "required" : "";
-                                <input type="hidden" name="Answers[@question.Id].Key" value="@question.Id" />
+                                        <input type="hidden" name="Answers[@question.Id].Key" value="@question.Id" />
 
-                                <div class="mb-4 question-block border-start border-4 border-primary ps-3 pt-2 pb-3 bg-light rounded" id="question-@question.Id">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <label class="form-label fw-semibold mb-0">
+                                        <div class="mb-4 question-block border-start border-4 border-primary ps-3 pt-2 pb-3 bg-light rounded" id="question-@question.Id">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <label class="form-label fw-semibold mb-0">
                                             @question.QuestionText
                                             @if (question.IsRequired)
                                             {
-                                                <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
                                             }
-                                        </label>
-                                        <button type="button" class="btn btn-sm btn-outline-danger delete-question-btn ms-3" data-question-id="@question.Id">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
+                                                </label>
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-question-btn ms-3" data-question-id="@question.Id">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
 
                                     @if (question.QuestionType == "text")
                                     {
-                                        <input type="text" name="answers[@question.Id]" class="form-control" placeholder="Enter the answer " @required />
+                                                    <input type="text" name="answers[@question.Id]" class="form-control" placeholder="Enter the answer " @required />
                                     }
                                     else if (question.QuestionType == "dropdown")
                                     {
                                         var options = question.Options?.Split(',') ?? new string[] { "Yes", "No" };
-                                        <select name="answers[@question.Id]" class="form-select  form-control" @required>
-                                            <option value="">--- SELECT ---</option>
+                                                    <select name="answers[@question.Id]" class="form-select  form-control" @required>
+                                                        <option value="">--- SELECT ---</option>
                                             @foreach (var option in options)
                                             {
-                                                <option value="@option">@option</option>
+                                                                <option value="@option">@option</option>
                                             }
-                                        </select>
+                                                    </select>
                                     }
                                     else if (question.QuestionType == "checkbox")
                                     {
-                                        <div class="form-check">
-                                            <input type="checkbox" name="answers[@question.Id]" value="true" class="form-check-input" @required />
-                                            <label class="form-check-label">Select</label>
-                                        </div>
+                                                    <div class="form-check">
+                                                        <input type="checkbox" name="answers[@question.Id]" value="true" class="form-check-input" @required />
+                                                        <label class="form-check-label">Select</label>
+                                                    </div>
                                     }
                                     else if (question.QuestionType == "date")
                                     {
-                                        <div class="position-relative">
-                                            <input max="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" name="answers[@question.Id]" class="form-control date-input pe-5" @required placeholder="@question.QuestionText"/>
-                                            <button type="button" class="btn btn-sm btn-clear-date" title="Clear date">
-                                                &times;
-                                            </button>
-                                        </div>
+                                                    <div class="position-relative">
+                                                        <input max="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" name="answers[@question.Id]" class="form-control date-input pe-5" @required placeholder="@question.QuestionText"/>
+                                                        <button type="button" class="btn btn-sm btn-clear-date" title="Clear date">
+                                                            &times;
+                                                        </button>
+                                                    </div>
                                     }
                                     else if (question.QuestionType == "file")
                                     {
-                                        <input type="file" name="answers[@question.Id]" class="form-control" @required />
+                                                    <input type="file" name="answers[@question.Id]" class="form-control" @required />
                                     }
                                     else if (question.QuestionType == "radio")
                                     {
@@ -109,29 +109,29 @@
                                         for (int j = 0; j < options.Length; j++)
                                         {
                                             var option = options[j];
-                                            <div class="form-check">
-                                                <input type="radio"
-                                                       name="answers[@question.Id]"
-                                                       value="@option"
-                                                       class="form-check-input"
+                                                            <div class="form-check">
+                                                                <input type="radio"
+                                                                       name="answers[@question.Id]"
+                                                                       value="@option"
+                                                                       class="form-check-input"
                                                 @(j == 0 && question.IsRequired ? "required" : "") />
-                                                <label class="form-check-label">@option</label>
-                                            </div>
+                                                                <label class="form-check-label">@option</label>
+                                                            </div>
                                         }
                                     }
 
-                                </div>
+                                        </div>
                             }
 
                             @* <button id="submit-answer" type="submit" class="btn btn-success w-100 mt-3">Submit Answers</button> *@
                         }
                         else
                         {
-                            <div class="d-flex justify-content-center align-items-center">
-                                <div class="alert alert-light bg-white border shadow-sm text-center px-4 py-3 rounded w-100">
-                                    No CLAIM Investigation questions available at the moment.
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div class="alert alert-light bg-white border shadow-sm text-center px-4 py-3 rounded w-100">
+                                        No CLAIM Investigation questions available at the moment.
+                                    </div>
                                 </div>
-                            </div>
                         }
 
                         <div id="alert-no-question"></div>
@@ -181,6 +181,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company/question.js"></script>
+        <script src="~/js/company/question.js"></script>
 
 }

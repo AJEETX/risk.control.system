@@ -5,10 +5,10 @@ namespace risk.control.system.Models
 {
     public class IdReportBase: BaseEntity
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-
+        public bool Selected { get; set; } = false;
+        public string? IdIName { get; set; }
         public byte[]? IdImage { get; set; }
 
         public string? IdImageData { get; set; } = "No Location Info...";

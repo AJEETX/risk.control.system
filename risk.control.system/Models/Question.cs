@@ -20,22 +20,24 @@ namespace risk.control.system.Models
 
         public bool IsRequired { get; set; } // New property to mark if the question is required or optional
 
-        public long CaseQuestionnaireId { get; set; }
-        public CaseQuestionnaire CaseQuestionnaire { get; set; }
+        public long? ReportTemplateId { get; set; }
+        public ReportTemplate? ReportTemplate { get; set; }
+        public long? CaseQuestionnaireId { get; set; }
+        public CaseQuestionnaire? CaseQuestionnaire { get; set; }
     }
     public class QuestionFormViewModel
     {
         public InsuranceType InsuranceType { get; set; }
-        public List<Question> Questions { get; set; } = new List<Question>();
+        public List<Question>? Questions { get; set; } = new List<Question>();
 
         // Fields for adding a new question
-        public string QuestionText { get; set; }
-        public string QuestionType { get; set; }
+        public string? QuestionText { get; set; }
+        public string? QuestionType { get; set; }
         public string? Options { get; set; }
-        public bool IsRequired { get; set; }
+        public bool? IsRequired { get; set; }
 
         // Dictionary to hold answers with question ID as key
-        public Dictionary<int, string> Answers { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, string>? Answers { get; set; } = new Dictionary<int, string>();
     }
 
     public class CaseQuestionnaire : BaseEntity
