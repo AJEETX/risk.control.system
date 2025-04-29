@@ -27,7 +27,7 @@ namespace risk.control.system.Models
         public long Id { get; set; }
         public string? LocationName { get; set; }
         public long AgentId { get; set; }
-        public DigitalIdReport Agent { get; set; } = new DigitalIdReport { ReportType = DigitalIdReportType.AGENT_FACE };
+        public DigitalIdReport Agent { get; set; } = new DigitalIdReport { Selected = true, ReportType = DigitalIdReportType.AGENT_FACE };
         public List<DigitalIdReport>? FaceIds { get; set; } = new List<DigitalIdReport>();
         public List<DocumentIdReport>? DocumentIds { get; set; } = new List<DocumentIdReport>();
         public List<Question>? Questions { get; set; } = new List<Question>();

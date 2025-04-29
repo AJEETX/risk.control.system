@@ -25,10 +25,11 @@
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
         <div class="row">
-
-            <partial name="_AgentIdReport" model="@Model" />
-            <partial name="_DigitalIdReport" model="@Model" />
-            <partial name="_DocumentIdReport" model="@Model" />
+            @{
+                var location = Model.ClaimsInvestigation.InvestigationReport.ReportTemplate;
+            }
+            <partial name="_Location" model="@location" />
+            
             
         </div>
         <div class="row">

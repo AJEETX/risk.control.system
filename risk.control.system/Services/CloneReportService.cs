@@ -26,19 +26,24 @@ namespace risk.control.system.Services
                     Agent = new DigitalIdReport
                     {
                         ReportType = loc.Agent.ReportType,
+                        Selected = true,
                         // Copy other DigitalIdReport fields if needed
                     },
                     FaceIds = loc.FaceIds?.Select(face => new DigitalIdReport
                     {
                         ReportType = face.ReportType,
-                         IdIName = face.IdIName
+                        Selected = face.Selected,
+                        Has2Face = face.Has2Face,
+                        IdIName = face.IdIName
                     }).ToList(),
 
                     DocumentIds = loc.DocumentIds?.Select(doc => new DocumentIdReport
                     {
                         // Copy fields if any
                         DocumentIdReportType = doc.DocumentIdReportType,
-                        IdIName = doc.IdIName
+                        IdIName = doc.IdIName,
+                        IdImageBack = doc.IdImageBack,
+                        Selected = doc.Selected,
                     }).ToList(),
 
                     Questions = loc.Questions?.Select(q => new Question
