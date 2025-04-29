@@ -2,166 +2,172 @@
 
 @foreach (var location in Model.LocationTemplate)
 {
-    <div class="col-12 p-3 border rounded location-container">
-        <h5 class="location-title mb-3 text-primary">
-            <i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
-        </h5>
+	<div class="col-12 p-4 mb-5 border rounded shadow-sm bg-light location-container">
+		<h5 class="mb-4 text-primary border-bottom pb-2">
+			<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
+		</h5>
 
-        <!-- FaceIds Table -->
-        @if (location.FaceIds?.Any(f => f.Selected) == true)
-        {
-            <table class="table table-bordered">
-                <thead class="table-light">
-                    <tr>
-                        <th>Face</th>
-                        <th>Single/Dual photo</th>
-                        <th>Lat/Long</th>
-                        <th>Photo</th>
-                        <th>Map</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var face in location.FaceIds.Where(f => f.Selected))
-                    {
-                        <tr>
-                            <td>
-                                @face.IdIName
-                            </td>
-                            <td>
-                                @if (face.Has2Face)
-                                {
-                                    <i class="fas fa-users text-primary" title="2 persons"></i>
-                                }
-                                else
-                                {
-                                    <i class="far fa-user text-primary" title="Single person"></i>
-                                }
-                            </td>
-                            <td>@face.IdImageLongLat</td>
-                            <td>
-                                @if (face.ValidationExecuted)
-                                {
-                                    <img src="@Url.Action("GetFaceImage", new { id = face.Id })" class="thumbnail profile-image doc-profile-image" />
-                                }
-                                else
-                                {
-                                    <img src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
-                                }
-                            </td>
-                            <td>
-                                <img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-primary">
-                                    <i class="fas fa-upload"></i> Update
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+		<!-- FaceIds Table -->
+		@if (location.FaceIds?.Any(f => f.Selected) == true)
+		{
+			<table class="table table-bordered table-striped mb-4">
+					<thead class="table-light">
+						<tr>
+							<th>Face</th>
+							<th>Single/Dual photo</th>
+							<th>Lat/Long</th>
+							<th>Photo</th>
+							<th>Map</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+			@foreach (var face in location.FaceIds.Where(f => f.Selected))
+			{
+				
+						<tr>
+							<td>
+								@face.IdIName
+							</td>
+							<td>
+								@if (face.Has2Face)
+								{
+									<i class="fas fa-users text-primary" title="2 persons"></i>
+								}
+								else
+								{
+									<i class="far fa-user text-primary" title="Single person"></i>
+								}
+							</td>
+							<td>@face.IdImageLongLat</td>
+							<td>
+								@if (face.ValidationExecuted)
+								{
+									<img src="@Url.Action("GetFaceImage", new { id = face.Id })" class="thumbnail profile-image doc-profile-image" />
+								}
+								else
+								{
+									<img src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
+								}
+							</td>
+							<td>
+								<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+							</td>
+							<td>
+								<button class="btn btn-sm btn-primary">
+									<i class="fas fa-upload"></i> Update
+								</button>
+							</td>
+						</tr>
+					
+			}
+				</tbody>
+			</table>
+		}
 
-        <!-- DocumentIds Table -->
-        @if (location.DocumentIds?.Any(d => d.Selected) == true)
-        {
-            <table class="table table-bordered">
-                <thead class="table-light">
-                    <tr>
-                        <th>Document</th>
-                        <th>Back Image</th>
-                        <th>Lat/Long</th>
-                        <th>Image</th>
-                        <th>Map</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var doc in location.DocumentIds.Where(d => d.Selected))
-                    {
-                        <tr>
-                            <td>@doc.IdIName</td>
-                            <td>
-                                @if (doc.HasBackImage)
-                                {
-                                    <i class="fas fa-copy text-muted" title="Back page present"></i>
-                                }
-                                else
-                                {
-                                    <i class="far fa-file text-muted" title="Front only"></i>
-                                }
-                            </td>
-                            <td>@doc.IdImageLongLat</td>
-                            <td>
-                                @if (doc.ValidationExecuted)
-                                {
-                                    <img src="@Url.Action("GetDocumentImage", new { id = doc.Id })" class="img-thumbnail"  />
-                                }
-                                else
-                                {
-                                    <img src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
-                                }
-                            </td>
-                            <td>
-                                <img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-primary">
-                                    <i class="fas fa-upload"></i> Update
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+		<!-- DocumentIds Table -->
+		@if (location.DocumentIds?.Any(d => d.Selected) == true)
+		{
+			<table class="table table-bordered table-striped mb-4">
+					<thead class="table-light">
+						<tr>
+							<th>Document</th>
+							<th>Back Image</th>
+							<th>Lat/Long</th>
+							<th>Image</th>
+							<th>Map</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+			@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+			{
+				
+						<tr>
+							<td>@doc.IdIName</td>
+							<td>
+								@if (doc.HasBackImage)
+								{
+									<i class="fas fa-copy text-muted" title="Back page present"></i>
+								}
+								else
+								{
+									<i class="far fa-file text-muted" title="Front only"></i>
+								}
+							</td>
+							<td>@doc.IdImageLongLat</td>
+							<td>
+								@if (doc.ValidationExecuted)
+								{
+									<img src="@Url.Action("GetDocumentImage", new { id = doc.Id })" class="img-thumbnail" />
+								}
+								else
+								{
+									<img src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
+								}
+							</td>
+							<td>
+								<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+							</td>
+							<td>
+								<button class="btn btn-sm btn-primary">
+									<i class="fas fa-upload"></i> Update
+								</button>
+							</td>
+						</tr>
+					
+			}
+				</tbody>
+			</table>
+		}
 
-        <!-- Questions Section -->
-        @if (location.Questions?.Any() == true)
-        {
-            <table class="table table-bordered">
-                <thead class="table-light">
-                    <tr>
-                        <th>Question</th>
-                        <th>Type</th>
-                        <th>Options</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var question in location.Questions)
-                    {
-                        <tr>
-                            <td>
-                                <i class="fas fa-question-circle text-warning me-1"></i>@question.QuestionText
-                                @if (question.IsRequired)
-                                {
-                                    <i class="fa fa-asterisk text-danger ms-1" title="Required"></i>
-                                }
-                            </td>
-                            <td>@question.QuestionType</td>
-                            <td>
-                                @if (!string.IsNullOrEmpty(question.Options) && question.QuestionType != "Text")
-                                {
-                                    <div class="d-flex flex-wrap gap-2">
-                                        @foreach (var option in question.Options.Split(',').Select(o => o.Trim()))
-                                        {
-                                            <span class="badge bg-light text-dark border">@option</span>
-                                        }
-                                    </div>
-                                }
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-warning update-question-btn" data-questionid="@question.Id">
-                                    <i class="fas fa-edit"></i> Update
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+		<!-- Questions Section -->
+		@if (location.Questions?.Any() == true)
+		{
+			<table class="table table-bordered table-striped">
+					<thead class="table-light">
+						<tr>
+							<th>Question</th>
+							<th>Type</th>
+							<th>Options</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+			@foreach (var question in location.Questions)
+					{
+				
+						<tr>
+							<td>
+								<i class="fas fa-question-circle text-warning me-1"></i>@question.QuestionText
+								@if (question.IsRequired)
+								{
+									<i class="fa fa-asterisk text-danger ms-1" title="Required"></i>
+								}
+							</td>
+							<td>@question.QuestionType</td>
+							<td>
+								@if (!string.IsNullOrEmpty(question.Options) && question.QuestionType != "Text")
+								{
+									<div class="d-flex flex-wrap gap-2">
+										@foreach (var option in question.Options.Split(',').Select(o => o.Trim()))
+										{
+											<span class="badge bg-light text-dark border">@option</span>
+										}
+									</div>
+								}
+							</td>
+							<td>
+								<button class="btn btn-sm btn-warning update-question-btn" data-questionid="@question.Id">
+									<i class="fas fa-edit"></i> Update
+								</button>
+							</td>
+						</tr>
+					
+					}
+				</tbody>
+			</table>
+		}
 
-    </div>
+	</div>
 }
