@@ -28,7 +28,6 @@
 					<th>Photo</th>
 					<th>Map</th>
 					<th>Match</th>
-					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -95,15 +94,6 @@
 						}
 
 					</td>
-					<td>
-						<input type="file" class="form-control remarks document-image-input face-upload" data-faceid="@agent.Id" accept="image/*"
-							   data-toggle="tooltip" title="Agent Photo" />
-						<button type="button" class="btn btn-sm btn-success mt-2 upload-face-btn" data-faceid="@agent.Id" data-isagent="true">
-							<i class="fas fa-upload"></i> Upload
-						</button>
-						<div id="upload-status-@agent.Id" class="text-success small mt-1"></div>
-					</td>
-
 				</tr>
 			</tbody>
 		</table>
@@ -123,7 +113,6 @@
 						<th>Photo</th>
 						<th>Map</th>
 						<th>Match</th>
-						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -192,14 +181,7 @@
 								}
 
 							</td>
-							<td>
-								<input type="file" class="form-control form-control-sm face-upload" data-faceid="@face.Id" accept="image/*" />
-								<button type="button" class="btn btn-sm btn-success mt-2 upload-face-btn" data-faceid="@face.Id">
-									<i class="fas fa-upload"></i> Upload
-								</button>
-								<div id="upload-status-@face.Id" class="text-success small mt-1"></div>
-							</td>
-
+							
 						</tr>
 					}
 
@@ -223,7 +205,6 @@
 						<th>Image</th>
 						<th>Map</th>
 						<th>Valid</th>
-						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -291,13 +272,6 @@
 								}
 
 							</td>
-							<td>
-								<input type="file" class="form-control form-control-sm doc-upload" data-docid="@doc.Id" />
-								<button class="btn btn-sm btn-primary mt-1 upload-doc-btn" data-docid="@doc.Id">
-									<i class="fas fa-upload"></i> Upload
-								</button>
-								<div id="doc-upload-status-@doc.Id" class="text-success small mt-1"></div>
-							</td>
 						</tr>
 
 					}
@@ -309,115 +283,65 @@
 		<!-- Questions Table -->
 		@if (location.Questions?.Any() == true)
 		{
-			<form asp-controller="Uploads" asp-action="SubmitLocationAnswers" method="post">
-				@Html.AntiForgeryToken()
-				<input type="hidden" name="LocationId" value="@location.Id" />
-				<input type="hidden" name="caseId" value="@Model.CaseId" />
+			<input type="hidden" name="LocationId" value="@location.Id" />
+			<input type="hidden" name="caseId" value="@Model.CaseId" />
 
-				<table class="table table-bordered table-striped">
-					<thead class="table-light">
+			<table class="table table-bordered table-striped">
+				<thead class="table-light">
+					<tr>
+						<th>Question</th>
+						<th>Answer</th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (int i = 0; i < location.Questions.Count; i++)
+					{
+						var question = location.Questions[i];
+						var required = question.IsRequired ? "required" : "";
 						<tr>
-							<th>Question</th>
-							<th>Answer</th>
+							<td>
+								@question.QuestionText
+								@if (question.IsRequired)
+								{
+									<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+								}
+
+								@* Hidden fields to pass extra data back *@
+								<input type="hidden" name="Questions[@i].Id" value="@question.Id" />
+								<input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
+								<input type="hidden" name="Questions[@i].QuestionType" value="@question.QuestionType" />
+								<input type="hidden" name="Questions[@i].Options" value="@question.Options" />
+								<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
+							</td>
+							<td>
+								@if (question.QuestionType == "text" || question.QuestionType == "date")
+								{
+									<span class="form-control-plaintext">@question.AnswerText</span>
+								}
+								else if (question.QuestionType == "radio" || question.QuestionType == "dropdown")
+								{
+									<span class="form-control-plaintext">@question.AnswerText</span>
+								}
+								else if (question.QuestionType == "checkbox")
+								{
+									var selectedOptions = question.AnswerText?.Split(',') ?? new string[] { };
+									<ul class="list-unstyled mb-0">
+										@foreach (var option in selectedOptions)
+										{
+											<li><i class="bi bi-check-circle-fill text-success"></i> @option</li>
+										}
+									</ul>
+								}
+								else
+								{
+									<span class="form-control-plaintext text-muted">N/A</span>
+								}
+							</td>
+
 						</tr>
-					</thead>
-					<tbody>
-						@for (int i = 0; i < location.Questions.Count; i++)
-						{
-							var question = location.Questions[i];
-							var required = question.IsRequired ? "required" : "";
-							<tr>
-								<td>
-									@question.QuestionText
-									@if (question.IsRequired)
-									{
-										<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
-									}
-
-									@* Hidden fields to pass extra data back *@
-									<input type="hidden" name="Questions[@i].Id" value="@question.Id" />
-									<input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
-									<input type="hidden" name="Questions[@i].QuestionType" value="@question.QuestionType" />
-									<input type="hidden" name="Questions[@i].Options" value="@question.Options" />
-									<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
-								</td>
-								<td>
-									@if (question.QuestionType == "text")
-									{
-										<input type="text" name="Questions[@i].Answer" value="@question.AnswerText" class="form-control" />
-									}
-									else if (question.QuestionType == "radio")
-									{
-										foreach (var option in question.Options.Split(','))
-										{
-											var trimmedOption = option.Trim();
-											var isChecked = question.AnswerText == trimmedOption ? "checked" : "";
-											<div class="form-check">
-												@if (question.AnswerText == trimmedOption)
-												{
-													<input type="radio" name="Questions[@i].Answer" value="@trimmedOption" class="form-check-input" checked />
-												}
-												else
-												{
-													<input type="radio" name="Questions[@i].Answer" value="@trimmedOption" class="form-check-input" />
-												}
-												<label class="form-check-label">@option.Trim()</label>
-											</div>
-										}
-									}
-									else if (question.QuestionType == "checkbox")
-									{
-										var selectedOptions = question.AnswerText?.Split(',') ?? new string[] { };
-
-										@foreach (var option in question.Options.Split(','))
-										{
-											var trimmedOption = option.Trim();
-											var isChecked = selectedOptions.Contains(trimmedOption) ? "checked" : "";
-											<div class="form-check">
-												<input type="checkbox" name="Questions[@i].Answer" value="@trimmedOption" class="form-check-input" @isChecked />
-												<label class="form-check-label">@trimmedOption</label>
-											</div>
-										}
-
-									}
-									else if (question.QuestionType == "dropdown")
-									{
-										var options = question.Options?.Split(',') ?? new string[] { "Yes", "No" };
-										<select name="Questions[@i].Answer" class="form-select form-control" @required>
-											<option value="">--- SELECT ---</option>
-											@foreach (var option in options)
-											{
-												@if (question.AnswerText == option)
-												{
-													<option value="@option" selected>@option</option>
-												}
-												else
-												{
-													<option value="@option">@option</option>
-												}
-											}
-										</select>
-
-									}
-
-									else if (question.QuestionType == "date")
-									{
-										<div class="position-relative">
-											<input max="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" name="Questions[@i].Answer"
-												   value="@question.AnswerText" class="form-control date-input pe-5" @required placeholder="@question.QuestionText" />
-											<button type="button" class="btn btn-sm btn-clear-date" title="Clear date">
-												&times;
-											</button>
-										</div>
-									}
-								</td>
-							</tr>
-						}
-					</tbody>
-				</table>
-
-				<button type="submit" class="btn btn-primary">Submit Answers</button>
-			</form>
+					}
+				</tbody>
+			</table>
 		}
 
 	</div>

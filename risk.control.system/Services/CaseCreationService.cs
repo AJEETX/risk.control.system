@@ -388,6 +388,8 @@ namespace risk.control.system.Services
             var masterTemplate = await context.ReportTemplates
                 .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.FaceIds)
+                   .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Agent)
                .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.DocumentIds)
                .Include(r => r.LocationTemplate)

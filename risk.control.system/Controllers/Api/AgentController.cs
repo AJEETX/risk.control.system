@@ -694,8 +694,7 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var (vendor, contract) = await service.SubmitToVendorSupervisor(
-                    data.Email, data.ClaimId, data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
+                var (vendor, contract) = await service.SubmitToVendorSupervisor(data.Email, data.ClaimId, data.Remarks);
 
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, portal_base_url));
 

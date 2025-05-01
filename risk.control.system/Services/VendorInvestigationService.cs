@@ -27,7 +27,7 @@ namespace risk.control.system.Services
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<CaseInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, long selectedcase);
         Task<InvestigationTask> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, long claimsInvestigationId);
-        Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4);
+        Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long claimsInvestigationId, string remarks);
 
     }
     public class VendorInvestigationService : IVendorInvestigationService
@@ -748,7 +748,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4)
+        public async Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long claimsInvestigationId, string remarks)
         {
             try
             {
@@ -768,11 +768,6 @@ namespace risk.control.system.Services
                 claim.SubmittedToSupervisorTime = DateTime.Now;
                 claim.CaseOwner = agent.Vendor.Email;
                 var claimReport = claim.InvestigationReport;
-
-                claimReport.CaseQuestionnaire.Questions[0].AnswerText = answer1;
-                claimReport.CaseQuestionnaire.Questions[1].AnswerText = answer2;
-                claimReport.CaseQuestionnaire.Questions[2].AnswerText = answer3;
-                claimReport.CaseQuestionnaire.Questions[3].AnswerText = answer4;
 
                 claimReport.AgentRemarks = remarks;
                 claimReport.AgentRemarksUpdated = DateTime.Now;

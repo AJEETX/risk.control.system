@@ -123,15 +123,20 @@
     {
         public string Email { get; set; }
         public long ClaimId { get; set; }
+        public long LocationId { get; set; }
+        public long FaceId { get; set; }
         public string LocationImage { get; set; }
         public string LocationLongLat { get; set; }
         public string? Type { get; set; } = "0";
+        public bool IsAgent { get; set; } = false;
     }
-    
+
     public class DocumentData
     {
         public string Email { get; set; }
         public long ClaimId { get; set; }
+        public long LocationId { get; set; }
+        public long DocId { get; set; }
         public string OcrImage { get; set; }
         public string OcrLongLat { get; set; }
     }

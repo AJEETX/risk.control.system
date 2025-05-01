@@ -556,7 +556,7 @@ $(document).ready(function () {
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationFaceIdData?claimId=' + $('#claimId').val(),
+                    url: '/api/CaseInvestigationDetails/GetInvestigationFaceIdData?claimId=' + $('#claimId').val() + '&faceId=' + $('#faceId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {

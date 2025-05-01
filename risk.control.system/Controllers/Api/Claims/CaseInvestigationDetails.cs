@@ -154,7 +154,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetInvestigationFaceIdData")]
-        public async Task<IActionResult> GetInvestigationFaceIdData(long claimId)
+        public async Task<IActionResult> GetInvestigationFaceIdData(long claimId, long faceId)
         {
             var claim = claimsService.GetCasesWithDetail()
                 .Include(c => c.InvestigationReport)
@@ -164,15 +164,16 @@ namespace risk.control.system.Controllers.Api.Claims
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+            var agentReport = _context.DigitalIdReport.FirstOrDefault(l => l.Id == faceId);
 
             string mapUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             string imageAddress = string.Empty;
             string faceLat = string.Empty, faceLng = string.Empty;
-            if (!string.IsNullOrWhiteSpace(claim.InvestigationReport?.DigitalIdReport?.IdImageLongLat))
+            if (!string.IsNullOrWhiteSpace(agentReport?.IdImageLongLat))
             {
-                var longLat = claim.InvestigationReport.DigitalIdReport.IdImageLongLat.IndexOf("/");
-                faceLat = claim.InvestigationReport.DigitalIdReport.IdImageLongLat.Substring(0, longLat)?.Trim();
-                faceLng = claim.InvestigationReport.DigitalIdReport.IdImageLongLat.Substring(longLat + 1)?.Trim();
+                var longLat = agentReport.IdImageLongLat.IndexOf("/");
+                faceLat = agentReport.IdImageLongLat.Substring(0, longLat)?.Trim();
+                faceLng = agentReport.IdImageLongLat.Substring(longLat + 1)?.Trim();
                 var longLatString = faceLat + "," + faceLng;
                 imageAddress = await httpClientService.GetRawAddress((faceLat), (faceLng));
                 mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
@@ -181,11 +182,11 @@ namespace risk.control.system.Controllers.Api.Claims
             var data = new
             {
                 Title = "Investigation Data",
-                LocationData = claim.InvestigationReport?.DigitalIdReport?.IdImageData ?? "Location Data",
-                LatLong = claim.InvestigationReport.DigitalIdReport.IdImageLocationUrl,
+                LocationData = agentReport?.IdImageData ?? "Location Data",
+                LatLong = agentReport.IdImageLocationUrl,
                 ImageAddress = imageAddress,
-                Location = claim.InvestigationReport?.DigitalIdReport?.IdImage != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.InvestigationReport?.DigitalIdReport?.IdImage)) :
+                Location = agentReport?.IdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(agentReport?.IdImage)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 FacePosition =
                 new
@@ -309,32 +310,33 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetAgentDetail")]
-        public IActionResult GetAgentDetail(long claimid)
+        public IActionResult GetAgentDetail(long claimid,long faceId)
         {
             var claim = claimsService.GetCasesWithDetail()
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.AgentIdReport)
                 .FirstOrDefault(c => c.Id == claimid);
+            var agentReport = _context.DigitalIdReport.FirstOrDefault(l => l.Id == faceId);
 
             if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
 
-                if (claim.InvestigationReport is not null && claim.InvestigationReport?.AgentIdReport is not null)
+                if (claim.InvestigationReport is not null && agentReport is not null)
                 {
-                    var longLat = claim.InvestigationReport.AgentIdReport.IdImageLongLat.IndexOf("/");
-                    var latitude = claim.InvestigationReport?.AgentIdReport.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.InvestigationReport?.AgentIdReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = agentReport.IdImageLongLat.IndexOf("/");
+                    var latitude = agentReport.IdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = agentReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
                         center,
                         dakota,
                         frick,
-                        url = claim.InvestigationReport?.AgentIdReport.IdImageLocationUrl,
-                        distance = claim.InvestigationReport?.AgentIdReport.Distance,
-                        duration = claim.InvestigationReport?.AgentIdReport.Duration,
+                        url = agentReport.IdImageLocationUrl,
+                        distance = agentReport.Distance,
+                        duration = agentReport.Duration,
                     });
                 }
             }
@@ -343,25 +345,80 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
-                if (claim.InvestigationReport is not null && claim.InvestigationReport?.AgentIdReport?.IdImageLongLat is not null)
+                if (claim.InvestigationReport is not null && agentReport?.IdImageLongLat is not null)
                 {
-                    var longLat = claim.InvestigationReport.AgentIdReport.IdImageLongLat.IndexOf("/");
-                    var latitude = claim.InvestigationReport?.AgentIdReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.InvestigationReport?.AgentIdReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = agentReport.IdImageLongLat.IndexOf("/");
+                    var latitude = agentReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = agentReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
                         center,
                         dakota,
                         frick,
-                        url = claim.InvestigationReport?.AgentIdReport.IdImageLocationUrl,
-                        distance = claim.InvestigationReport?.AgentIdReport.Distance,
-                        duration = claim.InvestigationReport?.AgentIdReport.Duration,
+                        url = agentReport.IdImageLocationUrl,
+                        distance = agentReport.Distance,
+                        duration = agentReport.Duration,
                     });
                 }
             }
             return Ok();
         }
-       
+        [HttpGet("GetDocumentDetail")]
+        public IActionResult GetDocumentDetail(long claimid, long docId)
+        {
+            var claim = claimsService.GetCasesWithDetail()
+                .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.AgentIdReport)
+                .FirstOrDefault(c => c.Id == claimid);
+            var docReport = _context.DocumentIdReport.FirstOrDefault(l => l.Id == docId);
+
+            if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+            {
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+
+                if (claim.InvestigationReport is not null && docReport is not null)
+                {
+                    var longLat = docReport.IdImageLongLat.IndexOf("/");
+                    var latitude = docReport.IdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
+                        url = docReport.IdImageLocationUrl,
+                        distance = docReport.Distance,
+                        duration = docReport.Duration,
+                    });
+                }
+            }
+            else
+            {
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+
+                if (claim.InvestigationReport is not null && docReport?.IdImageLongLat is not null)
+                {
+                    var longLat = docReport.IdImageLongLat.IndexOf("/");
+                    var latitude = docReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
+                        url = docReport.IdImageLocationUrl,
+                        distance = docReport.Distance,
+                        duration = docReport.Duration,
+                    });
+                }
+            }
+            return Ok();
+        }
+
     }
 }

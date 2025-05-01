@@ -26,9 +26,11 @@
         </div>
         <div class="row">
             @{
-                var location = Model.ClaimsInvestigation.InvestigationReport.ReportTemplate;
+                var template = Model.ClaimsInvestigation.InvestigationReport.ReportTemplate;
+                template.CaseId = Model.ClaimsInvestigation.Id;
             }
-            <partial name="_Location" model="@location" />
+            <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
+            <partial name="_Location" model="@template" />
             
             
         </div>

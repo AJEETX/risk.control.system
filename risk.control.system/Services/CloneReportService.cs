@@ -22,7 +22,6 @@ namespace risk.control.system.Services
                 LocationTemplate = originalTemplate.LocationTemplate.Select(loc => new LocationTemplate
                 {
                     LocationName = loc.LocationName,
-                    AgentId = loc.AgentId,
                     Agent = new DigitalIdReport
                     {
                         ReportType = loc.Agent.ReportType,

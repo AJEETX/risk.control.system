@@ -118,21 +118,9 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = model.ClaimsInvestigation.Id });
                 }
-                var answers = model.QuestionFormViewModel.Answers;
-
-                var questinAnswer = new List<string>();
-                foreach (var answer in answers)
-                {
-                    var questionAnswer = GetSelectedOptionText(model, answer.Key);
-                    questinAnswer.Add(questionAnswer);
-                }
 
                 var (vendor, contract) = await vendorInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
-                    WebUtility.HtmlDecode(remarks),
-                    WebUtility.HtmlDecode(questinAnswer[0]),
-                    WebUtility.HtmlDecode(questinAnswer[1]),
-                    WebUtility.HtmlDecode(questinAnswer[2]),
-                    WebUtility.HtmlDecode(questinAnswer[3]));
+                    WebUtility.HtmlDecode(remarks));
                 if (vendor == null)
                 {
                     notifyService.Error("OOPs !!!..Error submitting.");

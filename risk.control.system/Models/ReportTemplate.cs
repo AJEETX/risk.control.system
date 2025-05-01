@@ -5,7 +5,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace risk.control.system.Models
 {
-    // ReportTemplate myDeserializedClass = JsonConvert.DeserializeObject<ReportTemplate>(myJsonResponse);
+    public class QuestionTemplate
+    {
+        public int Id { get; set; }
+        public string? QuestionText { get; set; }
+        public string? QuestionType { get; set; } // "Text", "Radio", "Checkbox"
+        public string? Options { get; set; } // comma-separated
+        public bool? IsRequired { get; set; }
+        public string Answer { get; set; } // <== This will bind input value
+    }
+
 
     public class ReportTemplate : BaseEntity
     {
@@ -19,14 +28,19 @@ namespace risk.control.system.Models
         public List<LocationTemplate> LocationTemplate { get; set; } = new List<LocationTemplate>();
         public bool Basetemplate { get; set; } = false;
         public long? OriginalTemplateId { get; set; }
+        [NotMapped]
+        public long CaseId { get; set; }
     }
 
     public class LocationTemplate : BaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
+
+        public long? ReportTemplateId { get; set; }
+        public ReportTemplate? ReportTemplate { get; set; }
         public string? LocationName { get; set; }
-        public long AgentId { get; set; }
+        public string? AgentEmail { get; set; }
         public DigitalIdReport Agent { get; set; } = new DigitalIdReport { Selected = true, ReportType = DigitalIdReportType.AGENT_FACE };
         public List<DigitalIdReport>? FaceIds { get; set; } = new List<DigitalIdReport>();
         public List<DocumentIdReport>? DocumentIds { get; set; } = new List<DocumentIdReport>();

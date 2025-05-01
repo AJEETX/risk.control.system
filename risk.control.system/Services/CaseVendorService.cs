@@ -106,9 +106,9 @@ namespace risk.control.system.Services
                 Questions = claim.InvestigationReport.CaseQuestionnaire.Questions
             };
 
-            
-
             var templates = await _context.ReportTemplates
+                .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Agent)
                .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.FaceIds)
                .Include(r => r.LocationTemplate)
@@ -117,10 +117,10 @@ namespace risk.control.system.Services
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 
+            claim.InvestigationReport.ReportTemplate = templates;
             _context.Investigations.Update(claim);
             var rows =await _context.SaveChangesAsync();
 
-            claim.InvestigationReport.ReportTemplate = templates;
             var model = new CaseInvestigationVendorsModel
             {
                 InvestigationReport = claim.InvestigationReport,
@@ -168,15 +168,6 @@ namespace risk.control.system.Services
                .ThenInclude(c => c.BeneficiaryRelation)
                .Include(c => c.CaseNotes)
                .Include(c => c.CaseMessages)
-               .Include(c => c.InvestigationReport)
-               .ThenInclude(c => c.CaseQuestionnaire)
-               .ThenInclude(c => c.Questions)
-                .Include(c => c.InvestigationReport)
-               .ThenInclude(c => c.DigitalIdReport)
-               .Include(c => c.InvestigationReport)
-               .ThenInclude(c => c.PanIdReport)
-                .Include(c => c.InvestigationReport)
-               .ThenInclude(c => c.AgentIdReport)
                .FirstOrDefaultAsync(c => c.Id == selectedcase);
 
 
@@ -198,6 +189,18 @@ namespace risk.control.system.Services
             beneficiaryDetails.ContactNumber = beneficairyContactMasked;
             
             var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
+            var templates = await _context.ReportTemplates
+                .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Agent)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.FaceIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.DocumentIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Questions)
+                   .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+
+            claim.InvestigationReport.ReportTemplate = templates;
 
             return (new CaseInvestigationVendorsModel { InvestigationReport = claim.InvestigationReport, Location = beneficiaryDetails, ClaimsInvestigation = claim });
         }

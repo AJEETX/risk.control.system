@@ -10,7 +10,7 @@
         public string? OcrLongLat { get; set; }
         public DateTime? OcrTime { get; set; } = DateTime.Now;
         public string? FacePercent { get; set; }
-        public bool? PanValid { get; set; }
+        public bool? Valid { get; set; }
         public bool? Registered { get; set; }
     }
 }

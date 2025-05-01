@@ -2926,3 +2926,7 @@ input#checkall {
         opacity: 1;
     }
 }
+#liveMap {
+    height: 500px;
+    width: 100%;
+}
