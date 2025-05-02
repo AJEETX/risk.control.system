@@ -108,7 +108,7 @@ namespace risk.control.system.Services
 
             var templates = await _context.ReportTemplates
                 .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.Agent)
+                   .ThenInclude(l => l.AgentIdReport)
                .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.FaceIds)
                .Include(r => r.LocationTemplate)
@@ -191,7 +191,7 @@ namespace risk.control.system.Services
             var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
             var templates = await _context.ReportTemplates
                 .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.Agent)
+                   .ThenInclude(l => l.AgentIdReport)
                .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.FaceIds)
                .Include(r => r.LocationTemplate)
@@ -204,6 +204,5 @@ namespace risk.control.system.Services
 
             return (new CaseInvestigationVendorsModel { InvestigationReport = claim.InvestigationReport, Location = beneficiaryDetails, ClaimsInvestigation = claim });
         }
-
     }
 }

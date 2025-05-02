@@ -1,21 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
 using System.Text.RegularExpressions;
 
 using Hangfire;
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -23,8 +14,6 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -37,6 +26,7 @@ namespace risk.control.system.Controllers.Api
         private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         private static string PanTask_id = "pan-card-verification-at-lowest-price.p.rapidapi.com";
         private readonly ApplicationDbContext _context;
+        private readonly ICloneReportService cloneReportService;
         private readonly IHttpClientService httpClientService;
         private readonly IConfiguration configuration;
         private readonly IAgentIdService agentIdService;
@@ -54,7 +44,9 @@ namespace risk.control.system.Controllers.Api
         private string portal_base_url = string.Empty;
 
         //test PAN FNLPM8635N
-        public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
+        public AgentController(ApplicationDbContext context,
+            ICloneReportService cloneReportService,
+            IHttpClientService httpClientService,
             IConfiguration configuration,
             IAgentIdService agentIdService,
             IVendorInvestigationService service,
@@ -69,6 +61,7 @@ namespace risk.control.system.Controllers.Api
             IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
+            this.cloneReportService = cloneReportService;
             this.httpClientService = httpClientService;
             this.configuration = configuration;
             this.agentIdService = agentIdService;
@@ -447,7 +440,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("get")]
-        public async Task<IActionResult> Get(long claimId, string email = "agentx@verify.com")
+        public async Task<IActionResult> Get(long caseId, string email = "agentx@verify.com")
         {
             try
             {
@@ -481,7 +474,7 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
-                    .FirstOrDefault(c => c.Id == claimId);
+                    .FirstOrDefault(c => c.Id == caseId);
 
                 var beneficiary = _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
@@ -489,9 +482,15 @@ namespace risk.control.system.Controllers.Api
                     .Include(c => c.District)
                     .Include(c => c.State)
                     .Include(c => c.Country)
-                    .FirstOrDefault(c => c.InvestigationTaskId == claimId);
+                    .FirstOrDefault(c => c.InvestigationTaskId == caseId);
 
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
+
+                object locations = null;
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
+                {
+                    locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
+                }
 
                 return Ok(
                     new
@@ -537,15 +536,7 @@ namespace risk.control.system.Controllers.Api
                         },
                         InvestigationData = new
                         {
-                            LocationImage = claim?.InvestigationReport?.DigitalIdReport?.IdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.DigitalIdReport?.IdImage)) :
-                            Applicationsettings.NO_PHOTO_IMAGE,
-                            OcrImage = claim?.InvestigationReport?.PanIdReport?.IdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.PanIdReport?.IdImage)) :
-                            Applicationsettings.NO_PHOTO_IMAGE,
-                            OcrData = claim?.InvestigationReport?.PanIdReport?.IdImageData,
-                            LocationLongLat = claim?.InvestigationReport?.DigitalIdReport?.IdImageLongLat,
-                            OcrLongLat = claim?.InvestigationReport?.PanIdReport?.IdImageLongLat,
+                            locations
                         },
                         Remarks = claim?.InvestigationReport?.AgentRemarks,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)
@@ -557,17 +548,34 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(500);
             }
         }
-
-
         [AllowAnonymous]
+        [HttpGet("get-template")]
+        public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email = "agent@verify.com")
+        {
+            try
+            {
+                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+
+                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                var locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(500);
+            }
+        }
+                [AllowAnonymous]
         [HttpPost("faceid")]
+
         public async Task<IActionResult> FaceId(FaceData data)
         {
 
-            if (data == null ||
-                     string.IsNullOrWhiteSpace(data.LocationImage) ||
-                     !data.LocationImage.IsBase64String() ||
-                     string.IsNullOrEmpty(data.LocationLongLat))
+            if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
             {
                 return BadRequest();
             }
@@ -584,32 +592,17 @@ namespace risk.control.system.Controllers.Api
                     return StatusCode(401, new { message = "Offboarded Agent." });
                 }
             }
-
-
-            if (data.Type == "0")
-            {
-                var response = await agentIdService.GetAgentId(data);
-                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-                return Ok(response);
-            }
-            else if (data.Type == "1")
-            {
-                var response = await agentIdService.GetFaceId(data);
-                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-                return Ok(response);
-            }
-            return BadRequest();
+            var response = await agentIdService.GetAgentId(data);
+            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+            return Ok(response);
         }
 
         [AllowAnonymous]
         [HttpPost("documentid")]
+
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
-            if (data == null
-                    || string.IsNullOrWhiteSpace(data.OcrImage)
-                    || !data.OcrImage.IsBase64String()
-                    || string.IsNullOrEmpty(data.OcrLongLat)
-                    )
+            if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
             {
                 return BadRequest();
             }
@@ -677,7 +670,7 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-                if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || data.ClaimId < 1 || data.BeneficiaryId < 1)
+                if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || data.CaseId < 1)
                 {
                     throw new ArgumentNullException("Argument(s) can't be null");
                 }
@@ -694,9 +687,9 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var (vendor, contract) = await service.SubmitToVendorSupervisor(data.Email, data.ClaimId, data.Remarks);
+                var (vendor, contract) = await service.SubmitToVendorSupervisor(data.Email, data.CaseId, data.Remarks);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, portal_base_url));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.CaseId, portal_base_url));
 
                 return Ok(new { data, Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId) });
             }

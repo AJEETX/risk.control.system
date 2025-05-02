@@ -1,10 +1,4 @@
-﻿using System.ComponentModel.Design;
-using System.Diagnostics.Metrics;
-
-using Google.Api;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -156,35 +150,36 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.VERIFIER_ADDRESS,
-                        Agent = new DigitalIdReport
+                        AgentIdReport = new AgentIdReport
                         {
-                            Selected = true,
+                            ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO,                                          // You can set other properties of Agent here if needed
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
-                            IdIName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                          // You can set other properties of Agent here if needed
                         },
                         FaceIds = new List<DigitalIdReport>
                         {
                             new DigitalIdReport
                             {
                                 Selected = true,
-                                IdIName = CONSTANTS.LOCATIONS.CUSTOMER_PHOTO,
+                                ReportName = CONSTANTS.LOCATIONS.CUSTOMER_PHOTO,
+                                Has2Face = false,
                                 ReportType = DigitalIdReportType.SINGLE_FACE
                             },
                             new DigitalIdReport
                             {
-                                Selected = true,
-                                IdIName = CONSTANTS.LOCATIONS.AGENT_CUSTOMER_PHOTO,
+                                ReportName = CONSTANTS.LOCATIONS.AGENT_CUSTOMER_PHOTO,
                                 Has2Face = true,
                                 ReportType = DigitalIdReportType.DUAL_FACE
                             },
                             new DigitalIdReport
                             {
-                                IdIName = CONSTANTS.LOCATIONS.BENEFICIARY_PHOTO,
+                                Selected = true,
+                                ReportName = CONSTANTS.LOCATIONS.BENEFICIARY_PHOTO,
+                                Has2Face = false,
                                 ReportType = DigitalIdReportType.SINGLE_FACE
                             },
                             new DigitalIdReport
                             {
-                                IdIName = CONSTANTS.LOCATIONS.AGENT_BENEFICIARY_PHOTO,
+                                ReportName = CONSTANTS.LOCATIONS.AGENT_BENEFICIARY_PHOTO,
                                 Has2Face = true,
                                 ReportType = DigitalIdReportType.DUAL_FACE
                             }
@@ -193,38 +188,42 @@ namespace risk.control.system.Seeds
                         {
                             new DocumentIdReport
                             {
-                                Selected = true,
-                                IdIName = DocumentIdReportType.ADHAAR.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.ADHAAR
+                                Selected = false,
+                                ReportName = DocumentIdReportType.ADHAAR.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.ADHAAR
+                            },
+                            new DocumentIdReport
+                            {
+                                Selected = false,
+                                ReportName = DocumentIdReportType.DRIVING_LICENSE.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.DRIVING_LICENSE
                             },
                             new DocumentIdReport
                             {
                                 Selected = true,
-                                IdIName = DocumentIdReportType.DRIVING_LICENSE.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.DRIVING_LICENSE
-                            },
-                            new DocumentIdReport
-                            {
                                 HasBackImage = false,
-                                IdIName = DocumentIdReportType.PAN.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.PAN
+                                ReportName = DocumentIdReportType.PAN.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.PAN
                             },
                             new DocumentIdReport
                             {
+                                Selected = false,
                                 HasBackImage = false,
-                                IdIName = DocumentIdReportType.BIRTH_CERTIFICATE.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.BIRTH_CERTIFICATE
+                                ReportName = DocumentIdReportType.BIRTH_CERTIFICATE.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.BIRTH_CERTIFICATE
                             },
                             new DocumentIdReport
                             {
+                                Selected = false,
                                 HasBackImage = false,
-                                IdIName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
+                                ReportName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
                             },
                             new DocumentIdReport
                             {
-                                IdIName = DocumentIdReportType.VOTER_CARD.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.VOTER_CARD
+                                Selected = false,
+                                ReportName = DocumentIdReportType.VOTER_CARD.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.VOTER_CARD
                             }
                         },
 
@@ -285,38 +284,24 @@ namespace risk.control.system.Seeds
                 {
                     new LocationTemplate
                     {
-                        Agent = new DigitalIdReport
-                        {
-                            Selected = true,
-                            ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
-                            IdIName = "AGENT PHOTO"                                            // You can set other properties of Agent here if needed
-                        },
                         LocationName = CONSTANTS.LOCATIONS.VERIFIER_ADDRESS,
+                        AgentIdReport = new AgentIdReport
+                        {
+                            ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
+                            ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                              // You can set other properties of Agent here if needed
+                        },
                         FaceIds = new List<DigitalIdReport>
                         {
                             new DigitalIdReport
                             {
-                                Selected = true,
-                                IdIName = CONSTANTS.LOCATIONS.CUSTOMER_PHOTO,
+                                ReportName = CONSTANTS.LOCATIONS.CUSTOMER_PHOTO,
                                 ReportType = DigitalIdReportType.SINGLE_FACE
                             },
                             new DigitalIdReport
                             {
                                 Selected = true,
-                                IdIName = CONSTANTS.LOCATIONS.AGENT_CUSTOMER_PHOTO,
-                                Has2Face = true,
-                                ReportType = DigitalIdReportType.DUAL_FACE
-                            },
-                            new DigitalIdReport
-                            {
-                                IdIName = CONSTANTS.LOCATIONS.BENEFICIARY_PHOTO,
+                                ReportName = CONSTANTS.LOCATIONS.BENEFICIARY_PHOTO,
                                 ReportType = DigitalIdReportType.SINGLE_FACE
-                            },
-                            new DigitalIdReport
-                            {
-                                IdIName = CONSTANTS.LOCATIONS.AGENT_BENEFICIARY_PHOTO,
-                                Has2Face = true,
-                                ReportType = DigitalIdReportType.DUAL_FACE
                             }
                         },
                         DocumentIds = new List<DocumentIdReport>
@@ -324,43 +309,41 @@ namespace risk.control.system.Seeds
                             new DocumentIdReport
                             {
                                 HasBackImage = false,
-                                Selected = true,
-                                IdIName = DocumentIdReportType.DEATH_CERTIFICATE.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.DEATH_CERTIFICATE
+                                ReportName = DocumentIdReportType.DEATH_CERTIFICATE.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.DEATH_CERTIFICATE
+                            },
+                            new DocumentIdReport
+                            {
+                                ReportName = DocumentIdReportType.ADHAAR.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.ADHAAR
+                            },
+                            new DocumentIdReport
+                            {
+                                ReportName = DocumentIdReportType.DRIVING_LICENSE.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.DRIVING_LICENSE
                             },
                             new DocumentIdReport
                             {
                                 Selected = true,
-                                IdIName = DocumentIdReportType.ADHAAR.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.ADHAAR
-                            },
-                            new DocumentIdReport
-                            {
-                                Selected = true,
-                                IdIName = DocumentIdReportType.DRIVING_LICENSE.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.DRIVING_LICENSE
-                            },
-                            new DocumentIdReport
-                            {
-                                IdIName = DocumentIdReportType.PAN.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.PAN
+                                ReportName = DocumentIdReportType.PAN.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.PAN
                             },
                             new DocumentIdReport
                             {
                                 HasBackImage = false,
-                                IdIName = DocumentIdReportType.BIRTH_CERTIFICATE.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.BIRTH_CERTIFICATE
+                                ReportName = DocumentIdReportType.BIRTH_CERTIFICATE.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.BIRTH_CERTIFICATE
                             },
                             new DocumentIdReport
                             {
                                 HasBackImage = false,
-                                IdIName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
+                                ReportName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
                             },
                             new DocumentIdReport
                             {
-                                IdIName = DocumentIdReportType.VOTER_CARD.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.VOTER_CARD
+                                ReportName = DocumentIdReportType.VOTER_CARD.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.VOTER_CARD
                             }
                         },
                         Questions = new List<Question> { question1, question2, question3, question4 }
@@ -368,17 +351,18 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.POLICE_ADDRESS,
-                        Agent = new DigitalIdReport
+                        AgentIdReport = new AgentIdReport
                         {
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
-                            IdIName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                            
+                            ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                            
                         },
                         DocumentIds = new List<DocumentIdReport>
                         {
                             new DocumentIdReport
                             {
-                                IdIName = DocumentIdReportType.POLICE_REPORT.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.POLICE_REPORT
+                                Selected = true,
+                                ReportName = DocumentIdReportType.POLICE_REPORT.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.POLICE_REPORT
                             }
                         },
                         Questions = new List<Question> 
@@ -413,17 +397,18 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.HOSPITAL_ADDRESS,
-                        Agent = new DigitalIdReport
+                        AgentIdReport = new AgentIdReport
                         {
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
-                            IdIName = "AGENT PHOTO"                                            // You can set other properties of Agent here if needed
+                            ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                            // You can set other properties of Agent here if needed
                         },
                         DocumentIds = new List<DocumentIdReport>
                         {
                             new DocumentIdReport
                             {
-                                IdIName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
-                                DocumentIdReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
+                                Selected = true,
+                                ReportName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
                             }
                         },
                         Questions = new List<Question>

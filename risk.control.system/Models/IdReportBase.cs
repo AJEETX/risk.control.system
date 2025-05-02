@@ -8,7 +8,8 @@ namespace risk.control.system.Models
         [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public bool Selected { get; set; } = false;
-        public string? IdIName { get; set; }
+        public string? ReportName { get; set; }
+        public string? IdName { get; set; }
         public byte[]? IdImage { get; set; }
 
         public string? IdImageData { get; set; } = "No Location Info...";
@@ -24,5 +25,6 @@ namespace risk.control.system.Models
         public string? IdImageLongLat { get; set; }
         public DateTime? IdImageLongLatTime { get; set; }
         public bool ValidationExecuted { get; set; } = false;
+        public bool? IdImageValid { get; set; } = false;
     }
 }

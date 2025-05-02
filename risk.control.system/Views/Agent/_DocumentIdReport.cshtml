@@ -3,7 +3,7 @@
 
 @{
     var imageCapturedTime = @Model.InvestigationReport?.PanIdReport?.IdImageLongLatTime != null ? @Model.InvestigationReport?.PanIdReport?.IdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-    var documentName = @Model.InvestigationReport?.PanIdReport?.DocumentIdReportType.GetEnumDisplayName();
+    var documentName = @Model.InvestigationReport?.PanIdReport?.ReportType.GetEnumDisplayName();
     string documentIdColor = "progress-bar-grey";
     var borderColor = "";
     if (Model.InvestigationReport.PanIdReport?.IdImageLongLat == null)
@@ -11,7 +11,7 @@
 
     }
     else if (Model.InvestigationReport.PanIdReport?.IdImageLongLat != null && (
-    Model.InvestigationReport?.PanIdReport?.DocumentIdImageValid != null && Model.InvestigationReport?.PanIdReport?.DocumentIdImageValid == true))
+    Model.InvestigationReport?.PanIdReport?.IdImageValid != null && Model.InvestigationReport?.PanIdReport?.IdImageValid == true))
     {
         documentIdColor = "progress-bar-green";
         borderColor = "border-success";
@@ -91,7 +91,7 @@
                 {
                     <i class='fa fa-times i-grey' aria-hidden='true'></i>
                 }
-                else if (@Model.InvestigationReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
+                else if (@Model.InvestigationReport?.PanIdReport?.IdImageValid.Value ?? false)
                 {
                     <i class='fas fa-check-circle i-green'></i>
                 }
@@ -174,7 +174,7 @@
                     {
                         <i class='fa fa-times i-grey' aria-hidden='true'></i>
                     }
-                    else if (@Model.InvestigationReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
+                    else if (@Model.InvestigationReport?.PanIdReport?.IdImageValid.Value ?? false)
                     {
                         <i class='fas fa-check-circle i-green'></i>
                     }

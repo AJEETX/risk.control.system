@@ -87,25 +87,13 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> UploadFaceImage(long locationId, long faceId,string latitude, string longitude, long caseId, IFormFile faceImage, bool isAgent)
+        public async Task<IActionResult> UploadFaceImage(string reportName, string locationName, long locationId, long Id,string latitude, string longitude, long caseId, IFormFile Image, bool isAgent = false)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
-            if (faceImage != null && faceImage.Length > 0)
+            if (Image != null && Image.Length > 0)
             {
-                using (var stream = new MemoryStream())
-                {
-                    await faceImage.CopyToAsync(stream);
-                    // Update DB
-                    var face = await _context.DigitalIdReport.FindAsync(faceId);
-                    if (face != null)
-                    {
-                        face.IdImage = stream.ToArray();
-                        face.ValidationExecuted = true;
-                        await _context.SaveChangesAsync();
-                    }
-                    var response = await agentService.PostAgentId(currentUserEmail, locationId, caseId, faceId, latitude, longitude, isAgent, face.IdImage);
-                }
-                return Json(new { success = true });
+                var response = await agentService.PostAgentId(currentUserEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, isAgent, Image);
+                return Json(new { success = true, image = response.Image });
             }
             return BadRequest("Invalid image.");
         }
@@ -121,25 +109,13 @@ namespace risk.control.system.Controllers
         }
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> UploadDocumentImage(long locationId, long docId, string latitude, string longitude, long caseId, IFormFile docImage)
+        public async Task<IActionResult> UploadDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
-            if (docImage != null && docImage.Length > 0)
+            if (Image != null && Image.Length > 0)
             {
-                using (var stream = new MemoryStream())
-                {
-                    await docImage.CopyToAsync(stream);
-                    var doc = await _context.DocumentIdReport.FindAsync(docId);
-                    if (doc != null)
-                    {
-                        doc.IdImage = stream.ToArray(); // or doc.BackImage if you handle both
-                        doc.ValidationExecuted = true;
-                        await _context.SaveChangesAsync();
-                        var response = await agentService.PostDocumentId(currentUserEmail, locationId, caseId, docId, latitude, longitude, doc.IdImage);
-
-                    }
-                }
-                return Json(new { success = true });
+                var response = await agentService.PostDocumentId(currentUserEmail, reportName,locationName, locationId, caseId, Id, latitude, longitude, Image);
+                return Json(new { success = true, image = response.Image });
             }
             return BadRequest("Invalid image.");
         }

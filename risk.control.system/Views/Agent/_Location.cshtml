@@ -5,7 +5,6 @@
 <input type="hidden" name="caseId" value="@Model.CaseId" />
 @foreach (var location in Model.LocationTemplate)
 {
-	<input type="hidden" id="locationId" name="locationId" value="@location.Id" />
 	<div class="col-12 p-4 mb-5 border rounded shadow-sm bg-light location-container">
 		@Html.AntiForgeryToken()
 
@@ -15,8 +14,7 @@
 
 		<!-- Agent Table -->
 		@{
-			var agent = location.Agent;
-			var agentId = agent.Id;
+			var agent = location.AgentIdReport;
 		}
 		<table class="table table-bordered table-striped mb-4">
 			<thead class="table-light">
@@ -27,6 +25,7 @@
 					</th>
 					<th>Photo</th>
 					<th>Map</th>
+					<th>Address</th>
 					<th>Match</th>
 					<th>Action</th>
 				</tr>
@@ -44,7 +43,7 @@
 						}
 					</td>
 					<td>
-						<i class="far fa-user text-primary" title="Single person"></i> <i class="fa fa-asterisk asterik-style" title="Required"></i>
+						<i class="fa fa-asterisk asterik-style" title="Required"></i><i class="far fa-user text-primary" title="Single person"></i>
 					</td>
 					
 					<td>
@@ -80,6 +79,16 @@
 					<td>
 						@if (agent.ValidationExecuted)
 						{
+							@agent.IdImageLocationAddress
+						}
+						else
+						{
+							<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
+						}
+					</td>
+					<td>
+						@if (agent.ValidationExecuted)
+						{
 							@if (agent.Similarity < 70)
 							{
 								<i class='fa fa-times i-orangered' aria-hidden='true'></i>
@@ -98,7 +107,12 @@
 					<td>
 						<input type="file" class="form-control remarks document-image-input face-upload" data-faceid="@agent.Id" accept="image/*"
 							   data-toggle="tooltip" title="Agent Photo" />
-						<button type="button" class="btn btn-sm btn-success mt-2 upload-face-btn" data-faceid="@agent.Id" data-isagent="true">
+						<button type="button" class="btn btn-sm btn-success mt-2 upload-face-btn" 
+						data-faceid="@agent.Id" 
+						data-isagent="true" 
+						data-location-name="@location.LocationName" 
+						data-locationid="@location.Id" 
+						data-name="@agent.ReportName">
 							<i class="fas fa-upload"></i> Upload
 						</button>
 						<div id="upload-status-@agent.Id" class="text-success small mt-1"></div>
@@ -122,6 +136,7 @@
 						</th>
 						<th>Photo</th>
 						<th>Map</th>
+						<th>Address</th>
 						<th>Match</th>
 						<th>Action</th>
 					</tr>
@@ -131,7 +146,7 @@
 					{
 						<tr>
 							<td>
-								@face.IdIName
+								@face.ReportName
 							</td>
 							<td>
 								@if (face.Has2Face)
@@ -177,6 +192,16 @@
 							<td>
 								@if (face.ValidationExecuted)
 								{
+									@face.IdImageLocationAddress
+								}
+								else
+								{
+									<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
+								}
+							</td>
+							<td>
+								@if (face.ValidationExecuted)
+								{
 									@if (face.Similarity < 70)
 									{
 										<i class='fa fa-times i-orangered' aria-hidden='true'></i>
@@ -194,7 +219,11 @@
 							</td>
 							<td>
 								<input type="file" class="form-control form-control-sm face-upload" data-faceid="@face.Id" accept="image/*" />
-								<button type="button" class="btn btn-sm btn-success mt-2 upload-face-btn" data-faceid="@face.Id">
+								<button type="button" class="btn btn-sm btn-success mt-2 upload-face-btn" 
+								data-faceid="@face.Id" 
+								data-locationid="@location.Id"
+										data-location-name="@location.LocationName"
+										data-name="@face.ReportName">
 									<i class="fas fa-upload"></i> Upload
 								</button>
 								<div id="upload-status-@face.Id" class="text-success small mt-1"></div>
@@ -222,6 +251,7 @@
 						</th>
 						<th>Image</th>
 						<th>Map</th>
+						<th>Address</th>
 						<th>Valid</th>
 						<th>Action</th>
 					</tr>
@@ -231,7 +261,7 @@
 					{
 
 						<tr>
-							<td>@doc.IdIName</td>
+							<td>@doc.ReportName</td>
 							<td>
 								@if (doc.HasBackImage)
 								{
@@ -253,14 +283,15 @@
 								}
 								else
 								{
-									<img id="doc-img-@doc.Id" src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
+									<img id="doc-img-@doc.Id" src="~/img/no-policy.jpg" class="thumbnail profile-image doc-profile-image" />
 								}
 
 							</td>
 							<td>
 								@if (doc.ValidationExecuted)
 								{
-									<img src="@doc.IdImageLocationUrl"
+									<img id="face-img-@doc.Id"
+										 src="@doc.IdImageLocationUrl"
 										 class="thumbnail profile-image doc-profile-image map-image"
 										 data-faceid="@doc.Id"
 										 data-locationid="@location.Id"
@@ -276,13 +307,23 @@
 							<td>
 								@if (doc.ValidationExecuted)
 								{
-									@if (!doc.DocumentIdImageValid.HasValue && doc.DocumentIdImageValid.Value)
+									@doc.IdImageLocationAddress
+								}
+								else
+								{
+									<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
+								}
+							</td>
+							<td>
+								@if (doc.ValidationExecuted)
+								{
+									@if (doc.IdImageValid.HasValue && doc.IdImageValid.Value)
 									{
-										<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+										<i class='fas fa-check-circle i-green'></i>
 									}
 									else
 									{
-										<i class='fas fa-check-circle i-green'></i>
+										<i class='fa fa-times i-orangered' aria-hidden='true'></i>
 									}
 								}
 								else
@@ -293,13 +334,16 @@
 							</td>
 							<td>
 								<input type="file" class="form-control form-control-sm doc-upload" data-docid="@doc.Id" />
-								<button class="btn btn-sm btn-primary mt-1 upload-doc-btn" data-docid="@doc.Id">
+								<button class="btn btn-sm btn-primary mt-1 upload-doc-btn" 
+								data-docid="@doc.Id" 
+								data-locationid="@location.Id"
+										data-location-name="@location.LocationName"
+										data-name="@doc.ReportName">
 									<i class="fas fa-upload"></i> Upload
 								</button>
 								<div id="doc-upload-status-@doc.Id" class="text-success small mt-1"></div>
 							</td>
 						</tr>
-
 					}
 				</tbody>
 			</table>
@@ -312,6 +356,7 @@
 			<form asp-controller="Uploads" asp-action="SubmitLocationAnswers" method="post">
 				@Html.AntiForgeryToken()
 				<input type="hidden" name="LocationId" value="@location.Id" />
+				<input type="hidden" name="LocationName" value="@location.LocationName" />
 				<input type="hidden" name="caseId" value="@Model.CaseId" />
 
 				<table class="table table-bordered table-striped">

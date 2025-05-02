@@ -144,7 +144,7 @@
                                             <div class="form-check form-switch">
 
                                                 <label class="form-check-label" for="flexRadioDefault1">
-                                                    @if (@Model.ClaimsInvestigation.InvestigationReport.PanIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.InvestigationReport.PanIdReport.DocumentIdImageValid.Value)
+                                                    @if (@Model.ClaimsInvestigation.InvestigationReport.PanIdReport?.IdImageValid != null && @Model.ClaimsInvestigation.InvestigationReport.PanIdReport.IdImageValid.Value)
                                                     {
                                                         <i class='fas fa-check-circle  i-green'></i>
                                                     }
@@ -192,8 +192,8 @@
                                     <div class="col-md-12">
                                         @if (@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.Similarity < 70 ||
                                         @Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.Similarity < 70 ||
-                                        @Model.ClaimsInvestigation.InvestigationReport.PanIdReport?.DocumentIdImageValid == null ||
-                                        !@Model.ClaimsInvestigation.InvestigationReport.PanIdReport.DocumentIdImageValid.Value)
+                                        @Model.ClaimsInvestigation.InvestigationReport.PanIdReport?.IdImageValid == null ||
+                                        !@Model.ClaimsInvestigation.InvestigationReport.PanIdReport.IdImageValid.Value)
                                         {
                                             <div class="form-group">
                                                 <div class="form-check form-switch">

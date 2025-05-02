@@ -12,5 +12,6 @@
         public string? FacePercent { get; set; }
         public bool? Valid { get; set; }
         public bool? Registered { get; set; }
+        public byte[]? Image { get; set; }
     }
 }

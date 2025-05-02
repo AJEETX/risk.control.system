@@ -1,15 +1,38 @@
-﻿using risk.control.system.Models;
+﻿using System.Text.Json;
+using Google.Api;
+using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
+using risk.control.system.Data;
+using risk.control.system.Helpers;
+using risk.control.system.Models;
 
 namespace risk.control.system.Services
 {
     public interface ICloneReportService
     {
-        ReportTemplate DeepCloneReportTemplate(ReportTemplate originalTemplate);
+        Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType);
+        Task<object> GetReportTemplate(long caseId, string agentEmail);
     }
     public class CloneReportService : ICloneReportService
     {
-        public ReportTemplate DeepCloneReportTemplate(ReportTemplate originalTemplate)
+        private readonly ApplicationDbContext context;
+
+        public CloneReportService(ApplicationDbContext context)
         {
+            this.context = context;
+        }
+        public async Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType)
+        {
+            var originalTemplate = await context.ReportTemplates
+                .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.AgentIdReport)
+                   .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.FaceIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.DocumentIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Questions)
+            .FirstOrDefaultAsync(r => r.ClientCompanyId == clientCompanyId && r.InsuranceType == insuranceType && r.Basetemplate);
             var clone = new ReportTemplate
             {
                 Name = originalTemplate.Name,
@@ -22,25 +45,24 @@ namespace risk.control.system.Services
                 LocationTemplate = originalTemplate.LocationTemplate.Select(loc => new LocationTemplate
                 {
                     LocationName = loc.LocationName,
-                    Agent = new DigitalIdReport
+                    AgentIdReport = new AgentIdReport
                     {
-                        ReportType = loc.Agent.ReportType,
-                        Selected = true,
-                        // Copy other DigitalIdReport fields if needed
+                        ReportType = loc.AgentIdReport.ReportType,
+                        ReportName = loc.AgentIdReport.ReportName,
                     },
                     FaceIds = loc.FaceIds?.Select(face => new DigitalIdReport
                     {
                         ReportType = face.ReportType,
                         Selected = face.Selected,
                         Has2Face = face.Has2Face,
-                        IdIName = face.IdIName
+                        ReportName = face.ReportName
                     }).ToList(),
 
                     DocumentIds = loc.DocumentIds?.Select(doc => new DocumentIdReport
                     {
                         // Copy fields if any
-                        DocumentIdReportType = doc.DocumentIdReportType,
-                        IdIName = doc.IdIName,
+                        ReportType = doc.ReportType,
+                        ReportName = doc.ReportName,
                         IdImageBack = doc.IdImageBack,
                         Selected = doc.Selected,
                     }).ToList(),
@@ -58,6 +80,69 @@ namespace risk.control.system.Services
 
             return clone;
         }
+        public async Task<object> GetReportTemplate(long caseId, string agentEmail)
+        {
+            var investigation = await context.Investigations.FindAsync(caseId);
 
+            var originalTemplate = await context.ReportTemplates
+                 .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.AgentIdReport)
+                .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.FaceIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.DocumentIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Questions)
+            .FirstOrDefaultAsync(r => r.Id == investigation.ReportTemplateId);
+
+            var locationTemplate = originalTemplate.LocationTemplate.Select(loc => new             
+            {
+                LocationName = loc.LocationName,
+                Agent = new 
+                {
+                    ReportType = loc.AgentIdReport.ReportType.GetEnumDisplayName(),
+                    ReportName = loc.AgentIdReport.ReportName
+                },
+                FaceIds = loc.FaceIds.Where(face => face.Selected)?.Select(face => new 
+                {
+                    ReportType = face.ReportType.GetEnumDisplayName(),
+                    Has2Face = face.Has2Face,
+                    ReportName = face.ReportName
+                }).ToList(),
+
+                DocumentIds = loc.DocumentIds.Where(face => face.Selected)?.Select(doc => new 
+                {
+                    ReportType = doc.ReportType.GetEnumDisplayName(),
+                    ReportName = doc.ReportName,
+                    IdImageBack = doc.IdImageBack,
+                }).ToList(),
+
+                Questions = loc.Questions?.Select(q => new 
+                {
+                    Id = q.Id,
+                    QuestionText = q.QuestionText,
+                    QuestionType = q.QuestionType,
+                    Options = q.Options,
+                    IsRequired = q.IsRequired,
+                    AnswerText = q.AnswerText
+                }).ToList()
+            }).ToList();
+
+            return locationTemplate;
+        }
+        private async Task SaveReportTemplatesAsync(ReportTemplate template)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            string jsonString = JsonSerializer.Serialize(template, options);
+
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "report", "reportTemplate.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)); // Ensure folder exists
+
+            await File.WriteAllTextAsync(filePath, jsonString);
+        }
     }
 }

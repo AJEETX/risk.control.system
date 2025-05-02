@@ -130,7 +130,7 @@ namespace risk.control.system.Services
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                 }
-                var reportTemplate = await CloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
 
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.CreatedUser = userEmail;
@@ -159,21 +159,7 @@ namespace risk.control.system.Services
                 return null!;
             }
         }
-        private async Task<ReportTemplate> CloneReportTemplate(long clientCompanyId, InsuranceType insuranceType)
-        {
-            var masterTemplate = await context.ReportTemplates
-                .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.FaceIds)
-               .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.Questions)
-            .FirstOrDefaultAsync(r => r.ClientCompanyId == clientCompanyId && r.InsuranceType == insuranceType && r.Basetemplate);
-            var cloned = cloneService.DeepCloneReportTemplate(masterTemplate);
-            context.ReportTemplates.Add(cloned);
-            await context.SaveChangesAsync();
-            return cloned;
-        }
+        
         public async Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument)
         {
             try

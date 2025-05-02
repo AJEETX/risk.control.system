@@ -36,7 +36,7 @@
 
         public class LOCATIONS
         {
-            public const string AGENT_PHOTO = "AGENT";
+            public const string AGENT_PHOTO = "AGENT_PHOTO";
             public const string VERIFIER_ADDRESS = "VERIFIER_ADDRESS";
             public const string VERIFIER_PHOTO = "VERIFIER";
 

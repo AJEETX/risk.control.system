@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers
                 .Select(f => new
                 {
                     f.Id,
-                    f.IdIName,
+                    f.ReportName,
                     ReportType = f.ReportType.ToString() // Convert the ReportType enum to string
                 })
                 .FirstOrDefaultAsync();
@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers
             var location = context.LocationTemplate.Include(l => l.FaceIds).FirstOrDefault(l => l.Id == locationId);
             var faceId = new DigitalIdReport
             {
-                IdIName = IdIName,
+                IdName = IdIName,
                 ReportType = ReportType
             };
             location.FaceIds.Add(faceId);
@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers
             }
 
             // Update the properties
-            faceId.IdIName = newName;
+            faceId.IdName = newName;
             faceId.ReportType = Enum.TryParse(newReportType, out DigitalIdReportType reportType) ? reportType : faceId.ReportType;
 
             // Save the changes
@@ -104,7 +104,7 @@ namespace risk.control.system.Controllers
                 updatedFaceId = new
                 {
                     Id = faceId.Id,
-                    Name = faceId.IdIName,
+                    Name = faceId.IdName,
                     ReportType = faceId.ReportType.ToString()
                 }
             });
@@ -120,8 +120,8 @@ namespace risk.control.system.Controllers
                 .Select(d => new
                 {
                     d.Id,
-                    d.IdIName,
-                    DocumentType = d.DocumentIdReportType.ToString() // Convert the DocumentIdReportType enum to string
+                    d.IdName,
+                    DocumentType = d.ReportType.ToString() // Convert the DocumentIdReportType enum to string
                 })
                 .FirstOrDefaultAsync();
 
@@ -142,8 +142,8 @@ namespace risk.control.system.Controllers
             var location = context.LocationTemplate.Include(l => l.DocumentIds).FirstOrDefault(l => l.Id == locationId);
             var faceId = new DocumentIdReport
             {
-                IdIName = IdIName,
-                 DocumentIdReportType = ReportType
+                IdName = IdIName,
+                 ReportType = ReportType
             };
             location.DocumentIds.Add(faceId);
 
@@ -163,8 +163,8 @@ namespace risk.control.system.Controllers
             }
 
             // Update the properties
-            documentId.IdIName = newName;
-            documentId.DocumentIdReportType = Enum.TryParse(newDocumentType, out DocumentIdReportType documentType) ? documentType : documentId.DocumentIdReportType;
+            documentId.IdName = newName;
+            documentId.ReportType = Enum.TryParse(newDocumentType, out DocumentIdReportType documentType) ? documentType : documentId.ReportType;
 
             // Save the changes
             await context.SaveChangesAsync();
@@ -177,8 +177,8 @@ namespace risk.control.system.Controllers
                 updatedDocumentId = new
                 {
                     Id = documentId.Id,
-                    Name = documentId.IdIName,
-                    DocumentType = documentId.DocumentIdReportType.ToString()
+                    Name = documentId.IdName,
+                    DocumentType = documentId.ReportType.ToString()
                 }
             });
         }

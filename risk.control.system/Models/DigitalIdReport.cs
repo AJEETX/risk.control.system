@@ -10,6 +10,10 @@ namespace risk.control.system.Models
         public bool Has2Face { get; set; } = false;
         public bool? IdImageValid { get; set; } = false;
         public DigitalIdReportType ReportType { get; set; }
+        // Foreign key to LocationTemplate
+        public long? LocationTemplateId { get; set; }  // This is the FK property
+        public LocationTemplate? LocationTemplate { get; set; }  // Navigation property
+
     }
 
     public enum DigitalIdReportType

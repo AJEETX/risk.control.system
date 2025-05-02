@@ -33,6 +33,9 @@ namespace risk.control.system.Middleware
 
         public async Task Invoke(HttpContext context)
         {
+            var nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+            context.Items["CSP-Nonce"] = nonce;
+
             if (await featureManager.IsEnabledAsync(FeatureFlags.SECURITY))
             {
                 context.Response.Headers.Append("X-Frame-Options", "DENY");
@@ -46,6 +49,7 @@ namespace risk.control.system.Middleware
                     "default-src 'self';" +
                     "connect-src 'self' wss: https://maps.googleapis.com; " +
                     "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
+                    //$"script-src 'self' 'nonce-{nonce}' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
                     "style-src 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
                     "font-src  'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
                     "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +

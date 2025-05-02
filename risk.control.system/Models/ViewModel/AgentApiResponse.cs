@@ -1,4 +1,6 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using Swashbuckle.AspNetCore.Annotations;
+
+namespace risk.control.system.Models.ViewModel
 {
     public class PanVerifyResponse
     {
@@ -110,35 +112,30 @@
     public class SubmitData
     {
         public string Email { get; set; }
-        public long ClaimId { get; set; }
-        public long BeneficiaryId { get; set; }
-        public string? Question1 { get; set; }
-        public string? Question2 { get; set; }
-        public string? Question3 { get; set; }
-        public string? Question4 { get; set; }
+        public long CaseId { get; set; }
         public string Remarks { get; set; }
     }
 
     public class FaceData
     {
+        public IFormFile? Image { get; set; }
         public string Email { get; set; }
-        public long ClaimId { get; set; }
-        public long LocationId { get; set; }
-        public long FaceId { get; set; }
-        public string LocationImage { get; set; }
-        public string LocationLongLat { get; set; }
+        public long CaseId { get; set; }
+        public string? LocationName { get; set; }
+        public string? ReportName { get; set; }
+        
+        public string? LocationLatLong { get; set; }
         public string? Type { get; set; } = "0";
-        public bool IsAgent { get; set; } = false;
     }
 
     public class DocumentData
     {
+        public IFormFile? Image { get; set; }
         public string Email { get; set; }
-        public long ClaimId { get; set; }
-        public long LocationId { get; set; }
-        public long DocId { get; set; }
-        public string OcrImage { get; set; }
-        public string OcrLongLat { get; set; }
+        public long CaseId { get; set; }
+        public string? LocationName { get; set; }
+        public string? ReportName { get; set; }
+        public string LocationLatLong { get; set; }
     }
 
     public class MediaData

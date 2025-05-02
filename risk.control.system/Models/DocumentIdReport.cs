@@ -7,8 +7,10 @@ namespace risk.control.system.Models
     {
         public byte[]? IdImageBack { get; set; }
         public bool HasBackImage { get; set; } = true;
-        public bool? DocumentIdImageValid { get; set; } = false;
-        public DocumentIdReportType DocumentIdReportType { get; set; } = DocumentIdReportType.PAN;
+        public DocumentIdReportType ReportType { get; set; } = DocumentIdReportType.PAN;
+        // Foreign key to LocationTemplate
+        public long? LocationTemplateId { get; set; }  // This is the FK property
+        public LocationTemplate? LocationTemplate { get; set; }  // Navigation property
     }
 
     public enum DocumentIdReportType

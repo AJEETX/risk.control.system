@@ -1,0 +1,117 @@
+﻿@* @using risk.control.system.Helpers;
+@model LocationTemplate
+@{
+	string agentStatus = "btn-outline-secondary";
+	var agent = Model.Agent;
+	var location = Model;
+}
+<button class="btn btn-sm @agentStatus mb-2" type="button"
+		data-toggle="collapse"
+		data-target="#agent-@Model.Id"
+		aria-expanded="false"
+		aria-controls="agent-@Model.Id">
+	Agent Info <i class="fas fa-chevron-down"></i>
+</button>
+<div class="collapse" id="agent-@Model.Id">
+	<div class="table-responsive mb-4">
+		<table class="table table-bordered table-hover text-center align-middle">
+			<thead class="thead-light">
+				<tr>
+					<th>Email / Type</th>
+					<th><i class="far fa-user text-primary" title="Agent icon" data-toggle="tooltip"></i></th>
+					<th>ID Photo</th>
+					<th>Map Image</th>
+					<th>Address</th>
+					<th>Match</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<!-- Email or Report Type -->
+					<td>
+						@if (agent.ValidationExecuted)
+						{
+							@location.AgentEmail
+						}
+						else
+						{
+							@agent.ReportType.GetEnumDisplayName()
+						}
+					</td>
+
+					<!-- Agent icon with required indicator -->
+					<td>
+						<i class="far fa-user text-primary" title="Single person" data-toggle="tooltip"></i>
+						<i class="fa fa-asterisk text-danger ml-1" title="Required" data-toggle="tooltip"></i>
+					</td>
+
+					<!-- ID Photo -->
+					<td>
+						@if (agent.ValidationExecuted)
+						{
+							<img id="face-img-@agent.Id"
+								 src="data:image/*;base64,@(Convert.ToBase64String(agent?.IdImage))"
+								 class="img-thumbnail rounded"
+								 style="width: 75px; height: 75px;"
+								 title="Click to view @location.AgentEmail photo" />
+						}
+						else
+						{
+							<img src="~/img/no-user.png" class="img-thumbnail" style="width: 75px;" />
+						}
+					</td>
+
+					<!-- Map Image -->
+					<td>
+						@if (agent.ValidationExecuted)
+						{
+							<img src="@agent.IdImageLocationUrl"
+								 class="img-thumbnail"
+								 style="width: 75px; height: 75px;"
+								 data-faceid="@agent.Id"
+								 data-locationid="@location.Id"
+								 data-caseid="@Model.CaseId"
+								 data-source="agent"
+								 title="Click to view map" />
+						}
+						else
+						{
+							<img src="~/img/no-map.jpeg" class="img-thumbnail" style="width: 75px;" />
+						}
+					</td>
+
+					<!-- Address or fallback -->
+					<td>
+						@if (agent.ValidationExecuted)
+						{
+							<small>@agent.IdImageLocationAddress</small>
+						}
+						else
+						{
+							<img src="~/img/no-map-image.jpeg" class="img-thumbnail" style="width: 75px;" />
+						}
+					</td>
+
+					<!-- Match status -->
+					<td>
+						@if (agent.ValidationExecuted)
+						{
+							@if (agent.IdImageValid.HasValue && agent.IdImageValid.Value)
+							{
+								<i class="fas fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
+							}
+							else
+							{
+								<i class="fas fa-times-circle text-danger" title="Not matched" data-toggle="tooltip"></i>
+							}
+						}
+						else
+						{
+							<i class="fas fa-times-circle text-muted" title="Not validated" data-toggle="tooltip"></i>
+						}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div> *@

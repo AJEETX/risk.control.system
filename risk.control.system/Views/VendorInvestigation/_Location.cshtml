@@ -5,345 +5,415 @@
 <input type="hidden" name="caseId" value="@Model.CaseId" />
 @foreach (var location in Model.LocationTemplate)
 {
-	<input type="hidden" id="locationId" name="locationId" value="@location.Id" />
-	<div class="col-12 p-4 mb-5 border rounded shadow-sm bg-light location-container">
-		@Html.AntiForgeryToken()
+	location.SetStatus();
+	var agent = location.AgentIdReport;
 
-		<h5 class="mb-4 text-primary border-bottom pb-2">
-			<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
-		</h5>
+	<div class="col-12 mb-4 location-container">
+		<div class="card mb-2 border @location.StatusClass @location.LocationStatus">
+			<div class="card-header bg-light text-white d-flex align-items-center">
+				<h5 class="mb-0 flex-grow-1 @location.LocationStatus">
+					<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
+				</h5>
 
-		<!-- Agent Table -->
-		@{
-			var agent = location.Agent;
-			var agentId = agent.Id;
-		}
-		<table class="table table-bordered table-striped mb-4">
-			<thead class="table-light">
-				<tr>
-					<th>Photo</th>
-					<th>
-						<i class="far fa-user text-primary" title="This Image has agent photo at the location" data-toggle="tooltip"></i>
-					</th>
-					<th>Photo</th>
-					<th>Map</th>
-					<th>Match</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>
-						@if (agent.ValidationExecuted)
-						{
-							@location.AgentEmail
-						}
-						else
-						{
-							@agent.ReportType.GetEnumDisplayName()
-						}
-					</td>
-					<td>
-						<i class="far fa-user text-primary" title="Single person"></i> <i class="fa fa-asterisk asterik-style" title="Required"></i>
-					</td>
-					
-					<td>
-						@if (agent.ValidationExecuted)
-						{
-							<img id="face-img-@agent.Id"
-								 src="data:image/*;base64,@(Convert.ToBase64String(agent?.IdImage))"
-								 class="thumbnail profile-image doc-profile-image preview-image"
-								 title="Click to view @location.AgentEmail photo" />
-						}
-						else
-						{
-							<img src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
-						}
-						
-					</td>
-					<td>
-						@if (agent.ValidationExecuted)
-						{
-							<img src="@agent.IdImageLocationUrl"
-								 class="thumbnail profile-image doc-profile-image map-image"
-								 data-faceid="@agent.Id"
-								 data-locationid="@location.Id"
-								 data-caseid="@Model.CaseId"
-								 data-source="agent"
-								 title="Click to view map"/>
-						}
-						else
-						{
-							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-						}
-					</td>
-					<td>
-						@if (agent.ValidationExecuted)
-						{
-							@if (agent.Similarity < 70)
-							{
-								<i class='fa fa-times i-orangered' aria-hidden='true'></i>
-							}
-							else
-							{
-								<i class='fas fa-check-circle i-green'></i>
-							}
-						}
-						else
-						{
-							<i class='fa fa-times i-grey' aria-hidden='true'></i>
-						}
+				<button class="btn btn-sm @location.LocationStatusButton  mb-2" type="button"
+						data-toggle="collapse"
+						data-target="#location-@location.Id"
+						aria-expanded="false"
+						aria-controls="location-@location.Id">
+					@location.StatusText <i class="fas fa-chevron-down"></i>
+				</button>
+			</div>
+			
 
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<!-- FaceIds Table -->
-		@if (location.FaceIds?.Any(f => f.Selected) == true)
-		{
-			<table class="table table-bordered table-striped mb-4">
-				<thead class="table-light">
-					<tr>
-						<th>Photo</th>
-						<th>
-							<i class="fas fa-users text-primary"
-							   title="This Image has 2 person" data-toggle="tooltip"></i>
-							/
-							<i class="far fa-user text-primary" title="This Image has single person" data-toggle="tooltip"></i>
-						</th>
-						<th>Photo</th>
-						<th>Map</th>
-						<th>Match</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var face in location.FaceIds.Where(f => f.Selected))
+			<div id="location-@location.Id" class="collapse">
+
+				<div class="card-body bg-light">
+					@* Insert all the current content here (the agent table, face/doc/questions) *@
+
+					@Html.AntiForgeryToken()
+					<button class="btn btn-sm @location.AgentStatus mb-2" type="button"
+							data-toggle="collapse"
+							data-target="#agent-@location.Id"
+							aria-expanded="false"
+							aria-controls="agent-@location.Id">
+						Agent Info <i class="fas fa-chevron-down"></i>
+					</button>
+					<div class="collapse" id="agent-@location.Id">
+						<div class="table-responsive mb-4">
+							<table class="table table-bordered table-hover text-center align-middle">
+								<thead class="thead-light">
+									<tr>
+										<th>Email / Type</th>
+										<th><i class="far fa-user text-primary" title="Agent icon" data-toggle="tooltip"></i></th>
+										<th>ID Photo</th>
+										<th>Map Image</th>
+										<th>Address</th>
+										<th>Match</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<!-- Email or Report Type -->
+										<td>
+											@if (agent.ValidationExecuted)
+											{
+												@location.AgentEmail
+											}
+											else
+											{
+												@agent.ReportType.GetEnumDisplayName()
+											}
+										</td>
+
+										<!-- Agent icon with required indicator -->
+										<td>
+											<i class="far fa-user text-primary" title="Single person" data-toggle="tooltip"></i>
+											<i class="fa fa-asterisk text-danger ml-1" title="Required" data-toggle="tooltip"></i>
+										</td>
+
+										<!-- ID Photo -->
+										<td>
+											@if (agent.ValidationExecuted)
+											{
+												<img id="face-img-@agent.Id"
+													 src="data:image/*;base64,@(Convert.ToBase64String(agent?.IdImage))"
+													 class="img-thumbnail rounded"
+													 style="width: 75px; height: 75px;"
+													 title="Click to view @location.AgentEmail photo" />
+											}
+											else
+											{
+												<img src="~/img/no-user.png" class="img-thumbnail" style="width: 75px;" />
+											}
+										</td>
+
+										<!-- Map Image -->
+										<td>
+											@if (agent.ValidationExecuted)
+											{
+												<img src="@agent.IdImageLocationUrl"
+													 class="img-thumbnail"
+													 style="width: 75px; height: 75px;"
+													 data-faceid="@agent.Id"
+													 data-locationid="@location.Id"
+													 data-caseid="@Model.CaseId"
+													 data-source="agent"
+													 title="Click to view map" />
+											}
+											else
+											{
+												<img src="~/img/no-map.jpeg" class="img-thumbnail" style="width: 75px;" />
+											}
+										</td>
+
+										<!-- Address or fallback -->
+										<td>
+											@if (agent.ValidationExecuted)
+											{
+												<small>@agent.IdImageLocationAddress</small>
+											}
+											else
+											{
+												<img src="~/img/no-map-image.jpeg" class="img-thumbnail" style="width: 75px;" />
+											}
+										</td>
+
+										<!-- Match status -->
+										<td>
+											@if (agent.ValidationExecuted)
+											{
+												@if (agent.IdImageValid.HasValue && agent.IdImageValid.Value)
+												{
+													<i class="fas fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
+												}
+												else
+												{
+													<i class="fas fa-times-circle text-danger" title="Not matched" data-toggle="tooltip"></i>
+												}
+											}
+											else
+											{
+												<i class="fas fa-times-circle text-muted" title="Not validated" data-toggle="tooltip"></i>
+											}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- FaceIds Table -->
+					@if (location.FaceIds?.Any(f => f.Selected) == true)
 					{
-						<tr>
-							<td>
-								@face.IdIName
-							</td>
-							<td>
-								@if (face.Has2Face)
+						<table class="table table-bordered table-striped mb-4">
+							<thead class="table-light">
+								<tr>
+									<th>Photo</th>
+									<th>
+										<i class="fas fa-users text-primary"
+										   title="This Image has 2 person" data-toggle="tooltip"></i>
+										/
+										<i class="far fa-user text-primary" title="This Image has single person" data-toggle="tooltip"></i>
+									</th>
+									<th>Photo</th>
+									<th>Map</th>
+									<th>Address</th>
+									<th>Match</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var face in location.FaceIds.Where(f => f.Selected))
 								{
-									<i class="fas fa-users text-primary" title="2 persons"></i>
-								}
-								else
-								{
-									<i class="far fa-user text-primary" title="Single person"></i>
-								}
-								<i class="fa fa-asterisk asterik-style" title="Required"></i>
-							</td>
-							<td>
-								@if (face.ValidationExecuted)
-								{
-									<img id="face-img-@face.Id"
-										 src="data:image/*;base64,@(Convert.ToBase64String(face?.IdImage))"
-										 class="thumbnail profile-image doc-profile-image preview-image"
-										 title="Click to view face photo" />
-								}
-								else
-								{
-									<img src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
-								}
-							</td>
-							<td>
-								@if (face.ValidationExecuted)
-								{
-									<img src="@face.IdImageLocationUrl"
-								 class="thumbnail profile-image doc-profile-image map-image"
-								 data-faceid="@face.Id"
-								 data-locationid="@location.Id"
-								 data-caseid="@Model.CaseId"
-										 data-source="agent"
-								 title="Click to view map" />
+									<tr>
+										<td>
+											@face.ReportName
+										</td>
+										<td>
+											@if (face.Has2Face)
+											{
+												<i class="fas fa-users text-primary" title="2 persons"></i>
+											}
+											else
+											{
+												<i class="far fa-user text-primary" title="Single person"></i>
+											}
+											<i class="fa fa-asterisk asterik-style" title="Required"></i>
+										</td>
+										<td>
+											@if (face.ValidationExecuted)
+											{
+												<img id="face-img-@face.Id"
+													 src="data:image/*;base64,@(Convert.ToBase64String(face?.IdImage))"
+													 class="thumbnail profile-image doc-profile-image preview-image"
+													 title="Click to view face photo" />
+											}
+											else
+											{
+												<img src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
+											}
+										</td>
+										<td>
+											@if (face.ValidationExecuted)
+											{
+												<img src="@face.IdImageLocationUrl"
+													 class="thumbnail profile-image doc-profile-image map-image"
+													 data-faceid="@face.Id"
+													 data-locationid="@location.Id"
+													 data-caseid="@Model.CaseId"
+													 data-source="agent"
+													 title="Click to view map" />
 
-								}
-								else
-								{
-									<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-								}
-							</td>
-							<td>
-								@if (face.ValidationExecuted)
-								{
-									@if (face.Similarity < 70)
-									{
-										<i class='fa fa-times i-orangered' aria-hidden='true'></i>
-									}
-									else
-									{
-										<i class='fas fa-check-circle i-green'></i>
-									}
-								}
-								else
-								{
-									<i class='fa fa-times i-grey' aria-hidden='true'></i>
+											}
+											else
+											{
+												<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+											}
+										</td>
+										<td>
+											@if (face.ValidationExecuted)
+											{
+												@face.IdImageLocationAddress
+											}
+											else
+											{
+												<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
+											}
+										</td>
+										<td>
+											@if (face.ValidationExecuted)
+											{
+												@if (!face.IdImageValid.GetValueOrDefault())
+												{
+													<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+												}
+												else
+												{
+													<i class='fas fa-check-circle i-green'></i>
+												}
+											}
+											else
+											{
+												<i class='fa fa-times i-grey' aria-hidden='true'></i>
+											}
+
+										</td>
+
+									</tr>
 								}
 
-							</td>
-							
-						</tr>
+							</tbody>
+						</table>
 					}
 
-				</tbody>
-			</table>
-		}
-
-		<!-- DocumentIds Table -->
-		@if (location.DocumentIds?.Any(d => d.Selected) == true)
-		{
-			<table class="table table-bordered table-striped mb-4">
-				<thead class="table-light">
-					<tr>
-						<th>Document</th>
-						<th>
-							<i class="fas fa-copy text-muted ms-2"
-							   title="With Back page" data-toggle="tooltip"></i>
-							/
-							<i class="far fa-file text-muted ms-2" title="Single page" data-toggle="tooltip"></i>
-						</th>
-						<th>Image</th>
-						<th>Map</th>
-						<th>Valid</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+					<!-- DocumentIds Table -->
+					@if (location.DocumentIds?.Any(d => d.Selected) == true)
 					{
+						<table class="table table-bordered table-striped mb-4">
+							<thead class="table-light">
+								<tr>
+									<th>Document</th>
+									<th>
+										<i class="fas fa-copy text-muted ms-2"
+										   title="With Back page" data-toggle="tooltip"></i>
+										/
+										<i class="far fa-file text-muted ms-2" title="Single page" data-toggle="tooltip"></i>
+									</th>
+									<th>Image</th>
+									<th>Map</th>
+									<th>Address</th>
+									<th>Valid</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+								{
 
-						<tr>
-							<td>@doc.IdIName</td>
-							<td>
-								@if (doc.HasBackImage)
-								{
-									<i class="fas fa-copy text-muted" title="Back page present"></i>
-								}
-								else
-								{
-									<i class="far fa-file text-muted" title="Front only"></i>
-								}
-								<i class="fa fa-asterisk asterik-style" title="Required"></i>
-							</td>
-							<td>
-								@if (doc.ValidationExecuted)
-								{
-									<img id="doc-img-@doc.Id"
-										 src="data:image/*;base64,@(Convert.ToBase64String(doc?.IdImage))"
-										 class="thumbnail profile-image doc-profile-image preview-image"
-										 title="Click to view document" />
-								}
-								else
-								{
-									<img id="doc-img-@doc.Id" src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
-								}
+									<tr>
+										<td>@doc.ReportName</td>
+										<td>
+											@if (doc.HasBackImage)
+											{
+												<i class="fas fa-copy text-muted" title="Back page present"></i>
+											}
+											else
+											{
+												<i class="far fa-file text-muted" title="Front only"></i>
+											}
+											<i class="fa fa-asterisk asterik-style" title="Required"></i>
+										</td>
+										<td>
+											@if (doc.ValidationExecuted)
+											{
+												<img id="doc-img-@doc.Id"
+													 src="data:image/*;base64,@(Convert.ToBase64String(doc?.IdImage))"
+													 class="thumbnail profile-image doc-profile-image preview-image"
+													 title="Click to view document" />
+											}
+											else
+											{
+												<img id="doc-img-@doc.Id" src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
+											}
 
-							</td>
-							<td>
-								@if (doc.ValidationExecuted)
-								{
-									<img src="@doc.IdImageLocationUrl"
-										 class="thumbnail profile-image doc-profile-image map-image"
-										 data-faceid="@doc.Id"
-										 data-locationid="@location.Id"
-										 data-caseid="@Model.CaseId"
-										 data-source="document"
-										 title="Click to view map"/>
-								}
-								else
-								{
-									<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-								}
-							</td>
-							<td>
-								@if (doc.ValidationExecuted)
-								{
-									@if (!doc.DocumentIdImageValid.HasValue && doc.DocumentIdImageValid.Value)
-									{
-										<i class='fa fa-times i-orangered' aria-hidden='true'></i>
-									}
-									else
-									{
-										<i class='fas fa-check-circle i-green'></i>
-									}
-								}
-								else
-								{
-									<i class='fa fa-times i-grey' aria-hidden='true'></i>
-								}
+										</td>
+										<td>
+											@if (doc.ValidationExecuted)
+											{
+												<img src="@doc.IdImageLocationUrl"
+													 class="thumbnail profile-image doc-profile-image map-image"
+													 data-faceid="@doc.Id"
+													 data-locationid="@location.Id"
+													 data-caseid="@Model.CaseId"
+													 data-source="document"
+													 title="Click to view map" />
+											}
+											else
+											{
+												<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+											}
+										</td>
+										<td>
+											@if (doc.ValidationExecuted)
+											{
+												@doc.IdImageLocationAddress
+											}
+											else
+											{
+												<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
+											}
+										</td>
+										<td>
+											@if (doc.ValidationExecuted)
+											{
+												@if (doc.IdImageValid.HasValue && doc.IdImageValid.Value)
+												{
+													<i class='fas fa-check-circle i-green'></i>
+												}
+												else
+												{
+													<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+												}
+											}
+											else
+											{
+												<i class='fa fa-times i-grey' aria-hidden='true'></i>
+											}
 
-							</td>
-						</tr>
+										</td>
+									</tr>
 
+								}
+							</tbody>
+						</table>
 					}
-				</tbody>
-			</table>
-		}
 
 
-		<!-- Questions Table -->
-		@if (location.Questions?.Any() == true)
-		{
-			<input type="hidden" name="LocationId" value="@location.Id" />
-			<input type="hidden" name="caseId" value="@Model.CaseId" />
-
-			<table class="table table-bordered table-striped">
-				<thead class="table-light">
-					<tr>
-						<th>Question</th>
-						<th>Answer</th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (int i = 0; i < location.Questions.Count; i++)
+					<!-- Questions Table -->
+					@if (location.Questions?.Any() == true)
 					{
-						var question = location.Questions[i];
-						var required = question.IsRequired ? "required" : "";
-						<tr>
-							<td>
-								@question.QuestionText
-								@if (question.IsRequired)
-								{
-									<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
-								}
+						<input type="hidden" name="LocationId" value="@location.Id" />
+						<input type="hidden" name="caseId" value="@Model.CaseId" />
 
-								@* Hidden fields to pass extra data back *@
-								<input type="hidden" name="Questions[@i].Id" value="@question.Id" />
-								<input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
-								<input type="hidden" name="Questions[@i].QuestionType" value="@question.QuestionType" />
-								<input type="hidden" name="Questions[@i].Options" value="@question.Options" />
-								<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
-							</td>
-							<td>
-								@if (question.QuestionType == "text" || question.QuestionType == "date")
+						<table class="table table-bordered table-striped">
+							<thead class="table-light">
+								<tr>
+									<th>Question</th>
+									<th>Answer</th>
+								</tr>
+							</thead>
+							<tbody>
+								@for (int i = 0; i < location.Questions.Count; i++)
 								{
-									<span class="form-control-plaintext">@question.AnswerText</span>
-								}
-								else if (question.QuestionType == "radio" || question.QuestionType == "dropdown")
-								{
-									<span class="form-control-plaintext">@question.AnswerText</span>
-								}
-								else if (question.QuestionType == "checkbox")
-								{
-									var selectedOptions = question.AnswerText?.Split(',') ?? new string[] { };
-									<ul class="list-unstyled mb-0">
-										@foreach (var option in selectedOptions)
-										{
-											<li><i class="bi bi-check-circle-fill text-success"></i> @option</li>
-										}
-									</ul>
-								}
-								else
-								{
-									<span class="form-control-plaintext text-muted">N/A</span>
-								}
-							</td>
+									var question = location.Questions[i];
+									var required = question.IsRequired ? "required" : "";
+									<tr>
+										<td>
+											@question.QuestionText
+											@if (question.IsRequired)
+											{
+												<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+											}
 
-						</tr>
+											@* Hidden fields to pass extra data back *@
+											<input type="hidden" name="Questions[@i].Id" value="@question.Id" />
+											<input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
+											<input type="hidden" name="Questions[@i].QuestionType" value="@question.QuestionType" />
+											<input type="hidden" name="Questions[@i].Options" value="@question.Options" />
+											<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
+										</td>
+										<td>
+											@if (question.QuestionType == "text" || question.QuestionType == "date")
+											{
+												<span class="form-control-plaintext">@question.AnswerText</span>
+											}
+											else if (question.QuestionType == "radio" || question.QuestionType == "dropdown")
+											{
+												<span class="form-control-plaintext">@question.AnswerText</span>
+											}
+											else if (question.QuestionType == "checkbox")
+											{
+												var selectedOptions = question.AnswerText?.Split(',') ?? new string[] { };
+												<ul class="list-unstyled mb-0">
+													@foreach (var option in selectedOptions)
+													{
+														<li><i class="bi bi-check-circle-fill text-success"></i> @option</li>
+													}
+												</ul>
+											}
+											else
+											{
+												<span class="form-control-plaintext text-muted">N/A</span>
+											}
+										</td>
+
+									</tr>
+								}
+							</tbody>
+						</table>
 					}
-				</tbody>
-			</table>
-		}
 
-	</div>
+				</div> <!-- card-body -->
+			</div> <!-- collapse -->
+		</div> <!-- card -->
+	</div> <!-- col-12 -->
 }
 <partial name="_ReportModal" />

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Models
 {
@@ -40,11 +41,68 @@ namespace risk.control.system.Models
         public long? ReportTemplateId { get; set; }
         public ReportTemplate? ReportTemplate { get; set; }
         public string? LocationName { get; set; }
+        public string? Status { get; set; }
         public string? AgentEmail { get; set; }
-        public DigitalIdReport Agent { get; set; } = new DigitalIdReport { Selected = true, ReportType = DigitalIdReportType.AGENT_FACE };
-        public List<DigitalIdReport>? FaceIds { get; set; } = new List<DigitalIdReport>();
-        public List<DocumentIdReport>? DocumentIds { get; set; } = new List<DocumentIdReport>();
+        public long? AgentIdReportId { get; set; }
+        public AgentIdReport? AgentIdReport { get; set; } = new AgentIdReport { Selected = true, ReportType = DigitalIdReportType.AGENT_FACE, ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO };
+
+        public List<DigitalIdReport>? FaceIds { get; set; } = new();
+        public List<DocumentIdReport>? DocumentIds { get; set; } = new();
         public List<Question>? Questions { get; set; } = new List<Question>();
+
+
+        [NotMapped]
+        public string LocationStatus = "border-secondary";
+        [NotMapped]
+        public string LocationStatusButton = "btn-outline-secondary";
+        [NotMapped]
+        public string AgentStatus = "btn-outline-secondary";
+        [NotMapped]
+        public string StatusText = "Incomplete";
+        [NotMapped]
+        public string StatusClass = "bg-danger text-white";
+        [NotMapped]
+        public bool AllQuestionsAnswered => Questions != null && Questions.All(q => !string.IsNullOrWhiteSpace(q.AnswerText));
+
+        [NotMapped]
+        public bool DocumentsValidated => DocumentIds?.Where(d => d.Selected).All(d => d.IdImageValid.GetValueOrDefault()) ?? false;
+        [NotMapped]
+        public bool FaceIdsValidated => FaceIds?.Where(f => f.Selected).All(f => f.IdImageValid.GetValueOrDefault()) ?? false;
+        [NotMapped]
+        public bool AgentValidated => AgentIdReport?.IdImageValid ?? false;
+
+        public void SetStatus()
+        {
+            if (AllQuestionsAnswered && DocumentsValidated && FaceIdsValidated && AgentValidated)
+                {
+                    LocationStatusButton = "btn-outline-success";
+                    LocationStatus = "border-success";
+                    StatusText = "Completed";
+                    StatusClass = "bg-success text-white";
+                }
+            else if (!AllQuestionsAnswered && !DocumentsValidated && !FaceIdsValidated && !AgentValidated)
+            {
+                LocationStatusButton = "btn-outline-danger";
+                LocationStatus = "border-danger";
+                StatusText = "Invalid";
+                StatusClass = "bg-danger text-white";
+            }
+            else if (AllQuestionsAnswered || DocumentsValidated || FaceIdsValidated || AgentValidated)
+            {
+                LocationStatusButton = "btn-outline-warning";
+                LocationStatus = "border-warning";
+                StatusText = "Partial";
+                StatusClass = "bg-warning text-dark";
+            }
+            if(AgentValidated)
+            {
+                AgentStatus = "btn-outline-success";
+            }
+            else
+            {
+                AgentStatus = "btn-outline-warning";
+            }
+        }
     }
     public class ReportTemplateCreateViewModel
     {

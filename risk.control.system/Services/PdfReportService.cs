@@ -158,7 +158,7 @@ namespace risk.control.system.Services
             IdData panIdData = JsonConvert.DeserializeObject<IdData>(panIdDataJsonContent);
 
             panIdData.Passenger = "Document Id";
-            var panValid = claim.InvestigationReport.PanIdReport.DocumentIdImageValid.GetValueOrDefault();
+            var panValid = claim.InvestigationReport.PanIdReport.IdImageValid.GetValueOrDefault();
             panIdData.FaceMatchStatus = panValid ? "YES" : "NO";
             panIdData.PersonName = claim.InvestigationReport.PanIdReport.IdImageData.Length > 30 ?
                 claim.InvestigationReport.PanIdReport.IdImageData.Substring(0, 30) + "..." :
