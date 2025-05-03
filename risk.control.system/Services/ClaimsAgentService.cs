@@ -58,7 +58,7 @@ namespace risk.control.system.Services
             {
                 LocationName = locationName,
                 ReportName = reportName,
-                Type = isAgent ? "0":"1",
+                //Type = isAgent ? "0":"1",
                 //LocationId = locationId,
                 //Id = faceId,
                 Email = userEmail,

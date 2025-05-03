@@ -569,7 +569,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(500);
             }
         }
-                [AllowAnonymous]
+        [AllowAnonymous]
         [HttpPost("faceid")]
 
         public async Task<IActionResult> FaceId(FaceData data)
@@ -592,14 +592,23 @@ namespace risk.control.system.Controllers.Api
                     return StatusCode(401, new { message = "Offboarded Agent." });
                 }
             }
-            var response = await agentIdService.GetAgentId(data);
-            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-            return Ok(response);
+            var isAgentReportName = data.ReportName == DigitalIdReportType.AGENT_FACE.GetEnumDisplayName();
+            if (isAgentReportName)
+            {
+                var response = await agentIdService.GetAgentId(data);
+                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                return Ok(response);
+            }
+            else
+            {
+                var response = await agentIdService.GetFaceId(data);
+                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                return Ok(response);
+            }
         }
 
         [AllowAnonymous]
         [HttpPost("documentid")]
-
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
             if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
@@ -623,46 +632,29 @@ namespace risk.control.system.Controllers.Api
             response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
             return Ok(response);
         }
+        
+        [AllowAnonymous]
+        [HttpPost("answers")]
+        public async Task<IActionResult> Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
+        {
+            foreach (var question in Questions)
+            {
+                if (question.IsRequired.GetValueOrDefault() && string.IsNullOrEmpty(question.Answer))
+                {
+                    ModelState.AddModelError("", $"Answer required for: {question.QuestionText}");
+                }
+            }
 
-        //[AllowAnonymous]
-        //[HttpPost("audio")]
-        //public async Task<IActionResult> Audio(AudioData data)
-        //{
-        //    if (data == null)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(Path.GetFileName(data.MediaFile.Name)))
-        //    {
-        //        data.Name = Path.GetFileName(data.MediaFile.Name);
-        //        using (var ds = new MemoryStream())
-        //        {
-        //            data.MediaFile.CopyTo(ds);
-        //            data.Mediabytes = ds.ToArray();
-        //        };
-        //    }
+            if (!ModelState.IsValid)
+            {
+                // Re-load data and return view with error
+                // e.g. return View(model);
+                return BadRequest("Some answers are missing.");
+            }
+            await agentIdService.Answers(locationName, caseId, Questions);
 
-        //    var response = await iCheckifyService.GetAudio(data);
-        //    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-        //    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-        //    return Ok(response);
-        //}
-
-        //[AllowAnonymous]
-        //[HttpPost("video")]
-        //public async Task<IActionResult> Video(VideoData data)
-        //{
-        //    if (data == null)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    var response = await iCheckifyService.GetVideo(data);
-
-        //    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-        //    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-        //    return Ok(response);
-        //}
+            return Ok();
+        }
 
         [AllowAnonymous]
         [HttpPost("submit")]

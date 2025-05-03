@@ -101,11 +101,6 @@ namespace risk.control.system.Services
 
             claim.InvestigationReport.AgentEmail = userEmail;
 
-            var questionModel = new QuestionFormViewModel
-            {
-                Questions = claim.InvestigationReport.CaseQuestionnaire.Questions
-            };
-
             var templates = await _context.ReportTemplates
                 .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.AgentIdReport)
@@ -125,8 +120,7 @@ namespace risk.control.system.Services
             {
                 InvestigationReport = claim.InvestigationReport,
                 Location = claim.BeneficiaryDetail,
-                ClaimsInvestigation = claim,
-                QuestionFormViewModel = questionModel
+                ClaimsInvestigation = claim
             };
             return model;
         }

@@ -118,6 +118,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<IPanCardService, PanCardService>();
 builder.Services.AddScoped<ICloneReportService, CloneReportService>();
 builder.Services.AddScoped<IAgentIdService, AgentIdService>();
 builder.Services.AddScoped<ICaseVendorService, CaseVendorService>();

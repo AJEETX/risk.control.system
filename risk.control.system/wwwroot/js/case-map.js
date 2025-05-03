@@ -2,8 +2,7 @@
     document.querySelectorAll('.map-image').forEach(function (img) {
         img.addEventListener('click', function () {
             const faceId = this.dataset.faceid;
-            const locationId = this.dataset.locationid;
-            const claimId = this.dataset.caseid;
+            const caseId = $('#caseId').val();
             const source = this.dataset.source;
 
             const modalElement = document.getElementById('mapModal');
@@ -26,9 +25,12 @@
             let apiUrl = '';
 
             if (source === 'agent') {
-                apiUrl = `/api/CaseInvestigationDetails/GetAgentDetail?claimid=${claimId}&faceId=${faceId}&locationId=${locationId}`;
+                apiUrl = `/api/CaseInvestigationDetails/GetAgentDetail?caseId=${caseId}&faceId=${faceId}`;
             } else if (source === 'document') {
-                apiUrl = `/api/CaseInvestigationDetails/GetDocumentDetail?claimid=${claimId}&docId=${faceId}`;
+                apiUrl = `/api/CaseInvestigationDetails/GetDocumentDetail?caseId=${caseId}&docId=${faceId}`;
+            }
+            else if (source === 'face') {
+                apiUrl = `/api/CaseInvestigationDetails/GetFaceDetail?caseId=${caseId}&faceId=${faceId}`;
             } else {
                 alert("Invalid data source.");
                 return;

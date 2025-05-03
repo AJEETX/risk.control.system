@@ -38,6 +38,7 @@
 
 $(document).ready(function () {
     var caseId = $('#caseId').val();
+    $('#qCaseId').val(caseId);
     
     var latitude = "";
     var longitude = "";
@@ -94,7 +95,7 @@ $(document).ready(function () {
         formData.append("isAgent", isAgent);
 
         // Get anti-forgery token
-        var token = $('input[name="__RequestVerificationToken"]').val();
+        var token = $('input[name="icheckifyAntiforgery"]').val();
         formData.append("__RequestVerificationToken", token);
         // Show uploading indicator
         statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
@@ -159,7 +160,7 @@ $(document).ready(function () {
         formData.append("reportName", reportName);
         formData.append("locationName", locationName);
         // Get anti-forgery token
-        var token = $('input[name="__RequestVerificationToken"]').val();
+        var token = $('input[name="icheckifyAntiforgery"]').val();
         formData.append("__RequestVerificationToken", token);
         statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
         button.prop("disabled", true);

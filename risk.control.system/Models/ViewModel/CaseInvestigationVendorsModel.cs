@@ -3,7 +3,7 @@ namespace risk.control.system.Models.ViewModel
 {
     public class CaseInvestigationVendorsModel
     {
-        public QuestionFormViewModel QuestionFormViewModel { get; set; }
+        public QuestionFormViewModel? QuestionFormViewModel { get; set; }
         public InvestigationTask ClaimsInvestigation { get; set; }
         public BeneficiaryDetail Location { get; set; }
         public InvestigationReport InvestigationReport { get; set; }

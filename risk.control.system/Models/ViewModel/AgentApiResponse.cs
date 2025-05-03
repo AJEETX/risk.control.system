@@ -125,7 +125,6 @@ namespace risk.control.system.Models.ViewModel
         public string? ReportName { get; set; }
         
         public string? LocationLatLong { get; set; }
-        public string? Type { get; set; } = "0";
     }
 
     public class DocumentData

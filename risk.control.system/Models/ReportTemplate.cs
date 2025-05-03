@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Models
 {
     public class QuestionTemplate
     {
-        public int Id { get; set; }
         public string? QuestionText { get; set; }
         public string? QuestionType { get; set; } // "Text", "Radio", "Checkbox"
         public string? Options { get; set; } // comma-separated
@@ -44,7 +44,12 @@ namespace risk.control.system.Models
         public string? Status { get; set; }
         public string? AgentEmail { get; set; }
         public long? AgentIdReportId { get; set; }
-        public AgentIdReport? AgentIdReport { get; set; } = new AgentIdReport { Selected = true, ReportType = DigitalIdReportType.AGENT_FACE, ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO };
+        public AgentIdReport? AgentIdReport { get; set; } = new AgentIdReport 
+        { 
+            Selected = true, 
+            ReportType = DigitalIdReportType.AGENT_FACE,
+            ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()
+        };
 
         public List<DigitalIdReport>? FaceIds { get; set; } = new();
         public List<DocumentIdReport>? DocumentIds { get; set; } = new();

@@ -1,23 +1,11 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using System.Net.Http;
 
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Controllers.Api;
 using risk.control.system.Data;
 using risk.control.system.AppConstant;
-using System.IO;
-using Amazon.Textract;
-using System.Xml;
-using System.Text.RegularExpressions;
 using risk.control.system.Controllers.Api.Claims;
-using static Google.Apis.Requests.BatchRequest;
-using System.Threading.Tasks;
-using Google.Api;
-using static risk.control.system.Helpers.Permissions;
-using System.Security.Claims;
 
 namespace risk.control.system.Services;
 
@@ -26,41 +14,35 @@ public interface IAgentIdService
     Task<AppiCheckifyResponse> GetAgentId(FaceData data);
     Task<AppiCheckifyResponse> GetFaceId(FaceData data);
     Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
+    Task Answers(string locationName, long caseId, List<QuestionTemplate> Questions);
 
 }
 
 public class AgentIdService : IAgentIdService
 {
-    private static string panNumber2Find = "Permanent Account Number";
-    private static Regex panRegex = new Regex(@"[A-Z]{5}\d{4}[A-Z]{1}");
     private readonly ApplicationDbContext _context;
+    private readonly IPanCardService panCardService;
     private readonly IGoogleApi googleApi;
-    private readonly IGoogleMaskHelper googleHelper;
     private readonly IHttpClientService httpClientService;
     private readonly ICustomApiCLient customApiCLient;
-    private readonly IClaimsService claimsService;
     private readonly IFaceMatchService faceMatchService;
-    private readonly IWebHostEnvironment webHostEnvironment;
 
     private static HttpClient httpClient = new();
 
     //test PAN FNLPM8635N
-    public AgentIdService(ApplicationDbContext context, IGoogleApi googleApi,
-        IGoogleMaskHelper googleHelper,
+    public AgentIdService(ApplicationDbContext context,
+        IPanCardService panCardService,
+        IGoogleApi googleApi,
         IHttpClientService httpClientService,
         ICustomApiCLient customApiCLient,
-        IClaimsService claimsService,
-        IFaceMatchService faceMatchService,
-        IWebHostEnvironment webHostEnvironment)
+        IFaceMatchService faceMatchService)
     {
         this._context = context;
+        this.panCardService = panCardService;
         this.googleApi = googleApi;
-        this.googleHelper = googleHelper;
         this.httpClientService = httpClientService;
         this.customApiCLient = customApiCLient;
-        this.claimsService = claimsService;
         this.faceMatchService = faceMatchService;
-        this.webHostEnvironment = webHostEnvironment;
     }
 
     public async Task<AppiCheckifyResponse> GetAgentId(FaceData data)
@@ -109,7 +91,6 @@ public class AgentIdService : IAgentIdService
                 .Include(l => l.Questions)
                 .FirstOrDefault(l => l.Id == location.Id);
 
-            var isAgentReportName = data.ReportName == CONSTANTS.LOCATIONS.AGENT_PHOTO;
 
             face = locationTemplate.AgentIdReport;
 
@@ -130,22 +111,7 @@ public class AgentIdService : IAgentIdService
             var longitude = face.IdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-            byte[]? registeredImage = null;
-            if (data.Type == "0")
-            {
-                registeredImage = agent.ProfilePicture;
-            }
-            else
-            {
-                if (claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
-                {
-                    registeredImage = claim.BeneficiaryDetail.ProfilePicture;
-                }
-                else
-                {
-                    registeredImage = claim.CustomerDetail.ProfilePicture;
-                }
-            }
+            byte[]? registeredImage = agent.ProfilePicture;
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
@@ -167,7 +133,7 @@ public class AgentIdService : IAgentIdService
 
             var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, face.IdImage);
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-            var addressTask = httpClientService.GetRawAddress(latitude, longitude);
+            var addressTask = httpClientService.GetRawAddress(expectedLat, expectedLong);
             #endregion FACE IMAGE PROCESSING
 
             await Task.WhenAll(faceMatchTask, addressTask, weatherTask, mapTask);
@@ -283,6 +249,7 @@ public class AgentIdService : IAgentIdService
 
             face = locationTemplate.FaceIds.FirstOrDefault(c => c.ReportName == data.ReportName);
 
+            var hasCustomerVerification = face.ReportName == DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName();
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
@@ -301,20 +268,14 @@ public class AgentIdService : IAgentIdService
             var latLongString = latitude + "," + longitude;
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
             byte[]? registeredImage = null;
-            if (data.Type == "0")
+
+            if (!hasCustomerVerification)
             {
-                registeredImage = agent.ProfilePicture;
+                registeredImage = claim.BeneficiaryDetail.ProfilePicture;
             }
             else
             {
-                if (claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
-                {
-                    registeredImage = claim.BeneficiaryDetail.ProfilePicture;
-                }
-                else
-                {
-                    registeredImage = claim.CustomerDetail.ProfilePicture;
-                }
+                registeredImage = claim.CustomerDetail.ProfilePicture;
             }
 
             var expectedLat = string.Empty;
@@ -326,7 +287,6 @@ public class AgentIdService : IAgentIdService
             }
             else
             {
-
                 expectedLat = claim.CustomerDetail.Latitude;
                 expectedLong = claim.CustomerDetail.Longitude;
             }
@@ -337,7 +297,7 @@ public class AgentIdService : IAgentIdService
 
             var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, face.IdImage);
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-            var addressTask = httpClientService.GetRawAddress(latitude, longitude);
+            var addressTask = httpClientService.GetRawAddress(expectedLat, expectedLong);
             #endregion FACE IMAGE PROCESSING
 
             await Task.WhenAll(faceMatchTask, addressTask, weatherTask, mapTask);
@@ -363,7 +323,7 @@ public class AgentIdService : IAgentIdService
 
             face.IdImageData = weatherCustomData;
             face.IdImage = compressImage;
-            face.DigitalIdImageMatchConfidence = confidence;
+            face.MatchConfidence = confidence;
             face.IdImageLocationAddress = address;
             face.ValidationExecuted = true;
             face.Similarity = similarity;
@@ -379,14 +339,14 @@ public class AgentIdService : IAgentIdService
                 LocationImage = Convert.ToBase64String(face.IdImage),
                 LocationLongLat = face.IdImageLongLat,
                 LocationTime = face?.IdImageLongLatTime,
-                FacePercent = face?.DigitalIdImageMatchConfidence
+                FacePercent = face?.MatchConfidence
             };
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
             face.IdImageData = "No Weather Data";
-            face.DigitalIdImageMatchConfidence = string.Empty;
+            face.MatchConfidence = string.Empty;
             face.IdImageLocationAddress = "No Address data";
             face.ValidationExecuted = true;
             face.IdImageValid = false;
@@ -400,7 +360,7 @@ public class AgentIdService : IAgentIdService
                 LocationImage = Convert.ToBase64String( face?.IdImage),
                 LocationLongLat = face?.IdImageLongLat,
                 LocationTime = face?.IdImageLongLatTime,
-                FacePercent = face?.DigitalIdImageMatchConfidence
+                FacePercent = face?.MatchConfidence
             };
         }
     }
@@ -483,10 +443,6 @@ public class AgentIdService : IAgentIdService
             }
             var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
-            #region PAN IMAGE PROCESSING
-
-            //=================GOOGLE VISION API =========================
-
             var googleDetecTask = googleApi.DetectTextAsync(doc.IdImage);
 
             addressTask = httpClientService.GetRawAddress(latitude, longitude);
@@ -504,61 +460,21 @@ public class AgentIdService : IAgentIdService
             var imageReadOnly = await googleDetecTask;
             if (imageReadOnly != null && imageReadOnly.Count > 0)
             {
-                var allPanText = imageReadOnly.FirstOrDefault().Description;
-                var panTextPre = allPanText.IndexOf(panNumber2Find);
-                var panNumber = allPanText.Substring(panTextPre + panNumber2Find.Length + 1, 10);
-
-
-                var ocrImaged = googleHelper.MaskPanTextInImage(doc.IdImage, imageReadOnly, panNumber2Find);
-                var docyTypePan = allPanText.IndexOf(panNumber2Find) > 0 && allPanText.Length > allPanText.IndexOf(panNumber2Find) ? "PAN" : "UNKNOWN";
-                var maskedImage = new FaceImageDetail
+                //PAN
+                if(doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
                 {
-                    DocType = docyTypePan,
-                    DocumentId = panNumber,
-                    MaskedImage = Convert.ToBase64String(ocrImaged),
-                    OcrData = allPanText
-                };
-                try
-                {
-                    #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
-                    if (company.VerifyPan)
-                    {
-                        var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId, company.PanIdfyUrl, company.PanAPIKey, company.PanAPIHost);
-                        if (panResponse != null && panResponse.valid)
-                        {
-                            var panMatch = panRegex.Match(maskedImage.DocumentId);
-                            doc.IdImageValid = panMatch.Success && panResponse.valid ? true : false;
-                        }
-                    }
-                    else
-                    {
-                        var panMatch = panRegex.Match(maskedImage.DocumentId);
-                        doc.IdImageValid = panMatch.Success ? true : false;
-                    }
-
-                    #endregion PAN IMAGE PROCESSING
-
-                    var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                    var savedMaskedImage = CompressImage.ProcessCompress(image);
-                    doc.IdImage = savedMaskedImage;
-                    doc.IdImageData = maskedImage.DocType + " data: ";
-
-                    if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
-                    {
-                        doc.IdImageData = maskedImage.DocType + " data:. \r\n " +
-                            "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
-                    }
+                    await panCardService.Process(doc.IdImage, imageReadOnly, company, doc);
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine(ex.StackTrace);
-                    var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                    doc.IdImage = CompressImage.ProcessCompress(image);
+                    doc.IdImage = CompressImage.ProcessCompress(doc.IdImage);
+                    doc.IdImageValid = true;
                     doc.IdImageLongLatTime = DateTime.Now;
-                    doc.IdImageData = "no data: ";
+                    var allText = imageReadOnly.FirstOrDefault().Description;
+                    doc.IdImageData = allText;
                 }
+
             }
-            //=================END GOOGLE VISION  API =========================
 
             else
             {
@@ -568,11 +484,11 @@ public class AgentIdService : IAgentIdService
                 doc.IdImageData = "no data: ";
             }
 
-            #endregion PAN IMAGE PROCESSING
             var rawAddress = await addressTask;
             doc.IdImageLocationAddress = rawAddress;
             doc.ValidationExecuted = true;
 
+            _context.DocumentIdReport.Update(doc);
             _context.Investigations.Update(claim);
 
             var rows = await _context.SaveChangesAsync();
@@ -609,5 +525,38 @@ public class AgentIdService : IAgentIdService
                 Valid = doc?.IdImageValid
             };
         }
+    }
+
+    public async Task Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
+    {
+        var claim = await _context.Investigations
+                .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.ReportTemplate)
+                .ThenInclude(c => c.LocationTemplate)
+                .FirstOrDefaultAsync(c => c.Id == caseId);
+
+        var location = claim.InvestigationReport.ReportTemplate.LocationTemplate.FirstOrDefault(l => l.LocationName == locationName);
+
+        var locationTemplate = _context.LocationTemplate
+            .Include(l => l.Questions)
+            .FirstOrDefault(l => l.Id == location.Id);
+
+        locationTemplate.Questions.RemoveAll(q => true);
+        foreach (var q in Questions)
+        {
+            locationTemplate.Questions.Add(new Question
+            {
+                QuestionText = q.QuestionText,
+                QuestionType = q.QuestionType,
+                Options = q.Options,
+                AnswerText = q.Answer,
+                Updated = DateTime.Now,
+            });
+            //var locaQuestion = locationTemplate.Questions.FirstOrDefault(l => l.Id == q.Id);
+            //locaQuestion.AnswerText = q.Answer;
+            //locaQuestion.Updated = DateTime.Now;
+        }
+        _context.LocationTemplate.Update(locationTemplate);
+        await _context.SaveChangesAsync();
     }
 }

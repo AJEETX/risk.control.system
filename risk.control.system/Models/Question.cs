@@ -13,8 +13,7 @@ namespace risk.control.system.Models
         public string QuestionText { get; set; }
         public string? AnswerText { get; set; }
 
-        [Required]
-        public string QuestionType { get; set; } // Stores type: "text", "dropdown", "checkbox", "date", "file", "radio"
+        public string? QuestionType { get; set; } // Stores type: "text", "dropdown", "checkbox", "date", "file", "radio"
 
         public string? Options { get; set; } // Stores comma-separated values for dropdown/radio
 
@@ -22,8 +21,6 @@ namespace risk.control.system.Models
 
         public long? ReportTemplateId { get; set; }
         public ReportTemplate? ReportTemplate { get; set; }
-        public long? CaseQuestionnaireId { get; set; }
-        public CaseQuestionnaire? CaseQuestionnaire { get; set; }
     }
     public class QuestionFormViewModel
     {

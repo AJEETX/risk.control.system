@@ -36,17 +36,17 @@
 
         public class LOCATIONS
         {
-            public const string AGENT_PHOTO = "AGENT_PHOTO";
+            //public const string AGENT_PHOTO = "AGENT_PHOTO";
             public const string VERIFIER_ADDRESS = "VERIFIER_ADDRESS";
-            public const string VERIFIER_PHOTO = "VERIFIER";
+            //public const string VERIFIER_PHOTO = "VERIFIER";
 
-            public const string CUSTOMER_ADDRESS = "CUSTOMER_ADDRESS";
-            public const string CUSTOMER_PHOTO = "CUSTOMER";
-            public const string AGENT_CUSTOMER_PHOTO = "AGENT_CUSTOMER";
+            //public const string CUSTOMER_ADDRESS = "CUSTOMER_ADDRESS";
+            //public const string CUSTOMER_PHOTO = "CUSTOMER";
+            //public const string AGENT_CUSTOMER_PHOTO = "AGENT_CUSTOMER";
             
-            public const string BENEFICIARY_ADDRESS = "BENEFICIARY_ADDRESS";
-            public const string BENEFICIARY_PHOTO = "BENEFICIARY";
-            public const string AGENT_BENEFICIARY_PHOTO = "AGENT_BENEFICIARY";
+            //public const string BENEFICIARY_ADDRESS = "BENEFICIARY_ADDRESS";
+            //public const string BENEFICIARY_PHOTO = "BENEFICIARY";
+            //public const string AGENT_BENEFICIARY_PHOTO = "AGENT_BENEFICIARY";
             
             public const string HOSPITAL_ADDRESS = "HOSPITAL";
             public const string CEMETERY_ADDRESS = "CEMETERY";

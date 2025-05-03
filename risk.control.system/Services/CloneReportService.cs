@@ -119,7 +119,6 @@ namespace risk.control.system.Services
 
                 Questions = loc.Questions?.Select(q => new 
                 {
-                    Id = q.Id,
                     QuestionText = q.QuestionText,
                     QuestionType = q.QuestionType,
                     Options = q.Options,

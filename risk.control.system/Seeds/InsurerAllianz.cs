@@ -152,7 +152,7 @@ namespace risk.control.system.Seeds
                         LocationName = CONSTANTS.LOCATIONS.VERIFIER_ADDRESS,
                         AgentIdReport = new AgentIdReport
                         {
-                            ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO,                                          // You can set other properties of Agent here if needed
+                            ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName(),                                          // You can set other properties of Agent here if needed
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                         },
                         FaceIds = new List<DigitalIdReport>
@@ -160,28 +160,16 @@ namespace risk.control.system.Seeds
                             new DigitalIdReport
                             {
                                 Selected = true,
-                                ReportName = CONSTANTS.LOCATIONS.CUSTOMER_PHOTO,
+                                ReportName = DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName(),
                                 Has2Face = false,
-                                ReportType = DigitalIdReportType.SINGLE_FACE
-                            },
-                            new DigitalIdReport
-                            {
-                                ReportName = CONSTANTS.LOCATIONS.AGENT_CUSTOMER_PHOTO,
-                                Has2Face = true,
-                                ReportType = DigitalIdReportType.DUAL_FACE
+                                ReportType = DigitalIdReportType.CUSTOMER_FACE
                             },
                             new DigitalIdReport
                             {
                                 Selected = true,
-                                ReportName = CONSTANTS.LOCATIONS.BENEFICIARY_PHOTO,
+                                ReportName = DigitalIdReportType.BENEFICIARY_FACE.GetEnumDisplayName(),
                                 Has2Face = false,
-                                ReportType = DigitalIdReportType.SINGLE_FACE
-                            },
-                            new DigitalIdReport
-                            {
-                                ReportName = CONSTANTS.LOCATIONS.AGENT_BENEFICIARY_PHOTO,
-                                Has2Face = true,
-                                ReportType = DigitalIdReportType.DUAL_FACE
+                                ReportType = DigitalIdReportType.BENEFICIARY_FACE
                             }
                         },
                         DocumentIds = new List<DocumentIdReport>
@@ -288,20 +276,20 @@ namespace risk.control.system.Seeds
                         AgentIdReport = new AgentIdReport
                         {
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
-                            ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                              // You can set other properties of Agent here if needed
+                            ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
                         },
                         FaceIds = new List<DigitalIdReport>
                         {
                             new DigitalIdReport
                             {
-                                ReportName = CONSTANTS.LOCATIONS.CUSTOMER_PHOTO,
-                                ReportType = DigitalIdReportType.SINGLE_FACE
+                                ReportName = DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName(),
+                                ReportType = DigitalIdReportType.CUSTOMER_FACE
                             },
                             new DigitalIdReport
                             {
                                 Selected = true,
-                                ReportName = CONSTANTS.LOCATIONS.BENEFICIARY_PHOTO,
-                                ReportType = DigitalIdReportType.SINGLE_FACE
+                                ReportName = DigitalIdReportType.BENEFICIARY_FACE.GetEnumDisplayName(),
+                                ReportType = DigitalIdReportType.BENEFICIARY_FACE
                             }
                         },
                         DocumentIds = new List<DocumentIdReport>
@@ -354,7 +342,7 @@ namespace risk.control.system.Seeds
                         AgentIdReport = new AgentIdReport
                         {
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
-                            ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                            
+                            ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                            // You can set other properties of Agent here if needed
                         },
                         DocumentIds = new List<DocumentIdReport>
                         {
@@ -400,7 +388,7 @@ namespace risk.control.system.Seeds
                         AgentIdReport = new AgentIdReport
                         {
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
-                            ReportName = CONSTANTS.LOCATIONS.AGENT_PHOTO                                            // You can set other properties of Agent here if needed
+                            ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                            // You can set other properties of Agent here if needed
                         },
                         DocumentIds = new List<DocumentIdReport>
                         {
