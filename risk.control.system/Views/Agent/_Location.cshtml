@@ -5,6 +5,7 @@
 <input type="hidden" name="caseId" value="@Model.CaseId" />
 @foreach (var location in Model.LocationTemplate)
 {
+	location.CaseId = Model.CaseId;
 	<div class="col-12 p-4 mb-5 border rounded shadow-sm bg-light location-container">
 		@Html.AntiForgeryToken()
 

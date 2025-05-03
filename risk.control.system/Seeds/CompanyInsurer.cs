@@ -23,9 +23,9 @@ namespace risk.control.system.Seeds
         {
             var allianz = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "allianz.com", NAME = "Allianz", PHOTO = "/img/allianz.png" };
             var insurer = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "insurer.com", NAME = "Insurer", PHOTO = "/img/insurer.jpg" };
-#if !DEBUG
+//#if !DEBUG
             COUNTRY = CONSTANTS.COUNTRY_IN;
-#endif
+//#endif
             var canara = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "canara.com", NAME = "Allianz", PHOTO = "/img/chl.jpg" };
             
             var companies = new List<SeedInput> {
@@ -33,9 +33,9 @@ namespace risk.control.system.Seeds
                 //,
                 insurer
                 ,
-#if !DEBUG
+//#if !DEBUG
                 canara
-#endif
+//#endif
 
             };
 

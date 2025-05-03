@@ -38,7 +38,6 @@
 
 $(document).ready(function () {
     var caseId = $('#caseId').val();
-    $('#qCaseId').val(caseId);
     
     var latitude = "";
     var longitude = "";

@@ -45,6 +45,10 @@
             targets: 8                      // Index of the column to style
             },
             {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
+            },
+            {
                 'targets': 16, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],

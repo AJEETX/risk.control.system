@@ -521,17 +521,18 @@ namespace risk.control.system.Services
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            var count = claims.Count(a =>
+            var count = claims.Count(a => !a.Deleted &&
                 a.ClientCompanyId == companyUser.ClientCompanyId &&
                      a.CreatedUser == companyUser.Email &&
-                     a.Status != finished &&
-                         a.SubStatus == created ||
-                         a.SubStatus == drafted ||
-                         a.SubStatus == edited ||
-                         a.SubStatus == uploaded ||
-                         a.SubStatus == withdrawnByCompany ||
-                         a.SubStatus == withdrawnByAgency ||
-                        a.SubStatus == assigned);
+                         (
+                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED ||
+                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR ||
+                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR ||
+                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
+                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
+                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY ||
+                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
+                    ));
             return count;
         }
 

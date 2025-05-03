@@ -37,7 +37,7 @@
 						}
 						else
 						{
-							<img src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
+							<img id="face-img-@face.Id" src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
 						}
 					</td>
 					<td>
@@ -57,24 +57,12 @@
 						}
 					</td>
 					<td>
-						@if (face.ValidationExecuted)
-						{
-							@face.IdImageLocationAddress
-						}
-						else
-						{
-							<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
-						}
+						@face.IdImageLocationAddress
+
 					</td>
 					<td>
-						@if (face.ValidationExecuted)
-						{
-							@face.IdImageData
-						}
-						else
-						{
-							<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
-						}
+						@face.IdImageData
+
 					</td>
 					<td>
 						@if (face.ValidationExecuted)

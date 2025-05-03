@@ -343,7 +343,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
-                if (claim.InvestigationReport is not null && agentReport?.IdImageLongLat is not null)
+                if (agentReport is not null)
                 {
                     var longLat = agentReport.IdImageLongLat.IndexOf("/");
                     var latitude = agentReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
@@ -396,7 +396,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
-                if (claim.InvestigationReport is not null && faceReport?.IdImageLongLat is not null)
+                if (faceReport is not null)
                 {
                     var longLat = faceReport.IdImageLongLat.IndexOf("/");
                     var latitude = faceReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
@@ -449,7 +449,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
-                if (claim.InvestigationReport is not null && docReport?.IdImageLongLat is not null)
+                if (docReport is not null)
                 {
                     var longLat = docReport.IdImageLongLat.IndexOf("/");
                     var latitude = docReport?.IdImageLongLat.Substring(0, longLat)?.Trim();

@@ -42,7 +42,7 @@
 				}
 				else
 				{
-					<img src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
+					<img id="face-img-@agent.Id" src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
 				}
 
 			</td>
@@ -62,35 +62,23 @@
 				}
 			</td>
 			<td>
-				@if (agent.ValidationExecuted)
-				{
-					@agent.IdImageLocationAddress
-				}
-				else
-				{
-					<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
-				}
+				@agent.IdImageLocationAddress
+
 			</td>
 			<td>
-				@if (agent.ValidationExecuted)
-				{
-					@agent.IdImageData
-				}
-				else
-				{
-					<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
-				}
+				@agent.IdImageData
+
 			</td>
 			<td>
 				@if (agent.ValidationExecuted)
 				{
 					@if (agent.IdImageValid.GetValueOrDefault())
 					{
-						<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+						<i class='fas fa-check-circle i-green'></i>
 					}
 					else
 					{
-						<i class='fas fa-check-circle i-green'></i>
+						<i class='fa fa-times i-orangered' aria-hidden='true'></i>
 					}
 				}
 				else

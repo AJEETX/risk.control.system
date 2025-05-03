@@ -55,6 +55,8 @@ namespace risk.control.system.Models
         public List<DocumentIdReport>? DocumentIds { get; set; } = new();
         public List<Question>? Questions { get; set; } = new List<Question>();
 
+        [NotMapped]
+        public long CaseId { get; set; }
 
         [NotMapped]
         public string LocationStatus = "border-secondary";

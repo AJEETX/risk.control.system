@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitLocationAnswers(string locationName, long caseId, List<QuestionTemplate> Questions)
+        public async Task<IActionResult> SubmitLocationAnswers(string locationName, long CaseId, List<QuestionTemplate> Questions)
         {
             foreach (var question in Questions)
             {
@@ -151,9 +151,9 @@ namespace risk.control.system.Controllers
                 // e.g. return View(model);
                 return BadRequest("Some answers are missing.");
             }
-            await agentIdService.Answers(locationName, caseId, Questions);
+            await agentIdService.Answers(locationName, CaseId, Questions);
 
-            return Redirect("/Agent/GetInvestigate?selectedcase=" + caseId);
+            return Redirect("/Agent/GetInvestigate?selectedcase=" + CaseId);
         }
 
     }

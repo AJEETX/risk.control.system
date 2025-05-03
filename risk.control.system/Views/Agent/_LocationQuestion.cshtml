@@ -10,7 +10,7 @@
 		@Html.AntiForgeryToken()
 		<input type="hidden" name="LocationId" value="@location.Id" />
 		<input type="hidden" name="LocationName" value="@location.LocationName" />
-		<input type="hidden" name="caseId" id="qCaseId"/>
+		<input type="hidden" name="CaseId" value="@location.CaseId"/>
 
 		<table class="table table-bordered table-striped">
 			<thead class="table-light">
@@ -29,7 +29,7 @@
 							@question.QuestionText
 							@if (question.IsRequired)
 							{
-								<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+								<span class="required-asterisk" title="Required field">*</span>
 							}
 
 							@* Hidden fields to pass extra data back *@

@@ -58,24 +58,11 @@
 						}
 					</td>
 					<td>
-						@if (doc.ValidationExecuted)
-						{
-							@doc.IdImageLocationAddress
-						}
-						else
-						{
-							<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
-						}
+						@doc.IdImageLocationAddress
+
 					</td>
 					<td>
-						@if (doc.ValidationExecuted)
-						{
-							@doc.IdImageData
-						}
-						else
-						{
-							<img src="~/img/no-map-image.jpeg" class="thumbnail profile-image doc-profile-image" />
-						}
+						@doc.IdImageData
 					</td>
 					<td>
 						@if (doc.ValidationExecuted)

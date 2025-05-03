@@ -36,10 +36,10 @@ namespace risk.control.system.Seeds
             var greates = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greates.com", NAME = "Greates", PHOTO = "/img/company.png" };
 
 
-#if !DEBUG
+//#if !DEBUG
                         COUNTRY = CONSTANTS.COUNTRY_IN;
 
-#endif
+//#endif
             var proper = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "proper.com", NAME = "Proper", PHOTO = "/img/proper.png" };
             var honest = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "honest.com", NAME = "Honest", PHOTO = "/img/honest.png" };
             var greater = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greater.com", NAME = "Greater", PHOTO = "/img/company.png" };
@@ -51,12 +51,12 @@ namespace risk.control.system.Seeds
 
             var agencies = new List<SeedInput> { 
                 checker,
-#if !DEBUG
+//#if !DEBUG
 
                 verify, investigate, investigator, greatez
                 , proper, honest, greater, investigatoz
                 , nicer, demoz, investigatos, greates
-#endif
+//#endif
             };
             var vendors = new List<Vendor> { };
 
