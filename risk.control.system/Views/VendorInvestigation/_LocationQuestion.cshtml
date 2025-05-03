@@ -1,0 +1,70 @@
+﻿@using risk.control.system.Helpers;
+@model LocationTemplate
+@{
+	var location = Model;
+}
+
+<!-- Questions Table -->
+@if (location.Questions?.Any() == true)
+{
+	<input type="hidden" name="LocationId" value="@location.Id" />
+	<input type="hidden" name="caseId" value="@Model.CaseId" />
+
+	<table class="table table-bordered table-striped">
+		<thead class="table-light">
+			<tr>
+				<th>Question</th>
+				<th>Answer</th>
+			</tr>
+		</thead>
+		<tbody>
+			@for (int i = 0; i < location.Questions.Count; i++)
+			{
+				var question = location.Questions[i];
+				var required = question.IsRequired ? "required" : "";
+				<tr>
+					<td>
+						@question.QuestionText
+						@if (question.IsRequired)
+						{
+							<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+						}
+
+						@* Hidden fields to pass extra data back *@
+						<input type="hidden" name="Questions[@i].Id" value="@question.Id" />
+						<input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
+						<input type="hidden" name="Questions[@i].QuestionType" value="@question.QuestionType" />
+						<input type="hidden" name="Questions[@i].Options" value="@question.Options" />
+						<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
+					</td>
+					<td>
+						@if (question.QuestionType == "text" || question.QuestionType == "date")
+						{
+							<span class="form-control-plaintext">@question.AnswerText</span>
+						}
+						else if (question.QuestionType == "radio" || question.QuestionType == "dropdown")
+						{
+							<span class="form-control-plaintext">@question.AnswerText</span>
+						}
+						else if (question.QuestionType == "checkbox")
+						{
+							var selectedOptions = question.AnswerText?.Split(',') ?? new string[] { };
+							<ul class="list-unstyled mb-0">
+								@foreach (var option in selectedOptions)
+								{
+									<li><i class="bi bi-check-circle-fill text-success"></i> @option</li>
+								}
+							</ul>
+						}
+						else
+						{
+							<span class="form-control-plaintext text-muted">N/A</span>
+						}
+					</td>
+
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+

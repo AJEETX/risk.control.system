@@ -196,7 +196,12 @@ namespace risk.control.system.Services
 
             claim.InvestigationReport.ReportTemplate = templates;
 
-            return (new CaseInvestigationVendorsModel { InvestigationReport = claim.InvestigationReport, Location = beneficiaryDetails, ClaimsInvestigation = claim });
+            return (new CaseInvestigationVendorsModel 
+            { 
+                InvestigationReport = claim.InvestigationReport, 
+                Location = beneficiaryDetails, 
+                ClaimsInvestigation = claim 
+            });
         }
     }
 }

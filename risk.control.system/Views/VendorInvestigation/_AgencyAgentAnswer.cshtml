@@ -5,9 +5,10 @@
     var questionTime = @Model.InvestigationReport.AgentRemarksUpdated != null ?
     @Model.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 }
-<div class="col-6 p-4 mb-5 border rounded shadow-sm bg-light location-container">
-<div class="card border-success direct-chat-warning">
-    <div class="card-header text-muted border-bottom-0">
+<div class="col-md-6 col-6 d-flex align-items-stretch flex-column">
+    <div class="card bg-light border-success">
+
+    <div class="card-header">
         <h3 class="card-title">
                 <i class="far fa-comment"></i> Agent remarks
             <span class="hover-text">

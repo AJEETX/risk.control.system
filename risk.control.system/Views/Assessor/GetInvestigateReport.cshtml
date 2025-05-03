@@ -1,292 +1,285 @@
 ﻿@model CaseInvestigationVendorsModel
 
 @{
-    ViewData["Title"] = "Report ";
-
+	ViewData["Title"] = "Report ";
+	var locations = Model.InvestigationReport.ReportTemplate.LocationTemplate;
 }
 
 <section class="content">
-    <form id="create-form" method="post" asp-controller="InvestigationPost" asp-action="ProcessCaseReport">
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
-        <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
-        <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-        <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
-        <input type="hidden" id="reportAiSummary" value="@Model.ReportAiSummary" />
-        <input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
-        <div id="article" class="card shadow-lg border-1 rounded-lg">
-            <div class="card-header bg-secondary text-white text-center">
-                <h3 class="card-title">
-                    <i class="fas fa-newspaper"></i> Report
-                    <span class="hover-text">
-                        <i class="fas fa-info-circle"></i>
-                        <span class="tooltip-text" id="information">
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Photo ID Image
-                            </li>
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> PAN card
-                            </li>
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Questionnaire
-                            </li>
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Questionnaire
-                            </li>
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Review <i class="far fa-comment"></i> remark
-                            </li>
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Complete <i class='fas fa-check-circle'></i> remark
-                            </li>
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Select Submit type <input type="radio">
-                            </li>
-                            <li>
-                                <i class='far fa-hand-point-right'></i> <button class='btn btn-warning btn-xs'><i class="fa fa-edit"></i>  ENQUIRE</b> </button>
-                            </li>
-                            <li>
-                                <i class='far fa-thumbs-up'></i> <button class='btn btn-info btn-xs'><i class='fas fa-glasses'></i> <b>SUBMIT</b> </button>
-                            </li>
+	<form id="create-form" method="post" asp-controller="InvestigationPost" asp-action="ProcessCaseReport">
+		<input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
+		<input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
+		<input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+		<input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+		<input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+		<input type="hidden" id="reportAiSummary" value="@Model.ReportAiSummary" />
+		<input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
+		<div id="article" class="card shadow-lg border-1 rounded-lg">
+			<div class="card-header bg-secondary text-white text-center">
+				<h3 class="card-title">
+					<i class="fas fa-newspaper"></i> Report
+					<span class="hover-text">
+						<i class="fas fa-info-circle"></i>
+						<span class="tooltip-text" id="information">
+							<li>
+								<i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Photo ID Image
+							</li>
+							<li>
+								<i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> PAN card
+							</li>
+							<li>
+								<i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Questionnaire
+							</li>
+							<li>
+								<i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Questionnaire
+							</li>
+							<li>
+								<i class='far fa-hand-point-right'></i> Review <i class="far fa-comment"></i> remark
+							</li>
+							<li>
+								<i class='far fa-hand-point-right'></i> Complete <i class='fas fa-check-circle'></i> remark
+							</li>
+							<li>
+								<i class='far fa-hand-point-right'></i> Select Submit type <input type="radio">
+							</li>
+							<li>
+								<i class='far fa-hand-point-right'></i> <button class='btn btn-warning btn-xs'><i class="fa fa-edit"></i>  ENQUIRE</b> </button>
+							</li>
+							<li>
+								<i class='far fa-thumbs-up'></i> <button class='btn btn-info btn-xs'><i class='fas fa-glasses'></i> <b>SUBMIT</b> </button>
+							</li>
 
-                        </span>
-                    </span>
-                </h3>
-            </div>
-        </div>
-        <partial name="_PolicyDetails" model="@Model" />
+						</span>
+					</span>
+				</h3>
+			</div>
+		</div>
+		<partial name="_PolicyDetails" model="@Model" />
 
-            
-        <partial name="_AgencyReport" model="@Model" />
-        @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest != null)
-        {
-            var data = new CaseTransactionModel
-                {
-                    ClaimsInvestigation = Model.ClaimsInvestigation,
-                };
-            <partial name="_EnquiryReport" model="@data" />
-        }
 
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
-        @if (Model.ClaimsInvestigation.AiEnabled)
-        {
-            <partial name="_AgencyAiReport" model="@Model" />
-        }
+		<partial name="_AgencyReport" model="@Model" />
+		@if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest != null)
+		{
+			var data = new CaseTransactionModel
+				{
+					ClaimsInvestigation = Model.ClaimsInvestigation,
+				};
+			<partial name="_EnquiryReport" model="@data" />
+		}
 
-        <div class="card shadow-lg border-1 rounded-lg">
-            <div class="card-header bg-info text-white text-center">
-                <h3 class="card-title">
-                    <i class="fas fa-user-check"></i> Assessment
-                    <span class="hover-text">
-                        <i class="fas fa-info-circle"></i>
-                        <span class="tooltip-text" id="information">
-                            <li>
+		<div class="submit-progress hidden">
+			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+		</div>
+		@if (Model.ClaimsInvestigation.AiEnabled)
+		{
+			<partial name="_AgencyAiReport" model="@Model" />
+		}
 
-                                <i class='far fa-hand-point-right'></i> Report Summary  <i class="fas fa-newspaper"></i>
-                            </li>
-                            <li>
+		<div class="card shadow-lg border-1 rounded-lg">
+			<div class="card-header bg-info text-white text-center">
+				<h3 class="card-title">
+					<i class="fas fa-user-check"></i> Assessment
+					<span class="hover-text">
+						<i class="fas fa-info-circle"></i>
+						<span class="tooltip-text" id="information">
+							<li>
 
-                                <i class='far fa-hand-point-right'></i>  Submission type <i class="far fa-file-powerpoint"></i>
-                            </li>
-                        </span>
-                    </span>
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
+								<i class='far fa-hand-point-right'></i> Report Summary  <i class="fas fa-newspaper"></i>
+							</li>
+							<li>
 
-                    <div class="col-sm-6 d-flex align-items-stretch flex-column">
+								<i class='far fa-hand-point-right'></i>  Submission type <i class="far fa-file-powerpoint"></i>
+							</li>
+						</span>
+					</span>
+				</h3>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-sm-6 d-flex align-items-stretch flex-column">
+						<div class="card bg-light d-flex flex-fill">
+							<div class="card-footer text-muted border-bottom-0">
+								<i class="fas fa-newspaper"></i> <strong> Report Summary </strong>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-12">
+										@{
+											foreach (var location in locations)
+											{
+												<div class="card-header bg-light text-white d-flex align-items-center">
+													<h6 class="mb-0 flex-grow-1 @location.LocationStatus">
+														<i class="fas fa-map-marker-alt @location.LocationStatusButton"></i> @location.LocationName
+													</h6>
+												</div>
+												<div class="form-group">
+													<div class="form-check form-switch">
 
-                        <div class="card bg-light d-flex flex-fill">
-                            <div class="card-footer text-muted border-bottom-0">
-                                <i class="fas fa-newspaper"></i> <strong> Report Summary </strong>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <div class="form-check form-switch">
+														<label class="form-check-label" for="flexRadioDefault2">
+															@if (location.AgentIdReport.IdImageValid.GetValueOrDefault())
+															{
+																<i class='fas fa-check-circle i-green'></i>
+															}
+															else
+															{
+																<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+															}
+															<span class="process-case"> </span>
+															<i class="fas fa-portrait"></i> <b> @location.AgentEmail</b>
+														</label>
+													</div>
+												</div>
+												@foreach (var face in location.FaceIds.Where(f => f.Selected))
+												{
+													<div class="form-group">
+														<div class="form-check form-switch">
 
-                                                <label class="form-check-label" for="flexRadioDefault2">
-                                                    @if (@Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.Similarity <= 70)
-                                                    {
-                                                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class='fas fa-check-circle i-green'></i>
-                                                    }<span class="process-case"> </span>
-                                                    <i class="fas fa-portrait"></i> <b> Agent Id Match </b>
-                                                </label>
-                                            </div>
+															<label class="form-check-label" for="flexRadioDefault2">
+																@if (face.IdImageValid.GetValueOrDefault())
+																{
+																	<i class='fas fa-check-circle i-green'></i>
+																}
+																else
+																{
+																	<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+																}
+																<span class="process-case"> </span>
+																<i class="fas fa-portrait"></i> <b> @face.ReportName </b>
+															</label>
+														</div>
+													</div>
+												}
+												@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+												{
+													<div class="form-group">
+														<div class="form-check form-switch">
 
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="form-check form-switch">
+															<label class="form-check-label" for="flexRadioDefault2">
+																@if (doc.IdImageValid.GetValueOrDefault())
+																{
+																	<i class='fas fa-check-circle i-green'></i>
+																}
+																else
+																{
+																	<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+																}
+																<span class="process-case"> </span>
+																<i class="fas fa-files-o"></i> <b> @doc.ReportName </b>
+															</label>
+														</div>
+													</div>
+												}
+											}
+										}
 
-                                                <label class="form-check-label" for="flexRadioDefault2">
-                                                    @if (@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.Similarity <= 70)
-                                                    {
-                                                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class='fas fa-check-circle i-green'></i>
-                                                    }<span class="process-case"> </span>
-                                                    <i class="fas fa-portrait"></i> <b> Photo Match </b>
-                                                </label>
-                                            </div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="form-check form-switch">
+					<div class="col-sm-6 d-flex align-items-stretch flex-column">
+						<div class="card bg-light d-flex flex-fill">
+							<div class="card-footer text-muted border-bottom-0">
+								<i class="far fa-file-powerpoint"></i> <strong> Submission type </strong>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-12">
+										@if (!locations.All(l => l.AgentValidated && l.FaceIdsValidated && l.DocumentsValidated))
+										{
+											<div class="form-group">
+												<div class="form-check form-switch">
+													<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+													<label class="form-check-label" for="flexRadioDefault1">
+														<b>  REJECT </b> <span class="process-case"> System recommendation : <i class='fa fa-times i-orangered' aria-hidden='true'></i> </span>
+													</label>
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="form-check form-switch">
+													<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+													<label class="form-check-label" for="flexRadioDefault3">
+														<b> APPROVE </b>
+													</label>
+												</div>
+											</div>
+										}
+										else
+										{
+											<div class="form-group">
+												<div class="form-check form-switch">
+													<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+													<label class="form-check-label" for="flexRadioDefault1">
+														<b>  REJECT </b> <span class="process-case"> analyse the report and reject</span>
+													</label>
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="form-check form-switch">
+													<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
+													<label class="form-check-label" for="flexRadioDefault3">
+														<b> APPROVE </b> <span class="approve-case"> System recommendation : <i class='fas fa-check-circle i-green'></i> </span>
+													</label>
+												</div>
+											</div>
+										}
+									</div>
+								</div>
 
-                                                <label class="form-check-label" for="flexRadioDefault1">
-                                                    @if (@Model.ClaimsInvestigation.InvestigationReport.PanIdReport?.IdImageValid != null && @Model.ClaimsInvestigation.InvestigationReport.PanIdReport.IdImageValid.Value)
-                                                    {
-                                                        <i class='fas fa-check-circle  i-green'></i>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
-                                                    } <span class="process-case"></span>
-                                                    <i class="far fa-image"></i>  <b>  PAN Card Valid </b>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <div class="form-check form-switch">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-sm-12">
+											<div class="form-group">
+												<span class="input-group-label"> Remarks :</span>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<span class="input-group-text" asp-for="ClaimsInvestigation.InvestigationReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+													</div>
+													<textarea data-toggle="tooltip" title="Enter remarks" required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" placeholder="enter remarks to submit"></textarea>
 
-                                                <label class="form-check-label" for="flexRadioDefault3">
-                                                    <i class='fas fa-check-circle  i-green'></i> <span class="process-case"> </span>
-                                                    <i class="far fa-comment"></i>  <b> Questionaire info </b>
-                                                </label>
+													<span asp-validation-for="ClaimsInvestigation.InvestigationReport.SupervisorRemarks" class="text-danger"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="form-check form-switch">
-                                                <label class="form-check-label" for="flexRadioDefault3">
-                                                    <i class='fas fa-check-circle  i-green'></i> <span class="process-case"></span>
-                                                    <i class="fas fa-comment"></i>  <b> Supervisor remarks </b>
-                                                </label>
-                                            </div>
-                                        </div>
+			<div class="card-footer">
+				<div class="row  float-right">
+					<div class="col-md-12">
+						<a id="back" asp-controller="Assessor" class="btn btn-outline-secondary" asp-action="Assessor">
+							<i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+						</a>
+						<a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
+						   asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-warning">
+							<i class="fa fa-edit"></i>  ENQUIRE
+						</a>
+						<button id="approve-case" type="submit" class="btn btn-info">
+							<i class="fas fa-glasses" aria-hidden="true"></i> SUBMIT
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-sm-6 d-flex align-items-stretch flex-column">
-                        <div class="card bg-light d-flex flex-fill">
-                            <div class="card-footer text-muted border-bottom-0">
-                                <i class="far fa-file-powerpoint"></i> <strong> Submission type </strong>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        @if (@Model.ClaimsInvestigation.InvestigationReport?.DigitalIdReport?.Similarity < 70 ||
-                                        @Model.ClaimsInvestigation.InvestigationReport?.AgentIdReport?.Similarity < 70 ||
-                                        @Model.ClaimsInvestigation.InvestigationReport.PanIdReport?.IdImageValid == null ||
-                                        !@Model.ClaimsInvestigation.InvestigationReport.PanIdReport.IdImageValid.Value)
-                                        {
-                                            <div class="form-group">
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
-                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                        <b>  REJECT </b> <span class="process-case"> System recommendation : <i class='fa fa-times i-orangered' aria-hidden='true'></i> </span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
-                                                    <label class="form-check-label" for="flexRadioDefault3">
-                                                        <b> APPROVE </b>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="form-group">
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                        <b>  REJECT </b> <span class="process-case"> analyse the report and reject</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
-                                                    <label class="form-check-label" for="flexRadioDefault3">
-                                                        <b> APPROVE </b> <span class="approve-case"> System recommendation : <i class='fas fa-check-circle i-green'></i> </span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <span class="input-group-label"> Remarks :</span>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text" asp-for="ClaimsInvestigation.InvestigationReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                                    </div>
-                                                    <input data-toggle="tooltip" title="Enter remarks" required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required placeholder="enter remarks to submit" />
-
-                                                    <span asp-validation-for="ClaimsInvestigation.InvestigationReport.SupervisorRemarks" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-footer">
-                <div class="row  float-right">
-                    <div class="col-md-12">
-                        <a id="back" asp-controller="Assessor" class="btn btn-outline-secondary" asp-action="Assessor">
-                            <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
-                        </a>
-                        <a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
-                           asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-warning">
-                            <i class="fa fa-edit"></i>  ENQUIRE
-                        </a>
-                        <button id="approve-case" type="submit" class="btn btn-info">
-                            <i class="fas fa-glasses" aria-hidden="true"></i> SUBMIT
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </form>
+	</form>
 </section>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script src="~/js/common/claim-details.js"></script>
-    <script src="~/js/case-map.js"></script>
-    <script>
-        initReportMap();
-    </script>
-    <script src="~/js/assessor/get-report.js"></script>
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~/js/common/claim-details.js"></script>
+	<script src="~/js/case-map.js"></script>
+	<script>
+		initReportMap();
+	</script>
+	<script src="~/js/assessor/get-report.js"></script>
 
 }

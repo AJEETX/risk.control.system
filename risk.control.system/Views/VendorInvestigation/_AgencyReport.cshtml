@@ -32,23 +32,20 @@
             </div>
             
             <div class="card-body">
-
                 <div class="row">
-                    <div class="col-md-4">
-                        <partial name="_AgencyAgentReport" model="@Model" />
-                        <partial name="_AgencyDigitalReport" model="@Model" />
 
-                        <partial name="_AgencyDocumentReport" model="@Model" />
+                    @{
+                        var template = Model.InvestigationReport.ReportTemplate;
+                        template.CaseId = Model.ClaimsInvestigation.Id;
+                    }
+                    <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
+                    <partial name="_Location" model="@template" />
 
-                    </div>
-                    <div class="col-md-4">
-                        <partial name="_AgencyAgentAnswer" model="@Model" />
+                </div>
+                <div class="row">
+                    <partial name="_AgencyAgentAnswer" model="@Model" />
+                    <partial name="_AgencySupervisorAnswer" model="@Model" />
 
-                    </div>
-                    <div class="col-md-4">
-                        <partial name="_AgencySupervisorAnswer" model="@Model" />
-
-                    </div>
                 </div>
 
             </div>

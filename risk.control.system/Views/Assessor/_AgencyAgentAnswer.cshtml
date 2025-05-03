@@ -5,22 +5,19 @@
     @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 }
 
-
 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport.AgentRemarks))
 {
-
     <div class="col-12 col-md-6">
         <div class="card bg-light d-flex flex-fill border-success">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
-                    <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                    <i class="far fa-comment"></i> Remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
                             <span>
                                 <i class='far fa-hand-point-right'></i> Review <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                             </span>
-
                         </span>
                     </span>
                 </h3>
@@ -31,75 +28,37 @@
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
                 <div class="progress-bar progress-bar-green" role="progressbar">
-                    questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                    remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                 </div>
             </div>
             <div class="card-footer text-muted border-bottom-0">
                 <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.ClaimsInvestigation.InvestigationReport.AgentEmail </span>
             </div>
-            
             <div class="card-body text-muted text-sm">
                 <div class="row">
                     <!-- Questions Section -->
                     <div class="col-md-7">
-                        <h6 class="text-success mb-3">
-                            <span class="badge badge-light">
-                                <i class="fas fa-film"></i> Questions
-                            </span>
-                        </h6>
                         <ul class="fa-ul text-muted list-unstyled">
-                            @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
-                            {
-                                <li class="mb-2">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment text-primary"></i>
-                                    </span>
-                                    @question.QuestionText
-                                </li>
-                            }
-
                             <li class="mb-2">
                                 <span class="fa-li">
                                     <i class="far fa-comment text-info"></i>
                                 </span>
                                 Agent Remarks?
                             </li>
-
-
                         </ul>
-
                     </div>
-
                     <!-- Answers Section -->
                     <div class="col-md-5">
-                        <h6 class="text-success mb-3">
-                            <span class="badge badge-light">
-                                <i class="fas fa-film"></i> Answers
-                            </span>
-                        </h6>
                         <ul class="fa-ul list-unstyled">
-                            @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
-                            {
-                                <li class="mb-2">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment text-success"></i>
-                                    </span>
-                                    @question.AnswerText
-                                </li>
-                            }
-
                             <li class="mb-2">
                                 <span class="fa-li">
                                     <i class="far fa-comment text-secondary"></i>
                                 </span>
                                 @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
                             </li>
-
-
                         </ul>
                     </div>
                 </div>
-
                 @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
                 {
                     <div class="row">
