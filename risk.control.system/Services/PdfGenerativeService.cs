@@ -11,6 +11,7 @@ using static risk.control.system.Helpers.PdfReportBuilder;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
+using Hangfire;
 
 
 namespace risk.control.system.Services
@@ -61,6 +62,7 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
         }
 
+        [AutomaticRetry(Attempts = 0)]
         public async Task<string> Generate(long investigationTaskId, string userEmail = "assessor@insurer.com")
         {
             var investigation = context.Investigations
@@ -389,9 +391,7 @@ namespace risk.control.system.Services
 
             context.Investigations.Update(investigation);
             context.SaveChanges();
-            //using var stream = new MemoryStream();
-            //builder.Build(stream);
-            //return stream.ToArray();
+            
         }
 
         public static byte[] ConvertToPng(byte[] imageBytes)

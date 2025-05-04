@@ -36,18 +36,21 @@ namespace risk.control.system.Services
     public class ProcessCaseService : IProcessCaseService
     {
         private readonly ApplicationDbContext context;
+        private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly IMailService mailboxService;
         private readonly IPdfReportService reportService;
         private readonly ITimelineService timelineService;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public ProcessCaseService(ApplicationDbContext context,
+            IPdfGenerativeService pdfGenerativeService,
             IMailService mailboxService,
             IPdfReportService reportService,
             ITimelineService timelineService, 
             IBackgroundJobClient backgroundJobClient)
         {
             this.context = context;
+            this.pdfGenerativeService = pdfGenerativeService;
             this.mailboxService = mailboxService;
             this.reportService = reportService;
             this.timelineService = timelineService;
@@ -711,7 +714,7 @@ namespace risk.control.system.Services
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
-                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
+                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate( claimsInvestigationId, userEmail));
 
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
@@ -756,7 +759,7 @@ namespace risk.control.system.Services
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
-                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
+                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(claimsInvestigationId, userEmail));
 
                 return saveCount > 0 ? (claim.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }

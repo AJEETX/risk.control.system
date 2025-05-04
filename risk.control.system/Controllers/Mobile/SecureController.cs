@@ -262,29 +262,7 @@ namespace risk.control.system.Controllers.Mobile
             await SmsService.SendSmsAsync(mobile);
             return Ok(new { message = "Sms sent!!" });
         }
-        [AllowAnonymous]
-        [HttpGet("html2pdf")]
-        public async Task<IActionResult> ProcessCaseReport(long id=1, string currentUserEmail="assessor@insurer.com")
-        {
-            try
-            {
-                var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
-
-                var html = await viewRenderService.RenderViewToStringAsync("Investigation/_pdf", model);
-
-                SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-                SelectPdf.PdfDocument doc = converter.ConvertUrl("/pdf/ApprovedDetail?id="+id);
-                doc.Save("test.pdf");
-                doc.Close();
-
-                return Ok(new { message = "Report generated successfully", html });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing case report");
-                return StatusCode(500, "Internal server error");
-            }
-        }
+        
 
         [AllowAnonymous]
         [HttpGet("pdf")]
