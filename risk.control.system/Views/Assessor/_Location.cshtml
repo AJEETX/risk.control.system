@@ -78,12 +78,11 @@
 												<img id="face-img-@agent.Id"
 													 src="data:image/*;base64,@(Convert.ToBase64String(agent?.IdImage))"
 													 class="img-thumbnail rounded"
-													 style="width: 75px; height: 75px;"
 													 title="Click to view @location.AgentEmail photo" />
 											}
 											else
 											{
-												<img src="~/img/no-user.png" class="img-thumbnail" style="width: 75px;" />
+												<img src="~/img/no-user.png" class="img-thumbnail img-fluid"  />
 											}
 										</td>
 
@@ -101,7 +100,7 @@
 											}
 											else
 											{
-												<img src="~/img/no-map.jpeg" class="img-thumbnail" style="width: 75px;" />
+												<img src="~/img/no-map.jpeg" class="img-thumbnail img-fluid"  />
 											}
 										</td>
 
@@ -113,7 +112,7 @@
 											}
 											else
 											{
-												<img src="~/img/no-map-image.jpeg" class="img-thumbnail" style="width: 75px;" />
+												<img src="~/img/no-map-image.jpeg" class="img-thumbnail img-fluid" />
 											}
 										</td>
 

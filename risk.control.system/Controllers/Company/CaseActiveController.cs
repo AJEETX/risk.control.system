@@ -143,6 +143,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+        
     }
     
 }

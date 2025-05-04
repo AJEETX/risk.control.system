@@ -1,0 +1,13 @@
+﻿@model CaseTransactionModel
+
+@{
+    ViewData["Title"] = "Details";
+
+}
+<section class="content">
+
+    <partial name="Investigation/_ApprovedPolicyDetails" model="@Model" />
+    <partial name="Investigation/_AgencySubmittedReport" model="@Model" />
+
+</section>
+

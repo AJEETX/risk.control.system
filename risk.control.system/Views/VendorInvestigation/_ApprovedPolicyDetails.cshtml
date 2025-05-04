@@ -347,11 +347,11 @@
     <div class="card-body pb-0">
         <div class="row">
             @{
-                <partial name="_AgentSubmittedAgentdReport" model="@Model" />
-                <partial name="_AgentSubmittedDigitalIdReport" model="@Model" />
-                <partial name="_AgentSubmittedDocumentIdReport" model="@Model" />
+                var template = Model.ClaimsInvestigation.InvestigationReport.ReportTemplate;
+                template.CaseId = Model.ClaimsInvestigation.Id;
             }
-
+            <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
+            <partial name="_Location" model="@template" />
         </div>
         <div class="row">
             <div class="col-12 col-md-6">
@@ -364,12 +364,12 @@
                         <div class="card direct-chat-warning">
                             <div class="card-header text-muted border-bottom-0">
                                 <h3 class="card-title">
-                                    <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                                    <i class="far fa-comment"></i> remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                                     <span class="hover-text">
                                         <i class="fas fa-info-circle"></i>
                                         <span class="tooltip-text" id="information">
                                             <span>
-                                                <i class="far fa-comment"></i><b> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())</b>
+                                                <i class="far fa-comment"></i><b> remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())</b>
                                             </span>
 
                                         </span>
@@ -389,7 +389,7 @@
                             <div class="progress">
                                 <i class="far fa-bookmark bookmark-green"></i>
                                 <div class="progress-bar progress-bar-green" role="progressbar">
-                                    questionaaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                                    remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                                 </div>
                             </div>
                             <div class="card-body">
@@ -398,20 +398,9 @@
 
                                     <div class="col-7">
                                         <p class="text-muted text-sm">
-                                            <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
                                             <br />
                                             <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
-                                                {
-                                                    <li class="small">
-                                                        <span class="fa-li">
-                                                            <i class="far fa-comment"></i>
-                                                        </span>
-                                                        @question.QuestionText
-
-                                                    </li>
-                                                    <br />
-                                                }
+                                                
                                                 <li class="small">
                                                     Remarks?
                                                     <span class="fa-li">
@@ -425,20 +414,8 @@
 
                                     <div class="col-5">
                                         <p class="text-muted text-sm">
-                                            <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
                                             <br />
                                             <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                @foreach (var question in Model.ClaimsInvestigation.InvestigationReport.CaseQuestionnaire?.Questions)
-                                                {
-                                                    <li class="small">
-                                                        <span class="fa-li">
-                                                            <i class="far fa-comment"></i>
-                                                        </span>
-                                                        @question.AnswerText
-
-                                                    </li>
-                                                    <br />
-                                                }
                                                 <li class="small">
                                                     <span class="fa-li">
                                                         <i class="far fa-comment"></i>

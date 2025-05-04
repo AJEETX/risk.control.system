@@ -6,83 +6,86 @@
 
 @if (location.DocumentIds?.Any(d => d.Selected) == true)
 {
-	<table class="table table-bordered table-striped">
-		<thead class="table-light">
-			<tr>
-				<th>Document</th>
-				<th>
-					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
-				</th>
-				<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
-				<th>Verified Address</th>
-				<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
-				<th>Valid</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
-			{
+	<div class="table-responsive mb-4">
 
+		<table class="table table-bordered table-striped">
+			<thead class="table-light">
 				<tr>
-					<td>@doc.ReportName</td>
-					
-					<td>
-						@if (doc.ValidationExecuted)
-						{
-							<img id="doc-img-@doc.Id"
-								 src="data:image/*;base64,@(Convert.ToBase64String(doc?.IdImage))"
-								 class="thumbnail profile-image doc-profile-image preview-image"
-								 title="Click to view document" />
-						}
-						else
-						{
-							<img id="doc-img-@doc.Id" src="~/img/no-policy.jpg" class="thumbnail profile-image doc-profile-image" />
-						}
+					<th>Document</th>
+					<th>
+						<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
+					</th>
+					<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
+					<th>Verified Address</th>
+					<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
+					<th>Valid</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+				{
 
-					</td>
-					<td>
-						@if (doc.ValidationExecuted)
-						{
-							<img id="face-img-@doc.Id"
-								 src="@doc.IdImageLocationUrl"
-								 class="thumbnail profile-image doc-profile-image map-image"
-								 data-faceid="@doc.Id"
-								 data-locationid="@location.Id"
-								 data-source="document"
-								 title="Click to view map" />
-						}
-						else
-						{
-							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-						}
-					</td>
-					<td>
-						@doc.IdImageLocationAddress
+					<tr>
+						<td>@doc.ReportName</td>
 
-					</td>
-					<td>
-						@doc.IdImageData
-					</td>
-					<td>
-						@if (doc.ValidationExecuted)
-						{
-							@if (doc.IdImageValid.HasValue && doc.IdImageValid.Value)
+						<td>
+							@if (doc.ValidationExecuted)
 							{
-								<i class='fas fa-check-circle i-green'></i>
+								<img id="doc-img-@doc.Id"
+									 src="data:image/*;base64,@(Convert.ToBase64String(doc?.IdImage))"
+									 class="thumbnail profile-image doc-profile-image preview-image"
+									 title="Click to view document" />
 							}
 							else
 							{
-								<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+								<img id="doc-img-@doc.Id" src="~/img/no-policy.jpg" class="thumbnail profile-image doc-profile-image" />
 							}
-						}
-						else
-						{
-							<i class='fa fa-times i-grey' aria-hidden='true'></i>
-						}
 
-					</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+						</td>
+						<td>
+							@if (doc.ValidationExecuted)
+							{
+								<img id="face-img-@doc.Id"
+									 src="@doc.IdImageLocationUrl"
+									 class="thumbnail profile-image doc-profile-image map-image"
+									 data-faceid="@doc.Id"
+									 data-locationid="@location.Id"
+									 data-source="document"
+									 title="Click to view map" />
+							}
+							else
+							{
+								<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+							}
+						</td>
+						<td>
+							@doc.IdImageLocationAddress
+
+						</td>
+						<td>
+							@doc.IdImageData
+						</td>
+						<td>
+							@if (doc.ValidationExecuted)
+							{
+								@if (doc.IdImageValid.HasValue && doc.IdImageValid.Value)
+								{
+									<i class='fas fa-check-circle i-green'></i>
+								}
+								else
+								{
+									<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+								}
+							}
+							else
+							{
+								<i class='fa fa-times i-grey' aria-hidden='true'></i>
+							}
+
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
 }

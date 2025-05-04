@@ -1,22 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using risk.control.system.AppConstant;
 using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.Services;
-using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.FeatureManagement;
 using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Helpers;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.Models;
+using static risk.control.system.Helpers.Permissions;
+using HPdf;
 
 namespace risk.control.system.Controllers.Mobile
 {
@@ -25,14 +22,19 @@ namespace risk.control.system.Controllers.Mobile
     public class SecureController : ControllerBase
     {
         private readonly IConfiguration configuration;
+        private readonly IInvestigationService investigationService;
+        private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly ITokenService tokenService;
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
+        private readonly IPdfReportService pdfReportService;
         private readonly IAccountService accountService;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger _logger;
         private readonly IFeatureManager featureManager;
+        private readonly IViewRenderService viewRenderService;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
 
@@ -40,22 +42,32 @@ namespace risk.control.system.Controllers.Mobile
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             INotificationService service,
+            IPdfReportService pdfReportService,
             IConfiguration configuration,
+            IInvestigationService investigationService,
+            IPdfGenerativeService pdfGenerativeService,
             IAccountService accountService,
+            IWebHostEnvironment webHostEnvironment,
             ILogger<AccountController> logger,
             IFeatureManager featureManager,
+            IViewRenderService viewRenderService,
             ISmsService SmsService,
             ApplicationDbContext context, ITokenService tokenService)
         {
             this.configuration = configuration;
+            this.investigationService = investigationService;
+            this.pdfGenerativeService = pdfGenerativeService;
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.httpContextAccessor = httpContextAccessor;
             this.service = service;
+            this.pdfReportService = pdfReportService;
             this.accountService = accountService;
+            this.webHostEnvironment = webHostEnvironment;
             this._context = context;
             _logger = logger;
             this.featureManager = featureManager;
+            this.viewRenderService = viewRenderService;
             smsService = SmsService;
             this.tokenService = tokenService;
         }
@@ -250,6 +262,51 @@ namespace risk.control.system.Controllers.Mobile
             await SmsService.SendSmsAsync(mobile);
             return Ok(new { message = "Sms sent!!" });
         }
+        [AllowAnonymous]
+        [HttpGet("html2pdf")]
+        public async Task<IActionResult> ProcessCaseReport(long id=1, string currentUserEmail="assessor@insurer.com")
+        {
+            try
+            {
+                var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
 
+                var html = await viewRenderService.RenderViewToStringAsync("Investigation/_pdf", model);
+
+                SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                SelectPdf.PdfDocument doc = converter.ConvertUrl("/pdf/ApprovedDetail?id="+id);
+                doc.Save("test.pdf");
+                doc.Close();
+
+                return Ok(new { message = "Report generated successfully", html });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing case report");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("pdf")]
+        public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
+        {
+            try
+            {
+                var reportFilename = await pdfGenerativeService.Generate(id, currentUserEmail);
+
+                var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
+                var memory = new MemoryStream();
+                using var stream = new FileStream(ReportFilePath, FileMode.Open);
+                await stream.CopyToAsync(memory);
+                memory.Position = 0;
+                //notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
+                return File(memory, "application/pdf", reportFilename);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing case report");
+                return StatusCode(500, "Internal server error");
+            }
+        }
     }
 }

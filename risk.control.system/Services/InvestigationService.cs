@@ -37,6 +37,7 @@ namespace risk.control.system.Services
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
+        Task<CaseTransactionModel> GetPdfReport(long id);
     }
     public class InvestigationService : IInvestigationService
     {
@@ -496,15 +497,6 @@ namespace risk.control.system.Services
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.AgentIdReport)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.PanIdReport)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.CaseQuestionnaire)
-                .ThenInclude(c => c.Questions)
-                .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
@@ -546,7 +538,18 @@ namespace risk.control.system.Services
             : "-";
 
             var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var templates = await context.ReportTemplates
+               .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.AgentIdReport)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.FaceIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.DocumentIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.Questions)
+                  .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 
+            claim.InvestigationReport.ReportTemplate = templates;
             var model = new CaseTransactionModel
             {
                 ClaimsInvestigation = claim,
@@ -554,6 +557,79 @@ namespace risk.control.system.Services
                 Location = claim.BeneficiaryDetail,
                 Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
+                TimeTaken = totalTimeTaken,
+                VendorInvoice = invoice,
+                Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+            };
+
+            return model;
+        }
+
+        public async Task<CaseTransactionModel> GetPdfReport(long id)
+        {
+            var claim = await context.Investigations
+                .Include(c => c.CaseMessages)
+                .Include(c => c.CaseNotes)
+                .Include(c => c.InvestigationReport)
+                .Include(c => c.InvestigationTimeline)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+
+            var timeTaken = DateTime.Now - claim.Created;
+            var totalTimeTaken = timeTaken != TimeSpan.Zero
+                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
+              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
+              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
+              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
+            : "-";
+
+            var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var templates = await context.ReportTemplates
+               .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.AgentIdReport)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.FaceIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.DocumentIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.Questions)
+                  .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+
+            claim.InvestigationReport.ReportTemplate = templates;
+            var model = new CaseTransactionModel
+            {
+                ClaimsInvestigation = claim,
+                CaseIsValidToAssign = claim.IsValidCaseData(),
+                Location = claim.BeneficiaryDetail,
+                Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                AutoAllocation = false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)

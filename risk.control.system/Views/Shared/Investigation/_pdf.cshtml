@@ -2,42 +2,15 @@
 @model CaseTransactionModel
 
 <div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
-    <div class="card-header bg-light text-white">
-        <h3 class="card-title">
-            <i class="fas fa-print nav-icon"></i> Agency: <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span>
-            <span class="hover-text">
-                <i class="fas fa-info-circle"></i>
-                <span class="tooltip-text" id="information">
-                    <span>
-                        <i class='far fa-hand-point-right'></i>
-                        <b> @Model.ClaimsInvestigation.Vendor.Email</b> report  (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())<i class="fas fa-print nav-icon"></i>.
-                    </span>
-
-                </span>
-            </span>
-        </h3>
-        <div class="card-tools">
-            <span data-toggle="tooltip" title="Agent report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): @Model.ClaimsInvestigation.InvestigationReport.AgentEmail" class="badge badge-light">
-                <i class='far fa-hand-point-right'></i>
-            </span>
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-plus"></i>
-            </button>
-        </div>
-
-    </div>
     <div class="card-body pb-0">
         <div class="row">
-            <div class="row">
 
-                @{
-                    var template = Model.ClaimsInvestigation.InvestigationReport.ReportTemplate;
-                    template.CaseId = Model.ClaimsInvestigation.Id;
-                }
-                <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
-                <partial name="_Location" model="@template" />
-            </div>
-
+            @{
+                var template = Model.ClaimsInvestigation.InvestigationReport.ReportTemplate;
+                template.CaseId = Model.ClaimsInvestigation.Id;
+            }
+            <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
+            <partial name="Investigation/_Location" model="@template" />
         </div>
         <div class="row">
             <div class="col-12 col-md-6">
@@ -246,71 +219,5 @@
             </div>
         </div>
 
-        @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest != null)
-        {
-            <partial name="_EnquiryReport" model="@Model" />
-        }
     </div>
 </div>
-<div class="submit-progress hidden">
-    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-</div>
-@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport.AssessorRemarks))
-{
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-lg border-1 rounded-lg border-success">
-                <div class="card-header bg-light text-white">
-                    <h3 class="card-title">
-                        <i class="fas fa-user-check"></i> Assessor: <span class="badge badge-light">@Model.ClaimsInvestigation.InvestigationReport.AssessorEmail</span>
-                        <span class="hover-text">
-                            <i class="fas fa-info-circle"></i>
-                            <span class="tooltip-text" id="information">
-                                <span>
-                                    <i class="fas fa-user-check"></i><b> @Model?.ClaimsInvestigation.InvestigationReport?.AssessorEmail</b> remark.
-                                </span>
-
-                            </span>
-                        </span>
-                    </h3>
-                    <div class="card-tools">
-                        <span data-toggle="tooltip" title="Assessor: : @Model.ClaimsInvestigation.InvestigationReport.AssessorEmail" class="badge badge-light">
-                            @if (@Model.ClaimsInvestigation.InvestigationReport?.AssessorRemarksUpdated != null)
-                            {
-                                <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
-                            }
-                            else
-                            {
-                                <i class="nav-icon fas fa-clock"></i>
-                            }
-                        </span>
-                    </div>
-
-                </div>
-
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <p class="text-muted text-sm">
-
-                                <span>Assessor remarks: </span>
-                            </p>
-                            <ul class="ml-4 mb-0 fa-ul text-muted">
-                                <li class="small">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                    @Model.ClaimsInvestigation.InvestigationReport.AssessorRemarks <i class="far fa-comment"></i>
-                                </li>
-                            </ul>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    @* <a class="btn badge badge-danger btn-lg" asp-controller="Assessor" asp-action="DownloadReportPdf" asp-route-id="@Model.ClaimsInvestigation.InvestigationReport.Id">
-        <i class="far fa-file-pdf"> Download pdf</i>
-    </a> *@
-}

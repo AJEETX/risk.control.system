@@ -9,9 +9,6 @@
 {
 	<div class="table-responsive mb-4">
 
-		<input type="hidden" name="LocationId" value="@location.Id" />
-		<input type="hidden" name="caseId" value="@Model.CaseId" />
-
 		<table class="table table-bordered table-striped">
 			<thead class="table-light">
 				<tr>
@@ -32,12 +29,6 @@
 								<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
 							}
 
-							@* Hidden fields to pass extra data back *@
-							<input type="hidden" name="Questions[@i].Id" value="@question.Id" />
-							<input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
-							<input type="hidden" name="Questions[@i].QuestionType" value="@question.QuestionType" />
-							<input type="hidden" name="Questions[@i].Options" value="@question.Options" />
-							<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
 						</td>
 						<td>
 							@if (question.QuestionType == "text" || question.QuestionType == "date")
