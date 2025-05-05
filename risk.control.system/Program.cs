@@ -118,6 +118,13 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<IPdfGenerateQuestionLocationService, PdfGenerateQuestionLocationService>();
+builder.Services.AddScoped<IPdfGenerateDocumentLocationService, PdfGenerateDocumentLocationService>();
+builder.Services.AddScoped<IPdfGenerateFaceLocationService, PdfGenerateFaceLocationService>();
+builder.Services.AddScoped<IPdfGenerateAgentLocationService, PdfGenerateAgentLocationService>();
+builder.Services.AddScoped<IPdfGenerateDetailReportService, PdfGenerateDetailReportService>();
+builder.Services.AddScoped<IPdfGenerateCaseDetailService, PdfGenerateCaseDetailService>();
+builder.Services.AddScoped<IPdfGenerateDetailService,PdfGenerateDetailService>();
 builder.Services.AddScoped<IPdfGenerativeService,PdfGenerativeService>();
 builder.Services.AddScoped<IViewRenderService,ViewRenderService>();
 builder.Services.AddScoped<IPanCardService, PanCardService>();

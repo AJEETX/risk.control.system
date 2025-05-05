@@ -556,6 +556,7 @@ public class AgentIdService : IAgentIdService
             //locaQuestion.AnswerText = q.Answer;
             //locaQuestion.Updated = DateTime.Now;
         }
+        locationTemplate.Updated = DateTime.Now;
         _context.LocationTemplate.Update(locationTemplate);
         await _context.SaveChangesAsync();
     }
