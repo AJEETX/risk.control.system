@@ -14,6 +14,7 @@ using Font = SixLabors.Fonts.Font;
 using PointF = SixLabors.ImageSharp.PointF;
 using Brushes = SixLabors.ImageSharp.Drawing.Processing.Brushes;
 using Pens = SixLabors.ImageSharp.Drawing.Processing.Pens;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace risk.control.system.Helpers
 {
@@ -219,10 +220,11 @@ namespace risk.control.system.Helpers
         //    var imageOutByte = streamOut.ToArray();
         //    return imageOutByte;
         //}
-        public static byte[] ProcessCompress(byte[] imageByte, float cornerRadius = 10, int quality = 99)
+        public static byte[] ProcessCompress(byte[] imageByte,string onlyExtension, float cornerRadius = 10, int quality = 99)
         {
             using var stream = new MemoryStream(imageByte);
             using var image = SixLabors.ImageSharp.Image.Load(stream);
+
             float maxHeight = 1800.0f;
             float maxWidth = 1800.0f;
             float newWidth;
@@ -244,6 +246,8 @@ namespace risk.control.system.Helpers
             }
 
             image.Mutate(x => x.Resize(image.Width / 2, image.Height / 2, KnownResamplers.Triangle));
+
+
             var encoder = new JpegEncoder
             {
                 Quality = quality, // Adjust this value for desired compression quality
@@ -269,8 +273,23 @@ namespace risk.control.system.Helpers
             //roundImage.Mutate(x => x.DrawText(options, "scanned and processed", brush, pen));
 
             using var waterMarkedImage = roundImage.Clone(ctx => ctx.ApplyScalingWaterMark(font, "...iCheckified...", Color.Silver, 30, false));
-
-            waterMarkedImage.Save(streamOut, encoder);
+            if(onlyExtension == ".png")
+            {
+                var pngEncoder = new PngEncoder
+                {
+                    
+                };
+                waterMarkedImage.Save(streamOut, pngEncoder);
+            }
+            else if (onlyExtension == ".jpg" || onlyExtension == ".jpeg")
+            {
+                var jpgEncoder = new JpegEncoder
+                {
+                    Quality = quality, // Adjust this value for desired compression quality
+                };
+                waterMarkedImage.Save(streamOut, jpgEncoder);
+            }
+            
             var imageOutByte = streamOut.ToArray();
             return imageOutByte;
         }

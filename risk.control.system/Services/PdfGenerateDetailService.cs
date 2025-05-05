@@ -89,7 +89,6 @@ namespace risk.control.system.Services
             {
                 section = detailService.BuildClaim(section, investigation, policy, customer, beneficiary);
             }
-            section = detailService.BuildClaim(section, investigation, policy, customer, beneficiary);
 
             //CASE DETAIL   Investigation Report Section
             section = await detailReportService.Build(section, investigation, investigationReport);

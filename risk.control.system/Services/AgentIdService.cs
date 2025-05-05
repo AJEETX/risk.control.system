@@ -94,6 +94,10 @@ public class AgentIdService : IAgentIdService
 
             face = locationTemplate.AgentIdReport;
 
+            string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName);
+            string imageFileName = Path.GetFileNameWithoutExtension(imageFileNameWithExtension);
+            string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
+
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
@@ -131,7 +135,7 @@ public class AgentIdService : IAgentIdService
 
             #region FACE IMAGE PROCESSING
 
-            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, face.IdImage);
+            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, face.IdImage, onlyExtension);
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             var addressTask = httpClientService.GetRawAddress(expectedLat, expectedLong);
             #endregion FACE IMAGE PROCESSING
@@ -250,6 +254,9 @@ public class AgentIdService : IAgentIdService
             face = locationTemplate.FaceIds.FirstOrDefault(c => c.ReportName == data.ReportName);
 
             var hasCustomerVerification = face.ReportName == DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName();
+            string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName);
+            string imageFileName = Path.GetFileNameWithoutExtension(imageFileNameWithExtension);
+            string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
@@ -295,7 +302,7 @@ public class AgentIdService : IAgentIdService
 
             #region FACE IMAGE PROCESSING
 
-            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, face.IdImage);
+            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, face.IdImage, onlyExtension);
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             var addressTask = httpClientService.GetRawAddress(expectedLat, expectedLong);
             #endregion FACE IMAGE PROCESSING
@@ -415,6 +422,9 @@ public class AgentIdService : IAgentIdService
                 .FirstOrDefault(l => l.Id == location.Id);
 
             doc = locationTemplate.DocumentIds.FirstOrDefault(c => c.ReportName == data.ReportName);
+            string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName);
+            string imageFileName = Path.GetFileNameWithoutExtension(imageFileNameWithExtension);
+            string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
@@ -463,11 +473,11 @@ public class AgentIdService : IAgentIdService
                 //PAN
                 if(doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
                 {
-                    await panCardService.Process(doc.IdImage, imageReadOnly, company, doc);
+                    await panCardService.Process(doc.IdImage, imageReadOnly, company, doc,onlyExtension);
                 }
                 else
                 {
-                    doc.IdImage = CompressImage.ProcessCompress(doc.IdImage);
+                    doc.IdImage = CompressImage.ProcessCompress(doc.IdImage,onlyExtension);
                     doc.IdImageValid = true;
                     doc.IdImageLongLatTime = DateTime.Now;
                     var allText = imageReadOnly.FirstOrDefault().Description;
@@ -478,7 +488,7 @@ public class AgentIdService : IAgentIdService
 
             else
             {
-                doc.IdImage = CompressImage.ProcessCompress(doc.IdImage);
+                doc.IdImage = CompressImage.ProcessCompress(doc.IdImage, onlyExtension);
                 doc.IdImageValid = false;
                 doc.IdImageLongLatTime = DateTime.Now;
                 doc.IdImageData = "no data: ";

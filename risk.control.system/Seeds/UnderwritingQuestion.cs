@@ -86,7 +86,7 @@ namespace risk.control.system.Seeds
             {
                 QuestionText = "LA’s Education Qualification",
                 QuestionType = "dropdown",
-                Options = "PRIMARY SCHOOLING, MATRICULATION, GRADE 12  PASS,, GRADUATE, UNKNOWN",
+                Options = "PRIMARY SCHOOLING, MATRICULATION, GRADE 12  PASS, GRADUATE, UNKNOWN",
                 IsRequired = true
             };
 
@@ -94,7 +94,7 @@ namespace risk.control.system.Seeds
             {
                 QuestionText = "Employment Category (Salaried /Self employed\r\netc.)",
                 QuestionType = "dropdown",
-                Options = "SALARIED, SELF-EMPLOYED, CASUAL-CONTRACTOR,, GOVT-EMPLOYED, UNKNOWN",
+                Options = "SALARIED, SELF-EMPLOYED, CASUAL-CONTRACTOR, GOVT-EMPLOYED, UNKNOWN",
                 IsRequired = true
             };
             var question15 = new Question

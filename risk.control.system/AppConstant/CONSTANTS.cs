@@ -36,23 +36,13 @@
 
         public class LOCATIONS
         {
-            //public const string AGENT_PHOTO = "AGENT_PHOTO";
-            public const string EMPLOYMENT_ADDRESS = "EMPLOYMENT_ADDRESS";
-            public const string CHEMIST_ADDRESS = "CHEMIST_ADDRESS";
-            public const string LA_ADDRESS = "VERIFIER_ADDRESS";
-            public const string BUSINESS_ADDRESS = "BUSINESS_ADDRESS";
-            //public const string VERIFIER_PHOTO = "VERIFIER";
-
-            //public const string CUSTOMER_ADDRESS = "CUSTOMER_ADDRESS";
-            //public const string CUSTOMER_PHOTO = "CUSTOMER";
-            //public const string AGENT_CUSTOMER_PHOTO = "AGENT_CUSTOMER";
-            
-            //public const string BENEFICIARY_ADDRESS = "BENEFICIARY_ADDRESS";
-            //public const string BENEFICIARY_PHOTO = "BENEFICIARY";
-            //public const string AGENT_BENEFICIARY_PHOTO = "AGENT_BENEFICIARY";
+            public const string EMPLOYMENT_ADDRESS = "EMPLOYMENT";
+            public const string CHEMIST_ADDRESS = "CHEMIST";
+            public const string LA_ADDRESS = "LA_ADDRESS";
+            public const string BUSINESS_ADDRESS = "BUSINESS";
             
             public const string HOSPITAL_ADDRESS = "HOSPITAL";
-            public const string CEMETERY_ADDRESS = "CEMETERY_ADDRESS ";
+            public const string CEMETERY_ADDRESS = "CEMETERY";
             public const string POLICE_ADDRESS = "POLICE_STATION";
             public const string ANGANWAADI_ADDRESS = "ANGANWAADI";
         }

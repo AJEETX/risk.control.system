@@ -8,7 +8,7 @@ namespace risk.control.system.Services
 {
     public interface IPanCardService
     {
-        Task Process(byte[] IdImage, IReadOnlyList<EntityAnnotation> imageReadOnly, ClientCompany company, DocumentIdReport doc);
+        Task Process(byte[] IdImage, IReadOnlyList<EntityAnnotation> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension);
     }
     public class PanCardService : IPanCardService
     {
@@ -22,7 +22,7 @@ namespace risk.control.system.Services
             this.googleHelper = googleHelper;
             this.httpClientService = httpClientService;
         }
-        public async Task Process(byte[] IdImage, IReadOnlyList<EntityAnnotation> imageReadOnly, ClientCompany company, DocumentIdReport doc)
+        public async Task Process(byte[] IdImage, IReadOnlyList<EntityAnnotation> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension)
         {
             var allPanText = imageReadOnly.FirstOrDefault().Description;
             var panTextPre = allPanText.IndexOf(panNumber2Find);
@@ -59,7 +59,7 @@ namespace risk.control.system.Services
                 #endregion PAN IMAGE PROCESSING
 
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                var savedMaskedImage = CompressImage.ProcessCompress(image);
+                var savedMaskedImage = CompressImage.ProcessCompress(image, onlyExtension);
                 doc.IdImage = savedMaskedImage;
                 doc.IdImageData = maskedImage.DocType + " data: ";
 
@@ -73,7 +73,7 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                doc.IdImage = CompressImage.ProcessCompress(image);
+                doc.IdImage = CompressImage.ProcessCompress(image, onlyExtension);
                 doc.IdImageLongLatTime = DateTime.Now;
                 doc.IdImageData = "no data: ";
             }
