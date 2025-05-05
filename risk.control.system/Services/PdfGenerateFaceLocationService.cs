@@ -83,7 +83,7 @@ namespace risk.control.system.Services
                     {
                         try
                         {
-                            var pngBytes = ConvertToPng(face.IdImage);
+                            var pngBytes = ImageConverter.ConvertToPng(face.IdImage);
                             rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
                         }
                         catch (Exception ex)

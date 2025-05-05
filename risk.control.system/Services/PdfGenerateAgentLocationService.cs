@@ -77,7 +77,7 @@ namespace risk.control.system.Services
                 {
                     try
                     {
-                        var pngBytes = ConvertToPng(loc.AgentIdReport.IdImage);
+                        var pngBytes = ImageConverter.ConvertToPng(loc.AgentIdReport.IdImage);
                         rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes)
                       .SetWidth(100)
                       .SetHeight(100);
@@ -139,13 +139,38 @@ namespace risk.control.system.Services
                 throw new Exception($"Failed to download map image. Status: {response.StatusCode}");
             }
         }
+        
+    }
+    public static class ImageConverter
+    {
         public static byte[] ConvertToPng(byte[] imageBytes)
         {
-            using var inputStream = new MemoryStream(imageBytes);
-            using var image = Image.Load(inputStream); // Auto-detects format
-            using var outputStream = new MemoryStream();
-            image.Save(outputStream, new PngEncoder()); // Encode as PNG
-            return outputStream.ToArray();
+            if (imageBytes == null || imageBytes.Length == 0)
+                throw new ArgumentException("Input image data is null or empty.", nameof(imageBytes));
+
+            try
+            {
+                using var inputStream = new MemoryStream(imageBytes);
+                using var image = Image.Load(inputStream); // Auto-detects format
+                using var outputStream = new MemoryStream();
+
+                var pngEncoder = new PngEncoder
+                {
+                    CompressionLevel = PngCompressionLevel.DefaultCompression,
+                    ColorType = PngColorType.Rgb
+                };
+
+                image.Save(outputStream, pngEncoder);
+                return outputStream.ToArray();
+            }
+            catch (SixLabors.ImageSharp.UnknownImageFormatException)
+            {
+                throw new InvalidOperationException("The provided byte array is not a supported image format.");
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to convert image to PNG format.", ex);
+            }
         }
     }
 }

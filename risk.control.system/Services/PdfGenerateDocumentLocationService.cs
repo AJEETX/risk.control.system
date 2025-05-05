@@ -70,7 +70,7 @@ namespace risk.control.system.Services
                      .AddColumnPercentToTable("Photo type", 10)
                     .AddColumnPercentToTable("Photo", 20)
                     .AddColumnPercentToTable("Captured Address", 20)
-                    .AddColumnPercentToTable("Location Info", 20)
+                    .AddColumnPercentToTable("Scan Info", 20)
                     .AddColumnPercentToTable("Map Image", 25)
                     .AddColumnPercentToTable("Match", 5);
 
@@ -83,7 +83,7 @@ namespace risk.control.system.Services
                     {
                         try
                         {
-                            var pngBytes = ConvertToPng(face.IdImage);
+                            var pngBytes = ImageConverter.ConvertToPng(face.IdImage);
                             rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
                         }
                         catch (Exception ex)
@@ -144,14 +144,6 @@ namespace risk.control.system.Services
             {
                 throw new Exception($"Failed to download map image. Status: {response.StatusCode}");
             }
-        }
-        public static byte[] ConvertToPng(byte[] imageBytes)
-        {
-            using var inputStream = new MemoryStream(imageBytes);
-            using var image = Image.Load(inputStream); // Auto-detects format
-            using var outputStream = new MemoryStream();
-            image.Save(outputStream, new PngEncoder()); // Encode as PNG
-            return outputStream.ToArray();
         }
     }
 }

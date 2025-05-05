@@ -89,7 +89,7 @@ namespace risk.control.system.Seeds
             string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
             await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME, "Holland Road");
 
-            //if (!System.Diagnostics.Debugger.IsAttached)
+            if (!System.Diagnostics.Debugger.IsAttached)
             {
                 string agent2EmailwithSuffix = AGENTX.CODE + "@" + vendor.Email;
                 await AgentSeed.Seed(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENTX.PROFILE_IMAGE, AGENTX.FIRST_NAME, AGENTX.LAST_NAME, "44 Waverley Road");

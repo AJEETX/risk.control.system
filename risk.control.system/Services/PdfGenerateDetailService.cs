@@ -81,20 +81,25 @@ namespace risk.control.system.Services
             section.SetOrientation(PageOrientation.Landscape);
 
             //CASE DETAIL
-            section = detailService.Build(section, investigation, policy, customer, beneficiary);
+            if(policy.InsuranceType == InsuranceType.UNDERWRITING)
+            {
+                section = detailService.BuildUnderwritng(section, investigation, policy, customer, beneficiary);
+            }
+            else
+            {
+                section = detailService.BuildClaim(section, investigation, policy, customer, beneficiary);
+            }
+            section = detailService.BuildClaim(section, investigation, policy, customer, beneficiary);
 
             //CASE DETAIL   Investigation Report Section
             section = await detailReportService.Build(section, investigation, investigationReport);
 
             //add assessor remarks
-            section.AddParagraph().AddText(" Assessor remarks").SetFontSize(16).SetBold().SetUnderline();
 
-            section.AddParagraph().AddText($"{investigation.InvestigationReport.AssessorRemarks}");
+            section = AddRemarks(section, "Assessor remarks", investigation.InvestigationReport.AgentRemarks);
 
             //add status
-            section.AddParagraph().AddText(" Status").SetFontSize(16).SetBold().SetUnderline();
-
-            section.AddParagraph().AddText($"{investigation.SubStatus}");
+            section = AddRemarks(section, "Report Status", investigation.SubStatus);
 
             // Footer
             section.AddParagraph().AddText($"Generated on: {DateTime.Now:yyyy-MM-dd HH:mm}").SetItalic().SetFontSize(10);
@@ -107,7 +112,30 @@ namespace risk.control.system.Services
             return reportFilename;
         }
 
+        SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
+        {
+            var table = section.AddTable()
+                               .SetBorder(Stroke.Solid);
 
+            table.AddColumnPercentToTable("Title", 30);
+            table.AddColumnPercentToTable("Content", 70);
+
+            var row = table.AddRow();
+
+            // Title cell
+            row.AddCell()
+               .AddParagraph(title)
+               .SetFontSize(12)
+               .SetBold()
+               .SetBackColor(Gehtsoft.PDFFlow.Models.Shared.Color.Gray);
+
+            // Content cell
+            row.AddCell()
+               .AddParagraph(string.IsNullOrWhiteSpace(content) ? "N/A" : content)
+               .SetFontSize(11);
+
+            return section;
+        }
         public static byte[] ConvertToPng(byte[] imageBytes)
         {
             using var inputStream = new MemoryStream(imageBytes);

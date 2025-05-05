@@ -12,7 +12,8 @@ namespace risk.control.system.Services
 {
     public interface IPdfGenerateCaseDetailService
     {
-        SectionBuilder Build(SectionBuilder section,InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
+        SectionBuilder BuildUnderwritng(SectionBuilder section,InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
+        SectionBuilder BuildClaim(SectionBuilder section,InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
     }
     public class PdfGenerateCaseDetailService : IPdfGenerateCaseDetailService
     {
@@ -46,7 +47,7 @@ namespace risk.control.system.Services
 
         internal static readonly IdInfo EMPTY_ITEM = new IdInfo("", new FontText[0]);
         
-        public SectionBuilder Build(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
+        public SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             // Title
             section.AddParagraph().SetAlignment(HorizontalAlignment.Center)
@@ -54,22 +55,19 @@ namespace risk.control.system.Services
 
             // Investigation Section
             section.AddParagraph().AddText($" Investigator : {investigation.Vendor.Email}").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Case ID: {investigation?.PolicyDetail.ContractNumber}");
+            section.AddParagraph().AddText($"Proposal #: {investigation?.PolicyDetail.ContractNumber}");
             section.AddParagraph().AddText($"Insurer: {investigation?.ClientCompany?.Name}");
 
             // Policy Section
-            section.AddParagraph().AddText($"Policy Type: {policy?.InsuranceType.GetEnumDisplayName()}").SetFontSize(16).SetBold().SetUnderline();
+                section.AddParagraph().AddText($"Policy Type: {policy?.InsuranceType.GetEnumDisplayName()}").SetFontSize(16).SetBold().SetUnderline();
+            section.AddParagraph().AddText(" Proposal Info").SetFontSize(16).SetBold().SetUnderline();
 
-            section.AddParagraph().AddText(" Policy Details").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Policy Number: {policy?.ContractNumber}");
-            section.AddParagraph().AddText($"Service Type: {policy?.InvestigationServiceType?.Name}");
+            section.AddParagraph().AddText($"Verification Type: {policy?.InvestigationServiceType?.Name}");
             section.AddParagraph().AddText($"Assured Amount: {policy?.SumAssuredValue.ToString()}");
-            section.AddParagraph().AddText($"Policy Issue  date: {policy?.ContractIssueDate.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Incident date: {policy?.DateOfIncident.ToString("dd-MMM-yyyy")}");
 
             // Customer Section
-            section.AddParagraph().AddText(" Customer Details").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Name: {customer?.Name}");
+            section.AddParagraph().AddText(" Life Assured  Details").SetFontSize(16).SetBold().SetUnderline();
+            section.AddParagraph().AddText($"Life Assured Name: {customer?.Name}");
             section.AddParagraph().AddText($"Date Of birth: {customer?.DateOfBirth.Value.ToString("dd-MMM-yyyy")}");
             section.AddParagraph().AddText($"Occupation : {customer?.Occupation.GetEnumDisplayName()}");
             section.AddParagraph().AddText($"Income : {customer?.Income.GetEnumDisplayName()}");
@@ -85,7 +83,42 @@ namespace risk.control.system.Services
                return section;
         }
 
+        public SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
+        {
+            // Title
+            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"{policy?.InsuranceType.GetEnumDisplayName()} Investigation Report").SetFontSize(20).SetBold();
+            
+            section.AddParagraph().AddText($"Company: {investigation?.ClientCompany?.Name}");
+            section.AddParagraph().AddText($"Policy #: {investigation?.PolicyDetail.ContractNumber}");
 
+            section.AddParagraph().AddText($"Case received: {policy?.DateOfIncident.ToString("dd-MMM-yyyy")}");
+
+            // Investigation Section
+            section.AddParagraph().AddText($" Investigator : {investigation.Vendor.Email}").SetFontSize(16).SetBold().SetUnderline();
+            section.AddParagraph().AddText($" Report Date : {investigation.InvestigationReport.Updated.GetValueOrDefault()}");
+
+            // Customer Section
+            section.AddParagraph().AddText(" Life Assured  Details").SetFontSize(16).SetBold().SetUnderline();
+            section.AddParagraph().AddText($"Life Assured Name: {customer?.Name}");
+            section.AddParagraph().AddText($"Date Of birth: {customer?.DateOfBirth.Value.ToString("dd-MMM-yyyy")}");
+            section.AddParagraph().AddText($"Occupation : {customer?.Occupation.GetEnumDisplayName()}");
+            section.AddParagraph().AddText($"Income : {customer?.Income.GetEnumDisplayName()}");
+            section.AddParagraph().AddText($"Address: {customer?.Addressline},{customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}");
+
+            section.AddParagraph().AddText($"Verification Type: {policy?.InvestigationServiceType?.Name}");
+            section.AddParagraph().AddText($"Assured Amount: {policy?.SumAssuredValue.ToString()}");
+            section.AddParagraph().AddText($"Policy Issue  date: {policy?.ContractIssueDate.ToString("dd-MMM-yyyy")}");
+            section.AddParagraph().AddText($"Cause of Death: {policy?.CauseOfLoss}");
+
+            // Beneficiary Section
+            section.AddParagraph().AddText(" Claimant Details").SetFontSize(16).SetBold().SetUnderline();
+            section.AddParagraph().AddText($"Name: {beneficiary?.Name}");
+            section.AddParagraph().AddText($"Relation: {beneficiary?.BeneficiaryRelation?.Name}");
+            section.AddParagraph().AddText($"Date Of birth: {beneficiary?.DateOfBirth.Value.ToString("dd-MMM-yyyy")}");
+            section.AddParagraph().AddText($"Income : {beneficiary?.Income.GetEnumDisplayName()}");
+            section.AddParagraph().AddText($"Address: {beneficiary?.Addressline},{beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}");
+            return section;
+        }
         public static byte[] ConvertToPng(byte[] imageBytes)
         {
             using var inputStream = new MemoryStream(imageBytes);

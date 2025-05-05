@@ -58,7 +58,7 @@ namespace risk.control.system.Services
         }
         public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation,  ReportTemplate investigationReport)
         {
-            var img = ConvertToPng(investigation.Vendor.DocumentImage);
+            var img = ImageConverter.ConvertToPng(investigation.Vendor.DocumentImage);
             var paragraph = section.AddParagraph();
 
             // Add the image inline (before the text)
@@ -70,12 +70,13 @@ namespace risk.control.system.Services
                      .SetFontSize(18)
                      .SetBold()
                      .SetUnderline();
+            int locationCount = 1;
 
             foreach (var loc in investigationReport.LocationTemplate)
             {
                 section.AddParagraph()
                 .SetLineSpacing(1)
-                   .AddText($"Location Verified: {loc.LocationName}")
+                   .AddText($"{locationCount}.  Location Verified: {loc.LocationName}")
                    .SetBold()
                    .SetFontSize(14);
 
@@ -96,8 +97,10 @@ namespace risk.control.system.Services
 
                 // =================== QUESTIONS ====================
                 section = questionService.Build(section, loc);
-            }
 
+                section.AddParagraph();
+                locationCount++;
+            }
 
             section = AddRemarks(section, "Agent Remarks", investigation.InvestigationReport.AgentRemarks);
             section = AddRemarks(section, "Agent Edited Remarks", investigation.InvestigationReport.AgentRemarksEdit);
@@ -105,27 +108,30 @@ namespace risk.control.system.Services
             return section;
         }
 
-        SectionBuilder AddRemarks(SectionBuilder section,string title, string content)
+        SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
         {
-            section.AddParagraph()
-                   .SetLineSpacing(2)
-                   .AddText(title)
-                   .SetFontSize(14)
-            .SetBold()
-                   .SetUnderline();
+            var table = section.AddTable()
+                               .SetBorder(Stroke.Solid);
 
-            section.AddParagraph()
-                   .AddText(string.IsNullOrWhiteSpace(content) ? "N/A" : content)
-                   .SetFontSize(12);
+            table.AddColumnPercentToTable("Title", 30);
+            table.AddColumnPercentToTable("Content", 70);
+
+            var row = table.AddRow();
+
+            // Title cell
+            row.AddCell()
+               .AddParagraph(title)
+               .SetFontSize(12)
+               .SetBold()
+               .SetBackColor(Gehtsoft.PDFFlow.Models.Shared.Color.Gray);
+
+            // Content cell
+            row.AddCell()
+               .AddParagraph(string.IsNullOrWhiteSpace(content) ? "N/A" : content)
+               .SetFontSize(11);
+
             return section;
         }
-        public static byte[] ConvertToPng(byte[] imageBytes)
-        {
-            using var inputStream = new MemoryStream(imageBytes);
-            using var image = Image.Load(inputStream); // Auto-detects format
-            using var outputStream = new MemoryStream();
-            image.Save(outputStream, new PngEncoder()); // Encode as PNG
-            return outputStream.ToArray();
-        }
+
     }
 }
