@@ -51,7 +51,7 @@ namespace risk.control.system.Services
         {
             // Title
             section.AddParagraph().SetAlignment(HorizontalAlignment.Center)
-                .AddText("Investigation Report").SetFontSize(20).SetBold();
+                .AddText($"{policy?.InsuranceType.GetEnumDisplayName()} Investigation Report").SetFontSize(20).SetBold();
 
             // Investigation Section
             section.AddParagraph().AddText($" Investigator : {investigation.Vendor.Email}").SetFontSize(16).SetBold().SetUnderline();

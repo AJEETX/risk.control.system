@@ -14,12 +14,6 @@ namespace risk.control.system.Models
         public string? QuestionImageFileName { get; set; }
         public string? QuestionImageFileType { get; set; }
         public string? QuestionImageFileExtension { get; set; }
-
-        public byte[]? QuestionFileAttachment { get; set; }
-        public string? QuestionFileName { get; set; }
-        public string? QuestionFileType { get; set; }
-        public string? QuestionFileExtension { get; set; }
-
         public string? Answer { get; set; }
         public string? AnswerA { get; set; }
         public string? AnswerB { get; set; }
@@ -30,12 +24,5 @@ namespace risk.control.system.Models
         public string? AnswerImageFileName { get; set; }
         public string? AnswerImageFileType { get; set; }
         public string? AnswerImageFileExtension { get; set; }
-
-        public byte[]? AnswerFileAttachment { get; set; }
-        public string? AnswerFileName { get; set; }
-        public string? AnswerFileType { get; set; }
-        public string? AnswerFileExtension { get; set; }
-        public string? RequesterEmail { get; set; }
     }
-
 }

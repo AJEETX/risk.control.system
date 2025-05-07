@@ -146,7 +146,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Vendor vendor)
         {
@@ -227,7 +226,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string vendorId, string txn = "agency")
         {
@@ -266,6 +264,7 @@ namespace risk.control.system.Controllers
                     {
                         Directory.CreateDirectory(path);
                     }
+                    user.ProfilePictureExtension = fileExtension;
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
                     user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                     user.ProfilePictureUrl = "/agency/" + newFileName;
@@ -425,7 +424,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(string id, VendorApplicationUser applicationUser)
         {
@@ -474,10 +472,12 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfilePicture = dataStream.ToArray();
                     applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
+                    applicationUser.ProfilePictureExtension = fileExtension;
                 }
 
                 user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                 user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
+                user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
                 user.FirstName = applicationUser?.FirstName;
                 user.LastName = applicationUser?.LastName;
                 if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
@@ -695,7 +695,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
         {
@@ -780,7 +779,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateService(VendorInvestigationServiceType service)
         {
@@ -926,7 +924,6 @@ namespace risk.control.system.Controllers
         // POST: VendorService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditService(long vendorInvestigationServiceTypeId, VendorInvestigationServiceType service)

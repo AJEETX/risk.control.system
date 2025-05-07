@@ -64,7 +64,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClientCompany clientCompany, string domainAddress, string mailAddress)
         {
@@ -94,6 +93,7 @@ namespace risk.control.system.Controllers
                 using var dataStream = new MemoryStream();
                 companyDocument.CopyTo(dataStream);
                 clientCompany.DocumentImage = dataStream.ToArray();
+                clientCompany.DocumentImageExtension = fileExtension;
             }
 
             var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == clientCompany.SelectedPincodeId);
@@ -243,7 +243,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClientCompany clientCompany)
         {
@@ -272,6 +271,7 @@ namespace risk.control.system.Controllers
                     clientCompany.DocumentImage = dataStream.ToArray();
                     companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
                     clientCompany.DocumentUrl = "/company/" + newFileName;
+                    clientCompany.DocumentImageExtension = fileExtension;
                 }
                 else
                 {

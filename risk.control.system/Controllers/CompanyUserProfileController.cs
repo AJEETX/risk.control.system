@@ -116,7 +116,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ClientCompanyApplicationUser applicationUser)
         {
@@ -144,12 +143,14 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
+                    applicationUser.ProfilePictureExtension = fileExtension;
                 }
 
                 if (user != null)
                 {
                     user.Addressline = applicationUser?.Addressline ?? user.Addressline;
                     user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
                     user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture ;
                     user.FirstName = applicationUser?.FirstName;
                     user.LastName = applicationUser?.LastName;

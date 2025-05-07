@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using static risk.control.system.AppConstant.CONSTANTS;
 
 using Google.Api;
 
@@ -23,9 +24,7 @@ namespace risk.control.system.Services
     }
     public class CaseCreationService : ICaseCreationService
     {
-        private const string POLICY_IMAGE = "policy.jpg";
-        private const string CUSTOMER_IMAGE = "customer.jpg";
-        private const string BENEFICIARY_IMAGE = "beneficiary.jpg";
+        
         private readonly ApplicationDbContext context;
         private readonly ICustomApiCLient customApiCLient;
         private readonly ICloneReportService cloneService;
@@ -136,6 +135,7 @@ namespace risk.control.system.Services
                 CostCentreId = department.CostCentreId,
                 InsuranceType = caseType,
                 DocumentImage = savedNewImage ?? File.ReadAllBytes(noImagePath),
+                DocumentImageExtension = Path.GetExtension(POLICY_IMAGE),
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
@@ -254,6 +254,7 @@ namespace risk.control.system.Services
                 DistrictId = pinCode.DistrictId,
                 //Description = rowData[20]?.Trim(),
                 ProfilePicture = imagesWithData,
+                ProfilePictureExtension = Path.GetExtension(CUSTOMER_IMAGE),
                 UpdatedBy = companyUser.Email,
                 Updated = DateTime.Now
             };
@@ -317,6 +318,7 @@ namespace risk.control.system.Services
                 StateId = pinCode.State.StateId,
                 CountryId = pinCode.Country.CountryId,
                 ProfilePicture = beneficiaryNewImage,
+                ProfilePictureExtension = Path.GetExtension(BENEFICIARY_IMAGE),
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };

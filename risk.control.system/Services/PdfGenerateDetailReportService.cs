@@ -5,6 +5,9 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp;
 using Gehtsoft.PDFFlow.Utils;
 using static System.Collections.Specialized.BitVector32;
+using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.Helpers;
+using static SkiaSharp.SKPath;
 
 namespace risk.control.system.Services
 {
@@ -58,13 +61,24 @@ namespace risk.control.system.Services
         }
         public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation,  ReportTemplate investigationReport)
         {
-            var img = ImageConverter.ConvertToPng(investigation.Vendor.DocumentImage);
+           
             var paragraph = section.AddParagraph();
 
-            // Add the image inline (before the text)
-            paragraph.SetLineSpacing(2).AddInlineImage(img)
+            try
+            {
+                var pngBytes = ImageConverterToPng.ConvertToPng(investigation.Vendor.DocumentImage, investigation.Vendor.DocumentImageExtension);
+                paragraph.SetLineSpacing(2).AddInlineImage(pngBytes)
                      .SetWidth(100)   // adjust as needed
-                     .SetHeight(60); // optional small space between image and text
+                     .SetHeight(100); // optional small space between image and text
+            }
+            catch (Exception ex)
+            {
+                paragraph.AddText("Invalid image");
+                Console.WriteLine("Image conversion error: " + ex.Message);
+            }
+
+            // Add the image inline (before the text)
+            
 
             paragraph.AddText($" {investigation.Vendor.Email} : Investigation Report")
                      .SetFontSize(18)
@@ -74,9 +88,12 @@ namespace risk.control.system.Services
 
             foreach (var loc in investigationReport.LocationTemplate)
             {
+                var duration = loc.Updated.GetValueOrDefault().Subtract(loc.AgentIdReport.Updated.GetValueOrDefault());
+                var durationDisplay = "Time spent :" + (duration.Hours > 0 ? $"{duration.Hours}h " : "") + (duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
+
                 section.AddParagraph()
                 .SetLineSpacing(1)
-                   .AddText($"{locationCount}.  Location Verified: {loc.LocationName}")
+                   .AddText($"{locationCount}.  Location Verified: {loc.LocationName} : {durationDisplay}")
                    .SetBold()
                    .SetFontSize(14);
 
@@ -101,6 +118,81 @@ namespace risk.control.system.Services
                 section.AddParagraph();
                 locationCount++;
             }
+            
+            section.AddParagraph().AddText("");
+
+            // Add Enquiry Report
+            if (investigation.InvestigationReport.EnquiryRequests != null && investigation.InvestigationReport.EnquiryRequests.Any())
+            {
+                section.AddParagraph()
+                       .SetLineSpacing(1)
+                       .AddText($"Enquiry Report")
+                       .SetBold()
+                       .SetFontSize(14);
+
+                // Build the table
+                var tableBuilder = section.AddTable()
+                                          .SetBorder(Stroke.Solid);
+                // Add columns
+                tableBuilder
+                    .AddColumnPercentToTable("Question", 20)
+                    .AddColumnPercentToTable("Selected Answer", 15)
+                    .AddColumnPercentToTable("Detailed Query", 20)
+                    .AddColumnPercentToTable("Query Answer", 20)
+                    .AddColumnPercentToTable("Time", 10)
+                    .AddColumnPercentToTable("Query Attachment", 7)
+                    .AddColumnPercentToTable("Answer Attachment", 8);
+
+                foreach (var request in investigation.InvestigationReport.EnquiryRequests)
+                {
+                    var rowBuilder = tableBuilder.AddRow();
+                    rowBuilder.AddCell().AddParagraph().AddText(request.Subject ?? "N/A").SetFontSize(10);
+                    rowBuilder.AddCell().AddParagraph().AddText(request.AnswerSelected ?? "N/A").SetFontSize(10);
+                    rowBuilder.AddCell().AddParagraph().AddText(request.Description ?? "N/A").SetFontSize(10);
+                    rowBuilder.AddCell().AddParagraph().AddText(request.Answer ?? "N/A").SetFontSize(10);
+                    rowBuilder.AddCell().AddParagraph().AddText($"{request.Created:dd-MMM-yy hh:mm tt}").SetFontSize(10);
+
+                    // Question Image Cell
+                    if (request.QuestionImageAttachment != null)
+                    {
+                        try
+                        {
+                            var pngBytes = ImageConverterToPng.ConvertToPng(request.QuestionImageAttachment, request.QuestionImageFileExtension);
+                            rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
+                        }
+                        catch (Exception ex)
+                        {
+                            rowBuilder.AddCell().AddParagraph().AddText("X");
+                            Console.WriteLine("Image conversion error: " + ex.Message);
+                        }
+                    }
+                    else
+                    {
+                            rowBuilder.AddCell().AddParagraph().AddText("");
+                    }
+
+                    // Answer Image Cell
+                    if (request.AnswerImageAttachment != null)
+                    {
+                        try
+                        {
+                            var pngBytes = ImageConverterToPng.ConvertToPng(request.AnswerImageAttachment, request.AnswerImageFileExtension);
+                            rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
+                        }
+                        catch (Exception ex)
+                        {
+                            rowBuilder.AddCell().AddParagraph().AddText("X");
+                            Console.WriteLine("Image conversion error: " + ex.Message);
+                        }
+                    }
+                    else
+                    {
+                        rowBuilder.AddCell().AddParagraph().AddText("");
+                    }
+                }
+            }
+
+            section.AddParagraph().AddText("");
 
             section = AddRemarks(section, "Agent Remarks", investigation.InvestigationReport.AgentRemarks);
             section = AddRemarks(section, "Agent Edited Remarks", investigation.InvestigationReport.AgentRemarksEdit);
@@ -113,8 +205,8 @@ namespace risk.control.system.Services
             var table = section.AddTable()
                                .SetBorder(Stroke.Solid);
 
-            table.AddColumnPercentToTable("Title", 30);
-            table.AddColumnPercentToTable("Content", 70);
+            table.AddColumnPercentToTable("", 30);
+            table.AddColumnPercentToTable("", 70);
 
             var row = table.AddRow();
 
@@ -122,8 +214,7 @@ namespace risk.control.system.Services
             row.AddCell()
                .AddParagraph(title)
                .SetFontSize(12)
-               .SetBold()
-               .SetBackColor(Gehtsoft.PDFFlow.Models.Shared.Color.Gray);
+               .SetBold();
 
             // Content cell
             row.AddCell()

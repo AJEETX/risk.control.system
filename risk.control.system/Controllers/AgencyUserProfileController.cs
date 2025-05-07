@@ -147,6 +147,7 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
+                    applicationUser.ProfilePictureExtension = fileExtension;
                 }
 
                 if (user != null)

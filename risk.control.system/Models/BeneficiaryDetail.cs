@@ -31,6 +31,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Photo")]
         public byte[]? ProfilePicture { get; set; }
+        public string? ProfilePictureExtension { get; set; }
 
         [Display(Name = "Photo")]
         [NotMapped]

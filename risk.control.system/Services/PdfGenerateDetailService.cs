@@ -81,7 +81,7 @@ namespace risk.control.system.Services
             section.SetOrientation(PageOrientation.Landscape);
 
             //CASE DETAIL
-            if(policy.InsuranceType == InsuranceType.UNDERWRITING)
+            if (policy.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 section = detailService.BuildUnderwritng(section, investigation, policy, customer, beneficiary);
             }
@@ -93,12 +93,20 @@ namespace risk.control.system.Services
             //CASE DETAIL   Investigation Report Section
             section = await detailReportService.Build(section, investigation, investigationReport);
 
+            section.AddParagraph().AddText("");
+
             //add assessor remarks
 
             section = AddRemarks(section, "Assessor remarks", investigation.InvestigationReport.AgentRemarks);
 
+            section.AddParagraph().AddText("");
+
             //add status
             section = AddRemarks(section, "Report Status", investigation.SubStatus);
+
+            section.AddParagraph().AddText("");
+            section.AddParagraph().AddText("");
+            section.AddParagraph().AddText("");
 
             // Footer
             section.AddParagraph().AddText($"Generated on: {DateTime.Now:yyyy-MM-dd HH:mm}").SetItalic().SetFontSize(10);
@@ -116,8 +124,8 @@ namespace risk.control.system.Services
             var table = section.AddTable()
                                .SetBorder(Stroke.Solid);
 
-            table.AddColumnPercentToTable("Title", 30);
-            table.AddColumnPercentToTable("Content", 70);
+            table.AddColumnPercentToTable("", 30);
+            table.AddColumnPercentToTable("", 70);
 
             var row = table.AddRow();
 
@@ -125,8 +133,7 @@ namespace risk.control.system.Services
             row.AddCell()
                .AddParagraph(title)
                .SetFontSize(12)
-               .SetBold()
-               .SetBackColor(Gehtsoft.PDFFlow.Models.Shared.Color.Gray);
+               .SetBold();
 
             // Content cell
             row.AddCell()

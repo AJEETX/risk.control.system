@@ -148,7 +148,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClientCompany clientCompany)
         {
@@ -193,6 +192,7 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     companyDocument.CopyTo(dataStream);
                     existCompany.DocumentImage = dataStream.ToArray();
+                    existCompany.DocumentImageExtension = fileExtension;
                 }
 
                 existCompany.CountryId = clientCompany.CountryId;
@@ -275,7 +275,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(ClientCompanyApplicationUser user, string emailSuffix)
         {
@@ -307,6 +306,7 @@ namespace risk.control.system.Controllers
                     user.ProfilePicture = dataStream.ToArray();
 
                     user.ProfilePictureUrl = "/company/" + newFileName;
+                    user.ProfilePictureExtension = fileExtension;
                 }
                 //DEMO
                 user.Active = true;
@@ -386,7 +386,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(string id, ClientCompanyApplicationUser applicationUser)
         {
@@ -421,6 +420,7 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
+                    applicationUser.ProfilePictureExtension = fileExtension;
                 }
 
                 if (user != null)
@@ -670,7 +670,6 @@ namespace risk.control.system.Controllers
             }
 
         }
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditAgency(long vendorId, Vendor vendor)
@@ -703,6 +702,7 @@ namespace risk.control.system.Controllers
                     vendor.DocumentImage = dataStream.ToArray();
                     vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
                     vendor.DocumentUrl = "/agency/" + newFileName;
+                    vendor.DocumentImageExtension = fileExtension;
                 }
                 else
                 {
@@ -801,7 +801,6 @@ namespace risk.control.system.Controllers
             return View(model);
         }
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAgencyUser(VendorApplicationUser user, string emailSuffix)
         {
@@ -836,6 +835,7 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     user.ProfileImage.CopyTo(dataStream);
                     user.ProfilePicture = dataStream.ToArray();
+                    user.ProfilePictureExtension = fileExtension;
                 }
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 //DEMO
@@ -1621,7 +1621,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(string userId, CompanyUserRolesViewModel model)
         {

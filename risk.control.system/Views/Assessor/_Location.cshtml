@@ -7,12 +7,17 @@
 {
 	location.SetStatus();
 	var agent = location.AgentIdReport;
+	var duration = location.Updated.GetValueOrDefault().Subtract(agent.Updated.GetValueOrDefault());
 
 	<div class="col-12 mb-4 location-container">
 		<div class="card mb-2 border @location.StatusClass @location.LocationStatus">
 			<div class="card-header bg-light text-white d-flex align-items-center">
 				<h5 class="mb-0 flex-grow-1 @location.LocationStatus">
 					<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
+
+					<span class="badge badge-light">Time spent:</span><span class="badge @location.StatusClass" title="Time spent on the location">
+					 @(duration.Hours > 0 ? $"{duration.Hours}h " : "")@(duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min")   
+					</span>
 				</h5>
 
 				<button class="btn btn-sm @location.LocationStatusButton  mb-2" type="button"
@@ -20,7 +25,7 @@
 						data-target="#location-@location.Id"
 						aria-expanded="false"
 						aria-controls="location-@location.Id">
-					@location.StatusText <i class="fas fa-chevron-down"></i>
+					 <i class="fas fa-chevron-down"></i>
 				</button>
 			</div>
 			
@@ -31,23 +36,22 @@
 					@* Insert all the current content here (the agent table, face/doc/questions) *@
 
 					@Html.AntiForgeryToken()
-					<button class="btn btn-sm @location.AgentStatus mb-2" type="button"
+					<button class="btn btn-sm @location.AgentStatus" type="button"
 							data-toggle="collapse"
 							data-target="#agent-@location.Id"
 							aria-expanded="false"
 							aria-controls="agent-@location.Id">
-						Agent Info <i class="fas fa-chevron-down"></i>
+						Agent ID <i class="fas fa-chevron-down"></i>
 					</button>
 					<div class="collapse" id="agent-@location.Id">
-						<div class="table-responsive mb-4">
+						<div class="table-responsive">
 							<table class="table table-bordered table-hover text-center align-middle">
 								<thead class="thead-light">
 									<tr>
 										<th>Email / Type</th>
-										<th><i class="far fa-user text-primary" title="Agent icon" data-toggle="tooltip"></i></th>
 										<th>ID Photo</th>
 										<th>Map Image</th>
-										<th>Address</th>
+										<th>Captured Address Info</th>
 										<th>Match</th>
 									</tr>
 								</thead>
@@ -65,12 +69,7 @@
 											}
 										</td>
 
-										<!-- Agent icon with required indicator -->
-										<td>
-											<i class="far fa-user text-primary" title="Single person" data-toggle="tooltip"></i>
-											<i class="fa fa-asterisk text-danger ml-1" title="Required" data-toggle="tooltip"></i>
-										</td>
-
+										
 										<!-- ID Photo -->
 										<td>
 											@if (agent.ValidationExecuted)
@@ -109,12 +108,16 @@
 											@if (agent.ValidationExecuted)
 											{
 												<small>@agent.IdImageLocationAddress</small>
+												<span class="badge badge-light">
+													Distance travelled  @agent.Distance
+												</span>
 											}
 											else
 											{
 												<img src="~/img/no-map-image.jpeg" class="img-thumbnail img-fluid" />
 											}
 										</td>
+										
 
 										<!-- Match status -->
 										<td>
@@ -122,16 +125,16 @@
 											{
 												@if (agent.IdImageValid.HasValue && agent.IdImageValid.Value)
 												{
-													<i class="fas fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
+													<i class="fa fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
 												}
 												else
 												{
-													<i class="fas fa-times-circle text-danger" title="Not matched" data-toggle="tooltip"></i>
+													<i class="fa fa-times-circle text-danger" title="Not matched" data-toggle="tooltip"></i>
 												}
 											}
 											else
 											{
-												<i class="fas fa-times-circle text-muted" title="Not validated" data-toggle="tooltip"></i>
+												<i class="fa fa-times-circle text-muted" title="Not validated" data-toggle="tooltip"></i>
 											}
 										</td>
 									</tr>

@@ -72,7 +72,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser user)
         {
@@ -87,6 +86,7 @@ namespace risk.control.system.Controllers
                 using var dataStream = new MemoryStream();
                 user.ProfileImage.CopyTo(dataStream);
                 user.ProfilePicture = dataStream.ToArray();
+                user.ProfilePictureExtension = fileExtension;
             }
             user.EmailConfirmed = true;
             user.Email = user.Email.Trim().ToLower();
@@ -150,7 +150,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [FromForm] ApplicationUser applicationUser)
         {
@@ -177,6 +176,7 @@ namespace risk.control.system.Controllers
                         using var dataStream = new MemoryStream();
                         applicationUser.ProfileImage.CopyTo(dataStream);
                         applicationUser.ProfilePicture = dataStream.ToArray();
+                        applicationUser.ProfilePictureExtension = fileExtension;
                     }
 
                     if (user != null)

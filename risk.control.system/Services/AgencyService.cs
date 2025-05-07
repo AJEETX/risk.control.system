@@ -41,6 +41,7 @@ namespace risk.control.system.Services
 
                 using var dataStream = new MemoryStream();
                 vendorDocument.CopyTo(dataStream);
+                vendor.DocumentImageExtension = fileExtension;
                 vendor.DocumentImage = dataStream.ToArray();
                 vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
                 vendor.DocumentUrl = "/agency/" + newFileName;

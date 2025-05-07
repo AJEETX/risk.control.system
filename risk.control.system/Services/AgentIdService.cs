@@ -86,9 +86,6 @@ public class AgentIdService : IAgentIdService
 
             var locationTemplate = _context.LocationTemplate
                 .Include(l => l.AgentIdReport)
-                .Include(l => l.FaceIds)
-                .Include(l => l.DocumentIds)
-                .Include(l => l.Questions)
                 .FirstOrDefault(l => l.Id == location.Id);
 
 
@@ -97,7 +94,7 @@ public class AgentIdService : IAgentIdService
             string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName);
             string imageFileName = Path.GetFileNameWithoutExtension(imageFileNameWithExtension);
             string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
-
+            face.IdImageExtension = onlyExtension;
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
@@ -137,7 +134,7 @@ public class AgentIdService : IAgentIdService
 
             var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, face.IdImage, onlyExtension);
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-            var addressTask = httpClientService.GetRawAddress(expectedLat, expectedLong);
+            var addressTask = httpClientService.GetRawAddress(latitude, longitude);
             #endregion FACE IMAGE PROCESSING
 
             await Task.WhenAll(faceMatchTask, addressTask, weatherTask, mapTask);
@@ -172,7 +169,7 @@ public class AgentIdService : IAgentIdService
             var updateClaim = _context.Investigations.Update(claim);
             var rows = await _context.SaveChangesAsync();
 
-            
+
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
@@ -245,10 +242,7 @@ public class AgentIdService : IAgentIdService
             location = claim.InvestigationReport.ReportTemplate.LocationTemplate.FirstOrDefault(l => l.LocationName == data.LocationName);
 
             var locationTemplate = _context.LocationTemplate
-                .Include(l => l.AgentIdReport)
                 .Include(l => l.FaceIds)
-                .Include(l => l.DocumentIds)
-                .Include(l => l.Questions)
                 .FirstOrDefault(l => l.Id == location.Id);
 
             face = locationTemplate.FaceIds.FirstOrDefault(c => c.ReportName == data.ReportName);
@@ -257,6 +251,7 @@ public class AgentIdService : IAgentIdService
             string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName);
             string imageFileName = Path.GetFileNameWithoutExtension(imageFileNameWithExtension);
             string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
+            face.IdImageExtension = onlyExtension;
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
@@ -304,7 +299,7 @@ public class AgentIdService : IAgentIdService
 
             var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, face.IdImage, onlyExtension);
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-            var addressTask = httpClientService.GetRawAddress(expectedLat, expectedLong);
+            var addressTask = httpClientService.GetRawAddress(latitude, longitude);
             #endregion FACE IMAGE PROCESSING
 
             await Task.WhenAll(faceMatchTask, addressTask, weatherTask, mapTask);
@@ -364,7 +359,7 @@ public class AgentIdService : IAgentIdService
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
                 Image = face.IdImage,
-                LocationImage = Convert.ToBase64String( face?.IdImage),
+                LocationImage = Convert.ToBase64String(face?.IdImage),
                 LocationLongLat = face?.IdImageLongLat,
                 LocationTime = face?.IdImageLongLatTime,
                 FacePercent = face?.MatchConfidence
@@ -377,7 +372,7 @@ public class AgentIdService : IAgentIdService
         InvestigationTask claim = null;
         DocumentIdReport doc = null;
         Task<string> addressTask = null;
-        
+
         try
         {
             claim = await _context.Investigations
@@ -415,16 +410,14 @@ public class AgentIdService : IAgentIdService
             var location = claim.InvestigationReport.ReportTemplate.LocationTemplate.FirstOrDefault(l => l.LocationName == data.LocationName);
 
             var locationTemplate = _context.LocationTemplate
-                .Include(l => l.AgentIdReport)
-                .Include(l => l.FaceIds)
                 .Include(l => l.DocumentIds)
-                .Include(l => l.Questions)
                 .FirstOrDefault(l => l.Id == location.Id);
 
             doc = locationTemplate.DocumentIds.FirstOrDefault(c => c.ReportName == data.ReportName);
             string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName);
             string imageFileName = Path.GetFileNameWithoutExtension(imageFileNameWithExtension);
             string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
+            doc.IdImageExtension = onlyExtension;
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
@@ -471,13 +464,13 @@ public class AgentIdService : IAgentIdService
             if (imageReadOnly != null && imageReadOnly.Count > 0)
             {
                 //PAN
-                if(doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
+                if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
                 {
-                    await panCardService.Process(doc.IdImage, imageReadOnly, company, doc,onlyExtension);
+                    await panCardService.Process(doc.IdImage, imageReadOnly, company, doc, onlyExtension);
                 }
                 else
                 {
-                    doc.IdImage = CompressImage.ProcessCompress(doc.IdImage,onlyExtension);
+                    doc.IdImage = CompressImage.ProcessCompress(doc.IdImage, onlyExtension);
                     doc.IdImageValid = true;
                     doc.IdImageLongLatTime = DateTime.Now;
                     var allText = imageReadOnly.FirstOrDefault().Description;
@@ -503,7 +496,7 @@ public class AgentIdService : IAgentIdService
 
             var rows = await _context.SaveChangesAsync();
 
-           
+
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
@@ -524,7 +517,7 @@ public class AgentIdService : IAgentIdService
             _context.DocumentIdReport.Update(doc);
             var updateClaim = _context.Investigations.Update(claim);
             var rows = await _context.SaveChangesAsync();
-            
+
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,

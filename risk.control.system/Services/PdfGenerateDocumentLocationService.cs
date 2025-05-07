@@ -4,6 +4,7 @@ using risk.control.system.Models;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp;
 using Gehtsoft.PDFFlow.Utils;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Services
 {
@@ -72,7 +73,7 @@ namespace risk.control.system.Services
                     .AddColumnPercentToTable("Captured Address", 20)
                     .AddColumnPercentToTable("Scan Info", 20)
                     .AddColumnPercentToTable("Map Image", 25)
-                    .AddColumnPercentToTable("Match", 5);
+                    .AddColumnPercentToTable("Valid", 5);
 
                 foreach (var face in loc.DocumentIds.Where(f => f.Selected))
                 {
@@ -83,7 +84,7 @@ namespace risk.control.system.Services
                     {
                         try
                         {
-                            var pngBytes = ImageConverter.ConvertToPng(face.IdImage);
+                            var pngBytes = ImageConverterToPng.ConvertToPng(face.IdImage, face.IdImageExtension);
                             rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
                         }
                         catch (Exception ex)
@@ -98,7 +99,8 @@ namespace risk.control.system.Services
                     }
                     rowBuilder.AddCell().AddParagraph().AddText(face.IdImageLocationAddress);
 
-                    rowBuilder.AddCell().AddParagraph().AddText(face.IdImageData);
+                    var locData = $"DateTime:{face.Updated.GetValueOrDefault()} || {face.IdImageData}";
+                    rowBuilder.AddCell().AddParagraph().AddText(locData);
                     if (face.IdImageLocationUrl != null)
                     {
                         try

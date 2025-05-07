@@ -4,6 +4,7 @@ using risk.control.system.Models;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp;
 using Gehtsoft.PDFFlow.Utils;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Services
 {
@@ -83,7 +84,7 @@ namespace risk.control.system.Services
                     {
                         try
                         {
-                            var pngBytes = ImageConverter.ConvertToPng(face.IdImage);
+                            var pngBytes = ImageConverterToPng.ConvertToPng(face.IdImage, face.IdImageExtension);
                             rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
                         }
                         catch (Exception ex)
@@ -97,8 +98,8 @@ namespace risk.control.system.Services
                         rowBuilder.AddCell().AddParagraph().AddText("No Image");
                     }
                     rowBuilder.AddCell().AddParagraph().AddText(face.IdImageLocationAddress);
-
-                    rowBuilder.AddCell().AddParagraph().AddText(face.IdImageData);
+                    var locData = $"DateTime:{face.Updated.GetValueOrDefault()} || {face.IdImageData}";
+                    rowBuilder.AddCell().AddParagraph().AddText(locData);
                     if (face.IdImageLocationUrl != null)
                     {
                         try

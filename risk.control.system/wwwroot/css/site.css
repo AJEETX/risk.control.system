@@ -1410,7 +1410,10 @@ a#back-button {
     padding: 1rem;
     text-shadow: 4px 4px white;
 }
-
+.agent-block {
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    padding-bottom:5px;
+}
 .review-case {
     color: orange;
     margin: 1rem;
@@ -2933,4 +2936,14 @@ input#checkall {
 .loading-effect {
     filter: blur(2px) grayscale(100%);
     transition: filter 0.3s ease;
+}
+.equal-height-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollable-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
 }

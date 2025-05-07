@@ -51,7 +51,7 @@
                                     faceMapUrl.classList.remove('hidden');
                                 }
                                 if (faceMsg) {
-                                    faceMsg.innerHTML = `<p>Distance: <em>${data.distance}</em>, Duration: <em>${data.duration}</em>.</p>`;
+                                    faceMsg.innerHTML = `<p class="agent-block">Distance: <em>${data.distance}</em>, Duration: <em>${data.duration}</em>.</p>`;
                                     faceMsg.classList.remove('hidden');
                                 }
                                 if (liveMap) liveMap.classList.remove('hidden');

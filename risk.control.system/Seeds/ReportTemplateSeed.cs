@@ -74,6 +74,43 @@ namespace risk.control.system.Seeds
                 {
                     new LocationTemplate
                     {
+                        LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
+                        AgentIdReport = new AgentIdReport
+                        {
+                            ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
+                            ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
+                        },
+                        FaceIds = new List<DigitalIdReport>
+                        {
+                            new DigitalIdReport
+                            {
+                                Selected = true,
+                                ReportName = DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName(),
+                                Has2Face = false,
+                                ReportType = DigitalIdReportType.CUSTOMER_FACE
+                            },
+                            new DigitalIdReport
+                            {
+                                Selected = true,
+                                ReportName = DigitalIdReportType.BENEFICIARY_FACE.GetEnumDisplayName(),
+                                Has2Face = false,
+                                ReportType = DigitalIdReportType.BENEFICIARY_FACE
+                            }
+                        },
+                        DocumentIds = new List<DocumentIdReport>
+                        {
+                            new DocumentIdReport
+                            {
+                                Selected = true,
+                                HasBackImage = false,
+                                ReportName = DocumentIdReportType.PAN.GetEnumDisplayName(),
+                                ReportType = DocumentIdReportType.PAN
+                            }
+                        },
+                        Questions = ClaimQuestion.QuestionsCLAIM_LA_ADDRESS()
+                    },
+                    new LocationTemplate
+                    {
                         LocationName = CONSTANTS.LOCATIONS.HOSPITAL_ADDRESS,
                         AgentIdReport = new AgentIdReport
                         {
@@ -85,6 +122,7 @@ namespace risk.control.system.Seeds
                             new DocumentIdReport
                             {
                                 Selected = true,
+                                HasBackImage = false,
                                 ReportName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
                                 ReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
                             }
@@ -112,39 +150,7 @@ namespace risk.control.system.Seeds
                         },
                         Questions = ClaimQuestion.QuestionsCLAIM_BUSINESS_ADDRESS()
                     },
-                    new LocationTemplate
-                    {
-                        LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
-                        AgentIdReport = new AgentIdReport
-                        {
-                            ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
-                            ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
-                        },
-                        FaceIds = new List<DigitalIdReport>
-                        {
-                            new DigitalIdReport
-                            {
-                                ReportName = DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName(),
-                                ReportType = DigitalIdReportType.CUSTOMER_FACE
-                            },
-                            new DigitalIdReport
-                            {
-                                Selected = true,
-                                ReportName = DigitalIdReportType.BENEFICIARY_FACE.GetEnumDisplayName(),
-                                ReportType = DigitalIdReportType.BENEFICIARY_FACE
-                            }
-                        },
-                        DocumentIds = new List<DocumentIdReport>
-                        {
-                            new DocumentIdReport
-                            {
-                                Selected = true,
-                                ReportName = DocumentIdReportType.PAN.GetEnumDisplayName(),
-                                ReportType = DocumentIdReportType.PAN
-                            }
-                        },
-                        Questions = ClaimQuestion.QuestionsCLAIM_LA_ADDRESS()
-                    },
+
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.CHEMIST_ADDRESS,
@@ -219,13 +225,14 @@ namespace risk.control.system.Seeds
                             new DocumentIdReport
                             {
                                 Selected = true,
+                                HasBackImage = false,
                                 ReportName = DocumentIdReportType.POLICE_FIR_REPORT.GetEnumDisplayName(),
                                 ReportType = DocumentIdReportType.POLICE_FIR_REPORT
                             }
                         },
                         Questions = ClaimQuestion.QuestionsCLAIM_POLIC_STATION()
                     },
-                    
+
                 }
             };
 

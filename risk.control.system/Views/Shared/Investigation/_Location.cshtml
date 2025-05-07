@@ -27,15 +27,15 @@
 				<div class="card-body bg-light">
 					@* Insert all the current content here (the agent table, face/doc/questions) *@
 
-					<button class="btn btn-sm @location.AgentStatus mb-2" type="button"
+					<button class="btn btn-sm @location.AgentStatus" type="button"
 							data-toggle="collapse"
 							data-target="#agent-@location.Id"
 							aria-expanded="false"
 							aria-controls="agent-@location.Id">
-						Agent Info <i class="fas fa-chevron-down"></i>
+						Agent ID <i class="fas fa-chevron-down"></i>
 					</button>
 					<div class="collapse" id="agent-@location.Id">
-						<div class="table-responsive mb-4">
+						<div class="table-responsive">
 							<table class="table table-bordered table-hover text-center align-middle">
 								<thead class="thead-light">
 									<tr>
@@ -43,7 +43,7 @@
 										<th><i class="far fa-user text-primary" title="Agent icon" data-toggle="tooltip"></i></th>
 										<th>ID Photo</th>
 										<th>Map Image</th>
-										<th>Address</th>
+										<th>Captured Address Info</th>
 										<th>Match</th>
 									</tr>
 								</thead>
@@ -105,6 +105,9 @@
 											@if (agent.ValidationExecuted)
 											{
 												<small>@agent.IdImageLocationAddress</small>
+												<span class="badge badge-light">
+													@agent.Distance
+												</span>
 											}
 											else
 											{

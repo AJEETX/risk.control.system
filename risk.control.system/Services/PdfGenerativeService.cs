@@ -4,6 +4,7 @@ using risk.control.system.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using Hangfire;
+using System.Text.Json;
 
 
 namespace risk.control.system.Services
@@ -34,6 +35,7 @@ namespace risk.control.system.Services
                     .Include(c => c.ClientCompany)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.InvestigationReport)
+                    .ThenInclude(c => c.EnquiryRequests)
                 .FirstOrDefault(c => c.Id == investigationTaskId);
 
             var policy = context.PolicyDetail
@@ -102,9 +104,31 @@ namespace risk.control.system.Services
 
             context.VendorInvoice.Add(invoice);
             context.SaveChanges();
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                // Export the report template to JSON for debugging purposes
+                await Export2JsonReportTemplatesAsync(investigationReport);
+            }
+            var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
+
             
-            var reportFilename =await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
             return reportFilename;
+        }
+
+        private async Task Export2JsonReportTemplatesAsync(ReportTemplate template)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+            };
+
+            string jsonString = JsonSerializer.Serialize(template, options);
+
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "report", "reportTemplate.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)); // Ensure folder exists
+
+            await File.WriteAllTextAsync(filePath, jsonString);
         }
     }
 }

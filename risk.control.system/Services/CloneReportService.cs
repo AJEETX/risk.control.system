@@ -129,19 +129,6 @@ namespace risk.control.system.Services
 
             return locationTemplate;
         }
-        private async Task SaveReportTemplatesAsync(ReportTemplate template)
-        {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-
-            string jsonString = JsonSerializer.Serialize(template, options);
-
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "report", "reportTemplate.json");
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath)); // Ensure folder exists
-
-            await File.WriteAllTextAsync(filePath, jsonString);
-        }
+        
     }
 }

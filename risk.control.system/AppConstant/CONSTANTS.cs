@@ -46,5 +46,9 @@
             public const string POLICE_ADDRESS = "POLICE_STATION";
             public const string ANGANWAADI_ADDRESS = "ANGANWAADI";
         }
+
+        public const string POLICY_IMAGE = "policy.jpg";
+        public const string CUSTOMER_IMAGE = "customer.jpg";
+        public const string BENEFICIARY_IMAGE = "beneficiary.jpg";
     }
 }

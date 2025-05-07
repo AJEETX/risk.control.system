@@ -4,6 +4,9 @@ using risk.control.system.Models;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp;
 using Gehtsoft.PDFFlow.Utils;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Pbm;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Services
 {
@@ -56,7 +59,7 @@ namespace risk.control.system.Services
                 // Section title
                 section.AddParagraph()
                        .SetLineSpacing(1)
-                       .AddText($"Agent ID  : {loc.AgentIdReport.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy")}")
+                       .AddText($"Agent : Capture Date {loc.AgentIdReport.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy")}")
                        .SetFontSize(14)
                        .SetBold()
                        .SetUnderline();
@@ -77,7 +80,7 @@ namespace risk.control.system.Services
                 {
                     try
                     {
-                        var pngBytes = ImageConverter.ConvertToPng(loc.AgentIdReport.IdImage);
+                        var pngBytes = ImageConverterToPng.ConvertToPng(loc.AgentIdReport.IdImage, loc.AgentIdReport.IdImageExtension);
                         rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes)
                       .SetWidth(100)
                       .SetHeight(100);
@@ -141,36 +144,5 @@ namespace risk.control.system.Services
         }
         
     }
-    public static class ImageConverter
-    {
-        public static byte[] ConvertToPng(byte[] imageBytes)
-        {
-            if (imageBytes == null || imageBytes.Length == 0)
-                throw new ArgumentException("Input image data is null or empty.", nameof(imageBytes));
-
-            try
-            {
-                using var inputStream = new MemoryStream(imageBytes);
-                using var image = Image.Load(inputStream); // Auto-detects format
-                using var outputStream = new MemoryStream();
-
-                var pngEncoder = new PngEncoder
-                {
-                    CompressionLevel = PngCompressionLevel.DefaultCompression,
-                    ColorType = PngColorType.Rgb
-                };
-
-                image.Save(outputStream, pngEncoder);
-                return outputStream.ToArray();
-            }
-            catch (SixLabors.ImageSharp.UnknownImageFormatException)
-            {
-                throw new InvalidOperationException("The provided byte array is not a supported image format.");
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Failed to convert image to PNG format.", ex);
-            }
-        }
-    }
+    
 }

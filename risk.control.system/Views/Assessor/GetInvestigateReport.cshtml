@@ -97,26 +97,49 @@
 			<div class="card-body">
 				<div class="row">
 					<div class="col-sm-6 d-flex align-items-stretch flex-column">
-						<div class="card bg-light d-flex flex-fill">
+						<div class="card bg-light equal-height-card">
 							<div class="card-footer text-muted border-bottom-0">
 								<i class="fas fa-newspaper"></i> <strong> Report Summary </strong>
 							</div>
-							<div class="card-body">
-								<div class="row">
-									<div class="col-md-12">
-										@{
-											foreach (var location in locations)
-											{
-												<div class="card-header bg-light text-white d-flex align-items-center">
-													<h6 class="mb-0 flex-grow-1 @location.LocationStatus">
-														<i class="fas fa-map-marker-alt @location.LocationStatusButton"></i> @location.LocationName
-													</h6>
-												</div>
-												<div class="form-group">
-													<div class="form-check form-switch">
+							<div class="card-body scrollable-body">
+								<table class="table table-bordered table-hover table-sm">
+									<thead class="thead-light">
+										<tr>
+											<th><i class="fas fa-map-marker-alt"></i> [Time spent]</th>
+											<th>Agent</th>
+											<th>Face ID</th>
+											<th>Document ID</th>
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var location in locations)
+										{
+											var duration = location.Updated.GetValueOrDefault().Subtract(location.AgentIdReport.Updated.GetValueOrDefault());
+											var durationText = (duration.Hours > 0 ? $"{duration.Hours}h " : "") +
+											(duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
 
-														<label class="form-check-label" for="flexRadioDefault2">
-															@if (location.AgentIdReport.IdImageValid.GetValueOrDefault())
+											<tr>
+												<td>
+													<span class="badge  @location.LocationStatusButton" title="Time spent on the location">
+														@location.LocationName	(@durationText)
+													</span>
+												</td>
+
+												<td>
+													@if (location.AgentIdReport.IdImageValid.GetValueOrDefault())
+													{
+														<i class='fas fa-check-circle i-green'></i>
+													}
+													else
+													{
+														<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+													}
+												</td>
+												<td>
+													@foreach (var face in location.FaceIds.Where(f => f.Selected))
+													{
+														<div>
+															@if (face.IdImageValid.GetValueOrDefault())
 															{
 																<i class='fas fa-check-circle i-green'></i>
 															}
@@ -124,66 +147,41 @@
 															{
 																<i class='fa fa-times i-orangered' aria-hidden='true'></i>
 															}
-															<span class="process-case"> </span>
-															<i class="fas fa-portrait"></i> <b> @location.AgentEmail</b>
-														</label>
-													</div>
-												</div>
-												@foreach (var face in location.FaceIds.Where(f => f.Selected))
-												{
-													<div class="form-group">
-														<div class="form-check form-switch">
-
-															<label class="form-check-label" for="flexRadioDefault2">
-																@if (face.IdImageValid.GetValueOrDefault())
-																{
-																	<i class='fas fa-check-circle i-green'></i>
-																}
-																else
-																{
-																	<i class='fa fa-times i-orangered' aria-hidden='true'></i>
-																}
-																<span class="process-case"> </span>
-																<i class="fas fa-portrait"></i> <b> @face.ReportName </b>
-															</label>
+															<span class="badge"> @face.ReportName</span>
 														</div>
-													</div>
-												}
-												@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
-												{
-													<div class="form-group">
-														<div class="form-check form-switch">
-
-															<label class="form-check-label" for="flexRadioDefault2">
-																@if (doc.IdImageValid.GetValueOrDefault())
-																{
-																	<i class='fas fa-check-circle i-green'></i>
-																}
-																else
-																{
-																	<i class='fa fa-times i-orangered' aria-hidden='true'></i>
-																}
-																<span class="process-case"> </span>
-																<i class="fas fa-files-o"></i> <b> @doc.ReportName </b>
-															</label>
+													}
+												</td>
+												<td>
+													@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+													{
+														<div>
+															@if (doc.IdImageValid.GetValueOrDefault())
+															{
+																<i class='fas fa-check-circle i-green'></i>
+															}
+															else
+															{
+																<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+															}
+															<span class="badge"> @doc.ReportName</span>
 														</div>
-													</div>
-												}
-											}
+													}
+												</td>
+											</tr>
 										}
+									</tbody>
+								</table>
 
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-sm-6 d-flex align-items-stretch flex-column">
-						<div class="card bg-light d-flex flex-fill">
+						<div class="card bg-light equal-height-card">
 							<div class="card-footer text-muted border-bottom-0">
 								<i class="far fa-file-powerpoint"></i> <strong> Submission type </strong>
 							</div>
-							<div class="card-body">
+							<div class="card-body scrollable-body">
 								<div class="row">
 									<div class="col-md-12">
 										@if (!locations.All(l => l.AgentValidated && l.FaceIdsValidated && l.DocumentsValidated))

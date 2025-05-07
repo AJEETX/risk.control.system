@@ -20,7 +20,7 @@
 						data-target="#location-@location.Id"
 						aria-expanded="false"
 						aria-controls="location-@location.Id">
-					@location.StatusText <i class="fas fa-chevron-down"></i>
+					 <i class="fas fa-chevron-down"></i>
 				</button>
 			</div>
 			
@@ -36,7 +36,7 @@
 							data-target="#agent-@location.Id"
 							aria-expanded="false"
 							aria-controls="agent-@location.Id">
-						Agent Info <i class="fas fa-chevron-down"></i>
+						Agent ID <i class="fas fa-chevron-down"></i>
 					</button>
 					<div class="collapse" id="agent-@location.Id">
 						<div class="table-responsive mb-4">
@@ -68,7 +68,6 @@
 										<!-- Agent icon with required indicator -->
 										<td>
 											<i class="far fa-user text-primary" title="Single person" data-toggle="tooltip"></i>
-											<i class="fa fa-asterisk text-danger ml-1" title="Required" data-toggle="tooltip"></i>
 										</td>
 
 										<!-- ID Photo -->
@@ -78,7 +77,6 @@
 												<img id="face-img-@agent.Id"
 													 src="data:image/*;base64,@(Convert.ToBase64String(agent?.IdImage))"
 													 class="img-thumbnail rounded"
-													 style="width: 75px; height: 75px;"
 													 title="Click to view @location.AgentEmail photo" />
 											}
 											else
@@ -123,16 +121,16 @@
 											{
 												@if (agent.IdImageValid.HasValue && agent.IdImageValid.Value)
 												{
-													<i class="fas fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
+													<i class="fa fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
 												}
 												else
 												{
-													<i class="fas fa-times-circle text-danger" title="Not matched" data-toggle="tooltip"></i>
+													<i class="fa fa-times-circle text-danger" title="Not matched" data-toggle="tooltip"></i>
 												}
 											}
 											else
 											{
-												<i class="fas fa-times-circle text-muted" title="Not validated" data-toggle="tooltip"></i>
+												<i class="fa fa-times-circle text-muted" title="Not validated" data-toggle="tooltip"></i>
 											}
 										</td>
 									</tr>

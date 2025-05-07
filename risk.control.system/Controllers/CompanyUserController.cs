@@ -125,7 +125,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClientCompanyApplicationUser user, string emailSuffix)
         {
@@ -146,6 +145,7 @@ namespace risk.control.system.Controllers
                 user.ProfileImage.CopyTo(dataStream);
                 user.ProfilePicture = dataStream.ToArray();
                 user.ProfilePictureUrl = "/company/" + newFileName;
+                user.ProfilePictureExtension = fileExtension;
             }
             //DEMO
             user.Active = true; 
@@ -217,7 +217,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, ClientCompanyApplicationUser applicationUser)
         {
@@ -240,12 +239,14 @@ namespace risk.control.system.Controllers
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
                     applicationUser.ProfilePictureUrl = "/company/" + newFileName;
+                    applicationUser.ProfilePictureExtension = fileExtension;
                 }
 
                 if (user != null)
                 {
                     user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
                     user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
                     user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                     user.FirstName = applicationUser?.FirstName;
                     user.LastName = applicationUser?.LastName;

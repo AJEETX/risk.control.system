@@ -11,6 +11,7 @@ namespace risk.control.system.Models
         public string? ReportName { get; set; }
         public string? IdName { get; set; }
         public byte[]? IdImage { get; set; }
+        public string? IdImageExtension { get; set; }
 
         public string? IdImageData { get; set; } = "No Location Info...";
 

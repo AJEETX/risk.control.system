@@ -130,7 +130,9 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
+                    claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
                 }
+
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
 
                 claimsInvestigation.IsNew = true;
@@ -187,6 +189,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
                     existingPolicy.PolicyDetail.DocumentImage = dataStream.ToArray();
+                    claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
                 }
 
                 context.Investigations.Update(existingPolicy);
@@ -216,6 +219,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
                     customerDetail.ProfilePicture = dataStream.ToArray();
+                    customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
@@ -268,6 +272,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     await customerDocument.CopyToAsync(dataStream);
                     customerDetail.ProfilePicture = dataStream.ToArray();
+                    customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 else
                 {
@@ -330,6 +335,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
                     beneficiary.ProfilePicture = dataStream.ToArray();
+                    beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == ClaimsInvestigationId);
@@ -384,6 +390,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
                     beneficiary.ProfilePicture = dataStream.ToArray();
+                    beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 else
                 {

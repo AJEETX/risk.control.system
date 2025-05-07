@@ -15,7 +15,7 @@
 					<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-toggle="tooltip"></i>
 				</th>
 				<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
-				<th>Verified Address</th>
+					<th>Captured Address Info</th>
 				<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
 				<th>Match</th>
 			</tr>
@@ -58,8 +58,10 @@
 						}
 					</td>
 					<td>
-						@face.IdImageLocationAddress
-
+							<small>@face.IdImageLocationAddress</small>
+							<span class="badge badge-light">
+								Distance travelled  @face.Distance
+							</span>
 					</td>
 					<td>
 						@face.IdImageData
