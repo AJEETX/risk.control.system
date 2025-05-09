@@ -77,6 +77,7 @@ namespace risk.control.system.Services
             var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
             // Create document
             DocumentBuilder builder = DocumentBuilder.New();
+
             SectionBuilder section = builder.AddSection();
             section.SetOrientation(PageOrientation.Landscape);
 

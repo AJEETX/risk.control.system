@@ -8,6 +8,7 @@ using static System.Collections.Specialized.BitVector32;
 using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.Helpers;
 using static SkiaSharp.SKPath;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
@@ -61,15 +62,21 @@ namespace risk.control.system.Services
         }
         public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation,  ReportTemplate investigationReport)
         {
-           
+
+            //var concertTable = section.AddTable();
             var paragraph = section.AddParagraph();
 
             try
             {
+                //var rowBuilder = concertTable.AddRow();
+                //var cellBuilder = rowBuilder.AddCell();
+                //cellBuilder.SetPadding(2, 2, 2, 0);
+                //cellBuilder.AddImage("");
                 var pngBytes = ImageConverterToPng.ConvertToPng(investigation.Vendor.DocumentImage, investigation.Vendor.DocumentImageExtension);
-                paragraph.SetLineSpacing(2).AddInlineImage(pngBytes)
-                     .SetWidth(100)   // adjust as needed
-                     .SetHeight(100); // optional small space between image and text
+                
+                
+                paragraph.AddInlineImage(pngBytes)
+                     .SetWidth(150); // optional small space between image and text
             }
             catch (Exception ex)
             {
@@ -118,7 +125,7 @@ namespace risk.control.system.Services
                 section.AddParagraph();
                 locationCount++;
             }
-            
+
             section.AddParagraph().AddText("");
 
             // Add Enquiry Report
@@ -199,7 +206,13 @@ namespace risk.control.system.Services
             section = AddRemarks(section, "Supervisor Remarks", investigation.InvestigationReport.SupervisorRemarks);
             return section;
         }
-
+        private void AddLogoImage(TableCellBuilder cellBuilder)
+        {
+            cellBuilder
+                .SetPadding(2, 2, 2, 0);
+            cellBuilder
+                .AddImage("").SetHeight(340);
+        }
         SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
         {
             var table = section.AddTable()

@@ -107,7 +107,7 @@ namespace risk.control.system.Services
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 // Export the report template to JSON for debugging purposes
-                await Export2JsonReportTemplatesAsync(investigationReport);
+                //await Export2JsonReportTemplatesAsync(investigationReport);
             }
             var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
 

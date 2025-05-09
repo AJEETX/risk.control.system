@@ -6,8 +6,8 @@ namespace risk.control.system.Helpers
 {
     public static class ImageConverterToPng
     {
-        static int maxWidth = 80;
-        static int maxHeight = 80;
+        static int maxWidth = 100;
+        static int maxHeight = 100;
         public static byte[] ConvertToPng(byte[] imageBytes, string onlyExtension = "png")
         {
             if (imageBytes == null || imageBytes.Length == 0)
@@ -29,26 +29,26 @@ namespace risk.control.system.Helpers
 
                 using var outputStream = new MemoryStream();
 
-                onlyExtension = onlyExtension?.Trim().ToLowerInvariant().Replace(".", "") ?? "png";
+                //onlyExtension = onlyExtension?.Trim().ToLowerInvariant().Replace(".", "") ?? "png";
 
                 //if (onlyExtension == "jpg" || onlyExtension == "jpeg")
                 //{
-                //    var jpgEncoder = new JpegEncoder
-                //    {
-                //        Quality = 99,
-                //    };
-                //    image.Save(outputStream, jpgEncoder);
+                //    image.SaveAsPng(outputStream);
                 //}
                 //else
-                {
-                    var pngEncoder = new PngEncoder
-                    {
-                        CompressionLevel = PngCompressionLevel.BestCompression,
-                        ColorType = PngColorType.Rgb
-                    };
-                    image.Save(outputStream, pngEncoder);
-                }
+                //{
+                //    image.SaveAsPng(outputStream);
+                //}
 
+                //outputStream.Seek(0, SeekOrigin.Begin);
+                var pngEncoder = new PngEncoder
+                {
+                    CompressionLevel = PngCompressionLevel.BestCompression,
+                    ColorType = PngColorType.Rgb
+                };
+                image.Save(outputStream, pngEncoder);
+                int width =  image.Width;
+                int height =  image.Height;
                 return outputStream.ToArray();
             }
             catch (SixLabors.ImageSharp.UnknownImageFormatException)

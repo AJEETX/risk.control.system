@@ -7,7 +7,7 @@ namespace risk.control.system.Seeds
 {
     public class ReportTemplateSeed
     {
-        public static void QuestionsUNDERWRITING(ApplicationDbContext context, ClientCompany company)
+        public static ReportTemplate QuestionsUNDERWRITING(ApplicationDbContext context, ClientCompany company)
         {
             var template = new ReportTemplate
             {
@@ -60,9 +60,10 @@ namespace risk.control.system.Seeds
 
             // Add the new template to the database
             context.ReportTemplates.Add(template);
+            return template;
         }
 
-        public static void QuestionsCLAIM(ApplicationDbContext context, ClientCompany company)
+        public static ReportTemplate QuestionsCLAIM(ApplicationDbContext context, ClientCompany company)
         {
             var template = new ReportTemplate
             {
@@ -84,7 +85,7 @@ namespace risk.control.system.Seeds
                         {
                             new DigitalIdReport
                             {
-                                Selected = true,
+                                Selected = false,
                                 ReportName = DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName(),
                                 Has2Face = false,
                                 ReportType = DigitalIdReportType.CUSTOMER_FACE
@@ -238,6 +239,7 @@ namespace risk.control.system.Seeds
 
             // Add the new template to the database
             context.ReportTemplates.Add(template);
+            return template;
         }
 
     }

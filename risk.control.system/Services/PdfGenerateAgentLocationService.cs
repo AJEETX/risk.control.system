@@ -82,8 +82,7 @@ namespace risk.control.system.Services
                     {
                         var pngBytes = ImageConverterToPng.ConvertToPng(loc.AgentIdReport.IdImage, loc.AgentIdReport.IdImageExtension);
                         rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes)
-                      .SetWidth(100)
-                      .SetHeight(100);
+                      .SetWidth(100);
                     }
                     catch (Exception ex)
                     {
@@ -107,8 +106,7 @@ namespace risk.control.system.Services
                         rowBuilder.AddCell()
                                   .AddParagraph()
                                   .AddInlineImage(downloadedImagePath)
-                                  .SetWidth(150)
-                                  .SetHeight(150);
+                                  .SetWidth(150);
                     }
                     catch
                     {
