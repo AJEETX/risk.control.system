@@ -142,7 +142,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Agency = a.Vendor?.Name,
                 OwnerDetail = $"data:image/*;base64,{Convert.ToBase64String(a.Vendor.DocumentImage)}",
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
-                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                 Distance = a.SelectedAgentDrivingDistance,
                 Duration = a.SelectedAgentDrivingDuration
             }).ToList();
@@ -266,7 +266,7 @@ namespace risk.control.system.Controllers.Api.Company
                 OwnerDetail = $"data:image/*;base64,{Convert.ToBase64String(a.Vendor.DocumentImage)}",
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
-                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                 Distance = a.SelectedAgentDrivingDistance,
                 Duration = a.SelectedAgentDrivingDuration
             }).ToList();

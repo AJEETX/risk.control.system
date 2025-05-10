@@ -1205,8 +1205,8 @@ namespace risk.control.system.Services
                         : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
                 IsNewAssigned = a.IsNewAssignedToManager,
-                PersonMapAddressUrl = a.GetMap(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.SubStatus == assignedToAssignerStatus,
-                                                      a.SubStatus == submittedToAssessorStatus)
+                PersonMapAddressUrl =string.Format( a.GetMap(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.SubStatus == assignedToAssignerStatus,
+                                                      a.SubStatus == submittedToAssessorStatus),"300", "300")
             });
 
             // Apply Sorting AFTER Data Transformation

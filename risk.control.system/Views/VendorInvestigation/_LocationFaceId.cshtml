@@ -43,7 +43,7 @@
 					<td>
 						@if (face.ValidationExecuted)
 						{
-							<img src="@face.IdImageLocationUrl"
+								<img src="@string.Format(face.IdImageLocationUrl, "300","300")"
 								 class="thumbnail profile-image doc-profile-image map-image"
 								 data-faceid="@face.Id"
 								 data-locationid="@location.Id"

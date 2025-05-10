@@ -17,11 +17,23 @@ namespace risk.control.system.Models
 
     public enum DigitalIdReportType
     {
+        [Display(Name = "Agent Face")]
         AGENT_FACE,
+
+        [Display(Name = "Single Face")]
         SINGLE_FACE,
+
+        [Display(Name = "Customer Face")]
         CUSTOMER_FACE,
+
+        [Display(Name = "Beneficiary Face")]
         BENEFICIARY_FACE,
+
+        [Display(Name = "Dual Face")]
         DUAL_FACE,
+
+        [Display(Name = "House Front")]
         HOUSE_FRONT,
     }
+
 }

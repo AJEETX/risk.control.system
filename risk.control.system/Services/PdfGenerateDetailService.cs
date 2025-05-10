@@ -98,7 +98,7 @@ namespace risk.control.system.Services
 
             //add assessor remarks
 
-            section = AddRemarks(section, "Assessor remarks", investigation.InvestigationReport.AgentRemarks);
+            section = AddRemarks(section, "Assessor remarks", investigation.InvestigationReport.AssessorRemarks);
 
             section.AddParagraph().AddText("");
 

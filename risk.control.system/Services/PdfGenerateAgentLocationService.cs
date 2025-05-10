@@ -102,7 +102,7 @@ namespace risk.control.system.Services
                     try
                     {
                         // Download the image
-                        string downloadedImagePath = await DownloadMapImageAsync(loc.AgentIdReport.IdImageLocationUrl, googlePhotoImagePath);
+                        string downloadedImagePath = await DownloadMapImageAsync(string.Format(loc.AgentIdReport.IdImageLocationUrl, "300","300"), googlePhotoImagePath);
                         rowBuilder.AddCell()
                                   .AddParagraph()
                                   .AddInlineImage(downloadedImagePath)

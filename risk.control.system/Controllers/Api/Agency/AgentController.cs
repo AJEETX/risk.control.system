@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        TimeElapsed = DateTime.Now.Subtract(a.TaskToAgentTime.Value).TotalSeconds,
                        IsNewAssigned = a.IsNewSubmittedToAgent,
                        IsQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR,
-                       PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                       PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                        Distance = a.SelectedAgentDrivingDistance,
                        Duration = a.SelectedAgentDrivingDuration
                    })
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers.Api.Agency
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
                        TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
-                       PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                       PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                        Distance = a.SelectedAgentDrivingDistance,
                        Duration = a.SelectedAgentDrivingDuration
                    })

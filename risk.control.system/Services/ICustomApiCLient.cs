@@ -95,7 +95,20 @@ namespace risk.control.system.Services
                 var response = await client.GetStringAsync(directionsUrl);
                 var route = ParseRoute(response);
                 string encodedPolyline = WebUtility.UrlEncode(route); // URL-encode the polyline
-                var distanceMap = $"https://maps.googleapis.com/maps/api/staticmap?size={mapHeight}x{mapWidth}&markers=color:{startColor}|label:{startLbl}|{startLat},{startLong}&markers=color:{endColor}|label:{endLbl}|{endLat},{endLong}&path=enc:{encodedPolyline}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                                                                      //var distanceMap = $"https://maps.googleapis.com/maps/api/staticmap?size={mapHeight}x{mapWidth}&markers=color:{startColor}|label:{startLbl}|{startLat},{startLong}&markers=color:{endColor}|label:{endLbl}|{endLat},{endLong}&path=enc:{encodedPolyline}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var distanceMap = string.Format(
+                    "https://maps.googleapis.com/maps/api/staticmap?size={{0}}x{{1}}&markers=color:{0}|label:{1}|{2},{3}&markers=color:{4}|label:{5}|{6},{7}&path=enc:{8}&key={9}",
+                    startColor,
+                    startLbl,
+                    startLat,
+                    startLong,
+                    endColor,
+                    endLbl,
+                    endLat,
+                    endLong,
+                    encodedPolyline,
+                    Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")
+                    );
                 return (driving.Distance, driving.DistanceInMetres, driving.Duration, driving.DurationInTime, distanceMap);
             }
             catch (Exception ex)

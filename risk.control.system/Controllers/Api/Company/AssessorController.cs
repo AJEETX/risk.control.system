@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers.Api.Company
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                     Agent = a.Vendor.Name,
                     IsNewAssigned = a.IsNewSubmittedToCompany,
-                    PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 })
@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers.Api.Company
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.EnquiredByAssessorTime ?? DateTime.Now).TotalSeconds,
-                    PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                    PersonMapAddressUrl =string.Format(a.SelectedAgentDrivingMap, "300","300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 })
@@ -309,7 +309,7 @@ namespace risk.control.system.Controllers.Api.Company
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                     Agency = a.Vendor?.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
-                    PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 })
@@ -401,7 +401,7 @@ namespace risk.control.system.Controllers.Api.Company
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                     Agency = a.Vendor?.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
-                    PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 })

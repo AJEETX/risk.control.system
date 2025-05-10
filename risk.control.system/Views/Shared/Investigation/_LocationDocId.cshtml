@@ -45,7 +45,7 @@
 						@if (doc.ValidationExecuted)
 						{
 							<img id="face-img-@doc.Id"
-								 src="@doc.IdImageLocationUrl"
+									 src="@string.Format(doc.IdImageLocationUrl, "300","300")"
 								 class="thumbnail profile-image doc-profile-image map-image"
 								 data-faceid="@doc.Id"
 								 data-locationid="@location.Id"

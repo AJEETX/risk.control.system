@@ -126,7 +126,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ? "<span class=\"badge badge-danger\"><i class=\"fas fa-exclamation-triangle\"></i></span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = GetTimeElapsed(a),
-                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                 Distance = a.SelectedAgentDrivingDistance,
                 Duration = a.SelectedAgentDrivingDuration
             })?.ToList();
@@ -477,7 +477,7 @@ namespace risk.control.system.Controllers.Api.Agency
                             a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
                     IsNewAssigned = a.IsNewSubmittedToAgency,
-                    PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 }).ToList();
@@ -592,7 +592,7 @@ namespace risk.control.system.Controllers.Api.Agency
                                     "<span class=\"badge badge-danger\"><i class=\"fas fa-exclamation-triangle\"></i></span>" :
                                     a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
-                    PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 })

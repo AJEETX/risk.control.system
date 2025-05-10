@@ -38,12 +38,12 @@
         {
             public const string EMPLOYMENT_ADDRESS = "EMPLOYMENT";
             public const string CHEMIST_ADDRESS = "CHEMIST";
-            public const string LA_ADDRESS = "LA_ADDRESS";
+            public const string LA_ADDRESS = "LA ADDRESS";
             public const string BUSINESS_ADDRESS = "BUSINESS";
             
             public const string HOSPITAL_ADDRESS = "HOSPITAL";
             public const string CEMETERY_ADDRESS = "CEMETERY";
-            public const string POLICE_ADDRESS = "POLICE_STATION";
+            public const string POLICE_ADDRESS = "POLICE STATION";
             public const string ANGANWAADI_ADDRESS = "ANGANWAADI";
         }
 

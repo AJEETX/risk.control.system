@@ -351,7 +351,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Role = agent.UserRole.GetEnumDisplayName(),
                     AgentOnboarded = agent.UserRole != AgencyRole.AGENT || !string.IsNullOrWhiteSpace(agent.MobileUId),
                     RawEmail = agent.Email,
-                    PersonMapAddressUrl = map,
+                    PersonMapAddressUrl =string.Format(map,"300","300"),
                     MapDetails = mapDetails,
                     PinCode = agent.PinCode.Code,
                     Distance = distance,

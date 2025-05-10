@@ -176,14 +176,14 @@ namespace risk.control.system.Controllers.Api.Claims
                 faceLng = agentReport.IdImageLongLat.Substring(longLat + 1)?.Trim();
                 var longLatString = faceLat + "," + faceLng;
                 imageAddress = await httpClientService.GetRawAddress((faceLat), (faceLng));
-                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=500x500&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             }
 
             var data = new
             {
                 Title = "Investigation Data",
                 LocationData = agentReport?.IdImageData ?? "Location Data",
-                LatLong = agentReport.IdImageLocationUrl,
+                LatLong =string.Format(agentReport.IdImageLocationUrl, "500px", "500px"),
                 ImageAddress = imageAddress,
                 Location = agentReport?.IdImage != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(agentReport?.IdImage)) :
@@ -221,7 +221,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 panLongitude = claim.InvestigationReport.PanIdReport.IdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
                 var ocrLongLatString = panLatitude + "," + panLongitude;
                 panAddressAddress = await httpClientService.GetRawAddress((panLatitude), (panLongitude));
-                panLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                panLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=500x500&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             }
 
             var data = new
@@ -332,7 +332,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = agentReport.IdImageLocationUrl,
+                        url = string.Format(agentReport.IdImageLocationUrl, "500", "500"),
                         distance = agentReport.Distance,
                         duration = agentReport.Duration,
                     });
@@ -354,7 +354,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = agentReport.IdImageLocationUrl,
+                        url = string.Format(agentReport.IdImageLocationUrl, "500", "500"),
                         distance = agentReport.Distance,
                         duration = agentReport.Duration,
                     });
@@ -385,7 +385,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = faceReport.IdImageLocationUrl,
+                        url =string.Format( faceReport.IdImageLocationUrl, "500","500"),
                         distance = faceReport.Distance,
                         duration = faceReport.Duration,
                     });
@@ -407,7 +407,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = faceReport.IdImageLocationUrl,
+                        url =string.Format( faceReport.IdImageLocationUrl, "500","500"),
                         distance = faceReport.Distance,
                         duration = faceReport.Duration,
                     });
@@ -438,7 +438,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = docReport.IdImageLocationUrl,
+                        url =string.Format( docReport.IdImageLocationUrl, "500","500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
                     });
@@ -460,7 +460,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = docReport.IdImageLocationUrl,
+                        url =string.Format( docReport.IdImageLocationUrl, "500","500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
                     });

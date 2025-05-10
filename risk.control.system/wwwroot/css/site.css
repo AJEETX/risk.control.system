@@ -2930,8 +2930,9 @@ input#checkall {
     }
 }
 #liveMap {
-    height: 500px;
+    height: 550px;
     width: 100%;
+    margin-bottom:3em;
 }
 .loading-effect {
     filter: blur(2px) grayscale(100%);
