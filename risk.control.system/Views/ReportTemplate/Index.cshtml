@@ -50,10 +50,10 @@
 
                     <div class="tab-content" id="insuranceTypeTabContent">
                         <div class="tab-pane fade show active" id="claim-content" role="tabpanel">
-                            @await Html.PartialAsync("_ReportTemplateTablePartial", claimTemplates)
+                            @await Html.PartialAsync("_ReportTemplates", claimTemplates)
                         </div>
                         <div class="tab-pane fade" id="underwriting-content" role="tabpanel">
-                            @await Html.PartialAsync("_ReportTemplateTablePartial", underwritingTemplates)
+                            @await Html.PartialAsync("_ReportTemplates", underwritingTemplates)
                         </div>
                     </div>
                 </div>

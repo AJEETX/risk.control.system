@@ -1656,6 +1656,20 @@ ul#messagesList {
         transform: translateY(-50%);
         color: white; /* Icon color */
     }
+.thumbnail-image {
+    cursor: pointer;
+    max-width: 80px;
+    max-height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.modal-map-image {
+    max-height: 500px;
+    width: 100%;
+    object-fit: contain;
+}
 
 .map-thumbnail {
     position: relative;

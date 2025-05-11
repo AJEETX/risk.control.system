@@ -9,9 +9,11 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 using SkiaSharp;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb(" Report Templates")]
     public class ReportTemplateController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -38,6 +40,27 @@ namespace risk.control.system.Controllers
 
             return View(templates);
         }
+
+        [Breadcrumb(" Detail", FromAction = "Index")]
+        public async Task<IActionResult> Details(long id)
+        {
+            var template = await context.ReportTemplates
+                .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.FaceIds)
+                .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.DocumentIds)
+                .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.Questions)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (template == null)
+            {
+                return NotFound();
+            }
+
+            return View(template);
+        }
+
         // Controller method for adding FaceId
         [HttpGet]
         public async Task<IActionResult> GetFaceIdDetails(long faceId)
