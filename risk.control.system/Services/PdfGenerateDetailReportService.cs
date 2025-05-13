@@ -87,7 +87,7 @@ namespace risk.control.system.Services
             // Add the image inline (before the text)
             
 
-            paragraph.AddText($" {investigation.Vendor.Email} : Investigation Report")
+            paragraph.AddText($" {investigation.Vendor.Email} : Investigation detail")
                      .SetFontSize(18)
                      .SetBold()
                      .SetUnderline();
@@ -122,7 +122,16 @@ namespace risk.control.system.Services
                 // =================== QUESTIONS ====================
                 section = questionService.Build(section, loc);
 
-                section.AddParagraph();
+                // ====== Add Gap Between Locations ======
+                section.AddParagraph().AddText(""); // Empty line
+                section.AddParagraph().AddText(""); // Additional spacing
+                section.AddParagraph().AddText("----------------------------------------------") // Optional separator
+                       .SetFontSize(10)
+                       .SetItalic();
+                section.AddParagraph().AddText(""); // More space if needed
+                section.AddParagraph().AddText("");
+
+
                 locationCount++;
             }
 
