@@ -635,8 +635,9 @@ namespace risk.control.system.Controllers.Api
         
         [AllowAnonymous]
         [HttpPost("answers")]
-        public async Task<IActionResult> Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
+        public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
         {
+
             foreach (var question in Questions)
             {
                 if (question.IsRequired.GetValueOrDefault() && string.IsNullOrEmpty(question.Answer))
