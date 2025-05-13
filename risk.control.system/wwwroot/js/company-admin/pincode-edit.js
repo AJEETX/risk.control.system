@@ -28,6 +28,7 @@
             { data: 'district' },
             { data: 'state' },
             { data: 'country' },
+            { data: 'updated' },
             {
                 data: 'pinCodeId',
                 render: function (data, type, row) {

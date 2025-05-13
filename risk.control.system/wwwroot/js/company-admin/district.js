@@ -25,6 +25,7 @@ $(document).ready(function () {
             { data: 'name' },
             { data: 'state' },
             { data: 'country' },
+            { data: 'updated' },
             {
                 data: 'districtId',
                 render: function (data, type, row) {

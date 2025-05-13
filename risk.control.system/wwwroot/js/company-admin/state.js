@@ -74,6 +74,7 @@
             { data: 'code', orderable: true }, // Make sortable
             { data: 'name', orderable: true }, // Make sortable
             { data: 'countryName', orderable: true },
+            { data: 'updated'},
             {
                 data: 'stateId',
                 render: function (data, type, row) {

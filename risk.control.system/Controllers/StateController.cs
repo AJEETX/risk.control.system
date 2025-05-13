@@ -109,19 +109,28 @@ namespace risk.control.system.Controllers
 
             // Get total records before filtering
             var totalRecords = await query.CountAsync();
-
+            var rawData = await query
+            .Skip(start)
+            .Take(length)
+            .Select(s => new
+            {
+               s.StateId,
+               s.Name,
+               s.Code,
+               s.Updated,
+               CountryName = s.Country.Name
+            })
+            .ToListAsync();
             // Apply paging
-            var data = await query
-                .Skip(start)
-                .Take(length)
-                .Select(s => new
-                {
-                    s.StateId,
-                    s.Name,
-                    s.Code,
-                    CountryName = s.Country.Name
-                })
-                .ToListAsync();
+            // Now format the datetime in memory
+            var data = rawData.Select(s => new
+            {
+                s.StateId,
+                s.Name,
+                s.Code,
+                Updated = s.Updated?.ToString("dd-MMM-yyyy HH:mm"),
+                s.CountryName
+            });
 
             // Prepare DataTables response
             var response = new

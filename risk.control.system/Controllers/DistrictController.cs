@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
 
             var totalRecords = await query.CountAsync();
-            var data = await query
+            var rawData = await query
                 .Skip(start)
                 .Take(length)
                 .Select(p => new
@@ -111,11 +111,21 @@ namespace risk.control.system.Controllers
                     p.DistrictId,
                     p.Code,
                     p.Name,
+                    p.Updated,
                     State = p.State.Name,
                     Country = p.Country.Name
                 })
                 .ToListAsync();
 
+            var data = rawData.Select(p => new
+            {
+                p.DistrictId,
+                p.Code,
+                p.Name,
+                Updated = p.Updated?.ToString("dd-MMM-yyyy HH:mm"),
+                State = p.State,
+                Country = p.Country
+            }).ToList();
             var response = new
             {
                 draw = draw,

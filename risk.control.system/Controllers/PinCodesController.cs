@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers
             var totalRecords = await query.CountAsync();
 
             // Apply paging
-            var data = await query
+            var rawData = await query
                 .Skip(start)
                 .Take(length)
                 .Select(p => new
@@ -118,10 +118,21 @@ namespace risk.control.system.Controllers
                     District = p.District.Name,
                     State = p.State.Name,
                     Country = p.Country.Name,
+                    p.Updated,
                     p.PinCodeId
                 })
                 .ToListAsync();
 
+            var data = rawData.Select(s => new
+            {
+                s.Code,
+                s.Name,
+                District = s.District,
+                State = s.State,
+                Country = s.Country,
+                s.PinCodeId,
+                Updated = s.Updated?.ToString("dd-MMM-yyyy HH:mm"),
+            });
             // Prepare the DataTables response
             var response = new
             {
