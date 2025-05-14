@@ -27,5 +27,6 @@ namespace risk.control.system.Models
         public DateTime? IdImageLongLatTime { get; set; }
         public bool ValidationExecuted { get; set; } = false;
         public bool? IdImageValid { get; set; } = false;
+        public bool IsRequired { get; set; }   = false;
     }
 }

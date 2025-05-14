@@ -20,8 +20,10 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
+                        IsRequired = true,
                         AgentIdReport = new AgentIdReport
                         {
+                            IsRequired = true,
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName(),                                          // You can set other properties of Agent here if needed
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                         },
@@ -29,6 +31,7 @@ namespace risk.control.system.Seeds
                         {
                             new DigitalIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 ReportName = DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName(),
                                 Has2Face = false,
@@ -36,6 +39,7 @@ namespace risk.control.system.Seeds
                             },
                             new DigitalIdReport
                             {
+                                IsRequired = false,
                                 Selected = true,
                                 ReportName = DigitalIdReportType.BENEFICIARY_FACE.GetEnumDisplayName(),
                                 Has2Face = false,
@@ -46,6 +50,7 @@ namespace risk.control.system.Seeds
                         {
                             new DocumentIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.PAN.GetEnumDisplayName(),
@@ -76,8 +81,10 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
+                                IsRequired = true,
                         AgentIdReport = new AgentIdReport
                         {
+                                IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
                         },
@@ -92,6 +99,7 @@ namespace risk.control.system.Seeds
                             },
                             new DigitalIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 ReportName = DigitalIdReportType.BENEFICIARY_FACE.GetEnumDisplayName(),
                                 Has2Face = false,
@@ -102,6 +110,7 @@ namespace risk.control.system.Seeds
                         {
                             new DocumentIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.PAN.GetEnumDisplayName(),
@@ -113,8 +122,10 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.HOSPITAL_ADDRESS,
+                                IsRequired = false,
                         AgentIdReport = new AgentIdReport
                         {
+                            IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                            // You can set other properties of Agent here if needed
                         },
@@ -122,6 +133,7 @@ namespace risk.control.system.Seeds
                         {
                             new DocumentIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.MEDICAL_CERTIFICATE.GetEnumDisplayName(),
@@ -134,8 +146,10 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.BUSINESS_ADDRESS,
+                                IsRequired = false,
                         AgentIdReport = new AgentIdReport
                         {
+                            IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
                         },
@@ -143,6 +157,7 @@ namespace risk.control.system.Seeds
                         {
                             new DocumentIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.ITR.GetEnumDisplayName(),
@@ -155,8 +170,10 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.CHEMIST_ADDRESS,
+                                IsRequired = false,
                         AgentIdReport = new AgentIdReport
                         {
+                                IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
                         },
@@ -164,6 +181,7 @@ namespace risk.control.system.Seeds
                         {
                             new DocumentIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.MEDICAL_PRESCRIPTION.GetEnumDisplayName(),
@@ -175,8 +193,10 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.EMPLOYMENT_ADDRESS,
+                                IsRequired = false,
                         AgentIdReport = new AgentIdReport
                         {
+                                IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
                         },
@@ -184,6 +204,7 @@ namespace risk.control.system.Seeds
                         {
                             new DocumentIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.EMPLOYMENT_RECORD.GetEnumDisplayName(),
@@ -196,8 +217,10 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.CEMETERY_ADDRESS,
+                                IsRequired = true,
                         AgentIdReport = new AgentIdReport
                         {
+                                IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
                         },
@@ -205,6 +228,7 @@ namespace risk.control.system.Seeds
                         {
                             new DocumentIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.DEATH_CERTIFICATE.GetEnumDisplayName(),
@@ -216,8 +240,10 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.POLICE_ADDRESS,
+                                IsRequired = false,
                         AgentIdReport = new AgentIdReport
                         {
+                                IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                            // You can set other properties of Agent here if needed
                         },
@@ -225,6 +251,7 @@ namespace risk.control.system.Seeds
                         {
                             new DocumentIdReport
                             {
+                                IsRequired = true,
                                 Selected = true,
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.POLICE_FIR_REPORT.GetEnumDisplayName(),

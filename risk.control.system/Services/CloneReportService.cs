@@ -45,13 +45,16 @@ namespace risk.control.system.Services
                 LocationTemplate = originalTemplate.LocationTemplate.Select(loc => new LocationTemplate
                 {
                     LocationName = loc.LocationName,
+                    IsRequired = loc.IsRequired,
                     AgentIdReport = new AgentIdReport
                     {
+                        IsRequired = loc.AgentIdReport.IsRequired,
                         ReportType = loc.AgentIdReport.ReportType,
                         ReportName = loc.AgentIdReport.ReportName,
                     },
                     FaceIds = loc.FaceIds?.Select(face => new DigitalIdReport
                     {
+                        IsRequired = face.IsRequired,
                         ReportType = face.ReportType,
                         Selected = face.Selected,
                         Has2Face = face.Has2Face,
@@ -60,7 +63,7 @@ namespace risk.control.system.Services
 
                     DocumentIds = loc.DocumentIds?.Select(doc => new DocumentIdReport
                     {
-                        // Copy fields if any
+                        IsRequired = doc.IsRequired,
                         ReportType = doc.ReportType,
                         ReportName = doc.ReportName,
                         IdImageBack = doc.IdImageBack,
@@ -98,13 +101,16 @@ namespace risk.control.system.Services
             var locationTemplate = originalTemplate.LocationTemplate.Select(loc => new             
             {
                 LocationName = loc.LocationName,
+                IsRequired = loc.IsRequired,
                 Agent = new 
                 {
+                    IsRequired = loc.AgentIdReport.IsRequired,
                     ReportType = loc.AgentIdReport.ReportType.GetEnumDisplayName(),
                     ReportName = loc.AgentIdReport.ReportName
                 },
                 FaceIds = loc.FaceIds.Where(face => face.Selected)?.Select(face => new 
                 {
+                    IsRequired = face.IsRequired,
                     ReportType = face.ReportType.GetEnumDisplayName(),
                     Has2Face = face.Has2Face,
                     ReportName = face.ReportName
@@ -112,6 +118,7 @@ namespace risk.control.system.Services
 
                 DocumentIds = loc.DocumentIds.Where(face => face.Selected)?.Select(doc => new 
                 {
+                    IsRequired = doc.IsRequired,
                     ReportType = doc.ReportType.GetEnumDisplayName(),
                     ReportName = doc.ReportName,
                     IdImageBack = doc.IdImageBack,

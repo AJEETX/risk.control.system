@@ -25,7 +25,12 @@
 			{
 
 				<tr>
-					<td>@doc.ReportName</td>
+					<td>@doc.ReportName
+						@if (doc.IsRequired)
+						{
+							<span class="required-asterisk" title="Mandatory Location">*</span>
+						}
+					</td>
 					
 					<td>
 						@if (doc.ValidationExecuted)

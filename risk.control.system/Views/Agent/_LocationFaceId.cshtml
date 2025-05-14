@@ -25,6 +25,10 @@
 				<tr>
 					<td>
 						@face.ReportName
+						@if (face.IsRequired)
+						{
+							<span class="required-asterisk" title="Mandatory Location">*</span>
+						}
 					</td>
 					
 					<td>

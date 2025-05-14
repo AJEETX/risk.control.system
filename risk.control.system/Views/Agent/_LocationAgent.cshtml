@@ -25,10 +25,15 @@
 				@if (agent.ValidationExecuted)
 				{
 					@location.AgentEmail
+					
 				}
 				else
 				{
 					@agent.ReportType.GetEnumDisplayName()
+				}
+				@if (agent.IsRequired)
+				{
+					<span class="required-asterisk" title="Mandatory Location">*</span>
 				}
 			</td>
 

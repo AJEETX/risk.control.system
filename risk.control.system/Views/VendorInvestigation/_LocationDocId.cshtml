@@ -8,17 +8,17 @@
 {
 	<div class="table-responsive mb-4">
 
-		<table class="table table-bordered table-striped">
+		<table class="table table-bordered table-hover text-center align-middle">
 			<thead class="table-light">
 				<tr>
-					<th>Document</th>
-					<th>
+					<th class="col-verifier-name">Document</th>
+					<th class="col-face-photo">
 						<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
 					</th>
-					<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
-					<th>Verified Address</th>
-					<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
-					<th>Valid</th>
+					<th class="col-pin-img" title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
+					<th class="col-address">Verified Address</th>
+					<th class="col-weather" title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
+					<th class="col-match">Valid</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -26,7 +26,12 @@
 				{
 
 					<tr>
-						<td>@doc.ReportName</td>
+						<td>@doc.ReportName
+							@if (doc.IsRequired)
+							{
+								<span class="required-asterisk" title="Mandatory Location">*</span>
+							}
+						</td>
 
 						<td>
 							@if (doc.ValidationExecuted)

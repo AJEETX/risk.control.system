@@ -10,6 +10,10 @@
 			<div class="card-header bg-light text-white d-flex align-items-center">
 				<h5 class="mb-0 flex-grow-1 @location.LocationStatus">
 					<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
+					@if (location.IsRequired)
+					{
+						<span class="required-asterisk" title="Mandatory Location">*</span>
+					}
 				</h5>
 
 				<button class="btn btn-sm @location.LocationStatusButton  mb-2" type="button"
@@ -58,6 +62,10 @@
 											else
 											{
 												@agent.ReportType.GetEnumDisplayName()
+											}
+											@if (agent.IsRequired)
+											{
+												<span class="required-asterisk" title="Mandatory Location">*</span>
 											}
 										</td>
 

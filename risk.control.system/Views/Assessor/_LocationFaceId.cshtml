@@ -10,14 +10,14 @@
 		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 		<thead class="table-light">
 			<tr>
-				<th title="Verifier Name"><img class="action-image" src="~/headers/customer.gif" /></th>
-				<th>
+					<th class="col-verifier-name" title="Verifier Name"><img class="action-image" src="~/headers/customer.gif" /></th>
+					<th class="col-face-photo">
 					<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-toggle="tooltip"></i>
 				</th>
-				<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
-					<th>Captured Address Info</th>
-				<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
-				<th>Match</th>
+					<th class="col-pin-img" title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
+					<th class="col-address">Captured Address Info</th>
+					<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" /></th>
+					<th class="col-match">Match</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -26,6 +26,10 @@
 				<tr>
 					<td>
 						@face.ReportName
+							@if (face.IsRequired)
+							{
+								<span class="required-asterisk" title="Mandatory Location">*</span>
+							}
 					</td>
 					
 					<td>

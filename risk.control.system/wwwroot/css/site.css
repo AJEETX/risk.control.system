@@ -2962,3 +2962,26 @@ input#checkall {
     flex: 1 1 auto;
     overflow-y: auto;
 }
+th.col-verifier-name {
+    width: 12%;
+}
+
+th.col-face-photo {
+    width: 10%;
+}
+
+th.col-pin-img {
+    width: 12%;
+}
+
+th.col-address {
+    width: 28%;
+}
+
+th.col-weather {
+    width: 20%;
+}
+
+th.col-match {
+    width: 8%;
+}

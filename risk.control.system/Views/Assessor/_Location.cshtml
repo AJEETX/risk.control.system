@@ -14,7 +14,10 @@
 			<div class="card-header bg-light text-white d-flex align-items-center">
 				<h5 class="mb-0 flex-grow-1 @location.LocationStatus">
 					<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
-
+					@if (location.IsRequired)
+					{
+						<span class="required-asterisk" title="Mandatory Location">*</span>
+					}
 					<span class="badge badge-light">Time spent:</span><span class="badge @location.StatusClass" title="Time spent on the location">
 					 @(duration.Hours > 0 ? $"{duration.Hours}h " : "")@(duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min")   
 					</span>
@@ -66,6 +69,10 @@
 											else
 											{
 												@agent.ReportType.GetEnumDisplayName()
+											}
+											@if (agent.IsRequired)
+											{
+												<span class="required-asterisk" title="Mandatory Location">*</span>
 											}
 										</td>
 

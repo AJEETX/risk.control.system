@@ -35,6 +35,10 @@
 							<div class="card-header bg-light">
 								<h5 class="card-title">
 									<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
+									@if (location.IsRequired)
+									{
+										<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+									}
 								</h5>
 								<div class="card-tools">
 									<button class="btn btn-sm btn-outline-secondary" type="button"
@@ -69,6 +73,10 @@
 																		<i class="far fa-user text-info me-1"></i>
 																	}
 																	@face.ReportName
+																	@if (face.IsRequired)
+																	{
+																		<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+																	}
 																</label>
 															</div>
 														</div>
@@ -97,6 +105,10 @@
 																		<i class="far fa-file text-muted me-1"></i>
 																	}
 																	@doc.ReportName
+																	@if (doc.IsRequired)
+																	{
+																		<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+																	}
 																</label>
 															</div>
 														</div>
@@ -116,7 +128,7 @@
 															<span>@question.QuestionText</span>
 															@if (question.IsRequired)
 															{
-																<span class="text-danger ms-1" title="Required">*</span>
+																<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
 															}
 															<br />
 															<small class="text-muted">@question.QuestionType</small>

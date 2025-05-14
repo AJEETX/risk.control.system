@@ -13,7 +13,7 @@ namespace risk.control.system.Models
         public string? QuestionType { get; set; } // "Text", "Radio", "Checkbox"
         public string? Options { get; set; } // comma-separated
         public bool? IsRequired { get; set; }
-        public string Answer { get; set; } // <== This will bind input value
+        public string? Answer { get; set; } // <== This will bind input value
     }
 
 
@@ -54,7 +54,7 @@ namespace risk.control.system.Models
         public List<DigitalIdReport>? FaceIds { get; set; } = new();
         public List<DocumentIdReport>? DocumentIds { get; set; } = new();
         public List<Question>? Questions { get; set; } = new List<Question>();
-
+        public bool IsRequired { get; set; } = false;
         [NotMapped]
         public long CaseId { get; set; }
 

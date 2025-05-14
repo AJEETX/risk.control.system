@@ -6,25 +6,36 @@
 @if (location.FaceIds?.Any(f => f.Selected) == true)
 {  
 	<div class="table-responsive mb-4">
-	<table class="table table-bordered table-hover dt-responsive nowrap w-100">
-		<thead class="table-light">
-			<tr>
-				<th title="Verifier Name"><img class="action-image" src="~/headers/customer.gif" /></th>
-				<th>
-					<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-toggle="tooltip"></i>
-				</th>
-				<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
-				<th>Verified Address</th>
-				<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
-				<th>Match</th>
-			</tr>
-		</thead>
+		<table class="table table-bordered table-hover text-center align-middle">
+			<thead class="table-light">
+				<tr>
+					<th class="col-verifier-name" title="Verifier Name">
+						<img class="action-image" src="~/headers/customer.gif" />
+					</th>
+					<th class="col-face-photo">
+						<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-toggle="tooltip"></i>
+					</th>
+					<th class="col-pin-img" title="Verified Address">
+						<img class="action-image" src="~/headers/pincode.gif" />
+					</th>
+					<th class="col-address">Verified Address</th>
+					<th class="col-weather" title="Weather info">
+						<img class="action-image" src="~/headers/information.gif" />
+					</th>
+					<th class="col-match">Match</th>
+				</tr>
+			</thead>
+
 		<tbody>
 			@foreach (var face in location.FaceIds.Where(f => f.Selected))
 			{
 				<tr>
 					<td>
 						@face.ReportName
+							@if (face.IsRequired)
+							{
+								<span class="required-asterisk" title="Mandatory Location">*</span>
+							}
 					</td>
 					
 					<td>
