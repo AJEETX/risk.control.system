@@ -726,14 +726,8 @@ namespace risk.control.system.Services
                 claim.SelectedAgentDrivingDuration = drivingDuration;
                 claim.SelectedAgentDrivingDistanceInMetres = distanceInMeters;
                 claim.SelectedAgentDrivingDurationInSeconds = durationInSeconds;
-                claim.SelectedAgentDrivingMap = drivingMap;
+                claim.SelectedAgentDrivingMap =string.Format(drivingMap,"400","400");
                 claim.TaskToAgentTime = DateTime.Now;
-
-                //var CaseQuestionnaire = context.CaseQuestionnaire.Include(c => c.Questions).FirstOrDefault(x =>  x.ClientCompanyId == claim.ClientCompanyId  && x.InsuranceType == claim.PolicyDetail.InsuranceType);
-                
-                //claim.InvestigationReport = new InvestigationReport();
-                
-                //claim.InvestigationReport.CaseQuestionnaire = CaseQuestionnaire;
 
                 context.Investigations.Update(claim);
                 var rows = await context.SaveChangesAsync();

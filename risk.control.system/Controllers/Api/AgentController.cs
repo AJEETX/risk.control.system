@@ -632,7 +632,7 @@ namespace risk.control.system.Controllers.Api
             response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
             return Ok(response);
         }
-        
+
         [AllowAnonymous]
         [HttpPost("answers")]
         public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
@@ -652,9 +652,11 @@ namespace risk.control.system.Controllers.Api
                 // e.g. return View(model);
                 return BadRequest("Some answers are missing.");
             }
-            await agentIdService.Answers(locationName, caseId, Questions);
-
-            return Ok();
+            var answerSubmitted = await agentIdService.Answers(locationName, caseId, Questions);
+            if (answerSubmitted)
+                return Ok();
+            else
+                return BadRequest("Error in submitting answers");
         }
 
         [AllowAnonymous]

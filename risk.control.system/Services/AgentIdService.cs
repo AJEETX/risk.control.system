@@ -14,7 +14,7 @@ public interface IAgentIdService
     Task<AppiCheckifyResponse> GetAgentId(FaceData data);
     Task<AppiCheckifyResponse> GetFaceId(FaceData data);
     Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
-    Task Answers(string locationName, long caseId, List<QuestionTemplate> Questions);
+    Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions);
 
 }
 
@@ -537,7 +537,7 @@ public class AgentIdService : IAgentIdService
         }
     }
 
-    public async Task Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
+    public async Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
     {
         var claim = await _context.Investigations
                 .Include(c => c.InvestigationReport)
@@ -562,13 +562,11 @@ public class AgentIdService : IAgentIdService
                 AnswerText = q.Answer,
                 Updated = DateTime.Now,
             });
-            //var locaQuestion = locationTemplate.Questions.FirstOrDefault(l => l.Id == q.Id);
-            //locaQuestion.AnswerText = q.Answer;
-            //locaQuestion.Updated = DateTime.Now;
         }
         locationTemplate.ValidationExecuted = true;
         locationTemplate.Updated = DateTime.Now;
         _context.LocationTemplate.Update(locationTemplate);
-        await _context.SaveChangesAsync();
+        var rowsAffected = await _context.SaveChangesAsync();
+        return rowsAffected > 0;
     }
 }
