@@ -242,7 +242,9 @@ namespace risk.control.system.Services
                 var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
                 customerDetail.Latitude = latLong.Latitude;
                 customerDetail.Longitude = latLong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
                 customerDetail.CustomerLocationMap = url;
 
                 var addedClaim = context.CustomerDetail.Add(customerDetail);
@@ -303,7 +305,8 @@ namespace risk.control.system.Services
                 var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
                 customerDetail.Latitude = latLong.Latitude;
                 customerDetail.Longitude = latLong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
                 customerDetail.CustomerLocationMap = url;
 
                 // Attach the customerDetail object to the context and mark it as modified
@@ -359,7 +362,8 @@ namespace risk.control.system.Services
                 var address = beneficiary.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
                 beneficiary.BeneficiaryLocationMap = url;
                 beneficiary.Latitude = latlong.Latitude;
                 beneficiary.Longitude = latlong.Longitude;
@@ -423,7 +427,8 @@ namespace risk.control.system.Services
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 beneficiary.Latitude = latlong.Latitude;
                 beneficiary.Longitude = latlong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
                 beneficiary.BeneficiaryLocationMap = url;
 
                 context.BeneficiaryDetail.Attach(beneficiary);
@@ -779,7 +784,10 @@ namespace risk.control.system.Services
                 BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
                 CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
                 PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
-                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap : Applicationsettings.NO_MAP
+                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING?
+                        string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") :
+                        string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400") : 
+                        Applicationsettings.NO_MAP
             });
 
             // Apply Sorting AFTER Data Transformation
@@ -1007,7 +1015,9 @@ namespace risk.control.system.Services
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds, // Calculate here
-                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? 
+                string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") : 
+                string.Format( a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400")
             }); // Materialize the list
 
             // Apply Sorting AFTER Data Transformation
@@ -1206,7 +1216,7 @@ namespace risk.control.system.Services
                 TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
                 IsNewAssigned = a.IsNewAssignedToManager,
                 PersonMapAddressUrl =string.Format( a.GetMap(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.SubStatus == assignedToAssignerStatus,
-                                                      a.SubStatus == submittedToAssessorStatus),"300", "300")
+                                                      a.SubStatus == submittedToAssessorStatus),"400", "400")
             });
 
             // Apply Sorting AFTER Data Transformation

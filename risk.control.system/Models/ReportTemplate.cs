@@ -55,6 +55,8 @@ namespace risk.control.system.Models
         public List<DocumentIdReport>? DocumentIds { get; set; } = new();
         public List<Question>? Questions { get; set; } = new List<Question>();
         public bool IsRequired { get; set; } = false;
+        public bool ValidationExecuted { get; set; } = false;
+
         [NotMapped]
         public long CaseId { get; set; }
 
@@ -69,39 +71,40 @@ namespace risk.control.system.Models
         [NotMapped]
         public string StatusClass = "bg-danger text-white";
         [NotMapped]
-        public bool AllQuestionsAnswered => Questions != null && Questions.All(q => !string.IsNullOrWhiteSpace(q.AnswerText));
+        public bool AllQuestionsAnswered => Questions.Where(q => q.IsRequired).All(q => !string.IsNullOrWhiteSpace(q.AnswerText));
+
 
         [NotMapped]
-        public bool DocumentsValidated => DocumentIds?.Where(d => d.Selected).All(d => d.IdImageValid.GetValueOrDefault()) ?? false;
+        public bool DocumentsValidated => DocumentIds?.Where(d => d.Selected && d.IsRequired).All(d => d.IdImageValid.GetValueOrDefault() && d.IsRequired) ?? false;
         [NotMapped]
-        public bool FaceIdsValidated => FaceIds?.Where(f => f.Selected).All(f => f.IdImageValid.GetValueOrDefault()) ?? false;
+        public bool FaceIdsValidated => FaceIds?.Where(f => f.Selected && f.IsRequired).All(f => f.IdImageValid.GetValueOrDefault() && f.IsRequired) ?? false;
         [NotMapped]
         public bool AgentValidated => AgentIdReport?.IdImageValid ?? false;
 
         public void SetStatus()
         {
-            if (AllQuestionsAnswered && DocumentsValidated && FaceIdsValidated && AgentValidated)
+            if (IsRequired && AllQuestionsAnswered && DocumentsValidated && FaceIdsValidated && AgentValidated)
                 {
                     LocationStatusButton = "btn-outline-success";
                     LocationStatus = "border-success";
                     StatusText = "Completed";
-                    StatusClass = "bg-success text-white";
+                    StatusClass =  "bg-success text-white";
                 }
-            else if (!AllQuestionsAnswered && !DocumentsValidated && !FaceIdsValidated && !AgentValidated)
+            else if (!IsRequired && !AllQuestionsAnswered && !DocumentsValidated && !FaceIdsValidated && !AgentValidated)
             {
                 LocationStatusButton = "btn-outline-danger";
                 LocationStatus = "border-danger";
                 StatusText = "Invalid";
                 StatusClass = "bg-danger text-white";
             }
-            else if (AllQuestionsAnswered || DocumentsValidated || FaceIdsValidated || AgentValidated)
+            else if (IsRequired && (AllQuestionsAnswered || DocumentsValidated || FaceIdsValidated || AgentValidated))
             {
                 LocationStatusButton = "btn-outline-warning";
                 LocationStatus = "border-warning";
                 StatusText = "Partial";
                 StatusClass = "bg-warning text-dark";
             }
-            if(AgentValidated)
+            if(IsRequired && AgentValidated)
             {
                 AgentStatus = "btn-outline-success";
             }

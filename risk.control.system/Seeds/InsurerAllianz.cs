@@ -97,27 +97,9 @@ namespace risk.control.system.Seeds
             var claimTemplate = ReportTemplateSeed.QuestionsCLAIM(context, insurer);
             var underwriting = ReportTemplateSeed.QuestionsUNDERWRITING(context, insurer);
 
-            await Export2JsonReportTemplatesAsync(claimTemplate, "claimTemplate.json");
-            await Export2JsonReportTemplatesAsync(underwriting, "underwritingTemplate.json");
-
             await context.SaveChangesAsync(null, false);
 
             return insurerCompany.Entity;
-        }
-        private static async Task Export2JsonReportTemplatesAsync(ReportTemplate template, string file)
-        {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-            };
-
-            string jsonString = JsonSerializer.Serialize(template, options);
-
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "report", file);
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath)); // Ensure folder exists
-
-            await File.WriteAllTextAsync(filePath, jsonString);
         }
     }
 }

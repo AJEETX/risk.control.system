@@ -101,8 +101,10 @@ public class AgentIdService : IAgentIdService
                 face.IdImage = stream.ToArray();
             }
 
-            location.AgentEmail = agent.Email;
-            _context.LocationTemplate.Update(location);
+            locationTemplate.Updated = DateTime.Now ;
+            locationTemplate.AgentEmail = agent.Email;
+            locationTemplate.ValidationExecuted = true;
+            _context.LocationTemplate.Update(locationTemplate);
             face.Updated = DateTime.Now;
             face.UpdatedBy = data.Email;
             face.IdImageLongLatTime = DateTime.Now;
@@ -258,8 +260,10 @@ public class AgentIdService : IAgentIdService
                 face.IdImage = stream.ToArray();
             }
 
-            location.AgentEmail = agent.Email;
-            _context.LocationTemplate.Update(location);
+            locationTemplate.AgentEmail = agent.Email;
+            locationTemplate.Updated = DateTime.Now;
+            locationTemplate.ValidationExecuted = true;
+            _context.LocationTemplate.Update(locationTemplate);
             face.Updated = DateTime.Now;
             face.UpdatedBy = data.Email;
             face.IdImageLongLatTime = DateTime.Now;
@@ -424,6 +428,9 @@ public class AgentIdService : IAgentIdService
                 doc.IdImage = stream.ToArray();
             }
 
+            locationTemplate.ValidationExecuted = true;
+            locationTemplate.Updated = DateTime.Now;
+            _context.LocationTemplate.Update(locationTemplate);
             doc.IdImageLongLat = data.LocationLatLong;
             doc.IdImageLongLatTime = DateTime.Now;
             var longLat = doc.IdImageLongLat.IndexOf("/");
@@ -559,6 +566,7 @@ public class AgentIdService : IAgentIdService
             //locaQuestion.AnswerText = q.Answer;
             //locaQuestion.Updated = DateTime.Now;
         }
+        locationTemplate.ValidationExecuted = true;
         locationTemplate.Updated = DateTime.Now;
         _context.LocationTemplate.Update(locationTemplate);
         await _context.SaveChangesAsync();

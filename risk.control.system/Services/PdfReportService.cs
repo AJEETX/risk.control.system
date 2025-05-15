@@ -281,13 +281,13 @@ namespace risk.control.system.Services
             {
                 detailReport.VerifyAddress = claim.CustomerDetail.Addressline + ", " + claim.CustomerDetail.District.Name + ", " + claim.CustomerDetail.State.Name + ", (" + claim.CustomerDetail.Country.Code + "), " + claim.CustomerDetail.PinCode.Code;
                 contactNumer = claim.CustomerDetail.ContactNumber;
-                personAddressUrl = claim.CustomerDetail.CustomerLocationMap;
+                personAddressUrl =string.Format( claim.CustomerDetail.CustomerLocationMap,"400","400");
             }
             else
             {
                 detailReport.VerifyAddress = claim.BeneficiaryDetail.Addressline + ", " + claim.BeneficiaryDetail.District.Name + ", " + claim.BeneficiaryDetail.State.Name + ", (" + claim.BeneficiaryDetail.Country.Code + "), " + claim.BeneficiaryDetail.PinCode.Code;
                 contactNumer = claim.BeneficiaryDetail.ContactNumber;
-                personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
+                personAddressUrl = string.Format(claim.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400");
             }
 
             string googlePersonAddressImagePath = Path.Combine(imagePath, "report", $"google-agent-address-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
@@ -338,12 +338,12 @@ namespace risk.control.system.Services
             if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 contactNumer = new string('*', claim.CustomerDetail.ContactNumber.Length - 4) + claim.CustomerDetail.ContactNumber.Substring(claim.CustomerDetail.ContactNumber.Length - 4);
-                personAddressUrl = claim.CustomerDetail.CustomerLocationMap;
+                personAddressUrl =string.Format( claim.CustomerDetail.CustomerLocationMap, "400", "400");
             }
             else
             {
                 contactNumer = claim.BeneficiaryDetail.ContactNumber;
-                personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
+                personAddressUrl =string.Format( claim.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400");
             }
             string googlePersonAddressImagePath = Path.Combine(imagePath, "report", $"google-person-address-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
             var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);

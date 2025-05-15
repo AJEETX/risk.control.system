@@ -95,44 +95,48 @@ namespace risk.control.system.Services
 
             foreach (var loc in investigationReport.LocationTemplate)
             {
-                var duration = loc.Updated.GetValueOrDefault().Subtract(loc.AgentIdReport.Updated.GetValueOrDefault());
-                var durationDisplay = "Time spent :" + (duration.Hours > 0 ? $"{duration.Hours}h " : "") + (duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
+                if(loc.ValidationExecuted)
+                {
+                    var duration = loc.Updated.GetValueOrDefault().Subtract(loc.AgentIdReport.Updated.GetValueOrDefault());
+                    var durationDisplay = "Time spent :" + (duration.Hours > 0 ? $"{duration.Hours}h " : "") + (duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
 
-                section.AddParagraph()
-                .SetLineSpacing(1)
-                   .AddText($"{locationCount}.  Location Verified: {loc.LocationName} : {durationDisplay}")
-                   .SetBold()
-                   .SetFontSize(14);
+                    section.AddParagraph()
+                    .SetLineSpacing(1)
+                       .AddText($"{locationCount}.  Location Verified: {loc.LocationName} : {durationDisplay}")
+                       .SetBold()
+                       .SetFontSize(14);
 
-                section.AddParagraph()
-                       .SetLineSpacing(1)
-                       .AddText($"Verifying Agent: {loc.AgentEmail}")
-                       .SetFontSize(12)
-                       .SetItalic();
+                    section.AddParagraph()
+                           .SetLineSpacing(1)
+                           .AddText($"Verifying Agent: {loc.AgentEmail}")
+                           .SetFontSize(12)
+                           .SetItalic();
 
-                // =================== AGENT ID REPORT ====================
-                section = await agentService.Build(section, loc);
+                    // =================== AGENT ID REPORT ====================
+                    section = await agentService.Build(section, loc);
 
-                // =================== FACE IDs ====================
-                section = await faceService.Build(section, loc);
+                    // =================== FACE IDs ====================
+                    section = await faceService.Build(section, loc);
 
-                //// =================== DOCUMENT IDs ====================
-                section = await documentService.Build(section, loc);
+                    //// =================== DOCUMENT IDs ====================
+                    section = await documentService.Build(section, loc);
 
-                // =================== QUESTIONS ====================
-                section = questionService.Build(section, loc);
+                    // =================== QUESTIONS ====================
+                    section = questionService.Build(section, loc);
 
-                // ====== Add Gap Between Locations ======
-                section.AddParagraph().AddText(""); // Empty line
-                section.AddParagraph().AddText(""); // Additional spacing
-                section.AddParagraph().AddText("----------------------------------------------") // Optional separator
-                       .SetFontSize(10)
-                       .SetItalic();
-                section.AddParagraph().AddText(""); // More space if needed
-                section.AddParagraph().AddText("");
+                    // ====== Add Gap Between Locations ======
+                    section.AddParagraph().AddText(""); // Empty line
+                    section.AddParagraph().AddText(""); // Additional spacing
+                    section.AddParagraph().AddText("----------------------------------------------") // Optional separator
+                           .SetFontSize(10)
+                           .SetItalic();
+                    section.AddParagraph().AddText(""); // More space if needed
+                    section.AddParagraph().AddText("");
 
 
-                locationCount++;
+                    locationCount++;
+                }
+                
             }
 
             section.AddParagraph().AddText("");

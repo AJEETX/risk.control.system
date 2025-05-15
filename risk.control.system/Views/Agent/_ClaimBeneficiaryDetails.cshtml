@@ -15,7 +15,8 @@
             currentBAgeinYrs = (int)age / 365;
         }
     }
-    
+    var map = string.Format(Model.Location.BeneficiaryLocationMap, "400", "400");
+
     <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
         <div class="card bg-light d-flex flex-fill">
             <div class="card-header text-muted border-bottom-0">
@@ -95,7 +96,7 @@
                             }
                         </p>
                         <p class="text-muted text-sm">
-                            <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap" data-toggle="tooltip" title="Display Beneficiary Address in map">
+                            <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" data-toggle="tooltip" title="Display Beneficiary Address in map">
                         </p>
                     </div>
                 </div>

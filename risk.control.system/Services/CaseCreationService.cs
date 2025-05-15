@@ -268,7 +268,8 @@ namespace risk.control.system.Services
             customerDetail.Latitude = coordinates.Latitude;
             customerDetail.Longitude = coordinates.Longitude;
             var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
             customerDetail.CustomerLocationMap = url;
             return customerDetail;
         }
@@ -330,12 +331,12 @@ namespace risk.control.system.Services
 
             var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
 
-            var beneLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+            var latLong = coordinates.Latitude + "," + coordinates.Longitude;
             beneficairy.Latitude = coordinates.Latitude;
             beneficairy.Longitude = coordinates.Longitude;
-
-            var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{beneLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-            beneficairy.BeneficiaryLocationMap = beneUrl;
+            var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    latLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
+            beneficairy.BeneficiaryLocationMap = url;
             return beneficairy;
         }
 

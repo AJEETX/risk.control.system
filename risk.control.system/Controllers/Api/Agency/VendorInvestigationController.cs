@@ -339,7 +339,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds,
                 IsNewAssigned = a.IsNewAssignedToAgency,
                 IsQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR,
-                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap,
+                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
+                string.Format( a.CustomerDetail.CustomerLocationMap, "400", "400") :string.Format( a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400"),
                 AddressLocationInfo = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.AddressLocationInfo : a.BeneficiaryDetail.AddressLocationInfo
             }).ToList();
             // Mark claims as viewed

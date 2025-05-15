@@ -54,7 +54,7 @@ namespace risk.control.system.Services
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-face-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
             // =================== FACE IDs ====================
             
-            if (loc.FaceIds?.Any() == true)
+            if (loc.FaceIds?.Any() == true && loc.FaceIds.Any(f=>f.ValidationExecuted))
             {
                 section.AddParagraph()
                        .SetLineSpacing(1)
@@ -74,7 +74,7 @@ namespace risk.control.system.Services
                     .AddColumnPercentToTable("Map Image", 25)
                     .AddColumnPercentToTable("Match", 5);
 
-                foreach (var face in loc.FaceIds.Where(f => f.Selected))
+                foreach (var face in loc.FaceIds.Where(f => f.Selected && f.ValidationExecuted))
                 {
 
                     var rowBuilder = tableBuilder.AddRow();

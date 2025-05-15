@@ -54,7 +54,7 @@ namespace risk.control.system.Services
             var imagePath = webHostEnvironment.WebRootPath;
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-agent-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
             // =================== AGENT ID REPORT ====================
-            if (loc.AgentIdReport != null)
+            if (loc.AgentIdReport != null && loc.AgentIdReport.ValidationExecuted)
             {
                 // Section title
                 section.AddParagraph()

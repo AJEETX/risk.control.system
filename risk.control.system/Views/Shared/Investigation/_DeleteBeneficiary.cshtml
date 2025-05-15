@@ -8,6 +8,7 @@
     var imgPath = "/flags/in.png";
     var country = string.Empty;
     var phone = string.Empty;
+    var map = string.Empty;
     if (Model.ClaimsInvestigation.CustomerDetail != null)
     {
         customerExist = true;
@@ -21,6 +22,7 @@
         country = @Model.Location?.Country?.Name;
         phone = +@Model.Location?.Country.ISDCode +" (0) "+ @Model.Location?.ContactNumber;
         imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
+        map = string.Format(Model.Location.BeneficiaryLocationMap, "200", "200");
     }
     string benficiaryProgressClass = "progress-bar-lightgrey"; // Default class
 
@@ -108,7 +110,7 @@
                     <p class="text-muted text-sm">
                         @if (Model?.Location?.BeneficiaryLocationMap != null)
                         {
-                            <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap">
+                            <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map">
                         }
                     </p>
 

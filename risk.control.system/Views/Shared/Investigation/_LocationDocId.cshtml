@@ -21,7 +21,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+			@foreach (var doc in location.DocumentIds.Where(d => d.Selected && d.ValidationExecuted))
 			{
 
 				<tr>

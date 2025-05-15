@@ -7,6 +7,7 @@
     bool customerExist = false;
     var country = string.Empty;
     var phone = string.Empty;
+    string map = string.Empty;
     if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
     {
         address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
@@ -20,6 +21,7 @@
         country = @Model.ClaimsInvestigation?.CustomerDetail?.Country?.Name;
         phone = +@Model.ClaimsInvestigation?.CustomerDetail?.Country?.ISDCode +"(0) "+ @Model.ClaimsInvestigation?.CustomerDetail?.ContactNumber;
         imgPath = "/flags/" + @Model.ClaimsInvestigation.CustomerDetail.Country.Code.ToLower() + ".png";
+        map = string.Format(@Model.ClaimsInvestigation?.CustomerDetail.CustomerLocationMap, "200", "200");
     }
 }
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -108,7 +110,7 @@
                     <p class="text-muted text-sm">
                         @if (@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap is not null)
                         {
-                            <img id="customerGoogleMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap">
+                            <img id="customerGoogleMap" class="img-fluid block-data" src="@map">
                         }
                     </p>
                 </div>

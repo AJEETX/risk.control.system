@@ -75,7 +75,7 @@ namespace risk.control.system.Services
                     .AddColumnPercentToTable("Map Image", 25)
                     .AddColumnPercentToTable("Valid", 5);
 
-                foreach (var face in loc.DocumentIds.Where(f => f.Selected))
+                foreach (var face in loc.DocumentIds.Where(f => f.Selected && f.ValidationExecuted))
                 {
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(face.ReportName);

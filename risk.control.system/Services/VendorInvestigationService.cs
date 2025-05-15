@@ -232,7 +232,8 @@ namespace risk.control.system.Services
                 BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
                 CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
                 PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
-                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap : Applicationsettings.NO_MAP
+                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING? 
+                       string.Format( a.CustomerDetail.CustomerLocationMap,"400","400") :string.Format( a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400") : Applicationsettings.NO_MAP
             });
 
             // Apply Sorting AFTER Data Transformation
@@ -467,7 +468,8 @@ namespace risk.control.system.Services
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds, // Calculate here
-                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
+                string.Format( a.CustomerDetail.CustomerLocationMap, "400", "400") :string.Format( a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400")
             }); // Materialize the list
 
             // Apply Sorting AFTER Data Transformation
