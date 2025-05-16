@@ -640,7 +640,7 @@ namespace risk.control.system.Controllers.Api
 
             foreach (var question in Questions)
             {
-                if (question.IsRequired.GetValueOrDefault() && string.IsNullOrEmpty(question.Answer))
+                if (question.IsRequired && string.IsNullOrEmpty(question.Answer))
                 {
                     ModelState.AddModelError("", $"Answer required for: {question.QuestionText}");
                 }

@@ -12,7 +12,7 @@ namespace risk.control.system.Models
         public string? QuestionText { get; set; }
         public string? QuestionType { get; set; } // "Text", "Radio", "Checkbox"
         public string? Options { get; set; } // comma-separated
-        public bool? IsRequired { get; set; }
+        public bool IsRequired { get; set; }=false;
         public string? Answer { get; set; } // <== This will bind input value
     }
 

@@ -558,6 +558,7 @@ public class AgentIdService : IAgentIdService
             {
                 QuestionText = q.QuestionText,
                 QuestionType = q.QuestionType,
+                IsRequired = q.IsRequired,
                 Options = q.Options,
                 AnswerText = q.Answer,
                 Updated = DateTime.Now,
