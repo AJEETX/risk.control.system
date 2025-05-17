@@ -97,20 +97,11 @@ namespace risk.control.system.Services
             {
                 if(loc.ValidationExecuted)
                 {
-                    var duration = loc.Updated.GetValueOrDefault().Subtract(loc.AgentIdReport.Updated.GetValueOrDefault());
-                    var durationDisplay = "Time spent :" + (duration.Hours > 0 ? $"{duration.Hours}h " : "") + (duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
-
                     section.AddParagraph()
                     .SetLineSpacing(1)
-                       .AddText($"{locationCount}.  Location Verified: {loc.LocationName} : {durationDisplay}")
+                       .AddText($"{locationCount}.  Location Verified: {loc.LocationName}")
                        .SetBold()
                        .SetFontSize(14);
-
-                    section.AddParagraph()
-                           .SetLineSpacing(1)
-                           .AddText($"Verifying Agent: {loc.AgentEmail}")
-                           .SetFontSize(12)
-                           .SetItalic();
 
                     // =================== AGENT ID REPORT ====================
                     section = await agentService.Build(section, loc);

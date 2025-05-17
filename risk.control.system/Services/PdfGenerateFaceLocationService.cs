@@ -78,7 +78,7 @@ namespace risk.control.system.Services
                 {
 
                     var rowBuilder = tableBuilder.AddRow();
-                    rowBuilder.AddCell().AddParagraph().AddText(face.ReportName);
+                    rowBuilder.AddCell().AddParagraph().AddText(face.ReportName).SetFont(FNT9);
 
                     if (face.IdImage != null)
                     {
@@ -89,17 +89,20 @@ namespace risk.control.system.Services
                         }
                         catch (Exception ex)
                         {
-                            rowBuilder.AddCell().AddParagraph().AddText("Invalid image");
+                            rowBuilder.AddCell().AddParagraph().AddText("Invalid image").SetFont(FNT9);
                             Console.WriteLine("Image conversion error: " + ex.Message);
                         }
                     }
                     else
                     {
-                        rowBuilder.AddCell().AddParagraph().AddText("No Image");
+                        rowBuilder.AddCell().AddParagraph().AddText("No Image").SetFont(FNT9);
                     }
-                    rowBuilder.AddCell().AddParagraph().AddText(face.IdImageLocationAddress);
-                    var locData = $"DateTime:{face.Updated.GetValueOrDefault()} || {face.IdImageData}";
-                    rowBuilder.AddCell().AddParagraph().AddText(locData);
+
+                    var addressData = $"DateTime:{face.IdImageLongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {face.IdImageLocationAddress}";
+                    rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
+                    var locData = $"Distance travelled:{face.Distance}\r\n {face.IdImageData}";
+                    rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
+
                     if (face.IdImageLocationUrl != null)
                     {
                         try

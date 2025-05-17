@@ -473,7 +473,7 @@ public class AgentIdService : IAgentIdService
                 //PAN
                 if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
                 {
-                    await panCardService.Process(doc.IdImage, imageReadOnly, company, doc, onlyExtension);
+                    doc = await panCardService.Process(doc.IdImage, imageReadOnly, company, doc, onlyExtension);
                 }
                 else
                 {
