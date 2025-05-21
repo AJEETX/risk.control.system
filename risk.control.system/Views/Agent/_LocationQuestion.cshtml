@@ -42,7 +42,7 @@
 						<td>
 							@if (question.QuestionType == "text")
 							{
-								<input type="text" name="Questions[@i].Answer" value="@question.AnswerText" class="form-control" />
+								<input type="text" name="Questions[@i].AnswerText" value="@question.AnswerText" class="form-control" />
 							}
 							else if (question.QuestionType == "radio")
 							{
@@ -53,11 +53,11 @@
 									<div class="form-check">
 										@if (question.AnswerText == trimmedOption)
 										{
-											<input type="radio" name="Questions[@i].Answer" value="@trimmedOption" class="form-check-input" checked />
+											<input type="radio" name="Questions[@i].AnswerText" value="@trimmedOption" class="form-check-input" checked />
 										}
 										else
 										{
-											<input type="radio" name="Questions[@i].Answer" value="@trimmedOption" class="form-check-input" />
+											<input type="radio" name="Questions[@i].AnswerText" value="@trimmedOption" class="form-check-input" />
 										}
 										<label class="form-check-label">@option.Trim()</label>
 									</div>
@@ -72,7 +72,7 @@
 									var trimmedOption = option.Trim();
 									var isChecked = selectedOptions.Contains(trimmedOption) ? "checked" : "";
 									<div class="form-check">
-										<input type="checkbox" name="Questions[@i].Answer" value="@trimmedOption" class="form-check-input" @isChecked />
+										<input type="checkbox" name="Questions[@i].AnswerText" value="@trimmedOption" class="form-check-input" @isChecked />
 										<label class="form-check-label">@trimmedOption</label>
 									</div>
 								}
@@ -81,7 +81,7 @@
 							else if (question.QuestionType == "dropdown")
 							{
 								var options = question.Options?.Split(',') ?? new string[] { "Yes", "No" };
-								<select name="Questions[@i].Answer" class="form-select form-control" @required>
+								<select name="Questions[@i].AnswerText" class="form-select form-control" @required>
 									<option value="">--- SELECT ---</option>
 									@foreach (var option in options)
 									{
@@ -101,7 +101,7 @@
 							else if (question.QuestionType == "date")
 							{
 								<div class="position-relative">
-									<input max="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" name="Questions[@i].Answer"
+									<input max="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" name="Questions[@i].AnswerText"
 										   value="@question.AnswerText" class="form-control date-input pe-5" @required placeholder="@question.QuestionText" />
 									<button type="button" class="btn btn-sm btn-clear-date" title="Clear date">
 										&times;

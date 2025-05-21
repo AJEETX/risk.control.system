@@ -54,7 +54,7 @@
 									<div class="row g-3 align-items-start">
 
 										<!-- Face IDs -->
-										<div class="col-md-3 border rounded p-2">
+										<div class="col-md-2 border rounded p-2">
 											<h6 class="text-muted"><i class="far fa-user"></i> Face IDs</h6>
 											<ul class="list-unstyled mb-3">
 												@foreach (var face in location.FaceIds ?? new List<DigitalIdReport>())
@@ -86,7 +86,7 @@
 										</div>
 
 										<!-- Document IDs -->
-										<div class="col-md-3 border rounded p-2">
+										<div class="col-md-2 border rounded p-2">
 											<h6 class="text-muted"><i class="far fa-file-alt"></i> Document IDs</h6>
 											<ul class="list-unstyled mb-3">
 												@foreach (var doc in location.DocumentIds ?? new List<DocumentIdReport>())
@@ -104,6 +104,32 @@
 																	{
 																		<i class="far fa-file text-muted me-1"></i>
 																	}
+																	@doc.ReportName
+																	@if (doc.IsRequired)
+																	{
+																		<span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+																	}
+																</label>
+															</div>
+														</div>
+													</li>
+												}
+											</ul>
+										</div>
+
+										<!-- Media IDs -->
+										<div class="col-md-2 border rounded p-2">
+											<h6 class="text-muted"><i class="far fa-file-alt"></i> Media</h6>
+											<ul class="list-unstyled mb-3">
+												@foreach (var doc in location.MediaReports ?? new List<MediaReport>())
+												{
+													<li class="mb-2">
+														<div class="border rounded p-2 bg-light">
+															<div class="form-check">
+																<input class="form-check-input" type="checkbox" id="doc_@doc.Id" @(doc.Selected ? "checked" : "") />
+																<label class="form-check-label" for="doc_@doc.Id">
+																	<i class="far fa-file text-muted me-1"></i>
+
 																	@doc.ReportName
 																	@if (doc.IsRequired)
 																	{

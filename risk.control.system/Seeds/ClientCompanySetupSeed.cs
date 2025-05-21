@@ -85,6 +85,13 @@ namespace risk.control.system.Seeds
             #endregion
 
             #region CASE ENABLER
+            var demoCaseEnabler = new CaseEnabler
+            {
+                Name = "DEMO",
+                Code = "DEMO",
+                Updated = DateTime.Now,
+            };
+            var demoCaseEnablerEntity = await context.CaseEnabler.AddAsync(demoCaseEnabler);
 
             var doubtCaseEnabler = new CaseEnabler
             {
@@ -105,6 +112,15 @@ namespace risk.control.system.Seeds
             #endregion
 
             #region COST CENTRE
+
+            var demoCentre = new CostCentre
+            {
+                Name = "DEMO",
+                Code = "DEMO",
+                Updated = DateTime.Now,
+            };
+
+            var demoCentreEntity = await context.CostCentre.AddAsync(demoCentre);
 
             var loansCostCentre = new CostCentre
             {

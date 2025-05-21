@@ -12,8 +12,8 @@ namespace risk.control.system.Models
         public string? QuestionText { get; set; }
         public string? QuestionType { get; set; } // "Text", "Radio", "Checkbox"
         public string? Options { get; set; } // comma-separated
-        public bool IsRequired { get; set; }=false;
-        public string? Answer { get; set; } // <== This will bind input value
+        public bool IsRequired { get; set; } = false;
+        public string? AnswerText { get; set; } // <== This will bind input value
     }
 
 
@@ -51,12 +51,12 @@ namespace risk.control.system.Models
             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()
         };
 
+        public List<MediaReport>? MediaReports { get; set; } = new();
         public List<DigitalIdReport>? FaceIds { get; set; } = new();
         public List<DocumentIdReport>? DocumentIds { get; set; } = new();
         public List<Question>? Questions { get; set; } = new List<Question>();
         public bool IsRequired { get; set; } = false;
         public bool ValidationExecuted { get; set; } = false;
-
         [NotMapped]
         public long CaseId { get; set; }
 
@@ -72,7 +72,6 @@ namespace risk.control.system.Models
         public string StatusClass = "bg-danger text-white";
         [NotMapped]
         public bool AllQuestionsAnswered => Questions.Where(q => q.IsRequired).All(q => !string.IsNullOrWhiteSpace(q.AnswerText));
-
 
         [NotMapped]
         public bool DocumentsValidated => DocumentIds?.Where(d => d.Selected && d.IsRequired).All(d => d.IdImageValid.GetValueOrDefault() && d.IsRequired) ?? false;
@@ -114,6 +113,7 @@ namespace risk.control.system.Models
             }
         }
     }
+
     public class ReportTemplateCreateViewModel
     {
         public string? Name { get; set; }

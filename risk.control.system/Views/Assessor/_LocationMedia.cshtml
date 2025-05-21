@@ -1,0 +1,108 @@
+﻿@using risk.control.system.Helpers;
+@model LocationTemplate
+@{
+	var location = Model;
+}
+
+@if (location.MediaReports?.Any(d => d.Selected) == true)
+{
+		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
+
+		<thead class="table-light">
+			<tr>
+				<th>Media File</th>
+				<th>
+					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
+				</th>
+				<th title="Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
+				<th>Captured Address</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var doc in location.MediaReports.Where(d => d.Selected))
+			{
+				var accept = "audio/mpeg,audio/wav";
+				if(doc.MediaType == MediaType.VIDEO)
+				{
+					accept = "video/mp4,video/webm";
+				}
+				<tr>
+					<td>@doc.ReportName
+						@if (doc.IsRequired)
+						{
+							<span class="required-asterisk" title="Mandatory Location">*</span>
+						}
+					</td>
+					
+					<td>
+						@if (doc.ValidationExecuted)
+						{
+							<div id="doc-img-@doc.Id">
+								@if (doc.IdImage != null)
+								{
+									if (doc.MediaType == MediaType.VIDEO)
+									{
+										<video class="media-view" controls>
+											<source src="data:video/@doc.MediaExtension;base64,@Convert.ToBase64String(doc.IdImage)" type="video/@doc.MediaExtension">
+											Your browser does not support the video tag.
+										</video>
+									}
+									else if (doc.MediaType == MediaType.AUDIO)
+									{
+										<audio controls>
+											<source src="data:audio/@doc.MediaExtension;base64,@Convert.ToBase64String(doc.IdImage)" type="audio/@doc.MediaExtension" />
+										</audio>
+									}
+								}
+								else
+								{
+									if (doc.MediaType == MediaType.VIDEO)
+									{
+										<img src="~/img/no-video.png" class="thumbnail profile-image doc-profile-image" />
+									}
+									else{
+										<img src="~/img/no-audio.png" class="thumbnail profile-image doc-profile-image" />
+									}
+
+								}
+							</div>
+
+						}
+						else
+						{
+							if (doc.MediaType == MediaType.VIDEO)
+									{
+										<img src="~/img/no-video.png" class="thumbnail profile-image doc-profile-image" />
+									}
+									else{
+										<img src="~/img/no-audio.png" class="thumbnail profile-image doc-profile-image" />
+									}
+						}
+
+					</td>
+					<td>
+						@if (doc.ValidationExecuted)
+						{
+							<img id="face-img-@doc.Id"
+								 src="@string.Format(@doc.IdImageLocationUrl, "300","300")"
+								 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
+								 data-faceid="@doc.Id"
+								 data-locationid="@location.Id"
+								 data-source="media"
+								 title="Click to view map" />
+						}
+						else
+						{
+							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+						}
+					</td>
+					<td>
+						@doc.IdImageLocationAddress
+
+					</td>
+					
+				</tr>
+			}
+		</tbody>
+	</table>
+}

@@ -794,7 +794,12 @@ namespace risk.control.system.Services
                     var superRole = context.ApplicationRole.FirstOrDefault(r => r.Name == AppRoles.SUPERVISOR.ToString());
                     if(role.Name == AppRoles.SUPERVISOR.ToString())
                     {
-                        notifications = notifications.Where(n => n.NotifierUserEmail == userEmail && (!n.IsReadByVendor));
+                        notifications = notifications.Where(n => 
+                        (!n.IsReadByVendor && n.NotifierUserEmail == userEmail &&  
+                        (n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR || n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR))
+                        ||
+                        (!n.IsReadByVendor && n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                        );
                     }
                     else
                     {

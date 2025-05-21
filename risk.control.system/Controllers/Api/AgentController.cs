@@ -21,14 +21,12 @@ namespace risk.control.system.Controllers.Api
     [ApiController]
     public class AgentController : ControllerBase
     {
-        private Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
         private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         private static string PanTask_id = "pan-card-verification-at-lowest-price.p.rapidapi.com";
         private readonly ApplicationDbContext _context;
         private readonly ICloneReportService cloneReportService;
         private readonly IHttpClientService httpClientService;
-        private readonly IConfiguration configuration;
         private readonly IAgentIdService agentIdService;
         private readonly IVendorInvestigationService service;
         private readonly ICompareFaces compareFaces;
@@ -38,7 +36,6 @@ namespace risk.control.system.Controllers.Api
         private readonly IBackgroundJobClient backgroundJobClient;
         private readonly ISmsService smsService;
         private readonly IMailService mailboxService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         private static Random randomNumber = new Random();
         private string portal_base_url = string.Empty;
@@ -57,13 +54,11 @@ namespace risk.control.system.Controllers.Api
             IFeatureManager featureManager,
             IBackgroundJobClient backgroundJobClient,
             ISmsService SmsService,
-            IMailService mailboxService,
-            IWebHostEnvironment webHostEnvironment)
+            IMailService mailboxService)
         {
             this._context = context;
             this.cloneReportService = cloneReportService;
             this.httpClientService = httpClientService;
-            this.configuration = configuration;
             this.agentIdService = agentIdService;
             this.service = service;
             this.compareFaces = compareFaces;
@@ -73,7 +68,6 @@ namespace risk.control.system.Controllers.Api
             this.backgroundJobClient = backgroundJobClient;
             smsService = SmsService;
             this.mailboxService = mailboxService;
-            this.webHostEnvironment = webHostEnvironment;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -574,36 +568,43 @@ namespace risk.control.system.Controllers.Api
 
         public async Task<IActionResult> FaceId(FaceData data)
         {
-
-            if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+            try
             {
-                return BadRequest();
-            }
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-
-            if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
-            {
-                return Unauthorized("Invalid User !!!");
-            }
-            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
-            {
-                if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
                 {
-                    return StatusCode(401, new { message = "Offboarded Agent." });
+                    return BadRequest();
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+
+                if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
+                var isAgentReportName = data.ReportName == DigitalIdReportType.AGENT_FACE.GetEnumDisplayName();
+                if (isAgentReportName)
+                {
+                    var response = await agentIdService.GetAgentId(data);
+                    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                    return Ok(response);
+                }
+                else
+                {
+                    var response = await agentIdService.GetFaceId(data);
+                    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                    return Ok(response);
                 }
             }
-            var isAgentReportName = data.ReportName == DigitalIdReportType.AGENT_FACE.GetEnumDisplayName();
-            if (isAgentReportName)
+            catch (Exception ex)
             {
-                var response = await agentIdService.GetAgentId(data);
-                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-                return Ok(response);
-            }
-            else
-            {
-                var response = await agentIdService.GetFaceId(data);
-                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-                return Ok(response);
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, ex.StackTrace);
             }
         }
 
@@ -611,52 +612,65 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
-            if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+            try
             {
-                return BadRequest();
-            }
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-
-            if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
-            {
-                return Unauthorized("Invalid User !!!");
-            }
-            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
-            {
-                if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
                 {
-                    return StatusCode(401, new { message = "Offboarded Agent." });
+                    return BadRequest();
                 }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+
+                if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
+                var response = await agentIdService.GetDocumentId(data);
+                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                return Ok(response);
             }
-            var response = await agentIdService.GetDocumentId(data);
-            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-            return Ok(response);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, ex.StackTrace);
+            }
         }
 
         [AllowAnonymous]
         [HttpPost("answers")]
         public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
         {
-
-            foreach (var question in Questions)
+            try
             {
-                if (question.IsRequired && string.IsNullOrEmpty(question.Answer))
+                foreach (var question in Questions)
                 {
-                    ModelState.AddModelError("", $"Answer required for: {question.QuestionText}");
+                    if (question.IsRequired && string.IsNullOrEmpty(question.AnswerText))
+                    {
+                        ModelState.AddModelError("", $"Answer required for: {question.QuestionText}");
+                    }
                 }
-            }
 
-            if (!ModelState.IsValid)
-            {
-                // Re-load data and return view with error
-                // e.g. return View(model);
-                return BadRequest("Some answers are missing.");
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Some answers are missing.");
+                }
+                var answerSubmitted = await agentIdService.Answers(locationName, caseId, Questions);
+                if (answerSubmitted)
+                    return Ok( new { success = answerSubmitted });
+                else
+                    return BadRequest("Error in submitting answers");
             }
-            var answerSubmitted = await agentIdService.Answers(locationName, caseId, Questions);
-            if (answerSubmitted)
-                return Ok();
-            else
-                return BadRequest("Error in submitting answers");
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, ex.StackTrace);
+            }
         }
 
         [AllowAnonymous]

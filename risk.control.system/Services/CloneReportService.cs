@@ -26,6 +26,8 @@ namespace risk.control.system.Services
             var originalTemplate = await context.ReportTemplates
                 .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.AgentIdReport)
+                    .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.MediaReports)
                    .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.FaceIds)
                .Include(r => r.LocationTemplate)
@@ -52,6 +54,13 @@ namespace risk.control.system.Services
                         ReportType = loc.AgentIdReport.ReportType,
                         ReportName = loc.AgentIdReport.ReportName,
                     },
+                    MediaReports = loc.MediaReports?.Select(m=> new MediaReport
+                    {
+                        IsRequired = m.IsRequired,
+                        ReportName = m.ReportName,
+                        MediaType = m.MediaType,
+                        Selected = m.Selected,
+                    }).ToList(),
                     FaceIds = loc.FaceIds?.Select(face => new DigitalIdReport
                     {
                         IsRequired = face.IsRequired,
@@ -90,6 +99,8 @@ namespace risk.control.system.Services
             var originalTemplate = await context.ReportTemplates
                  .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.AgentIdReport)
+                   .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.MediaReports)
                 .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.FaceIds)
                .Include(r => r.LocationTemplate)
@@ -108,6 +119,13 @@ namespace risk.control.system.Services
                     ReportType = loc.AgentIdReport.ReportType.GetEnumDisplayName(),
                     ReportName = loc.AgentIdReport.ReportName
                 },
+                MediaReports = loc.MediaReports?.Select(m => new MediaReport
+                {
+                    IsRequired = m.IsRequired,
+                    ReportName = m.ReportName,
+                    MediaType = m.MediaType,
+                    Selected = m.Selected,
+                }).ToList(),
                 FaceIds = loc.FaceIds.Where(face => face.Selected)?.Select(face => new 
                 {
                     IsRequired = face.IsRequired,

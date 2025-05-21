@@ -69,11 +69,11 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(p => p.State)
                 .Where(a=> a.Status == CONSTANTS.CASE_STATUS.INPROGRESS)
                 .Where(a=> a.VendorId == vendorUser.VendorId)
-                .Where(a => (a.AllocatingSupervisordEmail == currentUserEmail) && 
-                            (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ))
-                .Where(a => (a.SubmittingSupervisordEmail == currentUserEmail) &&
+                .Where(a => (a.AllocatingSupervisordEmail == currentUserEmail && 
+                            a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ) ||
+                            ((a.SubmittingSupervisordEmail == currentUserEmail) &&
                             (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
-                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)).ToListAsync();
+                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR))).ToListAsync();
             }
             else
             {

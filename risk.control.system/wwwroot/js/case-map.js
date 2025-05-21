@@ -29,6 +29,9 @@
             } else if (source === 'document') {
                 apiUrl = `/api/CaseInvestigationDetails/GetDocumentDetail?caseId=${caseId}&docId=${faceId}`;
             }
+            else if (source === 'media') {
+                apiUrl = `/api/CaseInvestigationDetails/GetMediaDetail?caseId=${caseId}&docId=${faceId}`;
+            }
             else if (source === 'face') {
                 apiUrl = `/api/CaseInvestigationDetails/GetFaceDetail?caseId=${caseId}&faceId=${faceId}`;
             } else {

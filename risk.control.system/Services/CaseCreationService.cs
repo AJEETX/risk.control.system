@@ -68,7 +68,7 @@ namespace risk.control.system.Services
             var customer = await customerTask;
             var beneficiary = await beneficiaryTask;
             InsuranceType caseType = InsuranceType.CLAIM;
-            if (uploadCase.CaseType != "0")
+            if (uploadCase.InsuranceType != InsuranceType.CLAIM.GetEnumDisplayName())
             {
                 caseType = InsuranceType.UNDERWRITING;
             }
@@ -90,7 +90,7 @@ namespace risk.control.system.Services
             }
             else
             {
-                uploadCase.Amount = "0";
+                uploadCase.Amount = "1000";
             }
 
             if (!string.IsNullOrWhiteSpace(uploadCase.IssueDate) && DateTime.TryParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var issueDate))
@@ -178,13 +178,14 @@ namespace risk.control.system.Services
                                     .Include(p => p.District)
                                     .Include(p => p.State)
                                     .Include(p => p.Country)
-                                    .FirstOrDefault(p => p.Code == uploadCase.CustomerPincode);
+                                    .FirstOrDefault(p => p.Code == uploadCase.CustomerPincode && 
+                                    p.District.Name.ToLower().Contains(uploadCase.CustomerDistrictName.ToLower()));
             if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
             {
                 return null;
             }
             var imagesWithData = GetImagesWithDataInSubfolder(data, uploadCase.CaseId.ToLower(), CUSTOMER_IMAGE);
-            if (!string.IsNullOrWhiteSpace(uploadCase.Gender) && Enum.TryParse(typeof(Gender), uploadCase.Gender, out var gender)) 
+            if (!string.IsNullOrWhiteSpace(uploadCase.Gender) && Enum.TryParse< Gender>(uploadCase.Gender,true, out var gender)) 
             {
                 uploadCase.Gender = gender.ToString();
             }
@@ -192,7 +193,7 @@ namespace risk.control.system.Services
             {
                 uploadCase.Gender = Gender.UNKNOWN.ToString();
             }
-            if(!string.IsNullOrWhiteSpace(uploadCase.Education)  && Enum.TryParse(typeof(Education), uploadCase.Education, out var educationEnum))
+            if(!string.IsNullOrWhiteSpace(uploadCase.Education)  && Enum.TryParse< Education>( uploadCase.Education,true, out var educationEnum))
             {
                 uploadCase.Education = educationEnum.ToString();
             }
@@ -200,7 +201,7 @@ namespace risk.control.system.Services
             {
                 uploadCase.Education = Education.UNKNOWN.ToString();
             }
-            if(!string.IsNullOrWhiteSpace(uploadCase.Occupation) && Enum.TryParse(typeof(Occupation), uploadCase.Occupation, out var occupationEnum))
+            if(!string.IsNullOrWhiteSpace(uploadCase.Occupation) && Enum.TryParse<Occupation>(uploadCase.Occupation,true, out var occupationEnum))
             {
                 uploadCase.Occupation = occupationEnum.ToString();
             }
@@ -209,7 +210,7 @@ namespace risk.control.system.Services
                 uploadCase.Occupation = Occupation.UNKNOWN.ToString();
             }
 
-            if(!string.IsNullOrWhiteSpace(uploadCase.Income) && Enum.TryParse(typeof(Income), uploadCase.Income, out var incomeEnum))
+            if(!string.IsNullOrWhiteSpace(uploadCase.Income) && Enum.TryParse< Income>(uploadCase.Income,true, out var incomeEnum))
             {
                 uploadCase.Income = incomeEnum.ToString();
             }
@@ -275,11 +276,11 @@ namespace risk.control.system.Services
         }
         private async Task<BeneficiaryDetail> AddBeneficiary(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
-            var pinCode = context.PinCode
-                                                .Include(p => p.District)
+            var pinCode = context.PinCode.Include(p => p.District)
                                                 .Include(p => p.State)
                                                 .Include(p => p.Country)
-                                                .FirstOrDefault(p => p.Code == uploadCase.BeneficiaryPincode);
+                                                .FirstOrDefault(p => p.Code == uploadCase.BeneficiaryPincode && 
+                                                p.District.Name.ToLower().Contains(uploadCase.BeneficiaryDistrictName.ToLower()));
             if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
             {
                 return null;
@@ -289,7 +290,7 @@ namespace risk.control.system.Services
                 : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower())
                 ?? context.BeneficiaryRelation.FirstOrDefault();  // Get matching record
             var beneficiaryNewImage = GetImagesWithDataInSubfolder(data, uploadCase.CaseId.ToLower(), BENEFICIARY_IMAGE);
-            if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryIncome) && Enum.TryParse(typeof(Income), uploadCase.BeneficiaryIncome, out var incomeEnum))
+            if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryIncome) && Enum.TryParse< Income>(uploadCase.BeneficiaryIncome,true, out var incomeEnum))
             {
                 uploadCase.BeneficiaryIncome = incomeEnum.ToString();
             }

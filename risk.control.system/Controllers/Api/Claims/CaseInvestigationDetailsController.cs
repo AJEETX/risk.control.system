@@ -468,6 +468,61 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             return Ok();
         }
+        [HttpGet("GetMediaDetail")]
+        public IActionResult GetMediaDetail(long caseId, long docId)
+        {
+            var currentUserEmail = HttpContext.User.Identity.Name;
+            var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == currentUserEmail);
+            var claim = claimsService.GetCasesWithDetail()
+                .FirstOrDefault(c => c.Id == caseId);
+            var docReport = _context.MediaReport.FirstOrDefault(l => l.Id == docId);
+
+            if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+            {
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+
+                if (docReport is not null)
+                {
+                    var longLat = docReport.IdImageLongLat.IndexOf(",");
+                    var latitude = docReport.IdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
+                        url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
+                        distance = docReport.Distance,
+                        duration = docReport.Duration,
+                    });
+                }
+            }
+            else
+            {
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+
+                if (docReport is not null)
+                {
+                    var longLat = docReport.IdImageLongLat.IndexOf("/");
+                    var latitude = docReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
+                        url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
+                        distance = docReport.Distance,
+                        duration = docReport.Duration,
+                    });
+                }
+            }
+            return Ok();
+        }
 
     }
 }

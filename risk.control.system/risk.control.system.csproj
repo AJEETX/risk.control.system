@@ -8,15 +8,15 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCoreHero.ToastNotification" Version="1.1.0" />
-    <PackageReference Include="AWSSDK.Core" Version="3.7.402.39" />
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.400" />
-    <PackageReference Include="AWSSDK.Rekognition" Version="3.7.400.133" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.416.9" />
-    <PackageReference Include="AWSSDK.Textract" Version="3.7.400.133" />
-    <PackageReference Include="AWSSDK.TranscribeService" Version="3.7.403.5" />
+    <PackageReference Include="AWSSDK.Core" Version="4.0.0.5" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.1" />
+    <PackageReference Include="AWSSDK.Rekognition" Version="4.0.0.4" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.0.5" />
+    <PackageReference Include="AWSSDK.Textract" Version="4.0.0.4" />
+    <PackageReference Include="AWSSDK.TranscribeService" Version="4.0.0.4" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Google.Cloud.Vision.V1" Version="3.7.0" />
-    <PackageReference Include="Hangfire" Version="1.8.18" />
+    <PackageReference Include="Hangfire" Version="1.8.20" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.1" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.4.6.5" />
     <PackageReference Include="MetadataExtractor" Version="2.8.1" />
@@ -24,8 +24,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.10" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.3" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
       <PrivateAssets>all</PrivateAssets>
@@ -41,11 +41,11 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="Net8.Licensing" Version="1.0.0" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
-    <PackageReference Include="SixLabors.Fonts" Version="2.1.2" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.5" />
-    <PackageReference Include="SkiaSharp" Version="3.116.1" />
-    <PackageReference Include="SkiaSharp.Views.Desktop.Common" Version="3.116.1" />
+    <PackageReference Include="SixLabors.Fonts" Version="2.1.3" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.6" />
+    <PackageReference Include="SkiaSharp" Version="3.119.0" />
+    <PackageReference Include="SkiaSharp.Views.Desktop.Common" Version="3.119.0" />
     <PackageReference Include="SmartBreadcrumbs" Version="3.6.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.1" />
@@ -54,7 +54,7 @@
     <PackageReference Include="Gehtsoft.PDFFlowLib.Barcodes" Version="1.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.4" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.10.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.2" />
     <PackageReference Include="System.Text.Json" Version="9.0.4" />

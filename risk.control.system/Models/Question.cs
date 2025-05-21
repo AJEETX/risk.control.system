@@ -31,7 +31,7 @@ namespace risk.control.system.Models
         public string? QuestionText { get; set; }
         public string? QuestionType { get; set; }
         public string? Options { get; set; }
-        public bool? IsRequired { get; set; }
+        public bool IsRequired { get; set; }
 
         // Dictionary to hold answers with question ID as key
         public Dictionary<int, string>? Answers { get; set; } = new Dictionary<int, string>();

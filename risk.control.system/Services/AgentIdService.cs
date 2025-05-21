@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using risk.control.system.Helpers;
-using risk.control.system.Models;
-
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Data;
+﻿using Google.Api.Gax.ResourceNames;
+using Microsoft.CodeAnalysis.Operations;
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
+using risk.control.system.Data;
+using risk.control.system.Helpers;
+using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services;
 
@@ -14,6 +15,7 @@ public interface IAgentIdService
     Task<AppiCheckifyResponse> GetAgentId(FaceData data);
     Task<AppiCheckifyResponse> GetFaceId(FaceData data);
     Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
+    Task<AppiCheckifyResponse> GetMedia(DocumentData data);
     Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions);
 
 }
@@ -537,6 +539,116 @@ public class AgentIdService : IAgentIdService
         }
     }
 
+    public async Task<AppiCheckifyResponse> GetMedia(DocumentData data)
+    {
+        InvestigationTask claim = null;
+        MediaReport media = null;
+        Task<string> addressTask = null;
+
+        try
+        {
+            var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == data.Email);
+
+            using var memoryStream = new MemoryStream();
+            await data.Image.CopyToAsync(memoryStream);
+            var fileBytes = memoryStream.ToArray();
+            var extension = Path.GetExtension(data.Image.FileName).ToLower();
+
+            // Optional: Validate supported formats
+            
+            claim = await _context.Investigations
+                 .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.ReportTemplate)
+                .ThenInclude(c => c.LocationTemplate)
+                 .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.AgentIdReport)
+                .FirstOrDefaultAsync(c => c.Id == data.CaseId);
+
+            var location = claim.InvestigationReport.ReportTemplate.LocationTemplate.FirstOrDefault(l => l.LocationName == data.LocationName);
+
+            var locationTemplate = _context.LocationTemplate
+                .Include(l => l.MediaReports)
+                .FirstOrDefault(l => l.Id == location.Id);
+
+            // Save to DB
+            media = locationTemplate.MediaReports.FirstOrDefault(c => c.ReportName == data.ReportName);
+
+            var longLat = data.LocationLatLong.IndexOf("/");
+            var latitude = data.LocationLatLong.Substring(0, longLat)?.Trim();
+            var longitude = data.LocationLatLong.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+            var latLongString = latitude + "," + longitude;
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+
+            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+
+            var mapTask = customApiCLient.GetMap(double.Parse(latitude), double.Parse(longitude), double.Parse(agent.AddressLatitude), double.Parse(agent.AddressLongitude), "A", "X", "300", "300", "green", "red");
+
+            var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+            addressTask = httpClientService.GetRawAddress(latitude, longitude);
+
+            await Task.WhenAll(addressTask, weatherTask, mapTask);
+
+            var address = await addressTask;
+            var weatherData = await weatherTask;
+            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
+
+
+            media.IdImageLocationUrl = map;
+            media.Duration = duration;
+            media.Distance = distance;
+            media.DistanceInMetres = distanceInMetres;
+            media.DurationInSeconds = durationInSecs;
+
+
+            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                $"\r\n" +
+                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                $"\r\n" +
+                $"\r\nElevation(sea level):{weatherData.elevation} metres";
+            media.IdImage = fileBytes;
+            media.IdImageExtension = extension;
+            media.MediaExtension = extension.TrimStart('.');
+            media.ValidationExecuted = true;
+            media.IdImageValid = true; // Optional validation logic
+            media.IdImageLocationAddress = address;
+            media.IdImageData = weatherCustomData;
+            media.IdImageLongLat = $"{latitude},{longitude}";
+            media.IdImageLongLatTime = DateTime.UtcNow;
+            var mimeType = data.Image.ContentType.ToLower();
+
+            string[] videoExtensions = { ".mp4", ".webm", ".avi", ".mov", ".mkv" };
+            bool isVideo = mimeType.StartsWith("video/") || videoExtensions.Contains(extension);
+
+            media.MediaType = isVideo ? MediaType.VIDEO : MediaType.AUDIO;
+            await _context.SaveChangesAsync();
+
+            return new AppiCheckifyResponse
+            {
+                Image = media.IdImage,
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.StackTrace);
+            media.IdImageData = "No Weather Data";
+            media.IdImageValid = false;
+            media.IdImageLocationAddress = "No Address data";
+            media.ValidationExecuted = true;
+            _context.MediaReport.Update(media);
+            var updateClaim = _context.Investigations.Update(claim);
+            var rows = await _context.SaveChangesAsync();
+
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
+                Image = media.IdImage,
+                LocationImage = Convert.ToBase64String(media?.IdImage),
+                LocationLongLat = media?.IdImageLongLat,
+                LocationTime = media?.IdImageLongLatTime,
+                Valid = media?.IdImageValid
+            };
+        }
+    }
     public async Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
     {
         var claim = await _context.Investigations
@@ -560,7 +672,7 @@ public class AgentIdService : IAgentIdService
                 QuestionType = q.QuestionType,
                 IsRequired = q.IsRequired,
                 Options = q.Options,
-                AnswerText = q.Answer,
+                AnswerText = q.AnswerText,
                 Updated = DateTime.Now,
             });
         }

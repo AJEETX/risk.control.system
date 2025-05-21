@@ -142,20 +142,23 @@
                 "data": "pincode",
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
-                        return `
-            <div class="map-thumbnail profile-image doc-profile-image">
-                <img src="${row.personMapAddressUrl}" 
-                     class="thumbnail profile-image doc-profile-image preview-map-image" 
-                     data-toggle="modal" 
-                     data-target="#mapModal" 
-                     data-img='${row.personMapAddressUrl}' 
-                     data-title='${row.pincodeName}' />
-            </div>`;
-                    } else {
-                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
-                    }
-                }
+                        const formattedUrl = row.personMapAddressUrl
+                            .replace("{0}", "500")
+                            .replace("{1}", "500");
 
+                        return `
+                        <div class="map-thumbnail profile-image doc-profile-image">
+                            <img src="${formattedUrl}" 
+                                 class="thumbnail profile-image doc-profile-image preview-map-image" 
+                                 data-toggle="modal" 
+                                 data-target="#mapModal" 
+                                 data-img='${formattedUrl}' 
+                                 data-title='${row.pincodeName}' />
+                        </div>`;
+                                } else {
+                                    return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
+                                }
+                            }
             },
             {
                 "sDefaultContent": "",

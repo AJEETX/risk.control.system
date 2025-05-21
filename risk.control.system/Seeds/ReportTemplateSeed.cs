@@ -27,6 +27,26 @@ namespace risk.control.system.Seeds
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName(),                                          // You can set other properties of Agent here if needed
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                         },
+                        MediaReports = new List<MediaReport>
+                        {
+                            new MediaReport
+                            {
+                                IsRequired = false,
+                                Selected = true,
+                                ReportName = MediaType.AUDIO.GetEnumDisplayName(),
+                                MediaType = MediaType.AUDIO,
+                                MediaExtension = "mp3"
+                            },
+                            new MediaReport
+                            {
+                                IsRequired = false,
+                                Selected = true,
+                                ReportName = MediaType.VIDEO.GetEnumDisplayName(),
+                                MediaType = MediaType.VIDEO,
+                                MediaExtension = "mp4"
+                            }
+                        },
+
                         FaceIds = new List<DigitalIdReport>
                         {
                             new DigitalIdReport
@@ -62,8 +82,6 @@ namespace risk.control.system.Seeds
                     }
                 }
             };
-
-            // Add the new template to the database
             context.ReportTemplates.Add(template);
             return template;
         }
@@ -81,12 +99,31 @@ namespace risk.control.system.Seeds
                     new LocationTemplate
                     {
                         LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
-                                IsRequired = true,
+                        IsRequired = true,
                         AgentIdReport = new AgentIdReport
                         {
-                                IsRequired = true,
+                            IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
+                        },
+                        MediaReports = new List<MediaReport>
+                        {
+                            new MediaReport
+                            {
+                                IsRequired = false,
+                                Selected = true,
+                                ReportName = MediaType.AUDIO.GetEnumDisplayName(),
+                                MediaType = MediaType.AUDIO,
+                                MediaExtension = "mp3"
+                            },
+                            new MediaReport
+                            {
+                                IsRequired = false,
+                                Selected = true,
+                                ReportName = MediaType.VIDEO.GetEnumDisplayName(),
+                                MediaType = MediaType.VIDEO,
+                                MediaExtension = "mp4"
+                            }
                         },
                         FaceIds = new List<DigitalIdReport>
                         {
@@ -263,8 +300,6 @@ namespace risk.control.system.Seeds
 
                 }
             };
-
-            // Add the new template to the database
             context.ReportTemplates.Add(template);
             return template;
         }

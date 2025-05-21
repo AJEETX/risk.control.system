@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
 using System.Data;
-using AspNetCoreHero.ToastNotification.Abstractions;
-using Microsoft.AspNetCore.Authorization;
+using System.Net.Http;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -110,6 +110,7 @@ namespace risk.control.system.Controllers
             }
             return File("~/img/no-user.png", "image/jpeg");
         }
+       
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> UploadDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
@@ -134,12 +135,61 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> UploadMediaFile(long caseId, IFormFile Image, string latitude, string longitude, string reportName, string locationName)
+        {
+            if (Image == null || Image.Length == 0)
+                return Json(new { success = false, message = "No file provided." });
+            var currentUserEmail = HttpContext.User.Identity.Name;
+            var extension = Path.GetExtension(Image.FileName).ToLower();
+
+            var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav" };
+            if (!supportedExtensions.Contains(extension))
+                return Json(new { success = false, message = "Unsupported media format." });
+            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
+
+            var data = new DocumentData
+            {
+                LocationName = locationName,
+                //LocationId = locationId,
+                //Id = docId,
+                ReportName = reportName,
+                Email = currentUserEmail,
+                CaseId = caseId,
+                Image = Image,
+                LocationLatLong = locationLongLat
+            };
+            var response = await agentIdService.GetMedia(data);
+            return Json(new
+            {
+                success = true,
+                extension = extension.TrimStart('.'),
+                fileData = Convert.ToBase64String(response.Image)
+            });
+
+        }
+
+        [HttpGet]
+        public IActionResult GetMediaFile(long id)
+        {
+            var report = _context.MediaReport.Find(id);
+            if (report == null || report.IdImage == null)
+                return NotFound();
+
+            var contentType = report.MediaExtension == "mp4" ? "video/mp4" :
+                              report.MediaExtension == "mp3" ? "audio/mpeg" :
+                              "application/octet-stream";
+
+            return File(report.IdImage, contentType);
+        }
+
+
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitLocationAnswers(string locationName, long CaseId, List<QuestionTemplate> Questions)
         {
             foreach (var question in Questions)
             {
-                if (question.IsRequired && string.IsNullOrEmpty(question.Answer))
+                if (question.IsRequired && string.IsNullOrEmpty(question.AnswerText))
                 {
                     ModelState.AddModelError("", $"Answer required for: {question.QuestionText}");
                 }

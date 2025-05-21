@@ -55,7 +55,7 @@
 											<th>Email / Type</th>
 											<th>ID Photo</th>
 											<th>Map Image</th>
-											<th>Captured Address Info</th>
+											<th>Captured Address</th>
 											<th>Match</th>
 										</tr>
 									</thead>
@@ -156,6 +156,8 @@
 						<!-- DocumentIds Table -->
 
 						<partial name="_LocationDocId" model="@location" />
+
+						<partial name="_LocationMedia" model="@location" />
 
 						<!-- Questions Table -->
 						<partial name="_LocationQuestion" model="@location" />

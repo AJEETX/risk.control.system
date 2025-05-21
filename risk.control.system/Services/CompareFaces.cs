@@ -1,7 +1,5 @@
 ﻿using Amazon.Rekognition.Model;
 using Amazon.Rekognition;
-using Amazon;
-using risk.control.system.AppConstant;
 using Amazon.Textract.Model;
 using Amazon.Textract;
 
@@ -24,8 +22,8 @@ namespace risk.control.system.Services
         public async Task<(bool, float)> Do(byte[] data, byte[] tdata)
         {
             float similarityThreshold = 70F;
-            
-            Amazon.Rekognition.Model.Image imageSource = new Amazon.Rekognition.Model.Image();
+
+            Image imageSource = new();
 
             try
             {
@@ -39,7 +37,7 @@ namespace risk.control.system.Services
                 return (false, 0);
             }
 
-            Amazon.Rekognition.Model.Image imageTarget = new Amazon.Rekognition.Model.Image();
+            Image imageTarget = new();
 
             try
             {
@@ -74,7 +72,7 @@ namespace risk.control.system.Services
             //});
 
             //Console.WriteLine($"Found {compareFacesResponse.UnmatchedFaces.Count} face(s) that did not match.");
-            return (result, compareFacesResponse.FaceMatches[0].Similarity);
+            return (result, compareFacesResponse.FaceMatches[0].Similarity.GetValueOrDefault());
         }
 
         public async Task DetectSampleAsync(byte[] bytes)

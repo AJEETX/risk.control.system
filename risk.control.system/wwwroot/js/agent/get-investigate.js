@@ -196,6 +196,72 @@ $(document).ready(function () {
         });
     });
 
+    $(".upload-media-btn").click(function () {
+        const button = $(this);
+        var docId = button.data("docid");
+        var fileInput = $(".media-upload[data-docid='" + docId + "']")[0];
+        const statusDiv = $(`#media-upload-status-${docId}`);
+        const docImage = $(`#doc-img-${docId}`);
+        docImage.addClass("loading-effect");
+        const reportName = button.data("name");
+        const locationName = button.data("location-name");
+
+        var file = fileInput.files[0];
+        if (!file) {
+            alert("Please select a document image to upload.");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("Id", docId);
+        formData.append("Image", file);
+        formData.append("latitude", latitude);
+        formData.append("longitude", longitude);
+        formData.append("caseId", caseId);
+        formData.append("reportName", reportName);
+        formData.append("locationName", locationName);
+        // Get anti-forgery token
+        var token = $('input[name="icheckifyAntiforgery"]').val();
+        formData.append("__RequestVerificationToken", token);
+        statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
+        button.prop("disabled", true);
+        const allowedTypes = ['video/mp4', 'video/webm', 'audio/mpeg', 'audio/wav'];
+        if (!allowedTypes.includes(file.type)) {
+            alert("Unsupported file format. Please upload MP4, WebM, MP3, or WAV.");
+            return;
+        }
+
+        $.ajax({
+            url: '/Uploads/UploadMediaFile',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    statusDiv.html('<span class="text-success">Upload successful.</span>');
+                    let mediaType = response.extension.includes('mp4') || response.extension.includes('webm') ? 'video' : 'audio';
+                    const mediaTag = `
+                        <${mediaType} controls>
+                            <source src="data:${mediaType}/${response.extension};base64,${response.fileData}" type="${mediaType}/${response.extension}">
+                            Your browser does not support the ${mediaType} tag.
+                        </${mediaType}>
+                    `;
+                    docImage.replaceWith(`<div id="doc-img-${docId}">${mediaTag}</div>`);
+                    $(fileInput).val('');
+                } else {
+
+                }
+            },
+            error: function (err) {
+                statusDiv.html('<span class="text-danger">Upload failed.</span>');
+            },
+            complete: function () {
+                button.prop("disabled", false);
+                setTimeout(() => statusDiv.html(''), 3000);
+            }
+        });
+    });
     function toggleSubmitButton() {
         var report = $('#remarks').val().trim();
         var isChecked = $('#terms_and_conditions').is(':checked');

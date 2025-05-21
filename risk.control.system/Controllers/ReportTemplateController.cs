@@ -46,6 +46,8 @@ namespace risk.control.system.Controllers
         {
             var template = await context.ReportTemplates
                 .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.MediaReports)
+                .Include(r => r.LocationTemplate)
                     .ThenInclude(l => l.FaceIds)
                 .Include(r => r.LocationTemplate)
                     .ThenInclude(l => l.DocumentIds)

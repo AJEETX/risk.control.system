@@ -37,20 +37,21 @@ namespace risk.control.system.Services
             }
         }
 
-        public static async Task SendSmsAsync(string mobile = "+61432854196", string message = "Testing fom Azy")
+        public static async Task<string> SendSmsAsync(string mobile = "+61432854196", string message = "Testing fom Azy")
         {
             try
             {
                 //var localIps = GetActiveIPAddressesInNetwork();
-                var url = "https://api.sms-gate.app/3rdparty/v1/message";
+                var url = Environment.GetEnvironmentVariable("SMS_Url");
 
                 var username = Environment.GetEnvironmentVariable("SMS_User");
                 var password = Environment.GetEnvironmentVariable("SMS_Pwd");
+                var sim = Environment.GetEnvironmentVariable("SMS_Sin") ?? "1";
                 var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
                 mobile = mobile.StartsWith("+") ? mobile : "+" + mobile;
 
-                var newContent = new { message = message, phoneNumbers = new List<string> { mobile } };
+                var newContent = new { message = message, phoneNumbers = new List<string> { mobile }, simNumber = int.Parse(sim) };
                 var jsonContent = JsonConvert.SerializeObject(newContent);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -61,10 +62,12 @@ namespace risk.control.system.Services
                 var responseBody = await response.Content.ReadAsStringAsync();
                 Console.WriteLine("Response: " + responseBody);
                 response.EnsureSuccessStatusCode();
+                return responseBody;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error sending SMS: " + ex.Message);
+                return ex.Message;
             }
         }
 

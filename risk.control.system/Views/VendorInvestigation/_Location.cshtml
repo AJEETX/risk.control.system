@@ -85,7 +85,7 @@
 												<img id="face-img-@agent.Id"
 													 src="data:image/*;base64,@(Convert.ToBase64String(agent?.IdImage))"
 													 class="img-thumbnail rounded"
-													 title="Click to view @location.AgentEmail photo" />
+													 title="@location.AgentEmail photo" />
 											}
 											else
 											{
@@ -103,7 +103,7 @@
 													 data-locationid="@location.Id"
 													 data-caseid="@Model.CaseId"
 													 data-source="agent"
-													 title="Click to view map" />
+													 title="Captured Address map" />
 											}
 											else
 											{
@@ -153,6 +153,8 @@
 
 					<partial name="_LocationDocId" model="@location" />
 
+					<!-- Media Table -->
+					<partial name="_LocationMedia" model="@location" />
 					<!-- Questions Table -->
 					<partial name="_LocationQuestion" model="@location" />
 				</div> <!-- card-body -->

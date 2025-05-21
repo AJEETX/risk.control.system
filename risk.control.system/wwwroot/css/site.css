@@ -1666,7 +1666,6 @@ ul#messagesList {
 }
 
 .modal-map-image {
-    max-height: 500px;
     width: 100%;
     object-fit: contain;
 }
@@ -2984,4 +2983,8 @@ th.col-weather {
 
 th.col-match {
     width: 8%;
+}
+.media-view {
+    width: 200px;
+    height: auto;
 }

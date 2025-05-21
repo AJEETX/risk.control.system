@@ -66,7 +66,7 @@ namespace risk.control.system.Seeds
             };
             var question10 = new Question
             {
-                QuestionText = "No of Year at Current Residencen",
+                QuestionText = "No of Year at Current Residence",
                 QuestionType = "date",
                 IsRequired = true
             };

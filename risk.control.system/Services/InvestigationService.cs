@@ -553,6 +553,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
+                  .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -626,6 +628,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
+                  .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -784,10 +788,15 @@ namespace risk.control.system.Services
                 BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
                 CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
                 PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
-                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING?
-                        string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") :
-                        string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400") : 
+                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
+                        a.CustomerDetail.CustomerLocationMap :
+                        a.BeneficiaryDetail.BeneficiaryLocationMap :
                         Applicationsettings.NO_MAP
+                //PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
+                //        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING?
+                //        string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") :
+                //        string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400") : 
+                //        Applicationsettings.NO_MAP
             });
 
             // Apply Sorting AFTER Data Transformation

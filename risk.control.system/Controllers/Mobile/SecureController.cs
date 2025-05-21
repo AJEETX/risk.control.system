@@ -259,8 +259,8 @@ namespace risk.control.system.Controllers.Mobile
         [HttpGet("test-sms")]
         public async Task<IActionResult> Sms(string mobile = "61432854196")
         {
-            await SmsService.SendSmsAsync(mobile);
-            return Ok(new { message = "Sms sent!!" });
+            var respone = await SmsService.SendSmsAsync(mobile);
+            return Ok(new { message = respone });
         }
         
 

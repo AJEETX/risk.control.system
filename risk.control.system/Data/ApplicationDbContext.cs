@@ -54,6 +54,7 @@ namespace risk.control.system.Data
         public DbSet<AgentIdReport> AgentIdReport { get; set; } = default!;
         public DbSet<DigitalIdReport> DigitalIdReport { get; set; } = default!;
         public DbSet<DocumentIdReport> DocumentIdReport { get; set; } = default!;
+        public DbSet<MediaReport> MediaReport { get; set; } = default!;
         public DbSet<InvestigationReport> InvestigationReport { get; set; } = default!;
     }
 }

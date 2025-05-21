@@ -220,5 +220,4 @@ $.validator.setDefaults({
 });
 $(document).ready(function () {
     $("#answers").validate();
-
 });

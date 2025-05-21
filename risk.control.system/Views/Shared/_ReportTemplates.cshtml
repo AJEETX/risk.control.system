@@ -5,10 +5,10 @@
         <thead>
             <tr>
                 <th>Template Name</th>
-                <th>Insurance Type</th>
                 <th>Created</th>
                 <th><i class="fas fa-id-badge"></i> Face IDs</th>
                 <th><i class="fas fa-file-alt"></i> Documents</th>
+                <th><i class="fas fa-film"></i> Media</th>
                 <th><i class="fas fa-question-circle"></i> Questions</th>
                 <th>Actions</th>
             </tr>
@@ -19,17 +19,18 @@
                 foreach (var template in Model)
                 {
                     var faceCount = @template.LocationTemplate.Where(l => l.FaceIds.All(i => i.Selected))?.Count();
+                    var faceCountz = @template.LocationTemplate.Where(l => l.FaceIds.All(i => i.Selected))?.Count();
                     var docCount = @template.LocationTemplate.Where(l => l.DocumentIds.All(i => i.Selected))?.Count();
+                    var mediaCount = @template.LocationTemplate.Where(l => l.MediaReports.All(i => i.Selected))?.Count();
                     var questionCount = @template.LocationTemplate.Where(l => l.Questions.All(i => true))?.Count();
 
                     <tr>
                         <td>@template.Name</td>
-                        <td>
-                            <span class="badge bg-secondary">@template.InsuranceType</span>
-                        </td>
+                       
                         <td>@template.Created.ToString("dd-MMM-yyyy")</td>
                         <td>@faceCount</td>
                         <td>@docCount</td>
+                        <td>@mediaCount</td>
                         <td>@questionCount</td>
                         <td>
                             <a asp-action="Details" asp-controller="ReportTemplate" asp-route-id="@template.Id"

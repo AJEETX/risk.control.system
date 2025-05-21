@@ -42,7 +42,7 @@
 					<img id="face-img-@agent.Id"
 						 src="data:image/*;base64,@(Convert.ToBase64String(agent?.IdImage))"
 						 class="thumbnail profile-image doc-profile-image preview-image"
-						 title="Click to view @location.AgentEmail photo" />
+						 title="@location.AgentEmail photo" />
 				}
 				else
 				{
@@ -58,7 +58,7 @@
 						 data-faceid="@agent.Id"
 						 data-locationid="@location.Id"
 						 data-source="agent"
-						 title="Click to view map" />
+						 title="Captured Address map" />
 				}
 				else
 				{
