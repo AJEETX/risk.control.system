@@ -277,7 +277,7 @@ namespace risk.control.system.Helpers
             {
                 var pngEncoder = new PngEncoder
                 {
-                    
+                    CompressionLevel = PngCompressionLevel.BestCompression
                 };
                 waterMarkedImage.Save(streamOut, pngEncoder);
             }

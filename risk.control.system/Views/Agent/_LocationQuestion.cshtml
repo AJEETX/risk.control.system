@@ -85,7 +85,7 @@
 									<option value="">--- SELECT ---</option>
 									@foreach (var option in options)
 									{
-										@if (question.AnswerText == option)
+										@if (question.AnswerText == option.Trim())
 										{
 											<option value="@option" selected>@option</option>
 										}

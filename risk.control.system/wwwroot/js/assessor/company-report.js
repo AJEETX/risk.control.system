@@ -176,7 +176,9 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a id="details' + row.id + '" href="ApprovedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
-                    buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
+                    buttons += (row.canDownload)
+                        ? '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
+                        : '<button class="btn btn-xs btn-secondary" disabled><i class="far fa-file-pdf"></i> limit Reached</button>';
                     return buttons;
                 }
             },

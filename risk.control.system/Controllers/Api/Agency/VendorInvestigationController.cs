@@ -595,13 +595,25 @@ namespace risk.control.system.Controllers.Api.Agency
                     TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
-                    Duration = a.SelectedAgentDrivingDuration
+                    Duration = a.SelectedAgentDrivingDuration,
+                    CanDownload = CanDownload(a.Id, userEmail)
                 })
                 .ToList();
 
             return Ok(response);
         }
 
+        private bool CanDownload(long id, string userEmail)
+        {
+            var tracker = _context.PdfDownloadTracker
+                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == userEmail);
+            bool canDownload = true;
+            if (tracker != null && tracker.DownloadCount > 3)
+            {
+                canDownload = false;
+            }
+            return canDownload;
+        }
         private string GetSupervisorCompletedTimePending(InvestigationTask a)
         {
             DateTime timeToCompare = a.ProcessedByAssessorTime.Value;

@@ -1,21 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.Data;
-using SmartBreadcrumbs.Attributes;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Models;
-using System.Text.RegularExpressions;
-using risk.control.system.Helpers;
-using risk.control.system.Services;
-using NToastNotify;
-using AspNetCoreHero.ToastNotification.Notyf;
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
-using static risk.control.system.AppConstant.Applicationsettings;
-using SmartBreadcrumbs.Nodes;
-using risk.control.system.Controllers.Company;
+using Microsoft.AspNetCore.Mvc;
 using risk.control.system.Controllers.Api.Claims;
+using risk.control.system.Services;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
@@ -106,8 +94,8 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
-                var claim = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
+                
+                var claim = await investigationService.GetClaimPdfReport(currentUserEmail, id);
 
                 var fileName = Path.GetFileName(claim.ClaimsInvestigation.InvestigationReport.PdfReportFilePath);
                 var memory = new MemoryStream();

@@ -100,6 +100,7 @@ public class AgentIdService : IAgentIdService
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
+                face.IdOriginalImage = stream.ToArray();
                 face.IdImage = stream.ToArray();
             }
 
@@ -259,6 +260,7 @@ public class AgentIdService : IAgentIdService
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
+                face.IdOriginalImage = stream.ToArray();
                 face.IdImage = stream.ToArray();
             }
 
@@ -427,6 +429,7 @@ public class AgentIdService : IAgentIdService
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
+                doc.IdOriginalImage = stream.ToArray();
                 doc.IdImage = stream.ToArray();
             }
 
@@ -671,8 +674,8 @@ public class AgentIdService : IAgentIdService
                 QuestionText = q.QuestionText,
                 QuestionType = q.QuestionType,
                 IsRequired = q.IsRequired,
-                Options = q.Options,
-                AnswerText = q.AnswerText,
+                Options = q.Options?.Trim(),
+                AnswerText = q.AnswerText?.Trim(),
                 Updated = DateTime.Now,
             });
         }

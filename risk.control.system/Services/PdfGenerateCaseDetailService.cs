@@ -95,7 +95,7 @@ namespace risk.control.system.Services
 
             // Investigation Section
             section.AddParagraph().AddText($" Investigator : {investigation.Vendor.Email}").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($" Report Date : {investigation.InvestigationReport.Updated.GetValueOrDefault()}");
+            section.AddParagraph().AddText($" Report Date : {investigation.InvestigationReport.AssessorRemarksUpdated.GetValueOrDefault()}");
 
             // Customer Section
             section.AddParagraph().AddText(" Life Assured  Details").SetFontSize(16).SetBold().SetUnderline();
