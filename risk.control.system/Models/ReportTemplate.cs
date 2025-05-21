@@ -69,7 +69,7 @@ namespace risk.control.system.Models
         [NotMapped]
         public string StatusText = "Incomplete";
         [NotMapped]
-        public string StatusClass = "bg-danger text-white";
+        public string StatusClass = "bg-light i-red";
         [NotMapped]
         public bool AllQuestionsAnswered => Questions.Where(q => q.IsRequired).All(q => !string.IsNullOrWhiteSpace(q.AnswerText));
 
@@ -82,35 +82,71 @@ namespace risk.control.system.Models
 
         public void SetStatus()
         {
-            if (IsRequired && AllQuestionsAnswered && DocumentsValidated && FaceIdsValidated && AgentValidated)
+            if(IsRequired)
+            {
+                if (AllQuestionsAnswered && DocumentsValidated && FaceIdsValidated && AgentValidated)
                 {
                     LocationStatusButton = "btn-outline-success";
                     LocationStatus = "border-success";
                     StatusText = "Completed";
-                    StatusClass =  "bg-success text-white";
+                    StatusClass = "bg-light i-green";
                 }
-            else if (!IsRequired && !AllQuestionsAnswered && !DocumentsValidated && !FaceIdsValidated && !AgentValidated)
-            {
-                LocationStatusButton = "btn-outline-danger";
-                LocationStatus = "border-danger";
-                StatusText = "Invalid";
-                StatusClass = "bg-danger text-white";
-            }
-            else if (IsRequired && (AllQuestionsAnswered || DocumentsValidated || FaceIdsValidated || AgentValidated))
-            {
-                LocationStatusButton = "btn-outline-warning";
-                LocationStatus = "border-warning";
-                StatusText = "Partial";
-                StatusClass = "bg-warning text-dark";
-            }
-            if(IsRequired && AgentValidated)
-            {
-                AgentStatus = "btn-outline-success";
+                else if (!AllQuestionsAnswered && !DocumentsValidated && !FaceIdsValidated && !AgentValidated)
+                {
+                    LocationStatusButton = "btn-outline-danger";
+                    LocationStatus = "border-danger";
+                    StatusText = "Invalid";
+                    StatusClass = "bg-light i-red";
+                }
+                else if (!DocumentsValidated || !FaceIdsValidated || !AgentValidated)
+                {
+                    LocationStatusButton = "btn-outline-warning";
+                    LocationStatus = "border-warning";
+                    StatusText = "Partial";
+                    StatusClass = "bg-light i-orangered";
+                }
+                if (AgentValidated)
+                {
+                    AgentStatus = "btn-outline-success";
+                }
+                else
+                {
+                    AgentStatus = "btn-outline-warning";
+                }
             }
             else
             {
-                AgentStatus = "btn-outline-warning";
+                if (AllQuestionsAnswered && DocumentsValidated && FaceIdsValidated && AgentValidated)
+                {
+                    LocationStatusButton = "btn-outline-success";
+                    LocationStatus = "border-success";
+                    StatusText = "Completed";
+                    StatusClass = "bg-light i-green";
+                }
+                else if (!AllQuestionsAnswered && !DocumentsValidated && !FaceIdsValidated && !AgentValidated)
+                {
+                    LocationStatusButton = "btn-outline-danger";
+                    LocationStatus = "border-danger";
+                    StatusText = "Invalid";
+                    StatusClass = "bg-light i-red";
+                }
+                else if (!DocumentsValidated || !FaceIdsValidated || !AgentValidated)
+                {
+                    LocationStatusButton = "btn-outline-warning";
+                    LocationStatus = "border-warning";
+                    StatusText = "Partial";
+                    StatusClass = "bg-light i-orangered";
+                }
+                if (AgentValidated)
+                {
+                    AgentStatus = "btn-outline-success";
+                }
+                else
+                {
+                    AgentStatus = "btn-outline-warning";
+                }
             }
+            
         }
     }
 
