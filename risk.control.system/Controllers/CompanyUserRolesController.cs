@@ -3,8 +3,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-using NToastNotify;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -22,34 +20,29 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
-        private readonly IToastNotification toastNotification;
 
         public CompanyUserRolesController(UserManager<ApplicationUser> userManager,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             ISmsService SmsService,
-            IToastNotification toastNotification,
             SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             smsService = SmsService;
-            this.toastNotification = toastNotification;
             this.signInManager = signInManager;
         }
 
         public async Task<IActionResult> Index(string userId)
         {
             var userRoles = new List<CompanyUserRoleViewModel>();
-            //ViewBag.userId = userId;
             ClientCompanyApplicationUser user = (ClientCompanyApplicationUser)await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                toastNotification.AddErrorToastMessage("user not found!");
+                notifyService.Error("user not found!");
                 return NotFound();
             }
-            //ViewBag.UserName = user.UserName;
             foreach (var role in roleManager.Roles.Where(r =>
                 r.Name.Contains(AppRoles.COMPANY_ADMIN.ToString()) ||
                 r.Name.Contains(AppRoles.CREATOR.ToString()) ||

@@ -1,24 +1,17 @@
 ﻿using System.Security.Claims;
 using Hangfire;
-using Hangfire.Storage;
 using AspNetCoreHero.ToastNotification.Abstractions;
-
-using CsvHelper;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.Helpers;
@@ -30,20 +23,14 @@ namespace risk.control.system.Controllers.Company
     public class CaseActiveController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService investigationService;
 
         public CaseActiveController(ApplicationDbContext context,
-            IEmpanelledAgencyService empanelledAgencyService,
-            IFtpService ftpService,
             INotyfService notifyService,
             IInvestigationService investigationService)
         {
             _context = context;
-            this.empanelledAgencyService = empanelledAgencyService;
-            this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.investigationService = investigationService;
         }

@@ -1,6 +1,4 @@
-﻿using Amazon.Rekognition.Model;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,8 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
-using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -30,7 +26,6 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
-        private readonly IToastNotification toastNotification;
         private readonly ISmsService smsService;
         public List<UsersViewModel> UserList;
         private readonly ApplicationDbContext context;
@@ -43,7 +38,6 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             IFeatureManager featureManager,
-            IToastNotification toastNotification,
             ISmsService SmsService,
             ApplicationDbContext context)
         {
@@ -52,7 +46,6 @@ namespace risk.control.system.Controllers
             this.passwordHasher = passwordHasher;
             this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
-            this.toastNotification = toastNotification;
             smsService = SmsService;
             this.featureManager = featureManager;
             this.context = context;
@@ -111,7 +104,7 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                toastNotification.AddErrorToastMessage("Error to create user!");
+                notifyService.Error("Error to create user!");
                 foreach (IdentityError error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
@@ -145,7 +138,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error($"Image deleted successfully.", 3);
                 return Ok(new { message = "succes", succeeded = true });
             }
-            toastNotification.AddErrorToastMessage("image not found!");
+            notifyService.Error("image not found!");
             return NotFound("failed");
         }
 
@@ -155,7 +148,7 @@ namespace risk.control.system.Controllers
         {
             if (id != applicationUser.Id.ToString())
             {
-                toastNotification.AddErrorToastMessage("user not found!");
+                notifyService.Error("user not found!");
                 return NotFound();
             }
 
@@ -216,19 +209,19 @@ namespace risk.control.system.Controllers
                             notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
                             return RedirectToAction(nameof(Index));
                         }
-                        toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
+                        notifyService.Error("Error !!. The user can't be edited!");
                         Errors(result);
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.StackTrace);
-                    toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
+                    notifyService.Error("Error !!. The user con't be edited!");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
             }
 
-            toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
+            notifyService.Error("Error !!. The user con't be edited!");
             return RedirectToAction(nameof(User));
         }
 

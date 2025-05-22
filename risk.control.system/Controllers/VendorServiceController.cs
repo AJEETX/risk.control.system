@@ -1,13 +1,9 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
-using Google.Api;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -26,15 +22,12 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
-        private readonly IToastNotification toastNotification;
 
         public VendorServiceController(ApplicationDbContext context,
-            INotyfService notifyService,
-            IToastNotification toastNotification)
+            INotyfService notifyService)
         {
             _context = context;
             this.notifyService = notifyService;
-            this.toastNotification = toastNotification;
         }
 
         // GET: VendorService

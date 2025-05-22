@@ -1,8 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-
-using Amazon.Rekognition.Model;
-
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

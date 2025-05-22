@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -18,12 +17,12 @@ namespace risk.control.system.Controllers
     public class CostCentreController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public CostCentreController(ApplicationDbContext context, IToastNotification toastNotification)
+        public CostCentreController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: CostCentre
@@ -79,7 +78,7 @@ namespace risk.control.system.Controllers
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(costCentre);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("cost centre created successfully!");
+                notifyService.Success("cost centre created successfully!");
                 return RedirectToAction(nameof(Index));
             }
             return View(costCentre);
@@ -134,7 +133,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("cost centre edited successfully!");
+                notifyService.Success("cost centre edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
             return View(costCentre);
@@ -177,7 +176,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("cost centre deleted successfully!");
+            notifyService.Success("cost centre deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

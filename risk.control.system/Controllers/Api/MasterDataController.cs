@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization; // Required for AllowAnonymous
 using risk.control.system.Data;
 using risk.control.system.Models;
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.AppConstant;
 
 namespace risk.control.system.Controllers.Api
 {

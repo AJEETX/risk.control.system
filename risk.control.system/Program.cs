@@ -1,46 +1,32 @@
-using System;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Threading.RateLimiting;
 
 using Amazon;
 using Amazon.Rekognition;
 using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.S3.Model;
 using Amazon.Textract;
 using Amazon.TranscribeService;
 
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
 
-using Google.Api;
-
 using Hangfire;
 using Hangfire.MemoryStorage;
-
-using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
-using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
@@ -57,13 +43,10 @@ using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using Hangfire.Dashboard;
-using risk.control.system.WorkFlow;
-//using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
-//QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
     options.TagName = "nav";
@@ -195,13 +178,6 @@ AWSConfigs.LoggingConfig.LogResponses = ResponseLoggingOption.Always;
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation()
-    .AddNToastNotifyNoty(new NotyOptions
-    {
-        ProgressBar = true,
-        Timeout = 1000,
-        Modal = true,
-        Type = Enums.NotificationTypesNoty.Info
-    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
@@ -425,7 +401,6 @@ app.UseAuthorization();
 app.UseMiddleware<LicensingMiddleware>();
 app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
-app.UseNToastNotify();
 app.UseNotyf();
 app.UseFileServer();
 

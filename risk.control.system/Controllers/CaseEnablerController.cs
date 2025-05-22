@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -18,12 +17,12 @@ namespace risk.control.system.Controllers
     public class CaseEnablerController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public CaseEnablerController(ApplicationDbContext context, IToastNotification toastNotification)
+        public CaseEnablerController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         public IActionResult Index()
@@ -78,7 +77,7 @@ namespace risk.control.system.Controllers
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(caseEnabler);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("case enabler created successfully!");
+                notifyService.Success("case enabler created successfully!");
                 return RedirectToAction(nameof(Index));
             }
             return View(caseEnabler);
@@ -133,7 +132,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("case enabler edited successfully!");
+                notifyService.Warning("case enabler edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
             return View(caseEnabler);
@@ -176,7 +175,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("case enabler deleted successfully!");
+            notifyService.Success("case enabler deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

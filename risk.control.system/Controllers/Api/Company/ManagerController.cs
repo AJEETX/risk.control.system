@@ -1,20 +1,13 @@
-﻿using Amazon.Rekognition.Model;
-using Google.Api;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 using System.Globalization;
-using System.Linq.Expressions;
-using System.Security.Claims;
 using static risk.control.system.AppConstant.Applicationsettings;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
@@ -26,23 +19,17 @@ namespace risk.control.system.Controllers.Api.Company
     [Authorize(Roles = MANAGER.DISPLAY_NAME)]
     public class ManagerController : ControllerBase
     {
-        private const string UNDERWRITING = "underwriting";
         private static CultureInfo hindi = new CultureInfo("hi-IN");
         private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
         private readonly IInvestigationService service;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IClaimsService claimsService;
 
         public ManagerController(ApplicationDbContext context,
-            IInvestigationService service,
-            IWebHostEnvironment webHostEnvironment, IClaimsService claimsService)
+            IInvestigationService service)
         {
             _context = context;
             this.service = service;
-            this.webHostEnvironment = webHostEnvironment;
             hindiNFO.CurrencySymbol = string.Empty;
-            this.claimsService = claimsService;
         }
 
         [HttpGet("GetActive")]

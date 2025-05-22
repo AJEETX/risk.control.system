@@ -1,9 +1,4 @@
-﻿using System.Globalization;
-using System.Security.Claims;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,8 +6,6 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -24,25 +17,10 @@ namespace risk.control.system.Controllers.Api.Agency
     [Authorize(Roles = AGENT.DISPLAY_NAME)]
     public class AgentController : ControllerBase
     {
-        private const string UNDERWRITING = "underwriting";
-        private static CultureInfo hindi = new CultureInfo("hi-IN");
-        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
-        private readonly string noUserImagefilePath = string.Empty;
-        private readonly string noDataImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<VendorApplicationUser> userManager;
-        private readonly IDashboardService dashboardService;
-        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public AgentController(ApplicationDbContext context, 
-            UserManager<VendorApplicationUser> userManager, 
-            IWebHostEnvironment webHostEnvironment, 
-            IDashboardService dashboardService)
+        public AgentController(ApplicationDbContext context)
         {
-            hindiNFO.CurrencySymbol = string.Empty;
-            this.userManager = userManager;
-            this.dashboardService = dashboardService;
-            this.webHostEnvironment = webHostEnvironment;
             _context = context;
         }
 

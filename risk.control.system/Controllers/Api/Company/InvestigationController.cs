@@ -1,26 +1,14 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
-using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
 using System.Globalization;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
-using System.Text;
-using Microsoft.AspNetCore.Hosting;
 using risk.control.system.Controllers.Api.Claims;
-using Google.Api;
-using System.Linq.Expressions;
-using System.Linq;
 
 namespace risk.control.system.Controllers.Api.Company
 {

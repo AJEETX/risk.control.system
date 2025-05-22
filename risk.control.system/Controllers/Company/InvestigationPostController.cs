@@ -1,25 +1,14 @@
-﻿using AspNetCoreHero.ToastNotification.Notyf;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
-
-using risk.control.system.AppConstant;
-
-using SmartBreadcrumbs.Attributes;
+﻿using Microsoft.AspNetCore.Mvc;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using risk.control.system.Data;
 using risk.control.system.Services;
 using static risk.control.system.AppConstant.Applicationsettings;
 using Microsoft.EntityFrameworkCore;
-using Google.Api;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using SmartBreadcrumbs.Nodes;
 using risk.control.system.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Hangfire;
-using Amazon.Textract;
-using Microsoft.AspNetCore.Http;
 using System.Web;
 
 namespace risk.control.system.Controllers.Company
