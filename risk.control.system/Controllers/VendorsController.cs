@@ -1,15 +1,10 @@
-﻿using System.Linq;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
-using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -254,7 +249,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendor = await _context.Vendor
                     .Include(v => v.ratings)
                     .Include(v => v.Country)
@@ -316,7 +311,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Add User", FromAction = "Users")]
         public IActionResult CreateUser(long id)
         {
-            if(id <= 0)
+            if (id <= 0)
             {
                 notifyService.Custom($"OOPs !!!..Error creating user.", 3, "red", "fa fa-user");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -324,8 +319,8 @@ namespace risk.control.system.Controllers
             var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList();
             AgencyRole? role = null;
             string? adminEmail = null;
-            var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
-            if(vendor == null)
+            var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
+            if (vendor == null)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -343,7 +338,7 @@ namespace risk.control.system.Controllers
             {
                 allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
             }
-            var model = new VendorApplicationUser { Email = adminEmail, Active = status, Country= vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles, UserRole = role };
+            var model = new VendorApplicationUser { Email = adminEmail, Active = status, Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles, UserRole = role };
 
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
             var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
@@ -360,7 +355,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string createdBy="")
+        public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string createdBy = "")
         {
             if (user is null || string.IsNullOrEmpty(emailSuffix) || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
             {
@@ -370,7 +365,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
                     string newFileName = Guid.NewGuid().ToString();
@@ -431,17 +426,17 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode+user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
                     {
 
-                        await smsService.DoSendSmsAsync(isdCode+user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. Email : " + user.Email);
 
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
-                        
+
                         if (onboardAgent)
                         {
                             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
@@ -535,7 +530,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (string.IsNullOrWhiteSpace(id) || applicationUser is null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
@@ -658,7 +653,7 @@ namespace risk.control.system.Controllers
                         }
                     }
 
-                    if(editby == "company")
+                    if (editby == "company")
                     {
                         return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
                     }
@@ -691,8 +686,8 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
-                var model =await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
+
+                var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.Case Not Found.Try Again");
@@ -732,13 +727,13 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model =await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Email == email);
+                var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
@@ -751,7 +746,7 @@ namespace risk.control.system.Controllers
                 _context.VendorApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"User {model.Email} deleted", 3, "red", "fas fa-user-minus");
-                return RedirectToAction(nameof(VendorsController.Users), "Vendors",new {id = vendorId});
+                return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
             }
             catch (Exception ex)
             {
@@ -767,7 +762,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> UserRoles(string userId)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            
+
             var userRoles = new List<VendorUserRoleViewModel>();
             //ViewBag.userId = userId;
             VendorApplicationUser user = await userManager.FindByIdAsync(userId);
@@ -804,7 +799,7 @@ namespace risk.control.system.Controllers
                 UserName = user.UserName,
                 VendorUserRoleViewModel = userRoles
             };
-            
+
             return View(model);
         }
 
@@ -813,7 +808,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            
+
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
@@ -864,7 +859,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            
+
             ViewData["vendorId"] = id;
 
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
@@ -890,7 +885,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Vendor vendor, string domainAddress, string mailAddress)
         {
-            if(vendor is null || string.IsNullOrWhiteSpace(domainAddress) || string.IsNullOrWhiteSpace(mailAddress) || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
+            if (vendor is null || string.IsNullOrWhiteSpace(domainAddress) || string.IsNullOrWhiteSpace(mailAddress) || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Create), "Vendors");
@@ -898,7 +893,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
                 vendor.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
@@ -948,7 +943,7 @@ namespace risk.control.system.Controllers
                 _context.Add(vendor);
 
                 var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
-                var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+                var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
 
                 var notification = new StatusNotification
                 {
@@ -988,7 +983,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendor = await _context.Vendor.Include(v=>v.Country).FirstOrDefaultAsync(v=>v.VendorId == id);
+                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
@@ -998,7 +993,7 @@ namespace risk.control.system.Controllers
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
                 var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
                 var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit Agency") { Parent = agencyPage } ;
+                var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit Agency") { Parent = agencyPage };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(vendor);
@@ -1019,7 +1014,7 @@ namespace risk.control.system.Controllers
             if (vendor is null || vendorId != vendor.VendorId || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(Edit), "Vendors", new { id = vendorId});
+                return RedirectToAction(nameof(Edit), "Vendors", new { id = vendorId });
             }
 
             try
@@ -1073,7 +1068,7 @@ namespace risk.control.system.Controllers
 
                 _context.Vendor.Update(vendor);
 
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode+ vendor.PhoneNumber, "Agency edited. Domain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. Domain : " + vendor.Email);
 
                 await _context.SaveChangesAsync();
             }
@@ -1098,7 +1093,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendor = await _context.Vendor
                     .Include(v => v.ratings)
                     .Include(v => v.Country)
@@ -1124,7 +1119,7 @@ namespace risk.control.system.Controllers
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR };
 
-                var hasClaims = _context.Investigations.Any(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == id );
+                var hasClaims = _context.Investigations.Any(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == id);
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
                 var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage };
@@ -1154,7 +1149,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendor = await _context.Vendor.FindAsync(VendorId);
                 if (vendor == null)
                 {
@@ -1163,7 +1158,7 @@ namespace risk.control.system.Controllers
                 }
 
                 var vendorUser = await _context.VendorApplicationUser.Where(v => v.VendorId == VendorId).ToListAsync();
-                foreach(var user in vendorUser)
+                foreach (var user in vendorUser)
                 {
                     user.Updated = DateTime.Now;
                     user.UpdatedBy = currentUserEmail;

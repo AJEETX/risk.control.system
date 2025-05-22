@@ -2,11 +2,11 @@
 
 namespace risk.web.MVC.Controllers
 {
-public class ClaimController : Controller
-{
-    public IActionResult Index()
+    public class ClaimController : Controller
     {
-        return View();
+        public IActionResult Index()
+        {
+            return View();
+        }
     }
-}
 }

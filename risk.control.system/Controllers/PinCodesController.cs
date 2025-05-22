@@ -1,18 +1,12 @@
-﻿using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
 using NToastNotify;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
-
 using SmartBreadcrumbs.Attributes;
-
+using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -215,7 +209,7 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
             }
-            
+
             return View(pinCode);
         }
 
@@ -240,7 +234,7 @@ namespace risk.control.system.Controllers
                 pinCode.DistrictId = pinCode.SelectedDistrictId;
 
                 _context.Update(pinCode);
-                if( await _context.SaveChangesAsync() > 0)
+                if (await _context.SaveChangesAsync() > 0)
                 {
                     toastNotification.AddWarningToastMessage("pincode edited successfully!");
                     return RedirectToAction(nameof(Index));
@@ -248,7 +242,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-               Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.ToString());
             }
             toastNotification.AddErrorToastMessage("An error occurred while updating the pincode!");
             return RedirectToAction(nameof(Index));

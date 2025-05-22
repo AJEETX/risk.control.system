@@ -1,8 +1,4 @@
-﻿using System.Text;
-using System.Web;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -13,13 +9,14 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+using System.Text;
+using System.Web;
 
 namespace risk.control.system.Controllers
 {
@@ -270,7 +267,7 @@ namespace risk.control.system.Controllers
                             var userIsAgent = vendorUser.Role == AppRoles.AGENT;
                             if (userIsAgent)
                             {
-                                if(await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
+                                if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
                                 {
                                     vendorIsActive = false;
                                 }
@@ -529,7 +526,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Forgot(LoginViewModel input)
         {
             string message = "Incorrect details. Try Again";
-            string imagePath = Path.Combine(webHostEnvironment.WebRootPath,"img", "no-user.png");
+            string imagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
             byte[] image = System.IO.File.ReadAllBytes(imagePath);
             var flagPath = $"/img/no-map.jpeg";
             var model = new Models.ViewModel.ForgotPassword
@@ -561,7 +558,7 @@ namespace risk.control.system.Controllers
                 model.ProfilePicture = smsSent2User.ProfilePicture;
                 model.Reset = true;
             }
-            
+
             return View(model);
         }
         [HttpGet]

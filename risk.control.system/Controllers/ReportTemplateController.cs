@@ -1,14 +1,8 @@
-﻿using Google.Api;
-
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
-
-using SkiaSharp;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
@@ -98,9 +92,9 @@ namespace risk.control.system.Controllers
                 ReportType = ReportType
             };
             location.FaceIds.Add(faceId);
-            
+
             context.LocationTemplate.Update(location);
-           context.SaveChanges();
+            context.SaveChanges();
 
             return Json(new { locationId = locationId, newFaceId = faceId.Id });
         }
@@ -168,7 +162,7 @@ namespace risk.control.system.Controllers
             var faceId = new DocumentIdReport
             {
                 IdName = IdIName,
-                 ReportType = ReportType
+                ReportType = ReportType
             };
             location.DocumentIds.Add(faceId);
 

@@ -1,22 +1,15 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-
-using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
-using risk.control.system.Services;
 using System.Globalization;
-using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Controllers.Api.Claims;
-using Microsoft.AspNetCore.Hosting;
-using Google.Api;
+using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Company
 {
@@ -77,7 +70,7 @@ namespace risk.control.system.Controllers.Api.Company
                              i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR))
                 .ToListAsync();
 
-            
+
             // Prepare the response
             var response = claims
                 .Select(a => new ClaimsInvestigationResponse
@@ -163,7 +156,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(i => i.State)
                 .Include(i => i.BeneficiaryDetail)
                 .ThenInclude(i => i.Country)
-                .Where(i => !i.Deleted && i.ClientCompanyId == companyUser.ClientCompanyId && 
+                .Where(i => !i.Deleted && i.ClientCompanyId == companyUser.ClientCompanyId &&
                 i.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                 i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR &&
                 i.IsQueryCase &&
@@ -181,7 +174,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                     AssignedToAgency = a.AssignedToAgency,
                     Agent = a.Vendor.Email,
-                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String( GetOwnerImage(a))),
+                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwnerImage(a))),
                     Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                     PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                     Document = a.PolicyDetail?.DocumentImage != null ?
@@ -209,7 +202,7 @@ namespace risk.control.system.Controllers.Api.Company
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.EnquiredByAssessorTime ?? DateTime.Now).TotalSeconds,
-                    PersonMapAddressUrl =string.Format(a.SelectedAgentDrivingMap, "300","300"),
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 })
@@ -268,11 +261,11 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(i => i.Country)
                 .Where(i => !i.Deleted && i.ClientCompanyId == companyUser.ClientCompanyId &&
                             (i.SubStatus == approvedStatus) &&
-                            i.Status== finishStatus &&
+                            i.Status == finishStatus &&
                             i.SubmittedAssessordEmail == userEmail).ToListAsync();
 
             // Extracted common logic for review claim log check
-            
+
             var response = claims
                 .Select(a => new ClaimsInvestigationResponse
                 {
@@ -361,11 +354,11 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(i => i.Country)
                 .Where(i => !i.Deleted && i.ClientCompanyId == companyUser.ClientCompanyId &&
                             i.SubmittedAssessordEmail == userEmail &&
-                            i.Status== CONSTANTS.CASE_STATUS.FINISHED &&
-                            i.SubStatus== rejectStatus
+                            i.Status == CONSTANTS.CASE_STATUS.FINISHED &&
+                            i.SubStatus == rejectStatus
                             ).ToListAsync();
 
-            
+
             var response = claims
                 .Select(a => new ClaimsInvestigationResponse
                 {
@@ -429,7 +422,7 @@ namespace risk.control.system.Controllers.Api.Company
             string ownerDomain = string.Empty;
             string profileImage = string.Empty;
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
-            var noDataimage =System.IO.File.ReadAllBytes(noDataImagefilePath);
+            var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
 
             if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
                 a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)

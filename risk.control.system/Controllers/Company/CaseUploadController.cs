@@ -1,24 +1,14 @@
-﻿using System.Security.Claims;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
-
-using CsvHelper;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
-
+using System.Security.Claims;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
@@ -109,9 +99,9 @@ namespace risk.control.system.Controllers.Company
                 var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
                 userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
 
-                if(!userCanCreate)
+                if (!userCanCreate)
                 {
-                    notifyService.Custom($"MAX Assign Case limit = <b>{companyUser.ClientCompany.TotalToAssignMaxAllowed}</b> reached",5, "#dc3545", "fa fa-upload");
+                    notifyService.Custom($"MAX Assign Case limit = <b>{companyUser.ClientCompany.TotalToAssignMaxAllowed}</b> reached", 5, "#dc3545", "fa fa-upload");
                 }
                 return View(new CreateClaims
                 {

@@ -1,27 +1,19 @@
-﻿using Amazon.Rekognition.Model;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
-using NToastNotify;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
-
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
@@ -222,7 +214,7 @@ namespace risk.control.system.Controllers
                 await smsService.DoSendSmsAsync(existCompany.Country.ISDCode + existCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
             }
 
-            catch (Exception ex)
+            catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -619,7 +611,7 @@ namespace risk.control.system.Controllers
                           c.SubStatus == rejectedStatus));
 
                 // HACKY
-                var currentCases = service.GetAgencyIdsLoad(new List<long> {vendor.VendorId });
+                var currentCases = service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
                 vendor.SelectedCountryId = vendorUserCount;
                 vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
                 vendor.SelectedDistrictId = vendorAllCasesCount;

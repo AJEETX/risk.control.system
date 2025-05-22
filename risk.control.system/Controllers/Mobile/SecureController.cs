@@ -1,19 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Security.Claims;
-using risk.control.system.AppConstant;
-using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Services;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.FeatureManagement;
-using risk.control.system.Data;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using risk.control.system.Models;
-using static risk.control.system.Helpers.Permissions;
-using HPdf;
+using Microsoft.FeatureManagement;
+using risk.control.system.AppConstant;
+using risk.control.system.Data;
+using risk.control.system.Helpers;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
+using System.Security.Claims;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Mobile
 {
@@ -262,7 +259,7 @@ namespace risk.control.system.Controllers.Mobile
             var respone = await SmsService.SendSmsAsync(mobile);
             return Ok(new { message = respone });
         }
-        
+
 
         [AllowAnonymous]
         [HttpGet("pdf")]

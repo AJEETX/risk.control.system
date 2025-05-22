@@ -1,26 +1,13 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
-using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-
-using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
 using System.Globalization;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
-using System.Text;
-using Microsoft.AspNetCore.Hosting;
-using risk.control.system.Controllers.Api.Claims;
-using Google.Api;
-using System.Linq.Expressions;
-using System.Linq;
+using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Company
 {
@@ -40,7 +27,7 @@ namespace risk.control.system.Controllers.Api.Company
         private readonly IClaimsService claimsService;
         private readonly IInvestigationService service;
 
-        public InvestigationController(ApplicationDbContext context, 
+        public InvestigationController(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             IInvestigationService service,
             IClaimsService claimsService)
@@ -51,17 +38,17 @@ namespace risk.control.system.Controllers.Api.Company
             this.webHostEnvironment = webHostEnvironment;
             this.claimsService = claimsService;
         }
-        
+
         [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         [HttpGet("GetAuto")]
         public async Task<IActionResult> GetAuto(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            
-            var response = await service.GetAuto(currentUserEmail,draw,start,length, search, caseType, orderColumn, orderDir);
+
+            var response = await service.GetAuto(currentUserEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
             return Ok(response);
-            
+
         }
 
         [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
@@ -80,28 +67,28 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
 
             var totalReadyToAssign = await service.GetAutoCount(userEmail);
             var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
 
-            if(uploadId > 0 )
+            if (uploadId > 0)
             {
                 var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
                 if (file == null)
                 {
                     return NotFound(new { success = false, message = "File not found." });
                 }
-                if(file.ClaimsId != null && file.ClaimsId.Count > 0)
+                if (file.ClaimsId != null && file.ClaimsId.Count > 0)
                 {
                     totalReadyToAssign = totalReadyToAssign + file.ClaimsId.Count;
                 }
             }
-            
+
 
             var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && ((f.UploadedBy == userEmail && !f.Deleted) || isManager)).ToListAsync();
-            var result = files.OrderBy(o=>o.CreatedOn).Select(file => new
+            var result = files.OrderBy(o => o.CreatedOn).Select(file => new
             {
                 file.Id,
                 SequenceNumber = isManager ? file.CompanySequenceNumber : file.UserSequenceNumber,
@@ -128,8 +115,8 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> GetFileById(int uploadId)
         {
             var userEmail = HttpContext.User.Identity.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-            var file =  await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
             if (file == null)
             {
                 return NotFound(new { success = false, message = "File not found." });
@@ -139,7 +126,7 @@ namespace risk.control.system.Controllers.Api.Company
             var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
 
             var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
-            var result =  new
+            var result = new
             {
                 file.Id,
                 SequenceNumber = isManager ? file.CompanySequenceNumber : file.UserSequenceNumber,
@@ -155,7 +142,7 @@ namespace risk.control.system.Controllers.Api.Company
                 IsManager = isManager,
                 file.DirectAssign,
                 UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
-                TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 : 
+                TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
                 Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
             };//<i class='fas fa-sync fa-spin'></i>
 

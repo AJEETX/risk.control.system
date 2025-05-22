@@ -1,26 +1,15 @@
-﻿using AspNetCoreHero.ToastNotification.Notyf;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
-
-using risk.control.system.AppConstant;
-
-using SmartBreadcrumbs.Attributes;
-using AspNetCoreHero.ToastNotification.Abstractions;
-using risk.control.system.Data;
-using risk.control.system.Services;
-using static risk.control.system.AppConstant.Applicationsettings;
-using Microsoft.EntityFrameworkCore;
-using Google.Api;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using SmartBreadcrumbs.Nodes;
-using risk.control.system.Helpers;
-using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Hangfire;
-using Amazon.Textract;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using risk.control.system.Data;
+using risk.control.system.Helpers;
+using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 using System.Web;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -82,15 +71,15 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
                 var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, CREATEDBY.AUTO, model.UploadAndAssign);
-                var jobId = backgroundJobClient.Enqueue(() => ftpService.StartFileUpload(currentUserEmail, uploadId, baseUrl,model.UploadAndAssign));
+                var jobId = backgroundJobClient.Enqueue(() => ftpService.StartFileUpload(currentUserEmail, uploadId, baseUrl, model.UploadAndAssign));
                 progressService.AddUploadJob(jobId, currentUserEmail);
-                if(!model.UploadAndAssign)
+                if (!model.UploadAndAssign)
                 {
                     notifyService.Custom($"Upload in progress ", 3, "#17A2B8", "fa fa-upload");
                 }
@@ -216,17 +205,16 @@ namespace risk.control.system.Controllers.Company
 
                     return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
                 }
-                if (model == null || model.PolicyDetail == null ||  !model.PolicyDetail.IsValidCaseDetail())
+                if (model == null || model.PolicyDetail == null || !model.PolicyDetail.IsValidCaseDetail())
                 {
                     notifyService.Error("OOPs !!!..Incomplete/Invalid input");
 
-                    return RedirectToAction(nameof(InvestigationController.EditPolicy), "Investigation", new {id = id });
+                    return RedirectToAction(nameof(InvestigationController.EditPolicy), "Investigation", new { id = id });
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 IFormFile documentFile = null;
-                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
 
                 if (files != null && files.Count > 0)
@@ -242,7 +230,7 @@ namespace risk.control.system.Controllers.Company
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error editing policy");
-                    return RedirectToAction(nameof(InvestigationController.EditPolicy), "Investigation", new { id  = id });
+                    return RedirectToAction(nameof(InvestigationController.EditPolicy), "Investigation", new { id = id });
                 }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = claim.Id });
@@ -273,7 +261,7 @@ namespace risk.control.system.Controllers.Company
                     customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null || customerDetail.ProfileImage == null)
                 {
                     notifyService.Error("OOPs !!!..Incomplete/Invalid input");
-                    return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new {id = customerDetail.InvestigationTaskId });
+                    return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -316,13 +304,13 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if(customerDetail == null || investigationTaskId < 1)
+                if (customerDetail == null || investigationTaskId < 1)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
                     return RedirectToAction(nameof(InvestigationController.Create), "Investigation");
                 }
-                if (customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 || 
-                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber)  ||
+                if (customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 ||
+                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber) ||
                     customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
@@ -392,7 +380,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
                 }
                 var company = await service.CreateBeneficiary(currentUserEmail, investigationTaskId, beneficiary, file);
-                if(company == null)
+                if (company == null)
                 {
                     notifyService.Warning("Error creating Beneficiary !!! ");
                     return RedirectToAction(nameof(InvestigationController.CreateBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
@@ -416,7 +404,7 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (beneficiaryDetailId < 0 || beneficiary == null || beneficiary.InvestigationTaskId < 1 )
+                if (beneficiaryDetailId < 0 || beneficiary == null || beneficiary.InvestigationTaskId < 1)
                 {
                     notifyService.Error("OOPs !!!..Error editing customer");
                     return RedirectToAction(nameof(InvestigationController.Create), "Investigation");
@@ -442,7 +430,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
                 var company = await service.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
-                if(company == null)
+                if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error editing customer");
 

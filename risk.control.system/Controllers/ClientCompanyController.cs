@@ -3,10 +3,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -56,7 +53,7 @@ namespace risk.control.system.Controllers
         public IActionResult Create()
         {
             var country = _context.Country.FirstOrDefault();
-            var model = new ClientCompany { Country = country , SelectedCountryId = country.CountryId, CountryId= country.CountryId };
+            var model = new ClientCompany { Country = country, SelectedCountryId = country.CountryId, CountryId = country.CountryId };
             return View(model);
         }
 
@@ -67,7 +64,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClientCompany clientCompany, string domainAddress, string mailAddress)
         {
-            if(clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
+            if (clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Create));
@@ -106,7 +103,7 @@ namespace risk.control.system.Controllers
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
             var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == clientCompany.SelectedCountryId)?.ISDCode;
-            await smsService.DoSendSmsAsync(isdCode+clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
+            await smsService.DoSendSmsAsync(isdCode + clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
 
             //clientCompany.Description = "New company added.";
             clientCompany.AgreementDate = DateTime.Now;
@@ -131,7 +128,7 @@ namespace risk.control.system.Controllers
             if (id < 1 || _context.ClientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var clientCompany = await _context.ClientCompany
@@ -160,7 +157,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var clientCompany = await _context.ClientCompany.Include(c=>c.Country).FirstOrDefaultAsync(c=>c.ClientCompanyId == ClientCompanyId);
+            var clientCompany = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == ClientCompanyId);
             if (clientCompany != null)
             {
                 clientCompany.Updated = DateTime.Now;
@@ -178,7 +175,7 @@ namespace risk.control.system.Controllers
                 }
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(clientCompany.Country.ISDCode+ clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(clientCompany.Country.ISDCode + clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
 
                 notifyService.Custom($"Company {clientCompany.Email} deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
@@ -217,13 +214,13 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: "Edit Company", FromAction = "Details")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id <= 0 )
+            if (id <= 0)
             {
                 notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
-            var clientCompany = await _context.ClientCompany.Include(c=>c.Country).FirstOrDefaultAsync(c=>c.ClientCompanyId == id);
+            var clientCompany = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == id);
             if (clientCompany == null)
             {
                 notifyService.Error("Company not found!");
@@ -249,7 +246,7 @@ namespace risk.control.system.Controllers
             if (clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(Edit), "ClientCompany", new {id = clientCompany.ClientCompanyId });
+                return RedirectToAction(nameof(Edit), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
             try
             {
@@ -302,17 +299,17 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode+ clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
                 notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 notifyService.Custom($"Error editing company.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Edit), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
-            
+
         }
 
         // GET: ClientCompanies

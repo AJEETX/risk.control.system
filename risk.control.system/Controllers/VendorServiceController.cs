@@ -1,22 +1,15 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-
-using Google.Api;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
 using NToastNotify;
-
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
-
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
-
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
@@ -87,7 +80,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
+                var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
@@ -204,7 +197,7 @@ namespace risk.control.system.Controllers
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorsController.Service), "Vendors",new { id = service.VendorId });
+                return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = service.VendorId });
             }
         }
 
@@ -241,7 +234,7 @@ namespace risk.control.system.Controllers
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Available Agencies") { Parent = agencysPage };
                 var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
                 var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Service") { Parent = agencyDetailPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-                var createPage = new MvcBreadcrumbNode("Edit", "VendorService", $"Edit Service") { Parent = editPage};
+                var createPage = new MvcBreadcrumbNode("Edit", "VendorService", $"Edit Service") { Parent = editPage };
                 ViewData["BreadcrumbNode"] = createPage;
 
                 return View(vendorInvestigationServiceType);
@@ -391,7 +384,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
                 if (vendorInvestigationServiceType != null)
                 {

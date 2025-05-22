@@ -1,34 +1,18 @@
-﻿using System.Net;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
-
-using Google.Api;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
-using NToastNotify;
-
-using Org.BouncyCastle.Utilities.Net;
-
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Company;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using SixLabors.ImageSharp.ColorSpaces;
-
 using SmartBreadcrumbs.Attributes;
-
-using static Google.Cloud.Vision.V1.ProductSearchResults.Types;
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
@@ -822,7 +806,7 @@ namespace risk.control.system.Controllers
                 if (service.SelectedDistrictId == -1)
                 {
                     // Handle state-wide service creation
-                    if (stateWideService is not null && stateWideService.Any(s=>s.DistrictId == null))
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId == null))
                     {
                         var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
                         currentService.IsUpdated = true;
@@ -928,7 +912,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditService(long vendorInvestigationServiceTypeId, VendorInvestigationServiceType service)
         {
-            if (vendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId ||service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 || (service.SelectedDistrictId < 1 && service.SelectedDistrictId != -1 && service.SelectedDistrictId != 0))
+            if (vendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId || service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 || (service.SelectedDistrictId < 1 && service.SelectedDistrictId != -1 && service.SelectedDistrictId != 0))
             {
                 notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(EditService), "Agency", new { id = vendorInvestigationServiceTypeId });
@@ -944,7 +928,7 @@ namespace risk.control.system.Controllers
                            v.InsuranceType == service.InsuranceType &&
                            v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                            v.CountryId == (long?)service.SelectedCountryId &&
-                           v.StateId == (long?)service.SelectedStateId && 
+                           v.StateId == (long?)service.SelectedStateId &&
                            v.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId)?
                        .ToList();
                 if (service.SelectedDistrictId == 0 || service.SelectedDistrictId == -1)
@@ -963,7 +947,7 @@ namespace risk.control.system.Controllers
                 else
                 {
                     // Handle state-wide service creation
-                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId ))
+                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId))
                     {
                         var currentService = existingVendorServices.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId);
                         currentService.IsUpdated = true;

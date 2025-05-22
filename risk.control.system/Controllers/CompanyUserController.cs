@@ -1,5 +1,4 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-using AspNetCoreHero.ToastNotification.Notyf;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -63,7 +62,7 @@ namespace risk.control.system.Controllers
         public IActionResult Index(long id)
         {
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == id);
-           
+
             var model = new CompanyUsersViewModel
             {
                 Company = company,
@@ -106,7 +105,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Add New", FromAction = "Index")]
         public IActionResult Create(long id)
         {
-            var company = _context.ClientCompany.Include(c=>c.Country).FirstOrDefault(v => v.ClientCompanyId == id);
+            var company = _context.ClientCompany.Include(c => c.Country).FirstOrDefault(v => v.ClientCompanyId == id);
             var model = new ClientCompanyApplicationUser { Country = company.Country, CountryId = company.CountryId, ClientCompany = company };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
@@ -148,12 +147,12 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureExtension = fileExtension;
             }
             //DEMO
-            user.Active = true; 
+            user.Active = true;
             user.Password = Applicationsettings.Password;
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
-            
+
             user.PinCodeId = user.SelectedPincodeId;
             user.DistrictId = user.SelectedDistrictId;
             user.StateId = user.SelectedStateId;
@@ -196,7 +195,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var user = await _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).Include(c=>c.Country).FirstOrDefaultAsync(v=>v.Id == userId);
+            var user = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(v => v.Id == userId);
             if (user == null)
             {
                 notifyService.Error("company not found");
@@ -321,7 +320,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (id  <= 0)
+            if (id <= 0)
             {
                 return Problem("Entity set 'ApplicationDbContext.VendorApplicationUser'  is null.");
             }

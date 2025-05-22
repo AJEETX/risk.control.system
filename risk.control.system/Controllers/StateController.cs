@@ -1,18 +1,12 @@
-﻿using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
 using NToastNotify;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
-
 using SmartBreadcrumbs.Attributes;
-
+using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -38,7 +32,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("State")]
         public IActionResult Profile()
         {
-                return View();
+            return View();
         }
         [HttpGet]
         public async Task<IActionResult> GetStates(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
@@ -114,11 +108,11 @@ namespace risk.control.system.Controllers
             .Take(length)
             .Select(s => new
             {
-               s.StateId,
-               s.Name,
-               s.Code,
-               s.Updated,
-               CountryName = s.Country.Name
+                s.StateId,
+                s.Name,
+                s.Code,
+                s.Updated,
+                CountryName = s.Country.Name
             })
             .ToListAsync();
             // Apply paging
@@ -165,12 +159,12 @@ namespace risk.control.system.Controllers
             return View(state);
         }
 
-        [Breadcrumb("Add New", FromAction ="Profile")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.Include(u=>u.Country).FirstOrDefault(u => u.Email == userEmail);
+            var user = _context.ApplicationUser.Include(u => u.Country).FirstOrDefault(u => u.Email == userEmail);
 
             if (user.IsSuperAdmin)
             {
@@ -254,7 +248,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Delete", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
-            if (id < 1  || _context.State == null)
+            if (id < 1 || _context.State == null)
             {
                 toastNotification.AddErrorToastMessage("state not found!");
                 return NotFound();

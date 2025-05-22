@@ -29,7 +29,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
         public CaseInvestigationDetailsController(ApplicationDbContext context,
             IClaimsService claimsService,
-            IWebHostEnvironment webHostEnvironment, 
+            IWebHostEnvironment webHostEnvironment,
             IHttpClientService httpClientService)
         {
             _context = context;
@@ -183,7 +183,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Title = "Investigation Data",
                 LocationData = agentReport?.IdImageData ?? "Location Data",
-                LatLong =string.Format(agentReport.IdImageLocationUrl, "500px", "500px"),
+                LatLong = string.Format(agentReport.IdImageLocationUrl, "500px", "500px"),
                 ImageAddress = imageAddress,
                 Location = agentReport?.IdImage != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(agentReport?.IdImage)) :
@@ -385,7 +385,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url =string.Format( faceReport.IdImageLocationUrl, "500","500"),
+                        url = string.Format(faceReport.IdImageLocationUrl, "500", "500"),
                         distance = faceReport.Distance,
                         duration = faceReport.Duration,
                     });
@@ -407,7 +407,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url =string.Format( faceReport.IdImageLocationUrl, "500","500"),
+                        url = string.Format(faceReport.IdImageLocationUrl, "500", "500"),
                         distance = faceReport.Distance,
                         duration = faceReport.Duration,
                     });
@@ -438,7 +438,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url =string.Format( docReport.IdImageLocationUrl, "500","500"),
+                        url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
                     });
@@ -460,7 +460,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url =string.Format( docReport.IdImageLocationUrl, "500","500"),
+                        url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
                     });

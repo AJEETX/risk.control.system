@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id < 1  || _context.CaseEnabler == null)
+            if (id < 1 || _context.CaseEnabler == null)
             {
                 return NotFound();
             }

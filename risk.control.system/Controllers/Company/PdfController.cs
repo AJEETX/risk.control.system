@@ -1,7 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Notyf;
-using Microsoft.AspNetCore.Mvc;
-using risk.control.system.Services;
+﻿using Microsoft.AspNetCore.Mvc;
 using risk.control.system.Helpers;
+using risk.control.system.Services;
 namespace risk.control.system.Controllers.Company
 {
     public class PdfController : Controller
@@ -16,7 +15,7 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var model = await investigationService.GetPdfReport( id);
+                var model = await investigationService.GetPdfReport(id);
 
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 

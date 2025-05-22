@@ -1,19 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using NToastNotify;
-using risk.control.system.Data;
-using risk.control.system.Models.ViewModel;
-
-using risk.control.system.Models;
-using SmartBreadcrumbs.Attributes;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using risk.control.system.Services;
-using AspNetCoreHero.ToastNotification.Abstractions;
-using Microsoft.FeatureManagement;
-using Microsoft.AspNetCore.Http;
-using risk.control.system.AppConstant;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using risk.control.system.Data;
+using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
+using SmartBreadcrumbs.Attributes;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -88,7 +83,7 @@ namespace risk.control.system.Controllers
                     return NotFound();
                 }
 
-                var vendorApplicationUser = await _context.VendorApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u=>u.Id == userId);
+                var vendorApplicationUser = await _context.VendorApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
@@ -134,7 +129,7 @@ namespace risk.control.system.Controllers
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
                     string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName( applicationUser.ProfileImage.FileName));
+                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -179,8 +174,8 @@ namespace risk.control.system.Controllers
                     {
                         notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
 
-                       var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                        await smsService.DoSendSmsAsync(isdCode+ user.PhoneNumber, "Agency user edited. Email : " + user.Email);
+                        var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited. Email : " + user.Email);
 
                         return RedirectToAction(nameof(Index), "Dashboard");
                     }
@@ -236,8 +231,8 @@ namespace risk.control.system.Controllers
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-                    var admin = _context.ApplicationUser.Include(u=>u.Country).FirstOrDefault(u => u.IsSuperAdmin);
-                            var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+                    var admin = _context.ApplicationUser.Include(u => u.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                    var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                     //var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);
 
                     if (user == null)
@@ -260,7 +255,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"                                       ";
                         failedMessage += $"                                       ";
                         failedMessage += $"{BaseUrl}";
-                        await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode+ admin.PhoneNumber, failedMessage);
+                        await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
                         notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
@@ -289,7 +284,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode+ user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + user.PhoneNumber, message);
 
                     return View("ChangePasswordConfirmation");
                 }

@@ -1,18 +1,12 @@
-﻿using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
 using NToastNotify;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
-
 using SmartBreadcrumbs.Attributes;
-
+using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -166,7 +160,7 @@ namespace risk.control.system.Controllers
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => u.Email == userEmail);
+            var user = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.Email == userEmail);
 
             var district = new District { IsUpdated = !user.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
             return View(district);
@@ -204,13 +198,13 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var district = await _context.District.Include(d=>d.Country).Include(d=>d.State).FirstOrDefaultAsync(d => d.DistrictId == id);
+            var district = await _context.District.Include(d => d.Country).Include(d => d.State).FirstOrDefaultAsync(d => d.DistrictId == id);
             if (district == null)
             {
                 toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
             }
-           
+
             return View(district);
         }
 

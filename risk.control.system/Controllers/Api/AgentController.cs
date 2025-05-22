@@ -1,19 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
-
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -662,7 +659,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 var answerSubmitted = await agentIdService.Answers(locationName, caseId, Questions);
                 if (answerSubmitted)
-                    return Ok( new { success = answerSubmitted });
+                    return Ok(new { success = answerSubmitted });
                 else
                     return BadRequest("Error in submitting answers");
             }

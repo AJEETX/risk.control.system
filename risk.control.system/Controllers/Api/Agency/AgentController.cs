@@ -1,19 +1,13 @@
-﻿using System.Globalization;
-using System.Security.Claims;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
+using System.Globalization;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Agency
@@ -34,9 +28,9 @@ namespace risk.control.system.Controllers.Api.Agency
         private readonly IDashboardService dashboardService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public AgentController(ApplicationDbContext context, 
-            UserManager<VendorApplicationUser> userManager, 
-            IWebHostEnvironment webHostEnvironment, 
+        public AgentController(ApplicationDbContext context,
+            UserManager<VendorApplicationUser> userManager,
+            IWebHostEnvironment webHostEnvironment,
             IDashboardService dashboardService)
         {
             hindiNFO.CurrencySymbol = string.Empty;
@@ -54,11 +48,11 @@ namespace risk.control.system.Controllers.Api.Agency
             var vendorUser = _context.VendorApplicationUser.Include(v => v.Country).FirstOrDefault(c => c.Email == currentUserEmail);
             var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
             var claims = await GetClaims()
-                    .Where(i => i.VendorId == vendorUser.VendorId &&  
-                    i.TaskedAgentEmail == currentUserEmail && 
-                    !i.Deleted && 
+                    .Where(i => i.VendorId == vendorUser.VendorId &&
+                    i.TaskedAgentEmail == currentUserEmail &&
+                    !i.Deleted &&
                     i.SubStatus == assignedToAgentStatus).ToListAsync();
-            
+
 
             var response = claims
                    .Select(a => new ClaimsInvestigationAgencyResponse
@@ -104,7 +98,7 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var agentUser = _context.VendorApplicationUser.Include(v=>v.Country).Include(u => u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
+            var agentUser = _context.VendorApplicationUser.Include(v => v.Country).Include(u => u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
             var claims = await GetClaims()
                     .Where(i => i.VendorId == agentUser.VendorId &&
                     i.TaskedAgentEmail == currentUserEmail &&

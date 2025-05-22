@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using risk.control.system.Models;
 using NToastNotify;
+using risk.control.system.Models;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers

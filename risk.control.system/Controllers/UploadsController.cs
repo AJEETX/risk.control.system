@@ -8,7 +8,6 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 using System.Data;
-using System.Net.Http;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -90,7 +89,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> UploadFaceImage(string reportName, string locationName, long locationId, long Id,string latitude, string longitude, long caseId, IFormFile Image, bool isAgent = false)
+        public async Task<IActionResult> UploadFaceImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image, bool isAgent = false)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
@@ -110,7 +109,7 @@ namespace risk.control.system.Controllers
             }
             return File("~/img/no-user.png", "image/jpeg");
         }
-       
+
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> UploadDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
@@ -118,7 +117,7 @@ namespace risk.control.system.Controllers
             var currentUserEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
             {
-                var response = await agentService.PostDocumentId(currentUserEmail, reportName,locationName, locationId, caseId, Id, latitude, longitude, Image);
+                var response = await agentService.PostDocumentId(currentUserEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, Image);
                 return Json(new { success = true, image = response.Image });
             }
             return BadRequest("Invalid image.");

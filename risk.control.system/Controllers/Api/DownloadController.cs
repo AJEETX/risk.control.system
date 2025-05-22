@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
-using risk.control.system.Models;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -16,7 +14,7 @@ namespace risk.control.system.Controllers.Api
         {
             _context = context;
         }
- 
+
         public async Task<IActionResult> EnquiryFileAttachment(int id)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -27,9 +25,9 @@ namespace risk.control.system.Controllers.Api
                 return NotFound();
             }
 
-            var fileAttachment = _context.QueryRequest.FirstOrDefault(q=>q.QueryRequestId == id);
+            var fileAttachment = _context.QueryRequest.FirstOrDefault(q => q.QueryRequestId == id);
 
-            return fileAttachment != null ? File(fileAttachment.QuestionImageAttachment, fileAttachment.QuestionImageFileType, fileAttachment.QuestionImageFileName + fileAttachment.QuestionImageFileName): null;
+            return fileAttachment != null ? File(fileAttachment.QuestionImageAttachment, fileAttachment.QuestionImageFileType, fileAttachment.QuestionImageFileName + fileAttachment.QuestionImageFileName) : null;
         }
         public async Task<IActionResult> EnquiryReplyFileAttachment(int id)
         {
@@ -55,7 +53,7 @@ namespace risk.control.system.Controllers.Api
                 return NotFound();
             }
 
-            var investigation = _context.Investigations.Include(i=>i.InvestigationReport).FirstOrDefault(q => q.InvestigationReport.Id == id);
+            var investigation = _context.Investigations.Include(i => i.InvestigationReport).FirstOrDefault(q => q.InvestigationReport.Id == id);
             var fileAttachment = investigation.InvestigationReport;
 
             return fileAttachment != null ? File(fileAttachment.SupervisorAttachment, fileAttachment.SupervisorFileType, fileAttachment.SupervisorFileName + fileAttachment.SupervisorFileName) : null;

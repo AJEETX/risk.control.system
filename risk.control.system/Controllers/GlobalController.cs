@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
-using NToastNotify;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -38,7 +36,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
 
-         [Breadcrumb("Global-settings")]
+        [Breadcrumb("Global-settings")]
         public async Task<IActionResult> Profile()
         {
             var applicationDbContext = _context.GlobalSettings.AsQueryable();
@@ -61,7 +59,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    var globalSettings =await _context.GlobalSettings.FirstOrDefaultAsync(x => x.GlobalSettingsId == id);
+                    var globalSettings = await _context.GlobalSettings.FirstOrDefaultAsync(x => x.GlobalSettingsId == id);
                     globalSettings.SendSMS = await manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
                     globalSettings.CanChangePassword = settings.CanChangePassword;
                     globalSettings.ShowTimer = settings.ShowTimer;

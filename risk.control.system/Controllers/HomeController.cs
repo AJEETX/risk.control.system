@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using risk.control.system.Models;
-using Microsoft.AspNetCore.Diagnostics;
 
 namespace risk.control.system.Controllers
 {

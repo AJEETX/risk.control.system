@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorApplicationUser = await _context.VendorApplicationUser
                     .Include(v => v.Country)
                     .Include(v => v.District)
@@ -116,9 +116,9 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
-                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
-                var model = new VendorApplicationUser {Country = vendor.Country, Vendor = vendor };
+
+                var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
+                var model = new VendorApplicationUser { Country = vendor.Country, Vendor = vendor };
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
                 var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (user == null)
                 {
                     notifyService.Error("OOPs !!!..User not found");
@@ -233,14 +233,14 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (userId == null || _context.VendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorApplicationUser =await _context.VendorApplicationUser
+                var vendorApplicationUser = await _context.VendorApplicationUser
                     .Include(v => v.Vendor).Include(v => v.Country)?.FirstOrDefaultAsync(v => v.Id == userId);
                 if (vendorApplicationUser == null)
                 {
@@ -275,7 +275,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
@@ -496,7 +496,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(id);
                 if (vendorApplicationUser == null)
                 {

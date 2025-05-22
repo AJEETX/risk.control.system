@@ -1,13 +1,8 @@
-﻿using System.Text.RegularExpressions;
-
-using Amazon.Rekognition.Model;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
+using System.Text.RegularExpressions;
 
 namespace risk.control.system.Controllers
 {
@@ -27,9 +22,9 @@ namespace risk.control.system.Controllers
 
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(x => x.Email == currentUserEmail);
 
-            var questions = _context.CaseQuestionnaire.Include(c=>c.Questions).FirstOrDefault(x => 
-            x.ClientCompanyId == currentUser.ClientCompanyId && 
-            x.InsuranceType == insuranceType && 
+            var questions = _context.CaseQuestionnaire.Include(c => c.Questions).FirstOrDefault(x =>
+            x.ClientCompanyId == currentUser.ClientCompanyId &&
+            x.InsuranceType == insuranceType &&
             x.Questions.Count > 0);
 
             if (questions != null)
@@ -65,9 +60,9 @@ namespace risk.control.system.Controllers
                     Options = model.Options,
                     IsRequired = model.IsRequired,
                 };
-                var existingQuestion = _context.CaseQuestionnaire.Include(c=>c.Questions)
+                var existingQuestion = _context.CaseQuestionnaire.Include(c => c.Questions)
                     .FirstOrDefault(x => x.ClientCompanyId == currentUser.ClientCompanyId && x.InsuranceType == model.InsuranceType);
-                if(existingQuestion != null)
+                if (existingQuestion != null)
                 {
                     existingQuestion.Questions.Add(question);
                     _context.CaseQuestionnaire.Update(existingQuestion);
@@ -92,7 +87,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitAnswers(QuestionFormViewModel model)
         {
-           var fileNames = new Dictionary<int,string>();
+            var fileNames = new Dictionary<int, string>();
             var files = Request.Form.Files;
             // Handle file uploads separately
             if (files != null && files.Count > 0)
@@ -111,7 +106,7 @@ namespace risk.control.system.Controllers
                         {
                             Directory.CreateDirectory(path);
                         }
-                        var fileName =$"{DateTime.Now.ToString("dd-MMM-yyyy-hh-mm-ss")}-{Path.GetFileName(file.FileName)}";
+                        var fileName = $"{DateTime.Now.ToString("dd-MMM-yyyy-hh-mm-ss")}-{Path.GetFileName(file.FileName)}";
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", fileName);
                         file.CopyTo(new FileStream(upload, FileMode.Create));
                         var uploaded = "/company/" + fileName;
@@ -121,7 +116,7 @@ namespace risk.control.system.Controllers
                         if (match.Success)
                         {
                             int number = int.Parse(match.Groups["id"].Value); // Convert string to int
-                            fileNames.Add(number,file.FileName);
+                            fileNames.Add(number, file.FileName);
                             Console.WriteLine(number); // Output: 23
                         }
                         Console.WriteLine($"File Uploaded: {file.FileName}");
@@ -134,7 +129,7 @@ namespace risk.control.system.Controllers
                 var question = await _context.Questions.FirstOrDefaultAsync(q => q.Id == answer.Key);
                 int questionId = answer.Key;
                 string value = answer.Value;
-                if(string.IsNullOrWhiteSpace(value))
+                if (string.IsNullOrWhiteSpace(value))
                 {
                     value = fileNames[answer.Key];
                 }

@@ -1,23 +1,16 @@
-﻿using System.Collections.Concurrent;
-using System.Globalization;
-using System.Net.Http;
-
-using Highsoft.Web.Mvc.Charts;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
+using System.Collections.Concurrent;
+using System.Globalization;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Agency
@@ -119,7 +112,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Where(v => !v.Deleted);
 
             var agencies = allAgencies.
-                OrderBy(a=>a.Name);
+                OrderBy(a => a.Name);
 
             var result = agencies?.Select(u =>
                 new
@@ -351,7 +344,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Role = agent.UserRole.GetEnumDisplayName(),
                     AgentOnboarded = agent.UserRole != AgencyRole.AGENT || !string.IsNullOrWhiteSpace(agent.MobileUId),
                     RawEmail = agent.Email,
-                    PersonMapAddressUrl = string.Format(map,"300","300"),
+                    PersonMapAddressUrl = string.Format(map, "300", "300"),
                     MapDetails = mapDetails,
                     PinCode = agent.PinCode.Code,
                     Distance = distance,

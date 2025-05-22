@@ -1,6 +1,4 @@
-﻿using Amazon.Rekognition.Model;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -78,7 +76,7 @@ namespace risk.control.system.Controllers
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
                 string newFileName = Guid.NewGuid().ToString();
-                string fileExtension = Path.GetExtension(Path.GetFileName( user.ProfileImage.FileName));
+                string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
                 newFileName += fileExtension;
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
@@ -105,7 +103,7 @@ namespace risk.control.system.Controllers
             {
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 var isdCode = context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                await smsService.DoSendSmsAsync(isdCode +user.PhoneNumber, "User created. Email : " + user.Email);
+                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User created. Email : " + user.Email);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -194,7 +192,7 @@ namespace risk.control.system.Controllers
                         user.Country = applicationUser.Country;
                         user.Active = applicationUser.Active;
                         user.Addressline = applicationUser.Addressline;
-                        
+
                         user.CountryId = applicationUser.SelectedCountryId;
                         user.StateId = applicationUser.SelectedStateId;
                         user.DistrictId = applicationUser.SelectedDistrictId;

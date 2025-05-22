@@ -1,7 +1,4 @@
-﻿using Amazon.Rekognition.Model;
-using Google.Api;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +7,8 @@ using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 using System.Globalization;
-using System.Linq.Expressions;
-using System.Security.Claims;
 using static risk.control.system.AppConstant.Applicationsettings;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
@@ -74,7 +68,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             // Fetching the statuses once
             var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
-            
+
             var finishStatus = CONSTANTS.CASE_STATUS.FINISHED;
 
             if (approvedStatus == null || finishStatus == null)

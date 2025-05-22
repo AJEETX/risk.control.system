@@ -1,47 +1,27 @@
-using System;
-using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Threading.RateLimiting;
-
 using Amazon;
 using Amazon.Rekognition;
 using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.S3.Model;
 using Amazon.Textract;
 using Amazon.TranscribeService;
-
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
-
-using Google.Api;
-
 using Hangfire;
+using Hangfire.Dashboard;
 using Hangfire.MemoryStorage;
-
-using Highsoft.Web.Mvc.Charts;
-
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
 using NToastNotify;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
@@ -52,13 +32,11 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
 using risk.control.system.Seeds;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Extensions;
-
+using System.Net;
+using System.Reflection;
+using System.Text;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using Hangfire.Dashboard;
-using risk.control.system.WorkFlow;
-//using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
@@ -111,7 +89,8 @@ builder.Services.Configure<FormOptions>(x =>
 //        options.QueueLimit = 10;
 //    }));
 // forward headers configuration for reverse proxy
-builder.Services.Configure<ForwardedHeadersOptions>(options => {
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
@@ -124,9 +103,9 @@ builder.Services.AddScoped<IPdfGenerateFaceLocationService, PdfGenerateFaceLocat
 builder.Services.AddScoped<IPdfGenerateAgentLocationService, PdfGenerateAgentLocationService>();
 builder.Services.AddScoped<IPdfGenerateDetailReportService, PdfGenerateDetailReportService>();
 builder.Services.AddScoped<IPdfGenerateCaseDetailService, PdfGenerateCaseDetailService>();
-builder.Services.AddScoped<IPdfGenerateDetailService,PdfGenerateDetailService>();
-builder.Services.AddScoped<IPdfGenerativeService,PdfGenerativeService>();
-builder.Services.AddScoped<IViewRenderService,ViewRenderService>();
+builder.Services.AddScoped<IPdfGenerateDetailService, PdfGenerateDetailService>();
+builder.Services.AddScoped<IPdfGenerativeService, PdfGenerativeService>();
+builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
 builder.Services.AddScoped<IPanCardService, PanCardService>();
 builder.Services.AddScoped<ICloneReportService, CloneReportService>();
 builder.Services.AddScoped<IAgentIdService, AgentIdService>();
@@ -142,9 +121,9 @@ builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<ICaseCreationService, CaseCreationService>();
 builder.Services.AddScoped<IPdfReportService, PdfReportService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
-builder.Services.AddSingleton<IValidationService,ValidationService>();
-builder.Services.AddScoped<ITokenService,TokenService>();
-builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddSingleton<IValidationService, ValidationService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<ICustomApiCLient, CustomApiClient>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
@@ -347,7 +326,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description =@"JWT Authorization header. \r\n\r\n Enter the token in the text input below.",
+        Description = @"JWT Authorization header. \r\n\r\n Enter the token in the text input below.",
     });
     c.SwaggerDoc("v1", new OpenApiInfo
     {
