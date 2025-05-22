@@ -82,6 +82,14 @@ namespace risk.control.system.Seeds
             };
             var inlawEntity = await context.AddAsync(inlaw);
 
+            var unknown = new BeneficiaryRelation
+            {
+                Name = "UNKNOWN",
+                Code = "UNKNOWN",
+                Updated = DateTime.Now,
+            };
+            var unknownEntity = await context.AddAsync(unknown);
+
             #endregion
 
             #region CASE ENABLER
@@ -95,20 +103,27 @@ namespace risk.control.system.Seeds
 
             var doubtCaseEnabler = new CaseEnabler
             {
-                Name = "DOUBTFUL BACKGROUND DETAILS",
-                Code = "DBD",
+                Name = "DOUBT-DETAILS",
+                Code = "DOUBT",
                 Updated = DateTime.Now,
             };
             var doubtCaseEnablerEntity = await context.CaseEnabler.AddAsync(doubtCaseEnabler);
 
             var highAmountCaseEnabler = new CaseEnabler
             {
-                Name = "VERY HIGH INSURANCE PREMIUM",
-                Code = "VHIP",
+                Name = "HIGH-PREMIUM",
+                Code = "HIGH",
                 Updated = DateTime.Now,
             };
             var highAmountCaseEnablerEntity = await context.CaseEnabler.AddAsync(highAmountCaseEnabler);
 
+            var unknownCaseEnabler = new CaseEnabler
+            {
+                Name = "UNKNOWN",
+                Code = "UNKNOWN",
+                Updated = DateTime.Now,
+            };
+            var unknownCaseEnablerCaseEnablerEntity = await context.CaseEnabler.AddAsync(unknownCaseEnabler);
             #endregion
 
             #region COST CENTRE
@@ -140,6 +155,14 @@ namespace risk.control.system.Seeds
 
             var financeCostCentreEntity = await context.CostCentre.AddAsync(financeCostCentre);
 
+            var unknownCostCentre = new CostCentre
+            {
+                Name = "UNKNOWN",
+                Code = "UNKNOWN",
+                Updated = DateTime.Now,
+            };
+
+            var unknownCostCentreEntity = await context.CostCentre.AddAsync(unknownCostCentre);
             #endregion
 
         }

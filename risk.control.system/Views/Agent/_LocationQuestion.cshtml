@@ -6,6 +6,8 @@
 
 @if (location.Questions?.Any() == true)
 {
+	<div class="table-responsive mb-4">
+
 	<form asp-controller="Uploads" asp-action="SubmitLocationAnswers" method="post">
 		@Html.AntiForgeryToken()
 		<input type="hidden" name="LocationId" value="@location.Id" />
@@ -116,5 +118,6 @@
 
 		<button type="submit" class="btn btn-primary">Submit Answers</button>
 	</form>
+	</div>
 }
 

@@ -6,6 +6,8 @@
 
 @if (location.DocumentIds?.Any(d => d.Selected) == true)
 {
+	<div class="table-responsive mb-4">
+
 	<table class="table table-bordered table-striped">
 		<thead class="table-light">
 			<tr>
@@ -102,4 +104,5 @@
 			}
 		</tbody>
 	</table>
+	</div>
 }

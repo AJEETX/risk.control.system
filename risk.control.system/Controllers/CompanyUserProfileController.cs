@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -23,36 +22,27 @@ namespace risk.control.system.Controllers
         public List<UsersViewModel> UserList;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
-        private readonly INotificationService service;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
-        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
-        private readonly IToastNotification toastNotification;
 
         public CompanyUserProfileController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             INotyfService notifyService,
-            INotificationService service,
              IHttpContextAccessor httpContextAccessor,
-            RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
-            ISmsService SmsService,
-            IToastNotification toastNotification)
+            ISmsService SmsService)
         {
             this._context = context;
             this.signInManager = signInManager;
             this.notifyService = notifyService;
-            this.service = service;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
-            this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
-            this.toastNotification = toastNotification;
             UserList = new List<UsersViewModel>();
         }
 
