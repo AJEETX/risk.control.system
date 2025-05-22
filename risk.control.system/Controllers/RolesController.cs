@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.Models;
+using NToastNotify;
 using SmartBreadcrumbs.Attributes;
-using AspNetCoreHero.ToastNotification.Abstractions;
 
 namespace risk.control.system.Controllers
 {
@@ -11,12 +11,12 @@ namespace risk.control.system.Controllers
     public class RolesController : Controller
     {
         private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly INotyfService notyfService;
+        private readonly IToastNotification toastNotification;
 
-        public RolesController(RoleManager<ApplicationRole> roleManager, INotyfService notyfService)
+        public RolesController(RoleManager<ApplicationRole> roleManager, IToastNotification toastNotification)
         {
             _roleManager = roleManager;
-            this.notyfService = notyfService;
+            this.toastNotification = toastNotification;
         }
 
         public async Task<IActionResult> Index(string id = null)
@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers
             {
                 await _roleManager.CreateAsync(role);
             }
-            notyfService.Success("role created successfully!");
+            toastNotification.AddSuccessToastMessage("role created successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -65,11 +65,11 @@ namespace risk.control.system.Controllers
                 var existingRole = await _roleManager.FindByIdAsync(role.Id.ToString());
                 existingRole.Name = role.Name;
                 await _roleManager.UpdateAsync(existingRole);
-                notyfService.Warning("role edited successfully!");
+                toastNotification.AddSuccessToastMessage("role edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
 
-            notyfService.Error("Error to edit role!");
+            toastNotification.AddErrorToastMessage("Error to edit role!");
             return View(role);
         }
 
@@ -80,7 +80,7 @@ namespace risk.control.system.Controllers
 
             if (role == null)
             {
-                notyfService.Error("role not found!");
+                toastNotification.AddErrorToastMessage("role not found!");
                 return NotFound();
             }
 
@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers
             {
                 await _roleManager.DeleteAsync(role);
             }
-            notyfService.Success("role deleted successfully!");
+            toastNotification.AddSuccessToastMessage("role deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
     }

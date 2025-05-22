@@ -11,6 +11,9 @@ using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Helpers;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.Models;
+using static risk.control.system.Helpers.Permissions;
+using HPdf;
 
 namespace risk.control.system.Controllers.Mobile
 {
@@ -18,15 +21,20 @@ namespace risk.control.system.Controllers.Mobile
     [ApiController]
     public class SecureController : ControllerBase
     {
+        private readonly IConfiguration configuration;
+        private readonly IInvestigationService investigationService;
         private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly ITokenService tokenService;
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
+        private readonly IPdfReportService pdfReportService;
+        private readonly IAccountService accountService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger _logger;
         private readonly IFeatureManager featureManager;
+        private readonly IViewRenderService viewRenderService;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
 
@@ -34,22 +42,32 @@ namespace risk.control.system.Controllers.Mobile
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             INotificationService service,
+            IPdfReportService pdfReportService,
+            IConfiguration configuration,
+            IInvestigationService investigationService,
             IPdfGenerativeService pdfGenerativeService,
+            IAccountService accountService,
             IWebHostEnvironment webHostEnvironment,
             ILogger<AccountController> logger,
             IFeatureManager featureManager,
+            IViewRenderService viewRenderService,
             ISmsService SmsService,
             ApplicationDbContext context, ITokenService tokenService)
         {
+            this.configuration = configuration;
+            this.investigationService = investigationService;
             this.pdfGenerativeService = pdfGenerativeService;
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.httpContextAccessor = httpContextAccessor;
             this.service = service;
+            this.pdfReportService = pdfReportService;
+            this.accountService = accountService;
             this.webHostEnvironment = webHostEnvironment;
             this._context = context;
             _logger = logger;
             this.featureManager = featureManager;
+            this.viewRenderService = viewRenderService;
             smsService = SmsService;
             this.tokenService = tokenService;
         }

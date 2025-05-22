@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
 
@@ -9,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using risk.control.system.Services;
 using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.FeatureManagement;
+using Microsoft.AspNetCore.Http;
+using risk.control.system.AppConstant;
 using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -25,6 +29,7 @@ namespace risk.control.system.Controllers
         private readonly INotificationService service;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotyfService notifyService;
+        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
@@ -34,6 +39,7 @@ namespace risk.control.system.Controllers
              IHttpContextAccessor httpContextAccessor,
             INotyfService notifyService,
             SignInManager<ApplicationUser> signInManager,
+            RoleManager<ApplicationRole> roleManager,
             ISmsService SmsService,
             IWebHostEnvironment webHostEnvironment)
         {
@@ -43,6 +49,7 @@ namespace risk.control.system.Controllers
             this.service = service;
             this.httpContextAccessor = httpContextAccessor;
             this.notifyService = notifyService;
+            this.roleManager = roleManager;
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();

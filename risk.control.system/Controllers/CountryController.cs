@@ -1,12 +1,17 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using SmartBreadcrumbs.Attributes;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -16,12 +21,12 @@ namespace risk.control.system.Controllers
     public class CountryController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
+        private readonly IToastNotification toastNotification;
 
-        public CountryController(ApplicationDbContext context, INotyfService notifyService)
+        public CountryController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            this.notifyService = notifyService;
+            this.toastNotification = toastNotification;
         }
 
         // GET: RiskCaseStatus
@@ -108,7 +113,7 @@ namespace risk.control.system.Controllers
         {
             if (id == 0 || _context.Country == null)
             {
-                notifyService.Error("country not found!");
+                toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
             }
 
@@ -116,7 +121,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.CountryId == id);
             if (country == null)
             {
-                notifyService.Error("country not found!");
+                toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
             }
 
@@ -138,7 +143,7 @@ namespace risk.control.system.Controllers
             country.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(country);
             await _context.SaveChangesAsync();
-            notifyService.Success("country added successfully!");
+            toastNotification.AddSuccessToastMessage("country added successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -148,14 +153,14 @@ namespace risk.control.system.Controllers
         {
             if (id == 0 || _context.Country == null)
             {
-                notifyService.Error("country not found!");
+                toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
             }
 
             var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == id);
             if (country == null)
             {
-                notifyService.Error("country not found!");
+                toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
             }
             return View(country);
@@ -170,7 +175,7 @@ namespace risk.control.system.Controllers
         {
             if (id != country.CountryId)
             {
-                notifyService.Error("country not found!");
+                toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
             }
 
@@ -195,10 +200,10 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                notifyService.Success("country edited successfully!");
+                toastNotification.AddSuccessToastMessage("country edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            notifyService.Error("Error to edit country!");
+            toastNotification.AddErrorToastMessage("Error to edit country!");
             return View(country);
         }
 
@@ -208,7 +213,7 @@ namespace risk.control.system.Controllers
         {
             if (id == 0 || _context.Country == null)
             {
-                notifyService.Error("country not found!");
+                toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
             }
 
@@ -216,7 +221,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.CountryId == id);
             if (country == null)
             {
-                notifyService.Error("country not found!");
+                toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
             }
 
@@ -230,7 +235,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.Country == null)
             {
-                notifyService.Error("country not found!");
+                toastNotification.AddErrorToastMessage("country not found!");
                 return Problem("Entity set 'ApplicationDbContext.Country'  is null.");
             }
             var country = await _context.Country.FindAsync(id);
@@ -242,7 +247,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            notifyService.Success("country deleted successfully!");
+            toastNotification.AddSuccessToastMessage("country deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

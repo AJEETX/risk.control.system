@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
+using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -31,6 +33,7 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IToastNotification toastNotification;
         private readonly IFeatureManager featureManager;
 
         public VendorApplicationUsersController(ApplicationDbContext context,
@@ -40,7 +43,8 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             IFeatureManager featureManager,
             ISmsService SmsService,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment,
+            IToastNotification toastNotification)
         {
             _context = context;
             this.userManager = userManager;
@@ -49,6 +53,7 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
+            this.toastNotification = toastNotification;
             this.featureManager = featureManager;
         }
 
@@ -206,7 +211,7 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    notifyService.Error("Error to create user!");
+                    toastNotification.AddErrorToastMessage("Error to create user!");
                     foreach (IdentityError error in result.Errors)
                         ModelState.AddModelError("", error.Description);
                 }
@@ -368,7 +373,7 @@ namespace risk.control.system.Controllers
             VendorApplicationUser user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                notifyService.Error("user not found!");
+                toastNotification.AddErrorToastMessage("user not found!");
                 return NotFound();
             }
             //ViewBag.UserName = user.UserName;

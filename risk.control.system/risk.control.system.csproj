@@ -8,10 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCoreHero.ToastNotification" Version="1.1.0" />
-    <PackageReference Include="AWSSDK.Core" Version="4.0.0.6" />
+    <PackageReference Include="AWSSDK.Core" Version="4.0.0.5" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.1" />
     <PackageReference Include="AWSSDK.Rekognition" Version="4.0.0.4" />
-    <PackageReference Include="AWSSDK.S3" Version="4.0.0.6" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.0.5" />
     <PackageReference Include="AWSSDK.Textract" Version="4.0.0.4" />
     <PackageReference Include="AWSSDK.TranscribeService" Version="4.0.0.4" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
@@ -40,6 +40,7 @@
     <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="4.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="Net8.Licensing" Version="1.0.0" />
+    <PackageReference Include="NToastNotify" Version="8.0.0" />
     <PackageReference Include="SixLabors.Fonts" Version="2.1.3" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.6" />

@@ -16,6 +16,7 @@
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = false;
+                            // Disable all buttons, submit inputs, and anchors
                             $('button, input[type="submit"], a').prop('disabled', true);
 
                             // Add a class to visually indicate disabled state for anchors
@@ -47,10 +48,11 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Edit ",
+                        text: "Edit Item",
                         btnClass: 'btn-warning',
                         action: function () {
                             askEditConfirmation = false;
+                            / / / Disable all buttons, submit inputs, and anchors
                             $('button, input[type="submit"], a').prop('disabled', true);
 
                             // Add a class to visually indicate disabled state for anchors

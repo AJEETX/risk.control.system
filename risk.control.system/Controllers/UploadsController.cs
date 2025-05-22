@@ -8,6 +8,7 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 using System.Data;
+using System.Net.Http;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -19,16 +20,19 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly IClaimsAgentService agentService;
         private readonly IAgentIdService agentIdService;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
         public UploadsController(ApplicationDbContext context,
             INotyfService notifyService,
             IClaimsAgentService agentService,
-            IAgentIdService agentIdService)
+            IAgentIdService agentIdService,
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.notifyService = notifyService;
             this.agentService = agentService;
             this.agentIdService = agentIdService;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()

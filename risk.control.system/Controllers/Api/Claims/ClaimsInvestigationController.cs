@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -22,15 +23,18 @@ namespace risk.control.system.Controllers.Api.Claims
     public class ClaimsInvestigationController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IClaimsService claimsService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IHttpClientService httpClientService;
         private static HttpClient httpClient = new HttpClient();
 
         public ClaimsInvestigationController(ApplicationDbContext context,
+            IClaimsService claimsService,
             IWebHostEnvironment webHostEnvironment,
             IHttpClientService httpClientService)
         {
             _context = context;
+            this.claimsService = claimsService;
             this.webHostEnvironment = webHostEnvironment;
             this.httpClientService = httpClientService;
         }

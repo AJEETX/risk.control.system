@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCoreHero.ToastNotification.Notyf;
+using Microsoft.AspNetCore.Mvc;
 using risk.control.system.Services;
 using risk.control.system.Helpers;
 namespace risk.control.system.Controllers.Company

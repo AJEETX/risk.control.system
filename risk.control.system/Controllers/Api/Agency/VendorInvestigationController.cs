@@ -1,6 +1,10 @@
-﻿using System.Security.Claims;
+﻿using System.Globalization;
+using System.Security.Claims;
+
+using Google.Api;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +15,7 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using static risk.control.system.Helpers.Permissions;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
@@ -24,13 +29,16 @@ namespace risk.control.system.Controllers.Api.Agency
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private static readonly HttpClient httpClient = new();
+        private readonly UserManager<VendorApplicationUser> userManager;
+        private static HttpClient httpClient = new();
 
         public VendorInvestigationController(ApplicationDbContext context,
-             IWebHostEnvironment webHostEnvironment)
+             IWebHostEnvironment webHostEnvironment,
+             UserManager<VendorApplicationUser> userManager)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
+            this.userManager = userManager;
         }
 
         [HttpGet("GetOpen")]

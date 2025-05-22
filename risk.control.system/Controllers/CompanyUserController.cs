@@ -1,4 +1,5 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using AspNetCoreHero.ToastNotification.Notyf;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -6,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
+using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -30,6 +33,7 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IToastNotification toastNotification;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
         private readonly IFeatureManager featureManager;
@@ -39,6 +43,7 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
+            IToastNotification toastNotification,
             ISmsService SmsService,
             IFeatureManager featureManager,
             ApplicationDbContext context)
@@ -48,6 +53,7 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
+            this.toastNotification = toastNotification;
             smsService = SmsService;
             this.featureManager = featureManager;
             this._context = context;

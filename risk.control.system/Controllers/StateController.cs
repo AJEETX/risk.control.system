@@ -1,12 +1,18 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
+using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using SmartBreadcrumbs.Attributes;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -16,12 +22,12 @@ namespace risk.control.system.Controllers
     public class StateController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly INotyfService notyfService;
+        private readonly IToastNotification toastNotification;
 
-        public StateController(ApplicationDbContext context, INotyfService notyfService)
+        public StateController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            this.notyfService = notyfService;
+            this.toastNotification = toastNotification;
         }
 
         // GET: RiskCaseStatus
@@ -144,7 +150,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.State == null)
             {
-                notyfService.Error("state not found!");
+                toastNotification.AddErrorToastMessage("state not found!");
                 return NotFound();
             }
 
@@ -152,7 +158,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.StateId == id);
             if (state == null)
             {
-                notyfService.Error("state not found!");
+                toastNotification.AddErrorToastMessage("state not found!");
                 return NotFound();
             }
 
@@ -183,7 +189,7 @@ namespace risk.control.system.Controllers
             state.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(state);
             await _context.SaveChangesAsync();
-            notyfService.Success("state created successfully!");
+            toastNotification.AddSuccessToastMessage("state created successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -193,14 +199,14 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.State == null)
             {
-                notyfService.Error("state not found!");
+                toastNotification.AddErrorToastMessage("state not found!");
                 return NotFound();
             }
 
             var state = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
             if (state == null)
             {
-                notyfService.Error("state not found!");
+                toastNotification.AddErrorToastMessage("state not found!");
                 return NotFound();
             }
             //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", state.CountryId);
@@ -217,7 +223,7 @@ namespace risk.control.system.Controllers
         {
             if (id != state.StateId)
             {
-                notyfService.Error("state not found!");
+                toastNotification.AddErrorToastMessage("state not found!");
                 return NotFound();
             }
 
@@ -235,12 +241,12 @@ namespace risk.control.system.Controllers
                 {
                     Console.WriteLine(ex.ToString());
                 }
-                notyfService.Success("state edited successfully!");
+                toastNotification.AddSuccessToastMessage("state edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
             //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
-            notyfService.Error("Error to edit state!");
+            toastNotification.AddErrorToastMessage("Error to edit state!");
             return View(state);
         }
 
@@ -250,7 +256,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1  || _context.State == null)
             {
-                notyfService.Error("state not found!");
+                toastNotification.AddErrorToastMessage("state not found!");
                 return NotFound();
             }
 
@@ -258,7 +264,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.StateId == id);
             if (state == null)
             {
-                notyfService.Error("state not found!");
+                toastNotification.AddErrorToastMessage("state not found!");
                 return NotFound();
             }
 
@@ -283,7 +289,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            notyfService.Success("state deleted successfully!");
+            toastNotification.AddSuccessToastMessage("state deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

@@ -25,7 +25,7 @@ namespace risk.control.system.Controllers.Api.Claims
         private readonly IClaimsService claimsService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IHttpClientService httpClientService;
-        private static readonly HttpClient httpClient = new();
+        private static HttpClient httpClient = new HttpClient();
 
         public CaseInvestigationDetailsController(ApplicationDbContext context,
             IClaimsService claimsService,

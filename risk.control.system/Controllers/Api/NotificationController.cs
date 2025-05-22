@@ -1,7 +1,13 @@
-﻿using System.Web;
+﻿using System.Net.Sockets;
+using System.Net;
+using System.Web;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+
+using risk.control.system.AppConstant;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api
@@ -15,11 +21,13 @@ namespace risk.control.system.Controllers.Api
         private readonly int maxCountReached = 10;
         private readonly INotificationService service;
         private readonly ISmsService smsService;
+        private readonly IHttpClientService httpClientService;
 
-        public NotificationController(INotificationService service, ISmsService smsService)
+        public NotificationController(INotificationService service, ISmsService smsService, IHttpClientService httpClientService)
         {
             this.service = service;
             this.smsService = smsService;
+            this.httpClientService = httpClientService;
         }
         [HttpPost("ClearAll")]
         public async Task<IActionResult> ClearAllNotifications()
