@@ -15,10 +15,4 @@
         public string RoleName { get; set; }
         public bool Selected { get; set; }
     }
-
-    public class ManageVendorUserRolesViewModel
-    {
-        public long VendorId { get; set; }
-        public IList<VendorUserRoleViewModel> VendorUserRoles { get; set; }
-    }
 }

@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {
-    public class AddressDetail 
+    public class AddressDetail
     {
         [Display(Name = "PinCode name")]
         public long? PinCodeId { get; set; } = default!;

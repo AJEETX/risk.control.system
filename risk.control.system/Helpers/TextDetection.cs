@@ -1,11 +1,6 @@
 ﻿using Amazon.Textract;
 using Amazon.Textract.Model;
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-
 namespace risk.control.system.Helpers;
 
 public class TextDetection

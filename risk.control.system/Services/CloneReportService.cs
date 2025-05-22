@@ -1,7 +1,4 @@
-﻿using System.Text.Json;
-using Google.Api;
-using Microsoft.EntityFrameworkCore;
-using risk.control.system.AppConstant;
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -54,7 +51,7 @@ namespace risk.control.system.Services
                         ReportType = loc.AgentIdReport.ReportType,
                         ReportName = loc.AgentIdReport.ReportName,
                     },
-                    MediaReports = loc.MediaReports?.Select(m=> new MediaReport
+                    MediaReports = loc.MediaReports?.Select(m => new MediaReport
                     {
                         IsRequired = m.IsRequired,
                         ReportName = m.ReportName,
@@ -109,11 +106,11 @@ namespace risk.control.system.Services
                    .ThenInclude(l => l.Questions)
             .FirstOrDefaultAsync(r => r.Id == investigation.ReportTemplateId);
 
-            var locationTemplate = originalTemplate.LocationTemplate.Select(loc => new             
+            var locationTemplate = originalTemplate.LocationTemplate.Select(loc => new
             {
                 LocationName = loc.LocationName,
                 IsRequired = loc.IsRequired,
-                Agent = new 
+                Agent = new
                 {
                     IsRequired = loc.AgentIdReport.IsRequired,
                     ReportType = loc.AgentIdReport.ReportType.GetEnumDisplayName(),
@@ -126,7 +123,7 @@ namespace risk.control.system.Services
                     MediaType = m.MediaType,
                     Selected = m.Selected,
                 }).ToList(),
-                FaceIds = loc.FaceIds.Where(face => face.Selected)?.Select(face => new 
+                FaceIds = loc.FaceIds.Where(face => face.Selected)?.Select(face => new
                 {
                     IsRequired = face.IsRequired,
                     ReportType = face.ReportType.GetEnumDisplayName(),
@@ -134,7 +131,7 @@ namespace risk.control.system.Services
                     ReportName = face.ReportName
                 }).ToList(),
 
-                DocumentIds = loc.DocumentIds.Where(face => face.Selected)?.Select(doc => new 
+                DocumentIds = loc.DocumentIds.Where(face => face.Selected)?.Select(doc => new
                 {
                     IsRequired = doc.IsRequired,
                     ReportType = doc.ReportType.GetEnumDisplayName(),
@@ -142,7 +139,7 @@ namespace risk.control.system.Services
                     IdImageBack = doc.IdImageBack,
                 }).ToList(),
 
-                Questions = loc.Questions?.Select(q => new 
+                Questions = loc.Questions?.Select(q => new
                 {
                     QuestionText = q.QuestionText,
                     QuestionType = q.QuestionType,
@@ -154,6 +151,6 @@ namespace risk.control.system.Services
 
             return locationTemplate;
         }
-        
+
     }
 }

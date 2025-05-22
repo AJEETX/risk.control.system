@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using risk.control.system.Helpers;
 using System.ComponentModel.DataAnnotations;
-using risk.control.system.Helpers;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {

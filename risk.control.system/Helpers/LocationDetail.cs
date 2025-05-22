@@ -1,6 +1,4 @@
-﻿using System;
-
-using risk.control.system.Models;
+﻿using risk.control.system.Models;
 
 namespace risk.control.system.Helpers
 {

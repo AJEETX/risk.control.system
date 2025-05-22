@@ -1,13 +1,10 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
-using risk.control.system.Data;
-using risk.control.system.Helpers;
-using risk.control.system.Models;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp;
 using Gehtsoft.PDFFlow.Utils;
-using static risk.control.system.Helpers.PdfReportBuilder;
-using Microsoft.AspNetCore.Hosting;
+using risk.control.system.Data;
+using risk.control.system.Models;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace risk.control.system.Services
 {
@@ -46,7 +43,6 @@ namespace risk.control.system.Services
         internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
         internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
 
-        internal static readonly IdInfo EMPTY_ITEM = new IdInfo("", new FontText[0]);
         private string imgPath = string.Empty;
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;

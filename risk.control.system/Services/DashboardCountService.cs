@@ -1,25 +1,14 @@
-﻿using System.Linq;
-using System.Security.Claims;
-
-using Amazon.Runtime.Internal.Transform;
-
-using Microsoft.EntityFrameworkCore;
-
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Services
 {
     public interface IDashboardCountService
     {
-        //DashboardData GetClaimsCount(string userEmail, string role);
         DashboardData GetCreatorCount(string userEmail, string role);
         DashboardData GetAssessorCount(string userEmail, string role);
         DashboardData GetCompanyAdminCount(string userEmail, string role);
@@ -34,8 +23,6 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
 
         private const string uploaded = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED;
-        private const string edited = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR;
-        private const string drafted = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR;
         private const string created = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
         private const string assigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
         private const string reAssigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER;
@@ -446,7 +433,7 @@ namespace risk.control.system.Services
                 c.Status == finished &&
                 (c.SubStatus == approved)
                 );
-            
+
             return count;
         }
         private int GetAssessorReject(string userEmail, InsuranceType insuranceType)
@@ -490,7 +477,7 @@ namespace risk.control.system.Services
             var count = cases.Count(a => a.Status != finished &&
                      a.CreatedUser == companyUser.Email &&
             a.ClientCompanyId == companyUser.ClientCompanyId
-            && a.SubStatus != created && 
+            && a.SubStatus != created &&
             a.SubStatus != withdrawnByCompany
             && a.SubStatus != withdrawnByAgency
             && a.SubStatus != assigned

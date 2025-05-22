@@ -1,6 +1,4 @@
-﻿using risk.control.system.AppConstant;
-
-namespace risk.control.system.Models
+﻿namespace risk.control.system.Models
 {
     public class BaseEntity
     {

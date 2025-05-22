@@ -18,7 +18,7 @@ namespace risk.control.system.Models
         public string Code { get; set; } = default!;
         public InsuranceType? InsuranceType { get; set; }
 
-       public bool MasterData { get; set; } = false;
+        public bool MasterData { get; set; } = false;
 
         public override string ToString()
         {

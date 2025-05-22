@@ -1,10 +1,4 @@
-﻿using System.Diagnostics.Metrics;
-
-using Google.Api;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -18,7 +12,7 @@ namespace risk.control.system.Seeds
     {
         static string COUNTRY = CONSTANTS.COUNTRY_AU;
 
-        public static async Task<List<Vendor>> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, 
+        public static async Task<List<Vendor>> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
                     ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager)
         {
             var countries = context.Country.ToList();
@@ -36,10 +30,10 @@ namespace risk.control.system.Seeds
             var greates = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greates.com", NAME = "Greates", PHOTO = "/img/company.png" };
 
 
-//#if !DEBUG
-                        COUNTRY = CONSTANTS.COUNTRY_IN;
+            //#if !DEBUG
+            COUNTRY = CONSTANTS.COUNTRY_IN;
 
-//#endif
+            //#endif
             var proper = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "proper.com", NAME = "Proper", PHOTO = "/img/proper.png" };
             var honest = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "honest.com", NAME = "Honest", PHOTO = "/img/honest.png" };
             var greater = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greater.com", NAME = "Greater", PHOTO = "/img/company.png" };
@@ -49,7 +43,7 @@ namespace risk.control.system.Seeds
             var servicesTypes = await ServiceTypeSeed.Seed(context);
 
 
-            var agencies = new List<SeedInput> { 
+            var agencies = new List<SeedInput> {
                 checker,
 //#if !DEBUG
 

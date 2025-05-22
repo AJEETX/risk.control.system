@@ -1,8 +1,6 @@
-﻿using risk.control.system.AppConstant;
-using risk.control.system.Data;
-using risk.control.system.Models;
+﻿using risk.control.system.Data;
 using risk.control.system.Helpers;
-
+using risk.control.system.Models;
 using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Seeds

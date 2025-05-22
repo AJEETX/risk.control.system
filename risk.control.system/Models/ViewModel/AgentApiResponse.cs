@@ -1,6 +1,4 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
-
-namespace risk.control.system.Models.ViewModel
+﻿namespace risk.control.system.Models.ViewModel
 {
     public class PanVerifyResponse
     {
@@ -123,7 +121,7 @@ namespace risk.control.system.Models.ViewModel
         public long CaseId { get; set; }
         public string? LocationName { get; set; }
         public string? ReportName { get; set; }
-        
+
         public string? LocationLatLong { get; set; }
     }
 

@@ -1,13 +1,7 @@
-﻿using CsvHelper.Configuration;
-using risk.control.system.Models.ViewModel;
+﻿using risk.control.system.Data;
 using risk.control.system.Models;
-using System.Globalization;
-using CsvHelper;
-using risk.control.system.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using risk.control.system.Models.ViewModel;
 using System.Text.RegularExpressions;
-using Google.Api;
-using SkiaSharp;
 
 namespace risk.control.system.Seeds
 {
@@ -20,8 +14,8 @@ namespace risk.control.system.Seeds
         private static string au_stateWisePincodeFilePath = @"au_postcodes.csv";
         private static string all_india_pincodes = @"india_pincode.csv";
         private static string NO_DATA = " NO - DATA ";
-        private static List<Currency>  currencies = new List<Currency>();
-        private static List<Currency>  currenciesName = new List<Currency>();
+        private static List<Currency> currencies = new List<Currency>();
+        private static List<Currency> currenciesName = new List<Currency>();
 
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
 
@@ -97,7 +91,7 @@ namespace risk.control.system.Seeds
                                 Language = currency?.Language.ToUpper(),
                                 Updated = DateTime.Now,
                             };
-                            
+
                             countries.Add(country);
                         }
                     }
@@ -172,7 +166,7 @@ namespace risk.control.system.Seeds
                 }
             }
         }
-       
+
         public static async Task<List<PinCodeState>> CsvRead_Au(int maxCount = 0)
         {
             var pincodes = new List<PinCodeState>();
@@ -284,7 +278,7 @@ namespace risk.control.system.Seeds
                                 District = rowData[3]?.Trim() ?? NO_DATA,
                                 StateName = rowData[4]?.Trim() ?? NO_DATA,
                                 StateCode = GetInitials(rowData[4])?.Trim() ?? NO_DATA,
-                                Latitude =  NO_DATA,
+                                Latitude = NO_DATA,
                                 Longitude = NO_DATA,
                             };
                             pincodes.Add(pincodeState);

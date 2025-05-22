@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using risk.control.system.Helpers;
 using System.ComponentModel.DataAnnotations;
-using Google.Cloud.Vision.V1;
-using risk.control.system.Helpers;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {

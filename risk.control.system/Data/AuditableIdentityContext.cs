@@ -1,10 +1,8 @@
-﻿using System.Security.Claims;
-
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-
 using risk.control.system.Models;
+using System.Security.Claims;
 
 namespace risk.control.system.Data
 {

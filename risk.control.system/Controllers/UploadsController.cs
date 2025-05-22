@@ -149,8 +149,6 @@ namespace risk.control.system.Controllers
             var data = new DocumentData
             {
                 LocationName = locationName,
-                //LocationId = locationId,
-                //Id = docId,
                 ReportName = reportName,
                 Email = currentUserEmail,
                 CaseId = caseId,
@@ -200,9 +198,18 @@ namespace risk.control.system.Controllers
                 // e.g. return View(model);
                 return BadRequest("Some answers are missing.");
             }
-            await agentIdService.Answers(locationName, CaseId, Questions);
+            var submitted = await agentIdService.Answers(locationName, CaseId, Questions);
 
+            if (submitted)
+            {
+                notifyService.Success("Answer(s) submitted Successfully.");
+            }
+            else
+            {
+                notifyService.Error("Error in submitting Answer(s).");
+            }
             return Redirect("/Agent/GetInvestigate?selectedcase=" + CaseId);
+
         }
 
     }

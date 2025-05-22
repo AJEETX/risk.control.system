@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.AspNetCore.Identity;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
-using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 

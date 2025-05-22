@@ -1,23 +1,10 @@
-﻿using System.Net;
-
-using Amazon.Rekognition.Model;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
-
-using Google.Api;
-
-using Highsoft.Web.Mvc.Charts;
-
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-
-using SkiaSharp;
+using System.Net;
 
 namespace risk.control.system.Services
 {
@@ -47,8 +34,6 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext context;
         private readonly ISmsService smsService;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        //private readonly ICustomApiCLient customerApiclient;
         private readonly IHttpClientService httpClientService;
         private readonly IFeatureManager featureManager;
         private static string logo = "https://icheckify.co.in";
@@ -59,15 +44,11 @@ namespace risk.control.system.Services
 
         public NotificationService(ApplicationDbContext context,
             ISmsService SmsService,
-            IWebHostEnvironment webHostEnvironment,
-            //ICustomApiCLient customerApiclient,
             IHttpClientService httpClientService,
             IFeatureManager featureManager)
         {
             this.context = context;
             smsService = SmsService;
-            this.webHostEnvironment = webHostEnvironment;
-            //this.customerApiclient = customerApiclient;
             this.httpClientService = httpClientService;
             this.featureManager = featureManager;
         }
@@ -747,7 +728,7 @@ namespace risk.control.system.Services
 
         public async Task<List<StatusNotification>> GetNotifications(string userEmail)
         {
-            
+
             var companyUser = context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
@@ -762,7 +743,7 @@ namespace risk.control.system.Services
                 var notifications = context.Notifications.Where(n => n.Company == company && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
                 if (role.Name == AppRoles.ASSESSOR.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role  && !n.IsReadByAssessor);
+                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByAssessor);
                 }
                 else if (role.Name == AppRoles.MANAGER.ToString())
                 {
@@ -782,7 +763,7 @@ namespace risk.control.system.Services
             {
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == vendorUser.Role.ToString());
                 agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-                
+
                 var notifications = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
 
                 if (role.Name == AppRoles.AGENT.ToString())
@@ -792,10 +773,10 @@ namespace risk.control.system.Services
                 else
                 {
                     var superRole = context.ApplicationRole.FirstOrDefault(r => r.Name == AppRoles.SUPERVISOR.ToString());
-                    if(role.Name == AppRoles.SUPERVISOR.ToString())
+                    if (role.Name == AppRoles.SUPERVISOR.ToString())
                     {
-                        notifications = notifications.Where(n => 
-                        (!n.IsReadByVendor && n.NotifierUserEmail == userEmail &&  
+                        notifications = notifications.Where(n =>
+                        (!n.IsReadByVendor && n.NotifierUserEmail == userEmail &&
                         (n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR || n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR))
                         ||
                         (!n.IsReadByVendor && n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
@@ -808,8 +789,8 @@ namespace risk.control.system.Services
                 }
 
 
-               var activeNotifications = await notifications
-                    .OrderByDescending(n => n.CreatedAt).ToListAsync();
+                var activeNotifications = await notifications
+                     .OrderByDescending(n => n.CreatedAt).ToListAsync();
                 return activeNotifications;
             }
             var allNotifications = await context.Notifications
@@ -826,12 +807,12 @@ namespace risk.control.system.Services
             ApplicationRole role = null!;
             ClientCompany company = null!;
             Vendor agency = null!;
-            if(companyUser !=null)
+            if (companyUser != null)
             {
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
                 company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                var notification = context.Notifications.FirstOrDefault(s=>s.Role == role && s.Company == company && s.StatusNotificationId == id);
-                if(notification == null)
+                var notification = context.Notifications.FirstOrDefault(s => s.Role == role && s.Company == company && s.StatusNotificationId == id);
+                if (notification == null)
                 {
                     return;
                 }
@@ -839,7 +820,7 @@ namespace risk.control.system.Services
                 {
                     notification.IsReadByAssessor = true;
                 }
-                else if(role.Name == AppRoles.MANAGER.ToString())
+                else if (role.Name == AppRoles.MANAGER.ToString())
                 {
                     notification.IsReadByManager = true;
                 }
@@ -855,7 +836,7 @@ namespace risk.control.system.Services
             {
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == vendorUser.Role.ToString());
                 agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-                var notification = context.Notifications.FirstOrDefault(s=> s.Agency == agency && s.StatusNotificationId == id);
+                var notification = context.Notifications.FirstOrDefault(s => s.Agency == agency && s.StatusNotificationId == id);
                 if (notification == null)
                 {
                     return;
@@ -879,7 +860,7 @@ namespace risk.control.system.Services
             var notifications = await GetNotifications(userEmail);
             foreach (var notification in notifications)
             {
-                await MarkAsRead(notification.StatusNotificationId,userEmail);
+                await MarkAsRead(notification.StatusNotificationId, userEmail);
             }
         }
     }

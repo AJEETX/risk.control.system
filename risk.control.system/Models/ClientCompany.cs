@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-using risk.control.system.AppConstant;
-
+﻿using risk.control.system.AppConstant;
 using Standard.Licensing;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {

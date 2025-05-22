@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class IdReportBase: BaseEntity
+    public class IdReportBase : BaseEntity
     {
-        [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public bool Selected { get; set; } = false;
         public string? ReportName { get; set; }
@@ -28,6 +28,6 @@ namespace risk.control.system.Models
         public DateTime? IdImageLongLatTime { get; set; }
         public bool ValidationExecuted { get; set; } = false;
         public bool? IdImageValid { get; set; } = false;
-        public bool IsRequired { get; set; }   = false;
+        public bool IsRequired { get; set; } = false;
     }
 }

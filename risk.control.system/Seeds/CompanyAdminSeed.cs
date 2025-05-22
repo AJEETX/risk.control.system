@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.AspNetCore.Identity;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -13,16 +10,16 @@ namespace risk.control.system.Seeds
 {
     public static class CompanyAdminSeed
     {
-        public static async Task Seed(ApplicationDbContext context, 
-            IWebHostEnvironment webHostEnvironment, 
-            UserManager<ClientCompanyApplicationUser> userManager, 
-            ClientCompany clientCompany,string companyDomain, PinCode pinCode)
+        public static async Task Seed(ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
+            UserManager<ClientCompanyApplicationUser> userManager,
+            ClientCompany clientCompany, string companyDomain, PinCode pinCode)
         {
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
-            
+
             string adminEmailwithSuffix = Applicationsettings.COMPANY_ADMIN.CODE + "@" + companyDomain;
-            
+
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE));
 
             var adminImage = File.ReadAllBytes(adminImagePath);

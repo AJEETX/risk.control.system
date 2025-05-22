@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.Data;
 using risk.control.system.Models;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
-using Hangfire;
 using System.Text.Json;
 
 
@@ -16,7 +14,7 @@ namespace risk.control.system.Services
     }
     public class PdfGenerativeService : IPdfGenerativeService
     {
-        
+
         private readonly ApplicationDbContext context;
         private readonly IPdfGenerateDetailService pdfGenerate;
 
@@ -111,7 +109,7 @@ namespace risk.control.system.Services
             }
             var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
 
-            
+
             return reportFilename;
         }
 

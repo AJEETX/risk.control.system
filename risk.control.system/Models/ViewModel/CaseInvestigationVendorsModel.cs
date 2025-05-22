@@ -1,5 +1,4 @@
-﻿
-namespace risk.control.system.Models.ViewModel
+﻿namespace risk.control.system.Models.ViewModel
 {
     public class CaseInvestigationVendorsModel
     {
@@ -21,7 +20,7 @@ namespace risk.control.system.Models.ViewModel
         public InvestigationTask ClaimsInvestigation { get; set; }
         public BeneficiaryDetail Location { get; set; }
         public InvestigationReport? InvestigationReport { get; set; }
-        
+
     }
 
 }

@@ -1,9 +1,5 @@
 ﻿using Google.Cloud.Vision.V1;
 using SkiaSharp;
-using SkiaSharp.Views.Desktop;
-
-using System.Collections.Generic;
-using System.IO;
 
 namespace risk.control.system.Services
 {
@@ -33,7 +29,7 @@ namespace risk.control.system.Services
                 var panNumber = allText.Substring(panTextPre + txt2Find.Length + 1, 10);
 
                 var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().ToUpperInvariant() == panNumber.Trim().ToUpperInvariant());
-                if(annotation is null)
+                if (annotation is null)
                 {
                     return inputImage;
                 }

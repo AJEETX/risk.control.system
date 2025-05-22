@@ -1,13 +1,10 @@
-﻿using System.Globalization;
-
-using Gehtsoft.PDFFlow.Builder;
+﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Models.Shared;
 using Gehtsoft.PDFFlow.UserUtils;
 using Gehtsoft.PDFFlow.Utils;
-
 using risk.control.system.Models.ViewModel;
-using risk.control.system.AppConstant;
+using System.Globalization;
 
 namespace risk.control.system.Helpers
 {
@@ -125,9 +122,9 @@ namespace risk.control.system.Helpers
 
             var row3Builder = infoTable.AddRow();
             FillAgentRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
-            
+
             //FillAssessorRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
-            
+
             FillReportSummaryule(row3Builder.AddCell("", 2, 0).SetFont(FNT10));
 
             var row4Builder = infoTable.AddRow();

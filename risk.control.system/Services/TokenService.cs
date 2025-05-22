@@ -1,14 +1,10 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-
-using risk.control.system.Models.ViewModel;
+using risk.control.system.Data;
 using risk.control.system.Models;
-
+using risk.control.system.Models.ViewModel;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
-using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Data;
 
 namespace risk.control.system.Services
 {

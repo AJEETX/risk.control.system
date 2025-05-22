@@ -8,18 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-
-using System.ComponentModel.Design;
 using System.Data;
 using System.Globalization;
 using System.IO.Compression;
 using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace risk.control.system.Services
 {
@@ -35,12 +29,9 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ITimelineService timelineService;
-        private readonly ICustomApiCLient customApiCLient;
         private readonly IInvestigationService investigationService;
         private readonly IMailService mailService;
         private readonly IProcessCaseService processCaseService;
-        private readonly IBackgroundJobClient backgroundJobClient;
-        private readonly IProgressService progressService;
         private readonly IUploadService uploadService;
         private static WebClient client = new WebClient
         {
@@ -49,23 +40,17 @@ namespace risk.control.system.Services
         public FtpService(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
-            ICustomApiCLient customApiCLient,
             IInvestigationService investigationService,
             IMailService mailService,
             IProcessCaseService processCaseService,
-            IBackgroundJobClient backgroundJobClient,
-            IProgressService progressService,
             IUploadService uploadService)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.timelineService = timelineService;
-            this.customApiCLient = customApiCLient;
             this.investigationService = investigationService;
             this.mailService = mailService;
             this.processCaseService = processCaseService;
-            this.backgroundJobClient = backgroundJobClient;
-            this.progressService = progressService;
             this.uploadService = uploadService;
         }
 
@@ -212,7 +197,7 @@ namespace risk.control.system.Services
                 _context.Investigations.AddRange(uploadedClaims);
 
                 var ros = await _context.SaveChangesAsync();
-                
+
                 try
                 {
 

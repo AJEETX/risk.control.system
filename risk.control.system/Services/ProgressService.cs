@@ -1,5 +1,4 @@
-﻿using Hangfire;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace risk.control.system.Services
 {

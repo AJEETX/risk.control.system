@@ -1,18 +1,9 @@
-﻿using Amazon.Rekognition.Model;
-using Google.Api;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using SkiaSharp;
-using System;
-using System.Security.Claims;
-using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Services
 {
@@ -569,7 +560,7 @@ namespace risk.control.system.Services
             {
                 canDownload = tracker.DownloadCount <= 3;
             }
-            
+
             var model = new CaseTransactionModel
             {
                 ClaimsInvestigation = claim,

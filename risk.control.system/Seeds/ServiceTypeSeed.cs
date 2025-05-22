@@ -1,7 +1,4 @@
-﻿using Google.Api;
-
-using risk.control.system.Data;
-using risk.control.system.Helpers;
+﻿using risk.control.system.Data;
 using risk.control.system.Models;
 
 namespace risk.control.system.Seeds
@@ -10,7 +7,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task<List<InvestigationServiceType>> Seed(ApplicationDbContext context)
         {
-           
+
             #region INVESTIGATION SERVICE TYPES
 
             var claimComprehensive = new InvestigationServiceType

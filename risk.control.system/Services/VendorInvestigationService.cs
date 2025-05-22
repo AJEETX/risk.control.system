@@ -1,20 +1,10 @@
-﻿using System.Security.Claims;
-
-using Google.Api;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-
-using SkiaSharp;
-
-using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Services
 {
@@ -38,8 +28,8 @@ namespace risk.control.system.Services
         private readonly ITimelineService timelineService;
         private readonly ICustomApiCLient customApiCLient;
 
-        public VendorInvestigationService(ApplicationDbContext context, 
-            INumberSequenceService numberService, 
+        public VendorInvestigationService(ApplicationDbContext context,
+            INumberSequenceService numberService,
             IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
             ICustomApiCLient customApiCLient)
@@ -84,7 +74,7 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            
+
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
             var timeTaken = DateTime.Now - lastHistory.StatusChangedAt;
@@ -141,17 +131,17 @@ namespace risk.control.system.Services
             // Fetching all relevant substatuses in a single query for efficiency
 
             var query = context.Investigations
-                .Include(i=>i.PolicyDetail)
+                .Include(i => i.PolicyDetail)
                 .ThenInclude(i => i.InvestigationServiceType)
-                .Include(i=>i.CustomerDetail)
-                .ThenInclude(i=>i.PinCode)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.PinCode)
                 .Include(i => i.CustomerDetail)
                 .ThenInclude(i => i.District)
                 .Include(i => i.CustomerDetail)
                 .ThenInclude(i => i.State)
                 .Include(i => i.CustomerDetail)
                 .ThenInclude(i => i.Country)
-                .Include(i=>i.BeneficiaryDetail)
+                .Include(i => i.BeneficiaryDetail)
                 .ThenInclude(i => i.PinCode)
                 .Include(i => i.BeneficiaryDetail)
                 .ThenInclude(i => i.District)
@@ -168,7 +158,7 @@ namespace risk.control.system.Services
                          a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY ||
-                        a.SubStatus== CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
+                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
                     )
                 );
 
@@ -232,8 +222,8 @@ namespace risk.control.system.Services
                 BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
                 CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
                 PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
-                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING? 
-                       string.Format( a.CustomerDetail.CustomerLocationMap,"400","400") :string.Format( a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400") : Applicationsettings.NO_MAP
+                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
+                       string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") : string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400") : Applicationsettings.NO_MAP
             });
 
             // Apply Sorting AFTER Data Transformation
@@ -371,12 +361,6 @@ namespace risk.control.system.Services
 
             var openStatuses = new[] { CONSTANTS.CASE_STATUS.INITIATED, CONSTANTS.CASE_STATUS.INPROGRESS };
 
-            var createdStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
-            var assigned2AssignerStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
-            var withdrawnByCompanyStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY;
-            var declinedByAgencyStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY;
-            var requestedByCompanyStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
-
             var subStatus = new[]
             {
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
@@ -469,7 +453,7 @@ namespace risk.control.system.Services
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds, // Calculate here
                 PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
-                string.Format( a.CustomerDetail.CustomerLocationMap, "400", "400") :string.Format( a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400")
+                string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") : string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400")
             }); // Materialize the list
 
             // Apply Sorting AFTER Data Transformation
@@ -600,7 +584,7 @@ namespace risk.control.system.Services
         }
         public string GetOwner(InvestigationTask a)
         {
-            if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || 
+            if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
                 a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
                 a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
             {
@@ -634,7 +618,7 @@ namespace risk.control.system.Services
                 return 0;
             var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
             // Fetching all relevant substatuses in a single query for efficiency
-            var subStatuses =  new[]
+            var subStatuses = new[]
                 {
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
@@ -648,8 +632,8 @@ namespace risk.control.system.Services
                     a.ClientCompanyId == companyUser.ClientCompanyId &&
                     (
                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
-                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY  ||
-                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY  ||
+                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
+                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY ||
                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
                 ));
 
@@ -659,7 +643,7 @@ namespace risk.control.system.Services
 
         public async Task<CaseInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, long selectedcase)
         {
-            var claimsAllocate2Agent = GetCases().Include(c=>c.CaseNotes).FirstOrDefault(v => v.Id == selectedcase);
+            var claimsAllocate2Agent = GetCases().Include(c => c.CaseNotes).FirstOrDefault(v => v.Id == selectedcase);
 
             var beneficiaryDetail = await context.BeneficiaryDetail
                 .Include(c => c.PinCode)
@@ -691,7 +675,7 @@ namespace risk.control.system.Services
                 var claim = context.Investigations
                     .Include(c => c.InvestigationReport)
                     .ThenInclude(c => c.CaseQuestionnaire)
-                    .ThenInclude (c => c.Questions)
+                    .ThenInclude(c => c.Questions)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
                     .Include(c => c.BeneficiaryDetail)
@@ -726,13 +710,13 @@ namespace risk.control.system.Services
                 claim.SelectedAgentDrivingDuration = drivingDuration;
                 claim.SelectedAgentDrivingDistanceInMetres = distanceInMeters;
                 claim.SelectedAgentDrivingDurationInSeconds = durationInSeconds;
-                claim.SelectedAgentDrivingMap =string.Format(drivingMap,"400","400");
+                claim.SelectedAgentDrivingMap = string.Format(drivingMap, "400", "400");
                 claim.TaskToAgentTime = DateTime.Now;
 
                 context.Investigations.Update(claim);
                 var rows = await context.SaveChangesAsync();
 
-                await timelineService.UpdateTaskStatus(claim.Id,currentUser);
+                await timelineService.UpdateTaskStatus(claim.Id, currentUser);
                 return claim;
 
             }
@@ -753,9 +737,9 @@ namespace risk.control.system.Services
                 var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
 
                 var claim = GetCases()
-                    .Include(r=>r.InvestigationReport)
-                    .ThenInclude(r=>r.CaseQuestionnaire)
-                    .ThenInclude(r=>r.Questions)
+                    .Include(r => r.InvestigationReport)
+                    .ThenInclude(r => r.CaseQuestionnaire)
+                    .ThenInclude(r => r.Questions)
                     .FirstOrDefault(c => c.Id == claimsInvestigationId);
 
                 claim.Updated = DateTime.Now;

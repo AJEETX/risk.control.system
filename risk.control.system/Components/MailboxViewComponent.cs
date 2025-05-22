@@ -3,8 +3,6 @@ using Microsoft.FeatureManagement;
 
 using risk.control.system.Models.ViewModel;
 
-using System.Threading.Tasks;
-
 namespace risk.control.system.Components
 {
     public class MailboxViewComponent : ViewComponent

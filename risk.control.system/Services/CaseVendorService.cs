@@ -1,16 +1,8 @@
-﻿using Google.Api;
-
-using Highsoft.Web.Mvc.Charts;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
-using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -50,7 +42,7 @@ namespace risk.control.system.Services
             this.featureManager = featureManager;
             this.claimsService = claimsService;
         }
-        
+
         public async Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false)
         {
             var claim = await _context.Investigations
@@ -116,7 +108,7 @@ namespace risk.control.system.Services
 
             claim.InvestigationReport.ReportTemplate = templates;
             _context.Investigations.Update(claim);
-            var rows =await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync();
 
             var model = new CaseInvestigationVendorsModel
             {
@@ -167,7 +159,7 @@ namespace risk.control.system.Services
                .FirstOrDefaultAsync(c => c.Id == selectedcase);
 
 
-            var beneficiaryDetails =await _context.BeneficiaryDetail
+            var beneficiaryDetails = await _context.BeneficiaryDetail
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
@@ -183,7 +175,7 @@ namespace risk.control.system.Services
             claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
 
             beneficiaryDetails.ContactNumber = beneficairyContactMasked;
-            
+
             var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
             var templates = await _context.ReportTemplates
                 .Include(r => r.LocationTemplate)
@@ -200,11 +192,11 @@ namespace risk.control.system.Services
 
             claim.InvestigationReport.ReportTemplate = templates;
 
-            return (new CaseInvestigationVendorsModel 
-            { 
-                InvestigationReport = claim.InvestigationReport, 
-                Location = beneficiaryDetails, 
-                ClaimsInvestigation = claim 
+            return (new CaseInvestigationVendorsModel
+            {
+                InvestigationReport = claim.InvestigationReport,
+                Location = beneficiaryDetails,
+                ClaimsInvestigation = claim
             });
         }
     }

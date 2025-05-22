@@ -1,8 +1,8 @@
-﻿using System.Text.RegularExpressions;
-using Google.Cloud.Vision.V1;
+﻿using Google.Cloud.Vision.V1;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using System.Text.RegularExpressions;
 
 namespace risk.control.system.Services
 {

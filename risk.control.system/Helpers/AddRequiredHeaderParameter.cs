@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi.Models;
-
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 namespace risk.control.system.Helpers
 {
     public class AddRequiredHeaderParameter : IOperationFilter

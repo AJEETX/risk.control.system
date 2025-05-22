@@ -28,7 +28,7 @@ namespace risk.control.system.Middleware
                     return;
                 }
             }
-            
+
 
             await _next(context);
         }

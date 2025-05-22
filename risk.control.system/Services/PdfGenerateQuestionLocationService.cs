@@ -1,9 +1,9 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
-using risk.control.system.Models;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp;
 using Gehtsoft.PDFFlow.Utils;
+using risk.control.system.Models;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace risk.control.system.Services
 {

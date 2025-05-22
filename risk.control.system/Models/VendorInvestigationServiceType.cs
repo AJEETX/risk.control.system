@@ -1,10 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using Google.Rpc;
-using Google.Type;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-
 namespace risk.control.system.Models
 {
     public class VendorInvestigationServiceType : BaseEntity

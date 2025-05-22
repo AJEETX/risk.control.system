@@ -1,20 +1,14 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
-using risk.control.system.Models;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp;
 using Gehtsoft.PDFFlow.Utils;
-using static System.Collections.Specialized.BitVector32;
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.Helpers;
-using static SkiaSharp.SKPath;
-using risk.control.system.Models.ViewModel;
+using risk.control.system.Models;
 
 namespace risk.control.system.Services
 {
     public interface IPdfGenerateDetailReportService
     {
-        Task<SectionBuilder> Build(SectionBuilder section,InvestigationTask investigation, ReportTemplate investigationReport);
+        Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport);
     }
     public class PdfGenerateDetailReportService : IPdfGenerateDetailReportService
     {
@@ -51,16 +45,16 @@ namespace risk.control.system.Services
         private readonly IPdfGenerateDocumentLocationService documentService;
         private readonly IPdfGenerateQuestionLocationService questionService;
 
-        public PdfGenerateDetailReportService(IPdfGenerateAgentLocationService agentService, 
+        public PdfGenerateDetailReportService(IPdfGenerateAgentLocationService agentService,
             IPdfGenerateFaceLocationService faceService, IPdfGenerateDocumentLocationService documentService,
             IPdfGenerateQuestionLocationService questionService)
         {
-            this.agentService= agentService;
+            this.agentService = agentService;
             this.faceService = faceService;
             this.documentService = documentService;
             this.questionService = questionService;
         }
-        public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation,  ReportTemplate investigationReport)
+        public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport)
         {
 
             //var concertTable = section.AddTable();
@@ -73,8 +67,8 @@ namespace risk.control.system.Services
                 //cellBuilder.SetPadding(2, 2, 2, 0);
                 //cellBuilder.AddImage("");
                 var pngBytes = ImageConverterToPng.ConvertToPng(investigation.Vendor.DocumentImage, investigation.Vendor.DocumentImageExtension);
-                
-                
+
+
                 paragraph.AddInlineImage(pngBytes)
                      .SetWidth(150); // optional small space between image and text
             }
@@ -85,7 +79,7 @@ namespace risk.control.system.Services
             }
 
             // Add the image inline (before the text)
-            
+
 
             paragraph.AddText($" {investigation.Vendor.Email} : Investigation detail")
                      .SetFontSize(18)
@@ -95,7 +89,7 @@ namespace risk.control.system.Services
 
             foreach (var loc in investigationReport.LocationTemplate)
             {
-                if(loc.ValidationExecuted)
+                if (loc.ValidationExecuted)
                 {
                     section.AddParagraph()
                     .SetLineSpacing(1)
@@ -127,7 +121,7 @@ namespace risk.control.system.Services
 
                     locationCount++;
                 }
-                
+
             }
 
             section.AddParagraph().AddText("");
@@ -179,7 +173,7 @@ namespace risk.control.system.Services
                     }
                     else
                     {
-                            rowBuilder.AddCell().AddParagraph().AddText("");
+                        rowBuilder.AddCell().AddParagraph().AddText("");
                     }
 
                     // Answer Image Cell

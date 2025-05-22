@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.AppConstant;
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 namespace risk.control.system.Services
@@ -33,7 +29,7 @@ namespace risk.control.system.Services
         {
             //CHECK AND VALIDATE EMAIL PASSWORD
             var resetPhone = countryCode.TrimStart('+') + mobile.Trim().ToString();
-            var user = context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country.ISDCode.ToString(), u.PhoneNumber) == resetPhone);
+            var user = context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country.ISDCode.ToString(), u.PhoneNumber) == resetPhone);
             if (user != null)
             {
                 var passwordString = $"Your password is: {user.Password}";
@@ -48,9 +44,9 @@ namespace risk.control.system.Services
                 message += $"Thanks";
                 message += $"                                          ";
                 message += $"{BaseUrl}";
-                if(user != null)
+                if (user != null)
                 {
-                    await smsService.DoSendSmsAsync(user.Country.ISDCode+ user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
                 }
             }
             //SEND SMS

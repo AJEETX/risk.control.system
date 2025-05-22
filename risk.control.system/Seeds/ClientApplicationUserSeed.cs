@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -13,9 +11,9 @@ namespace risk.control.system.Seeds
 {
     public static class ClientApplicationUserSeed
     {
-        public static async Task<ClientCompanyApplicationUser> Seed(ApplicationDbContext context, 
-            IWebHostEnvironment webHostEnvironment, 
-            UserManager<ClientCompanyApplicationUser> userManager, 
+        public static async Task<ClientCompanyApplicationUser> Seed(ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
+            UserManager<ClientCompanyApplicationUser> userManager,
             ClientCompany clientCompany)
         {
             var company = context.ClientCompany.FirstOrDefault(c => c.Email == clientCompany.Email);
@@ -37,7 +35,7 @@ namespace risk.control.system.Seeds
             firstName = MANAGER.FIRST_NAME;
             lastName = MANAGER.LAST_NAME;
             photo = MANAGER.PROFILE_IMAGE;
-            await ManagerSeed.Seed(context,webHostEnvironment, userManager, clientCompany, pinCode, managerEmailwithSuffix, photo, firstName, lastName);
+            await ManagerSeed.Seed(context, webHostEnvironment, userManager, clientCompany, pinCode, managerEmailwithSuffix, photo, firstName, lastName);
 
             //Seed client assessor
             string assessorEmailwithSuffix = ASSESSOR.CODE + "@" + company.Email;

@@ -1,10 +1,8 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
-using risk.control.system.Models;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp;
 using Gehtsoft.PDFFlow.Utils;
 using risk.control.system.Helpers;
+using risk.control.system.Models;
 
 namespace risk.control.system.Services
 {
@@ -106,7 +104,7 @@ namespace risk.control.system.Services
                         try
                         {
                             // Download the image
-                            string downloadedImagePath = await DownloadMapImageAsync(string.Format(face.IdImageLocationUrl,"300","300"), googlePhotoImagePath);
+                            string downloadedImagePath = await DownloadMapImageAsync(string.Format(face.IdImageLocationUrl, "300", "300"), googlePhotoImagePath);
                             rowBuilder.AddCell()
                                       .AddParagraph()
                                       .AddInlineImage(downloadedImagePath)

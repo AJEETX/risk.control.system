@@ -1,8 +1,4 @@
-﻿using System;
-
-using Highsoft.Web.Mvc.Charts;
-
-using risk.control.system.AppConstant;
+﻿using risk.control.system.AppConstant;
 using risk.control.system.Models;
 
 namespace risk.control.system.Helpers
@@ -36,14 +32,14 @@ namespace risk.control.system.Helpers
             }
             else
             {
-                if(beneficiary is not null)
+                if (beneficiary is not null)
                 {
                     return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture));
                 }
             }
             return Applicationsettings.NO_USER;
         }
-        
+
         public static string GetPincodeName(bool claimType, CustomerDetail cdetail, BeneficiaryDetail location)
         {
             if (claimType)

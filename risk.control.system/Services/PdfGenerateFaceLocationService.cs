@@ -1,10 +1,10 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
-using risk.control.system.Models;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp;
 using Gehtsoft.PDFFlow.Utils;
 using risk.control.system.Helpers;
+using risk.control.system.Models;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace risk.control.system.Services
 {
@@ -47,14 +47,14 @@ namespace risk.control.system.Services
         {
             this.webHostEnvironment = webHostEnvironment;
         }
-        public async Task< SectionBuilder> Build(SectionBuilder section, LocationTemplate loc)
+        public async Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc)
         {
             var imagePath = webHostEnvironment.WebRootPath;
-            
+
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-face-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
             // =================== FACE IDs ====================
-            
-            if (loc.FaceIds?.Any() == true && loc.FaceIds.Any(f=>f.ValidationExecuted))
+
+            if (loc.FaceIds?.Any() == true && loc.FaceIds.Any(f => f.ValidationExecuted))
             {
                 section.AddParagraph()
                        .SetLineSpacing(1)
@@ -108,7 +108,7 @@ namespace risk.control.system.Services
                         try
                         {
                             // Download the image
-                            string downloadedImagePath = await DownloadMapImageAsync(string.Format(face.IdImageLocationUrl,"300","300"), googlePhotoImagePath);
+                            string downloadedImagePath = await DownloadMapImageAsync(string.Format(face.IdImageLocationUrl, "300", "300"), googlePhotoImagePath);
                             rowBuilder.AddCell()
                                       .AddParagraph()
                                       .AddInlineImage(downloadedImagePath)

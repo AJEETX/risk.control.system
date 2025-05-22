@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-using Microsoft.AspNetCore.Identity;
-
+﻿using Microsoft.AspNetCore.Identity;
 using risk.control.system.AppConstant;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {

@@ -27,7 +27,6 @@ using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Middleware;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
 using risk.control.system.Seeds;
 using risk.control.system.Services;
@@ -40,7 +39,6 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
-//QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
     options.TagName = "nav";
@@ -48,7 +46,6 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.OlClasses = "breadcrumb";
     options.LiClasses = "breadcrumb-item";
     options.ActiveLiClasses = "breadcrumb-item active";
-    //options.SeparatorElement = "<li class=\"separator\">/</li>";
 });
 //builder.Services.AddWorkflow();
 //builder.Services.AddTransient<InvestigationTaskWorkflow>();
@@ -118,7 +115,6 @@ builder.Services.AddScoped<IInvestigationService, InvestigationService>();
 builder.Services.AddScoped<IHangfireJobService, HangfireJobService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<ICaseCreationService, CaseCreationService>();
-builder.Services.AddScoped<IPdfReportService, PdfReportService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddSingleton<IValidationService, ValidationService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -150,7 +146,6 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 //builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
-builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
 {

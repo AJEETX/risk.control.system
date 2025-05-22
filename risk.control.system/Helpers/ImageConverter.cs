@@ -1,6 +1,5 @@
-﻿using SixLabors.ImageSharp.Formats.Jpeg;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 namespace risk.control.system.Helpers
 {
@@ -47,8 +46,8 @@ namespace risk.control.system.Helpers
                     ColorType = PngColorType.Rgb
                 };
                 image.Save(outputStream, pngEncoder);
-                int width =  image.Width;
-                int height =  image.Height;
+                int width = image.Width;
+                int height = image.Height;
                 return outputStream.ToArray();
             }
             catch (SixLabors.ImageSharp.UnknownImageFormatException)

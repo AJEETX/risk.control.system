@@ -1,10 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Linq;
-
-using risk.control.system.AppConstant;
+﻿using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {

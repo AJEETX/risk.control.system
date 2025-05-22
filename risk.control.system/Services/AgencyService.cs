@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -8,7 +7,7 @@ namespace risk.control.system.Services
 {
     public interface IAgencyService
     {
-        Task<bool> EditAgency(Vendor vendor,IFormFile vendorDocument, string currentUserEmail);
+        Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail);
     }
     public class AgencyService : IAgencyService
     {
@@ -76,9 +75,9 @@ namespace risk.control.system.Services
             vendor.UpdatedBy = currentUserEmail;
             context.Vendor.Update(vendor);
             var rowsAffected = await context.SaveChangesAsync();
-            if(rowsAffected > 0)
+            if (rowsAffected > 0)
             {
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode+ vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
                 return true;
             }
             return false;

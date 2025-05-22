@@ -1,15 +1,10 @@
 ﻿using Hangfire;
-
 using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.Helpers;
-using risk.control.system.Data;
-using risk.control.system.Models;
-
-using static risk.control.system.Helpers.Permissions;
 using risk.control.system.AppConstant;
+using risk.control.system.Data;
+using risk.control.system.Helpers;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Services
 {
@@ -22,7 +17,7 @@ namespace risk.control.system.Services
         Task<string> ProcessAutoSingleAllocation(long claim, string userEmail, string url = "");
         Task<(string, string)> AllocateToVendor(string userEmail, long claimsInvestigationId, long vendorId, bool autoAllocated = true);
         Task<Vendor> WithdrawCase(string userEmail, CaseTransactionModel model, long claimId);
-        Task<(ClientCompany,long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long claimId);
+        Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long claimId);
         Task<Vendor> WithdrawCaseFromAgent(string userEmail, CaseTransactionModel model, long claimId);
 
         Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
@@ -38,21 +33,18 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext context;
         private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly IMailService mailboxService;
-        private readonly IPdfReportService reportService;
         private readonly ITimelineService timelineService;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public ProcessCaseService(ApplicationDbContext context,
             IPdfGenerativeService pdfGenerativeService,
             IMailService mailboxService,
-            IPdfReportService reportService,
-            ITimelineService timelineService, 
+            ITimelineService timelineService,
             IBackgroundJobClient backgroundJobClient)
         {
             this.context = context;
             this.pdfGenerativeService = pdfGenerativeService;
             this.mailboxService = mailboxService;
-            this.reportService = reportService;
             this.timelineService = timelineService;
             this.backgroundJobClient = backgroundJobClient;
         }
@@ -126,7 +118,6 @@ namespace risk.control.system.Services
         async Task<List<long>> DoAutoAllocation(List<long> claims, string userEmail, string url = "")
         {
             var companyUser = context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
-            var uploadedRecordsCount = 0;
 
             var company = context.ClientCompany
                     .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
@@ -267,7 +258,7 @@ namespace risk.control.system.Services
                 return;
             }
             var cases2Assign = context.Investigations
-                .Include(c=>c.InvestigationTimeline)
+                .Include(c => c.InvestigationTimeline)
                    .Where(v => claims.Contains(v.Id));
             var currentUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var assigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
@@ -355,7 +346,7 @@ namespace risk.control.system.Services
                 await context.SaveChangesAsync();
 
                 await timelineService.UpdateTaskStatus(claimsCase.Id, currentUser.Email);
-                
+
                 return (claimsCase.PolicyDetail.ContractNumber, claimsCase.SubStatus);
 
             }
@@ -380,7 +371,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UpdatedBy = currentUser.Email;
                 claimsInvestigation.AssignedToAgency = false;
-               claimsInvestigation.CaseOwner = company.Email;
+                claimsInvestigation.CaseOwner = company.Email;
                 claimsInvestigation.VendorId = null;
                 claimsInvestigation.Vendor = null;
                 claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY;
@@ -459,7 +450,7 @@ namespace risk.control.system.Services
         public List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors)
         {
             // Get relevant status IDs in one query
-            var relevantStatuses =  new[]
+            var relevantStatuses = new[]
                 {
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
@@ -547,7 +538,7 @@ namespace risk.control.system.Services
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
-                return  rowsAffected ? claim : null;
+                return rowsAffected ? claim : null;
             }
             catch (Exception ex)
             {
@@ -581,7 +572,7 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.TaskToAgentTime = DateTime.Now;
                 context.Investigations.Update(claimsCaseToAllocateToVendor);
 
-                var rowsAffected =  await context.SaveChangesAsync() > 0 ;
+                var rowsAffected = await context.SaveChangesAsync() > 0;
 
                 await timelineService.UpdateTaskStatus(claimsCaseToAllocateToVendor.Id, userEmail);
                 return rowsAffected ? claimsCaseToAllocateToVendor : null;
@@ -609,7 +600,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.Id == claimId);
 
                 var replyByAgency = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR;
-                
+
                 claim.SubStatus = replyByAgency;
                 claim.UpdatedBy = userEmail;
                 claim.AssignedToAgency = false;
@@ -714,7 +705,7 @@ namespace risk.control.system.Services
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
-                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate( claimsInvestigationId, userEmail));
+                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(claimsInvestigationId, userEmail));
 
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
@@ -784,7 +775,7 @@ namespace risk.control.system.Services
 
                 var requestedByAssessor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
 
-                claim.SubStatus= requestedByAssessor;
+                claim.SubStatus = requestedByAssessor;
                 claim.UpdatedBy = userEmail;
                 claim.CaseOwner = claim.Vendor.Email;
                 claim.RequestedAssessordEmail = userEmail;

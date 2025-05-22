@@ -1,8 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-
-using Microsoft.FeatureManagement;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.FeatureManagement;
 
 using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
@@ -71,7 +67,7 @@ namespace risk.control.system.Middleware
                 var token = ExtractJwtToken(context);
                 var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
 
-                if (!string.IsNullOrEmpty(token) && !(await tokenService.ValidateJwtToken(dbContext, context,token)))
+                if (!string.IsNullOrEmpty(token) && !(await tokenService.ValidateJwtToken(dbContext, context, token)))
                 {
                     _logger.LogWarning("Invalid JWT token.");
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;

@@ -1,6 +1,4 @@
-﻿using Highsoft.Web.Mvc.Charts;
-using risk.control.system.Helpers;
-using risk.control.system.Models;
+﻿using risk.control.system.Helpers;
 
 namespace risk.control.system.Services
 {
@@ -22,11 +20,11 @@ namespace risk.control.system.Services
             try
             {
                 var matched = await compareFaces.Do(registeredImage, face2Verify);
-                return matched.Item1 ? (matched.Item2.ToString(), CompressImage.ProcessCompress(face2Verify, onlyExtension), matched.Item2) : ("0", CompressImage.ProcessCompress(face2Verify, onlyExtension),0);
+                return matched.Item1 ? (matched.Item2.ToString(), CompressImage.ProcessCompress(face2Verify, onlyExtension), matched.Item2) : ("0", CompressImage.ProcessCompress(face2Verify, onlyExtension), 0);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return ("0", CompressImage.ProcessCompress(face2Verify, onlyExtension),0);
+                return ("0", CompressImage.ProcessCompress(face2Verify, onlyExtension), 0);
             }
         }
     }

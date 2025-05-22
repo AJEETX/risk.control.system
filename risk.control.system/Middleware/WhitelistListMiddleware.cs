@@ -1,13 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.Options;
-using Microsoft.FeatureManagement;
-using risk.control.system.Data;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
-
-using System.Collections.Generic;
-using System.Net;
+﻿using Microsoft.FeatureManagement;
 
 namespace risk.control.system.Middleware
 {

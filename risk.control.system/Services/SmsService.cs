@@ -1,16 +1,11 @@
-﻿using System.Net;
-using System.Net.Http;
+﻿using Microsoft.FeatureManagement;
+using Newtonsoft.Json;
+using risk.control.system.Models.ViewModel;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
-
-using Microsoft.FeatureManagement;
-
-using Newtonsoft.Json;
-
-using risk.control.system.Helpers;
-using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {

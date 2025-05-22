@@ -1,19 +1,17 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
-using risk.control.system.Data;
+using Gehtsoft.PDFFlow.Utils;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp;
-using Gehtsoft.PDFFlow.Utils;
-using static risk.control.system.Helpers.PdfReportBuilder;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace risk.control.system.Services
 {
     public interface IPdfGenerateCaseDetailService
     {
-        SectionBuilder BuildUnderwritng(SectionBuilder section,InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
-        SectionBuilder BuildClaim(SectionBuilder section,InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
+        SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
+        SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
     }
     public class PdfGenerateCaseDetailService : IPdfGenerateCaseDetailService
     {
@@ -45,8 +43,6 @@ namespace risk.control.system.Services
         internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
         internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
 
-        internal static readonly IdInfo EMPTY_ITEM = new IdInfo("", new FontText[0]);
-        
         public SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             // Title
@@ -59,7 +55,7 @@ namespace risk.control.system.Services
             section.AddParagraph().AddText($"Insurer: {investigation?.ClientCompany?.Name}");
 
             // Policy Section
-                section.AddParagraph().AddText($"Policy Type: {policy?.InsuranceType.GetEnumDisplayName()}").SetFontSize(16).SetBold().SetUnderline();
+            section.AddParagraph().AddText($"Policy Type: {policy?.InsuranceType.GetEnumDisplayName()}").SetFontSize(16).SetBold().SetUnderline();
             section.AddParagraph().AddText(" Proposal Info").SetFontSize(16).SetBold().SetUnderline();
 
             section.AddParagraph().AddText($"Verification Type: {policy?.InvestigationServiceType?.Name}");
@@ -80,14 +76,14 @@ namespace risk.control.system.Services
             section.AddParagraph().AddText($"Date Of birth: {beneficiary?.DateOfBirth.Value.ToString("dd-MMM-yyyy")}");
             section.AddParagraph().AddText($"Income : {beneficiary?.Income.GetEnumDisplayName()}");
             section.AddParagraph().AddText($"Address: {beneficiary?.Addressline},{beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}");
-               return section;
+            return section;
         }
 
         public SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             // Title
             section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"{policy?.InsuranceType.GetEnumDisplayName()} Investigation Report").SetFontSize(20).SetBold();
-            
+
             section.AddParagraph().AddText($"Company: {investigation?.ClientCompany?.Name}");
             section.AddParagraph().AddText($"Policy #: {investigation?.PolicyDetail.ContractNumber}");
 

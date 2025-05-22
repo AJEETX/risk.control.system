@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-using Microsoft.AspNetCore.Mvc.Rendering;
-using risk.control.system.AppConstant;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using risk.control.system.Helpers;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
@@ -25,7 +23,7 @@ namespace risk.control.system.Models
         public long? ClientCompanyId { get; set; }
         public ClientCompany? ClientCompany { get; set; }
         public InsuranceType InsuranceType { get; set; } = InsuranceType.CLAIM;
-        
+
         public List<LocationTemplate> LocationTemplate { get; set; } = new List<LocationTemplate>();
         public bool Basetemplate { get; set; } = false;
         public long? OriginalTemplateId { get; set; }
@@ -44,9 +42,9 @@ namespace risk.control.system.Models
         public string? Status { get; set; }
         public string? AgentEmail { get; set; }
         public long? AgentIdReportId { get; set; }
-        public AgentIdReport? AgentIdReport { get; set; } = new AgentIdReport 
-        { 
-            Selected = true, 
+        public AgentIdReport? AgentIdReport { get; set; } = new AgentIdReport
+        {
+            Selected = true,
             ReportType = DigitalIdReportType.AGENT_FACE,
             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()
         };
@@ -82,7 +80,7 @@ namespace risk.control.system.Models
 
         public void SetStatus()
         {
-            if(IsRequired)
+            if (IsRequired)
             {
                 if (AllQuestionsAnswered && DocumentsValidated && FaceIdsValidated && AgentValidated)
                 {
@@ -146,7 +144,7 @@ namespace risk.control.system.Models
                     AgentStatus = "btn-outline-warning";
                 }
             }
-            
+
         }
     }
 

@@ -562,7 +562,6 @@ namespace risk.control.system.Controllers.Api
         }
         [AllowAnonymous]
         [HttpPost("faceid")]
-
         public async Task<IActionResult> FaceId(FaceData data)
         {
             try
@@ -629,6 +628,40 @@ namespace risk.control.system.Controllers.Api
                     }
                 }
                 var response = await agentIdService.GetDocumentId(data);
+                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, ex.StackTrace);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("media")]
+        public async Task<IActionResult> Media(DocumentData data)
+        {
+            try
+            {
+                if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                {
+                    return BadRequest();
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+
+                if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
+                var response = await agentIdService.GetMedia(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }

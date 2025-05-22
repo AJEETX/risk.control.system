@@ -1,8 +1,4 @@
-﻿using Google.Api.Gax.ResourceNames;
-using Microsoft.CodeAnalysis.Operations;
-using Microsoft.EntityFrameworkCore;
-using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Api.Claims;
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -104,7 +100,7 @@ public class AgentIdService : IAgentIdService
                 face.IdImage = stream.ToArray();
             }
 
-            locationTemplate.Updated = DateTime.Now ;
+            locationTemplate.Updated = DateTime.Now;
             locationTemplate.AgentEmail = agent.Email;
             locationTemplate.ValidationExecuted = true;
             _context.LocationTemplate.Update(locationTemplate);
@@ -558,7 +554,7 @@ public class AgentIdService : IAgentIdService
             var extension = Path.GetExtension(data.Image.FileName).ToLower();
 
             // Optional: Validate supported formats
-            
+
             claim = await _context.Investigations
                  .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.ReportTemplate)
