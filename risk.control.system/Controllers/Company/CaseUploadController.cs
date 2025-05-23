@@ -1,24 +1,15 @@
-﻿using System.Security.Claims;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
-
-using CsvHelper;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
-
+using System.Security.Claims;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
@@ -92,7 +83,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(u => u.Email == currentUserEmail);
-                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
                     var totalClaimsCreated = _context.Investigations.Count(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
                     availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated;
@@ -109,9 +100,9 @@ namespace risk.control.system.Controllers.Company
                 var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
                 userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
 
-                if(!userCanCreate)
+                if (!userCanCreate)
                 {
-                    notifyService.Custom($"MAX Assign Case limit = <b>{companyUser.ClientCompany.TotalToAssignMaxAllowed}</b> reached",5, "#dc3545", "fa fa-upload");
+                    notifyService.Custom($"MAX Assign Case limit = <b>{companyUser.ClientCompany.TotalToAssignMaxAllowed}</b> reached", 5, "#dc3545", "fa fa-upload");
                 }
                 return View(new CreateClaims
                 {

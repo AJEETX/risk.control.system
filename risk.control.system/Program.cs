@@ -1,69 +1,43 @@
-using System;
-using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Threading.RateLimiting;
-
 using Amazon;
 using Amazon.Rekognition;
 using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.S3.Model;
 using Amazon.Textract;
 using Amazon.TranscribeService;
-
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
-
-using Google.Api;
-
 using Hangfire;
 using Hangfire.MemoryStorage;
-
-using Highsoft.Web.Mvc.Charts;
-
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
-using NToastNotify;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Middleware;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
 using risk.control.system.Seeds;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Extensions;
-
+using System.Net;
+using System.Reflection;
+using System.Text;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using Hangfire.Dashboard;
-using risk.control.system.WorkFlow;
-//using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
-//QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
     options.TagName = "nav";
@@ -71,7 +45,6 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.OlClasses = "breadcrumb";
     options.LiClasses = "breadcrumb-item";
     options.ActiveLiClasses = "breadcrumb-item active";
-    //options.SeparatorElement = "<li class=\"separator\">/</li>";
 });
 //builder.Services.AddWorkflow();
 //builder.Services.AddTransient<InvestigationTaskWorkflow>();
@@ -98,9 +71,9 @@ builder.Services.AddCors(opt =>
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
-    x.MultipartBodyLengthLimit = 5000000; // In case of multipart
-    x.ValueLengthLimit = 5000000; //not recommended value
-    x.MemoryBufferThreshold = 5000000;
+    x.MultipartBodyLengthLimit = 20000000; // In case of multipart
+    x.ValueLengthLimit = 20000000; //not recommended value
+    x.MemoryBufferThreshold = 20000000;
 });
 //builder.Services.AddRateLimiter(_ => _
 //    .AddFixedWindowLimiter(policyName: "fixed", options =>
@@ -111,13 +84,25 @@ builder.Services.Configure<FormOptions>(x =>
 //        options.QueueLimit = 10;
 //    }));
 // forward headers configuration for reverse proxy
-builder.Services.Configure<ForwardedHeadersOptions>(options => {
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<IPdfGenerateQuestionLocationService, PdfGenerateQuestionLocationService>();
+builder.Services.AddScoped<IPdfGenerateDocumentLocationService, PdfGenerateDocumentLocationService>();
+builder.Services.AddScoped<IPdfGenerateFaceLocationService, PdfGenerateFaceLocationService>();
+builder.Services.AddScoped<IPdfGenerateAgentLocationService, PdfGenerateAgentLocationService>();
+builder.Services.AddScoped<IPdfGenerateDetailReportService, PdfGenerateDetailReportService>();
+builder.Services.AddScoped<IPdfGenerateCaseDetailService, PdfGenerateCaseDetailService>();
+builder.Services.AddScoped<IPdfGenerateDetailService, PdfGenerateDetailService>();
+builder.Services.AddScoped<IPdfGenerativeService, PdfGenerativeService>();
+builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
+builder.Services.AddScoped<IPanCardService, PanCardService>();
+builder.Services.AddScoped<ICloneReportService, CloneReportService>();
 builder.Services.AddScoped<IAgentIdService, AgentIdService>();
 builder.Services.AddScoped<ICaseVendorService, CaseVendorService>();
 builder.Services.AddScoped<IVendorInvestigationService, VendorInvestigationService>();
@@ -129,11 +114,10 @@ builder.Services.AddScoped<IInvestigationService, InvestigationService>();
 builder.Services.AddScoped<IHangfireJobService, HangfireJobService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<ICaseCreationService, CaseCreationService>();
-builder.Services.AddScoped<IPdfReportService, PdfReportService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
-builder.Services.AddSingleton<IValidationService,ValidationService>();
-builder.Services.AddScoped<ITokenService,TokenService>();
-builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddSingleton<IValidationService, ValidationService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<ICustomApiCLient, CustomApiClient>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
@@ -161,7 +145,6 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 //builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
-builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
 {
@@ -180,17 +163,9 @@ AWSConfigs.LoggingConfig.LogMetrics = true;
 AWSConfigs.LoggingConfig.LogResponses = ResponseLoggingOption.Always;
 
 
-//builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation()
-    .AddNToastNotifyNoty(new NotyOptions
-    {
-        ProgressBar = true,
-        Timeout = 1000,
-        Modal = true,
-        Type = Enums.NotificationTypesNoty.Info
-    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
@@ -198,6 +173,7 @@ builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
+
 //builder.Services.AddSignalR();
 builder.Services.AddNotyf(config =>
 {
@@ -336,7 +312,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description =@"JWT Authorization header. \r\n\r\n Enter the token in the text input below.",
+        Description = @"JWT Authorization header. \r\n\r\n Enter the token in the text input below.",
     });
     c.SwaggerDoc("v1", new OpenApiInfo
     {
@@ -389,7 +365,6 @@ else
 
 app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
 
-//app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
 app.UseHttpsRedirection();
 
 await DatabaseSeed.SeedDatabase(app);
@@ -414,7 +389,6 @@ app.UseAuthorization();
 app.UseMiddleware<LicensingMiddleware>();
 app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
-app.UseNToastNotify();
 app.UseNotyf();
 app.UseFileServer();
 
@@ -435,52 +409,3 @@ int sessionTimeoutMinutes = int.Parse(builder.Configuration["SESSION_TIMEOUT_SEC
 //    $"*/{sessionTimeoutMinutes} * * * *"); // Check every 5 minutes
 
 app.Run();
-public class BasicAuthAuthorizationFilter : IDashboardAuthorizationFilter
-{
-    public bool Authorize(DashboardContext context)
-    {
-        var httpContext = context.GetHttpContext();
-        var request = httpContext.Request;
-        var response = httpContext.Response;
-        var authorization = request.Headers["Authorization"].ToString();
-
-        if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
-        {
-            // Send 401 response with WWW-Authenticate to trigger login popup
-            response.Headers["WWW-Authenticate"] = "Basic realm=\"Hangfire Dashboard\"";
-            response.StatusCode = StatusCodes.Status401Unauthorized;
-            return false;
-        }
-
-        try
-        {
-            // Decode Authorization header (Base64 username:password)
-            var encodedCredentials = authorization.Substring(6); // Remove "Basic "
-            var decodedAuthHeader = Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredentials));
-            var credentials = decodedAuthHeader.Split(':');
-
-            if (credentials.Length != 2)
-                return false;
-
-            string username = "admin", password = "admin";
-
-#if !DEBUG
-            username = Environment.GetEnvironmentVariable("SMS_User");
-            password = Environment.GetEnvironmentVariable("SMS_Pwd");
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                Console.WriteLine("Environment variables not set properly!");
-                return false;
-            }
-#endif
-
-            // Check if credentials match
-            return credentials[0] == username && credentials[1] == password;
-        }
-        catch
-        {
-            return false; // Handle malformed authorization header
-        }
-    }
-}

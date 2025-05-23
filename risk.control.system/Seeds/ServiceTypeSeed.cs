@@ -1,7 +1,4 @@
-﻿using Google.Api;
-
-using risk.control.system.Data;
-using risk.control.system.Helpers;
+﻿using risk.control.system.Data;
 using risk.control.system.Models;
 
 namespace risk.control.system.Seeds
@@ -10,7 +7,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task<List<InvestigationServiceType>> Seed(ApplicationDbContext context)
         {
-           
+
             #region INVESTIGATION SERVICE TYPES
 
             var claimComprehensive = new InvestigationServiceType
@@ -27,7 +24,7 @@ namespace risk.control.system.Seeds
             var claimNonComprehensive = new InvestigationServiceType
             {
                 Name = "STANDARD",
-                Code = "NON-COMP",
+                Code = "STD",
                 InsuranceType = InsuranceType.CLAIM,
                 MasterData = true,
                 Updated = DateTime.Now
@@ -35,32 +32,10 @@ namespace risk.control.system.Seeds
 
             var claimNonComprehensiveService = await context.InvestigationServiceType.AddAsync(claimNonComprehensive);
 
-            var claimDocumentCollection = new InvestigationServiceType
-            {
-                Name = "COLLECTION",
-                Code = "DOC",
-                InsuranceType = InsuranceType.CLAIM,
-                MasterData = true,
-                Updated = DateTime.Now
-            };
-
-            var claimDocumentCollectionService = await context.InvestigationServiceType.AddAsync(claimDocumentCollection);
-
-            var claimDiscreet = new InvestigationServiceType
-            {
-                Name = "DISCREET",
-                Code = "DISCREET",
-                MasterData = true,
-                InsuranceType = InsuranceType.CLAIM,
-                Updated = DateTime.Now
-            };
-
-            var claimDiscreetService = await context.InvestigationServiceType.AddAsync(claimDiscreet);
-
             var underWritingPreVerification = new InvestigationServiceType
             {
                 Name = "PRE-BOARD",
-                Code = "PRE-OV",
+                Code = "PRE",
                 InsuranceType = InsuranceType.UNDERWRITING,
                 MasterData = true,
                 Updated = DateTime.Now
@@ -71,7 +46,7 @@ namespace risk.control.system.Seeds
             var underWritingPostVerification = new InvestigationServiceType
             {
                 Name = "POST-BOARD",
-                Code = "POST-OV",
+                Code = "POS",
                 InsuranceType = InsuranceType.UNDERWRITING,
                 MasterData = true
             };
@@ -86,8 +61,6 @@ namespace risk.control.system.Seeds
             {
                 claimComprehensiveService.Entity,
                 claimNonComprehensiveService.Entity,
-                claimDocumentCollectionService.Entity,
-                claimDiscreetService.Entity,
                 underWritingPreVerificationService.Entity,
                 underWritingPostVerificationService.Entity
             };

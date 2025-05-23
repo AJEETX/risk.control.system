@@ -1,14 +1,8 @@
-﻿using Highsoft.Web.Mvc.Charts;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
-using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -48,7 +42,7 @@ namespace risk.control.system.Services
             this.featureManager = featureManager;
             this.claimsService = claimsService;
         }
-        
+
         public async Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false)
         {
             var claim = await _context.Investigations
@@ -99,22 +93,29 @@ namespace risk.control.system.Services
 
             claim.InvestigationReport.AgentEmail = userEmail;
 
-            var questionModel = new QuestionFormViewModel
-            {
-                Questions = claim.InvestigationReport.CaseQuestionnaire.Questions
-            };
+            var templates = await _context.ReportTemplates
+                .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.AgentIdReport)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.FaceIds)
+                   .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.MediaReports)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.DocumentIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Questions)
+                   .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 
-            var model = new CaseInvestigationVendorsModel 
-            {
-                InvestigationReport = claim.InvestigationReport, 
-                Location = claim.BeneficiaryDetail, 
-                ClaimsInvestigation = claim ,
-                QuestionFormViewModel = questionModel
-            };
-
-
+            claim.InvestigationReport.ReportTemplate = templates;
             _context.Investigations.Update(claim);
-            var rows =await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync();
+
+            var model = new CaseInvestigationVendorsModel
+            {
+                InvestigationReport = claim.InvestigationReport,
+                Location = claim.BeneficiaryDetail,
+                ClaimsInvestigation = claim
+            };
             return model;
         }
 
@@ -155,19 +156,10 @@ namespace risk.control.system.Services
                .ThenInclude(c => c.BeneficiaryRelation)
                .Include(c => c.CaseNotes)
                .Include(c => c.CaseMessages)
-               .Include(c => c.InvestigationReport)
-               .ThenInclude(c => c.CaseQuestionnaire)
-               .ThenInclude(c => c.Questions)
-                .Include(c => c.InvestigationReport)
-               .ThenInclude(c => c.DigitalIdReport)
-               .Include(c => c.InvestigationReport)
-               .ThenInclude(c => c.PanIdReport)
-                .Include(c => c.InvestigationReport)
-               .ThenInclude(c => c.AgentIdReport)
                .FirstOrDefaultAsync(c => c.Id == selectedcase);
 
 
-            var beneficiaryDetails =await _context.BeneficiaryDetail
+            var beneficiaryDetails = await _context.BeneficiaryDetail
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
@@ -183,11 +175,29 @@ namespace risk.control.system.Services
             claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
 
             beneficiaryDetails.ContactNumber = beneficairyContactMasked;
-            
+
             var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
+            var templates = await _context.ReportTemplates
+                .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.AgentIdReport)
+                   .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.MediaReports)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.FaceIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.DocumentIds)
+               .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.Questions)
+                   .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 
-            return (new CaseInvestigationVendorsModel { InvestigationReport = claim.InvestigationReport, Location = beneficiaryDetails, ClaimsInvestigation = claim });
+            claim.InvestigationReport.ReportTemplate = templates;
+
+            return (new CaseInvestigationVendorsModel
+            {
+                InvestigationReport = claim.InvestigationReport,
+                Location = beneficiaryDetails,
+                ClaimsInvestigation = claim
+            });
         }
-
     }
 }

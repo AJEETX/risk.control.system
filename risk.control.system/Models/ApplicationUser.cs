@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-using Microsoft.AspNetCore.Identity;
-
+﻿using Microsoft.AspNetCore.Identity;
 using risk.control.system.AppConstant;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
@@ -18,6 +16,7 @@ namespace risk.control.system.Models
         public bool IsClientAdmin { get; set; } = false;
         public bool IsVendorAdmin { get; set; } = false;
         public byte[]? ProfilePicture { get; set; }
+        public string? ProfilePictureExtension { get; set; }
 
         [Display(Name = "Image")]
         [NotMapped]

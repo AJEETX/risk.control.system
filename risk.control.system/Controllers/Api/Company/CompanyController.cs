@@ -1,21 +1,15 @@
-﻿using System.ComponentModel;
-using System.Data;
-using System.Globalization;
-
-using Google.Api;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
+using System.Data;
+using System.Globalization;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Company
@@ -197,7 +191,7 @@ namespace risk.control.system.Controllers.Api.Company
                 return NotFound("Company user not found.");
             }
 
-            var statuses =new[] {
+            var statuses = new[] {
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
@@ -209,7 +203,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue && statuses.Contains(c.SubStatus))
                 .ToListAsync();
 
-            
+
 
             // Fetch the company with necessary relationships
             var company = await _context.ClientCompany
@@ -300,14 +294,14 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(v => v.VendorId == vendorId);
 
             var hasService = vendor?.VendorInvestigationServiceTypes
-                .Any(v => v.InvestigationServiceTypeId == serviceType && 
-                    v.InsuranceType  == selectedCase.PolicyDetail.InsuranceType &&
+                .Any(v => v.InvestigationServiceTypeId == serviceType &&
+                    v.InsuranceType == selectedCase.PolicyDetail.InsuranceType &&
                             (
-                            v.DistrictId == 0 || 
-                            v.DistrictId == null || 
+                            v.DistrictId == 0 ||
+                            v.DistrictId == null ||
                             v.DistrictId == districtId
-                            ) && 
-                            v.StateId == stateId && 
+                            ) &&
+                            v.StateId == stateId &&
                             v.CountryId == countryId
                             );
             return hasService ?? false;
@@ -418,7 +412,7 @@ namespace risk.control.system.Controllers.Api.Company
             await _context.SaveChangesAsync();
             return Ok(serviceResponse);
         }
-        
+
         [HttpGet("SearchCountry")]
         public IActionResult SearchCountry(string term = "")
         {
@@ -514,8 +508,8 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(result);
         }
 
-       
-       
+
+
         [HttpGet("SearchPincode")]
         public IActionResult SearchPincode(long districtId, long stateId, long countryId, string term = "")
         {
@@ -889,7 +883,7 @@ namespace risk.control.system.Controllers.Api.Company
             var countries = allCountries
                     .Where(c => c.Name.StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.ISDCode.ToString().StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.Code.StartsWith(term, StringComparison.OrdinalIgnoreCase))
                     .OrderBy(x => x.Name)
-                 //.Take(10)
+                    //.Take(10)
                     .Select(c => new
                     {
                         IsdCode = $"+{c.ISDCode.ToString()}",

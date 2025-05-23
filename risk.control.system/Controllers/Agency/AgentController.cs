@@ -1,20 +1,15 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-using AspNetCoreHero.ToastNotification.Notyf;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using risk.control.system.Services;
-
-using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.Helpers;
+using risk.control.system.Services;
+using SmartBreadcrumbs.Attributes;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Agency
 {
     [Breadcrumb(" Cases")]
-        [Authorize(Roles = AGENT.DISPLAY_NAME)]
+    [Authorize(Roles = AGENT.DISPLAY_NAME)]
     public class AgentController : Controller
     {
         private readonly INotyfService notifyService;
@@ -42,7 +37,7 @@ namespace risk.control.system.Controllers.Agency
             return View();
         }
 
-        [Breadcrumb("Submit",FromAction = "Agent")]
+        [Breadcrumb("Submit", FromAction = "Agent")]
         public async Task<IActionResult> GetInvestigate(long selectedcase, bool uploaded = false)
         {
             try

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace risk.control.system.Models
+﻿namespace risk.control.system.Models
 {
     public class StatusNotification
     {

@@ -12,7 +12,7 @@
 
         }
         else if (Model.InvestigationReport.PanIdReport?.IdImageLongLat != null && (
-        Model.InvestigationReport?.PanIdReport?.DocumentIdImageValid != null && Model.InvestigationReport?.PanIdReport?.DocumentIdImageValid == true))
+        Model.InvestigationReport?.PanIdReport?.IdImageValid != null && Model.InvestigationReport?.PanIdReport?.IdImageValid == true))
         {
             documentIdColor = "progress-bar-green";
             documentIdBorderColor = "border-success";
@@ -130,7 +130,7 @@
             </div>
             <div class="text-muted text-center">
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                @if (@Model.InvestigationReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
+                @if (@Model.InvestigationReport?.PanIdReport?.IdImageValid.Value ?? false)
                 {
                     <i class='fas fa-check-circle i-green'></i>
                 }

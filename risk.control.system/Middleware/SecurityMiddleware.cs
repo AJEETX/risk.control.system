@@ -1,8 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-
-using Microsoft.FeatureManagement;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.FeatureManagement;
 
 using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
@@ -33,6 +29,9 @@ namespace risk.control.system.Middleware
 
         public async Task Invoke(HttpContext context)
         {
+            var nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+            context.Items["CSP-Nonce"] = nonce;
+
             if (await featureManager.IsEnabledAsync(FeatureFlags.SECURITY))
             {
                 context.Response.Headers.Append("X-Frame-Options", "DENY");
@@ -46,11 +45,12 @@ namespace risk.control.system.Middleware
                     "default-src 'self';" +
                     "connect-src 'self' wss: https://maps.googleapis.com; " +
                     "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
+                    //$"script-src 'self' 'nonce-{nonce}' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
                     "style-src 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
                     "font-src  'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
                     "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
                     "frame-src 'none';" +
-                    "media-src 'self' blob: https:;" +
+                    "media-src 'self' data: blob: https:;" +
                     "object-src 'none';" +
                     "form-action 'self';" +
                     "frame-ancestors 'self' https://maps.googleapis.com;" +
@@ -67,7 +67,7 @@ namespace risk.control.system.Middleware
                 var token = ExtractJwtToken(context);
                 var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
 
-                if (!string.IsNullOrEmpty(token) && !(await tokenService.ValidateJwtToken(dbContext, context,token)))
+                if (!string.IsNullOrEmpty(token) && !(await tokenService.ValidateJwtToken(dbContext, context, token)))
                 {
                     _logger.LogWarning("Invalid JWT token.");
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;

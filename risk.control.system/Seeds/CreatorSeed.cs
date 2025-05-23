@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.AspNetCore.Identity;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -13,9 +10,9 @@ namespace risk.control.system.Seeds
 {
     public static class CreatorSeed
     {
-        public static async Task<ClientCompanyApplicationUser> Seed(ApplicationDbContext context, 
-            IWebHostEnvironment webHostEnvironment, 
-            UserManager<ClientCompanyApplicationUser> userManager, 
+        public static async Task<ClientCompanyApplicationUser> Seed(ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
+            UserManager<ClientCompanyApplicationUser> userManager,
             ClientCompany clientCompany, PinCode pinCode, string creatorEmailwithSuffix, string photo, string firstName, string lastName)
         {
             //Seed client creator

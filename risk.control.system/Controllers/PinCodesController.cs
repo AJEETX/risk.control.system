@@ -1,18 +1,12 @@
-﻿using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
-
 using SmartBreadcrumbs.Attributes;
-
+using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -22,12 +16,12 @@ namespace risk.control.system.Controllers
     public class PinCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public PinCodesController(ApplicationDbContext context, IToastNotification toastNotification)
+        public PinCodesController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: PinCodes
@@ -108,7 +102,7 @@ namespace risk.control.system.Controllers
             var totalRecords = await query.CountAsync();
 
             // Apply paging
-            var data = await query
+            var rawData = await query
                 .Skip(start)
                 .Take(length)
                 .Select(p => new
@@ -118,10 +112,21 @@ namespace risk.control.system.Controllers
                     District = p.District.Name,
                     State = p.State.Name,
                     Country = p.Country.Name,
+                    p.Updated,
                     p.PinCodeId
                 })
                 .ToListAsync();
 
+            var data = rawData.Select(s => new
+            {
+                s.Code,
+                s.Name,
+                District = s.District,
+                State = s.State,
+                Country = s.Country,
+                s.PinCodeId,
+                Updated = s.Updated?.ToString("dd-MMM-yyyy HH:mm"),
+            });
             // Prepare the DataTables response
             var response = new
             {
@@ -140,7 +145,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.PinCode == null)
             {
-                toastNotification.AddErrorToastMessage("pincode not found!");
+                notifyService.Error("pincode not found!");
                 return NotFound();
             }
 
@@ -151,7 +156,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.PinCodeId == id);
             if (pinCode == null)
             {
-                toastNotification.AddErrorToastMessage("pincode not found!");
+                notifyService.Error("pincode not found!");
                 return NotFound();
             }
 
@@ -184,7 +189,7 @@ namespace risk.control.system.Controllers
             pinCode.DistrictId = pinCode.SelectedDistrictId;
             _context.Add(pinCode);
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("pincode created successfully!");
+            notifyService.Success("pincode created successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -194,17 +199,17 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                toastNotification.AddErrorToastMessage("pincode not found!");
+                notifyService.Error("pincode not found!");
                 return NotFound();
             }
 
             var pinCode = await _context.PinCode.Include(d => d.Country).Include(d => d.State).Include(d => d.District).FirstOrDefaultAsync(p => p.PinCodeId == id);
             if (pinCode == null)
             {
-                toastNotification.AddErrorToastMessage("pincode not found!");
+                notifyService.Error("pincode not found!");
                 return NotFound();
             }
-            
+
             return View(pinCode);
         }
 
@@ -217,7 +222,7 @@ namespace risk.control.system.Controllers
         {
             if (id != pinCode.PinCodeId)
             {
-                toastNotification.AddErrorToastMessage("pincode not found!");
+                notifyService.Error("pincode not found!");
                 return NotFound();
             }
             try
@@ -229,17 +234,17 @@ namespace risk.control.system.Controllers
                 pinCode.DistrictId = pinCode.SelectedDistrictId;
 
                 _context.Update(pinCode);
-                if( await _context.SaveChangesAsync() > 0)
+                if (await _context.SaveChangesAsync() > 0)
                 {
-                    toastNotification.AddWarningToastMessage("pincode edited successfully!");
+                    notifyService.Success("pincode edited successfully!");
                     return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
             {
-               Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.ToString());
             }
-            toastNotification.AddErrorToastMessage("An error occurred while updating the pincode!");
+            notifyService.Error("An error occurred while updating the pincode!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -249,7 +254,7 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                toastNotification.AddErrorToastMessage("pincode not found!");
+                notifyService.Error("pincode not found!");
                 return NotFound();
             }
 
@@ -257,7 +262,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.PinCodeId == id);
             if (pinCode == null)
             {
-                toastNotification.AddErrorToastMessage("pincode not found!");
+                notifyService.Error("pincode not found!");
                 return NotFound();
             }
 
@@ -271,7 +276,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.PinCode == null)
             {
-                toastNotification.AddErrorToastMessage("pincode not found!");
+                notifyService.Error("pincode not found!");
                 return Problem("Entity set 'ApplicationDbContext.PinCode'  is null.");
             }
             var pinCode = await _context.PinCode.FindAsync(id);
@@ -283,7 +288,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("pincode deleted successfully!");
+            notifyService.Success("pincode deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
     }

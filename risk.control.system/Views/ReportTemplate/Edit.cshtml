@@ -1,0 +1,91 @@
+﻿@* @model ReportTemplateCreateViewModel
+
+@{
+    ViewData["Title"] = "Edit Report Template";
+}
+
+<section class="content">
+    <input type="hidden" id="digitalIdReportTypes" value="@(Model.DigitalIdReportItems != null ? string.Join(",", Model.DigitalIdReportItems.Select(x => x.Value)) : "")" />
+    <input type="hidden" id="documentIdReportTypes" value="@(Model.DocumentIdReportItems != null ? string.Join(",", Model.DocumentIdReportItems.Select(x => x.Value)) : "")" />
+    <form asp-action="Create" method="post" class="p-4 bg-white border rounded shadow-sm questionnaire-form">
+        <input type="hidden" asp-for="ReportTemplateId" value="@Model.ReportTemplateId" />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-4 question-block border-start border-4 border-primary ps-3 pt-2 pb-3 bg-light rounded">
+                    @{
+                        var faceIds = Model.FaceIds;
+                    }
+
+                    <div class="form-group">
+                        <label>Face IDs</label>
+                        <div id="faceIdsContainer">
+                            @for (int i = 0; i < faceIds.Count; i++)
+                            {
+                                <div class="faceId-entry d-flex justify-content-between align-items-center">
+                                    <div class="d-flex w-100">
+                                        <input name="FaceIds[@i].FaceIdName" class="form-control mt-2" value="@faceIds[i].FaceIdName" placeholder="Face ID Name" />
+                                        <select name="FaceIds[@i].DigitalIdReportType" class="form-control mt-2">
+                                            <option value="">-- Select Digital ID Type --</option>
+                                            @foreach (var item in Model.DigitalIdReportItems)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-danger delete-question-btn btn-sm mt-2 deleteFaceIdButton text-sm"><i class="fa fa-trash"> </i></button>
+                                </div>
+                            }
+                        </div>
+
+                        <button type="button" id="addFaceIdButton" class="btn btn-secondary">Add Face ID</button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-4 question-block border-start border-4 border-primary ps-3 pt-2 pb-3 bg-light rounded">
+
+                    @{
+                        var documentIds = Model.DocumentIds;
+                    }
+
+                    <div class="form-group">
+                        <label>Document IDs</label>
+                        <div id="documentIdsContainer">
+                            @for (int i = 0; i < documentIds.Count; i++)
+                            {
+                                <div class="documentId-entry d-flex justify-content-between align-items-center">
+                                    <div class="d-flex w-100">
+                                        <input name="DocumentIds[@i].DocumentIdName" class="form-control mt-2" value="@documentIds[i].DocumentIdName" placeholder="Document ID Name" />
+                                        <select name="DocumentIds[@i].DocumentIdReportType" class="form-control mt-2">
+                                            <option value="">-- Select Document ID Type --</option>
+                                            @foreach (var item in Model.DocumentIdReportItems)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-danger delete-question-btn btn-sm mt-2 deleteDocumentIdButton text-sm"><i class="fa fa-trash"> </i></button>
+
+                                </div>
+                            }
+                        </div>
+                        <button type="button" id="addDocumentIdButton" class="btn btn-secondary">Add Document ID</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button id="submit-answer" type="submit" class="btn btn-success w-100 mt-3">Save template</button>
+
+    </form>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/company/edit-report-template.js"></script>
+
+}
+
+ *@

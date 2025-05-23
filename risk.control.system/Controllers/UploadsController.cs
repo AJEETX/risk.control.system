@@ -1,21 +1,13 @@
-﻿using CsvHelper;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using SmartBreadcrumbs.Attributes;
-
 using System.Data;
-using AspNetCoreHero.ToastNotification.Abstractions;
-using System.IO.Compression;
-using risk.control.system.Controllers.Company;
-using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -26,16 +18,19 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
         private readonly IClaimsAgentService agentService;
+        private readonly IAgentIdService agentIdService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public UploadsController(ApplicationDbContext context,
             INotyfService notifyService,
             IClaimsAgentService agentService,
+            IAgentIdService agentIdService,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.notifyService = notifyService;
             this.agentService = agentService;
+            this.agentIdService = agentIdService;
             this.webHostEnvironment = webHostEnvironment;
         }
 
@@ -92,383 +87,130 @@ namespace risk.control.system.Controllers
             }
         }
 
-
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AgentUpload(long selectedcase, IFormFile agentImage, string agentIdLatitude, string agentIdLongitude, bool supervisorPhotoIdUpdate = false)
+        public async Task<IActionResult> UploadFaceImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image, bool isAgent = false)
         {
-            try
+            var currentUserEmail = HttpContext.User.Identity.Name;
+            if (Image != null && Image.Length > 0)
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-                    (agentImage == null) ||
-                    selectedcase < 1 ||
-                    string.IsNullOrWhiteSpace(agentIdLatitude) ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(agentImage.FileName)) ||
-                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(agentImage.FileName))) ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(agentImage.Name)) ||
-                    string.IsNullOrWhiteSpace(agentIdLongitude))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                using (var ds = new MemoryStream())
-                {
-                    agentImage.CopyTo(ds);
-                    var imageByte = ds.ToArray();
-                    var response = await agentService.PostAgentId(currentUserEmail, selectedcase, agentIdLatitude, agentIdLongitude, imageByte);
-
-                    notifyService.Custom($"Agent Image Uploaded", 3, "green", "fas fa-portrait");
-                    if (supervisorPhotoIdUpdate)
-                    {
-                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedcase);
-                    }
-                    else
-                    {
-                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
-                    }
-                }
+                var response = await agentService.PostAgentId(currentUserEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, isAgent, Image);
+                return Json(new { success = true, image = response.Image });
             }
-            catch (Exception ex)
+            return BadRequest("Invalid image.");
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetFaceImage(long id)
+        {
+            var face = await _context.DigitalIdReport.FindAsync(id);
+            if (face?.IdImage != null)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return File(face.IdImage, "image/jpeg"); // or "image/png" if PNG
             }
+            return File("~/img/no-user.png", "image/jpeg");
         }
 
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FaceUpload(long selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude, bool supervisorPhotoIdUpdate = false)
+        public async Task<IActionResult> UploadDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
         {
-            try
+            var currentUserEmail = HttpContext.User.Identity.Name;
+            if (Image != null && Image.Length > 0)
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-                    (digitalImage == null) ||
-                    selectedcase < 1 ||
-                    string.IsNullOrWhiteSpace(digitalIdLatitude) ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(digitalImage.FileName)) ||
-                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(digitalImage.FileName))) ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(digitalImage.Name)) ||
-                    string.IsNullOrWhiteSpace(digitalIdLongitude))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                using (var ds = new MemoryStream())
-                {
-                    digitalImage.CopyTo(ds);
-                    var imageByte = ds.ToArray();
-                    var response = await agentService.PostFaceId(currentUserEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
-
-                    notifyService.Custom($"Photo Image Uploaded", 3, "green", "fas fa-portrait");
-                    if (supervisorPhotoIdUpdate)
-                    {
-                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedcase);
-                    }
-                    else
-                    {
-                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
-                    }
-                }
+                var response = await agentService.PostDocumentId(currentUserEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, Image);
+                return Json(new { success = true, image = response.Image });
             }
-            catch (Exception ex)
+            return BadRequest("Invalid image.");
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetDocumentImage(long id)
+        {
+            var doc = await _context.DocumentIdReport.FindAsync(id);
+            if (doc?.IdImage != null)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return File(doc.IdImage, "image/jpeg");
             }
+            return File("~/img/no-user.png", "image/jpeg");
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        public async Task<IActionResult> UploadMediaFile(long caseId, IFormFile Image, string latitude, string longitude, string reportName, string locationName)
+        {
+            if (Image == null || Image.Length == 0)
+                return Json(new { success = false, message = "No file provided." });
+            var currentUserEmail = HttpContext.User.Identity.Name;
+            var extension = Path.GetExtension(Image.FileName).ToLower();
+
+            var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav" };
+            if (!supportedExtensions.Contains(extension))
+                return Json(new { success = false, message = "Unsupported media format." });
+            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
+
+            var data = new DocumentData
+            {
+                LocationName = locationName,
+                ReportName = reportName,
+                Email = currentUserEmail,
+                CaseId = caseId,
+                Image = Image,
+                LocationLatLong = locationLongLat
+            };
+            var response = await agentIdService.GetMedia(data);
+            return Json(new
+            {
+                success = true,
+                extension = extension.TrimStart('.'),
+                fileData = Convert.ToBase64String(response.Image)
+            });
+
+        }
+
+        [HttpGet]
+        public IActionResult GetMediaFile(long id)
+        {
+            var report = _context.MediaReport.Find(id);
+            if (report == null || report.IdImage == null)
+                return NotFound();
+
+            var contentType = report.MediaExtension == "mp4" ? "video/mp4" :
+                              report.MediaExtension == "mp3" ? "audio/mpeg" :
+                              "application/octet-stream";
+
+            return File(report.IdImage, contentType);
+        }
+
+
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PanUpload(long selectedclaim, IFormFile panImage, string documentIdLatitude, string documentIdLongitude, bool supervisorPanUpdate = false)
+        public async Task<IActionResult> SubmitLocationAnswers(string locationName, long CaseId, List<QuestionTemplate> Questions)
         {
-            try
+            foreach (var question in Questions)
             {
-
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
+                if (question.IsRequired && string.IsNullOrEmpty(question.AnswerText))
                 {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-                    (panImage == null) ||
-                    selectedclaim < 1 ||
-                    string.IsNullOrWhiteSpace(documentIdLatitude) ||
-                    string.IsNullOrWhiteSpace(documentIdLongitude) ||
-                    Path.GetInvalidFileNameChars() == null ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(panImage.FileName)) ||
-                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(panImage.FileName))) ||
-                    string.IsNullOrWhiteSpace(Path.GetFileName(panImage.Name))
-                    )
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                using (var ds = new MemoryStream())
-                {
-                    panImage.CopyTo(ds);
-                    var imageByte = ds.ToArray();
-                    var response = await agentService.PostDocumentId(currentUserEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
-
-                    notifyService.Custom($"Pan card Image Uploaded", 3, "green", "fas fa-mobile-alt");
-                    if (supervisorPanUpdate)
-                    {
-                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
-                    }
-                    else
-                    {
-                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-                    }
+                    ModelState.AddModelError("", $"Answer required for: {question.QuestionText}");
                 }
             }
-            catch (Exception ex)
+
+            if (!ModelState.IsValid)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                // Re-load data and return view with error
+                // e.g. return View(model);
+                return BadRequest("Some answers are missing.");
             }
+            var submitted = await agentIdService.Answers(locationName, CaseId, Questions);
+
+            if (submitted)
+            {
+                notifyService.Success("Answer(s) submitted Successfully.");
+            }
+            else
+            {
+                notifyService.Error("Error in submitting Answer(s).");
+            }
+            return Redirect("/Agent/GetInvestigate?selectedcase=" + CaseId);
+
         }
 
-        //[HttpPost]
-        //[RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> PassportUpload(string selectedclaim, IFormFile passportImage, string passportIdLatitude, string passportIdLongitude, bool supervisorPassportUpdate = false)
-        //{
-        //    try
-        //    {
-        //        var currentUserEmail = HttpContext.User?.Identity?.Name;
-        //        if (currentUserEmail == null)
-        //        {
-        //            notifyService.Error("OOPs !!!..Unauthenticated Access");
-        //            return RedirectToAction(nameof(Index), "Dashboard");
-        //        }
-
-        //        if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-        //            (passportImage == null) ||
-        //            string.IsNullOrWhiteSpace(passportIdLatitude) ||
-        //            string.IsNullOrWhiteSpace(passportIdLongitude) ||
-        //            Path.GetInvalidFileNameChars() == null ||
-        //            string.IsNullOrWhiteSpace(Path.GetFileName(passportImage.FileName)) ||
-        //            string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(passportImage.FileName))) ||
-        //            string.IsNullOrWhiteSpace(Path.GetFileName(passportImage.Name))
-        //            )
-        //        {
-        //            notifyService.Error("OOPs !!!..Contact Admin");
-        //            return RedirectToAction(nameof(Index), "Dashboard");
-        //        }
-        //        if (string.IsNullOrWhiteSpace(selectedclaim))
-        //        {
-        //            notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-        //            return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-        //        }
-
-        //        using (var ds = new MemoryStream())
-        //        {
-        //            passportImage.CopyTo(ds);
-        //            var imageByte = ds.ToArray();
-        //            var response = await agentService.PostPassportId(currentUserEmail, selectedclaim, passportIdLatitude, passportIdLongitude, imageByte);
-
-        //            notifyService.Custom($"Passport Image Uploaded", 3, "green", "fas fa-mobile-alt");
-        //            if (supervisorPassportUpdate)
-        //            {
-        //                return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
-        //            }
-        //            else
-        //            {
-        //                return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.StackTrace);
-        //        notifyService.Error("OOPs !!!..Contact Admin");
-        //        return RedirectToAction(nameof(Index), "Dashboard");
-        //    }
-        //}
-
-        //[HttpPost]
-        //[RequestSizeLimit(5_000_000)] // Checking for 5 MB
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> AudioUpload(string selectedclaim, IFormFile audioFile, string audioLatitude, string audioLongitude, bool supervisorAudioUpdate = false)
-        //{
-        //    try
-        //    {
-        //        var currentUserEmail = HttpContext.User?.Identity?.Name;
-        //        if (currentUserEmail == null)
-        //        {
-        //            notifyService.Error("OOPs !!!..Unauthenticated Access");
-        //            return RedirectToAction(nameof(Index), "Dashboard");
-        //        }
-
-        //        if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-        //            (audioFile == null) ||
-        //            string.IsNullOrWhiteSpace(audioLatitude) ||
-        //            string.IsNullOrWhiteSpace(audioLongitude) ||
-        //            Path.GetInvalidFileNameChars() == null ||
-        //            string.IsNullOrWhiteSpace(Path.GetFileName(audioFile.FileName)) ||
-        //            string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(audioFile.FileName))) ||
-        //            string.IsNullOrWhiteSpace(Path.GetFileName(audioFile.Name))
-        //            )
-        //        {
-        //            notifyService.Error("OOPs !!!..Contact Admin");
-        //            return RedirectToAction(nameof(Index), "Dashboard");
-        //        }
-        //        if (string.IsNullOrWhiteSpace(selectedclaim))
-        //        {
-        //            notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-        //            if (supervisorAudioUpdate)
-        //            {
-        //                return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
-        //            }
-        //            else
-        //            {
-        //                return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-        //            }
-        //        }
-
-        //        using (var ds = new MemoryStream())
-        //        {
-        //            audioFile.CopyTo(ds);
-        //            var imageByte = ds.ToArray();
-        //            var response = await agentService.PostAudio(currentUserEmail, selectedclaim, audioLatitude, audioLongitude, Path.GetFileName(audioFile.FileName), imageByte);
-
-        //            notifyService.Custom($"Audio Uploaded", 3, "green", "fas fa-mobile-alt");
-        //            return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.StackTrace);
-        //        notifyService.Error("OOPs !!!..Contact Admin");
-        //        return RedirectToAction(nameof(Index), "Dashboard");
-        //    }
-        //}
-
-        //public IActionResult GetAudioFile(string fileName)
-        //{
-        //    var currentUserEmail = HttpContext.User?.Identity?.Name;
-        //    if (currentUserEmail == null)
-        //    {
-        //        notifyService.Error("OOPs !!!..Unauthenticated Access");
-        //        return RedirectToAction(nameof(Index), "Dashboard");
-        //    }
-
-        //    var filePath = Path.Combine("wwwroot/audio", fileName);
-        //    if (!System.IO.File.Exists(filePath))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-        //    return File(fileStream, "audio/mpeg"); // MIME type for MP3
-        //}
-        //[HttpPost]
-        //[RequestSizeLimit(5_000_000)] // Checking for 5 MB
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> VideoUpload(string selectedclaim, IFormFile videoFile, string videoLatitude, string videoLongitude, bool supervisorVideoUpdate = false)
-        //{
-        //    try
-        //    {
-        //        var currentUserEmail = HttpContext.User?.Identity?.Name;
-        //        if (currentUserEmail == null)
-        //        {
-        //            notifyService.Error("OOPs !!!..Unauthenticated Access");
-        //            return RedirectToAction(nameof(Index), "Dashboard");
-        //        }
-
-        //        if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-        //            (videoFile == null) ||
-        //            string.IsNullOrWhiteSpace(videoLatitude) ||
-        //            string.IsNullOrWhiteSpace(videoLongitude) ||
-        //            Path.GetInvalidFileNameChars() == null ||
-        //            string.IsNullOrWhiteSpace(Path.GetFileName(videoFile.FileName)) ||
-        //            string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(videoFile.FileName))) ||
-        //            string.IsNullOrWhiteSpace(Path.GetFileName(videoFile.Name))
-        //            )
-        //        {
-        //            notifyService.Error("OOPs !!!..Contact Admin");
-        //            return RedirectToAction(nameof(Index), "Dashboard");
-        //        }
-        //        if (string.IsNullOrWhiteSpace(selectedclaim))
-        //        {
-        //            notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-        //            return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-        //        }
-
-        //        using (var ds = new MemoryStream())
-        //        {
-        //            videoFile.CopyTo(ds);
-        //            var imageByte = ds.ToArray();
-        //            var response = await agentService.PostVideo(currentUserEmail, selectedclaim, videoLatitude, videoLongitude, Path.GetFileName(videoFile.FileName), imageByte);
-
-        //            notifyService.Custom($"Video Uploaded", 3, "green", "fas fa-mobile-alt");
-        //            if (supervisorVideoUpdate)
-        //            {
-        //                return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
-        //            }
-        //            else
-        //            {
-        //                return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.StackTrace);
-        //        notifyService.Error("OOPs !!!..Contact Admin");
-        //        return RedirectToAction(nameof(Index), "Dashboard");
-        //    }
-        //}
-
-        public IActionResult GetVideoFile(string fileName)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var filePath = Path.Combine("wwwroot/video", fileName);
-                if (!System.IO.File.Exists(filePath))
-                {
-                    return NotFound();
-                }
-
-                var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                return File(fileStream, "video/mp4"); // MIME type for MP4
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
     }
 }

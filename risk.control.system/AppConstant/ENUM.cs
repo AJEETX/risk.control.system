@@ -3,7 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {
-
+    public enum LicenseType
+    {
+        Trial,
+        Standard
+    }
     public enum Income
     {
         [Display(Name = "UNKNOWN")]

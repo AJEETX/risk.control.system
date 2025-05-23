@@ -1,19 +1,11 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-using AspNetCoreHero.ToastNotification.Notyf;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using NToastNotify;
-
-using risk.control.system.Models.ViewModel;
+using risk.control.system.Helpers;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
-
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Helpers;
 //using QuestPDF.Fluent;
 namespace risk.control.system.Controllers.Company
 {
@@ -83,7 +75,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index));
                 }
                 var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
-                if(model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
+                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
                     model.InvestigationReport.AiSummaryUpdated = DateTime.Now;
@@ -135,7 +127,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        
+
         [Breadcrumb(title: "Review")]
         public IActionResult Review()
         {
@@ -191,7 +183,7 @@ namespace risk.control.system.Controllers.Company
         {
             return View();
         }
-        [Breadcrumb(" Details",FromAction = "Approved")]
+        [Breadcrumb(" Details", FromAction = "Approved")]
         public async Task<IActionResult> ApprovedDetail(long id)
         {
             try
@@ -288,7 +280,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (id==0)
+                if (id == 0)
                 {
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");

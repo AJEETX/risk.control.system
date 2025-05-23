@@ -1,11 +1,6 @@
-﻿using System.Net.Http;
-using System.Text;
-
-using Google.Cloud.Vision.V1;
-
-using Newtonsoft.Json;
-
+﻿using Newtonsoft.Json;
 using risk.control.system.Models;
+using System.Text;
 
 public interface IChatSummarizer
 {

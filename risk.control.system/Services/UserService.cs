@@ -1,6 +1,4 @@
-﻿using Amazon.Rekognition.Model;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
@@ -14,11 +12,11 @@ namespace risk.control.system.Services
 {
     public interface IUserService
     {
-       Task<List<UserDetailResponse>> GetUsers(string userEmail);
-       Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail);
+        Task<List<UserDetailResponse>> GetUsers(string userEmail);
+        Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail);
         Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail, long id);
-       Task<List<UserDetailResponse>> GetCompanyAgencyUsers(string userEmail, long id);
-       Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail);
+        Task<List<UserDetailResponse>> GetCompanyAgencyUsers(string userEmail, long id);
+        Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail);
     }
     public class UserService : IUserService
     {
@@ -139,16 +137,16 @@ namespace risk.control.system.Services
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a>" :
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
-                    Phone = "(+"+ u.AgencyUser.Country.ISDCode+") " + u.AgencyUser.PhoneNumber,
+                    Phone = "(+" + u.AgencyUser.Country.ISDCode + ") " + u.AgencyUser.PhoneNumber,
                     Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name,
                     State = u.AgencyUser.State.Code,
                     StateName = u.AgencyUser.State.Name,
-                    Pincode =  u.AgencyUser.PinCode.Code,
-                    PincodeName =  u.AgencyUser.PinCode.Name + " - " +u.AgencyUser.PinCode.Code,
+                    Pincode = u.AgencyUser.PinCode.Code,
+                    PincodeName = u.AgencyUser.PinCode.Name + " - " + u.AgencyUser.PinCode.Code,
                     Country = u.AgencyUser.Country.Code,
                     Flag = "/flags/" + u.AgencyUser.Country.Code.ToLower() + ".png",
                     Active = u.AgencyUser.Active,
-                    Roles = u.AgencyUser.UserRole != null ?u.AgencyUser.UserRole.GetEnumDisplayName() : "..",
+                    Roles = u.AgencyUser.UserRole != null ? u.AgencyUser.UserRole.GetEnumDisplayName() : "..",
                     Count = u.CurrentCaseCount,
                     Role = u.AgencyUser.UserRole.GetEnumDisplayName(),
                     AgentOnboarded = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT),
@@ -199,7 +197,7 @@ namespace risk.control.system.Services
 
             var activeUsersDetails = new List<UserDetailResponse>();
 
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 var currentOnlineTime = context.UserSessionAlive
                     .Where(a => a.ActiveUser.Email == user.Email && activeUsers.Contains(a.ActiveUser.Email))?
@@ -242,14 +240,14 @@ namespace risk.control.system.Services
                     "<a href=/Vendors/EditUser?userId=" + user.Id + ">" + user.Email + "</a>" :
                     "<a href=/Vendors/EditUser?userId=" + user.Id + ">" + user.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     RawEmail = user.Email,
-                    Phone = "(+"+ user.Country.ISDCode+") " + user.PhoneNumber,
+                    Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
                     Addressline = user.Addressline + ", " + user.District.Name,
                     State = user.State.Code,
                     StateName = user.State.Name,
                     Pincode = user.PinCode.Code,
-                    PincodeName = user.PinCode.Name +" - "+ user.PinCode.Code,
+                    PincodeName = user.PinCode.Name + " - " + user.PinCode.Code,
                     Country = user.Country.Code,
                     Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
                     Roles = user.UserRole.GetEnumDisplayName(),
@@ -304,7 +302,7 @@ namespace risk.control.system.Services
                 .ThenBy(u => u.LastName);
             var activeUsersDetails = new List<UserDetailResponse>();
 
-            foreach(var user in allUsers)
+            foreach (var user in allUsers)
             {
                 var currentOnlineTime = context.UserSessionAlive
                     .Where(a => a.ActiveUser.Email == user.Email && activeUsers.Contains(a.ActiveUser.Email))?
@@ -345,7 +343,7 @@ namespace risk.control.system.Services
                     Name = user.FirstName + " " + user.LastName,
                     Email = "<a href=/Company/EditUser?userId=" + user.Id + ">" + user.Email + "</a>",
                     RawEmail = user.Email,
-                    Phone = "(+"+ user.Country.ISDCode+") " + user.PhoneNumber,
+                    Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
                     Addressline = user.Addressline + ", " + user.District.Name,
@@ -356,7 +354,7 @@ namespace risk.control.system.Services
                     Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
                     Role = user.UserRole.GetEnumDisplayName(),
                     Pincode = user.PinCode.Code,
-                    PincodeName = user.PinCode.Name + " - "+ user.PinCode.Code,
+                    PincodeName = user.PinCode.Name + " - " + user.PinCode.Code,
                     OnlineStatus = status,
                     OnlineStatusName = statusName,
                     OnlineStatusIcon = statusIcon,
@@ -545,7 +543,7 @@ namespace risk.control.system.Services
                     Name = user.FirstName + " " + user.LastName,
                     Email = "<a href=/User/Edit?userId=" + user.Id + ">" + user.Email + "</a>",
                     RawEmail = user.Email,
-                    Phone = "(+"+ user.Country.ISDCode +") " + user.PhoneNumber,
+                    Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
                     Addressline = user.Addressline,

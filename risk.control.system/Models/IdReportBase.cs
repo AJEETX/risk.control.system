@@ -1,15 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class IdReportBase: BaseEntity
+    public class IdReportBase : BaseEntity
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-
+        public bool Selected { get; set; } = false;
+        public string? ReportName { get; set; }
+        public string? IdName { get; set; }
         public byte[]? IdImage { get; set; }
+        public byte[]? IdOriginalImage { get; set; }
+        public string? IdImageExtension { get; set; }
 
         public string? IdImageData { get; set; } = "No Location Info...";
 
@@ -24,5 +27,7 @@ namespace risk.control.system.Models
         public string? IdImageLongLat { get; set; }
         public DateTime? IdImageLongLatTime { get; set; }
         public bool ValidationExecuted { get; set; } = false;
+        public bool? IdImageValid { get; set; } = false;
+        public bool IsRequired { get; set; } = false;
     }
 }

@@ -1,17 +1,11 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-using AspNetCoreHero.ToastNotification.Notyf;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using risk.control.system.Models.ViewModel;
+using risk.control.system.Helpers;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
-
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -73,7 +67,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model =await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
+                var model = await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -145,7 +139,7 @@ namespace risk.control.system.Controllers.Company
             }
             return View();
         }
-        [Breadcrumb(title: " Details",FromAction = "Approved")]
+        [Breadcrumb(title: " Details", FromAction = "Approved")]
         public async Task<IActionResult> ApprovedDetail(long id)
         {
             try

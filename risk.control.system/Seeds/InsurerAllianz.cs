@@ -1,10 +1,4 @@
-﻿using System.ComponentModel.Design;
-using System.Diagnostics.Metrics;
-
-using Google.Api;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -94,98 +88,16 @@ namespace risk.control.system.Seeds
 
             var insurerCompany = await context.ClientCompany.AddAsync(insurer);
 
-
-
             await context.SaveChangesAsync(null, false);
 
             var creator = await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, insurerCompany.Entity);
 
-            QuestionsCLAIM(context, insurer, creator);
-            QuestionsUNDERWRITING(context, insurer, creator);
+            var claimTemplate = ReportTemplateSeed.QuestionsCLAIM(context, insurer);
+            var underwriting = ReportTemplateSeed.QuestionsUNDERWRITING(context, insurer);
+
             await context.SaveChangesAsync(null, false);
 
             return insurerCompany.Entity;
         }
-
-        private static void QuestionsUNDERWRITING(ApplicationDbContext context, ClientCompany company, ClientCompanyApplicationUser creator)
-        {
-            var question1 = new Question
-            {
-                QuestionText = "Ownership status of the home visited",
-                QuestionType = "dropdown",
-                Options = "SOLE- OWNER, JOINT-OWNER, RENTED, UNKNOWN",
-                IsRequired = true
-            };
-            var question2 = new Question
-            {
-                QuestionText = "Person Financial Status",
-                QuestionType = "dropdown",
-                Options = "Rs. 0 - 10000, Rs. 10000 - 100000, Rs. 100000 +, UNKNOWN",
-                IsRequired = true
-            };
-            var question3 = new Question
-            {
-                QuestionText = "Name of the Person Met",
-                QuestionType = "text",
-                IsRequired = true
-            };
-            var question4 = new Question
-            {
-                QuestionText = "Date and time met with Person",
-                QuestionType = "date",
-                IsRequired = true
-            };
-
-            var caseQuestionnaire = new CaseQuestionnaire
-            {
-                ClientCompanyId = company.ClientCompanyId,
-                InsuranceType = InsuranceType.UNDERWRITING,
-                CreatedUser = creator.Email,
-                Questions = new List<Question> {question1, question2, question3,question4 }
-            };
-
-            context.CaseQuestionnaire.Add(caseQuestionnaire);
-        }
-
-        private static void QuestionsCLAIM(ApplicationDbContext context, ClientCompany company, ClientCompanyApplicationUser creator)
-        {
-            var question1 = new Question
-            {
-                QuestionText = "Injury/Illness prior to commencement/revival ?",
-                QuestionType = "dropdown",
-                Options = "YES, NO",
-                IsRequired = true
-            };
-            var question2 = new Question
-            {
-                QuestionText = "Duration of treatment ?",
-                QuestionType = "dropdown",
-                Options = "0 , Less Than 6 months, More Than 6 months",
-                IsRequired = true
-            };
-            var question3 = new Question
-            {
-                QuestionText = "Name of person met at the cemetery",
-                QuestionType = "text",
-                IsRequired = true
-            };
-            var question4 = new Question
-            {
-                QuestionText = "Date and time of death",
-                QuestionType = "date",
-                IsRequired = true
-            };
-
-            var caseQuestionnaire = new CaseQuestionnaire
-            {
-                ClientCompanyId = company.ClientCompanyId,
-                InsuranceType = InsuranceType.CLAIM,
-                CreatedUser = creator.Email,
-                Questions = new List<Question> { question1, question2, question3, question4 }
-            };
-
-            context.CaseQuestionnaire.Add(caseQuestionnaire);
-        }
-
     }
 }

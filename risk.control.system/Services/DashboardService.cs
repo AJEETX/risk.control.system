@@ -1,19 +1,8 @@
-﻿using System.Linq;
-using System.Security.Claims;
-
-using Amazon.Runtime.Internal.Transform;
-
-using Microsoft.EntityFrameworkCore;
-
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Services
 {
@@ -50,7 +39,7 @@ namespace risk.control.system.Services
             this._context = context;
         }
 
-        public Dictionary<string, int> CalculateAgencyClaimStatus(string userEmail) 
+        public Dictionary<string, int> CalculateAgencyClaimStatus(string userEmail)
         {
             return CalculateAgencyCaseStatus(userEmail, InsuranceType.CLAIM);
         }
@@ -74,14 +63,14 @@ namespace risk.control.system.Services
             }
 
             var claimsCases = _context.Investigations
-               .Include(c => c.PolicyDetail).Where(c=>c.PolicyDetail.InsuranceType == insuranceType && 
-               !c.Deleted && c.VendorId.HasValue  && 
+               .Include(c => c.PolicyDetail).Where(c => c.PolicyDetail.InsuranceType == insuranceType &&
+               !c.Deleted && c.VendorId.HasValue &&
                                 (c.SubStatus == allocatedStatus ||
                                 c.SubStatus == assignedToAgentStatus ||
                                 c.SubStatus == enquiryStatus ||
                                 c.SubStatus == submitted2SuperStatus));
 
-           
+
             int countOfCases = 0;
             foreach (var claimsCase in claimsCases)
             {
@@ -111,8 +100,8 @@ namespace risk.control.system.Services
             }
             return vendorWithCaseCounts;
         }
-        
-        
+
+
         public Dictionary<string, int> CalculateAgentCaseStatus(string userEmail)
         {
             var vendorCaseCount = new Dictionary<string, int>();
@@ -190,8 +179,8 @@ namespace risk.control.system.Services
                     foreach (var _case in cases)
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
-                        if (userSubStatuses.Contains(caseCurrentStatus.SubStatus) && 
-                            caseCurrentStatus.Created > monthName.Date && 
+                        if (userSubStatuses.Contains(caseCurrentStatus.SubStatus) &&
+                            caseCurrentStatus.Created > monthName.Date &&
                             caseCurrentStatus.Created <= monthName.AddMonths(1))
                         {
 
@@ -277,7 +266,7 @@ namespace risk.control.system.Services
                         {
                             claimsWithSameStatus.Add(caseCurrentStatus);
                         }
-                        else if (caseCurrentStatus.PolicyDetail.InsuranceType== InsuranceType.UNDERWRITING && !caseCurrentStatus.Deleted)
+                        else if (caseCurrentStatus.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING && !caseCurrentStatus.Deleted)
                         {
                             underwritingWithSameStatus.Add(caseCurrentStatus);
                         }
@@ -441,7 +430,7 @@ namespace risk.control.system.Services
 
                         if (caseCurrentStatus != null && caseCurrentStatus.SubStatus == subStatus && !caseCurrentStatus.Deleted)
                         {
-                            if(caseCurrentStatus.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
+                            if (caseCurrentStatus.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
                             {
                                 claimsWithSameStatus.Add(caseCurrentStatus);
                             }
@@ -451,7 +440,7 @@ namespace risk.control.system.Services
                             }
                         }
                     }
-                    dictWeeklyCases.Add(subStatus, (claimsWithSameStatus.Count,underwritingWithSameStatus.Count));
+                    dictWeeklyCases.Add(subStatus, (claimsWithSameStatus.Count, underwritingWithSameStatus.Count));
                 }
             }
             else if (vendorUser != null)
@@ -509,7 +498,7 @@ namespace risk.control.system.Services
             if (companyUser != null)
             {
                 var tdetail = tdetailDays.Where(d =>
-                    (companyUser.Role == AppRoles.ASSESSOR ||  companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                    (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                     d.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
@@ -523,9 +512,9 @@ namespace risk.control.system.Services
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
-                        if (caseCurrentStatus != null && 
-                            caseCurrentStatus.SubStatus == subStatus && 
-                            !caseCurrentStatus.Deleted && 
+                        if (caseCurrentStatus != null &&
+                            caseCurrentStatus.SubStatus == subStatus &&
+                            !caseCurrentStatus.Deleted &&
                             caseCurrentStatus.PolicyDetail.InsuranceType == insuranceType)
                         {
                             casesWithSameStatus.Add(caseCurrentStatus);

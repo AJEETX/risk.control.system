@@ -1,22 +1,9 @@
-﻿using System;
-using System.Security.Claims;
-
-using Google.Api;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-
-using SkiaSharp;
-
-using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Services
 {
@@ -37,23 +24,28 @@ namespace risk.control.system.Services
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
+        Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id);
+        Task<CaseTransactionModel> GetPdfReport(long id);
     }
     public class InvestigationService : IInvestigationService
     {
         private readonly ApplicationDbContext context;
         private readonly INumberSequenceService numberService;
+        private readonly ICloneReportService cloneService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ITimelineService timelineService;
         private readonly ICustomApiCLient customApiCLient;
 
-        public InvestigationService(ApplicationDbContext context, 
-            INumberSequenceService numberService, 
+        public InvestigationService(ApplicationDbContext context,
+            INumberSequenceService numberService,
+            ICloneReportService cloneService,
             IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
             ICustomApiCLient customApiCLient)
         {
             this.context = context;
             this.numberService = numberService;
+            this.cloneService = cloneService;
             this.webHostEnvironment = webHostEnvironment;
             this.timelineService = timelineService;
             this.customApiCLient = customApiCLient;
@@ -68,7 +60,7 @@ namespace risk.control.system.Services
             };
             bool userCanCreate = true;
             int availableCount = 0;
-            var trial = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial;
+            var trial = companyUser.ClientCompany.LicenseType == LicenseType.Trial;
             if (trial)
             {
                 var totalClaimsCreated = context.Investigations.Include(c => c.PolicyDetail).Where(c => !c.Deleted &&
@@ -126,7 +118,11 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
+                    claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
                 }
+
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
+
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.CreatedUser = userEmail;
                 claimsInvestigation.CaseOwner = userEmail;
@@ -137,6 +133,9 @@ namespace risk.control.system.Services
                 claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR;
                 claimsInvestigation.CreatorSla = currentUser.ClientCompany.CreatorSla;
                 claimsInvestigation.ClientCompany = currentUser.ClientCompany;
+                claimsInvestigation.ClientCompanyId = currentUser.ClientCompanyId;
+                claimsInvestigation.ReportTemplate = reportTemplate;
+                claimsInvestigation.ReportTemplateId = reportTemplate.Id;
                 var aaddedClaimId = context.Investigations.Add(claimsInvestigation);
 
                 var saved = await context.SaveChangesAsync() > 0;
@@ -151,6 +150,7 @@ namespace risk.control.system.Services
                 return null!;
             }
         }
+
         public async Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument)
         {
             try
@@ -177,6 +177,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
                     existingPolicy.PolicyDetail.DocumentImage = dataStream.ToArray();
+                    claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
                 }
 
                 context.Investigations.Update(existingPolicy);
@@ -206,6 +207,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
                     customerDetail.ProfilePicture = dataStream.ToArray();
+                    customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
@@ -228,7 +230,9 @@ namespace risk.control.system.Services
                 var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
                 customerDetail.Latitude = latLong.Latitude;
                 customerDetail.Longitude = latLong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
                 customerDetail.CustomerLocationMap = url;
 
                 var addedClaim = context.CustomerDetail.Add(customerDetail);
@@ -258,6 +262,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     await customerDocument.CopyToAsync(dataStream);
                     customerDetail.ProfilePicture = dataStream.ToArray();
+                    customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 else
                 {
@@ -288,7 +293,8 @@ namespace risk.control.system.Services
                 var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
                 customerDetail.Latitude = latLong.Latitude;
                 customerDetail.Longitude = latLong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
                 customerDetail.CustomerLocationMap = url;
 
                 // Attach the customerDetail object to the context and mark it as modified
@@ -320,6 +326,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
                     beneficiary.ProfilePicture = dataStream.ToArray();
+                    beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == ClaimsInvestigationId);
@@ -343,7 +350,8 @@ namespace risk.control.system.Services
                 var address = beneficiary.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
                 beneficiary.BeneficiaryLocationMap = url;
                 beneficiary.Latitude = latlong.Latitude;
                 beneficiary.Longitude = latlong.Longitude;
@@ -374,6 +382,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
                     beneficiary.ProfilePicture = dataStream.ToArray();
+                    beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 else
                 {
@@ -406,7 +415,8 @@ namespace risk.control.system.Services
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 beneficiary.Latitude = latlong.Latitude;
                 beneficiary.Longitude = latlong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
                 beneficiary.BeneficiaryLocationMap = url;
 
                 context.BeneficiaryDetail.Attach(beneficiary);
@@ -457,11 +467,11 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            
+
             var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
-            var timeTaken = DateTime.Now - claim.Created ;
+            var timeTaken = DateTime.Now - claim.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
               $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
@@ -487,15 +497,6 @@ namespace risk.control.system.Services
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.AgentIdReport)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.PanIdReport)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.CaseQuestionnaire)
-                .ThenInclude(c => c.Questions)
-                .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
@@ -537,6 +538,28 @@ namespace risk.control.system.Services
             : "-";
 
             var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var templates = await context.ReportTemplates
+               .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.AgentIdReport)
+                  .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.MediaReports)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.FaceIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.DocumentIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.Questions)
+                  .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+
+            claim.InvestigationReport.ReportTemplate = templates;
+
+            var tracker = context.PdfDownloadTracker
+                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == currentUserEmail);
+            bool canDownload = true;
+            if (tracker != null)
+            {
+                canDownload = tracker.DownloadCount <= 3;
+            }
 
             var model = new CaseTransactionModel
             {
@@ -545,6 +568,181 @@ namespace risk.control.system.Services
                 Location = claim.BeneficiaryDetail,
                 Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
+                TimeTaken = totalTimeTaken,
+                VendorInvoice = invoice,
+                CanDownload = canDownload,
+                Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+            };
+
+            return model;
+        }
+
+        public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
+        {
+            var claim = await context.Investigations
+                .Include(c => c.CaseMessages)
+                .Include(c => c.CaseNotes)
+                .Include(c => c.InvestigationReport)
+                .Include(c => c.InvestigationTimeline)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+
+            var timeTaken = DateTime.Now - claim.Created;
+            var totalTimeTaken = timeTaken != TimeSpan.Zero
+                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
+              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
+              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
+              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
+            : "-";
+
+            var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var templates = await context.ReportTemplates
+               .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.AgentIdReport)
+                  .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.MediaReports)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.FaceIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.DocumentIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.Questions)
+                  .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+
+            claim.InvestigationReport.ReportTemplate = templates;
+
+            var tracker = context.PdfDownloadTracker
+                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == currentUserEmail);
+            bool canDownload = true;
+            if (tracker != null)
+            {
+                canDownload = tracker.DownloadCount <= 3;
+                tracker.DownloadCount++;
+                tracker.LastDownloaded = DateTime.UtcNow;
+                context.PdfDownloadTracker.Update(tracker);
+            }
+            else
+            {
+                tracker = new PdfDownloadTracker
+                {
+                    ReportId = id,
+                    UserEmail = currentUserEmail,
+                    DownloadCount = 1,
+                    LastDownloaded = DateTime.UtcNow
+                };
+                context.PdfDownloadTracker.Add(tracker);
+            }
+            context.SaveChanges();
+            var model = new CaseTransactionModel
+            {
+                ClaimsInvestigation = claim,
+                CaseIsValidToAssign = claim.IsValidCaseData(),
+                Location = claim.BeneficiaryDetail,
+                Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
+                TimeTaken = totalTimeTaken,
+                VendorInvoice = invoice,
+                CanDownload = canDownload,
+                Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+            };
+
+            return model;
+        }
+        public async Task<CaseTransactionModel> GetPdfReport(long id)
+        {
+            var claim = await context.Investigations
+                .Include(c => c.CaseMessages)
+                .Include(c => c.CaseNotes)
+                .Include(c => c.InvestigationReport)
+                .Include(c => c.InvestigationTimeline)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+
+            var timeTaken = DateTime.Now - claim.Created;
+            var totalTimeTaken = timeTaken != TimeSpan.Zero
+                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
+              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
+              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
+              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
+            : "-";
+
+            var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var templates = await context.ReportTemplates
+               .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.AgentIdReport)
+                  .Include(r => r.LocationTemplate)
+                   .ThenInclude(l => l.MediaReports)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.FaceIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.DocumentIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.Questions)
+                  .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+
+            claim.InvestigationReport.ReportTemplate = templates;
+            var model = new CaseTransactionModel
+            {
+                ClaimsInvestigation = claim,
+                CaseIsValidToAssign = claim.IsValidCaseData(),
+                Location = claim.BeneficiaryDetail,
+                Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                AutoAllocation = false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
@@ -593,17 +791,17 @@ namespace risk.control.system.Services
             // Fetching all relevant substatuses in a single query for efficiency
 
             var query = context.Investigations
-                .Include(i=>i.PolicyDetail)
+                .Include(i => i.PolicyDetail)
                 .ThenInclude(i => i.InvestigationServiceType)
-                .Include(i=>i.CustomerDetail)
-                .ThenInclude(i=>i.PinCode)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.PinCode)
                 .Include(i => i.CustomerDetail)
                 .ThenInclude(i => i.District)
                 .Include(i => i.CustomerDetail)
                 .ThenInclude(i => i.State)
                 .Include(i => i.CustomerDetail)
                 .ThenInclude(i => i.Country)
-                .Include(i=>i.BeneficiaryDetail)
+                .Include(i => i.BeneficiaryDetail)
                 .ThenInclude(i => i.PinCode)
                 .Include(i => i.BeneficiaryDetail)
                 .ThenInclude(i => i.District)
@@ -621,7 +819,7 @@ namespace risk.control.system.Services
                          a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY ||
-                        a.SubStatus== CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
+                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
                     )
                 );
 
@@ -687,7 +885,15 @@ namespace risk.control.system.Services
                 BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
                 CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
                 PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
-                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap : Applicationsettings.NO_MAP
+                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
+                        a.CustomerDetail.CustomerLocationMap :
+                        a.BeneficiaryDetail.BeneficiaryLocationMap :
+                        Applicationsettings.NO_MAP
+                //PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
+                //        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING?
+                //        string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") :
+                //        string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400") : 
+                //        Applicationsettings.NO_MAP
             });
 
             // Apply Sorting AFTER Data Transformation
@@ -894,7 +1100,7 @@ namespace risk.control.system.Services
                 PolicyId = a.PolicyDetail.ContractNumber,
                 Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
-                Agent =  GetOwner(a),
+                Agent = GetOwner(a),
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwnerImage(a))),
                 CaseWithPerson = a.CaseOwner,
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
@@ -915,7 +1121,9 @@ namespace risk.control.system.Services
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds, // Calculate here
-                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
+                string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") :
+                string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400")
             }); // Materialize the list
 
             // Apply Sorting AFTER Data Transformation
@@ -1113,8 +1321,8 @@ namespace risk.control.system.Services
                         : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
                 IsNewAssigned = a.IsNewAssignedToManager,
-                PersonMapAddressUrl = a.GetMap(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.SubStatus == assignedToAssignerStatus,
-                                                      a.SubStatus == submittedToAssessorStatus)
+                PersonMapAddressUrl = string.Format(a.GetMap(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.SubStatus == assignedToAssignerStatus,
+                                                      a.SubStatus == submittedToAssessorStatus), "400", "400")
             });
 
             // Apply Sorting AFTER Data Transformation
@@ -1210,7 +1418,7 @@ namespace risk.control.system.Services
 
             return response;
         }
-        
+
         private static string GetManagerActiveTimePending(InvestigationTask a)
         {
             if (a.CreatorSla == 0)
@@ -1283,7 +1491,7 @@ namespace risk.control.system.Services
         }
         public string GetOwner(InvestigationTask a)
         {
-            if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || 
+            if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
                 a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
                 a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
             {
@@ -1319,7 +1527,7 @@ namespace risk.control.system.Services
                 return 0;
             var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
             // Fetching all relevant substatuses in a single query for efficiency
-            var subStatuses =  new[]
+            var subStatuses = new[]
                 {
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
@@ -1333,8 +1541,8 @@ namespace risk.control.system.Services
                     a.ClientCompanyId == companyUser.ClientCompanyId &&
                     (
                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
-                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY  ||
-                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY  ||
+                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
+                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY ||
                         a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
                 ));
 

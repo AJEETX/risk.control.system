@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -20,8 +20,10 @@ namespace risk.control.system.Seeds
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             var customApiCLient = scope.ServiceProvider.GetRequiredService<ICustomApiCLient>();
             var httpAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-            //context.Database.EnsureDeleted();
+
             context.Database.EnsureCreated();
+
+            context.Database.Migrate();
 
             //check for users
             if (context.ApplicationUser.Any())
@@ -43,25 +45,35 @@ namespace risk.control.system.Seeds
             await PinCodeStateSeed.Currencies(context);
             var countries = await PinCodeStateSeed.Countries(context);
 
-#if !DEBUG
+            //#if !DEBUG
             // seed INDIA
             var india = countries.FirstOrDefault(c => c.Code.ToLower() == "in");
             var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
-            var indianStates = indiaPincodes.Where(s => s.StateName.ToLower() == "haryana" ||
-                s.StateName.ToLower() == "delhi" ||
+            var indianStates = indiaPincodes.Where(s =>
+                s.StateName.ToLower() == "haryana"
+                ||
+                s.StateName.ToLower() == "delhi"
+                ||
                 s.StateCode.ToLower() == "up"
                 ).Select(g => g.StateCode).Distinct()?.ToList();
 
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
 
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
-#endif
+            //#endif
             // seed AUSTRALIA
             var au = countries.FirstOrDefault(c => c.Code.ToLower() == "au");
-            var auPincodes = await PinCodeStateSeed.CsvRead_Au();
-            var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "nsw" ||
-                //s.StateCode.ToLower() == "qld" ||
-                s.StateCode.ToLower() == "vic"
+
+            int maxRowCountForDebug = 0;
+
+            var auPincodes = await PinCodeStateSeed.CsvRead_Au(maxRowCountForDebug);
+            var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "vic"
+                //#if !DEBUG
+
+                || s.StateCode.ToLower() == "qld"
+                || s.StateCode.ToLower() == "nsw"
+                //#endif
+
                 ).Select(g => g.StateCode).Distinct()?.ToList();
 
             var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
@@ -81,7 +93,10 @@ namespace risk.control.system.Seeds
 
             await context.SaveChangesAsync(null, false);
 
-            await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager);
+
+            var randomPinCode = filteredAuPincodes.FirstOrDefault();
+
+            await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode.Code);
 
             await DataSeed.SeedDetails(context, webHostEnvironment, clientUserManager, vendorUserManager, customApiCLient, httpAccessor);
         }

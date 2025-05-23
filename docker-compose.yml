@@ -23,7 +23,7 @@ services:
     volumes:
       - ./risk.control.system:/app
     working_dir: /app
-    command: ["dotnet", "ef", "database", "update", "--no-build", "--project", "./risk.control.system.csproj", "--context", "ApplicationDbContext", "--verbose"] # runs migration
+    command: ["dotnet-ef", "database", "update", "--no-build", "--project", "./risk.control.system.csproj", "--context", "ApplicationDbContext", "--verbose"] # runs migration
 
 volumes:
   pgdata:

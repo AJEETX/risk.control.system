@@ -209,7 +209,7 @@
                         </div>
                         <span class="help-block">Max. 2MB</span>
                         <div class="float-right">
-                            <a asp-controller="SuperVisor" asp-action="Allocate" class="btn btn-secondary">
+                            <a asp-controller="VendorInvestigation" asp-action="Allocate" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> @Applicationsettings.CANCEL
                             </a>
 
@@ -230,9 +230,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/case-map.js"></script>
-    <script>
-        initReportMap();
-    </script>
     <script src="~/js/supervisor/get-report.js"></script>
-
 }

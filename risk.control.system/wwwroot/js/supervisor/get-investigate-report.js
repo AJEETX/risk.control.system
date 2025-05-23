@@ -165,7 +165,7 @@
 
                             $('#supervisor-form').submit();
 
-                            var createForm = document.getElementById("create-form");
+                            var createForm = document.getElementById("supervisor-form");
                             if (createForm) {
 
                                 var nodes = createForm.getElementsByTagName('*');

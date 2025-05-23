@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using risk.control.system.Helpers;
 using System.ComponentModel.DataAnnotations;
-using risk.control.system.Helpers;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
@@ -54,6 +54,7 @@ namespace risk.control.system.Models
         public IFormFile? Document { get; set; }
 
         [Display(Name = "Case Document")]
+        public string? DocumentImageExtension { get; set; }
         public byte[]? DocumentImage { get; set; } = default!;
 
         [Display(Name = "Case remarks")]

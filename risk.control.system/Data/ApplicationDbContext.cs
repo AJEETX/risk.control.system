@@ -32,7 +32,10 @@ namespace risk.control.system.Data
         {
             base.OnModelCreating(builder);
         }
+        public virtual DbSet<PdfDownloadTracker> PdfDownloadTracker { get; set; }
         public virtual DbSet<InvestigationTask> Investigations { get; set; }
+        public DbSet<ReportTemplate> ReportTemplates { get; set; }
+        public DbSet<LocationTemplate> LocationTemplate { get; set; }
         public virtual DbSet<Question> Questions { get; set; }
         public virtual DbSet<CaseQuestionnaire> CaseQuestionnaire { get; set; }
         public virtual DbSet<StatusNotification> Notifications { get; set; }
@@ -66,9 +69,10 @@ namespace risk.control.system.Data
         public DbSet<PolicyDetail> PolicyDetail { get; set; } = default!;
         public DbSet<CustomerDetail> CustomerDetail { get; set; } = default!;
         public DbSet<BeneficiaryDetail> BeneficiaryDetail { get; set; } = default!;
-        public DbSet<DigitalIdReport> AgentIdReport { get; set; } = default!;
+        public DbSet<AgentIdReport> AgentIdReport { get; set; } = default!;
         public DbSet<DigitalIdReport> DigitalIdReport { get; set; } = default!;
-        public DbSet<DocumentIdReport> PanIdReport { get; set; } = default!;
+        public DbSet<DocumentIdReport> DocumentIdReport { get; set; } = default!;
+        public DbSet<MediaReport> MediaReport { get; set; } = default!;
         public DbSet<InvestigationReport> InvestigationReport { get; set; } = default!;
     }
 }

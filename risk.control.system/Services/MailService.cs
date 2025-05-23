@@ -1,20 +1,11 @@
-﻿using System.Net.Http.Headers;
-
-using Amazon.Auth.AccessControlPolicy;
-using Amazon.Rekognition.Model;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-
-using Newtonsoft.Json;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace risk.control.system.Services
 {
@@ -46,10 +37,6 @@ namespace risk.control.system.Services
 
     public class MailService : IMailService
     {
-        private const string TEST_PHONE = "61432854196";
-        private static string BaseUrl = string.Empty;
-        private static string AgencyBaseUrl = string.Empty;
-        private string FilePath = string.Empty;
         private readonly ApplicationDbContext _context;
         private readonly ISmsService smsService;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -71,12 +58,9 @@ namespace risk.control.system.Services
             this.httpContextAccessor = httpContextAccessor;
             this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
-            FilePath = Path.Combine(webHostEnvironment.WebRootPath, "Templates", "WelcomeTemplate.html");
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
 
-            BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/InsuranceClaims/Summary4Insurer/";
-            AgencyBaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/InsuranceClaims/Summary4Agency/";
             this.userManager = userManager;
             this.userVendorManager = userVendorManager;
         }
@@ -693,7 +677,7 @@ namespace risk.control.system.Services
                 {
                     Role = vendorRole,
                     Agency = claimsInvestigation.Vendor,
-                    Symbol = claimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ? "fa fa-check i-green" : "fa fa-times i-orangered",
+                    Symbol = claimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ? "far fa-thumbs-up i-green" : "far fa-thumbs-down i-orangered",
                     Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
                     Status = claimsInvestigation.SubStatus
                 };
@@ -703,7 +687,7 @@ namespace risk.control.system.Services
                 {
                     Role = managerRole,
                     Company = company,
-                    Symbol = claimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ? "fa fa-check i-green" : "fa fa-times i-orangered",
+                    Symbol = claimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ? "far fa-thumbs-up i-green" : "far fa-thumbs-down i-orangered",
                     Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
                     Status = claimsInvestigation.SubStatus,
                     NotifierUserEmail = senderUserEmail

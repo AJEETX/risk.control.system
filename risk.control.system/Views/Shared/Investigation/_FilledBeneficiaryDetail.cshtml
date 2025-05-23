@@ -18,6 +18,7 @@
     var beneficiaryAddress = $"{Model.Location.Addressline} {Model.Location.District?.Name} {Model.Location.State?.Name} {Model.Location.Country?.Name} {Model.Location.PinCode?.Code}";
     var beneficiaryAgeInYears =$"{(int)(DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
     var imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
+    var map = string.Format(Model.Location?.BeneficiaryLocationMap, "200", "200");
 
 }
 
@@ -84,11 +85,11 @@
                         }
                         else
                         {
-                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Beneficiary Photo" />
+                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER"  title="No Beneficiary Photo" />
                         }
                     </p>
                     <p class="text-muted text-sm">
-                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap" data-toggle="tooltip" title="Display Beneficiary Address on Map" />
+                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Beneficiary Address on Map" />
                     </p>
                 </div>
             </div>

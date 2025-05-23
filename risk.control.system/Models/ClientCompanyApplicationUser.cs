@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using risk.control.system.AppConstant;
+﻿using risk.control.system.AppConstant;
+using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {

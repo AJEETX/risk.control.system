@@ -1,8 +1,4 @@
-﻿using System.Diagnostics.Metrics;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -24,7 +20,7 @@ namespace risk.control.system.Seeds
             var newGlobalSetting = await context.GlobalSettings.AddAsync(globalSetting);
             await context.SaveChangesAsync(null, false);
 
-            var vendors = await VendorSeed.Seed(context, webHostEnvironment,customApiCLient, vendorUserManager);
+            var vendors = await VendorSeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager);
 
             var companies = await CompanyInsurer.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager);
 

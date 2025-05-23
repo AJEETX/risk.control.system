@@ -52,7 +52,7 @@ namespace risk.control.system.Helpers
                !string.IsNullOrWhiteSpace(customerDetail.ContactNumber) &&
                 customerDetail.ContactNumber.Length >= 9 &&
                 customerDetail.PinCodeId > 0 &&
-                customerDetail.DistrictId  > 0 &&
+                customerDetail.DistrictId > 0 &&
                 customerDetail.StateId > 0 &&
                 customerDetail.CountryId > 0 &&
                 !string.IsNullOrWhiteSpace(customerDetail.Addressline) &&

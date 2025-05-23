@@ -1,18 +1,12 @@
-﻿using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
-
 using SmartBreadcrumbs.Attributes;
-
+using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -22,12 +16,12 @@ namespace risk.control.system.Controllers
     public class DistrictController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public DistrictController(ApplicationDbContext context, IToastNotification toastNotification)
+        public DistrictController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: District
@@ -103,7 +97,7 @@ namespace risk.control.system.Controllers
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
 
             var totalRecords = await query.CountAsync();
-            var data = await query
+            var rawData = await query
                 .Skip(start)
                 .Take(length)
                 .Select(p => new
@@ -111,11 +105,21 @@ namespace risk.control.system.Controllers
                     p.DistrictId,
                     p.Code,
                     p.Name,
+                    p.Updated,
                     State = p.State.Name,
                     Country = p.Country.Name
                 })
                 .ToListAsync();
 
+            var data = rawData.Select(p => new
+            {
+                p.DistrictId,
+                p.Code,
+                p.Name,
+                Updated = p.Updated?.ToString("dd-MMM-yyyy HH:mm"),
+                State = p.State,
+                Country = p.Country
+            }).ToList();
             var response = new
             {
                 draw = draw,
@@ -133,7 +137,7 @@ namespace risk.control.system.Controllers
         {
             if (id == 0 || _context.District == null)
             {
-                toastNotification.AddErrorToastMessage("district not found!");
+                notifyService.Error("district not found!");
                 return NotFound();
             }
 
@@ -143,7 +147,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.DistrictId == id);
             if (district == null)
             {
-                toastNotification.AddErrorToastMessage("district not found!");
+                notifyService.Error("district not found!");
                 return NotFound();
             }
 
@@ -156,7 +160,7 @@ namespace risk.control.system.Controllers
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => u.Email == userEmail);
+            var user = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.Email == userEmail);
 
             var district = new District { IsUpdated = !user.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
             return View(district);
@@ -177,10 +181,10 @@ namespace risk.control.system.Controllers
                 district.StateId = district.SelectedStateId;
                 _context.Add(district);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("district created successfully!");
+                notifyService.Success("district created successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            toastNotification.AddErrorToastMessage("district not found!");
+            notifyService.Error("district not found!");
             return Problem();
         }
 
@@ -190,17 +194,17 @@ namespace risk.control.system.Controllers
         {
             if (id == 0 || _context.District == null)
             {
-                toastNotification.AddErrorToastMessage("district not found!");
+                notifyService.Error("district not found!");
                 return NotFound();
             }
 
-            var district = await _context.District.Include(d=>d.Country).Include(d=>d.State).FirstOrDefaultAsync(d => d.DistrictId == id);
+            var district = await _context.District.Include(d => d.Country).Include(d => d.State).FirstOrDefaultAsync(d => d.DistrictId == id);
             if (district == null)
             {
-                toastNotification.AddErrorToastMessage("district not found!");
+                notifyService.Error("district not found!");
                 return NotFound();
             }
-           
+
             return View(district);
         }
 
@@ -213,7 +217,7 @@ namespace risk.control.system.Controllers
         {
             if (id != district.DistrictId)
             {
-                toastNotification.AddErrorToastMessage("district not found!");
+                notifyService.Error("district not found!");
                 return NotFound();
             }
 
@@ -237,7 +241,7 @@ namespace risk.control.system.Controllers
                     throw;
                 }
             }
-            toastNotification.AddWarningToastMessage("district edited successfully!");
+            notifyService.Success("district edited successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -247,7 +251,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1)
             {
-                toastNotification.AddErrorToastMessage("district not found!");
+                notifyService.Error("district not found!");
                 return NotFound();
             }
 
@@ -257,7 +261,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.DistrictId == id);
             if (district == null)
             {
-                toastNotification.AddErrorToastMessage("district not found!");
+                notifyService.Error("district not found!");
                 return NotFound();
             }
 
@@ -271,7 +275,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.District == null)
             {
-                toastNotification.AddErrorToastMessage("district not found!");
+                notifyService.Error("district not found!");
                 return Problem("Entity set 'ApplicationDbContext.District'  is null.");
             }
             var district = await _context.District.FindAsync(id);
@@ -283,7 +287,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("district deleted successfully!");
+            notifyService.Success("district deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

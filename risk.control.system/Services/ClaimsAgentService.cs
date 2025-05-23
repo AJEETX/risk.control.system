@@ -4,9 +4,8 @@ namespace risk.control.system.Services
 {
     public interface IClaimsAgentService
     {
-        Task<AppiCheckifyResponse> PostAgentId(string userEmail, long claimId, string latitude, string longitude, byte[]? image = null);
-        Task<AppiCheckifyResponse> PostFaceId(string userEmail, long claimId, string latitude, string longitude, byte[]? image = null);
-        Task<AppiCheckifyResponse> PostDocumentId(string userEmail, long claimId, string latitude, string longitude, byte[]? image = null);
+        Task<AppiCheckifyResponse> PostAgentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long faceId, string latitude, string longitude, bool isAgent, IFormFile Image);
+        Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long docId, string latitude, string longitude, IFormFile Image);
     }
     public class ClaimsAgentService : IClaimsAgentService
     {
@@ -16,48 +15,47 @@ namespace risk.control.system.Services
         {
             this.agentIdService = agentIdService;
         }
-        public async Task<AppiCheckifyResponse> PostDocumentId(string userEmail, long claimId, string latitude, string longitude, byte[]? image = null)
+        public async Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long docId, string latitude, string longitude, IFormFile Image)
         {
             var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
 
             var data = new DocumentData
             {
+                LocationName = locationName,
+                ReportName = reportName,
                 Email = userEmail,
-                ClaimId = claimId,
-                OcrImage = Convert.ToBase64String(image),
-                OcrLongLat = locationLongLat
+                CaseId = claimId,
+                Image = Image,
+                LocationLatLong = locationLongLat
             };
             var result = await agentIdService.GetDocumentId(data);
             return result;
         }
 
-
-        public async Task<AppiCheckifyResponse> PostFaceId(string userEmail, long claimId, string latitude, string longitude, byte[]? image = null)
+        public async Task<AppiCheckifyResponse> PostAgentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long faceId, string latitude, string longitude, bool isAgent, IFormFile Image)
         {
             var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
-            var data = new FaceData
-            {
-                Email = userEmail,
-                ClaimId = claimId,
-                LocationImage = Convert.ToBase64String(image),
-                LocationLongLat = locationLongLat
-            };
-            var result = await agentIdService.GetFaceId(data);
-            return result;
-        }
 
-        public async Task<AppiCheckifyResponse> PostAgentId(string userEmail, long claimId, string latitude, string longitude, byte[]? image = null)
-        {
-            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
             var data = new FaceData
             {
+                LocationName = locationName,
+                ReportName = reportName,
                 Email = userEmail,
-                ClaimId = claimId,
-                LocationImage = Convert.ToBase64String(image),
-                LocationLongLat = locationLongLat
+                CaseId = claimId,
+                Image = Image,
+                LocationLatLong = locationLongLat
             };
-            var result = await agentIdService.GetAgentId(data);
-            return result;
+            if (isAgent)
+            {
+                var result = await agentIdService.GetAgentId(data);
+                return result;
+            }
+            else
+            {
+                var result = await agentIdService.GetFaceId(data);
+                return result;
+            }
+
         }
     }
 }

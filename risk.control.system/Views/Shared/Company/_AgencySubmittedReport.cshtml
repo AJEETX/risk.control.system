@@ -28,12 +28,13 @@
     </div>
     <div class="card-body pb-0">
         <div class="row">
-            @{
-                <partial name="_AgentSubmittedAgentdReport" model="@Model" />
-                <partial name="_AgentSubmittedDigitalIdReport" model="@Model" />
-                <partial name="_AgentSubmittedDocumentIdReport" model="@Model" />
-            }
 
+            @{
+                var template = Model.ClaimsInvestigation.InvestigationReport.ReportTemplate;
+                template.CaseId = Model.ClaimsInvestigation.Id;
+            }
+            <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
+            <partial name="_Location" model="@template" />
         </div>
         <div class="row">
             <div class="col-12 col-md-6">

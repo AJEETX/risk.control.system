@@ -23,6 +23,8 @@
                         <th>
                             @Html.DisplayNameFor(model => model.Code)
                         </th>
+                        <th>Date Updated</th>
+
                         <th>Edit/ Delete</th>
                     </tr>
                 </thead>
@@ -35,6 +37,9 @@
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Code)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Updated)
                             </td>
                             <td>
                                 <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.CaseEnablerId"><i class="fas fa-puzzle-piece"></i> @Applicationsettings.EDIT</a> &nbsp;

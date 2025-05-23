@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization; // Required for AllowAnonymous
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization; // Required for AllowAnonymous
 using risk.control.system.Data;
 using risk.control.system.Models;
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.AppConstant;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -21,7 +19,7 @@ namespace risk.control.system.Controllers.Api
             this.context = context;
         }
 
-        
+
         [HttpGet("GetInvestigationServicesByInsuranceType")]
         public async Task<IActionResult> GetInvestigationServicesByInsuranceType(string insuranceType)
         {
@@ -33,7 +31,7 @@ namespace risk.control.system.Controllers.Api
             }
             return Ok(services);
         }
-        
+
         [HttpGet("GetStatesByCountryId")]
         public async Task<IActionResult> GetStatesByCountryId(long countryId)
         {

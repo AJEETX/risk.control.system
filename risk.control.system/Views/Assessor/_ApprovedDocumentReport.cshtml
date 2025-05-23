@@ -9,7 +9,7 @@
 
     }
     else if (Model.ClaimsInvestigation.InvestigationReport.PanIdReport?.IdImageLongLat != null && (
-    Model.ClaimsInvestigation.InvestigationReport?.PanIdReport?.DocumentIdImageValid != null && Model.ClaimsInvestigation.InvestigationReport?.PanIdReport?.DocumentIdImageValid == true))
+    Model.ClaimsInvestigation.InvestigationReport?.PanIdReport?.IdImageValid != null && Model.ClaimsInvestigation.InvestigationReport?.PanIdReport?.IdImageValid == true))
     {
         documentIdColor = "progress-bar-green";
         borderColor = "border-success";
@@ -31,7 +31,7 @@
             </div>
             <div class="card-footer text-center">
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                @if (@Model.ClaimsInvestigation.InvestigationReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
+                @if (@Model.ClaimsInvestigation.InvestigationReport?.PanIdReport?.IdImageValid.Value ?? false)
                 {
                         <i class='fas fa-check-circle i-green'></i>
                 }
@@ -101,7 +101,7 @@
                 </div>
                 <p class="text-center">
                     <span class="badge badge-light">Valid : </span>
-                    @if (@Model.ClaimsInvestigation.InvestigationReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
+                    @if (@Model.ClaimsInvestigation.InvestigationReport?.PanIdReport?.IdImageValid.Value ?? false)
                     {
                         <i class='fas fa-check-circle i-green'></i>
                     }

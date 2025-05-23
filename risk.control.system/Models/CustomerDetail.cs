@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using risk.control.system.Helpers;
 using System.ComponentModel.DataAnnotations;
-using Google.Cloud.Vision.V1;
-using risk.control.system.Helpers;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
@@ -87,6 +86,7 @@ namespace risk.control.system.Models
         public string? ProfilePictureUrl { get; set; }
 
         public byte[]? ProfilePicture { get; set; }
+        public string? ProfilePictureExtension { get; set; }
 
         [Display(Name = "Image")]
         [NotMapped]

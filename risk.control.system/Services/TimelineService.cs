@@ -35,7 +35,7 @@ namespace risk.control.system.Services
                 duration = DateTime.Now - lastHistory.StatusChangedAt;
             }
 
-            if(!string.IsNullOrWhiteSpace(subStatus))
+            if (!string.IsNullOrWhiteSpace(subStatus))
             {
                 task.SubStatus = subStatus;
             }

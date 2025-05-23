@@ -1,9 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using risk.control.system.AppConstant;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-using risk.control.system.AppConstant;
-
-using Standard.Licensing;
 
 namespace risk.control.system.Models
 {
@@ -75,6 +72,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Document url")]
         public byte[]? DocumentImage { get; set; } = default!;
+        public string? DocumentImageExtension { get; set; } = default!;
         public string? AddressMapLocation { get; set; }
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }

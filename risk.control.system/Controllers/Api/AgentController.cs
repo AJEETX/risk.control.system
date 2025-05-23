@@ -1,30 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
-using System.Text.RegularExpressions;
-
-using Hangfire;
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using static risk.control.system.AppConstant.Applicationsettings;
+using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -32,13 +18,12 @@ namespace risk.control.system.Controllers.Api
     [ApiController]
     public class AgentController : ControllerBase
     {
-        private Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
         private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         private static string PanTask_id = "pan-card-verification-at-lowest-price.p.rapidapi.com";
         private readonly ApplicationDbContext _context;
+        private readonly ICloneReportService cloneReportService;
         private readonly IHttpClientService httpClientService;
-        private readonly IConfiguration configuration;
         private readonly IAgentIdService agentIdService;
         private readonly IVendorInvestigationService service;
         private readonly ICompareFaces compareFaces;
@@ -48,13 +33,14 @@ namespace risk.control.system.Controllers.Api
         private readonly IBackgroundJobClient backgroundJobClient;
         private readonly ISmsService smsService;
         private readonly IMailService mailboxService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         private static Random randomNumber = new Random();
         private string portal_base_url = string.Empty;
 
         //test PAN FNLPM8635N
-        public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
+        public AgentController(ApplicationDbContext context,
+            ICloneReportService cloneReportService,
+            IHttpClientService httpClientService,
             IConfiguration configuration,
             IAgentIdService agentIdService,
             IVendorInvestigationService service,
@@ -65,12 +51,11 @@ namespace risk.control.system.Controllers.Api
             IFeatureManager featureManager,
             IBackgroundJobClient backgroundJobClient,
             ISmsService SmsService,
-            IMailService mailboxService,
-            IWebHostEnvironment webHostEnvironment)
+            IMailService mailboxService)
         {
             this._context = context;
+            this.cloneReportService = cloneReportService;
             this.httpClientService = httpClientService;
-            this.configuration = configuration;
             this.agentIdService = agentIdService;
             this.service = service;
             this.compareFaces = compareFaces;
@@ -80,7 +65,6 @@ namespace risk.control.system.Controllers.Api
             this.backgroundJobClient = backgroundJobClient;
             smsService = SmsService;
             this.mailboxService = mailboxService;
-            this.webHostEnvironment = webHostEnvironment;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -447,7 +431,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("get")]
-        public async Task<IActionResult> Get(long claimId, string email = "agentx@verify.com")
+        public async Task<IActionResult> Get(long caseId, string email = "agentx@verify.com")
         {
             try
             {
@@ -481,7 +465,7 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
-                    .FirstOrDefault(c => c.Id == claimId);
+                    .FirstOrDefault(c => c.Id == caseId);
 
                 var beneficiary = _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
@@ -489,9 +473,15 @@ namespace risk.control.system.Controllers.Api
                     .Include(c => c.District)
                     .Include(c => c.State)
                     .Include(c => c.Country)
-                    .FirstOrDefault(c => c.InvestigationTaskId == claimId);
+                    .FirstOrDefault(c => c.InvestigationTaskId == caseId);
 
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
+
+                object locations = null;
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
+                {
+                    locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
+                }
 
                 return Ok(
                     new
@@ -537,15 +527,7 @@ namespace risk.control.system.Controllers.Api
                         },
                         InvestigationData = new
                         {
-                            LocationImage = claim?.InvestigationReport?.DigitalIdReport?.IdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.DigitalIdReport?.IdImage)) :
-                            Applicationsettings.NO_PHOTO_IMAGE,
-                            OcrImage = claim?.InvestigationReport?.PanIdReport?.IdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.InvestigationReport?.PanIdReport?.IdImage)) :
-                            Applicationsettings.NO_PHOTO_IMAGE,
-                            OcrData = claim?.InvestigationReport?.PanIdReport?.IdImageData,
-                            LocationLongLat = claim?.InvestigationReport?.DigitalIdReport?.IdImageLongLat,
-                            OcrLongLat = claim?.InvestigationReport?.PanIdReport?.IdImageLongLat,
+                            locations
                         },
                         Remarks = claim?.InvestigationReport?.AgentRemarks,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)
@@ -557,119 +539,169 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(500);
             }
         }
+        [AllowAnonymous]
+        [HttpGet("get-template")]
+        public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email = "agent@verify.com")
+        {
+            try
+            {
+                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
 
-
+                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                var locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(500);
+            }
+        }
         [AllowAnonymous]
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
-
-            if (data == null ||
-                     string.IsNullOrWhiteSpace(data.LocationImage) ||
-                     !data.LocationImage.IsBase64String() ||
-                     string.IsNullOrEmpty(data.LocationLongLat))
+            try
             {
-                return BadRequest();
-            }
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-
-            if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
-            {
-                return Unauthorized("Invalid User !!!");
-            }
-            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
-            {
-                if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
                 {
-                    return StatusCode(401, new { message = "Offboarded Agent." });
+                    return BadRequest();
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+
+                if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
+                var isAgentReportName = data.ReportName == DigitalIdReportType.AGENT_FACE.GetEnumDisplayName();
+                if (isAgentReportName)
+                {
+                    var response = await agentIdService.GetAgentId(data);
+                    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                    return Ok(response);
+                }
+                else
+                {
+                    var response = await agentIdService.GetFaceId(data);
+                    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                    return Ok(response);
                 }
             }
-
-
-            if (data.Type == "0")
+            catch (Exception ex)
             {
-                var response = await agentIdService.GetAgentId(data);
-                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-                return Ok(response);
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, ex.StackTrace);
             }
-            else if (data.Type == "1")
-            {
-                var response = await agentIdService.GetFaceId(data);
-                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-                return Ok(response);
-            }
-            return BadRequest();
         }
 
         [AllowAnonymous]
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
-            if (data == null
-                    || string.IsNullOrWhiteSpace(data.OcrImage)
-                    || !data.OcrImage.IsBase64String()
-                    || string.IsNullOrEmpty(data.OcrLongLat)
-                    )
+            try
             {
-                return BadRequest();
-            }
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-
-            if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
-            {
-                return Unauthorized("Invalid User !!!");
-            }
-            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
-            {
-                if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
                 {
-                    return StatusCode(401, new { message = "Offboarded Agent." });
+                    return BadRequest();
                 }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+
+                if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
+                var response = await agentIdService.GetDocumentId(data);
+                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                return Ok(response);
             }
-            var response = await agentIdService.GetDocumentId(data);
-            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-            return Ok(response);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, ex.StackTrace);
+            }
         }
 
-        //[AllowAnonymous]
-        //[HttpPost("audio")]
-        //public async Task<IActionResult> Audio(AudioData data)
-        //{
-        //    if (data == null)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(Path.GetFileName(data.MediaFile.Name)))
-        //    {
-        //        data.Name = Path.GetFileName(data.MediaFile.Name);
-        //        using (var ds = new MemoryStream())
-        //        {
-        //            data.MediaFile.CopyTo(ds);
-        //            data.Mediabytes = ds.ToArray();
-        //        };
-        //    }
+        [AllowAnonymous]
+        [HttpPost("media")]
+        public async Task<IActionResult> Media(DocumentData data)
+        {
+            try
+            {
+                if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                {
+                    return BadRequest();
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
-        //    var response = await iCheckifyService.GetAudio(data);
-        //    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-        //    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-        //    return Ok(response);
-        //}
+                if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                {
+                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    {
+                        return StatusCode(401, new { message = "Offboarded Agent." });
+                    }
+                }
+                var response = await agentIdService.GetMedia(data);
+                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, ex.StackTrace);
+            }
+        }
 
-        //[AllowAnonymous]
-        //[HttpPost("video")]
-        //public async Task<IActionResult> Video(VideoData data)
-        //{
-        //    if (data == null)
-        //    {
-        //        return BadRequest();
-        //    }
+        [AllowAnonymous]
+        [HttpPost("answers")]
+        public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
+        {
+            try
+            {
+                foreach (var question in Questions)
+                {
+                    if (question.IsRequired && string.IsNullOrEmpty(question.AnswerText))
+                    {
+                        ModelState.AddModelError("", $"Answer required for: {question.QuestionText}");
+                    }
+                }
 
-        //    var response = await iCheckifyService.GetVideo(data);
-
-        //    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-        //    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
-        //    return Ok(response);
-        //}
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Some answers are missing.");
+                }
+                var answerSubmitted = await agentIdService.Answers(locationName, caseId, Questions);
+                if (answerSubmitted)
+                    return Ok(new { success = answerSubmitted });
+                else
+                    return BadRequest("Error in submitting answers");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, ex.StackTrace);
+            }
+        }
 
         [AllowAnonymous]
         [HttpPost("submit")]
@@ -677,7 +709,7 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-                if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || data.ClaimId < 1 || data.BeneficiaryId < 1)
+                if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || data.CaseId < 1)
                 {
                     throw new ArgumentNullException("Argument(s) can't be null");
                 }
@@ -694,10 +726,9 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var (vendor, contract) = await service.SubmitToVendorSupervisor(
-                    data.Email, data.ClaimId, data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
+                var (vendor, contract) = await service.SubmitToVendorSupervisor(data.Email, data.CaseId, data.Remarks);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, portal_base_url));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.CaseId, portal_base_url));
 
                 return Ok(new { data, Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId) });
             }

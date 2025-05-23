@@ -1,23 +1,16 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-
-using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
 using System.Globalization;
-using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Controllers.Api.Claims;
-using Microsoft.AspNetCore.Hosting;
-using System.Linq.Expressions;
-using Google.Api;
+using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Company
 {
@@ -58,15 +51,15 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetReport")]
         public async Task<IActionResult> GetReport()
         {
-            var user = HttpContext.User.Identity.Name;
-            if (string.IsNullOrEmpty(user))
+            var userEmail = HttpContext.User.Identity.Name;
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return BadRequest("User identity is missing.");
             }
 
             var companyUser = await _context.ClientCompanyApplicationUser
                 .Include(c => c.Country)
-                .FirstOrDefaultAsync(u => u.Email == user);
+                .FirstOrDefaultAsync(u => u.Email == userEmail);
 
             if (companyUser == null)
             {
@@ -75,7 +68,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             // Fetching the statuses once
             var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
-            
+
             var finishStatus = CONSTANTS.CASE_STATUS.FINISHED;
 
             if (approvedStatus == null || finishStatus == null)
@@ -142,9 +135,10 @@ namespace risk.control.system.Controllers.Api.Company
                 Agency = a.Vendor?.Name,
                 OwnerDetail = $"data:image/*;base64,{Convert.ToBase64String(a.Vendor.DocumentImage)}",
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
-                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                 Distance = a.SelectedAgentDrivingDistance,
-                Duration = a.SelectedAgentDrivingDuration
+                Duration = a.SelectedAgentDrivingDuration,
+                CanDownload = CanDownload(a.Id, userEmail)
             }).ToList();
 
             return Ok(response);
@@ -266,12 +260,26 @@ namespace risk.control.system.Controllers.Api.Company
                 OwnerDetail = $"data:image/*;base64,{Convert.ToBase64String(a.Vendor.DocumentImage)}",
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
-                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                 Distance = a.SelectedAgentDrivingDistance,
-                Duration = a.SelectedAgentDrivingDuration
+                Duration = a.SelectedAgentDrivingDuration,
+                CanDownload = CanDownload(a.Id, userEmail)
             }).ToList();
 
             return Ok(response);
+        }
+
+
+        private bool CanDownload(long id, string userEmail)
+        {
+            var tracker = _context.PdfDownloadTracker
+                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == userEmail);
+            bool canDownload = true;
+            if (tracker != null && tracker.DownloadCount > 3)
+            {
+                canDownload = false;
+            }
+            return canDownload;
         }
     }
 }

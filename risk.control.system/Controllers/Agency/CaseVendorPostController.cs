@@ -1,26 +1,15 @@
-﻿using System.Net;
-using System.Web;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Hangfire;
-
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Extensions;
-
-using NToastNotify;
-
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
+using System.Net;
+using System.Web;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Agency
@@ -74,7 +63,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendorAgent = _context.VendorApplicationUser.Include(a=>a.Vendor).FirstOrDefault(c => c.Id.ToString() == selectedcase);
+                var vendorAgent = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Id.ToString() == selectedcase);
                 if (vendorAgent == null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
@@ -91,7 +80,7 @@ namespace risk.control.system.Controllers.Agency
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                backgroundJobClient.Enqueue(()=> mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, baseUrl));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, baseUrl));
 
                 notifyService.Custom($"Case #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
@@ -118,21 +107,9 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = model.ClaimsInvestigation.Id });
                 }
-                var answers = model.QuestionFormViewModel.Answers;
-
-                var questinAnswer = new List<string>();
-                foreach (var answer in answers)
-                {
-                    var questionAnswer = GetSelectedOptionText(model, answer.Key);
-                    questinAnswer.Add(questionAnswer);
-                }
 
                 var (vendor, contract) = await vendorInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
-                    WebUtility.HtmlDecode(remarks),
-                    WebUtility.HtmlDecode(questinAnswer[0]),
-                    WebUtility.HtmlDecode(questinAnswer[1]),
-                    WebUtility.HtmlDecode(questinAnswer[2]),
-                    WebUtility.HtmlDecode(questinAnswer[3]));
+                    WebUtility.HtmlDecode(remarks));
                 if (vendor == null)
                 {
                     notifyService.Error("OOPs !!!..Error submitting.");
@@ -159,12 +136,12 @@ namespace risk.control.system.Controllers.Agency
         {
             var question = model.QuestionFormViewModel.Questions.FirstOrDefault(q => q.Id == questionId);
             if (question == null) return "N/A";
-            if(question.QuestionType == "text")
+            if (question.QuestionType == "text")
                 return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
 
-            if(question.QuestionType == "file")
+            if (question.QuestionType == "file")
                 return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
-            if(question.QuestionType == "date")
+            if (question.QuestionType == "date")
                 return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
             if (question.QuestionType == "checkbox")
                 return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";

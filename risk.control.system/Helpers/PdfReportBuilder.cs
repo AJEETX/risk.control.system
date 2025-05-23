@@ -1,13 +1,10 @@
-﻿using System.Globalization;
-
-using Gehtsoft.PDFFlow.Builder;
+﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Models.Shared;
 using Gehtsoft.PDFFlow.UserUtils;
 using Gehtsoft.PDFFlow.Utils;
-
 using risk.control.system.Models.ViewModel;
-using risk.control.system.AppConstant;
+using System.Globalization;
 
 namespace risk.control.system.Helpers
 {
@@ -68,9 +65,9 @@ namespace risk.control.system.Helpers
             imgPath = imagePath;
             DocumentBuilder documentBuilder = DocumentBuilder.New();
             var concertSection = documentBuilder.AddSection();
-            IdInfo[,] photoItems = GetPhotoItems();
-            IdInfo[,] panItems = GetPanItems();
-            IdInfo[,] agentItems = GetAgentItems();
+            IdInfo[,] photoItems = GetPhotoItems(PhotoIdData);
+            IdInfo[,] panItems = GetPanItems(PanData);
+            IdInfo[,] agentItems = GetAgentItems(AgentIdData);
 
             concertSection
                  .SetOrientation(Orientation)
@@ -125,9 +122,9 @@ namespace risk.control.system.Helpers
 
             var row3Builder = infoTable.AddRow();
             FillAgentRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
-            
+
             //FillAssessorRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
-            
+
             FillReportSummaryule(row3Builder.AddCell("", 2, 0).SetFont(FNT10));
 
             var row4Builder = infoTable.AddRow();
@@ -162,8 +159,8 @@ namespace risk.control.system.Helpers
                 .AddImage(DetailedReport.InsurerLogo).SetHeight(100);
             FillTitle(row6Builder.AddCell());
             FillPersonalInfoCounterFoil(row6Builder.AddCell());
-            row6Builder.AddCell()
-                .AddQRCodeUrl(DetailedReport.ReportQr, 4, Color.Black, Color.White, false).SetWidth(153);
+            //row6Builder.AddCell()
+            //    .AddQRCodeUrl(DetailedReport.ReportQr, 4, Color.Black, Color.White, false).SetWidth(153);
 
             var row7Builder = counterFoil.AddRow();
             row7Builder.AddCell();
@@ -196,9 +193,9 @@ namespace risk.control.system.Helpers
                .AddParagraph(DetailedReport.AgencyNameTitle);
             cellBuilder
                 .AddParagraph("").SetLineSpacing(1.5f).AddUrl(AgencyDetailData.AgencyDomain);
-            cellBuilder
-                .AddQRCodeUrl(DetailedReport.ReportQr, 4,
-                              Color.Black, Color.White, false).SetHeight(100);
+            //cellBuilder
+            //    .AddQRCodeUrl(DetailedReport.ReportQr, 4,
+            //                  Color.Black, Color.White, false).SetHeight(100);
         }
 
         private void FillAgentRemarks(int start, int end, TableCellBuilder cellBuilder)
@@ -411,100 +408,100 @@ namespace risk.control.system.Helpers
         }
 
 
-        private IdInfo[,] GetAgentItems()
+        private IdInfo[,] GetAgentItems(IdData agentIdData)
         {
             IdInfo[,] result =
             {
                 {
                 new IdInfo("Investigation Type", FNT15,
-                    AgentIdData.Passenger, 4),
+                    agentIdData.Passenger, 4),
                     EMPTY_ITEM,
                     EMPTY_ITEM,
                     EMPTY_ITEM
                 },
                 {
                 new IdInfo("Agent Name", new FontText[] {
-                    new FontText (FNT12, AgentIdData.PersonName + " / "),
-                    new FontText (FNT12B, AgentIdData.Salutation)
+                    new FontText (FNT12, agentIdData.PersonName + " / "),
+                    new FontText (FNT12B, agentIdData.Salutation)
                 }, 2),
                 EMPTY_ITEM,
                 new IdInfo("Address Visited", new FontText[] {
-                    new FontText (FNT12, AgentIdData.ArrivalAirport + " / "),
-                    new FontText (FNT12B, AgentIdData.ArrivalAbvr)
+                    new FontText (FNT12, agentIdData.ArrivalAirport + " / "),
+                    new FontText (FNT12B, agentIdData.ArrivalAbvr)
                 }, 2),
                 EMPTY_ITEM
                 },
                 {
-                new IdInfo("Match", AgentIdData.MatchFont, AgentIdData.FaceMatchStatus),
-                new IdInfo("Photo", FNT16, "",AgentIdData.PhotoIdPath),
+                new IdInfo("Match", agentIdData.MatchFont, agentIdData.FaceMatchStatus),
+                new IdInfo("Photo", FNT16, "",agentIdData.PhotoIdPath),
                 new IdInfo("", FNT16, ""),
-                new IdInfo("Status", AgentIdData.MatchFont, "", AgentIdData.StatusImagePath)
+                new IdInfo("Status", agentIdData.MatchFont, "", agentIdData.StatusImagePath)
                 },
                 {
                 new IdInfo("Visit Date", FNT16,
-                    AgentIdData.PhotoIdTime.ToString(
+                    agentIdData.PhotoIdTime.ToString(
                                 "dd MMMM", DocumentLocale)),
                 new IdInfo("Time", FNT16,
-                    AgentIdData.BoardingTill.ToString(
+                    agentIdData.BoardingTill.ToString(
                                 "HH:mm", DocumentLocale)),
                 new IdInfo("", FNT16, ""),
                 new IdInfo("Weather", FNT8,
-                    AgentIdData.WeatherData)
+                    agentIdData.WeatherData)
                 }
             };
             return result;
         }
-        private IdInfo[,] GetPhotoItems()
+        private IdInfo[,] GetPhotoItems(IdData photoIdData)
         {
             IdInfo[,] result =
             {
                 {
                 new IdInfo("Investigation Type", FNT15,
-                    PhotoIdData.Passenger, 4),
+                    photoIdData.Passenger, 4),
                     EMPTY_ITEM,
                     EMPTY_ITEM,
                     EMPTY_ITEM
                 },
                 {
                 new IdInfo("Person Name", new FontText[] {
-                    new FontText (FNT12, PhotoIdData.PersonName + " / "),
-                    new FontText (FNT12B, PhotoIdData.Salutation)
+                    new FontText (FNT12, photoIdData.PersonName + " / "),
+                    new FontText (FNT12B, photoIdData.Salutation)
                 }, 2),
                 EMPTY_ITEM,
                 new IdInfo("Address Visited", new FontText[] {
-                    new FontText (FNT12, PhotoIdData.ArrivalAirport + " / "),
-                    new FontText (FNT12B, PhotoIdData.ArrivalAbvr)
+                    new FontText (FNT12, photoIdData.ArrivalAirport + " / "),
+                    new FontText (FNT12B, photoIdData.ArrivalAbvr)
                 }, 2),
                 EMPTY_ITEM
                 },
                 {
-                new IdInfo("Match", PhotoIdData.MatchFont, PhotoIdData.FaceMatchStatus),
-                new IdInfo("Photo", FNT16, "",PhotoIdData.PhotoIdPath),
+                new IdInfo("Match", photoIdData.MatchFont, photoIdData.FaceMatchStatus),
+                new IdInfo("Photo", FNT16, "",photoIdData.PhotoIdPath),
                 new IdInfo("", FNT16, ""),
-                new IdInfo("Status", PhotoIdData.MatchFont, "", PhotoIdData.StatusImagePath)
+                new IdInfo("Status", photoIdData.MatchFont, "", photoIdData.StatusImagePath)
                 },
                 {
                 new IdInfo("Visit Date", FNT16,
-                    PhotoIdData.PhotoIdTime.ToString(
+                    photoIdData.PhotoIdTime.ToString(
                                 "dd MMMM", DocumentLocale)),
                 new IdInfo("Time", FNT16,
-                    PhotoIdData.BoardingTill.ToString(
+                    photoIdData.BoardingTill.ToString(
                                 "HH:mm", DocumentLocale)),
                 new IdInfo("", FNT16, ""),
                 new IdInfo("Weather", FNT8,
-                    PhotoIdData.WeatherData)
+                    photoIdData.WeatherData)
                 }
             };
             return result;
         }
 
-        private IdInfo[,] GetPanItems()
+        private IdInfo[,] GetPanItems(IdData panData)
         {
             IdInfo[,] result =
             {
                 {
                 new IdInfo("Investigation Type", FNT15,
-                    PanData.Passenger, 4),
+                    panData.Passenger, 4),
                     EMPTY_ITEM,
                     EMPTY_ITEM,
                     EMPTY_ITEM
@@ -512,31 +509,31 @@ namespace risk.control.system.Helpers
                 {
                 new IdInfo("Document Name", new FontText[] {
                     new FontText (FNT12, " / "),
-                    new FontText (FNT12B, PanData.Salutation)
+                    new FontText (FNT12B, panData.Salutation)
                 }, 2),
                 EMPTY_ITEM,
                 new IdInfo("Address Visited", new FontText[] {
-                    new FontText (FNT12, PanData.ArrivalAirport + " / "),
-                    new FontText (FNT12B, PanData.ArrivalAbvr)
+                    new FontText (FNT12, panData.ArrivalAirport + " / "),
+                    new FontText (FNT12B, panData.ArrivalAbvr)
                 }, 2),
                 EMPTY_ITEM
                 },
                 {
-                new IdInfo("Match", PanData.MatchFont, PanData.FaceMatchStatus),
-                new IdInfo("Image", FNT16, "", PanData.PanPhotoPath),
+                new IdInfo("Match", panData.MatchFont, panData.FaceMatchStatus),
+                new IdInfo("Image", FNT16, "", panData.PanPhotoPath),
                 new IdInfo("", FNT16, " "),
-                new IdInfo("Status", PanData.MatchFont,"", PanData.StatusImagePath)
+                new IdInfo("Status", panData.MatchFont,"", panData.StatusImagePath)
                 },
                 {
                 new IdInfo("Visit Date", FNT16,
-                    PanData.PhotoIdTime.ToString(
+                    panData.PhotoIdTime.ToString(
                                 "dd MMMM", DocumentLocale)),
                 new IdInfo("Time", FNT16,
-                    PanData.BoardingTill.ToString(
+                    panData.BoardingTill.ToString(
                                 "HH:mm", DocumentLocale)),
                 new IdInfo("", FNT16, ""),
                 new IdInfo("Pan Scanned Info", FNT8,
-                    PanData.WeatherData)
+                    panData.WeatherData)
                 }
             };
             return result;

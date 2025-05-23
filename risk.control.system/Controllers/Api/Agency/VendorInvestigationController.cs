@@ -1,22 +1,14 @@
-﻿using System.Globalization;
-using System.Security.Claims;
-
-using Google.Api;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-
+using System.Security.Claims;
 using static risk.control.system.AppConstant.Applicationsettings;
-using static risk.control.system.Helpers.Permissions;
-
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Agency
@@ -67,13 +59,13 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(p => p.District)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(p => p.State)
-                .Where(a=> a.Status == CONSTANTS.CASE_STATUS.INPROGRESS)
-                .Where(a=> a.VendorId == vendorUser.VendorId)
-                .Where(a => (a.AllocatingSupervisordEmail == currentUserEmail) && 
-                            (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ))
-                .Where(a => (a.SubmittingSupervisordEmail == currentUserEmail) &&
+                .Where(a => a.Status == CONSTANTS.CASE_STATUS.INPROGRESS)
+                .Where(a => a.VendorId == vendorUser.VendorId)
+                .Where(a => (a.AllocatingSupervisordEmail == currentUserEmail &&
+                            a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT) ||
+                            ((a.SubmittingSupervisordEmail == currentUserEmail) &&
                             (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
-                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)).ToListAsync();
+                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR))).ToListAsync();
             }
             else
             {
@@ -93,7 +85,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(p => p.District)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(p => p.State)
-                .Where(a=> a.Status == CONSTANTS.CASE_STATUS.INPROGRESS)
+                .Where(a => a.Status == CONSTANTS.CASE_STATUS.INPROGRESS)
                 .Where(a => a.VendorId == vendorUser.VendorId &&
                             (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
@@ -126,7 +118,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ? "<span class=\"badge badge-danger\"><i class=\"fas fa-exclamation-triangle\"></i></span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = GetTimeElapsed(a),
-                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                 Distance = a.SelectedAgentDrivingDistance,
                 Duration = a.SelectedAgentDrivingDuration
             })?.ToList();
@@ -203,7 +195,7 @@ namespace risk.control.system.Controllers.Api.Agency
             var allocated2agent = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
 
             return (a.SubStatus == allocated2agent);
-            
+
         }
         private string GetOwnerEmail(InvestigationTask a)
         {
@@ -302,13 +294,13 @@ namespace risk.control.system.Controllers.Api.Agency
                     // Fetch weather data for HEALTH claims
                     claim.CustomerDetail.AddressLocationInfo = await UpdateWeatherDataAsync(double.Parse(claim.CustomerDetail.Latitude), double.Parse(claim.CustomerDetail.Longitude));
                 }
-                else if (claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM&& claim.BeneficiaryDetail != null)
+                else if (claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM && claim.BeneficiaryDetail != null)
                 {
                     // Fetch weather data for DEATH claims
                     claim.BeneficiaryDetail.AddressLocationInfo = await UpdateWeatherDataAsync(double.Parse(claim.BeneficiaryDetail.Latitude), double.Parse(claim.BeneficiaryDetail.Longitude));
                 }
             }
-            
+
             var response = claims.Select(a => new ClaimsInvestigationAgencyResponse
             {
                 Id = a.Id,
@@ -339,7 +331,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds,
                 IsNewAssigned = a.IsNewAssignedToAgency,
                 IsQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR,
-                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap,
+                PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
+                string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") : string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400"),
                 AddressLocationInfo = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.AddressLocationInfo : a.BeneficiaryDetail.AddressLocationInfo
             }).ToList();
             // Mark claims as viewed
@@ -375,12 +368,10 @@ namespace risk.control.system.Controllers.Api.Agency
         private string GetSupervisorNewTimePending(InvestigationTask a)
         {
             DateTime timeToCompare = a.AllocatedToAgencyTime.Value;
-            
-            var allocated2agency = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
 
             var requested2agency = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
             //1. All new case
-            if (a.SubStatus  == requested2agency)
+            if (a.SubStatus == requested2agency)
             {
                 timeToCompare = a.EnquiredByAssessorTime.GetValueOrDefault();
             }
@@ -443,7 +434,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(p => p.District)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(p => p.State)
-                .Where(a => a.VendorId == vendorUser.VendorId && 
+                .Where(a => a.VendorId == vendorUser.VendorId &&
                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
             var responseData = await claims.ToListAsync();
             var response = responseData.Select(a =>
@@ -477,7 +468,7 @@ namespace risk.control.system.Controllers.Api.Agency
                             a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
                     IsNewAssigned = a.IsNewSubmittedToAgency,
-                    PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 }).ToList();
@@ -555,7 +546,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(p => p.State)
                 .Where(a => a.VendorId == agencyUser.VendorId && a.Status == finishedStatus && (a.SubStatus == approvedStatus || a.SubStatus == rejectedStatus));
 
-            if(agencyUser.Role.ToString() == AppRoles.SUPERVISOR.ToString())
+            if (agencyUser.Role.ToString() == AppRoles.SUPERVISOR.ToString())
             {
                 claims = claims
                     .Where(a => a.SubmittedAssessordEmail == currentUserEmail);
@@ -592,15 +583,27 @@ namespace risk.control.system.Controllers.Api.Agency
                                     "<span class=\"badge badge-danger\"><i class=\"fas fa-exclamation-triangle\"></i></span>" :
                                     a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
-                    PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
-                    Duration = a.SelectedAgentDrivingDuration
+                    Duration = a.SelectedAgentDrivingDuration,
+                    CanDownload = CanDownload(a.Id, userEmail)
                 })
                 .ToList();
 
             return Ok(response);
         }
 
+        private bool CanDownload(long id, string userEmail)
+        {
+            var tracker = _context.PdfDownloadTracker
+                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == userEmail);
+            bool canDownload = true;
+            if (tracker != null && tracker.DownloadCount > 3)
+            {
+                canDownload = false;
+            }
+            return canDownload;
+        }
         private string GetSupervisorCompletedTimePending(InvestigationTask a)
         {
             DateTime timeToCompare = a.ProcessedByAssessorTime.Value;

@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using CsvHelper.Configuration.Attributes;
 using System.ComponentModel.DataAnnotations;
-using CsvHelper.Configuration.Attributes;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models.ViewModel
 {
-    public class IpApiResponse:BaseEntity
+    public class IpApiResponse : BaseEntity
     {
         [Ignore]
         [Key]

@@ -111,21 +111,15 @@
                 }
             },
             {
-                "data": "country",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
-                }
-            },
-            {
                 "data": "caseCount",
                 "mRender": function (data, type, row) {
                     let statusText = row.hasService
-                        ? '<span class="text-success fw-bold small">SERVICE AVAILABLE</span>'
-                        : '<span class="i-red fw-bold small">NO SERVICE AVAILABLE</span>';
+                        ? '<span class="text-success fw-bold small"> <i class="fas fa-check-circle i-green"></i></span>'
+                        : '<span class="i-red fw-bold small"> <i class="fa fa-times i-grey></i></span>';
 
                     let tooltipText = row.hasService
                         ? 'SERVICE AVAILABLE\r\n  Total number of current cases = ' + row.caseCount
-                        : 'NO SERVICE AVAILABLE\r\n Total number of current cases = ' + row.caseCount;
+                        : ' NO SERVICE AVAILABLE\r\n Total number of current cases = ' + row.caseCount;
 
                     return `
             <span data-toggle="tooltip" data-html="true" title="${tooltipText}">

@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
-using NToastNotify;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -33,7 +31,6 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IToastNotification toastNotification;
         private readonly IFeatureManager featureManager;
 
         public VendorApplicationUsersController(ApplicationDbContext context,
@@ -43,8 +40,7 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             IFeatureManager featureManager,
             ISmsService SmsService,
-            IWebHostEnvironment webHostEnvironment,
-            IToastNotification toastNotification)
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.userManager = userManager;
@@ -53,7 +49,6 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
-            this.toastNotification = toastNotification;
             this.featureManager = featureManager;
         }
 
@@ -76,7 +71,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorApplicationUser = await _context.VendorApplicationUser
                     .Include(v => v.Country)
                     .Include(v => v.District)
@@ -116,9 +111,9 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
-                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
-                var model = new VendorApplicationUser {Country = vendor.Country, Vendor = vendor };
+
+                var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
+                var model = new VendorApplicationUser { Country = vendor.Country, Vendor = vendor };
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
                 var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
@@ -141,14 +136,13 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VendorApplicationUser user, string emailSuffix)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (user == null)
                 {
                     notifyService.Error("OOPs !!!..User not found");
@@ -176,6 +170,7 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     user.ProfileImage.CopyTo(dataStream);
                     user.ProfilePicture = dataStream.ToArray();
+                    user.ProfilePictureExtension = fileExtension;
                 }
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 //DEMO
@@ -211,7 +206,7 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    toastNotification.AddErrorToastMessage("Error to create user!");
+                    notifyService.Error("Error to create user!");
                     foreach (IdentityError error in result.Errors)
                         ModelState.AddModelError("", error.Description);
                 }
@@ -233,14 +228,14 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (userId == null || _context.VendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorApplicationUser =await _context.VendorApplicationUser
+                var vendorApplicationUser = await _context.VendorApplicationUser
                     .Include(v => v.Vendor).Include(v => v.Country)?.FirstOrDefaultAsync(v => v.Id == userId);
                 if (vendorApplicationUser == null)
                 {
@@ -269,14 +264,13 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
@@ -294,12 +288,14 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
+                    applicationUser.ProfilePictureExtension = fileExtension;
                 }
 
                 if (user != null)
                 {
                     user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                     user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
                     user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                     user.FirstName = applicationUser?.FirstName;
                     user.LastName = applicationUser?.LastName;
@@ -372,7 +368,7 @@ namespace risk.control.system.Controllers
             VendorApplicationUser user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                toastNotification.AddErrorToastMessage("user not found!");
+                notifyService.Error("user not found!");
                 return NotFound();
             }
             //ViewBag.UserName = user.UserName;
@@ -495,7 +491,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(id);
                 if (vendorApplicationUser == null)
                 {

@@ -77,14 +77,21 @@
                 "data": "pincode",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '</div>';
-                    return img;
+                    if (row.pincodeName != '...') {
+                        return `
+            <div class="map-thumbnail profile-image doc-profile-image">
+                <img src="${row.personMapAddressUrl}" 
+                     class="thumbnail profile-image doc-profile-image preview-map-image" 
+                     data-toggle="modal" 
+                     data-target="#mapModal" 
+                     data-img='${row.personMapAddressUrl}' 
+                     data-title='${row.pincodeName}' />
+            </div>`;
+                    } else {
+                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
+                    }
                 }
             },
-
             {
                 "data": "distance",
                 "mRender": function (data, type, row) {
@@ -103,7 +110,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -114,7 +121,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
                     img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.customer + '" class="table-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -129,7 +136,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
@@ -176,7 +183,9 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a id="details' + row.id + '" href="RejectDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
-                    buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
+                    buttons += (row.canDownload)
+                        ? '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
+                        : '<button class="btn btn-xs btn-secondary" disabled><i class="far fa-file-pdf"></i> limit Reached</button>';
                     return buttons;
                 }
             },
@@ -209,23 +218,32 @@
         }
         table.ajax.reload(null, false); // false => Retains current page
     });
-   table.on('mouseenter', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+    $(document).on('show.bs.modal', '#mapModal', function (event) {
+        var trigger = $(event.relatedTarget); // The <img> clicked
+        var imageUrl = trigger.data('img');
+        var title = trigger.data('title');
 
-            // Set a timeout to show the full map after 1 second
-            hoverTimeout = setTimeout(function () {
-                $this.find('.full-map').show(); // Show full map
-            }, 1000); // Delay of 1 second
-        })
-        .on('mouseleave', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+        var modal = $(this);
+        modal.find('#modalMapImage').attr('src', imageUrl);
+        modal.find('.modal-title').text(title || 'Map Preview');
+    });
+   //table.on('mouseenter', '.map-thumbnail', function () {
+   //         const $this = $(this); // Cache the current element
 
-            // Clear the timeout to cancel showing the map
-            clearTimeout(hoverTimeout);
+   //         // Set a timeout to show the full map after 1 second
+   //         hoverTimeout = setTimeout(function () {
+   //             $this.find('.full-map').show(); // Show full map
+   //         }, 1000); // Delay of 1 second
+   //     })
+   //     .on('mouseleave', '.map-thumbnail', function () {
+   //         const $this = $(this); // Cache the current element
 
-            // Immediately hide the full map
-            $this.find('.full-map').hide();
-        });
+   //         // Clear the timeout to cancel showing the map
+   //         clearTimeout(hoverTimeout);
+
+   //         // Immediately hide the full map
+   //         $this.find('.full-map').hide();
+   //     });
 });
 
 function getdetails(id) {

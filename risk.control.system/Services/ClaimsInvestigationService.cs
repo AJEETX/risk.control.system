@@ -1,24 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Notyf;
-
-using Hangfire;
-
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Company;
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-
-using System.Buffers.Text;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Services
 {
@@ -29,31 +11,11 @@ namespace risk.control.system.Services
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
     {
-        private const string CLAIMS = "claims";
-        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext _context;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IHttpContextAccessor accessor;
-        private readonly IPdfReportService reportService;
-        private readonly IBackgroundJobClient backgroundJobClient;
-        private readonly IProgressService progressService;
-        private readonly ICustomApiCLient customApiCLient;
 
-        public ClaimsInvestigationService(ApplicationDbContext context,
-            IHttpContextAccessor accessor,
-            IPdfReportService reportService,
-            IBackgroundJobClient backgroundJobClient,
-            IProgressService progressService,
-            ICustomApiCLient customApiCLient,
-            IWebHostEnvironment webHostEnvironment)
+        public ClaimsInvestigationService(ApplicationDbContext context)
         {
             this._context = context;
-            this.accessor = accessor;
-            this.reportService = reportService;
-            this.backgroundJobClient = backgroundJobClient;
-            this.progressService = progressService;
-            this.customApiCLient = customApiCLient;
-            this.webHostEnvironment = webHostEnvironment;
         }
         public async Task<bool> SubmitNotes(string userEmail, long claimId, string notes)
         {

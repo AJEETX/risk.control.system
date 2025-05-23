@@ -1,16 +1,4 @@
-﻿using System.Data;
-using System.Globalization;
-using System.IO.Compression;
-using System.Text.RegularExpressions;
-
-using CsvHelper;
-using CsvHelper.Configuration;
-
-using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.AppConstant;
-using risk.control.system.Data;
-using risk.control.system.Models;
+﻿using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
@@ -21,19 +9,13 @@ namespace risk.control.system.Services
     }
     public class UploadService : IUploadService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ICustomApiCLient customApiCLient;
         private readonly IProgressService uploadProgressService;
-        private readonly Regex regex = new Regex("\"(.*?)\"");
-        private const string NO_DATA = "NO DATA";
         private readonly ICaseCreationService _caseCreationService;
 
-        public UploadService(ICaseCreationService caseCreationService, ApplicationDbContext context, ICustomApiCLient customApiCLient,
+        public UploadService(ICaseCreationService caseCreationService,
             IProgressService uploadProgressService)
         {
-            _context = context;
             _caseCreationService = caseCreationService;
-            this.customApiCLient = customApiCLient;
             this.uploadProgressService = uploadProgressService;
         }
 

@@ -1,19 +1,13 @@
-﻿using System.Security.Claims;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
-using AspNetCoreHero.ToastNotification.Notyf;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
+using System.Security.Claims;
 
 namespace risk.control.system.Controllers
 {
@@ -49,7 +43,7 @@ namespace risk.control.system.Controllers
                 }
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
-                if(userRole.Value.Contains(AppRoles.CREATOR.ToString()))
+                if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
                 {
                     var model = dashboardCountService.GetCreatorCount(currentUserEmail, userRole.Value);
                     return View(model);
@@ -97,7 +91,7 @@ namespace risk.control.system.Controllers
 
                     return View();
                 }
-               
+
             }
             catch (Exception ex)
             {

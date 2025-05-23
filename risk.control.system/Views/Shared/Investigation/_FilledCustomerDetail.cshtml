@@ -25,6 +25,7 @@
 
     string beneficiaryProgressbarMessage = beneficiaryExist ? "edit beneficiary" : "beneficiary";
     var imgPath = "/flags/" + @customerDetail.Country.Code.ToLower() + ".png";
+    var map = string.Format(@customerDetail?.CustomerLocationMap, "200", "200");
 }
 
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -70,11 +71,11 @@
                         }
                         else
                         {
-                            <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Customer Photo">
+                            <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER"  title="No Customer Photo">
                         }
                     </p>
                     <p class="text-muted text-sm">
-                        <img id="customerGoogleMap" class="img-fluid block-data" src="@customerDetail?.CustomerLocationMap" data-toggle="tooltip" title="Display Customer Address in map">
+                        <img id="customerGoogleMap" class="img-fluid block-data" src="@map"  title="Display Customer Address in map">
                     </p>
                 </div>
             </div>

@@ -1,22 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using risk.control.system.AppConstant;
-using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Services;
-using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement;
 using risk.control.system.Data;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Helpers;
-using Microsoft.EntityFrameworkCore;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Mobile
 {

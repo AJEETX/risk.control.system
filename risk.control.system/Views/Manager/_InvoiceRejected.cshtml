@@ -15,11 +15,7 @@
                     </span>
                 </span>
             </h3>
-            <div class="card-tools">
-                <span data-toggle="tooltip" title="Billing Info: @Model.ClaimsInvestigation.Vendor.Email" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
-                </span>
-            </div>
+            
         </div>
         <div class="card-body pt-0">
             <div class="row">
@@ -44,7 +40,7 @@
                             <span class="fa-li">
                                 <i class="fas fa-sun"></i>
                             </span>
-                            Total Amount (@ViewBag.Currency) : @Model.VendorInvoice.GrandTotal;
+                            Total Amount (@ViewBag.Currency) : @Model.VendorInvoice.GrandTotal
                         </li>
 
                     </ul>

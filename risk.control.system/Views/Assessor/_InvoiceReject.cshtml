@@ -9,7 +9,7 @@
                     <i class="fas fa-money-check-alt"></i> Billing Info:
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
-                        <span class="tooltip-InsuranceType.GetEnumDisplayName()text" id="information">
+                        <span class="tooltip-text" id="information">
                             <span>
                                 <i class="fas fa-user-check"></i><b> Billing Info: @Model.ClaimsInvestigation.Vendor.Email</b>.
                             </span>
@@ -17,10 +17,7 @@
                         </span>
                     </span>
                 </h3>
-                <div class="card-tools">
-                    <span data-toggle="tooltip" title="Billing Info: @Model.ClaimsInvestigation.Vendor.Email" class="badge badge-light">
-                        <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
-                </div>
+                
             </div>
 
             <div class="card-body">
@@ -46,7 +43,7 @@
                                 <span class="fa-li">
                                     <i class="fas fa-sun"></i>
                                 </span>
-                                Total Amount (@ViewBag.Currency) : @Model.VendorInvoice.GrandTotal;
+                                Total Amount (@ViewBag.Currency) : @Model.VendorInvoice.GrandTotal
                             </li>
 
                         </ul>

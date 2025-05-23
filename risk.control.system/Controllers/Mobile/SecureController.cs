@@ -1,22 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using risk.control.system.AppConstant;
-using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.Services;
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.FeatureManagement;
-using risk.control.system.Data;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
+using risk.control.system.AppConstant;
+using risk.control.system.Data;
+using risk.control.system.Helpers;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
+using System.Security.Claims;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Mobile
 {
@@ -24,13 +18,13 @@ namespace risk.control.system.Controllers.Mobile
     [ApiController]
     public class SecureController : ControllerBase
     {
-        private readonly IConfiguration configuration;
+        private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly ITokenService tokenService;
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
-        private readonly IAccountService accountService;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger _logger;
         private readonly IFeatureManager featureManager;
         private readonly ISmsService smsService;
@@ -40,19 +34,20 @@ namespace risk.control.system.Controllers.Mobile
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             INotificationService service,
-            IConfiguration configuration,
-            IAccountService accountService,
+            IPdfGenerativeService pdfGenerativeService,
+            IWebHostEnvironment webHostEnvironment,
             ILogger<AccountController> logger,
             IFeatureManager featureManager,
             ISmsService SmsService,
-            ApplicationDbContext context, ITokenService tokenService)
+            ApplicationDbContext context,
+            ITokenService tokenService)
         {
-            this.configuration = configuration;
+            this.pdfGenerativeService = pdfGenerativeService;
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.httpContextAccessor = httpContextAccessor;
             this.service = service;
-            this.accountService = accountService;
+            this.webHostEnvironment = webHostEnvironment;
             this._context = context;
             _logger = logger;
             this.featureManager = featureManager;
@@ -247,9 +242,32 @@ namespace risk.control.system.Controllers.Mobile
         [HttpGet("test-sms")]
         public async Task<IActionResult> Sms(string mobile = "61432854196")
         {
-            await SmsService.SendSmsAsync(mobile);
-            return Ok(new { message = "Sms sent!!" });
+            var respone = await SmsService.SendSmsAsync(mobile);
+            return Ok(new { message = respone });
         }
 
+
+        [AllowAnonymous]
+        [HttpGet("pdf")]
+        public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
+        {
+            try
+            {
+                var reportFilename = await pdfGenerativeService.Generate(id, currentUserEmail);
+
+                var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
+                var memory = new MemoryStream();
+                using var stream = new FileStream(ReportFilePath, FileMode.Open);
+                await stream.CopyToAsync(memory);
+                memory.Position = 0;
+                //notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
+                return File(memory, "application/pdf", reportFilename);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing case report");
+                return StatusCode(500, "Internal server error");
+            }
+        }
     }
 }

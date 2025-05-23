@@ -33,21 +33,23 @@
         </li>
         <li class="nav-item">
             <a is-active-page asp-controller="Company" asp-action="CreateUser" class="actual-link nav-link @Url.MakeActiveClass("Company","CreateUser")
-                                    ">
+            ">
                 <i class="fas fa-user-plus nav-icon"></i>
                 <p>
                     Add User
                 </p>
             </a>
         </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="Question" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Question","Index")">
-                <i class="nav-icon fa fa-question"></i>
-                <p>
-                    <span class="badge badge-success">QUESTION <sub>claim</sub></span>
-
-                </p>
-            </a>
-        </li>
+        if(System.Diagnostics.Debugger.IsAttached)
+        {
+            <li class="nav-item">
+                <a is-active-page asp-controller="Question" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Question","Index")">
+                    <i class="nav-icon fa fa-question"></i>
+                    <p>
+                        <span class="badge badge-success">QUESTION <sub>claim</sub></span>
+                    </p>
+                </a>
+            </li>
+        }
     }
 }

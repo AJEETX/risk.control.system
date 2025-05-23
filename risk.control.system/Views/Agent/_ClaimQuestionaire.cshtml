@@ -14,7 +14,7 @@
             <div class="card-header text-muted border-bottom-0">
 
                 <h3 class="card-title">
-                    <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                    <i class="far fa-comment"></i> Remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
@@ -37,7 +37,7 @@
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
                 <div id="questionaire" class="progress-bar @questionaire" role="progressbar">
-                    questionaire
+                    agent remarks
                 </div>
             </div>
             <form id="create-form" asp-controller="CaseVendorPost" asp-action="SubmitReport" method="post">
@@ -46,70 +46,6 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-12 col-md-6">
-                            @for (int i = 0; i < Model.QuestionFormViewModel.Questions.Count; i++)
-                            {
-                                var question = Model.QuestionFormViewModel.Questions[i];
-                                var required = question.IsRequired ? "required" : "";
-
-                                <input type="hidden" name="QuestionFormViewModel.Questions[@i].Id" value="@question.Id" />
-                                <input type="hidden" name="QuestionFormViewModel.Questions[@i].QuestionText" value="@question.QuestionText" />
-                                <input type="hidden" name="QuestionFormViewModel.Questions[@i].QuestionType" value="@question.QuestionType" />
-                                <input type="hidden" name="QuestionFormViewModel.Questions[@i].Options" value="@question.Options" />
-                                <input type="hidden" name="QuestionFormViewModel.Questions[@i].IsRequired" value="@question.IsRequired" />
-
-                                <div class="question-block">
-                                    <label>@question.QuestionText</label>
-                                    @if (question.IsRequired)
-                                    {
-                                        <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
-                                    }
-                                    @if (question.QuestionType == "text")
-                                    {
-                                        <input type="text" name="QuestionFormViewModel.Answers[@question.Id]" class="form-control remarks" placeholder="Enter answer" @required />
-                                    }
-                                    else if (question.QuestionType == "dropdown")
-                                    {
-                                        var options = question.Options?.Split(',') ?? new string[] { "Yes", "No" };
-                                        <select name="QuestionFormViewModel.Answers[@question.Id]" class="form-select form-control remarks" @required>
-                                            <option value="">--- SELECT ---</option>
-                                            @foreach (var option in options)
-                                            {
-                                                <option value="@option">@option</option>
-                                            }
-                                        </select>
-                                    }
-                                    else if (question.QuestionType == "checkbox")
-                                    {
-                                        <input type="checkbox" name="QuestionFormViewModel.Answers[@question.Id]" value="true" class="form-check-input remarks" @required />
-                                        <label class="form-check-label">Select</label>
-                                    }
-                                    else if (question.QuestionType == "date")
-                                    {
-                                        <input max="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" name="QuestionFormViewModel.Answers[@question.Id]" class="form-control remarks date-input pe-5" @required placeholder="@question.QuestionText" @required />
-                                        <button type="button" class="btn btn-sm btn-clear-date" title="Clear date">
-                                            &times;
-                                        </button>
-                                    }
-                                    else if (question.QuestionType == "file")
-                                    {
-                                        <input type="file" name="QuestionFormViewModel.Answers[@question.Id]" class="form-control" />
-                                    }
-                                    else if (question.QuestionType == "radio")
-                                    {
-                                        var options = question.Options?.Split(',') ?? new string[] { "Option 1", "Option 2" };
-                                        foreach (var option in options)
-                                        {
-                                            <div class="form-check  remarks">
-                                            <input type="radio" name="QuestionFormViewModel.Answers[@question.Id]" value="@option" @required/>
-                                                <label class="form-check-label">@option</label>
-                                            </div>
-                                        }
-                                    }
-                                </div>
-                            }
-                        </div>
-                        <div class="col-12 col-md-6">
-                            
                             <div class="form-group">
                                 <span class="input-group-label"> Remarks :</span>
                                 <div class="input-group mb-3">
@@ -121,6 +57,10 @@
                                     <span asp-validation-for="InvestigationReport.AgentRemarks" class="text-danger"></span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            
+                            
                             <div class="col-12 d-flex justify-content-center align-items-center">
                                 <div class="ml-4 mb-0 fa-ul text-muted">
 
@@ -138,20 +78,9 @@
 
                     <div class="text-right">
                         <a id="back" asp-controller="Agent" asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
-                        @if (@Model.InvestigationReport?.AgentIdReport?.IdImageLocationUrl != null && @Model.InvestigationReport?.DigitalIdReport?.IdImageLocationUrl != null && 
-                            @Model.InvestigationReport?.PanIdReport?.IdImageLocationUrl != null)
-                        {
-                            <button disabled id="submit-case" type="submit" class="btn btn-danger">
-                                <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT
-                            </button>
-                        }
-                        else
-                        {
-                            <button disabled id="incomplete-case" type="submit" class="btn btn-danger">
-                                <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT
-                            </button>
-                        }
-
+                        <button disabled id="submit-case" type="submit" class="btn btn-danger">
+                            <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT
+                        </button>
                     </div>
                 </div>
 

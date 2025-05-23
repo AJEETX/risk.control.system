@@ -1,6 +1,4 @@
-﻿using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-
-namespace risk.control.system.Models.ViewModel
+﻿namespace risk.control.system.Models.ViewModel
 {
     public class MapResponse
     {

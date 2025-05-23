@@ -78,7 +78,7 @@
                                             License Type: <b>@Html.DisplayFor(model => model.LicenseType)</b>
                                         </li>
                                         @{
-                                            if (Model.LicenseType == Standard.Licensing.LicenseType.Trial)
+                                            if (Model.LicenseType == LicenseType.Trial)
                                             {
                                                 var expiryDate = Model.ExpiryDate.Value.ToString("dd-MMM-yyyy");
 

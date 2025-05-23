@@ -5,9 +5,9 @@
     font-family: Tahoma;
 }
 
-html{
+/*html{
     min-width:420px;
-}
+}*/
 a.navbar-brand {
     white-space: normal;
     text-align: center;
@@ -1410,7 +1410,10 @@ a#back-button {
     padding: 1rem;
     text-shadow: 4px 4px white;
 }
-
+.agent-block {
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    padding-bottom:5px;
+}
 .review-case {
     color: orange;
     margin: 1rem;
@@ -1653,6 +1656,19 @@ ul#messagesList {
         transform: translateY(-50%);
         color: white; /* Icon color */
     }
+.thumbnail-image {
+    cursor: pointer;
+    max-width: 80px;
+    max-height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.modal-map-image {
+    width: 100%;
+    object-fit: contain;
+}
 
 .map-thumbnail {
     position: relative;
@@ -2847,3 +2863,128 @@ input#checkall {
     .btn-clear-date:hover {
         color: #a71d2a;
     }
+
+.location-card {
+    border: 1px solid #dcdcdc;
+    margin-bottom: 12px;
+    background-color: #fefefe;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: 0.3s ease;
+}
+
+.location-header {
+    padding: 12px 16px;
+    background-color: #e9ecef;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+    .location-header:hover {
+        background-color: #ced4da;
+    }
+.location-title {
+    flex-grow: 1;
+    font-size: 1rem;
+}
+
+.location-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+    .location-badges .badge {
+        padding: 6px 10px;
+    }
+.location-toggle {
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+}
+.location-content {
+    padding: 15px 20px;
+    display: none;
+    margin-left:1em;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.location-card.active .location-content {
+    display: block;
+}
+
+.expand-icon {
+    transition: transform 0.3s ease;
+}
+
+.location-header.active .expand-icon {
+    transform: rotate(180deg);
+}
+
+.location-content h6 {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.location-content ul li {
+    margin-bottom: 1em;
+    margin-left: 1em;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+#liveMap {
+    height: 550px;
+    width: 100%;
+    margin-bottom:3em;
+}
+.loading-effect {
+    filter: blur(2px) grayscale(100%);
+    transition: filter 0.3s ease;
+}
+.equal-height-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollable-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+th.col-verifier-name {
+    width: 12%;
+}
+
+th.col-face-photo {
+    width: 10%;
+}
+
+th.col-pin-img {
+    width: 12%;
+}
+
+th.col-address {
+    width: 28%;
+}
+
+th.col-weather {
+    width: 20%;
+}
+
+th.col-match {
+    width: 8%;
+}
+.media-view {
+    width: 200px;
+    height: auto;
+}

@@ -1,14 +1,9 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using NToastNotify;
-
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -27,36 +22,27 @@ namespace risk.control.system.Controllers
         public List<UsersViewModel> UserList;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
-        private readonly INotificationService service;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
-        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
-        private readonly IToastNotification toastNotification;
 
         public CompanyUserProfileController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             INotyfService notifyService,
-            INotificationService service,
              IHttpContextAccessor httpContextAccessor,
-            RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
-            ISmsService SmsService,
-            IToastNotification toastNotification)
+            ISmsService SmsService)
         {
             this._context = context;
             this.signInManager = signInManager;
             this.notifyService = notifyService;
-            this.service = service;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
-            this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
-            this.toastNotification = toastNotification;
             UserList = new List<UsersViewModel>();
         }
 
@@ -80,7 +66,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         [Breadcrumb("Edit Profile")]
@@ -94,13 +80,13 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u=>u.Id == userId);
+                var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
                 if (clientCompanyApplicationUser == null)
                 {
                     notifyService.Error("USER NOT FOUND");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-               
+
                 return View(clientCompanyApplicationUser);
             }
             catch (Exception ex)
@@ -109,14 +95,13 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         // POST: ClientCompanyApplicationUser/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ClientCompanyApplicationUser applicationUser)
         {
@@ -144,13 +129,15 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
+                    applicationUser.ProfilePictureExtension = fileExtension;
                 }
 
                 if (user != null)
                 {
                     user.Addressline = applicationUser?.Addressline ?? user.Addressline;
                     user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                    user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture ;
+                    user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
+                    user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
                     user.FirstName = applicationUser?.FirstName;
                     user.LastName = applicationUser?.LastName;
                     if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
@@ -197,7 +184,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                if(string.IsNullOrEmpty(userEmail))
+                if (string.IsNullOrEmpty(userEmail))
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -233,7 +220,7 @@ namespace risk.control.system.Controllers
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-                    var admin = _context.ApplicationUser.Include(c=>c.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                    var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                     //var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);
 
@@ -257,7 +244,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"                                       ";
                         failedMessage += $"                                       ";
                         failedMessage += $"{BaseUrl}";
-                        await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode+ admin.PhoneNumber, failedMessage);
+                        await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
                         notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }

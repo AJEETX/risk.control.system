@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +8,6 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api
@@ -26,7 +23,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IUserService userService;
         private readonly IConfiguration config;
 
-        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IUserService userService, IConfiguration config)
+        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IUserService userService, IConfiguration config)
         {
             this._context = context;
             this.userManager = userManager;
@@ -139,7 +136,7 @@ namespace risk.control.system.Controllers.Api
                     await _context.SaveChangesAsync();
                     return Ok(activeUsersDetails);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                     throw;

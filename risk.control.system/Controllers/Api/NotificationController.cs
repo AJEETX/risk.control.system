@@ -1,14 +1,7 @@
-﻿using System.Net.Sockets;
-using System.Net;
-using System.Web;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Extensions;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using risk.control.system.AppConstant;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+using System.Web;
 
 namespace risk.control.system.Controllers.Api
 {

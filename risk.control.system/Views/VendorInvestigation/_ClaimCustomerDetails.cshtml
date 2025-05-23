@@ -5,13 +5,14 @@
     if (Model.ClaimsInvestigation != null)
     {
         address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-       
+
         if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
         {
             var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
             currentAgeinYrs = (int)age / 365;
         }
     }
+    var map = string.Format(Model.ClaimsInvestigation.CustomerDetail.CustomerLocationMap, "400", "400");
 }
 <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
     <div class="card bg-light d-flex flex-fill">
@@ -112,7 +113,7 @@
                         }
                     </p>
                     <p class="text-muted text-sm">
-                        <img id="customerGoogleMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap" data-toggle="tooltip" title="Display Customer Address in map">
+                        <img id="customerGoogleMap" class="img-fluid block-data" src="@map" data-toggle="tooltip" title="Display Customer Address in map">
                     </p>
                 </div>
             </div>

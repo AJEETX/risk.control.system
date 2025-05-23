@@ -18,10 +18,4 @@ namespace risk.control.system.Models.ViewModel
         public string RoleName { get; set; }
         public bool Selected { get; set; }
     }
-
-    public class ManageCompanyUserRolesViewModel
-    {
-        public string CompanyId { get; set; }
-        public IList<CompanyUserRoleViewModel> CompanyUserRoles { get; set; }
-    }
 }

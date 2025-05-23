@@ -1,18 +1,12 @@
-﻿using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
-
 using SmartBreadcrumbs.Attributes;
-
+using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -22,12 +16,12 @@ namespace risk.control.system.Controllers
     public class StateController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public StateController(ApplicationDbContext context, IToastNotification toastNotification)
+        public StateController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: RiskCaseStatus
@@ -38,7 +32,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("State")]
         public IActionResult Profile()
         {
-                return View();
+            return View();
         }
         [HttpGet]
         public async Task<IActionResult> GetStates(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
@@ -109,19 +103,28 @@ namespace risk.control.system.Controllers
 
             // Get total records before filtering
             var totalRecords = await query.CountAsync();
-
+            var rawData = await query
+            .Skip(start)
+            .Take(length)
+            .Select(s => new
+            {
+                s.StateId,
+                s.Name,
+                s.Code,
+                s.Updated,
+                CountryName = s.Country.Name
+            })
+            .ToListAsync();
             // Apply paging
-            var data = await query
-                .Skip(start)
-                .Take(length)
-                .Select(s => new
-                {
-                    s.StateId,
-                    s.Name,
-                    s.Code,
-                    CountryName = s.Country.Name
-                })
-                .ToListAsync();
+            // Now format the datetime in memory
+            var data = rawData.Select(s => new
+            {
+                s.StateId,
+                s.Name,
+                s.Code,
+                Updated = s.Updated?.ToString("dd-MMM-yyyy HH:mm"),
+                s.CountryName
+            });
 
             // Prepare DataTables response
             var response = new
@@ -141,7 +144,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.State == null)
             {
-                toastNotification.AddErrorToastMessage("state not found!");
+                notifyService.Error("state not found!");
                 return NotFound();
             }
 
@@ -149,19 +152,19 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.StateId == id);
             if (state == null)
             {
-                toastNotification.AddErrorToastMessage("state not found!");
+                notifyService.Error("state not found!");
                 return NotFound();
             }
 
             return View(state);
         }
 
-        [Breadcrumb("Add New", FromAction ="Profile")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.Include(u=>u.Country).FirstOrDefault(u => u.Email == userEmail);
+            var user = _context.ApplicationUser.Include(u => u.Country).FirstOrDefault(u => u.Email == userEmail);
 
             if (user.IsSuperAdmin)
             {
@@ -180,7 +183,7 @@ namespace risk.control.system.Controllers
             state.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(state);
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("state created successfully!");
+            notifyService.Success("state created successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -190,14 +193,14 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.State == null)
             {
-                toastNotification.AddErrorToastMessage("state not found!");
+                notifyService.Error("state not found!");
                 return NotFound();
             }
 
             var state = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
             if (state == null)
             {
-                toastNotification.AddErrorToastMessage("state not found!");
+                notifyService.Error("state not found!");
                 return NotFound();
             }
             //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", state.CountryId);
@@ -214,7 +217,7 @@ namespace risk.control.system.Controllers
         {
             if (id != state.StateId)
             {
-                toastNotification.AddErrorToastMessage("state not found!");
+                notifyService.Error("state not found!");
                 return NotFound();
             }
 
@@ -232,12 +235,12 @@ namespace risk.control.system.Controllers
                 {
                     Console.WriteLine(ex.ToString());
                 }
-                toastNotification.AddSuccessToastMessage("state edited successfully!");
+                notifyService.Success("state edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
             //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
-            toastNotification.AddErrorToastMessage("Error to edit state!");
+            notifyService.Error("Error to edit state!");
             return View(state);
         }
 
@@ -245,9 +248,9 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Delete", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
-            if (id < 1  || _context.State == null)
+            if (id < 1 || _context.State == null)
             {
-                toastNotification.AddErrorToastMessage("state not found!");
+                notifyService.Error("state not found!");
                 return NotFound();
             }
 
@@ -255,7 +258,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.StateId == id);
             if (state == null)
             {
-                toastNotification.AddErrorToastMessage("state not found!");
+                notifyService.Error("state not found!");
                 return NotFound();
             }
 
@@ -280,7 +283,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("state deleted successfully!");
+            notifyService.Success("state deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

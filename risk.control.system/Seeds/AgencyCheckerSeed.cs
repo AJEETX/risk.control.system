@@ -1,9 +1,4 @@
-﻿using System.Diagnostics.Metrics;
-
-using Google.Api;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -26,7 +21,7 @@ namespace risk.control.system.Seeds
 
             //CREATE VENDOR COMPANY
 
-            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o=>o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
+            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
             var checkerAddressline = "1, Nice Road";
 
             var states = context.State.Include(s => s.Country).Where(s => s.Country.Code.ToLower() == input.COUNTRY).ToList();
@@ -76,7 +71,7 @@ namespace risk.control.system.Seeds
             var checkerAgency = await context.Vendor.AddAsync(checker);
             await context.SaveChangesAsync(null, false);
             var agencyServices = new List<VendorInvestigationServiceType>();
-            foreach(var state in states)
+            foreach (var state in states)
             {
                 foreach (var service in servicesTypes)
                 {

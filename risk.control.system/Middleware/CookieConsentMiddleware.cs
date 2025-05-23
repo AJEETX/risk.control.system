@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace risk.control.system.Middleware
+﻿namespace risk.control.system.Middleware
 {
     public class CookieConsentMiddleware
     {
