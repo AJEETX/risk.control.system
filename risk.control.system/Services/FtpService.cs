@@ -153,7 +153,7 @@ namespace risk.control.system.Services
 
             try
             {
-                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
                     if (totalClaimsCreated > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
@@ -174,7 +174,7 @@ namespace risk.control.system.Services
                 }
                 var totalAddedAndExistingCount = uploadedClaims.Count + totalClaimsCreated;
                 // License Check (if Trial)
-                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
                     if (totalAddedAndExistingCount > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {

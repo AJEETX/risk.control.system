@@ -1,5 +1,4 @@
 ﻿using risk.control.system.AppConstant;
-using Standard.Licensing;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

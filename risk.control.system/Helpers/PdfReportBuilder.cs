@@ -159,8 +159,8 @@ namespace risk.control.system.Helpers
                 .AddImage(DetailedReport.InsurerLogo).SetHeight(100);
             FillTitle(row6Builder.AddCell());
             FillPersonalInfoCounterFoil(row6Builder.AddCell());
-            row6Builder.AddCell()
-                .AddQRCodeUrl(DetailedReport.ReportQr, 4, Color.Black, Color.White, false).SetWidth(153);
+            //row6Builder.AddCell()
+            //    .AddQRCodeUrl(DetailedReport.ReportQr, 4, Color.Black, Color.White, false).SetWidth(153);
 
             var row7Builder = counterFoil.AddRow();
             row7Builder.AddCell();
@@ -193,9 +193,9 @@ namespace risk.control.system.Helpers
                .AddParagraph(DetailedReport.AgencyNameTitle);
             cellBuilder
                 .AddParagraph("").SetLineSpacing(1.5f).AddUrl(AgencyDetailData.AgencyDomain);
-            cellBuilder
-                .AddQRCodeUrl(DetailedReport.ReportQr, 4,
-                              Color.Black, Color.White, false).SetHeight(100);
+            //cellBuilder
+            //    .AddQRCodeUrl(DetailedReport.ReportQr, 4,
+            //                  Color.Black, Color.White, false).SetHeight(100);
         }
 
         private void FillAgentRemarks(int start, int end, TableCellBuilder cellBuilder)

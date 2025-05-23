@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(u => u.Email == currentUserEmail);
-                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
                     var totalClaimsCreated = context.Investigations.Count(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
                     availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated;

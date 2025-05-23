@@ -60,7 +60,7 @@ namespace risk.control.system.Services
             };
             bool userCanCreate = true;
             int availableCount = 0;
-            var trial = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial;
+            var trial = companyUser.ClientCompany.LicenseType == LicenseType.Trial;
             if (trial)
             {
                 var totalClaimsCreated = context.Investigations.Include(c => c.PolicyDetail).Where(c => !c.Deleted &&

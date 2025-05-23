@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using System.Net;
 using System.Security.Claims;
@@ -77,7 +78,7 @@ namespace risk.control.system.Middleware
                                 context.Response.Redirect("/page/oops.html");
                                 return;
                             }
-                            if (company.LicenseType == Standard.Licensing.LicenseType.Trial && company.ExpiryDate.HasValue && DateTime.Now.Subtract(company.ExpiryDate.Value).Ticks > 0)
+                            if (company.LicenseType == LicenseType.Trial && company.ExpiryDate.HasValue && DateTime.Now.Subtract(company.ExpiryDate.Value).Ticks > 0)
                             {
                                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                                 context.Response.Redirect("/page/trial.html");

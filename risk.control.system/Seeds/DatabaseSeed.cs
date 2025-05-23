@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -20,8 +20,10 @@ namespace risk.control.system.Seeds
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             var customApiCLient = scope.ServiceProvider.GetRequiredService<ICustomApiCLient>();
             var httpAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-            //context.Database.EnsureDeleted();
+
             context.Database.EnsureCreated();
+
+            context.Database.Migrate();
 
             //check for users
             if (context.ApplicationUser.Any())
