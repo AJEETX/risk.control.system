@@ -20,20 +20,14 @@ namespace risk.control.system.Controllers.Company
     public class CaseActiveController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService investigationService;
 
         public CaseActiveController(ApplicationDbContext context,
-            IEmpanelledAgencyService empanelledAgencyService,
-            IFtpService ftpService,
             INotyfService notifyService,
             IInvestigationService investigationService)
         {
             _context = context;
-            this.empanelledAgencyService = empanelledAgencyService;
-            this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.investigationService = investigationService;
         }

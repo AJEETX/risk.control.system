@@ -6,7 +6,6 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 using static risk.control.system.AppConstant.Applicationsettings;
-//using QuestPDF.Fluent;
 namespace risk.control.system.Controllers.Company
 {
     [Breadcrumb(" Cases")]

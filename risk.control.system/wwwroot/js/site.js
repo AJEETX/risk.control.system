@@ -30,6 +30,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+function checkInternetConnection() {
+    if (!navigator.onLine) {
+        $.confirm({
+            title: 'No Internet Connection',
+            content: 'It looks like your internet connection is down. Please check and try again.',
+            type: 'red',
+            buttons: {
+                tryAgain: {
+                    text: 'Retry',
+                    action: function () {
+                        checkInternetConnection(); // Retry check
+                    }
+                },
+                close: function () {
+                    // Do nothing
+                }
+            }
+        });
+    }
+}
 function checkFormCompletion(formSelector, create = false) {
     let isFormComplete = true;
 
@@ -344,6 +364,7 @@ function clearAllNotifications() {
 
 $(document).ready(function () {
 
+    checkInternetConnection();
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -945,5 +966,10 @@ window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
 
 fetchIpInfo();
 
-    // Load notifications on page load WITHOUT keeping it open
-    loadNotifications(false);
+// Load notifications on page load WITHOUT keeping it open
+loadNotifications(false);
+
+// Optional: Listen for offline events
+window.addEventListener('offline', function () {
+    checkInternetConnection();
+});

@@ -19,20 +19,14 @@ namespace risk.control.system.Controllers.Company
     public class CaseUploadController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly IFtpService ftpService;
         private readonly IInvestigationService service;
         private readonly INotyfService notifyService;
 
         public CaseUploadController(ApplicationDbContext context,
-            IEmpanelledAgencyService empanelledAgencyService,
-            IFtpService ftpService,
             IInvestigationService service,
             INotyfService notifyService)
         {
             _context = context;
-            this.empanelledAgencyService = empanelledAgencyService;
-            this.ftpService = ftpService;
             this.service = service;
             this.notifyService = notifyService;
         }

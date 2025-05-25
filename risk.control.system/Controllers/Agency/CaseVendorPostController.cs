@@ -156,8 +156,6 @@ namespace risk.control.system.Controllers.Agency
             return "N/A";
         }
 
-        // Usage
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]

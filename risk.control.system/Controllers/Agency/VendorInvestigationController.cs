@@ -150,7 +150,6 @@ namespace risk.control.system.Controllers.Agency
 
 
         [Breadcrumb("Submit", FromAction = "ClaimReport")]
-
         public async Task<IActionResult> GetInvestigateReport(long selectedcase)
         {
             try

@@ -50,7 +50,7 @@ namespace risk.control.system.Helpers
                 int height = image.Height;
                 return outputStream.ToArray();
             }
-            catch (SixLabors.ImageSharp.UnknownImageFormatException)
+            catch (UnknownImageFormatException)
             {
                 throw new InvalidOperationException("The provided byte array is not a supported image format.");
             }

@@ -184,7 +184,7 @@ public class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            face.IdImageData = "No Weather Data";
+            face.IdImageData = "No Data";
             face.DigitalIdImageMatchConfidence = string.Empty;
             face.IdImageLocationAddress = "No Address data";
             face.ValidationExecuted = true;
@@ -351,7 +351,7 @@ public class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            face.IdImageData = "No Weather Data";
+            face.IdImageData = "No Data";
             face.MatchConfidence = string.Empty;
             face.IdImageLocationAddress = "No Address data";
             face.ValidationExecuted = true;
@@ -518,7 +518,7 @@ public class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            doc.IdImageData = "No Weather Data";
+            doc.IdImageData = "No Data";
             doc.IdImageValid = false;
             doc.IdImageLocationAddress = "No Address data";
             doc.ValidationExecuted = true;
@@ -629,7 +629,7 @@ public class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            media.IdImageData = "No Weather Data";
+            media.IdImageData = "No Data";
             media.IdImageValid = false;
             media.IdImageLocationAddress = "No Address data";
             media.ValidationExecuted = true;
@@ -648,6 +648,7 @@ public class AgentIdService : IAgentIdService
             };
         }
     }
+
     public async Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
     {
         var claim = await _context.Investigations

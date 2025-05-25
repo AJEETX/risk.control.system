@@ -2,10 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Services;
-using System.Globalization;
 using static risk.control.system.AppConstant.Applicationsettings;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
@@ -17,26 +15,14 @@ namespace risk.control.system.Controllers.Api.Company
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class InvestigationController : ControllerBase
     {
-        private const string UNDERWRITING = "underwriting";
-        private const string CLAIMS = "claims";
-        private static CultureInfo hindi = new CultureInfo("hi-IN");
-        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
 
         private readonly ApplicationDbContext _context;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IClaimsService claimsService;
         private readonly IInvestigationService service;
 
-        public InvestigationController(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
-            IInvestigationService service,
-            IClaimsService claimsService)
+        public InvestigationController(ApplicationDbContext context, IInvestigationService service)
         {
-            hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.service = service;
-            this.webHostEnvironment = webHostEnvironment;
-            this.claimsService = claimsService;
         }
 
         [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]

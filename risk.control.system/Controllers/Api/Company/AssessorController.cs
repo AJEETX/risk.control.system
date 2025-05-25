@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using System.Globalization;
 using static risk.control.system.AppConstant.Applicationsettings;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
@@ -19,19 +17,13 @@ namespace risk.control.system.Controllers.Api.Company
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     public class AssessorController : ControllerBase
     {
-        private const string UNDERWRITING = "underwriting";
-        private static CultureInfo hindi = new CultureInfo("hi-IN");
-        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IClaimsService claimsService;
 
-        public AssessorController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IClaimsService claimsService)
+        public AssessorController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
-            hindiNFO.CurrencySymbol = string.Empty;
-            this.claimsService = claimsService;
         }
 
         [HttpGet("Get")]

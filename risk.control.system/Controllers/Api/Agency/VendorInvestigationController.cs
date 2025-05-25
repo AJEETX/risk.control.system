@@ -157,7 +157,6 @@ namespace risk.control.system.Controllers.Api.Agency
         private string GetSupervisorOpenTimePending(InvestigationTask a)
         {
             DateTime timeToCompare = a.TaskToAgentTime.Value;
-            //1. assigned case to agent
             if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
                 timeToCompare = a.TaskToAgentTime.GetValueOrDefault();
@@ -187,7 +186,7 @@ namespace risk.control.system.Controllers.Api.Agency
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
-        private bool IsCaseWithAgent(InvestigationTask a)
+        private static bool IsCaseWithAgent(InvestigationTask a)
         {
             string ownerEmail = string.Empty;
             string ownerDomain = string.Empty;
@@ -351,7 +350,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
             return Ok(response);
         }
-        private string GetPolicyNumForAgency(InvestigationTask a, string enquiryStatus, string allocatedStatus)
+        private static string GetPolicyNumForAgency(InvestigationTask a, string enquiryStatus, string allocatedStatus)
         {
             var claim = a;
             if (claim is not null)
@@ -365,7 +364,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style-none\"></i>");
         }
-        private string GetSupervisorNewTimePending(InvestigationTask a)
+        private static string GetSupervisorNewTimePending(InvestigationTask a)
         {
             DateTime timeToCompare = a.AllocatedToAgencyTime.Value;
 
@@ -487,7 +486,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
             return Ok(response);
         }
-        private string GetSupervisorReportTimePending(InvestigationTask a)
+        private static string GetSupervisorReportTimePending(InvestigationTask a)
         {
             DateTime timeToCompare = a.SubmittedToSupervisorTime.Value;
 
@@ -604,7 +603,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             return canDownload;
         }
-        private string GetSupervisorCompletedTimePending(InvestigationTask a)
+        private static string GetSupervisorCompletedTimePending(InvestigationTask a)
         {
             DateTime timeToCompare = a.ProcessedByAssessorTime.Value;
 

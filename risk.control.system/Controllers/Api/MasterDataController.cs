@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization; // Required for AllowAnonymous
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.Data;

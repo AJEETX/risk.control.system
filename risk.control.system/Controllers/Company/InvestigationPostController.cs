@@ -54,7 +54,6 @@ namespace risk.control.system.Controllers.Company
             this.backgroundJobClient = backgroundJobClient;
         }
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> New(IFormFile postedFile, CreateClaims model)
         {
@@ -143,7 +142,6 @@ namespace risk.control.system.Controllers.Company
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> CreatePolicy(InvestigationTask model)
@@ -192,7 +190,6 @@ namespace risk.control.system.Controllers.Company
         }
 
         [ValidateAntiForgeryToken]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> EditPolicy(long id, InvestigationTask model)
@@ -245,7 +242,6 @@ namespace risk.control.system.Controllers.Company
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> CreateCustomer(CustomerDetail customerDetail)
         {
@@ -297,7 +293,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> EditCustomer(long investigationTaskId, CustomerDetail customerDetail)
@@ -346,7 +341,6 @@ namespace risk.control.system.Controllers.Company
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateBeneficiary(long investigationTaskId, BeneficiaryDetail beneficiary)
         {
@@ -398,7 +392,6 @@ namespace risk.control.system.Controllers.Company
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> EditBeneficiary(long beneficiaryDetailId, BeneficiaryDetail beneficiary)
         {

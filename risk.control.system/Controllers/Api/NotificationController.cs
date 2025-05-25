@@ -14,13 +14,11 @@ namespace risk.control.system.Controllers.Api
         private readonly int maxCountReached = 10;
         private readonly INotificationService service;
         private readonly ISmsService smsService;
-        private readonly IHttpClientService httpClientService;
 
-        public NotificationController(INotificationService service, ISmsService smsService, IHttpClientService httpClientService)
+        public NotificationController(INotificationService service, ISmsService smsService)
         {
             this.service = service;
             this.smsService = smsService;
-            this.httpClientService = httpClientService;
         }
         [HttpPost("ClearAll")]
         public async Task<IActionResult> ClearAllNotifications()

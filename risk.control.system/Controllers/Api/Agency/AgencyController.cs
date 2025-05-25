@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
@@ -10,7 +9,6 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 using System.Collections.Concurrent;
-using System.Globalization;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Agency
@@ -21,31 +19,21 @@ namespace risk.control.system.Controllers.Api.Agency
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class AgencyController : ControllerBase
     {
-        private const string UNDERWRITING = "underwriting";
-        private static CultureInfo hindi = new CultureInfo("hi-IN");
-        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly string noUserImagefilePath = string.Empty;
         private readonly string noDataImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
         private readonly IUserService userService;
         private readonly ICustomApiCLient customApiCLient;
-        private static HttpClient httpClient = new();
 
         public AgencyController(ApplicationDbContext context,
-            UserManager<VendorApplicationUser> userManager,
-            IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
             IUserService userService,
             ICustomApiCLient customApiCLient,
             IDashboardService dashboardService)
         {
-            this.userManager = userManager;
             this.dashboardService = dashboardService;
-            this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
             this.userService = userService;
             this.customApiCLient = customApiCLient;

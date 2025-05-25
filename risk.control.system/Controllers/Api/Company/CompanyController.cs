@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
@@ -9,7 +8,6 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 using System.Data;
-using System.Globalization;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Company
@@ -20,19 +18,13 @@ namespace risk.control.system.Controllers.Api.Company
     [ApiController]
     public class CompanyController : ControllerBase
     {
-        private static CultureInfo hindi = new CultureInfo("hi-IN");
-        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
-        private readonly string noUserImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
         private readonly IUserService userService;
-        private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
-        public CompanyController(ApplicationDbContext context, IUserService userService, UserManager<ClientCompanyApplicationUser> userManager)
+        public CompanyController(ApplicationDbContext context, IUserService userService)
         {
-            this.userManager = userManager;
             _context = context;
             this.userService = userService;
-            noUserImagefilePath = "/img/no-user.png";
         }
 
         [HttpGet("AllCompanies")]
