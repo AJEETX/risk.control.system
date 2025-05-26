@@ -106,7 +106,6 @@ namespace risk.control.system.Services
             };
             return model;
         }
-
         public async Task<InvestigationTask> CreatePolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument)
         {
             try
@@ -150,7 +149,6 @@ namespace risk.control.system.Services
                 return null!;
             }
         }
-
         public async Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument)
         {
             try
@@ -179,7 +177,10 @@ namespace risk.control.system.Services
                     existingPolicy.PolicyDetail.DocumentImage = dataStream.ToArray();
                     claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
                 }
-
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
+                existingPolicy.ReportTemplate = reportTemplate;
+                existingPolicy.ReportTemplateId = reportTemplate.Id;
                 context.Investigations.Update(existingPolicy);
 
                 var saved = await context.SaveChangesAsync() > 0;
@@ -368,7 +369,6 @@ namespace risk.control.system.Services
                 return null;
             }
         }
-
         public async Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument)
         {
             try
@@ -576,7 +576,6 @@ namespace risk.control.system.Services
 
             return model;
         }
-
         public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
         {
             var claim = await context.Investigations
@@ -1216,7 +1215,6 @@ namespace risk.control.system.Services
             return response;
 
         }
-
         public async Task<object> GetManagerActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var companyUser = await context.ClientCompanyApplicationUser
@@ -1418,7 +1416,6 @@ namespace risk.control.system.Services
 
             return response;
         }
-
         private static string GetManagerActiveTimePending(InvestigationTask a)
         {
             if (a.CreatorSla == 0)

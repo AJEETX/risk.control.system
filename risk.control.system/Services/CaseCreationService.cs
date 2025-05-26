@@ -6,7 +6,6 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using System.Globalization;
 using System.IO.Compression;
-using System.Text.RegularExpressions;
 using static risk.control.system.AppConstant.CONSTANTS;
 
 namespace risk.control.system.Services
@@ -14,7 +13,6 @@ namespace risk.control.system.Services
     public interface ICaseCreationService
     {
         Task<InvestigationTask> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model);
-
     }
     public class CaseCreationService : ICaseCreationService
     {
@@ -23,8 +21,6 @@ namespace risk.control.system.Services
         private readonly ICustomApiCLient customApiCLient;
         private readonly ICloneReportService cloneService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly Regex regex = new Regex("\"(.*?)\"");
-        private const string NO_DATA = "NO DATA";
         public CaseCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient, ICloneReportService cloneService, IWebHostEnvironment webHostEnvironment)
         {
             this.context = context;
@@ -33,7 +29,7 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        private bool ValidateDataCase(UploadCase uploadCase)
+        private static bool ValidateDataCase(UploadCase uploadCase)
         {
             if (string.IsNullOrWhiteSpace(uploadCase.CaseId) ||
                 string.IsNullOrWhiteSpace(uploadCase.CustomerName) ||
@@ -381,7 +377,6 @@ namespace risk.control.system.Services
             string extension = Path.GetExtension(filePath)?.ToLower();
             return imageExtensions.Contains(extension);
         }
-
 
         public async Task<InvestigationTask> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model)
         {

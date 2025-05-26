@@ -22,9 +22,9 @@ namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<Models.ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly SignInManager<Models.ApplicationUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration config;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
@@ -36,9 +36,9 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
 
         public AccountController(
-            UserManager<Models.ApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
-            SignInManager<Models.ApplicationUser> signInManager,
+            SignInManager<ApplicationUser> signInManager,
             IConfiguration config,
              IHttpContextAccessor httpContextAccessor,
             INotificationService service,
@@ -660,21 +660,9 @@ namespace risk.control.system.Controllers
 
             return userCount == 0 ? 0 : 1;
         }
-
     }
     public class KeepSessionRequest
     {
         public string CurrentPage { get; set; }
-    }
-    // DTOs
-    public class SendOtpRequest
-    {
-        public string Email { get; set; }
-    }
-
-    public class VerifyOtpRequest
-    {
-        public string Email { get; set; }
-        public string Otp { get; set; }
     }
 }
