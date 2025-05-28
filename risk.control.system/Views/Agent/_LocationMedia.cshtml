@@ -84,7 +84,7 @@
 
 					</td>
 					<td>
-						@if (doc.ValidationExecuted)
+						@if (doc.ValidationExecuted && doc.IdImageLocationUrl != null)
 						{
 							<img id="face-img-@doc.Id"
 								 src="@string.Format(@doc.IdImageLocationUrl, "300","300")"

@@ -55,7 +55,7 @@
 
 			</td>
 			<td>
-				@if (agent.ValidationExecuted)
+				@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
 				{
 					<img src="@string.Format(@agent.IdImageLocationUrl, "400","400")"
 						 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"

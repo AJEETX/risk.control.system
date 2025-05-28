@@ -358,7 +358,7 @@ else
 {
     // Redirect to custom error page in production
     app.UseExceptionHandler("/Home/Error");
-    app.UseStatusCodePagesWithRedirects("/Home/HTTP?statusCode={0}");
+    //app.UseStatusCodePagesWithRedirects("/Home/HTTP?statusCode={0}");
     app.UseHsts();
 }
 
