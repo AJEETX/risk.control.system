@@ -8,10 +8,10 @@
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
 
         <div class="image">
-            @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
+            @if (UserManager.GetUserAsync(User).Result?.ProfilePicture != null)
 
             {
-                <img class="elevation-2 sidebar-profile img-circle" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl" alt="user image">
+                <img class="elevation-2 sidebar-profile img-circle" src="data:image/*;base64,@(Convert.ToBase64String(@UserManager.GetUserAsync(User).Result.ProfilePicture))" alt="user image">
             }
             else
             {
