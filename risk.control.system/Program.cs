@@ -1,13 +1,20 @@
+using System.Net;
+using System.Reflection;
+using System.Text;
+
 using Amazon;
 using Amazon.Rekognition;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.Textract;
 using Amazon.TranscribeService;
+
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
+
 using Hangfire;
 using Hangfire.MemoryStorage;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -20,6 +27,7 @@ using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
@@ -29,10 +37,9 @@ using risk.control.system.Models;
 using risk.control.system.Permission;
 using risk.control.system.Seeds;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Extensions;
-using System.Net;
-using System.Reflection;
-using System.Text;
+
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -181,9 +188,9 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopCenter;
 });
 
-var connectionString = builder.Configuration.GetConnectionString("Database");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite(connectionString));
+                        options.UseSqlServer(connectionString));
 builder.Services.AddHangfire(config => config.UseMemoryStorage());
 builder.Services.AddHangfireServer(options =>
 {
