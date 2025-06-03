@@ -35,7 +35,6 @@ using risk.control.system.Helpers;
 using risk.control.system.Middleware;
 using risk.control.system.Models;
 using risk.control.system.Permission;
-using risk.control.system.Seeds;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Extensions;
@@ -43,6 +42,15 @@ using SmartBreadcrumbs.Extensions;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.ConfigureAppConfiguration((context, config) =>
+{
+    var env = context.HostingEnvironment;
+    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+});
+
+
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
@@ -78,9 +86,9 @@ builder.Services.AddCors(opt =>
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
-    x.MultipartBodyLengthLimit = 20000000; // In case of multipart
-    x.ValueLengthLimit = 20000000; //not recommended value
-    x.MemoryBufferThreshold = 20000000;
+    x.MultipartBodyLengthLimit = 10000000; // In case of multipart
+    x.ValueLengthLimit = 10000000; //not recommended value
+    x.MemoryBufferThreshold = 10000000;
 });
 //builder.Services.AddRateLimiter(_ => _
 //    .AddFixedWindowLimiter(policyName: "fixed", options =>
@@ -345,73 +353,83 @@ builder.Services.AddMvcCore(config =>
     config.Filters.Add(new AuthorizeFilter(policy));
 });
 builder.Services.AddHttpContextAccessor();
-
-var app = builder.Build();
-
-
-app.UseHangfireDashboard("/hangfire", new DashboardOptions
+try
 {
-    Authorization = new[] { new BasicAuthAuthorizationFilter() }
-});
-app.UseMiddleware<RequirePasswordChangeMiddleware>();
-app.UseSwagger();
+    var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    // Show detailed error page for devs
-    app.UseDeveloperExceptionPage();
+
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = new[] { new BasicAuthAuthorizationFilter() }
+    });
+    app.UseMiddleware<RequirePasswordChangeMiddleware>();
+    app.UseSwagger();
+
+    if (app.Environment.IsDevelopment())
+    {
+        // Show detailed error page for devs
+        app.UseDeveloperExceptionPage();
+    }
+    else
+    {
+        // Redirect to custom error page in production
+        app.UseExceptionHandler("/Home/Error");
+        //app.UseStatusCodePagesWithRedirects("/Home/HTTP?statusCode={0}");
+        app.UseHsts();
+    }
+
+    app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
+
+    app.UseHttpsRedirection();
+
+    if (app.Environment.IsDevelopment())
+    {
+        await risk.control.system.Seeds.DatabaseSeed.SeedDatabase(app);
+    }
+
+    app.UseStaticFiles();
+
+    app.UseRouting();
+    //app.UseRateLimiter();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    });
+
+    app.UseMiddleware<CookieConsentMiddleware>();
+
+    app.UseMiddleware<WhitelistListMiddleware>();
+
+    app.UseCors();
+    app.UseCookiePolicy();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.UseMiddleware<LicensingMiddleware>();
+    app.UseMiddleware<UpdateUserLastActivityMiddleware>();
+
+    app.UseNotyf();
+    app.UseFileServer();
+
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Dashboard}/{action=Index}/{id?}");
+
+    RecurringJob.AddOrUpdate<IHangfireJobService>(
+        "clean-failed-jobs",
+        job => job.CleanFailedJobs(),
+        Cron.Hourly // Runs every hour
+    );
+
+    int sessionTimeoutMinutes = int.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]) / 60;
+    //RecurringJob.AddOrUpdate<IdleUserService>(
+    //    "check-idle-users",
+    //    service => service.CheckIdleUsers(),
+    //    $"*/{sessionTimeoutMinutes} * * * *"); // Check every 5 minutes
+
+    app.Run();
 }
-else
+catch (Exception ex)
 {
-    // Redirect to custom error page in production
-    app.UseExceptionHandler("/Home/Error");
-    //app.UseStatusCodePagesWithRedirects("/Home/HTTP?statusCode={0}");
-    app.UseHsts();
+    File.WriteAllText("start.txt", ex.ToString());
+    throw;
 }
-
-app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
-
-app.UseHttpsRedirection();
-
-await DatabaseSeed.SeedDatabase(app);
-
-app.UseStaticFiles();
-
-app.UseRouting();
-//app.UseRateLimiter();
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-});
-
-app.UseMiddleware<CookieConsentMiddleware>();
-
-app.UseMiddleware<WhitelistListMiddleware>();
-
-app.UseCors();
-app.UseCookiePolicy();
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseMiddleware<LicensingMiddleware>();
-app.UseMiddleware<UpdateUserLastActivityMiddleware>();
-
-app.UseNotyf();
-app.UseFileServer();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Dashboard}/{action=Index}/{id?}");
-
-RecurringJob.AddOrUpdate<IHangfireJobService>(
-    "clean-failed-jobs",
-    job => job.CleanFailedJobs(),
-    Cron.Hourly // Runs every hour
-);
-
-int sessionTimeoutMinutes = int.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]) / 60;
-//RecurringJob.AddOrUpdate<IdleUserService>(
-//    "check-idle-users",
-//    service => service.CheckIdleUsers(),
-//    $"*/{sessionTimeoutMinutes} * * * *"); // Check every 5 minutes
-
-app.Run();
