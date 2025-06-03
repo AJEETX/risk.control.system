@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Helpers;
 using risk.control.system.Services;
 
@@ -175,7 +176,9 @@ namespace risk.control.system.Controllers.Agency
             {
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                System.IO.File.AppendAllText("admin.txt", ex.Message + Environment.NewLine);
+                throw ex;
+                //return RedirectToAction(nameof(Index), "Dashboard");
             }
 
         }

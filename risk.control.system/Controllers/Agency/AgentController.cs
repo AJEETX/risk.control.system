@@ -1,9 +1,13 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Helpers;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Agency
@@ -62,9 +66,11 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                System.IO.File.AppendAllText("agent.txt", ex.Message + Environment.NewLine);
+                throw ex;
+                //return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
 
