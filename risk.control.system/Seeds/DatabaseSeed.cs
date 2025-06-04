@@ -94,7 +94,7 @@ namespace risk.control.system.Seeds
             await context.SaveChangesAsync(null, false);
 
 
-            var randomPinCode = filteredAuPincodes.FirstOrDefault();
+            var randomPinCode = filteredInPincodes.FirstOrDefault();
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode.Code);
 

@@ -1,16 +1,19 @@
-﻿using Hangfire;
+﻿using System.ComponentModel.DataAnnotations;
+
+using Hangfire;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -648,6 +651,13 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest();
                 }
+
+                var extension = Path.GetExtension(data.Image.FileName).ToLower();
+
+                var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav" };
+                if (!supportedExtensions.Contains(extension))
+                    return BadRequest("Unsupported media format.");
+
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)

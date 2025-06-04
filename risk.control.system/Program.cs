@@ -196,9 +196,13 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopCenter;
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//                        options.UseSqlServer(connectionString));
+
+var connectionString = builder.Configuration.GetConnectionString("Database");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlServer(connectionString));
+                        options.UseSqlite(connectionString));
 builder.Services.AddHangfire(config => config.UseMemoryStorage());
 builder.Services.AddHangfireServer(options =>
 {
@@ -382,10 +386,7 @@ try
 
     app.UseHttpsRedirection();
 
-    if (app.Environment.IsDevelopment())
-    {
-        await risk.control.system.Seeds.DatabaseSeed.SeedDatabase(app);
-    }
+    await risk.control.system.Seeds.DatabaseSeed.SeedDatabase(app);
 
     app.UseStaticFiles();
 

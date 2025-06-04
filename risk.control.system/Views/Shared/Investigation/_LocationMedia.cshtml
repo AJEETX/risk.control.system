@@ -39,13 +39,11 @@
 					<td>
 						@if (doc.ValidationExecuted)
 						{
-							<div id="doc-img-@doc.Id">
-								@if (doc.IdImage != null)
-								{
-									if (doc.MediaType == MediaType.VIDEO)
+								<div id="doc-img-@doc.Id">
+									@if (doc.MediaType == MediaType.VIDEO)
 									{
 										<video class="media-view" controls>
-											<source src="data:video/@doc.MediaExtension;base64,@Convert.ToBase64String(doc.IdImage)" type="video/@doc.MediaExtension">
+											<source src="@doc.FilePath" type="video/@doc.MediaExtension">
 											Your browser does not support the video tag.
 										</video>
 									}
@@ -55,20 +53,7 @@
 											<source src="data:audio/@doc.MediaExtension;base64,@Convert.ToBase64String(doc.IdImage)" type="audio/@doc.MediaExtension" />
 										</audio>
 									}
-								}
-								else
-								{
-									if (doc.MediaType == MediaType.VIDEO)
-									{
-										<img src="~/img/no-video.png" class="thumbnail profile-image doc-profile-image" />
-									}
-									else{
-										<img src="~/img/no-audio.png" class="thumbnail profile-image doc-profile-image" />
-									}
-
-								}
-							</div>
-
+								</div>
 						}
 						else
 						{

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -73,15 +74,7 @@ namespace risk.control.system.Services
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.BeneficiaryRelation)
                 .Include(c => c.CaseNotes)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.CaseQuestionnaire)
-                .ThenInclude(c => c.Questions)
-                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.PanIdReport)
-                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.AgentIdReport)
+                .Include(t => t.InvestigationReport)
                 .FirstOrDefaultAsync(c => c.Id == selectedcase);
 
             var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
@@ -158,7 +151,6 @@ namespace risk.control.system.Services
                .Include(c => c.CaseMessages)
                .FirstOrDefaultAsync(c => c.Id == selectedcase);
 
-
             var beneficiaryDetails = await _context.BeneficiaryDetail
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
@@ -176,7 +168,6 @@ namespace risk.control.system.Services
 
             beneficiaryDetails.ContactNumber = beneficairyContactMasked;
 
-            var isClaim = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM;
             var templates = await _context.ReportTemplates
                 .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.AgentIdReport)
