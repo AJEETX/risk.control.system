@@ -626,7 +626,7 @@ public class AgentIdService : IAgentIdService
             media.IdImageValid = true;
             media.IdImageLocationAddress = address;
             media.IdImageData = weatherCustomData;
-            media.IdImageLongLat = $"{latitude},{longitude}";
+            media.IdImageLongLat = $"{latitude}/{longitude}";
             media.IdImageLongLatTime = DateTime.UtcNow;
             var mimeType = data.Image.ContentType.ToLower();
 

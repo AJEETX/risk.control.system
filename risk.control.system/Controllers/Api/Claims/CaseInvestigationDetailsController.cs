@@ -484,7 +484,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 if (docReport is not null)
                 {
-                    var longLat = docReport.IdImageLongLat.IndexOf(",");
+                    var longLat = docReport.IdImageLongLat.IndexOf("/");
                     var latitude = docReport.IdImageLongLat.Substring(0, longLat)?.Trim();
                     var longitude = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
