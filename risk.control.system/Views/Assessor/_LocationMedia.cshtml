@@ -50,7 +50,7 @@
 									else if (doc.MediaType == MediaType.AUDIO)
 									{
 										<audio controls>
-											<source src="data:audio/@doc.MediaExtension;base64,@Convert.ToBase64String(doc.IdImage)" type="audio/@doc.MediaExtension" />
+											<source src="@doc.FilePath" type="audio/@doc.MediaExtension" />
 										</audio>
 									}
 								</div>

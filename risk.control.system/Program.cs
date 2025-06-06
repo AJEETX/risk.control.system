@@ -86,9 +86,9 @@ builder.Services.AddCors(opt =>
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
-    x.MultipartBodyLengthLimit = 10000000; // In case of multipart
-    x.ValueLengthLimit = 10000000; //not recommended value
-    x.MemoryBufferThreshold = 10000000;
+    x.MultipartBodyLengthLimit = 20 * 1024 * 1024; // 20 MB
+    //x.ValueLengthLimit = 20000000; //not recommended value
+    //x.MemoryBufferThreshold = 20000000;
 });
 //builder.Services.AddRateLimiter(_ => _
 //    .AddFixedWindowLimiter(policyName: "fixed", options =>

@@ -145,7 +145,7 @@ namespace risk.control.system.Controllers
             var currentUserEmail = HttpContext.User.Identity.Name;
             var extension = Path.GetExtension(Image.FileName).ToLower();
 
-            var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav" };
+            var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
             if (!supportedExtensions.Contains(extension))
                 return Json(new { success = false, message = "Unsupported media format." });
             var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";

@@ -634,10 +634,7 @@ public class AgentIdService : IAgentIdService
             bool isVideo = mimeType.StartsWith("video/") || videoExtensions.Contains(extension);
 
             media.MediaType = isVideo ? MediaType.VIDEO : MediaType.AUDIO;
-            if (!isVideo)
-            {
-                media.IdImage = fileBytes;
-            }
+
             await _context.SaveChangesAsync();
 
             return new AppiCheckifyResponse

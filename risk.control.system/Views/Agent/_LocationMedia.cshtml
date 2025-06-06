@@ -24,7 +24,7 @@
 		<tbody>
 			@foreach (var doc in location.MediaReports.Where(d => d.Selected))
 			{
-				var accept = "audio/mpeg,audio/wav";
+					var accept = "audio/mpeg, audio/wav, audio/aac, audio / vnd.dlna.adts";
 				if(doc.MediaType == MediaType.VIDEO)
 				{
 					accept = "video/mp4,video/webm";
@@ -51,7 +51,7 @@
 									else if (doc.MediaType == MediaType.AUDIO)
 									{
 									<audio controls>
-										<source src="data:audio/@doc.MediaExtension;base64,@Convert.ToBase64String(doc.IdImage)" type="audio/@doc.MediaExtension" />
+											<source src="@doc.FilePath" type="audio/@doc.MediaExtension" />
 									</audio>
 									}
 							</div>
