@@ -42,7 +42,7 @@ namespace risk.control.system.Seeds
                 Password = Password,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
-                Addressline = "453 Main Road",
+                Addressline = "139 Sector 44",
                 PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
                 IsVendorAdmin = false,
                 Country = pinCode.Country,

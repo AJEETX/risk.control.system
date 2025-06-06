@@ -39,7 +39,7 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
-                Addressline = "987 Canterbury Road",
+                Addressline = "139 Sector 44",
                 PhoneNumber = PORTAL_ADMIN_MOBILE,
                 IsVendorAdmin = false,
                 PinCode = pinCode,

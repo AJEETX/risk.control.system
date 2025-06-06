@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -60,25 +61,20 @@ namespace risk.control.system.Seeds
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
 
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
-            //#endif
-            // seed AUSTRALIA
-            var au = countries.FirstOrDefault(c => c.Code.ToLower() == "au");
 
-            int maxRowCountForDebug = 0;
+            //var auPincodes = await PinCodeStateSeed.CsvRead_Au(maxRowCountForDebug);
+            //var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "vic"
+            //    //#if !DEBUG
 
-            var auPincodes = await PinCodeStateSeed.CsvRead_Au(maxRowCountForDebug);
-            var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "vic"
-                //#if !DEBUG
+            //    || s.StateCode.ToLower() == "qld"
+            //    || s.StateCode.ToLower() == "nsw"
+            //    //#endif
 
-                || s.StateCode.ToLower() == "qld"
-                || s.StateCode.ToLower() == "nsw"
-                //#endif
+            //    ).Select(g => g.StateCode).Distinct()?.ToList();
 
-                ).Select(g => g.StateCode).Distinct()?.ToList();
+            //var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
 
-            var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
-
-            await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes, au);
+            //await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes, au);
 
             // seed USA
             //var us = countries.FirstOrDefault(c => c.Code.ToLower() == "us");

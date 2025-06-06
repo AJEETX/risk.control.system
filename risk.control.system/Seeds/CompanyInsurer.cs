@@ -20,13 +20,13 @@ namespace risk.control.system.Seeds
             //#if !DEBUG
             COUNTRY = CONSTANTS.COUNTRY_IN;
             //#endif
-            var canara = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "canara.com", NAME = "Allianz", PHOTO = "/img/chl.jpg" };
+            var canara = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "canara.com", NAME = "Canara", PHOTO = "/img/insurer.jpg" };
 
             var companies = new List<SeedInput> {
                 //allianz
                 //,
-                insurer
-                ,
+                //insurer
+                //,
 //#if !DEBUG
                 canara
 //#endif

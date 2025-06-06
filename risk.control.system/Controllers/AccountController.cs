@@ -1,4 +1,8 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Text;
+using System.Web;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -9,14 +13,13 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Text;
-using System.Web;
 
 namespace risk.control.system.Controllers
 {
@@ -96,7 +99,7 @@ namespace risk.control.system.Controllers
                             CurrentPage = request.CurrentPage,
                         };
                         _context.UserSessionAlive.Add(userSessionAlive);
-                        await _context.SaveChangesAsync();
+                        await _context.SaveChangesAsync(null, false);
                         return Ok(userDetails);
                     }
                 }
@@ -172,8 +175,6 @@ namespace risk.control.system.Controllers
             await Response.Body.FlushAsync(cancellationToken);
         }
 
-
-
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login()
@@ -186,7 +187,8 @@ namespace risk.control.system.Controllers
             var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
             if (showgtrialUsers)
             {
-                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted && !u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
+                var emails = _context.Users.Where(u => !u.Deleted && u.Email != "admin@icheckify.co.in").OrderBy(o => o.Email);
+                ViewData["Users"] = new SelectList(emails, "Email", "Email");
             }
             else
             {
@@ -295,7 +297,7 @@ namespace risk.control.system.Controllers
 
                         var isAuthenticated = User.Identity.IsAuthenticated;
 
-                        if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
+                        if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null)
                         {
                             string message = string.Empty;
                             if (admin != null)
@@ -320,7 +322,7 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string failedMessage = $"Dear {admin.Email}, ";

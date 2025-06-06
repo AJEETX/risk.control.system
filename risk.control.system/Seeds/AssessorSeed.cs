@@ -41,7 +41,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
                 IsClientManager = true,
-                Addressline = "11 Nurlendi Street",
+                Addressline = "139 Sector 44",
                 PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
                 PinCode = pinCode,
                 Country = pinCode.Country,

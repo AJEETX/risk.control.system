@@ -92,7 +92,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> UploadFaceImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image, bool isAgent = false)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
@@ -115,7 +114,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> UploadDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;

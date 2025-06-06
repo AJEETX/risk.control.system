@@ -20,7 +20,7 @@ namespace risk.control.system.Middleware
                 if (user != null)
                 {
                     user.LastActivityDate = DateTime.Now;
-                    dbContext.SaveChanges();
+                    await dbContext.SaveChangesAsync(null, false);
                 }
             }
 

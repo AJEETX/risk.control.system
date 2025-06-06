@@ -18,17 +18,16 @@ namespace risk.control.system.Seeds
             var countries = context.Country.ToList();
 
             //CREATE VENDOR COMPANY
-            var checker = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "checker.com", NAME = "Checker", PHOTO = "/img/checker.png" };
-            var verify = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "verify.com", NAME = "Verify", PHOTO = "/img/verify.png" };
-            var investigate = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigate.com", NAME = "Investigate", PHOTO = "/img/investigate.png" };
-            var investigator = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigator.com", NAME = "Investigator", PHOTO = "/img/investigation.png" };
-            var greatez = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greatez.com", NAME = "Greatez", PHOTO = "/img/company.png" };
+            //var checker = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "checker.com", NAME = "Checker", PHOTO = "/img/checker.png" };
+            //var verify = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "verify.com", NAME = "Verify", PHOTO = "/img/verify.png" };
+            //var investigate = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigate.com", NAME = "Investigate", PHOTO = "/img/investigate.png" };
+            //var investigator = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigator.com", NAME = "Investigator", PHOTO = "/img/investigation.png" };
+            //var greatez = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greatez.com", NAME = "Greatez", PHOTO = "/img/company.png" };
 
-            var nicer = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "nicer.com", NAME = "Nicer", PHOTO = "/img/nicer.png" };
-            var demoz = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "demoz.com", NAME = "Demoz", PHOTO = "/img/demo.png" };
-            var investigatos = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigatos.com", NAME = "Investigatos", PHOTO = "/img/investigation.png" };
-            var greates = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greates.com", NAME = "Greates", PHOTO = "/img/company.png" };
-
+            //var nicer = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "nicer.com", NAME = "Nicer", PHOTO = "/img/nicer.png" };
+            //var demoz = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "demoz.com", NAME = "Demoz", PHOTO = "/img/demo.png" };
+            //var investigatos = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigatos.com", NAME = "Investigatos", PHOTO = "/img/investigation.png" };
+            //var greates = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greates.com", NAME = "Greates", PHOTO = "/img/company.png" };
 
             //#if !DEBUG
             COUNTRY = CONSTANTS.COUNTRY_IN;
@@ -39,17 +38,16 @@ namespace risk.control.system.Seeds
             var greater = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greater.com", NAME = "Greater", PHOTO = "/img/company.png" };
             var investigatoz = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigatoz.com", NAME = "Investigatoz", PHOTO = "/img/investigation.png" };
 
-
             var servicesTypes = await ServiceTypeSeed.Seed(context);
 
-
             var agencies = new List<SeedInput> {
-                checker,
+                //checker, 
 //#if !DEBUG
 
-                verify, investigate, investigator, greatez
-                , proper, honest, greater, investigatoz
-                , nicer, demoz, investigatos, greates
+                //verify, investigate, investigator, greatez,
+                proper, honest,
+                //greater, investigatoz
+                //, nicer, demoz, investigatos, greates
 //#endif
             };
             var vendors = new List<Vendor> { };
