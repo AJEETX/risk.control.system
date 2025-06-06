@@ -47,7 +47,7 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = true,
-                Addressline = "123 Carnegie St",
+                Addressline = "1 Gandhi Nagar",
                 PhoneNumber = Applicationsettings.ADMIN_MOBILE,
                 Vendor = vendor,
                 CountryId = countryId,
@@ -85,19 +85,19 @@ namespace risk.control.system.Seeds
 
             //Seed Vendor Agent
             string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
-            await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME, "Holland Road");
+            await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME, "2 Jawahar Nagar");
 
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                string agent2EmailwithSuffix = AGENTX.CODE + "@" + vendor.Email;
-                await AgentSeed.Seed(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENTX.PROFILE_IMAGE, AGENTX.FIRST_NAME, AGENTX.LAST_NAME, "44 Waverley Road");
+            //if (!System.Diagnostics.Debugger.IsAttached)
+            //{
+            //    string agent2EmailwithSuffix = AGENTX.CODE + "@" + vendor.Email;
+            //    await AgentSeed.Seed(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENTX.PROFILE_IMAGE, AGENTX.FIRST_NAME, AGENTX.LAST_NAME, "44 Waverley Road");
 
-                string agent3EmailwithSuffix = AGENTY.CODE + "@" + vendor.Email;
-                await AgentSeed.Seed(context, agent3EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENTY.PROFILE_IMAGE, AGENTY.FIRST_NAME, AGENTX.LAST_NAME, "44 Waverley Road");
+            //    string agent3EmailwithSuffix = AGENTY.CODE + "@" + vendor.Email;
+            //    await AgentSeed.Seed(context, agent3EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENTY.PROFILE_IMAGE, AGENTY.FIRST_NAME, AGENTX.LAST_NAME, "44 Waverley Road");
 
-                string agent4EmailwithSuffix = AGENTZ.CODE + "@" + vendor.Email;
-                await AgentSeed.Seed(context, agent4EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENTZ.PROFILE_IMAGE, AGENTZ.FIRST_NAME, AGENTZ.LAST_NAME, "44 Waverley Road");
-            }
+            //    string agent4EmailwithSuffix = AGENTZ.CODE + "@" + vendor.Email;
+            //    await AgentSeed.Seed(context, agent4EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENTZ.PROFILE_IMAGE, AGENTZ.FIRST_NAME, AGENTZ.LAST_NAME, "44 Waverley Road");
+            //}
         }
     }
 }

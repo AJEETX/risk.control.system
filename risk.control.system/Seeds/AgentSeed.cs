@@ -5,6 +5,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Services;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Seeds
@@ -47,7 +48,7 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
-                Addressline = "23 Vincent Avenue",
+                Addressline = addressLine,
                 Country = pincode?.Country,
                 PinCode = pincode,
                 CountryId = pincode?.CountryId,

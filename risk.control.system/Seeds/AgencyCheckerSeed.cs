@@ -22,7 +22,7 @@ namespace risk.control.system.Seeds
             //CREATE VENDOR COMPANY
 
             var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
-            var checkerAddressline = "1, Nice Road";
+            var checkerAddressline = "1, Ring Road";
 
             var states = context.State.Include(s => s.Country).Where(s => s.Country.Code.ToLower() == input.COUNTRY).ToList();
 
