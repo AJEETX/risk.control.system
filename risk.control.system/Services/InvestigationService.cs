@@ -541,8 +541,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
-                  .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.MediaReports)
+                  //.Include(r => r.LocationTemplate)
+                  // .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -626,8 +626,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
-                  .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.MediaReports)
+                  //.Include(r => r.LocationTemplate)
+                  // .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -724,8 +724,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
-                  .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.MediaReports)
+                  //.Include(r => r.LocationTemplate)
+                  // .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
