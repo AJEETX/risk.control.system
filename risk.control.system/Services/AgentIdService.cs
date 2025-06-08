@@ -99,7 +99,6 @@ public class AgentIdService : IAgentIdService
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
-                face.IdOriginalImage = stream.ToArray();
                 face.IdImage = stream.ToArray();
             }
 
@@ -259,7 +258,6 @@ public class AgentIdService : IAgentIdService
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
-                face.IdOriginalImage = stream.ToArray();
                 face.IdImage = stream.ToArray();
             }
 
@@ -428,7 +426,6 @@ public class AgentIdService : IAgentIdService
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
-                doc.IdOriginalImage = stream.ToArray();
                 doc.IdImage = stream.ToArray();
             }
 

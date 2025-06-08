@@ -7,8 +7,8 @@
         Login
         <sup class="fa fa-info-circle password-info-icon"></sup>
     </div>
-    @Html.AntiForgeryToken()
     <form id="login-form" asp-controller="Account" method="post">
+        @Html.AntiForgeryToken()
         <div class="input-boxes">
 
             <div class="input-box autocomplete-wrapper">

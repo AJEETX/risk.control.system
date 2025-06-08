@@ -95,7 +95,7 @@ namespace risk.control.system.Controllers.Api
             var applicationUsers = new List<ApplicationUser>();
             if (string.IsNullOrWhiteSpace(search))
             {
-                return Ok(context.ApplicationUser?.Where(a => a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower()).OrderBy(o => o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList());
+                return Ok(context.ApplicationUser?.Where(a => a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower() && !a.Email.ToLower().StartsWith("agent")).OrderBy(o => o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList());
             }
             if (!string.IsNullOrEmpty(search))
             {
@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers.Api
                    (!string.IsNullOrEmpty(search) && s.Email.ToLower().StartsWith(search.Trim().ToLower()))
                 ).ToListAsync();
             }
-            var users = applicationUsers?.Where(a => a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower()).OrderBy(o => o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList();
+            var users = applicationUsers?.Where(a => a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower() && !a.Email.ToLower().StartsWith("agent")).OrderBy(o => o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList();
             return Ok(users);
         }
 

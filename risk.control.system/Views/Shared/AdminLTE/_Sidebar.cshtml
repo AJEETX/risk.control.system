@@ -78,15 +78,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
-                            <i class="fas fa-handshake nav-icon"></i>
-                          <p>
-                              @Applicationsettings.INVESTIGATION_UNDERWRITINGS ^
-                        </p>
-                    </a>
-                </li>
-               
+                
                 <li class="nav-item">
                     <a is-active-page asp-controller="ClientCompany" asp-action="Companies" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Index")
                                                     @Url.MakeActiveClass("ClientCompany","Details")
@@ -276,14 +268,14 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                @* <li class="nav-item">
                     <a is-active-page asp-controller="IpAddress" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("IpAddress","")">
                         <i class="fas fa-sitemap nav-icon"></i>
                         <p>
                             IP Tracking
                         </p>
                     </a>
-                </li>
+                </li> *@
                 <li class="nav-item">
                     <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
                         <i class="nav-icon fa fa-align-center"></i>
