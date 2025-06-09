@@ -1,12 +1,17 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using SmartBreadcrumbs.Attributes;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -215,33 +220,28 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, State state)
         {
-            if (id != state.StateId)
-            {
-                notifyService.Error("state not found!");
-                return NotFound();
-            }
-
             if (state is not null)
             {
                 try
                 {
-                    state.Updated = DateTime.Now;
-                    state.CountryId = state.SelectedCountryId;
-                    state.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    _context.Update(state);
+                    var existingState = _context.State.Find(id);
+                    existingState.Code = state.Code;
+                    existingState.Name = state.Name;
+                    existingState.Updated = DateTime.Now;
+                    existingState.CountryId = state.SelectedCountryId;
+                    existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    _context.Update(existingState);
                     await _context.SaveChangesAsync();
+                    notifyService.Success("state edited successfully!");
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.ToString());
                 }
-                notifyService.Success("state edited successfully!");
-                return RedirectToAction(nameof(Index));
             }
-            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-
             notifyService.Error("Error to edit state!");
-            return View(state);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: RiskCaseStatus/Delete/5

@@ -1,12 +1,17 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using SmartBreadcrumbs.Attributes;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -215,33 +220,25 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, District district)
         {
-            if (id != district.DistrictId)
-            {
-                notifyService.Error("district not found!");
-                return NotFound();
-            }
-
             try
             {
-                district.Updated = DateTime.Now;
-                district.UpdatedBy = HttpContext.User?.Identity?.Name;
-                district.CountryId = district.SelectedCountryId;
-                district.StateId = district.SelectedStateId;
-                _context.Update(district);
+                var existingdistrict = await _context.District.FindAsync(id);
+                existingdistrict.Name = district.Name;
+                existingdistrict.Code = district.Code;
+                existingdistrict.CountryId = district.SelectedCountryId;
+                existingdistrict.Updated = DateTime.Now;
+                existingdistrict.UpdatedBy = HttpContext.User?.Identity?.Name;
+                existingdistrict.StateId = district.SelectedStateId;
+                _context.Update(existingdistrict);
                 await _context.SaveChangesAsync();
+                notifyService.Success("district edited successfully!");
+                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!DistrictExists(district.DistrictId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                Console.WriteLine(ex.ToString());
             }
-            notifyService.Success("district edited successfully!");
+            notifyService.Error("An error occurred while updating the pincode!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -289,11 +286,6 @@ namespace risk.control.system.Controllers
             await _context.SaveChangesAsync();
             notifyService.Success("district deleted successfully!");
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool DistrictExists(long id)
-        {
-            return (_context.District?.Any(e => e.DistrictId == id)).GetValueOrDefault();
         }
     }
 }
