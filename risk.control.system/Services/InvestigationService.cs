@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
@@ -541,8 +542,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
-                  //.Include(r => r.LocationTemplate)
-                  // .ThenInclude(l => l.MediaReports)
+              //.Include(r => r.LocationTemplate)
+              // .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -626,8 +627,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
-                  //.Include(r => r.LocationTemplate)
-                  // .ThenInclude(l => l.MediaReports)
+              //.Include(r => r.LocationTemplate)
+              // .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -724,8 +725,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
-                  //.Include(r => r.LocationTemplate)
-                  // .ThenInclude(l => l.MediaReports)
+              //.Include(r => r.LocationTemplate)
+              // .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -1244,7 +1245,7 @@ namespace risk.control.system.Services
                 .ThenInclude(i => i.State)
                 .Include(i => i.BeneficiaryDetail)
                 .ThenInclude(i => i.Country)
-                .Where(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
+                .Where(a => !a.Deleted && a.ClientCompanyId == companyUser.ClientCompanyId &&
                     a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                     (a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
                     a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR ||
