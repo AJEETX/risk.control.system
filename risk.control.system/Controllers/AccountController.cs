@@ -298,8 +298,8 @@ namespace risk.control.system.Controllers
                         var isAuthenticated = User.Identity.IsAuthenticated;
 
                         if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null
-                            && !user.Email.ToLower().Contains("admin@canara.com")
-                            && !user.Email.ToLower().Contains("manager@canara.com")
+                            && !user.Email.ToLower().StartsWith("admin")
+                            && !user.Email.ToLower().StartsWith("manager")
                             )
                         {
                             string message = string.Empty;

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -24,7 +23,7 @@ namespace risk.control.system.Seeds
 
             context.Database.EnsureCreated();
 
-            context.Database.Migrate();
+            //context.Database.Migrate();
 
             //check for users
             if (context.ApplicationUser.Any())
