@@ -529,8 +529,8 @@ namespace risk.control.system.Services
 
             var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-
-            var timeTaken = DateTime.Now - claim.Created;
+            var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
+            var timeTaken = endTIme - claim.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
               $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +

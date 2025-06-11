@@ -1,5 +1,7 @@
 ﻿using Hangfire;
+
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
@@ -561,10 +563,10 @@ namespace risk.control.system.Services
                     .Include(p => p.ClientCompany)
                     .FirstOrDefault(v => v.Id == claimsInvestigationId);
 
-                var report = claimsCaseToAllocateToVendor.InvestigationReport;
-                report.SupervisorRemarkType = reportUpdateStatus;
-                report.SupervisorRemarks = supervisorRemarks;
-
+                //var report = claimsCaseToAllocateToVendor.InvestigationReport;
+                //report.SupervisorRemarkType = reportUpdateStatus;
+                //report.SupervisorRemarks = supervisorRemarks;
+                claimsCaseToAllocateToVendor.CaseOwner = agencyUser.Email;
                 claimsCaseToAllocateToVendor.TaskedAgentEmail = agencyUser.Email;
                 claimsCaseToAllocateToVendor.Updated = DateTime.Now;
                 claimsCaseToAllocateToVendor.UpdatedBy = userEmail;
@@ -600,7 +602,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.Id == claimId);
 
                 var replyByAgency = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR;
-
+                claim.CaseOwner = claim.ClientCompany.Email;
                 claim.SubStatus = replyByAgency;
                 claim.UpdatedBy = userEmail;
                 claim.AssignedToAgency = false;
