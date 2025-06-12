@@ -329,15 +329,15 @@ namespace risk.control.system.Controllers
                 {
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string failedMessage = $"Dear {admin.Email}, ";
-                    failedMessage += $"Locked user {user.Email} logged in. ";
+                    failedMessage += $"User {user.Email} can't log in. ";
                     failedMessage += $"Thanks, ";
                     failedMessage += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                _logger.LogWarning("User account locked out.");
-                model.LoginError = "User account locked out.";
+                _logger.LogWarning("User can't login.");
+                model.LoginError = "User can't login.";
                 return View(model);
             }
             else if (result.IsLockedOut)
