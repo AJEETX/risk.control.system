@@ -1,5 +1,9 @@
-﻿using risk.control.system.AppConstant;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Models
 {
@@ -11,7 +15,8 @@ namespace risk.control.system.Models
         [Display(Name = "Insurer name")]
         public ClientCompany? ClientCompany { get; set; } = default!;
         public CompanyRole? UserRole { get; set; }
-
+        [NotMapped]
+        public List<SelectListItem> AvailableRoles { get; set; }
         public string? Comments { get; set; } = default!;
     }
 }

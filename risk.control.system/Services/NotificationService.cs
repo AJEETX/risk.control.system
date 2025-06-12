@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Net;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using System.Net;
 
 namespace risk.control.system.Services
 {
@@ -752,7 +754,7 @@ namespace risk.control.system.Services
 
                 else if (role.Name == AppRoles.CREATOR.ToString())
                 {
-                    notifications = notifications.Where(n => (n.Role == role && n.NotifierUserEmail == userEmail || n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY) && !n.IsReadByCreator);
+                    notifications = notifications.Where(n => (n.Role == role && n.NotifierUserEmail == userEmail) && !n.IsReadByCreator);
                 }
 
                 var activeNotifications = await notifications

@@ -78,7 +78,6 @@
 
 
   <ItemGroup>
-    <Folder Include="wwwroot\agency\" />
     <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\media\" />
     <Folder Include="wwwroot\report\" />

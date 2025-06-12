@@ -1,15 +1,20 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Net;
+using System.Web;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Hangfire;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Net;
-using System.Web;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Agency
@@ -271,7 +276,7 @@ namespace risk.control.system.Controllers.Agency
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId, baseUrl));
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlFromAgent(userEmail, claimId, agency.VendorId, baseUrl));
 
                 notifyService.Custom($"Case #{policyNumber} withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
 

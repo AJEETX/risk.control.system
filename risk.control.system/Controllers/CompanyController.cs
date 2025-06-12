@@ -1,18 +1,22 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -254,7 +258,17 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = new ClientCompanyApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId };
+                var hasManager = _context.ClientCompanyApplicationUser.Any(u => u.UserRole == CompanyRole.MANAGER);
+                var availableRoles = Enum.GetValues(typeof(CompanyRole))
+                         .Cast<CompanyRole>()
+                         .Where(role => role != CompanyRole.COMPANY_ADMIN && (hasManager ? role != CompanyRole.MANAGER : true))
+                         .Select(role => new SelectListItem
+                         {
+                             Value = role.ToString(),
+                             Text = role.ToString()
+                         }).ToList();
+
+                var model = new ClientCompanyApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId, AvailableRoles = availableRoles };
                 return View(model);
             }
             catch (Exception ex)
@@ -362,7 +376,19 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                var hasManager = _context.ClientCompanyApplicationUser.Any(u => u.UserRole == CompanyRole.MANAGER && u.Email.ToLower() != clientCompanyApplicationUser.Email.ToLower());
+                var availableRoles = Enum.GetValues(typeof(CompanyRole))
+                         .Cast<CompanyRole>()
+                         .Where(role => role != CompanyRole.COMPANY_ADMIN && (hasManager ? role != CompanyRole.MANAGER : true))
+                         .Select(role => new SelectListItem
+                         {
+                             Value = role.ToString(),
+                             Text = role.ToString(),
+                             Selected = (role == clientCompanyApplicationUser.UserRole)
+                         }).ToList();
+
                 clientCompanyApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !clientCompanyApplicationUser.IsPasswordChangeRequired : true;
+                clientCompanyApplicationUser.AvailableRoles = availableRoles;
                 return View(clientCompanyApplicationUser);
             }
             catch (Exception ex)

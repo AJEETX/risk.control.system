@@ -19,6 +19,7 @@ namespace risk.control.system.Services
         Task NotifyClaimAssignmentToAssigner(string userEmail, List<long> claims, string url = "");
 
         Task NotifyClaimWithdrawlToCompany(string senderUserEmail, long claimId, long vendorId, string url = "");
+        Task NotifyClaimWithdrawlFromAgent(string senderUserEmail, long claimId, long vendorId, string url = "");
 
         Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, long claimId, string agentEmail, long vendorId, string url = "");
 
@@ -136,7 +137,7 @@ namespace risk.control.system.Services
 
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
-                if(file.Completed.GetValueOrDefault())
+                if (file.Completed.GetValueOrDefault())
                 {
                     var notification = new StatusNotification
                     {
@@ -328,7 +329,7 @@ namespace risk.control.system.Services
 
                 foreach (var userEmailToSend in userEmailsToSend)
                 {
-                   
+
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
@@ -391,7 +392,7 @@ namespace risk.control.system.Services
                     }
                     //SMS ::END
                 }
-                
+
 
                 var rows = await _context.SaveChangesAsync();
             }
@@ -516,7 +517,6 @@ namespace risk.control.system.Services
                     NotifierUserEmail = senderUserEmail
                 };
                 _context.Notifications.Add(vendorNotification);
-                //claim.Notifications.Add(vendorNotification);
 
                 var notification = new StatusNotification
                 {
@@ -525,7 +525,7 @@ namespace risk.control.system.Services
                     Symbol = "fa fa-times i-orangered",
                     Message = $"Case #{claim.PolicyDetail.ContractNumber}",
                     Status = claim.SubStatus,
-                    NotifierUserEmail = senderUserEmail
+                    NotifierUserEmail = claim.CreatedUser
                 };
                 _context.Notifications.Add(notification);
                 //claim.Notifications.Add(notification);
@@ -578,7 +578,7 @@ namespace risk.control.system.Services
                 };
                 _context.Notifications.Add(notification);
                 //claimsInvestigation.Notifications.Add(notification);
-                
+
                 var rows = await _context.SaveChangesAsync();
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
@@ -623,12 +623,12 @@ namespace risk.control.system.Services
                     }
                 }
             }
-            
+
             try
             {
                 var rows = await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -801,7 +801,7 @@ namespace risk.control.system.Services
                         users.Add(user);
                     }
                 }
-                
+
                 var claimsInvestigation = _context.Investigations
                     .Include(i => i.Vendor)
                     .Include(i => i.PolicyDetail)
@@ -818,7 +818,7 @@ namespace risk.control.system.Services
                     NotifierUserEmail = senderUserEmail
                 };
                 _context.Notifications.Add(notification);
-                
+
                 foreach (var user in users)
                 {
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
@@ -874,7 +874,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                
+
 
                 var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == senderUserEmail);
 
@@ -890,7 +890,7 @@ namespace risk.control.system.Services
                     NotifierUserEmail = senderUserEmail
                 };
                 _context.Notifications.Add(notification);
-                
+
                 foreach (var userEmailToSend in userEmailsToSend)
                 {
                     //SEND SMS
@@ -937,7 +937,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-               
+
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
                 var notification = new StatusNotification
@@ -949,7 +949,7 @@ namespace risk.control.system.Services
                     NotifierUserEmail = senderUserEmail
                 };
                 _context.Notifications.Add(notification);
-                
+
                 foreach (var user in users)
                 {
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
@@ -961,6 +961,55 @@ namespace risk.control.system.Services
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
+                    }
+                }
+
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
+        }
+
+        public async Task NotifyClaimWithdrawlFromAgent(string senderUserEmail, long claimId, long vendorId, string url = "")
+        {
+            try
+            {
+                var claim = _context.Investigations
+                    .Include(i => i.PolicyDetail)
+                    .FirstOrDefault(v => v.Id == claimId);
+
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
+
+                var users = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId && u.UserRole == AgencyRole.AGENCY_ADMIN || u.UserRole == AgencyRole.SUPERVISOR);
+
+                var vendorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+
+                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
+                var vendorNotification = new StatusNotification
+                {
+                    Role = vendorRole,
+                    Agency = vendor,
+                    Symbol = "fa fa-times i-orangered",
+                    Message = $"Case #{claim.PolicyDetail.ContractNumber}",
+                    Status = claim.SubStatus,
+                    NotifierUserEmail = senderUserEmail
+                };
+                _context.Notifications.Add(vendorNotification);
+
+                foreach (var user in users)
+                {
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                    {
+                        string message = $"Dear {user.Email}, ";
+                        message += $"Case #{claim.PolicyDetail.ContractNumber} : {claim.SubStatus}, ";
+                        message += $"Thanks, ";
+                        message += $"{senderUserEmail}, ";
+                        message += $"{url}";
+                        await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
+                        //claim.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
