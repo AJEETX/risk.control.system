@@ -8,6 +8,8 @@
         <sup class="fa fa-info-circle password-info-icon"></sup>
     </div>
     <form id="login-form" asp-controller="Account" method="post">
+        <input name="agent_login" title="agent_login" type="text" id="agent_login" value="">
+
         @Html.AntiForgeryToken()
         <div class="input-boxes">
 

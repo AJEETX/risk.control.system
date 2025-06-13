@@ -347,7 +347,9 @@ input:focus {
         display: none;
     }
 }
-
+#agent_login {
+    display: none;
+}
 p.account, p.account1 {
     padding-top: 20px;
     padding-bottom: 0px;

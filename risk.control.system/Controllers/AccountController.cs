@@ -201,7 +201,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model, string agent_login = "", string returnUrl = null)
         {
             //var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
             //var ipAddressWithoutPort = ipAddress?.Split(':')[0];
@@ -264,21 +264,25 @@ namespace risk.control.system.Controllers
                     else if (vendorUser != null)
                     {
                         vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-                        if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
+                        if(agent_login != "agent_login")
                         {
-                            var userIsAgent = vendorUser.Role == AppRoles.AGENT;
-                            if (userIsAgent)
+                            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
                             {
-                                if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
+                                var userIsAgent = vendorUser.Role == AppRoles.AGENT;
+                                if (userIsAgent)
                                 {
-                                    vendorIsActive = false;
-                                }
-                                else
-                                {
-                                    vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                                    if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
+                                    {
+                                        vendorIsActive = false;
+                                    }
+                                    else
+                                    {
+                                        vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                                    }
                                 }
                             }
                         }
+                       
                     }
                     if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
                     {

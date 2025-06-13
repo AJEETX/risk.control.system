@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -375,7 +375,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -446,7 +446,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -581,7 +581,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -625,7 +625,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -666,7 +666,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -731,7 +731,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
