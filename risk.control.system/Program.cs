@@ -411,11 +411,11 @@ try
         name: "default",
         pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
-    RecurringJob.AddOrUpdate<IHangfireJobService>(
-        "clean-failed-jobs",
-        job => job.CleanFailedJobs(),
-        Cron.Hourly // Runs every hour
-    );
+    //RecurringJob.AddOrUpdate<IHangfireJobService>(
+    //    "clean-failed-jobs",
+    //    job => job.CleanFailedJobs(),
+    //    Cron.Hourly // Runs every hour
+    //);
 
     int sessionTimeoutMinutes = int.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]) / 60;
     //RecurringJob.AddOrUpdate<IdleUserService>(
