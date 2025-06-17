@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+
 using Brushes = SixLabors.ImageSharp.Drawing.Processing.Brushes;
 using Color = SixLabors.ImageSharp.Color;
 using Font = SixLabors.Fonts.Font;
@@ -22,8 +23,8 @@ namespace risk.control.system.Helpers
             using var stream = new MemoryStream(imageByte);
             using var image = SixLabors.ImageSharp.Image.Load(stream);
 
-            float maxHeight = 1800.0f;
-            float maxWidth = 1800.0f;
+            float maxHeight = 800.0f;
+            float maxWidth = 800.0f;
             float newWidth;
             float newHeight;
 

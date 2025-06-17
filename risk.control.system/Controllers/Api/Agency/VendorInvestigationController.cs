@@ -1,14 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using System.Security.Claims;
+
 using static risk.control.system.AppConstant.Applicationsettings;
+
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Agency
@@ -140,7 +144,7 @@ namespace risk.control.system.Controllers.Api.Agency
                         entity.IsNewSubmittedToCompany = false;
                     }
 
-                await _context.SaveChangesAsync(); // mark as viewed
+                await _context.SaveChangesAsync(null, false); // mark as viewed
             }
             return Ok(response);
         }
@@ -345,7 +349,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNewAssignedToAgency = false;
 
-                await _context.SaveChangesAsync(); // mark as viewed
+                await _context.SaveChangesAsync(null, false); // mark as viewed
             }
 
             return Ok(response);
@@ -481,7 +485,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNewSubmittedToAgency = false;
 
-                await _context.SaveChangesAsync(); // mark as viewed
+                await _context.SaveChangesAsync(null, false); // mark as viewed
             }
 
             return Ok(response);

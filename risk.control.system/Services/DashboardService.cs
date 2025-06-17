@@ -498,7 +498,7 @@ namespace risk.control.system.Services
             if (companyUser != null)
             {
                 var tdetail = tdetailDays.Where(d =>
-                    (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                    (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail || (companyUser.Role == AppRoles.CREATOR && d.CreatedUser == companyUser.Email)) &&
                     d.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();

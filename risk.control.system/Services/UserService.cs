@@ -164,7 +164,7 @@ namespace risk.control.system.Services
             }
             vendorUsers?.ToList().ForEach(user => user.IsUpdated = false);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(null, false);
             return activeUsersDetails;
         }
 
@@ -266,7 +266,7 @@ namespace risk.control.system.Services
             }
 
             vendorUsers?.ToList().ForEach(u => u.IsUpdated = false);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(null, false);
             return activeUsersDetails;
         }
 
@@ -368,7 +368,7 @@ namespace risk.control.system.Services
             }
 
             users?.ToList().ForEach(u => u.IsUpdated = false);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(null, false);
             return activeUsersDetails;
         }
 
@@ -470,7 +470,7 @@ namespace risk.control.system.Services
             }
 
             users?.ToList().ForEach(u => u.IsUpdated = false);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(null, false);
             return activeUsersDetails;
         }
 
@@ -565,7 +565,7 @@ namespace risk.control.system.Services
                 activeUsersDetails.Add(activeUser);
             }
             users?.ToList().ForEach(u => u.IsUpdated = false);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(null, false);
             return activeUsersDetails;
         }
 

@@ -1,8 +1,10 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Utils;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 
@@ -112,7 +114,7 @@ namespace risk.control.system.Services
             investigation.InvestigationReport.PdfReportFilePath = ReportFilePath;
 
             context.Investigations.Update(investigation);
-            context.SaveChanges();
+            await context.SaveChangesAsync(null, false);
             return reportFilename;
         }
 

@@ -91,8 +91,8 @@ namespace risk.control.system.Services
                    .ThenInclude(l => l.AgentIdReport)
                .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.FaceIds)
-                   //.Include(r => r.LocationTemplate)
-                   //.ThenInclude(l => l.MediaReports)
+               //.Include(r => r.LocationTemplate)
+               //.ThenInclude(l => l.MediaReports)
                .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.DocumentIds)
                .Include(r => r.LocationTemplate)
@@ -101,7 +101,7 @@ namespace risk.control.system.Services
 
             claim.InvestigationReport.ReportTemplate = templates;
             _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync(null, false);
 
             var model = new CaseInvestigationVendorsModel
             {
@@ -171,8 +171,8 @@ namespace risk.control.system.Services
             var templates = await _context.ReportTemplates
                 .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.AgentIdReport)
-                   //.Include(r => r.LocationTemplate)
-                   //.ThenInclude(l => l.MediaReports)
+               //.Include(r => r.LocationTemplate)
+               //.ThenInclude(l => l.MediaReports)
                .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.FaceIds)
                .Include(r => r.LocationTemplate)

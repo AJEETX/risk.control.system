@@ -1,8 +1,11 @@
-﻿using Hangfire;
+﻿using System.Text.Json;
+
+using Hangfire;
+
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
-using System.Text.Json;
 
 
 namespace risk.control.system.Services
@@ -101,7 +104,7 @@ namespace risk.control.system.Services
             };
 
             context.VendorInvoice.Add(invoice);
-            context.SaveChanges();
+            await context.SaveChangesAsync(null, false);
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 // Export the report template to JSON for debugging purposes

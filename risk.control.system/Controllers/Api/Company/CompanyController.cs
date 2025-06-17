@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.Api.Company
                     LastModified = u.Updated
                 })?.ToArray();
             companies.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(result);
         }
 
@@ -162,7 +162,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             // Update vendors in the context
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
 
             return Ok(result);
         }
@@ -249,7 +249,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             // Update vendors in the context
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
 
             return Ok(result);
         }
@@ -348,7 +348,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Deletable = u.CreatedUser == userEmail
                 })?.ToArray();
             availableVendors?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(result);
         }
 
@@ -401,7 +401,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
 
             vendor.VendorInvestigationServiceTypes?.ToList().ForEach(i => i.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(serviceResponse);
         }
 

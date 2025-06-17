@@ -120,7 +120,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -184,7 +184,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -269,7 +269,7 @@ namespace risk.control.system.Services
                     //SMS ::END
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -344,7 +344,7 @@ namespace risk.control.system.Services
                     //SMS ::END
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -394,7 +394,7 @@ namespace risk.control.system.Services
                 }
 
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -433,7 +433,7 @@ namespace risk.control.system.Services
                     await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -471,7 +471,7 @@ namespace risk.control.system.Services
                     await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -544,7 +544,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -579,7 +579,7 @@ namespace risk.control.system.Services
                 _context.Notifications.Add(notification);
                 //claimsInvestigation.Notifications.Add(notification);
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {recepientUser.Email}, ";
@@ -626,7 +626,7 @@ namespace risk.control.system.Services
 
             try
             {
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception)
             {
@@ -709,7 +709,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -766,7 +766,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -833,7 +833,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -907,7 +907,7 @@ namespace risk.control.system.Services
                     //SMS ::END
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -964,7 +964,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -1013,7 +1013,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {

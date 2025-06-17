@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 })?.ToArray();
 
             users?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(result);
         }
 
@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 })?.ToArray();
 
             allAgencies?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
 
             return Ok(result);
         }
@@ -160,7 +160,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 })?.ToArray();
 
             agencies?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(result);
         }
 
@@ -214,7 +214,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
 
             vendor.VendorInvestigationServiceTypes?.ToList().ForEach(i => i.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(serviceResponse);
         }
 

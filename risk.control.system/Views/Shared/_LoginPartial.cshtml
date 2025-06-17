@@ -24,15 +24,15 @@
             </div>
             <div class="input-box">
                 <i class="fas fa-lock left-padd"></i>
-                @* @if (Model.SetPassword)
+                @if (Model.SetPassword)
                 {
                     <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
                 }
                 else 
-                {*@
+                {
                     <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" autocomplete="off" required />
-                @*
-                }*@
+                
+                }
                 <!-- Eye Icon for Toggling Password Visibility -->
                 @* <div class="password-toggle remarks">
                     <span class="input-group-text toggle-password-visibility" data-target="Password">

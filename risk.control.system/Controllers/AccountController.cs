@@ -183,19 +183,10 @@ namespace risk.control.system.Controllers
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
-            var dontSetPassword = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+            var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
             var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
-            if (showgtrialUsers)
-            {
-                var emails = _context.Users.Where(u => !u.Deleted && u.Email != "admin@icheckify.co.in").OrderBy(o => o.Email);
-                ViewData["Users"] = new SelectList(emails, "Email", "Email");
-            }
-            else
-            {
-                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
-            }
 
-            return View(new LoginViewModel { SetPassword = !dontSetPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
+            return View(new LoginViewModel { SetPassword = setPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
         }
 
         [HttpPost]
@@ -264,7 +255,7 @@ namespace risk.control.system.Controllers
                     else if (vendorUser != null)
                     {
                         vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-                        if(agent_login != "agent_login")
+                        if (agent_login != "agent_login")
                         {
                             if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
                             {
@@ -282,7 +273,7 @@ namespace risk.control.system.Controllers
                                 }
                             }
                         }
-                       
+
                     }
                     if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
                     {

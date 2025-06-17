@@ -308,7 +308,7 @@ namespace risk.control.system.Services
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNew = false;
 
-                await context.SaveChangesAsync(); // mark as viewed
+                await context.SaveChangesAsync(null, false); // mark as viewed
             }
 
             var response = new
@@ -533,7 +533,7 @@ namespace risk.control.system.Services
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNew = false;
 
-                await context.SaveChangesAsync(); // mark as viewed
+                await context.SaveChangesAsync(null, false); // mark as viewed
             }
             var response = new
             {
@@ -714,7 +714,7 @@ namespace risk.control.system.Services
                 claim.TaskToAgentTime = DateTime.Now;
 
                 context.Investigations.Update(claim);
-                var rows = await context.SaveChangesAsync();
+                var rows = await context.SaveChangesAsync(null, false);
 
                 await timelineService.UpdateTaskStatus(claim.Id, currentUser);
                 return claim;
@@ -755,7 +755,7 @@ namespace risk.control.system.Services
 
                 context.Investigations.Update(claim);
 
-                var rows = await context.SaveChangesAsync();
+                var rows = await context.SaveChangesAsync(null, false);
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 

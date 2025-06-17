@@ -170,7 +170,7 @@ public class AgentIdService : IAgentIdService
             face.IdImageValid = similarity > 70;
             _context.AgentIdReport.Update(face);
             var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync(null, false);
 
 
             return new AppiCheckifyResponse
@@ -337,7 +337,7 @@ public class AgentIdService : IAgentIdService
             face.IdImageValid = similarity > 70;
             _context.DigitalIdReport.Update(face);
             var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync(null, false);
 
             return new AppiCheckifyResponse
             {
@@ -502,7 +502,7 @@ public class AgentIdService : IAgentIdService
             _context.DocumentIdReport.Update(doc);
             _context.Investigations.Update(claim);
 
-            var rows = await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync(null, false);
 
 
             return new AppiCheckifyResponse
@@ -632,7 +632,7 @@ public class AgentIdService : IAgentIdService
 
             media.MediaType = isVideo ? MediaType.VIDEO : MediaType.AUDIO;
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
 
             return new AppiCheckifyResponse
             {
@@ -692,7 +692,7 @@ public class AgentIdService : IAgentIdService
         locationTemplate.ValidationExecuted = true;
         locationTemplate.Updated = DateTime.Now;
         _context.LocationTemplate.Update(locationTemplate);
-        var rowsAffected = await _context.SaveChangesAsync();
+        var rowsAffected = await _context.SaveChangesAsync(null, false);
         return rowsAffected > 0;
     }
 }

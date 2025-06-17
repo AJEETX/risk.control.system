@@ -53,7 +53,7 @@ namespace risk.control.system.Services
 
             task.InvestigationTimeline.Add(history);
             context.Investigations.Update(task);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(null, false);
         }
     }
 }

@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers.Api.Company
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNewSubmittedToCompany = false;
 
-                await _context.SaveChangesAsync(); // mark as viewed
+                await _context.SaveChangesAsync(null, false); // mark as viewed
             }
             return Ok(response);
         }

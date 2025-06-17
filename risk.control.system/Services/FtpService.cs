@@ -1,4 +1,9 @@
-﻿using CsvHelper;
+﻿using System.Data;
+using System.Globalization;
+using System.IO.Compression;
+using System.Net;
+
+using CsvHelper;
 using CsvHelper.Configuration;
 
 using Hangfire;
@@ -10,10 +15,6 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using System.Data;
-using System.Globalization;
-using System.IO.Compression;
-using System.Net;
 
 namespace risk.control.system.Services
 {
@@ -102,7 +103,7 @@ namespace risk.control.system.Services
                 DirectAssign = uploadAndAssign
             };
             var uploadData = _context.FilesOnFileSystem.Add(fileModel);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return uploadData.Entity.Id;
         }
 
@@ -196,7 +197,7 @@ namespace risk.control.system.Services
 
                 _context.Investigations.AddRange(uploadedClaims);
 
-                var ros = await _context.SaveChangesAsync();
+                var ros = await _context.SaveChangesAsync(null, false);
 
                 try
                 {

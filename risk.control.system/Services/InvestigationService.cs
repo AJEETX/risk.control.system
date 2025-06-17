@@ -117,8 +117,8 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
-                    claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                     claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
+                    claimsInvestigation.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
                 }
 
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
@@ -175,8 +175,8 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
-                    existingPolicy.PolicyDetail.DocumentImage = dataStream.ToArray();
                     claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
+                    existingPolicy.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
                 }
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
@@ -208,8 +208,8 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
-                    customerDetail.ProfilePicture = dataStream.ToArray();
                     customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
+                    customerDetail.ProfilePicture = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(customerDocument.FileName));
                 }
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
@@ -263,8 +263,8 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     await customerDocument.CopyToAsync(dataStream);
-                    customerDetail.ProfilePicture = dataStream.ToArray();
                     customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
+                    customerDetail.ProfilePicture = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(customerDocument.FileName));
                 }
                 else
                 {
@@ -327,7 +327,7 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
-                    beneficiary.ProfilePicture = dataStream.ToArray();
+                    beneficiary.ProfilePicture = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(customerDocument.FileName));
                     beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
@@ -382,7 +382,7 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
-                    beneficiary.ProfilePicture = dataStream.ToArray();
+                    beneficiary.ProfilePicture = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(customerDocument.FileName));
                     beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 else

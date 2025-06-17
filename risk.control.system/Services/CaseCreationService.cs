@@ -368,7 +368,8 @@ namespace risk.control.system.Services
             var image = images.FirstOrDefault(i => i.FileName == filename);
             if (image.ImageData != null)
             {
-                return image.ImageData;
+                var compressed = CompressImage.ProcessCompress(image.ImageData, ".jpg");
+                return compressed;
             }
             return null;
         }

@@ -258,15 +258,17 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var hasManager = _context.ClientCompanyApplicationUser.Any(u => u.UserRole == CompanyRole.MANAGER);
+                var existingUsers = _context.ClientCompanyApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                var isManagerTaken = existingUsers.Any(u => u.UserRole == CompanyRole.MANAGER);
                 var availableRoles = Enum.GetValues(typeof(CompanyRole))
-                         .Cast<CompanyRole>()
-                         .Where(role => role != CompanyRole.COMPANY_ADMIN && (hasManager ? role != CompanyRole.MANAGER : true))
-                         .Select(role => new SelectListItem
-                         {
-                             Value = role.ToString(),
-                             Text = role.ToString()
-                         }).ToList();
+                    .Cast<CompanyRole>()
+                    .Where(role => role != CompanyRole.COMPANY_ADMIN && (isManagerTaken ? role != CompanyRole.MANAGER : true))
+                    .Select(role => new SelectListItem
+                    {
+                        Value = role.ToString(),
+                        Text = role.ToString()
+                    })
+                    .ToList();
 
                 var model = new ClientCompanyApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId, AvailableRoles = availableRoles };
                 return View(model);
@@ -376,16 +378,17 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var hasManager = _context.ClientCompanyApplicationUser.Any(u => u.UserRole == CompanyRole.MANAGER && u.Email.ToLower() != clientCompanyApplicationUser.Email.ToLower());
+                var existingUsers = _context.ClientCompanyApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
+                var isManagerTaken = existingUsers.Any(u => u.UserRole == CompanyRole.MANAGER);
                 var availableRoles = Enum.GetValues(typeof(CompanyRole))
-                         .Cast<CompanyRole>()
-                         .Where(role => role != CompanyRole.COMPANY_ADMIN && (hasManager ? role != CompanyRole.MANAGER : true))
-                         .Select(role => new SelectListItem
-                         {
-                             Value = role.ToString(),
-                             Text = role.ToString(),
-                             Selected = (role == clientCompanyApplicationUser.UserRole)
-                         }).ToList();
+                    .Cast<CompanyRole>()
+                    .Where(role => role != CompanyRole.COMPANY_ADMIN && (isManagerTaken ? role != CompanyRole.MANAGER : true))
+                    .Select(role => new SelectListItem
+                    {
+                        Value = role.ToString(),
+                        Text = role.ToString()
+                    })
+                    .ToList();
 
                 clientCompanyApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !clientCompanyApplicationUser.IsPasswordChangeRequired : true;
                 clientCompanyApplicationUser.AvailableRoles = availableRoles;

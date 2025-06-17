@@ -528,7 +528,7 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now
             };
             claim.CaseMessages.Add(scheduleMessage);
-            context.SaveChanges();
+            await context.SaveChangesAsync(null, false);
             await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
             return claim.CustomerDetail.Name;
         }
@@ -657,7 +657,7 @@ namespace risk.control.system.Services
                .ThenInclude(c => c.PinCode)
             .FirstOrDefault(c => c.Id == claimId);
             claim.CaseMessages.Add(scheduleMessage);
-            context.SaveChanges();
+            await context.SaveChangesAsync(null, false);
             await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
             return beneficiary.Name;
         }
@@ -813,7 +813,7 @@ namespace risk.control.system.Services
             {
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
                 company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                var notification = context.Notifications.FirstOrDefault(s => s.Role == role && s.Company == company && s.StatusNotificationId == id);
+                var notification = context.Notifications.FirstOrDefault(s => s.StatusNotificationId == id);
                 if (notification == null)
                 {
                     return;
@@ -832,7 +832,7 @@ namespace risk.control.system.Services
                     notification.IsReadByCreator = true;
                 }
                 context.Notifications.Update(notification);
-                var rows = await context.SaveChangesAsync();
+                var rows = await context.SaveChangesAsync(null, false);
             }
             else if (vendorUser != null)
             {
@@ -853,7 +853,7 @@ namespace risk.control.system.Services
                     notification.IsReadByVendorAgent = true;
                 }
                 context.Notifications.Update(notification);
-                var rows = await context.SaveChangesAsync();
+                var rows = await context.SaveChangesAsync(null, false);
             }
         }
 
