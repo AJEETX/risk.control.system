@@ -100,7 +100,7 @@ namespace risk.control.system.Services
                                 context.UserSessionAlive.Add(userSessionAlive);
                             }
                             context.IpApiResponse.Add(response);
-                            await context.SaveChangesAsync(false);
+                            await context.SaveChangesAsync(null, false);
                         }
                         return response;
                     }
@@ -164,7 +164,7 @@ namespace risk.control.system.Services
                             context.UserSessionAlive.Add(userSessionAlive);
 
                             context.IpApiResponse.Add(response);
-                            await context.SaveChangesAsync(false);
+                            await context.SaveChangesAsync(null, false);
                         }
                         return response;
                     }

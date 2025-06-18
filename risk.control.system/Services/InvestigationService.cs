@@ -1405,7 +1405,7 @@ namespace risk.control.system.Services
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNewAssignedToManager = false;
 
-                await context.SaveChangesAsync(); // mark as viewed
+                await context.SaveChangesAsync(null, false); // mark as viewed
             }
             var response = new
             {

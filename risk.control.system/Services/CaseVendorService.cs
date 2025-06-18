@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
+﻿using Microsoft.EntityFrameworkCore;
 
-using risk.control.system.Controllers.Api.Claims;
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Models;
+using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
@@ -13,35 +11,21 @@ namespace risk.control.system.Services
     {
         Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false);
 
+        Task<CaseTransactionModel> GetInvestigatedForAgent(string currentUserEmail, long id);
+
         Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase);
 
     }
 
     public class CaseVendorService : ICaseVendorService
     {
-        private const string CLAIMS = "claims";
-        private const string UNDERWRITING = "underwriting";
-        private readonly UserManager<VendorApplicationUser> userManager;
         private readonly ApplicationDbContext _context;
-        private readonly IDashboardService dashboardService;
-        private readonly IInvestigationService investigationService;
-        private readonly IFeatureManager featureManager;
-        private readonly IClaimsService claimsService;
+
 
         public CaseVendorService(
-            UserManager<VendorApplicationUser> userManager,
-            ApplicationDbContext context,
-            IDashboardService dashboardService,
-            IInvestigationService investigationService,
-            IFeatureManager featureManager,
-            IClaimsService claimsService)
+            ApplicationDbContext context)
         {
-            this.userManager = userManager;
             this._context = context;
-            this.dashboardService = dashboardService;
-            this.investigationService = investigationService;
-            this.featureManager = featureManager;
-            this.claimsService = claimsService;
         }
 
         public async Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false)
@@ -112,6 +96,91 @@ namespace risk.control.system.Services
             return model;
         }
 
+        public async Task<CaseTransactionModel> GetInvestigatedForAgent(string currentUserEmail, long id)
+        {
+            var claim = await _context.Investigations
+                .Include(c => c.CaseMessages)
+                .Include(c => c.CaseNotes)
+                .Include(c => c.InvestigationReport)
+                .Include(c => c.InvestigationTimeline)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+            var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
+            var timeTaken = endTIme - claim.Created;
+            var totalTimeTaken = timeTaken != TimeSpan.Zero
+                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
+              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
+              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
+              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
+            : "-";
+
+            var invoice = _context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var templates = await _context.ReportTemplates
+               .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.AgentIdReport)
+              .Include(r => r.LocationTemplate)
+               .ThenInclude(l => l.MediaReports)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.FaceIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.DocumentIds)
+              .Include(r => r.LocationTemplate)
+                  .ThenInclude(l => l.Questions)
+                  .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+
+            claim.InvestigationReport.ReportTemplate = templates;
+
+            var tracker = _context.PdfDownloadTracker
+                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == currentUserEmail);
+            bool canDownload = true;
+            if (tracker != null)
+            {
+                canDownload = tracker.DownloadCount <= 3;
+            }
+
+            var model = new CaseTransactionModel
+            {
+                ClaimsInvestigation = claim,
+                CaseIsValidToAssign = claim.IsValidCaseData(),
+                Location = claim.BeneficiaryDetail,
+                Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
+                TimeTaken = totalTimeTaken,
+                VendorInvoice = invoice,
+                CanDownload = canDownload,
+                Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+            };
+
+            return model;
+        }
         public async Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
             var claim = await _context.Investigations

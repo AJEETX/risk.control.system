@@ -290,30 +290,30 @@ namespace risk.control.system.Controllers
                             return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
                         }
 
-                        var isAuthenticated = User.Identity.IsAuthenticated;
+                        //var isAuthenticated = User.Identity.IsAuthenticated;
 
-                        if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null
-                            && !user.Email.ToLower().StartsWith("admin")
-                            && !user.Email.ToLower().StartsWith("manager")
-                            )
-                        {
-                            string message = string.Empty;
-                            if (admin != null)
-                            {
-                                message = $"Dear {admin.Email}, ";
-                                message += $"User {user.Email} logged in. ";
-                                message += $"Thanks, ";
-                                message += $"{BaseUrl}";
-                                try
-                                {
-                                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine(ex.ToString());
-                                }
-                            }
-                        }
+                        //if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null
+                        //    && !user.Email.ToLower().StartsWith("admin")
+                        //    && !user.Email.ToLower().StartsWith("manager")
+                        //    )
+                        //{
+                        //    string message = string.Empty;
+                        //    if (admin != null)
+                        //    {
+                        //        message = $"Dear {admin.Email}, ";
+                        //        message += $"User {user.Email} logged in. ";
+                        //        message += $"Thanks, ";
+                        //        message += $"{BaseUrl}";
+                        //        try
+                        //        {
+                        //            await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+                        //        }
+                        //        catch (Exception ex)
+                        //        {
+                        //            Console.WriteLine(ex.ToString());
+                        //        }
+                        //    }
+                        //}
 
                         notifyService.Success("Login successful");
                         return RedirectToAction("Index", "Dashboard");
@@ -608,7 +608,7 @@ namespace risk.control.system.Controllers
                 LoggedOut = true
             };
             _context.UserSessionAlive.Add(userSessionAlive);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(AccountController.Login), "Account");

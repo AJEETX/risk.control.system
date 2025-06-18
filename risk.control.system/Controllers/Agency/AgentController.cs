@@ -101,7 +101,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorService.GetInvestigateReport(currentUserEmail, id);
+                var model = await vendorService.GetInvestigatedForAgent(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);

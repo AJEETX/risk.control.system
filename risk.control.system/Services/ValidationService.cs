@@ -1,9 +1,11 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using risk.control.system.Data;
-using risk.control.system.Models;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+
+using Microsoft.IdentityModel.Tokens;
+
+using risk.control.system.Data;
+using risk.control.system.Models;
 
 namespace risk.control.system.Services
 {
@@ -48,7 +50,7 @@ namespace risk.control.system.Services
                     CurrentPage = httpContext.Request.Path.Value
                 };
                 context.UserSessionAlive.Add(userSessionAlive);
-                await context.SaveChangesAsync(false);
+                await context.SaveChangesAsync(null, false);
                 return true;
             }
             catch (Exception ex)
