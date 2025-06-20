@@ -16,7 +16,6 @@
                 <input type="hidden" asp-for="AddressLatitude" />
                 <input type="hidden" asp-for="AddressLongitude" />
                 <input type="hidden" asp-for="AddressMapLocation" />
-                <input type="hidden" asp-for="MobileAppUrl" />
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
@@ -33,6 +32,25 @@
                             </div>
                         </div>
                     </div>
+                    @if(Model.SelectedByCompany)
+                    {
+                        
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="input-group-label"> App download Url: </label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-tool"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input type="text" id="MobileAppUrl" asp-for="MobileAppUrl" class="form-control remarks title-name" required placeholder="Enter App download Url" maxlength="50">
+                                <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+                        </div>
+                    }
+                    else
+                    {
+                <input type="hidden" asp-for="MobileAppUrl" />
                     
                     <div class="col-sm-6">
                         <div class="form-group">
@@ -46,7 +64,9 @@
                             </div>
                         </div>
                     </div>
+                    }
                 </div>
+                    
                 <partial name="Vendor/_Edit" model="Model" />
 
                 

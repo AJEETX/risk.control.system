@@ -38,6 +38,10 @@ $(document).ready(function () {
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 6                      // Index of the column to style
             },
             {
