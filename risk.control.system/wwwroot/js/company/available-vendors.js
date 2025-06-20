@@ -23,17 +23,17 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 3                      // Index of the column to style
-            },
+        //{
+        //    className: 'max-width-column-name', // Apply the CSS class,
+        //    targets: 3                      // Index of the column to style
+        //    },
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
+                targets: 5                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 11                      // Index of the column to style
+                targets: 10                      // Index of the column to style
             }],
         order: [[1, 'asc']],
         fixedHeader: true,
@@ -76,12 +76,12 @@
                     return '<span title="' + row.vendorName + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            {
-                "data": "name",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
+            //{
+            //    "data": "name",
+            //    "mRender": function (data, type, row) {
+            //        return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+            //    }
+            //},
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {

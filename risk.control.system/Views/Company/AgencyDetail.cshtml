@@ -78,8 +78,8 @@
                                 {
                                     <a id="back" asp-controller="Vendors" asp-action="EmpanelledVendors" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                                 }
-                                <a asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fa fa-user-secret"></i>  Users (@Model.SelectedCountryId)</a>
-                                <a asp-controller="Company" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-danger"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
+                                <a asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.VendorId" class="btn btn-success" title="Agent count = @Model.SelectedCountryId"><i class="fa fa-user-secret"></i>  Agent (@Model.SelectedCountryId)</a>
+                                <a asp-controller="Company" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-danger" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
                             </div>
                         </div>
                     </div>

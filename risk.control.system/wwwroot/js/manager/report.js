@@ -23,6 +23,10 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 8                      // Index of the column to style
             },
             {
