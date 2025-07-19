@@ -15,7 +15,7 @@ namespace risk.control.system.Services
 {
     public interface ICaseCreationService
     {
-        Task<InvestigationTask> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model);
+        Task<UploadResult> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model);
     }
     public class CaseCreationService : ICaseCreationService
     {
@@ -50,22 +50,26 @@ namespace risk.control.system.Services
             }
             return true;
         }
-        private async Task<InvestigationTask> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model)
+        private async Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model)
         {
-
+            var case_errors = new List<UploadError>();
             var customerTask = AddCustomer(companyUser, uploadCase, model.ByteData);
             var beneficiaryTask = AddBeneficiary(companyUser, uploadCase, model.ByteData);
             await Task.WhenAll(customerTask, beneficiaryTask);
 
             // Get the results
-            var customer = await customerTask;
-            var beneficiary = await beneficiaryTask;
+            var (customer, customer_errors) = await customerTask;
+            var (beneficiary, beneficiary_errors) = await beneficiaryTask;
             InsuranceType caseType = InsuranceType.CLAIM;
             if (uploadCase.InsuranceType != InsuranceType.CLAIM.GetEnumDisplayName())
             {
                 caseType = InsuranceType.UNDERWRITING;
             }
 
+            if (string.IsNullOrWhiteSpace(uploadCase.ServiceType))
+            {
+                case_errors.Add(new UploadError { UploadData = "Service type", Error = "null/empty" });
+            }
             var servicetype = string.IsNullOrWhiteSpace(uploadCase.ServiceType)
                 ? context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == caseType)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
                 : context.InvestigationServiceType
@@ -73,10 +77,11 @@ namespace risk.control.system.Services
                   ?? context.InvestigationServiceType
                     .FirstOrDefault(b => b.InsuranceType == caseType);  // Case 3: If no match, retry ignoring LineOfBusinessId
 
-
-
             var savedNewImage = GetImagesWithDataInSubfolder(model.ByteData, uploadCase.CaseId.ToLower(), POLICY_IMAGE);
-
+            if (savedNewImage == null)
+            {
+                case_errors.Add(new UploadError { UploadData = "Policy image/doc", Error = "null/not found" });
+            }
             if (!string.IsNullOrWhiteSpace(uploadCase.Amount) && decimal.TryParse(uploadCase.Amount, out var amount))
             {
                 uploadCase.Amount = amount.ToString();
@@ -84,30 +89,85 @@ namespace risk.control.system.Services
             else
             {
                 uploadCase.Amount = "1000";
-            }
+                case_errors.Add(new UploadError { UploadData = "Assured amount", Error = $"Invalid assured amount {uploadCase.Amount}" });
 
-            if (!string.IsNullOrWhiteSpace(uploadCase.IssueDate) && DateTime.TryParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var issueDate))
+            }
+            DateTime issueDate, dateOfIncident;
+            bool isIssueDateValid = false, isIncidentDateValid = false;
+
+            // Validate IssueDate
+            if (!string.IsNullOrWhiteSpace(uploadCase.IssueDate) && DateTime.TryParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out issueDate))
             {
+                if (issueDate >= DateTime.Today)
+                {
+                    case_errors.Add(new UploadError
+                    {
+                        UploadData = "Issue date",
+                        Error = $"Issue date ({issueDate:dd-MM-yyyy}) cannot be in the future"
+                    });
+                }
+                else
+                {
+                    isIssueDateValid = true;
+                    uploadCase.IssueDate = issueDate.ToString("dd-MM-yyyy");
+                }
+            }
+            else
+            {
+                issueDate = DateTime.Now;
                 uploadCase.IssueDate = issueDate.ToString("dd-MM-yyyy");
-            }
-            else
-            {
-                uploadCase.IssueDate = DateTime.Now.ToString("dd-MM-yyyy");
-            }
-            if (!string.IsNullOrWhiteSpace(uploadCase.IncidentDate) && DateTime.TryParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfIncident))
-            {
-                uploadCase.IncidentDate = dateOfIncident.ToString("dd-MM-yyyy");
-            }
-            else
-            {
-                uploadCase.IncidentDate = DateTime.Now.ToString("dd-MM-yyyy");
+                case_errors.Add(new UploadError { UploadData = "Issue date", Error = $"Invalid issue date {uploadCase.IssueDate}" });
             }
 
+            // Validate IncidentDate
+            if (!string.IsNullOrWhiteSpace(uploadCase.IncidentDate) && DateTime.TryParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateOfIncident))
+            {
+                if (dateOfIncident > DateTime.Today)
+                {
+                    case_errors.Add(new UploadError
+                    {
+                        UploadData = "Incident date",
+                        Error = $"Incident date ({dateOfIncident:dd-MM-yyyy}) cannot be in the future"
+                    });
+                }
+                else
+                {
+                    isIncidentDateValid = true;
+                    uploadCase.IncidentDate = dateOfIncident.ToString("dd-MM-yyyy");
+                }
+            }
+            else
+            {
+                dateOfIncident = DateTime.Now;
+                uploadCase.IncidentDate = dateOfIncident.ToString("dd-MM-yyyy");
+                case_errors.Add(new UploadError { UploadData = "Incident date", Error = $"Invalid incident date {uploadCase.IncidentDate}" });
+            }
+
+            // Check chronological order
+            if (isIssueDateValid && isIncidentDateValid && issueDate > dateOfIncident)
+            {
+                case_errors.Add(new UploadError
+                {
+                    UploadData = "Date comparison",
+                    Error = $"Issue date ({uploadCase.IssueDate}) must be on or before Incident date ({uploadCase.IncidentDate})"
+                });
+            }
+
+
+            if (string.IsNullOrWhiteSpace(uploadCase.Reason))
+            {
+                case_errors.Add(new UploadError { UploadData = " Reason", Error = $"null/empty" });
+            }
             var caseEnabler = string.IsNullOrWhiteSpace(uploadCase.Reason) ?
                 context.CaseEnabler.FirstOrDefault() :
                 context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Reason.Trim().ToLower())
                 ?? context.CaseEnabler.FirstOrDefault();
 
+
+            if (string.IsNullOrWhiteSpace(uploadCase.Department))
+            {
+                case_errors.Add(new UploadError { UploadData = " Department", Error = $"null/empty" });
+            }
             var department = string.IsNullOrWhiteSpace(uploadCase.Department) ?
                context.CostCentre.FirstOrDefault() :
                context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
@@ -132,14 +192,14 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
-            if (!policyDetail.IsValidCaseDetail())
-            {
-                return null;
-            }
-            if (customer is null || !policyDetail.IsValidCustomerForUpload(customer) || beneficiary is null || !policyDetail.IsValidBeneficiaryForUpload(beneficiary))
-            {
-                return null;
-            }
+            //if (!policyDetail.IsValidCaseDetail())
+            //{
+            //    return null;
+            //}
+            //if (customer is null || !policyDetail.IsValidCustomerForUpload(customer) || beneficiary is null || !policyDetail.IsValidBeneficiaryForUpload(beneficiary))
+            //{
+            //    return null;
+            //}
             var reportTemplate = await cloneService.DeepCloneReportTemplate(companyUser.ClientCompanyId.Value, caseType);
             var claim = new InvestigationTask
             {
@@ -163,10 +223,17 @@ namespace risk.control.system.Services
             claim.CustomerDetail = customer;
             claim.BeneficiaryDetail = beneficiary;
             claim.IsReady2Assign = claim.IsValidCaseData();
-            return claim;
+            case_errors.AddRange(customer_errors);
+            case_errors.AddRange(beneficiary_errors);
+            return new UploadResult { InvestigationTask = claim, ErrorDetail = case_errors };
         }
-        private async Task<CustomerDetail> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
+        private async Task<(CustomerDetail, List<UploadError>)> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
+            var errors = new List<UploadError>();
+            if (string.IsNullOrWhiteSpace(uploadCase.CustomerName))
+            {
+                errors.Add(new UploadError { UploadData = "Customer name", Error = "null/empty" });
+            }
             var pinCode = context.PinCode
                                     .Include(p => p.District)
                                     .Include(p => p.State)
@@ -175,9 +242,29 @@ namespace risk.control.system.Services
                                     p.District.Name.ToLower().Contains(uploadCase.CustomerDistrictName.ToLower()));
             if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
             {
-                return null;
+                errors.Add(new UploadError
+                {
+                    UploadData = "customer pincode/district",
+                    Error = $"pincode {uploadCase.CustomerPincode}/district {uploadCase.CustomerDistrictName} null/not found"
+                });
             }
             var imagesWithData = GetImagesWithDataInSubfolder(data, uploadCase.CaseId.ToLower(), CUSTOMER_IMAGE);
+            if (imagesWithData is null)
+            {
+                errors.Add(new UploadError
+                {
+                    UploadData = "Customer image",
+                    Error = $"Image {CUSTOMER_IMAGE} null/not found"
+                });
+            }
+            if (string.IsNullOrWhiteSpace(uploadCase.CustomerAddressLine))
+            {
+                errors.Add(new UploadError
+                {
+                    UploadData = "Customer addressline",
+                    Error = "null/empty"
+                });
+            }
             if (!string.IsNullOrWhiteSpace(uploadCase.Gender) && Enum.TryParse<Gender>(uploadCase.Gender, true, out var gender))
             {
                 uploadCase.Gender = gender.ToString();
@@ -185,6 +272,11 @@ namespace risk.control.system.Services
             else
             {
                 uploadCase.Gender = Gender.UNKNOWN.ToString();
+                errors.Add(new UploadError
+                {
+                    UploadData = "Customer gender",
+                    Error = $"gender {uploadCase.Gender} invalid"
+                });
             }
             if (!string.IsNullOrWhiteSpace(uploadCase.Education) && Enum.TryParse<Education>(uploadCase.Education, true, out var educationEnum))
             {
@@ -193,6 +285,11 @@ namespace risk.control.system.Services
             else
             {
                 uploadCase.Education = Education.UNKNOWN.ToString();
+                errors.Add(new UploadError
+                {
+                    UploadData = "Customer education",
+                    Error = $"education {uploadCase.Education} invalid"
+                });
             }
             if (!string.IsNullOrWhiteSpace(uploadCase.Occupation) && Enum.TryParse<Occupation>(uploadCase.Occupation, true, out var occupationEnum))
             {
@@ -201,6 +298,11 @@ namespace risk.control.system.Services
             else
             {
                 uploadCase.Occupation = Occupation.UNKNOWN.ToString();
+                errors.Add(new UploadError
+                {
+                    UploadData = "Customer occupation",
+                    Error = $"occupation {uploadCase.Occupation} invalid"
+                });
             }
 
             if (!string.IsNullOrWhiteSpace(uploadCase.Income) && Enum.TryParse<Income>(uploadCase.Income, true, out var incomeEnum))
@@ -210,6 +312,11 @@ namespace risk.control.system.Services
             else
             {
                 uploadCase.Income = Income.UNKNOWN.ToString();
+                errors.Add(new UploadError
+                {
+                    UploadData = "Customer income",
+                    Error = $"income {uploadCase.Income} invalid"
+                });
             }
 
             if (!string.IsNullOrWhiteSpace(uploadCase.CustomerDob) && DateTime.TryParseExact(uploadCase.CustomerDob, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var customerDob))
@@ -219,6 +326,11 @@ namespace risk.control.system.Services
             else
             {
                 uploadCase.CustomerDob = DateTime.Now.AddYears(-20).ToString("dd-MM-yyyy");
+                errors.Add(new UploadError
+                {
+                    UploadData = "Customer Date of Birth",
+                    Error = $"Date of Birth {uploadCase.CustomerDob} invalid"
+                });
             }
 
             if (!string.IsNullOrWhiteSpace(uploadCase.CustomerType) && Enum.TryParse(typeof(CustomerType), uploadCase.CustomerType, out var customerTypeEnum))
@@ -229,6 +341,7 @@ namespace risk.control.system.Services
             {
                 uploadCase.CustomerType = CustomerType.UNKNOWN.ToString();
             }
+
             string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", CUSTOMER_IMAGE);
 
             var customerDetail = new CustomerDetail
@@ -242,10 +355,10 @@ namespace risk.control.system.Services
                 Occupation = (Occupation)Enum.Parse(typeof(Occupation), uploadCase.Occupation),
                 Income = (Income)Enum.Parse(typeof(Income), uploadCase.Income),
                 Addressline = uploadCase.CustomerAddressLine,
-                CountryId = pinCode.CountryId,
-                PinCodeId = pinCode.PinCodeId,
-                StateId = pinCode.StateId,
-                DistrictId = pinCode.DistrictId,
+                CountryId = pinCode?.CountryId,
+                PinCodeId = pinCode?.PinCodeId,
+                StateId = pinCode?.StateId,
+                DistrictId = pinCode?.DistrictId,
                 //Description = rowData[20]?.Trim(),
                 ProfilePicture = imagesWithData,
                 ProfilePictureExtension = Path.GetExtension(CUSTOMER_IMAGE),
@@ -253,22 +366,28 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now
             };
             var address = customerDetail.Addressline + ", " +
-                pinCode.District.Name + ", " +
-                pinCode.State.Name + ", " +
-                pinCode.Country.Code + ", " +
-                pinCode.Code;
+                pinCode?.District?.Name + ", " +
+                pinCode?.State?.Name + ", " +
+                pinCode?.Country?.Code + ", " +
+                pinCode?.Code;
 
-            var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
-            customerDetail.Latitude = coordinates.Latitude;
-            customerDetail.Longitude = coordinates.Longitude;
-            var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+            var (Latitude, Longitude) = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+            customerDetail.Latitude = Latitude;
+            customerDetail.Longitude = Longitude;
+            var customerLatLong = Latitude + "," + Longitude;
             var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
                     customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
             customerDetail.CustomerLocationMap = url;
-            return customerDetail;
+            return (customerDetail, errors);
         }
-        private async Task<BeneficiaryDetail> AddBeneficiary(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
+        private async Task<(BeneficiaryDetail, List<UploadError>)> AddBeneficiary(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
+            var errors = new List<UploadError>();
+
+            if (string.IsNullOrWhiteSpace(uploadCase.BeneficiaryName))
+            {
+                errors.Add(new UploadError { UploadData = "Beneficiary name", Error = "null/empty" });
+            }
             var pinCode = context.PinCode.Include(p => p.District)
                                                 .Include(p => p.State)
                                                 .Include(p => p.Country)
@@ -276,13 +395,36 @@ namespace risk.control.system.Services
                                                 p.District.Name.ToLower().Contains(uploadCase.BeneficiaryDistrictName.ToLower()));
             if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
             {
-                return null;
+                errors.Add(new UploadError
+                {
+                    UploadData = "Beneficiary pincode/district",
+                    Error = $"pincode {uploadCase.BeneficiaryPincode}/district {uploadCase.BeneficiaryDistrictName} null/not found"
+                });
             }
+
+            if (string.IsNullOrWhiteSpace(uploadCase.Relation))
+            {
+                errors.Add(new UploadError
+                {
+                    UploadData = "Beneficiary relation",
+                    Error = $"Relation {uploadCase.Relation} null/empty/invalid"
+                });
+            }
+
             var relation = string.IsNullOrWhiteSpace(uploadCase.Relation)
                 ? context.BeneficiaryRelation.FirstOrDefault()  // Get first record from the table
-                : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower())
-                ?? context.BeneficiaryRelation.FirstOrDefault();  // Get matching record
+                : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower()) // Get matching record
+                ?? context.BeneficiaryRelation.FirstOrDefault();
+
             var beneficiaryNewImage = GetImagesWithDataInSubfolder(data, uploadCase.CaseId.ToLower(), BENEFICIARY_IMAGE);
+            if (beneficiaryNewImage == null)
+            {
+                errors.Add(new UploadError
+                {
+                    UploadData = "Beneficiary image",
+                    Error = "null/empty"
+                });
+            }
             if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryIncome) && Enum.TryParse<Income>(uploadCase.BeneficiaryIncome, true, out var incomeEnum))
             {
                 uploadCase.BeneficiaryIncome = incomeEnum.ToString();
@@ -290,6 +432,11 @@ namespace risk.control.system.Services
             else
             {
                 uploadCase.BeneficiaryIncome = Income.UNKNOWN.ToString();
+                errors.Add(new UploadError
+                {
+                    UploadData = "Beneficiary income",
+                    Error = $"income {uploadCase.BeneficiaryIncome} invalid"
+                });
             }
             if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryDob) && DateTime.TryParseExact(uploadCase.BeneficiaryDob, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var beneficiaryDob))
             {
@@ -298,7 +445,22 @@ namespace risk.control.system.Services
             else
             {
                 uploadCase.BeneficiaryDob = DateTime.Now.AddYears(-20).ToString("dd-MM-yyyy");
+                errors.Add(new UploadError
+                {
+                    UploadData = "Beneficiary Date of Birth",
+                    Error = $"Invalid {uploadCase.BeneficiaryDob}"
+                });
             }
+
+            if (string.IsNullOrWhiteSpace(uploadCase.BeneficiaryAddressLine))
+            {
+                errors.Add(new UploadError
+                {
+                    UploadData = "Beneficiary addressline",
+                    Error = "null/empty"
+                });
+            }
+
             string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", BENEFICIARY_IMAGE);
             var beneficairy = new BeneficiaryDetail
             {
@@ -308,30 +470,30 @@ namespace risk.control.system.Services
                 Income = (Income)Enum.Parse(typeof(Income), uploadCase.BeneficiaryIncome),
                 ContactNumber = uploadCase.BeneficiaryContact,
                 Addressline = uploadCase.BeneficiaryAddressLine,
-                PinCodeId = pinCode.PinCodeId,
-                DistrictId = pinCode.District.DistrictId,
-                StateId = pinCode.State.StateId,
-                CountryId = pinCode.Country.CountryId,
+                PinCodeId = pinCode?.PinCodeId,
+                DistrictId = pinCode?.DistrictId,
+                StateId = pinCode?.StateId,
+                CountryId = pinCode?.CountryId,
                 ProfilePicture = beneficiaryNewImage,
                 ProfilePictureExtension = Path.GetExtension(BENEFICIARY_IMAGE),
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
             var address = beneficairy.Addressline + ", " +
-                pinCode.District.Name + ", " +
-                pinCode.State.Name + ", " +
-                pinCode.Country.Code + ", " +
-                pinCode.Code;
+                pinCode?.District?.Name + ", " +
+                pinCode?.State?.Name + ", " +
+                pinCode?.Country?.Code + ", " +
+                pinCode?.Code;
 
-            var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+            var (Latitude, Longitude) = await customApiCLient.GetCoordinatesFromAddressAsync(address);
 
-            var latLong = coordinates.Latitude + "," + coordinates.Longitude;
-            beneficairy.Latitude = coordinates.Latitude;
-            beneficairy.Longitude = coordinates.Longitude;
+            var latLong = Latitude + "," + Longitude;
+            beneficairy.Latitude = Latitude;
+            beneficairy.Longitude = Longitude;
             var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
                     latLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
             beneficairy.BeneficiaryLocationMap = url;
-            return beneficairy;
+            return (beneficairy, errors);
         }
 
         public static byte[] GetImagesWithDataInSubfolder(byte[] zipData, string subfolderName, string filename = "")
@@ -382,7 +544,7 @@ namespace risk.control.system.Services
             return imageExtensions.Contains(extension);
         }
 
-        public async Task<InvestigationTask> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model)
+        public async Task<UploadResult> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model)
         {
             try
             {

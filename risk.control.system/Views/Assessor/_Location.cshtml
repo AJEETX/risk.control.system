@@ -25,30 +25,16 @@
 						</span>
 					</h5>
 
-					<button class="btn btn-sm @location.LocationStatusButton  mb-2" type="button"
-							data-toggle="collapse"
-							data-target="#location-@location.Id"
-							aria-expanded="false"
-							aria-controls="location-@location.Id">
-						<i class="fas fa-chevron-down"></i>
-					</button>
 				</div>
 
 
-				<div id="location-@location.Id" class="collapse">
+				<div id="location-@location.Id" class="expand">
 
 					<div class="card-body bg-light">
 						@* Insert all the current content here (the agent table, face/doc/questions) *@
 
 						@Html.AntiForgeryToken()
-						<button class="btn btn-sm @location.AgentStatus" type="button"
-								data-toggle="collapse"
-								data-target="#agent-@location.Id"
-								aria-expanded="false"
-								aria-controls="agent-@location.Id">
-							Agent ID <i class="fas fa-chevron-down"></i>
-						</button>
-						<div class="collapse" id="agent-@location.Id">
+						<div class="expand" id="agent-@location.Id">
 							<div class="table-responsive">
 								<table class="table table-bordered table-hover text-center align-middle">
 									<thead class="thead-light">
@@ -118,7 +104,7 @@
 												{
 													<small>@agent.IdImageLocationAddress</small>
 													<span class="badge badge-light">
-														Distance travelled  @agent.Distance
+														Distance from Location  @agent.Distance
 													</span>
 												}
 												else

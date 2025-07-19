@@ -63,7 +63,28 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+        public async Task<IActionResult> DownloadErrorLog(long id)
+        {
+            try
+            {
+                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+                if (file == null)
+                {
+                    notifyService.Error("OOPs !!!.. Download error");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var fileBytes = file.ErrorByteData;
+                var fileName = $"ErrorLog_{id}.csv"; // Or use a timestamp
 
+                return File(fileBytes, "text/csv", fileName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
         [HttpPost]
         public IActionResult DeleteLog(int id)
         {

@@ -18,7 +18,7 @@ namespace risk.control.system.Seeds
             {
                 QuestionText = "Met Person Relation With LA",
                 QuestionType = "dropdown",
-                Options = "BORTHER, RELATIVE, COUSIN, FRIEND, UNKNOWN",
+                Options = "BROTHER, RELATIVE, COUSIN, FRIEND, UNKNOWN",
                 IsRequired = true
             };
             var question3 = new Question

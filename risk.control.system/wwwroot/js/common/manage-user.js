@@ -124,10 +124,11 @@
     $("#create-form").validate();
     $("#edit-form").validate();
 
-    $('input#emailAddress').on('input change focus', function () {
+    $('input#emailAddress').on('input change focus blur', function () {
         if ($(this).val() !== '' && $(this).val().length > 4) {
             $('#check-email').prop('disabled', false).removeClass('disabled-btn').addClass('enabled-btn');
         } else {
+            $('#create').prop('disabled', true);
             $('#check-email').prop('disabled', true).removeClass('enabled-btn').addClass('disabled-btn');
         }
     });
@@ -155,6 +156,7 @@ function checkUserEmail() {
     var url = "/Account/CheckUserEmail";
     var name = $('#emailAddress').val().toLowerCase();
     var emailSuffix = $('#emailSuffix').val().toLowerCase();
+    $('#mailAddress').val('');
     if (name) {
         $.get(url, { input: name + '@' + emailSuffix }, function (data) {
             if (data == 0) { //available
@@ -164,12 +166,14 @@ function checkUserEmail() {
                 $("#emailAddress").removeClass('error-border');
             }
             else if (data == 1) { //domain exists
+                $('#mailAddress').val('');
                 $("#result").html("<span class='unavailable' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").addClass('error-border');
             }
 
             else if (data = null || data == undefined) {
+                $('#mailAddress').val('');
             }
         });
     }

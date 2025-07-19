@@ -198,7 +198,8 @@ builder.Services.AddNotyf(config =>
 
 var connectionString = builder.Configuration.GetConnectionString("Database");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite(connectionString));
+                        options.UseSqlite(connectionString,
+        sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 builder.Services.AddHangfire(config => config.UseMemoryStorage());
 builder.Services.AddHangfireServer(options =>
 {

@@ -61,15 +61,40 @@
                     return '<i title="' + row.message + '" class="' + data + '" data-toggle="tooltip"></i>';
                 }
             },
-            { "data": "name" },
-            { "data": "fileType" },
-            { "data": "uploadedBy" },
-            { "data": "createdOn" },
-            { "data": "timeTaken" },
+            {
+                "data": "name",
+                "mRender": function (data, type, row) {
+                    return '<i title="' + data + '" data-toggle="tooltip">' + data + '</i>';
+                }
+            },
+            {
+                "data": "fileType",
+                "mRender": function (data, type, row) {
+                    return '<i title="' + data + '" data-toggle="tooltip">' + data + '</i>';
+                }
+            },
+            {
+                "data": "uploadedBy",
+                "mRender": function (data, type, row) {
+                    return '<i title="Uploaded By' + data + '" data-toggle="tooltip">' + data + '</i>';
+                }
+            },
+            {
+                "data": "createdOn",
+                "mRender": function (data, type, row) {
+                    return '<i title="Action time = ' + data + '" data-toggle="tooltip">' + data + '</i>';
+                }
+            },
+            {
+                "data": "timeTaken",
+                "mRender": function (data, type, row) {
+                    return '<i title="Time taken = ' + data + '" data-toggle="tooltip">' + data + '</i>';
+                }
+            },
             {
                 "data": "uploadedType",
                 "mRender": function (data, type, row) {
-                    var title = row.directAssign ? "Direct Assign" : "Upload";
+                    var title = row.directAssign ? "Direct Assign" : "Only Upload";
                     return `
                     <span class="custom-message-badge" title="${title}" data-toggle="tooltip">
                         ${data}
@@ -87,24 +112,31 @@
                             ${data}
                         </span>`;
                     } else {
-                        return `
+                        if (row.status == 'Error') {
+                            return `
                         <span class="custom-message-badge i-red" title="${data}" data-toggle="tooltip">
+                            ${row.errorLog} ${data}
+                        </span>`;
+                        } else {
+                            return `
+                        <span class="custom-message-badge i-grey" title="${data}" data-toggle="tooltip">
                             ${data}
                         </span>`;
+                        }
+                        
                     }
-                    
                 }
             },
             {
                 "data": null,
                 "bSortable": false,
                 "render": function (data, type, row) {
-                    var img = '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary"><i class="nav-icon fa fa-download"></i> Download</a> ';
-                    if (row.isManager || row.status != 'Completed') {
-                        img += '<button class="btn btn-xs btn-danger delete-file" data-id="' + row.id + '"><i class="fas fa-trash"></i> Delete</button>';
-                    } else {
-                        img += '<button class="btn btn-xs btn-danger disabled" disabled><i class="fas fa-trash"></i> Delete</button>';
-                    }
+                    var img = '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file"><i class="nav-icon fa fa-download"></i> Download</a> ';
+                    //if (row.isManager || row.status != 'Completed') {
+                    //    img += '<button class="btn btn-xs btn-danger delete-file" data-id="' + row.id + '"><i class="fas fa-trash"></i> Delete</button>';
+                    //} else {
+                    //    img += '<button class="btn btn-xs btn-danger disabled" disabled><i class="fas fa-trash"></i> Delete</button>';
+                    //}
                     return img;
                 }
             },

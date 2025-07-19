@@ -74,10 +74,11 @@ $(document).ready(function () {
 
     $("#create-form").validate();
 
-    $('input#emailAddress').on('input change focus', function () {
+    $('input#emailAddress').on('input change focus blur', function () {
         if ($(this).val() !== '' && $(this).val().length > 4) {
             $('#check-domain').prop('disabled', false).removeClass('disabled-btn').addClass('enabled-btn');
         } else {
+            $('#create').prop('disabled', true);
             $('#check-domain').prop('disabled', true).removeClass('enabled-btn').addClass('disabled-btn');
         }
     });

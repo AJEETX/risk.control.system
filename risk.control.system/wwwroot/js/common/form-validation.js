@@ -1,9 +1,9 @@
 ﻿
 $(document).ready(function () {
 
-    $('input[type="text"]').on("cut copy paste", function (e) {
-        e.preventDefault();
-    });
+    //$('input[type="text"]').on("cut copy paste", function (e) {
+    //    e.preventDefault();
+    //});
 
     // Call validateInput with selectors and patterns
     validateInput('#emailAddress', /[^a-z]/g); // Allow only alphabet characters (no spaces)
@@ -23,7 +23,7 @@ $(document).ready(function () {
     validateFileInput('#createImageInput', ['jpg', 'png', 'jpeg']); // Adjust the selector and extensions as per your needs
 
     // Common selector for required fields and specific inputs
-    const requiredFieldsSelector = 'select[required], input[required], input[type="file"], input[type="checkbox"], #Comments, #PinCodeId';
+    const requiredFieldsSelector = '#emailAddress, #mailAddress, #domainAddress, select[required], input[required], input[type="file"], input[type="checkbox"], #Comments, #PinCodeId';
 
     // Add event handlers for 'change' and 'blur' events
     $(requiredFieldsSelector).on('input change blur', function () {
@@ -90,6 +90,9 @@ function alphaOnly(event) {
     return true;
 }
 function checkDomain() {
+    $("#domainAddress").val('');
+    $('#mailAddress').val('');
+
     var url = "/Account/CheckAgencyName";
     var name = $('#emailAddress').val().toLowerCase();
     var domain = $('#domain').val().toLowerCase();
@@ -110,6 +113,8 @@ function checkDomain() {
                 $("#Name").focus();
             }
             else if (data == 1) {//domain exists
+                $("#domainAddress").val('');
+                $('#mailAddress').val('');
                 $("#result").html("<span class='unavailable' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").addClass('error-border');
@@ -117,6 +122,8 @@ function checkDomain() {
                 $('#result').fadeIn('slow'); // 1.5 seconds
             }
             else if (data = null || data == undefined) {
+                $("#domainAddress").val('');
+                $('#mailAddress').val('');
             }
         });
     }

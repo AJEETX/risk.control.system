@@ -168,7 +168,7 @@ namespace risk.control.system.Services
                         Company = applicationUser.ClientCompany,
                         Symbol = "fa fa-times i-orangered",
                         Message = $"Upload Error",
-                        Status = $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR}",
+                        Status = $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_ERR}",
                         NotifierUserEmail = senderUserEmail
                     };
                     _context.Notifications.Add(notification);

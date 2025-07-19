@@ -14,6 +14,7 @@
             {
                 public const string UPLOAD_IN_PROGRESS = "PENDING";
                 public const string UPLOAD_COMPLETED = "UPLOADED";
+                public const string UPLOAD_ERR = "UPLOAD_ERR";
                 public const string DRAFTED_BY_CREATOR = "DRAFTED";
                 public const string CREATED_BY_CREATOR = "CREATED";
                 public const string EDITED_BY_CREATOR = "EDITED";
@@ -28,7 +29,7 @@
                 public const string REQUESTED_BY_ASSESSOR = "REQUESTED";
                 public const string REASSIGNED_TO_ASSIGNER = "REASSIGNED";
                 public const string WITHDRAWN_BY_COMPANY = "WITHDRAWN";
-                public const string WITHDRAWN_BY_AGENCY= "DECLINED";
+                public const string WITHDRAWN_BY_AGENCY = "DECLINED";
             }
         }
         public const string UNDERWRITING = "underwriting";
@@ -40,7 +41,7 @@
             public const string CHEMIST_ADDRESS = "CHEMIST";
             public const string LA_ADDRESS = "LA ADDRESS";
             public const string BUSINESS_ADDRESS = "BUSINESS";
-            
+
             public const string HOSPITAL_ADDRESS = "HOSPITAL";
             public const string CEMETERY_ADDRESS = "CEMETERY";
             public const string POLICE_ADDRESS = "POLICE STATION";

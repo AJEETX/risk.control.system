@@ -1,6 +1,7 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Utils;
+
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 
@@ -97,7 +98,7 @@ namespace risk.control.system.Services
                     }
                     var addressData = $"DateTime:{face.IdImageLongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {face.IdImageLocationAddress}";
                     rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
-                    var locData = $"Distance travelled:{face.Distance}\r\n {face.IdImageData}";
+                    var locData = $"Distance from location of Interest:{face.Distance}\r\n {face.IdImageData}";
                     rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
                     if (face.IdImageLocationUrl != null)
                     {

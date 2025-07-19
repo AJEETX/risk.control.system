@@ -1,17 +1,21 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -218,7 +222,11 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(CreateUser), "Agency");
             }
-
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                notifyService.Custom($"Empty username.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(CreateUser), "Agency");
+            }
             try
             {
                 if (user == null || string.IsNullOrWhiteSpace(emailSuffix) || string.IsNullOrWhiteSpace(vendorId))

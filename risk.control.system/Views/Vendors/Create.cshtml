@@ -29,7 +29,7 @@
                                 <select id="domain" name="domain" asp-for="DomainName" required class="form-control remarks" asp-items="Html.GetEnumSelectList<Domain>()">
                                 </select>
                                 <div class="input-group-append">
-                                    <button disabled id="check-domain" class="input-group-text">
+                                    <button disabled id="check-domain" class="input-group-text" title="Click to validate domain">
                                         <i class="far fa-question-circle"></i>
                                     </button>
                                     <span id="result"></span>
@@ -44,8 +44,8 @@
             </div>
         </div>
         <form id="create-form" asp-action="Create" enctype="multipart/form-data" method="post" autocomplete="off">
-            <input type="hidden" asp-for="Email" id="mailAddress" name="mailAddress" />
-            <input type="hidden" asp-for="DomainName" id="domainAddress" name="domainAddress" />
+            <input type="hidden" asp-for="Email" id="mailAddress" name="mailAddress" required/>
+            <input type="hidden" asp-for="DomainName" id="domainAddress" name="domainAddress" required/>
             <partial name="Vendor/_Create" model="Model" />
 
             <div class="card-footer">

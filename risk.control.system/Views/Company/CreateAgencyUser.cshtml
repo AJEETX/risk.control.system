@@ -20,17 +20,17 @@
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="input-group-label"> Email Address:</label>
+                        <label class="input-group-label"> Email:(minimum 5 character)</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
+                                <span class="input-group-text" id="emailid" title="Email : (minimum 5 character)"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                             </div>
                             <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address remarks" value="" 
-                                   required placeholder="username" maxlength="15"  autocomplete="name">
-                            <div class="input-group-append">
+                                   required placeholder="email" maxlength="15" autocomplete="name" title="enter unique email">
+                            <div class="input-group-append" title="domain name">
                                 <span class="input-group-text" id="Email">@@@email</span>
                             </div>
-                            <div class="input-group-append">
+                            <div class="input-group-append" title="Click to validate email">
                                 <button disabled id="check-email" class="input-group-text">
                                     <i class="far fa-question-circle"></i>
                                 </button>
@@ -49,6 +49,7 @@
         </div>
 
         <form id="create-form" asp-controller="Agency" asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
+            <input type="hidden" asp-for="Email" id="mailAddress" name="mailAddress" required />
             <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
             <input type="hidden" id="txn" name="txn" value="company" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>

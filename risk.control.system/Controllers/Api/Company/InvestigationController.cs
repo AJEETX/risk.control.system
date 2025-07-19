@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Services;
+
 using static risk.control.system.AppConstant.Applicationsettings;
+
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Company
@@ -89,6 +92,8 @@ namespace risk.control.system.Controllers.Api.Company
                 IsManager = isManager,
                 file.Completed,
                 file.DirectAssign,
+                hasError = file.ErrorByteData != null ? true : false,
+                errorLog = file.ErrorByteData != null ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "",
                 UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
                 TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
                 Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
@@ -123,10 +128,12 @@ namespace risk.control.system.Controllers.Api.Company
                 file.UploadedBy,
                 Status = file.Status,
                 file.Completed,
-                file.Message,
+                Message = file.Message == "Upload In progress" ? file.Icon : file.Message,
                 Icon = file.Icon, // or use some other status representation
                 IsManager = isManager,
                 file.DirectAssign,
+                hasError = file.ErrorByteData != null ? true : false,
+                errorLog = file.ErrorByteData != null ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "",
                 UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
                 TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
                 Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",

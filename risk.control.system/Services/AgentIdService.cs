@@ -164,7 +164,7 @@ public class AgentIdService : IAgentIdService
             face.IdImageData = weatherCustomData;
             face.IdImage = compressImage;
             face.DigitalIdImageMatchConfidence = confidence;
-            face.IdImageLocationAddress = address;
+            face.IdImageLocationAddress = $"(Latitude = {latitude} Longitude ={longitude} ) {address}";
             face.ValidationExecuted = true;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
@@ -331,7 +331,7 @@ public class AgentIdService : IAgentIdService
             face.IdImageData = weatherCustomData;
             face.IdImage = compressImage;
             face.MatchConfidence = confidence;
-            face.IdImageLocationAddress = address;
+            face.IdImageLocationAddress = $"(Latitude = {latitude} Longitude ={longitude} ) {address}";
             face.ValidationExecuted = true;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
@@ -496,7 +496,7 @@ public class AgentIdService : IAgentIdService
             }
 
             var rawAddress = await addressTask;
-            doc.IdImageLocationAddress = rawAddress;
+            doc.IdImageLocationAddress = $"(Latitude = {latitude}, Longitude = {longitude}) {rawAddress}";
             doc.ValidationExecuted = true;
 
             _context.DocumentIdReport.Update(doc);
@@ -621,7 +621,7 @@ public class AgentIdService : IAgentIdService
             media.MediaExtension = extension.TrimStart('.');
             media.ValidationExecuted = true;
             media.IdImageValid = true;
-            media.IdImageLocationAddress = address;
+            media.IdImageLocationAddress = $"(Latitude = {latitude} Longitude ={longitude} ) {address}";
             media.IdImageData = weatherCustomData;
             media.IdImageLongLat = $"{latitude}/{longitude}";
             media.IdImageLongLatTime = DateTime.UtcNow;

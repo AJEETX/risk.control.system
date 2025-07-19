@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO.Compression;
 using System.Net;
+using System.Text;
 
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -62,7 +63,8 @@ namespace risk.control.system.Services
             {
                 Directory.CreateDirectory(path);
             }
-            string filePath = Path.Combine(path, Path.GetFileName(postedFile.FileName));
+            var uploadFilePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", Path.GetFileName(postedFile.FileName));
+            postedFile.CopyTo(new FileStream(uploadFilePath, FileMode.Create));
 
             byte[] byteData;
             using (MemoryStream ms = new MemoryStream())
@@ -71,7 +73,7 @@ namespace risk.control.system.Services
                 byteData = ms.ToArray();
             }
 
-            var uploadId = await SaveUpload(postedFile, filePath, "File upload", userEmail, byteData, autoOrManual, ORIGIN.FILE, uploadAndAssign);
+            var uploadId = await SaveUpload(postedFile, uploadFilePath, "File upload", userEmail, byteData, autoOrManual, ORIGIN.FILE, uploadAndAssign);
             return uploadId;
         }
 
@@ -107,49 +109,33 @@ namespace risk.control.system.Services
             return uploadData.Entity.Id;
         }
 
-        void SetUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<string> claimsIds = null)
-        {
-            fileData.Completed = false;
-            fileData.Icon = "fas fa-times-circle i-orangered";
-            fileData.Status = "Error";
-            fileData.Message = message;
-            fileData.DirectAssign = uploadAndAssign;
-            fileData.CompletedOn = DateTime.Now;
-            fileData.ClaimsId = claimsIds;
-        }
-
-        private static List<UploadCase>? ReadFirstCsvFromZipToObject(byte[] zipData)
-        {
-            using (MemoryStream zipStream = new MemoryStream(zipData))
-            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
-            {
-                // Find the first CSV file in the ZIP archive
-                ZipArchiveEntry? csvEntry = archive.Entries.FirstOrDefault(e =>
-                    e.FullName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase));
-
-                if (csvEntry != null)
-                {
-                    using (StreamReader reader = new StreamReader(csvEntry.Open()))
-                    using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
-                    {
-                        TrimOptions = TrimOptions.Trim,
-                        HeaderValidated = null,  // Disables header validation errors
-                        MissingFieldFound = null // Prevents missing field errors
-                    }))
-                    {
-                        return csv.GetRecords<UploadCase>().ToList(); // Convert CSV rows to objects
-                    }
-                }
-            }
-            return null; // Return null if no CSV is found
-        }
-
         [AutomaticRetry(Attempts = 0)]
         public async Task StartFileUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false)
         {
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
-            var customData = ReadFirstCsvFromZipToObject(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
+            var (validRecords, errors) = ReadPipeDelimitedCsvFromZip(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
+
+            if (errors.Any())
+            {
+                string errorString = string.Join(Environment.NewLine, errors); // or use "," or "\n"
+                uploadFileData.ErrorByteData = Encoding.UTF8.GetBytes(errorString);
+                SetFileUploadFailure(uploadFileData, $"{errorString}", uploadAndAssign);
+                await _context.SaveChangesAsync();
+                await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
+                return;
+            }
+
+            if (validRecords.Count == 0)
+            {
+                string errorString = "No data";
+                uploadFileData.ErrorByteData = Encoding.UTF8.GetBytes(errorString);
+                SetFileUploadFailure(uploadFileData, $"{errorString}", uploadAndAssign);
+                await _context.SaveChangesAsync();
+                await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
+                return;
+
+            }
             var totalClaimsCreated = await _context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
 
             try
@@ -165,15 +151,49 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var uploadedClaims = await uploadService.FileUpload(companyUser, customData, uploadFileData);
-                if (uploadedClaims == null || uploadedClaims.Count == 0)
+                var uploadedCaseResult = await uploadService.FileUpload(companyUser, validRecords, uploadFileData);
+                var sb = new StringBuilder();
+
+                if (uploadedCaseResult.Count > 0)
+                {
+                    var rowNum = 1;
+                    sb.AppendLine("Row #, FieldName, Error"); // CSV header
+                    foreach (var result in uploadedCaseResult)
+                    {
+                        var errorList = result.ErrorDetail;
+                        if (errorList.Count > 0)
+                        {
+                            foreach (var err in errorList)
+                            {
+                                var uploadData = err.UploadData?.Replace("\"", "\"\"") ?? "";
+                                var errorMsg = err.Error?.Replace("\"", "\"\"") ?? "";
+
+                                sb.AppendLine($"\"{rowNum}\",\"{uploadData}\",\"{errorMsg}\"");
+                            }
+                            rowNum++;
+                        }
+                    }
+                    if (rowNum > 1)
+                    {
+                        SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
+                        byte[] errorBytes = Encoding.UTF8.GetBytes(sb.ToString());
+                        uploadFileData.ErrorByteData = errorBytes;
+                        await _context.SaveChangesAsync();
+                        await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
+                        return;
+                    }
+                }
+                var uploadedCases = uploadedCaseResult.Select(c => c.InvestigationTask)?.ToList();
+
+                if (uploadedCases == null || uploadedCases.Count == 0)
                 {
                     SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
+
                     await _context.SaveChangesAsync();
                     await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
                     return;
                 }
-                var totalAddedAndExistingCount = uploadedClaims.Count + totalClaimsCreated;
+                var totalAddedAndExistingCount = uploadedCases.Count + totalClaimsCreated;
                 // License Check (if Trial)
                 if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
@@ -187,36 +207,36 @@ namespace risk.control.system.Services
                 }
 
                 var totalReadyToAssign = await investigationService.GetAutoCount(userEmail);
-                if (uploadedClaims.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
+                if (uploadedCases.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
                 {
-                    SetFileUploadFailure(uploadFileData, $"Max count of {companyUser.ClientCompany.TotalToAssignMaxAllowed} Assign-Ready Case(s) limit reached.", uploadAndAssign, uploadedClaims.Select(c => c.Id).ToList());
+                    SetFileUploadFailure(uploadFileData, $"Max count of {companyUser.ClientCompany.TotalToAssignMaxAllowed} Assign-Ready Case(s) limit reached.", uploadAndAssign, uploadedCases.Select(c => c.Id).ToList());
                     await _context.SaveChangesAsync();
                     await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
                     return;
                 }
 
-                _context.Investigations.AddRange(uploadedClaims);
+                _context.Investigations.AddRange(uploadedCases);
 
                 var ros = await _context.SaveChangesAsync(null, false);
 
                 try
                 {
 
-                    if (uploadAndAssign && uploadedClaims.Any())
+                    if (uploadAndAssign && uploadedCases.Any())
                     {
                         // Auto-Assign Claims if Enabled
-                        var claimsIds = uploadedClaims.Select(c => c.Id).ToList();
+                        var claimsIds = uploadedCases.Select(c => c.Id).ToList();
                         var autoAllocated = await processCaseService.BackgroundUploadAutoAllocation(claimsIds, userEmail, url);
-                        SetUploadAssignSuccess(uploadFileData, uploadedClaims, autoAllocated);
+                        SetUploadAssignSuccess(uploadFileData, uploadedCases, autoAllocated);
                         await _context.SaveChangesAsync();
                     }
                     else
                     {
                         // Upload Success
-                        SetUploadSuccess(uploadFileData, uploadedClaims);
+                        SetUploadSuccess(uploadFileData, uploadedCases);
                         await _context.SaveChangesAsync();
 
-                        var updateTasks = uploadedClaims.Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
+                        var updateTasks = uploadedCases.Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
                         await Task.WhenAll(updateTasks);
 
                         // Notify User
@@ -226,7 +246,7 @@ namespace risk.control.system.Services
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.StackTrace);
-                    SetFileUploadFailure(uploadFileData, "Error Assigning cases", uploadAndAssign, uploadedClaims.Select(u => u.Id).ToList());
+                    SetFileUploadFailure(uploadFileData, "Error Assigning cases", uploadAndAssign, uploadedCases.Select(u => u.Id).ToList());
                     await _context.SaveChangesAsync();
                     await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
                     return;
@@ -243,6 +263,66 @@ namespace risk.control.system.Services
             }
 
 
+        }
+
+        private static (List<UploadCase> ValidRecords, List<string> Errors) ReadPipeDelimitedCsvFromZip(byte[] zipData)
+        {
+            var validRecords = new List<UploadCase>();
+            var errors = new List<string>();
+
+            using var zipStream = new MemoryStream(zipData);
+            using var archive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+
+            var csvEntry = archive.Entries.FirstOrDefault(e =>
+                e.FullName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase));
+
+            if (csvEntry != null)
+            {
+                using var reader = new StreamReader(csvEntry.Open());
+                using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    Delimiter = ",", // 👈 Pipe-delimited
+                    TrimOptions = TrimOptions.Trim,
+                    HeaderValidated = null,
+                    MissingFieldFound = null,
+                    BadDataFound = context =>
+                    {
+                        errors.Add($"Row {context.Field}: Bad data - {context.RawRecord}");
+                    }
+                });
+
+                int rowNumber = 1;
+                try
+                {
+                    csv.Read();
+                    csv.ReadHeader();
+                }
+                catch (Exception ex)
+                {
+                    errors.Add($"Error reading header: {ex.Message}");
+                    return (validRecords, errors);
+                }
+
+                while (csv.Read())
+                {
+                    rowNumber++;
+                    try
+                    {
+                        var record = csv.GetRecord<UploadCase>();
+                        validRecords.Add(record);
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add($"Row {rowNumber}: {ex.Message}");
+                    }
+                }
+            }
+            else
+            {
+                errors.Add("No CSV file found in ZIP.");
+            }
+
+            return (validRecords, errors);
         }
 
         private static void SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims, List<long> autoAllocated)
@@ -270,7 +350,7 @@ namespace risk.control.system.Services
             var claimCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.CLAIM);
             var underWritingCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING);
 
-            string message = $"Total Uploaded Claims: {claimCount} & Underwritings: {underWritingCount}";
+            string message = $"Uploaded Claims: {claimCount} & Underwritings: {underWritingCount}";
             fileData.Completed = true;
             fileData.Icon = "fas fa-check-circle i-green";
             fileData.Status = "Completed";
