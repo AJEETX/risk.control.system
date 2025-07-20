@@ -54,7 +54,8 @@
                                     faceMapUrl.classList.remove('hidden');
                                 }
                                 if (faceMsg) {
-                                    faceMsg.innerHTML = `<p class="agent-block">Distance: <em>${data.distance}</em>, Duration: <em>${data.duration}</em>.</p>`;
+                                    var address = data.isClaim ? "Beneficiary" : "Life-Assured";
+                                    faceMsg.innerHTML = `<p class="agent-block">Distance from ${address} Address: <em>${data.distance}</em>, Duration: <em>${data.duration}</em>.</p>`;
                                     faceMsg.classList.remove('hidden');
                                 }
                                 if (liveMap) liveMap.classList.remove('hidden');

@@ -335,6 +335,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         url = string.Format(agentReport.IdImageLocationUrl, "500", "500"),
                         distance = agentReport.Distance,
                         duration = agentReport.Duration,
+                        isCLaim = false
                     });
                 }
             }
@@ -357,6 +358,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         url = string.Format(agentReport.IdImageLocationUrl, "500", "500"),
                         distance = agentReport.Distance,
                         duration = agentReport.Duration,
+                        isCLaim = true
                     });
                 }
             }
@@ -388,6 +390,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         url = string.Format(faceReport.IdImageLocationUrl, "500", "500"),
                         distance = faceReport.Distance,
                         duration = faceReport.Duration,
+                        isCLaim = false
                     });
                 }
             }
@@ -410,6 +413,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         url = string.Format(faceReport.IdImageLocationUrl, "500", "500"),
                         distance = faceReport.Distance,
                         duration = faceReport.Duration,
+                        isCLaim = true
                     });
                 }
             }
@@ -441,6 +445,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
+                        isCLaim = false
                     });
                 }
             }
@@ -463,6 +468,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
+                        isCLaim = true
                     });
                 }
             }
@@ -496,6 +502,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
+                        isCLaim = false
                     });
                 }
             }
@@ -518,6 +525,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
+                        isCLaim = true
                     });
                 }
             }

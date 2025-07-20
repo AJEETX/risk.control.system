@@ -115,11 +115,6 @@
                         if (row.status == 'Error') {
                             return `
                         <span class="custom-message-badge i-red" title="${data}" data-toggle="tooltip">
-                            ${row.errorLog} ${data}
-                        </span>`;
-                        } else {
-                            return `
-                        <span class="custom-message-badge i-grey" title="${data}" data-toggle="tooltip">
                             ${data}
                         </span>`;
                         }
@@ -131,12 +126,21 @@
                 "data": null,
                 "bSortable": false,
                 "render": function (data, type, row) {
-                    var img = '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file"><i class="nav-icon fa fa-download"></i> Download</a> ';
-                    //if (row.isManager || row.status != 'Completed') {
-                    //    img += '<button class="btn btn-xs btn-danger delete-file" data-id="' + row.id + '"><i class="fas fa-trash"></i> Delete</button>';
-                    //} else {
-                    //    img += '<button class="btn btn-xs btn-danger disabled" disabled><i class="fas fa-trash"></i> Delete</button>';
-                    //}
+                    var img = '';
+                    if (row.hasError) {
+                        img += `<a href='/Uploads/DownloadErrorLog/${row.Id}' class='btn-xs btn-danger' title='Error file'><i class='fa fa-download'></i> </a> &nbsp;`;
+                    }
+                    else {
+                        img += `<span class='i-green' title='Upload Success'><i class='fa fa-check'></i> </span>&nbsp;`;
+                    }
+                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file"><i class="nav-icon fa fa-download"></i> Download</a> ';
+                    if (row.isManager || row.status != 'Completed') {
+                        img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete row"><i class="fas fa-trash"></i> </button>';
+                    } else {
+                        img += '<button class="btn-xs btn-danger disabled" disabled title="Can\'t Delete row"><i class="fas fa-trash"></i> </button>';
+                    }
+
+                   
                     return img;
                 }
             },
@@ -214,7 +218,7 @@
             });
 
             if (errorRow) {
-                var title = errorRow.directAssign ? "Direct Assign" : "Upload"; // ✅ Dynamically set title
+                var title = errorRow.directAssign ? "Direct Assign" : "Upload Only"; // ✅ Dynamically set title
                 var icon = errorRow.directAssign ? 'fas fa-random' : 'fas fa-upload';
             }
         }

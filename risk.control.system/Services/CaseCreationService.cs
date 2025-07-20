@@ -354,7 +354,7 @@ namespace risk.control.system.Services
                 Education = (Education)Enum.Parse(typeof(Education), uploadCase.Education),
                 Occupation = (Occupation)Enum.Parse(typeof(Occupation), uploadCase.Occupation),
                 Income = (Income)Enum.Parse(typeof(Income), uploadCase.Income),
-                Addressline = uploadCase.CustomerAddressLine,
+                Addressline = uploadCase?.CustomerAddressLine,
                 CountryId = pinCode?.CountryId,
                 PinCodeId = pinCode?.PinCodeId,
                 StateId = pinCode?.StateId,
@@ -365,19 +365,23 @@ namespace risk.control.system.Services
                 UpdatedBy = companyUser.Email,
                 Updated = DateTime.Now
             };
-            var address = customerDetail.Addressline + ", " +
+            if (pinCode != null)
+            {
+                var address = customerDetail.Addressline + ", " +
                 pinCode?.District?.Name + ", " +
                 pinCode?.State?.Name + ", " +
                 pinCode?.Country?.Code + ", " +
                 pinCode?.Code;
 
-            var (Latitude, Longitude) = await customApiCLient.GetCoordinatesFromAddressAsync(address);
-            customerDetail.Latitude = Latitude;
-            customerDetail.Longitude = Longitude;
-            var customerLatLong = Latitude + "," + Longitude;
-            var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
-            customerDetail.CustomerLocationMap = url;
+                var (Latitude, Longitude) = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+                customerDetail.Latitude = Latitude;
+                customerDetail.Longitude = Longitude;
+                var customerLatLong = Latitude + "," + Longitude;
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                        customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
+                customerDetail.CustomerLocationMap = url;
+            }
+
             return (customerDetail, errors);
         }
         private async Task<(BeneficiaryDetail, List<UploadError>)> AddBeneficiary(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
@@ -398,7 +402,7 @@ namespace risk.control.system.Services
                 errors.Add(new UploadError
                 {
                     UploadData = "Beneficiary pincode/district",
-                    Error = $"pincode {uploadCase.BeneficiaryPincode}/district {uploadCase.BeneficiaryDistrictName} null/not found"
+                    Error = $"pincode {uploadCase?.BeneficiaryPincode}/district {uploadCase?.BeneficiaryDistrictName} null/not found"
                 });
             }
 
@@ -479,20 +483,24 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
-            var address = beneficairy.Addressline + ", " +
+            if (pinCode != null)
+            {
+                var address = beneficairy.Addressline + ", " +
                 pinCode?.District?.Name + ", " +
                 pinCode?.State?.Name + ", " +
                 pinCode?.Country?.Code + ", " +
                 pinCode?.Code;
 
-            var (Latitude, Longitude) = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+                var (Latitude, Longitude) = await customApiCLient.GetCoordinatesFromAddressAsync(address);
 
-            var latLong = Latitude + "," + Longitude;
-            beneficairy.Latitude = Latitude;
-            beneficairy.Longitude = Longitude;
-            var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    latLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
-            beneficairy.BeneficiaryLocationMap = url;
+                var latLong = Latitude + "," + Longitude;
+                beneficairy.Latitude = Latitude;
+                beneficairy.Longitude = Longitude;
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                        latLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
+                beneficairy.BeneficiaryLocationMap = url;
+            }
+
             return (beneficairy, errors);
         }
 

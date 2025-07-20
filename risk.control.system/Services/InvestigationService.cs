@@ -25,6 +25,7 @@ namespace risk.control.system.Services
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
+        Task<CaseTransactionModel> GetClaimDetailsAiReportSummary(CaseTransactionModel model);
         Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id);
         Task<CaseTransactionModel> GetPdfReport(long id);
     }
@@ -32,6 +33,7 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext context;
         private readonly INumberSequenceService numberService;
+        private readonly IChatSummarizer chatSummarizer;
         private readonly ICloneReportService cloneService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ITimelineService timelineService;
@@ -39,6 +41,7 @@ namespace risk.control.system.Services
 
         public InvestigationService(ApplicationDbContext context,
             INumberSequenceService numberService,
+            IChatSummarizer chatSummarizer,
             ICloneReportService cloneService,
             IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
@@ -46,6 +49,7 @@ namespace risk.control.system.Services
         {
             this.context = context;
             this.numberService = numberService;
+            this.chatSummarizer = chatSummarizer;
             this.cloneService = cloneService;
             this.webHostEnvironment = webHostEnvironment;
             this.timelineService = timelineService;
@@ -575,6 +579,13 @@ namespace risk.control.system.Services
                 Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
             };
 
+            return model;
+        }
+
+        public async Task<CaseTransactionModel> GetClaimDetailsAiReportSummary(CaseTransactionModel model)
+        {
+            var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+            model.ReportAiSummary = investigationSummary;
             return model;
         }
         public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)

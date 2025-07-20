@@ -1,10 +1,14 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Helpers;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 namespace risk.control.system.Controllers.Company
 {
@@ -200,13 +204,11 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
-                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
+                if (model != null && model.ReportAiSummary == null && model.ClaimsInvestigation.AiEnabled)
                 {
-                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
-                    model.ReportAiSummary = investigationSummary;
+                    model = await investigationService.GetClaimDetailsAiReportSummary(model);
                 }
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-
                 return View(model);
             }
             catch (Exception ex)
