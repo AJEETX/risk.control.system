@@ -14,8 +14,8 @@
 				<th>
 					<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-toggle="tooltip"></i>
 				</th>
-				<th title="Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
-					<th>Captured Address Info</th>
+				<th title="Indicative Captured Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
+					<th>Indicative Captured Address Info</th>
 					<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
 				<th>Match</th>
 			</tr>
@@ -25,7 +25,9 @@
 			{
 				<tr>
 					<td>
+						<small>
 						@face.ReportName
+						</small>
 							@if (face.IsRequired)
 							{
 								<span class="required-asterisk" title="Mandatory Location">*</span>
@@ -48,7 +50,7 @@
 					<td>
 						@if (face.ValidationExecuted && face.IdImageLocationUrl != null)
 						{
-								<img src="@string.Format(face.IdImageLocationUrl, "300","300")"
+								<img src="@string.Format(face.IdImageLocationUrl, "500","500")"
 									 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
 								 data-faceid="@face.Id"
 								 data-locationid="@location.Id"
@@ -62,12 +64,14 @@
 						}
 					</td>
 					<td>
+						<small>
 						@face.IdImageLocationAddress
-
+						</small>
 					</td>
 					<td>
+						<small>
 						@face.IdImageData
-
+						</small>
 					</td>
 					<td>
 						@if (face.ValidationExecuted)

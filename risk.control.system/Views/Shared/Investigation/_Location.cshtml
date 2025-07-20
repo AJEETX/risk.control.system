@@ -48,7 +48,7 @@
 											<th><i class="far fa-user text-primary" title="Agent icon" data-toggle="tooltip"></i></th>
 											<th>ID Photo</th>
 											<th>Map Image</th>
-											<th>Captured Address Info</th>
+											<th>Indicative Captured Address Info</th>
 											<th>Match</th>
 										</tr>
 									</thead>
@@ -56,6 +56,7 @@
 										<tr>
 											<!-- Email or Report Type -->
 											<td>
+												<small>
 												@if (agent.ValidationExecuted)
 												{
 													@location.AgentEmail
@@ -64,6 +65,7 @@
 												{
 													@agent.ReportType.GetEnumDisplayName()
 												}
+												</small>
 												@if (agent.IsRequired)
 												{
 													<span class="required-asterisk" title="Mandatory Location">*</span>
@@ -95,7 +97,7 @@
 											<td>
 											@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
 												{
-													<img src="@string.Format(@agent.IdImageLocationUrl, "300","300")"
+													<img src="@string.Format(@agent.IdImageLocationUrl, "500","500")"
 														 class="img-thumbnail"
 														 data-faceid="@agent.Id"
 														 data-locationid="@location.Id"

@@ -25,7 +25,7 @@
 			{
 				<tr>
 					<td>
-						@face.ReportName
+						<small>@face.ReportName</small>
 							@if (face.IsRequired)
 							{
 								<span class="required-asterisk" title="Mandatory Location">*</span>
@@ -48,7 +48,7 @@
 					<td>
 						@if (face.ValidationExecuted && face.IdImageLocationUrl != null)
 						{
-								<img src="@string.Format(face.IdImageLocationUrl, "300","300")"
+								<img src="@string.Format(face.IdImageLocationUrl, "500","500")"
 									 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
 								 data-faceid="@face.Id"
 								 data-locationid="@location.Id"
@@ -64,11 +64,11 @@
 					<td>
 							<small>@face.IdImageLocationAddress</small>
 							<span class="badge badge-light">
-								Distance from Location of Interest  @face.Distance
+								Indicative Distance from Location of Interest  @face.Distance
 							</span>
 					</td>
 					<td>
-						@face.IdImageData
+						<small>@face.IdImageData</small>
 
 					</td>
 					<td>

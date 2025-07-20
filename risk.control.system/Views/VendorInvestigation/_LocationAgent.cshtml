@@ -13,7 +13,7 @@
 				<i class="far fa-user text-primary" title="This Image has agent photo at the location" data-toggle="tooltip"></i>
 			</th>
 			<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
-			<th>Verified Address</th>
+			<th>Indicative Captured Address Info</th>
 			<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
 			<th>Match</th>
 			<th title="Action"><img class="action-image" src="~/headers/action.gif" /></th>
@@ -22,6 +22,7 @@
 	<tbody>
 		<tr>
 			<td>
+				<small>
 				@if (agent.ValidationExecuted)
 				{
 					@location.AgentEmail
@@ -30,6 +31,7 @@
 				{
 					@agent.ReportType.GetEnumDisplayName()
 				}
+					</small>
 				@if (agent.IsRequired)
 				{
 					<span class="required-asterisk" title="Mandatory Location">*</span>
@@ -53,7 +55,7 @@
 			<td>
 				@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
 				{
-					<img src="@string.Format(@agent.IdImageLocationUrl, "300","300")"
+					<img src="@string.Format(@agent.IdImageLocationUrl, "500","500")"
 						 class="thumbnail profile-image doc-profile-image map-image"
 						 data-faceid="@agent.Id"
 						 data-locationid="@location.Id"
@@ -66,12 +68,14 @@
 				}
 			</td>
 			<td>
+				<small>
 				@agent.IdImageLocationAddress
-
+					</small>
 			</td>
 			<td>
+				<small>
 				@agent.IdImageData
-
+					</small>
 			</td>
 			<td>
 				@if (agent.ValidationExecuted)

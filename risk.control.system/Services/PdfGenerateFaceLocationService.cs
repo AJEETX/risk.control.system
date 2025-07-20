@@ -12,7 +12,7 @@ namespace risk.control.system.Services
 {
     public interface IPdfGenerateFaceLocationService
     {
-        Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc);
+        Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc, bool isClaim = true);
     }
     public class PdfGenerateFaceLocationService : IPdfGenerateFaceLocationService
     {
@@ -49,7 +49,7 @@ namespace risk.control.system.Services
         {
             this.webHostEnvironment = webHostEnvironment;
         }
-        public async Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc)
+        public async Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc, bool isClaim = true)
         {
             var imagePath = webHostEnvironment.WebRootPath;
 
@@ -102,7 +102,8 @@ namespace risk.control.system.Services
 
                     var addressData = $"DateTime:{face.IdImageLongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {face.IdImageLocationAddress}";
                     rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
-                    var locData = $"Distance from Location of Interest:{face.Distance}\r\n {face.IdImageData}";
+                    string location = isClaim ? "Beneficiary " : "Life Assured ";
+                    var locData = $"Indicative Distance from {location} Address :{face.Distance}\r\n {face.IdImageData}";
                     rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
 
                     if (face.IdImageLocationUrl != null)

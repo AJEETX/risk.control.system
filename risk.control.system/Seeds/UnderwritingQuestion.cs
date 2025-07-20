@@ -18,7 +18,7 @@ namespace risk.control.system.Seeds
             {
                 QuestionText = "Met Person Relation With LA",
                 QuestionType = "dropdown",
-                Options = "BROTHER, RELATIVE, COUSIN, FRIEND, UNKNOWN",
+                Options = "BROTHER, RELATIVE, COUSIN, FRIEND, UNKNOWN, SELF",
                 IsRequired = true
             };
             var question3 = new Question
@@ -66,7 +66,7 @@ namespace risk.control.system.Seeds
             };
             var question10 = new Question
             {
-                QuestionText = "No of Year at Current Residence",
+                QuestionText = "Date since living at Current Residence",
                 QuestionType = "date",
                 IsRequired = true
             };

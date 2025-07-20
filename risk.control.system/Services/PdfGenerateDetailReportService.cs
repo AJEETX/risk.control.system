@@ -1,6 +1,7 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Utils;
+
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 
@@ -8,7 +9,7 @@ namespace risk.control.system.Services
 {
     public interface IPdfGenerateDetailReportService
     {
-        Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport);
+        Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true);
     }
     public class PdfGenerateDetailReportService : IPdfGenerateDetailReportService
     {
@@ -54,7 +55,7 @@ namespace risk.control.system.Services
             this.documentService = documentService;
             this.questionService = questionService;
         }
-        public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport)
+        public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true)
         {
 
             //var concertTable = section.AddTable();
@@ -98,13 +99,13 @@ namespace risk.control.system.Services
                        .SetFontSize(14);
 
                     // =================== AGENT ID REPORT ====================
-                    section = await agentService.Build(section, loc);
+                    section = await agentService.Build(section, loc, isClaim);
 
                     // =================== FACE IDs ====================
-                    section = await faceService.Build(section, loc);
+                    section = await faceService.Build(section, loc, isClaim);
 
                     //// =================== DOCUMENT IDs ====================
-                    section = await documentService.Build(section, loc);
+                    section = await documentService.Build(section, loc, isClaim);
 
                     // =================== QUESTIONS ====================
                     section = questionService.Build(section, loc);

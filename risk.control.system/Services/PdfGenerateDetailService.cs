@@ -78,10 +78,11 @@ namespace risk.control.system.Services
 
             SectionBuilder section = builder.AddSection();
             section.SetOrientation(PageOrientation.Landscape);
-
+            bool isClaim = true;
             //CASE DETAIL
             if (policy.InsuranceType == InsuranceType.UNDERWRITING)
             {
+                isClaim = false;
                 section = detailService.BuildUnderwritng(section, investigation, policy, customer, beneficiary);
             }
             else
@@ -90,7 +91,7 @@ namespace risk.control.system.Services
             }
 
             //CASE DETAIL   Investigation Report Section
-            section = await detailReportService.Build(section, investigation, investigationReport);
+            section = await detailReportService.Build(section, investigation, investigationReport, isClaim);
 
             section.AddParagraph().AddText("");
 

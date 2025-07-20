@@ -16,8 +16,8 @@
 				<th>
 					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
 				</th>
-				<th title="Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
-				<th>Captured Address</th>
+					<th title="Indicative Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
+				<th>Indicative Captured Address</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -71,7 +71,7 @@
 						@if (doc.ValidationExecuted && doc.IdImageLocationUrl != null)
 						{
 							<img id="face-img-@doc.Id"
-								 src="@string.Format(@doc.IdImageLocationUrl, "300","300")"
+								 src="@string.Format(@doc.IdImageLocationUrl, "400","400")"
 								 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
 								 data-faceid="@doc.Id"
 								 data-locationid="@location.Id"
@@ -84,8 +84,9 @@
 						}
 					</td>
 					<td>
-						@doc.IdImageLocationAddress
-
+							<small>
+								@doc.IdImageLocationAddress
+								</small>
 					</td>
 					
 				</tr>

@@ -9,7 +9,7 @@ namespace risk.control.system.Services
 {
     public interface IPdfGenerateAgentLocationService
     {
-        Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc);
+        Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc, bool isClaim = true);
     }
     public class PdfGenerateAgentLocationService : IPdfGenerateAgentLocationService
     {
@@ -46,7 +46,7 @@ namespace risk.control.system.Services
         {
             this.webHostEnvironment = webHostEnvironment;
         }
-        public async Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc)
+        public async Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc, bool isClaim)
         {
             var imagePath = webHostEnvironment.WebRootPath;
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-agent-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
@@ -105,7 +105,8 @@ namespace risk.control.system.Services
                 }
                 var addressData = $"DateTime:{loc.AgentIdReport.IdImageLongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {loc.AgentIdReport.IdImageLocationAddress}";
                 rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
-                var locData = $"Distance from location of Interest:{loc.AgentIdReport.Distance}\r\n {loc.AgentIdReport.IdImageData}";
+                string location = isClaim ? "Beneficiary " : "Life Assured ";
+                var locData = $"Indicative Distance from {location} Address :{loc.AgentIdReport.Distance}\r\n {loc.AgentIdReport.IdImageData}";
                 rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
 
                 if (loc.AgentIdReport.IdImageLocationUrl != null)

@@ -14,8 +14,8 @@
 				<th>
 					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
 				</th>
-					<th title="Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
-					<th>Captured Address</th>
+					<th title="Indicative Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
+					<th>Indicative Captured Address</th>
 				<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
 				<th>Valid</th>
 			</tr>
@@ -25,7 +25,10 @@
 			{
 
 				<tr>
-					<td>@doc.ReportName
+					<td>
+							<small>
+						@doc.ReportName
+								</small>
 							@if (doc.IsRequired)
 							{
 								<span class="required-asterisk" title="Mandatory Location">*</span>
@@ -50,7 +53,7 @@
 						@if (doc.ValidationExecuted && doc.IdImageLocationUrl != null)
 						{
 							<img id="face-img-@doc.Id"
-									 src="@string.Format(doc.IdImageLocationUrl, "300","300")"
+									 src="@string.Format(doc.IdImageLocationUrl, "500","500")"
 									 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
 								 data-faceid="@doc.Id"
 								 data-locationid="@location.Id"
@@ -63,11 +66,14 @@
 						}
 					</td>
 					<td>
+							<small>
 						@doc.IdImageLocationAddress
-
+								</small>
 					</td>
 					<td>
+							<small>
 						@doc.IdImageData
+								</small>
 					</td>
 					<td>
 						@if (doc.ValidationExecuted)

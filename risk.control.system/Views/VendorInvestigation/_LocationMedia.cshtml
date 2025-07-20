@@ -29,7 +29,10 @@
 					accept = "video/mp4,video/webm";
 				}
 				<tr>
-					<td>@doc.ReportName
+					<td>
+							<small>
+						@doc.ReportName
+								</small>
 						@if (doc.IsRequired)
 						{
 							<span class="required-asterisk" title="Mandatory Location">*</span>
@@ -84,8 +87,9 @@
 						}
 					</td>
 					<td>
+							<small>
 						@doc.IdImageLocationAddress
-
+								</small>
 					</td>
 					
 				</tr>
