@@ -19,7 +19,7 @@ namespace risk.control.system.Seeds
 
             var globalSettings = context.GlobalSettings.FirstOrDefault();
 
-            var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY && s.Code == "122003");
+            var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY && s.Code == input.PINCODE);
 
             var companyAddressline = "139 Sector 44";
             var companyAddress = companyAddressline + ", " + companyPinCode.District.Name + ", " + companyPinCode.State.Name + ", " + companyPinCode.Country.Code;

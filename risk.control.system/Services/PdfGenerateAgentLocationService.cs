@@ -105,7 +105,7 @@ namespace risk.control.system.Services
                 }
                 var addressData = $"DateTime:{loc.AgentIdReport.IdImageLongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {loc.AgentIdReport.IdImageLocationAddress}";
                 rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
-                string location = isClaim ? "Beneficiary " : "Life Assured ";
+                string location = isClaim ? "Beneficiary " : "Life-Assured ";
                 var locData = $"Indicative Distance from {location} Address :{loc.AgentIdReport.Distance}\r\n {loc.AgentIdReport.IdImageData}";
                 rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
 

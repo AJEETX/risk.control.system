@@ -54,11 +54,12 @@
         </div>
         <div class="card-footer">
             <div class="text-right">
-                <a id="back" asp-controller="Assessor" asp-action="Approved" class="btn btn-outline-secondary">
+                <a id="back" asp-controller="Assessor" asp-action="Approved" class="btn  btn-xs btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i>
                     Back
                 </a>
-                <a class="btn bg-teal" asp-controller="Assessor" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
+                <a href="/Report/PrintPdfReport?Id=@Model.ClaimsInvestigation.Id" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>
+                <a class="btn  btn-xs  bg-teal" asp-controller="Assessor" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
                     <i class="fa fa-print"> Invoice</i>
                 </a>
             </div>

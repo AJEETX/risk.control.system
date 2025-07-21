@@ -15,18 +15,18 @@ namespace risk.control.system.Seeds
         public static async Task<List<ClientCompany>> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
                     ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager)
         {
-            var allianz = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "allianz.com", NAME = "Allianz", PHOTO = "/img/allianz.png" };
-            var insurer = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "insurer.com", NAME = "Insurer", PHOTO = "/img/insurer.jpg" };
+            var allianz = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "allianz.com", NAME = "Allianz", PHOTO = "/img/allianz.png", PINCODE = "3131" };
+            var insurer = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "insurer.com", NAME = "Insurer", PHOTO = "/img/insurer.jpg", PINCODE = "3131" };
             //#if !DEBUG
             COUNTRY = CONSTANTS.COUNTRY_IN;
             //#endif
-            var canara = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "canara.com", NAME = "Canara", PHOTO = "/img/insurer.jpg" };
+            var canara = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "canara.com", NAME = "Canara", PHOTO = "/img/insurer.jpg", PINCODE = "122003" };
 
             var companies = new List<SeedInput> {
                 //allianz
                 //,
-                //insurer
-                //,
+                insurer
+                ,
 //#if !DEBUG
                 canara
 //#endif

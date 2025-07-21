@@ -102,7 +102,7 @@ namespace risk.control.system.Services
 
                     var addressData = $"DateTime:{face.IdImageLongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {face.IdImageLocationAddress}";
                     rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
-                    string location = isClaim ? "Beneficiary " : "Life Assured ";
+                    string location = isClaim ? "Beneficiary " : "Life-Assured ";
                     var locData = $"Indicative Distance from {location} Address :{face.Distance}\r\n {face.IdImageData}";
                     rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
 

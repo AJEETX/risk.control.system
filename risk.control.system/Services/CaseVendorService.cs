@@ -237,7 +237,7 @@ namespace risk.control.system.Services
 
             beneficiaryDetails.ContactNumber = beneficairyContactMasked;
 
-            var templates = await _context.ReportTemplates
+            var caseReportTemplate = await _context.ReportTemplates
                 .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.AgentIdReport)
                //.Include(r => r.LocationTemplate)
@@ -250,13 +250,14 @@ namespace risk.control.system.Services
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 
-            claim.InvestigationReport.ReportTemplate = templates;
+            claim.InvestigationReport.ReportTemplate = caseReportTemplate;
 
             return (new CaseInvestigationVendorsModel
             {
                 InvestigationReport = claim.InvestigationReport,
                 Location = beneficiaryDetails,
-                ClaimsInvestigation = claim
+                ClaimsInvestigation = claim,
+                Address = claim.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured"
             });
         }
     }

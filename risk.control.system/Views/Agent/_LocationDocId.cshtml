@@ -25,7 +25,6 @@
 		<tbody>
 			@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
 			{
-
 				<tr>
 					<td>@doc.ReportName
 						@if (doc.IsRequired)

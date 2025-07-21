@@ -131,11 +131,12 @@
                 "bSortable": false,
                 "render": function (data, type, row) {
                     var img = '';
+                    var title = row.directAssign ? "Direct Assign" : "Only Upload";
                     if (row.hasError) {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn-xs btn-danger' title='Error file'><i class='fa fa-download'></i> </a> &nbsp;`;
+                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn-xs btn-danger' title='Download Error file'><i class='fa fa-download'></i> </a> &nbsp;`;
                     }
                     else if (!row.hasError && row.status == 'Completed') {
-                        img += `<span class='i-green' title='Upload Success'><i class='fa fa-check'></i> </span>&nbsp;`;
+                        img += `<span class='btn-xs btn-default i-green' title='${title} Success'><i class='fa fa-check'></i> </span>&nbsp;`;
                     } else {
                         img += `<i class='fas fa-sync fa-spin i-grey'></i>&nbsp;`;
                     }

@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
 
 
-            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && ((f.UploadedBy == userEmail && !f.Deleted) || isManager)).ToListAsync();
+            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && ((f.UploadedBy == userEmail && !f.Deleted) || isManager && !f.Deleted)).ToListAsync();
             var result = files.OrderBy(o => o.CreatedOn).Select(file => new
             {
                 file.Id,

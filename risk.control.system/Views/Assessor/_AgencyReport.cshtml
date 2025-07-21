@@ -41,6 +41,7 @@
                         template.CaseId = Model.ClaimsInvestigation.Id;
                     }
                     <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
+                    <input type="hidden" id="address" value="@Model.Address" />
                     <partial name="_Location" model="@template" />
 
                 </div>

@@ -18,8 +18,8 @@ namespace risk.control.system.Seeds
             var countries = context.Country.ToList();
 
             //CREATE VENDOR COMPANY
-            //var checker = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "checker.com", NAME = "Checker", PHOTO = "/img/checker.png" };
-            //var verify = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "verify.com", NAME = "Verify", PHOTO = "/img/verify.png" };
+            var checker = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "checker.com", NAME = "Checker", PHOTO = "/img/checker.png" };
+            var verify = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "verify.com", NAME = "Verify", PHOTO = "/img/verify.png" };
             //var investigate = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigate.com", NAME = "Investigate", PHOTO = "/img/investigate.png" };
             //var investigator = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "investigator.com", NAME = "Investigator", PHOTO = "/img/investigation.png" };
             //var greatez = new SeedInput { COUNTRY = COUNTRY, DOMAIN = "greatez.com", NAME = "Greatez", PHOTO = "/img/company.png" };
@@ -41,9 +41,10 @@ namespace risk.control.system.Seeds
             var servicesTypes = await ServiceTypeSeed.Seed(context);
 
             var agencies = new List<SeedInput> {
-                //checker, 
+                checker, 
 //#if !DEBUG
 
+                verify,
                 //verify, investigate, investigator, greatez,
                 proper, honest,
                 //greater, investigatoz

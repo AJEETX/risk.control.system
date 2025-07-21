@@ -7,6 +7,7 @@
 {
 	location.SetStatus();
 	var agent = location.AgentIdReport;
+		location.Address = Model.InsuranceType == InsuranceType.CLAIM ? "Beneficiary" : location.Address;
 
 	<div class="col-12 mb-4 location-container">
 		<div class="card mb-2 border @location.StatusClass @location.LocationStatus">
@@ -48,9 +49,10 @@
 								<thead class="thead-light">
 									<tr>
 										<th>Agent</th>
-										<th>ID Photo</th>
-										<th>Map Image</th>
-										<th>Address</th>
+										<th>Captured Photo</th>
+											<th>Indicative Map Route</th>
+											<th> Captured Address Info</th>
+											<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" /></th>
 										<th>Match</th>
 									</tr>
 								</thead>
@@ -99,7 +101,7 @@
 													 data-locationid="@location.Id"
 													 data-caseid="@Model.CaseId"
 													 data-source="agent"
-													 title="Captured Address map" />
+													 title="Captured map route" />
 											}
 											else
 											{
@@ -112,13 +114,19 @@
 											@if (agent.ValidationExecuted)
 											{
 												<small>@agent.IdImageLocationAddress</small>
+												<span class="badge badge-light">
+														Indicative Distance from @location.Address Address  @agent.Distance
+													</span>
 											}
 											else
 											{
 												<img src="~/img/no-map-image.jpeg" class="img-thumbnail img-fluid profile-image" />
 											}
 										</td>
+										<td>
+												<small>@agent.IdImageData</small>
 
+											</td>
 										<!-- Match status -->
 										<td>
 											@if (agent.ValidationExecuted)

@@ -61,19 +61,20 @@ namespace risk.control.system.Seeds
 
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
 
-            //var auPincodes = await PinCodeStateSeed.CsvRead_Au(maxRowCountForDebug);
-            //var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "vic"
-            //    //#if !DEBUG
+            var au = countries.FirstOrDefault(c => c.Code.ToLower() == "au");
+            var auPincodes = await PinCodeStateSeed.CsvRead_Au(0);
+            var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "vic"
+                //#if !DEBUG
 
-            //    || s.StateCode.ToLower() == "qld"
-            //    || s.StateCode.ToLower() == "nsw"
-            //    //#endif
+                || s.StateCode.ToLower() == "qld"
+                || s.StateCode.ToLower() == "nsw"
+                //#endif
 
-            //    ).Select(g => g.StateCode).Distinct()?.ToList();
+                ).Select(g => g.StateCode).Distinct()?.ToList();
 
-            //var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
+            var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
 
-            //await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes, au);
+            await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes, au);
 
             // seed USA
             //var us = countries.FirstOrDefault(c => c.Code.ToLower() == "us");
@@ -89,7 +90,7 @@ namespace risk.control.system.Seeds
             await context.SaveChangesAsync(null, false);
 
 
-            var randomPinCode = filteredInPincodes.FirstOrDefault();
+            var randomPinCode = filteredAuPincodes.FirstOrDefault();
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode.Code);
 

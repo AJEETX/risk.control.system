@@ -10,7 +10,7 @@
 		location.SetStatus();
 		var agent = location.AgentIdReport;
 		var duration = location.Updated.GetValueOrDefault().Subtract(agent.Updated.GetValueOrDefault());
-
+		location.Address = Model.InsuranceType == InsuranceType.CLAIM ? "Beneficiary" : location.Address;
 		<div class="col-12 mb-4 location-container">
 			<div class="card mb-2 border @location.StatusClass @location.LocationStatus">
 				<div class="card-header bg-light text-white d-flex align-items-center">
@@ -39,10 +39,11 @@
 								<table class="table table-bordered table-hover text-center align-middle">
 									<thead class="thead-light">
 										<tr>
-											<th>Email / Type</th>
-											<th>ID Photo</th>
-											<th>Indicative Map </th>
+											<th>Agent </th>
+											<th>Captured Photo</th>
+											<th>Indicative Map Route</th>
 											<th> Captured Address Info</th>
+											<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" /></th>
 											<th>Match</th>
 										</tr>
 									</thead>
@@ -74,7 +75,7 @@
 													<img id="face-img-@agent.Id"
 														 src="data:image/*;base64,@(Convert.ToBase64String(agent?.IdImage))"
 														 class="img-thumbnail rounded"
-														 title="Click to view @location.AgentEmail photo" />
+														 title="@location.AgentEmail photo" />
 												}
 												else
 												{
@@ -86,7 +87,7 @@
 											<td>
 												@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
 												{
-													<img src="@string.Format(@agent.IdImageLocationUrl, "500","500")"
+													<img src="@string.Format(@agent.IdImageLocationUrl, "600","500")"
 														 class="img-thumbnail"
 														 data-faceid="@agent.Id"
 														 data-locationid="@location.Id"
@@ -105,7 +106,7 @@
 												{
 													<small>@agent.IdImageLocationAddress</small>
 													<span class="badge badge-light">
-														Indicative Distance from Location of Interest  @agent.Distance
+														Indicative Distance from  @location.Address Address @agent.Distance
 													</span>
 												}
 												else
@@ -113,7 +114,10 @@
 													<img src="~/img/no-map-image.jpeg" class="img-thumbnail img-fluid profile-image" />
 												}
 											</td>
+											<td>
+												<small>@agent.IdImageData</small>
 
+											</td>
 
 											<!-- Match status -->
 											<td>

@@ -6,6 +6,7 @@
 @foreach (var location in Model.LocationTemplate)
 {
 	location.CaseId = Model.CaseId;
+	location.Address = Model.InsuranceType == InsuranceType.CLAIM ? "Beneficiary" : location.Address;
 	<div class="col-12 p-4 mb-5 border rounded shadow-sm bg-light location-container">
 		@Html.AntiForgeryToken()
 
