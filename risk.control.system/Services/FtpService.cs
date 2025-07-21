@@ -63,8 +63,9 @@ namespace risk.control.system.Services
             {
                 Directory.CreateDirectory(path);
             }
-            var uploadFilePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", Path.GetFileName(postedFile.FileName));
-            postedFile.CopyTo(new FileStream(uploadFilePath, FileMode.Create));
+            var fileName = Path.GetFileName(postedFile.FileName) + DateTime.Now.ToString("ddMMMyyyyHHMMss");
+            var uploadFilePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", fileName);
+            //postedFile.CopyTo(new FileStream(uploadFilePath, FileMode.CreateNew));
 
             byte[] byteData;
             using (MemoryStream ms = new MemoryStream())

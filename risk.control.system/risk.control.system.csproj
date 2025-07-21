@@ -82,6 +82,7 @@
     <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\media\" />
     <Folder Include="wwwroot\report\" />
+    <Folder Include="wwwroot\upload-file\" />
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 </Project>

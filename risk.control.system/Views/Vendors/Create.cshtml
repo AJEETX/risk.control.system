@@ -18,13 +18,13 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="input-group-label"> Domain:</label>
+                        <label class="input-group-label"> Domain: <small>(minimum 5 character)</small></label>
                         <div class="input-group mb-3">
                             <div class="input-group-append">
                                 <span class="input-group-text" id="emailid"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                             </div>
                             <input asp-for="Email" id="emailAddress" class="form-control email-address remarks" type="text" required
-                                   placeholder="domain name" maxlength="15" autocomplete="name">
+                                   placeholder="domain name" maxlength="15" autocomplete="name" title="Enter unique domain name with minimum 5 character" />
                             <div class="input-group-append">
                                 <select id="domain" name="domain" asp-for="DomainName" required class="form-control remarks" asp-items="Html.GetEnumSelectList<Domain>()">
                                 </select>

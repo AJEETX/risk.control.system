@@ -28,13 +28,13 @@
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="input-group-label"> Email:</label>
+                                    <label class="input-group-label"> Email:<small>(minimum 5 character)</small></label>
                                     <div class="input-group mb-3">
                                         <div class="input-group-append">
                                             <span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                                         </div>
                                         <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address" value="" required
-                                               placeholder="Enter User Email prefix" maxlength="15" autocomplete="name">
+                                               placeholder="Enter User Email prefix" maxlength="15" autocomplete="name" title="Enter unique email with 5 minimum character" />
                                         <div class="input-group-append">
                                             <span class="input-group-text" id="Email">@@@email</span>
                                         </div>

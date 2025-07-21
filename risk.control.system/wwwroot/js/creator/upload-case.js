@@ -117,8 +117,12 @@
                         <span class="custom-message-badge i-red" title="${data}" data-toggle="tooltip">
                             ${data}
                         </span>`;
+                        } else {
+                            return `
+                        <span class="custom-message-badge i-grey" title="${data}" data-toggle="tooltip">
+                            ${data}
+                        </span>`;
                         }
-                        
                     }
                 }
             },
@@ -128,17 +132,21 @@
                 "render": function (data, type, row) {
                     var img = '';
                     if (row.hasError) {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.Id}' class='btn-xs btn-danger' title='Error file'><i class='fa fa-download'></i> </a> &nbsp;`;
+                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn-xs btn-danger' title='Error file'><i class='fa fa-download'></i> </a> &nbsp;`;
                     }
-                    else {
+                    else if (!row.hasError && row.status == 'Completed') {
                         img += `<span class='i-green' title='Upload Success'><i class='fa fa-check'></i> </span>&nbsp;`;
-                    }
-                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file"><i class="nav-icon fa fa-download"></i> Download</a> ';
-                    if (row.isManager || row.status != 'Completed') {
-                        img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete row"><i class="fas fa-trash"></i> </button>';
                     } else {
-                        img += '<button class="btn-xs btn-danger disabled" disabled title="Can\'t Delete row"><i class="fas fa-trash"></i> </button>';
+                        img += `<i class='fas fa-sync fa-spin i-grey'></i>&nbsp;`;
                     }
+
+                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file"><i class="nav-icon fa fa-download"></i> Download</a> ';
+                    //if (row.isManager || row.status != 'Completed') {
+                    //    img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete row"><i class="fas fa-trash"></i> </button>';
+                    //} else {
+                    //    img += '<button class="btn-xs btn-danger disabled" disabled title="Can\'t Delete row"><i class="fas fa-trash"></i> </button>';
+                    //}
+                    //img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete row"><i class="fas fa-trash"></i> </button>';
 
                    
                     return img;

@@ -88,18 +88,24 @@ namespace risk.control.system.Controllers.Api.Company
                 file.UploadedBy,
                 Status = file.Status,
                 file.Message,
+                //Message = file.Message == "Upload In progress" ? file.Icon : file.Message,
                 Icon = file.Icon, // or use some other status representation
                 IsManager = isManager,
                 file.Completed,
                 file.DirectAssign,
-                hasError = file.ErrorByteData != null ? true : false,
-                errorLog = file.ErrorByteData != null ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "",
+                hasError = (file.CompletedOn != null && file.ErrorByteData != null) ? true : false,
+                errorLog = (file.CompletedOn != null && file.ErrorByteData != null) ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "<i class='fas fa-sync fa-spin i-grey'></i>",
                 UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
-                TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
-                Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
+                TimeTaken = file.CompletedOn != null ?
+                $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ?
+                1 : Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
             }).ToList();
 
-            return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalReadyToAssign });
+            return Ok(new
+            {
+                data = result,
+                maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalReadyToAssign
+            });
         }
 
         [HttpGet("GetFileById/{uploadId}")]
@@ -128,12 +134,12 @@ namespace risk.control.system.Controllers.Api.Company
                 file.UploadedBy,
                 Status = file.Status,
                 file.Completed,
-                Message = file.Message == "Upload In progress" ? file.Icon : file.Message,
+                Message = file.Message,
                 Icon = file.Icon, // or use some other status representation
                 IsManager = isManager,
                 file.DirectAssign,
-                hasError = file.ErrorByteData != null ? true : false,
-                errorLog = file.ErrorByteData != null ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "",
+                hasError = (file.CompletedOn != null && file.ErrorByteData != null) ? true : false,
+                errorLog = (file.CompletedOn != null && file.ErrorByteData != null) ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "<i class='fas fa-sync fa-spin i-grey'></i>",
                 UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
                 TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
                 Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
