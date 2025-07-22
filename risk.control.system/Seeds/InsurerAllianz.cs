@@ -19,9 +19,9 @@ namespace risk.control.system.Seeds
 
             var globalSettings = context.GlobalSettings.FirstOrDefault();
 
-            var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY && s.Code == input.PINCODE);
+            var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY.ToLower() && s.Code == input.PINCODE);
 
-            var companyAddressline = "139 Sector 44";
+            var companyAddressline = input.ADDRESSLINE;
             var companyAddress = companyAddressline + ", " + companyPinCode.District.Name + ", " + companyPinCode.State.Name + ", " + companyPinCode.Country.Code;
             var companyAddressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
             var companyAddressCoordinatesLatLong = companyAddressCoordinates.Latitude + "," + companyAddressCoordinates.Longitude;
@@ -41,10 +41,10 @@ namespace risk.control.system.Seeds
             {
                 Name = input.NAME,
                 Addressline = companyAddressline,
-                Branch = "FOREST HILL CHASE",
+                Branch = input.BRANCH,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
-                BankName = "NAB",
+                BankName = input.BANK,
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
                 PinCode = companyPinCode,

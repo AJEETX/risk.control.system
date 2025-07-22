@@ -21,10 +21,10 @@ namespace risk.control.system.Seeds
 
             //CREATE VENDOR COMPANY
 
-            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
-            var checkerAddressline = "1, Ring Road";
+            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY.ToLower() && s.Code == input.PINCODE);
+            var checkerAddressline = input.ADDRESSLINE;
 
-            var states = context.State.Include(s => s.Country).Where(s => s.Country.Code.ToLower() == input.COUNTRY).ToList();
+            var states = context.State.Include(s => s.Country).Where(s => s.Country.Code.ToLower() == input.COUNTRY.ToLower()).ToList();
 
             var checkerAddress = checkerAddressline + ", " + checkerPinCode.District.Name + ", " + checkerPinCode.State.Name + ", " + checkerPinCode.Country.Code;
             var checkerCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(checkerAddress);
@@ -43,10 +43,10 @@ namespace risk.control.system.Seeds
             {
                 Name = input.NAME,
                 Addressline = checkerAddressline,
-                Branch = "MAHATTAN",
+                Branch = input.BRANCH,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
-                BankName = "WESTPAC",
+                BankName = input.BANK,
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
                 PinCode = checkerPinCode,
@@ -81,7 +81,7 @@ namespace risk.control.system.Seeds
                         InvestigationServiceTypeId = service.InvestigationServiceTypeId,
                         Price = 399,
                         InsuranceType = service.InsuranceType,
-                        DistrictId = null,
+                        AllDistrictsCheckbox = true,
                         StateId = state.StateId,
                         CountryId = state.CountryId,
                         Updated = DateTime.Now,
