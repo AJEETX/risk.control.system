@@ -1,40 +1,34 @@
-﻿using Microsoft.AspNetCore.Identity;
-using risk.control.system.Data;
-using risk.control.system.Models;
-using risk.control.system.Services;
+﻿//using Microsoft.AspNetCore.Identity;
+//using risk.control.system.Data;
+//using risk.control.system.Models;
+//using risk.control.system.Services;
 
-namespace risk.control.system.Seeds
-{
-    public static class DataSeed
-    {
-        public static async Task SeedDetails(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
-            UserManager<ClientCompanyApplicationUser> clientUserManager,
-            UserManager<VendorApplicationUser> vendorUserManager,
-            ICustomApiCLient customApiCLient,
-            IHttpContextAccessor httpAccessor)
-        {
+//namespace risk.control.system.Seeds
+//{
+//    public static class DataSeed
+//    {
+//        public static async Task SeedDetails(ApplicationDbContext context,
+//            IWebHostEnvironment webHostEnvironment,
+//            UserManager<ClientCompanyApplicationUser> clientUserManager,
+//            UserManager<VendorApplicationUser> vendorUserManager,
+//            ICustomApiCLient customApiCLient,
+//            IHttpContextAccessor httpAccessor)
+//        {
 
-            #region BENEFICIARY-RELATION
+//            #region CLIENT/ VENDOR COMPANY
 
-            await ClientCompanySetupSeed.Seed(context);
+//            var (vendors, companyIds) = await ClientVendorSeed.Seed(context, webHostEnvironment, customApiCLient, clientUserManager, vendorUserManager);
 
-            #endregion BENEFICIARY-RELATION
+//            #endregion CLIENT/ VENDOR COMPANY
 
-            #region CLIENT/ VENDOR COMPANY
+//            #region PERMISSIONS ROLES
 
-            var (vendors, companyIds) = await ClientVendorSeed.Seed(context, webHostEnvironment, customApiCLient, clientUserManager, vendorUserManager);
+//            //PermissionModuleSeed.SeedMailbox(context);
 
-            #endregion CLIENT/ VENDOR COMPANY
+//            //PermissionModuleSeed.SeedClaim(context);
 
-            #region PERMISSIONS ROLES
+//            #endregion PERMISSIONS ROLES
 
-            //PermissionModuleSeed.SeedMailbox(context);
-
-            //PermissionModuleSeed.SeedClaim(context);
-
-            #endregion PERMISSIONS ROLES
-
-        }
-    }
-}
+//        }
+//    }
+//}

@@ -2988,3 +2988,6 @@ th.col-match {
     width: 200px;
     height: auto;
 }
+.multidistrict, #SelectedDistrictIds {
+    height: 300px;
+}

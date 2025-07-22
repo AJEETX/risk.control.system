@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace risk.control.system.Models
 {
     public class VendorInvestigationServiceType : BaseEntity
@@ -27,6 +29,11 @@ namespace risk.control.system.Models
 
         public State? State { get; set; } = default!;
 
+        public bool AllDistrictsCheckbox { get; set; }
+        public List<long> SelectedDistrictIds { get; set; } = new List<long>();
+
+        [NotMapped]
+        public List<SelectListItem> DistrictList { get; set; } = new();
         [Display(Name = "District")]
         public long? DistrictId { get; set; } = default!;
 

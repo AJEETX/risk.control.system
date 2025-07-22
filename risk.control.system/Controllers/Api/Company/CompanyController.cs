@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Data;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Data;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Company
@@ -377,7 +380,7 @@ namespace risk.control.system.Controllers.Api.Company
             var serviceResponse = new List<AgencyServiceResponse>();
             foreach (var service in services)
             {
-                var IsAllDistrict = (service.DistrictId == null);
+                var IsAllDistrict = (service.AllDistrictsCheckbox);
                 string pincodes = $"{ALL_PINCODE}";
                 string rawPincodes = $"{ALL_PINCODE}";
                 serviceResponse.Add(new AgencyServiceResponse
@@ -386,7 +389,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Id = service.VendorInvestigationServiceTypeId,
                     CaseType = service.InsuranceType.GetEnumDisplayName(),
                     ServiceType = service.InvestigationServiceType.Name,
-                    District = IsAllDistrict ? ALL_DISTRICT : service.District.Name,
+                    District = IsAllDistrict ? ALL_DISTRICT : string.Join(",", _context.District.Where(d => service.SelectedDistrictIds.Contains(d.DistrictId)).Select(s => s.Name)),
                     State = service.State.Code,
                     Country = service.Country.Code,
                     Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
@@ -671,19 +674,20 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetDistrictNameForAgency")]
         public IActionResult GetDistrictName(long id, long stateId, long countryId, long lob, long serviceId, long vendorId)
         {
-            if (id == -1)
-            {
-                var result = new
-                {
-                    DistrictId = -1, // Special value for "ALL DISTRICTS"
-                    DistrictName = Applicationsettings.ALL_DISTRICT
-                };
-                return Ok(result);
-            }
-            var pincode = _context.District.Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
-                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+            var districts = _context.District.Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
+                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).ToList(); // Format for jQuery UI Autocomplete
 
-            return Ok(pincode);
+            var result = new List<object>
+            {
+                new {
+                    DistrictId = -1,
+                    DistrictName = Applicationsettings.ALL_DISTRICT
+                }
+            };
+
+            result.AddRange(districts);
+
+            return Ok(districts);
         }
 
         [HttpGet("GetPincodeName")]
