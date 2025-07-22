@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest($"Empty mobile number");
                 }
-                var user2Onboard = await agentService.ResetUid(mobile.TrimStart('+'), sendSMS);
+                var user2Onboard = await agentService.ResetUid(mobile.TrimStart('+'), portal_base_url, sendSMS);
 
                 if (user2Onboard == null)
                 {
@@ -140,7 +140,7 @@ namespace risk.control.system.Controllers.Api
                             message += $"                                      ";
                             message += $"Thanks                           ";
                             message += $"                                ";
-                            message += $"https://icheckify.co.in";
+                            message += $"{portal_base_url}";
                             await smsService.DoSendSmsAsync(request.Mobile, message);
                         }
 
