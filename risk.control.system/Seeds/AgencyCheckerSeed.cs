@@ -82,6 +82,7 @@ namespace risk.control.system.Seeds
                         Price = 399,
                         InsuranceType = service.InsuranceType,
                         AllDistrictsCheckbox = true,
+                        SelectedDistrictIds = { -1 },
                         StateId = state.StateId,
                         CountryId = state.CountryId,
                         Updated = DateTime.Now,

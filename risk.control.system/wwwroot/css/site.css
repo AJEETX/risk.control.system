@@ -2991,3 +2991,8 @@ th.col-match {
 .multidistrict, #SelectedDistrictIds {
     height: 300px;
 }
+.district-spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-left: 0.5rem; /* optional spacing */
+}

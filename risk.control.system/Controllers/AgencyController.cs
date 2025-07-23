@@ -799,7 +799,7 @@ namespace risk.control.system.Controllers
 
                 if (!isCountryValid || !isStateValid)
                 {
-                    notifyService.Error("Invalid country, state, or district selected.");
+                    notifyService.Error("Invalid country/state.");
                     return RedirectToAction(nameof(Service), "Agency");
                 }
 
@@ -812,7 +812,7 @@ namespace risk.control.system.Controllers
                             v.CountryId == service.SelectedCountryId &&
                             v.StateId == service.SelectedStateId)?
                         .ToList();
-                bool isAllDistricts = service.SelectedDistrictIds?.Contains(-1) == true;
+                bool isAllDistricts = service.SelectedDistrictIds?.Contains(-1) == true; // how to set this value in case all districts selected
                 // Handle state-wide service existence
                 if (isAllDistricts)
                 {
@@ -927,12 +927,14 @@ namespace risk.control.system.Controllers
                            v.StateId == service.SelectedStateId &&
                            v.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId)?
                        .ToList();
-                if (service.AllDistrictsCheckbox)
+                bool isAllDistricts = service.SelectedDistrictIds?.Contains(-1) == true; // how to set this value in case all districts selected
+
+                if (isAllDistricts)
                 {
                     // Handle state-wide service creation
-                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.AllDistrictsCheckbox))
+                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.SelectedDistrictIds?.Contains(-1) == true))
                     {
-                        var currentService = existingVendorServices.FirstOrDefault(s => s.AllDistrictsCheckbox);
+                        var currentService = existingVendorServices.FirstOrDefault(s => s.SelectedDistrictIds?.Contains(-1) == true);
                         currentService.IsUpdated = true;
                         _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();

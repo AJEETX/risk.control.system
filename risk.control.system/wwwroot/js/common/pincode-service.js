@@ -29,7 +29,7 @@ $(document).ready(function () {
     $("#StateId").on("blur change", function () {
         const countryId = $("#SelectedCountryId").val();
         const stateId = $("#SelectedStateId").val();
-
+        
         if (countryId && stateId) {
             loadDistrictData(countryId, stateId);
         }
@@ -75,25 +75,37 @@ $(document).ready(function () {
         $(this).select();
     });
 
-    $('#allDistrictsCheckbox').on('change', function () {
-        const isChecked = $(this).is(':checked');
-        const $select = $('#SelectedDistrictIds');
+    const $select = $('#SelectedDistrictIds');
+    const $checkbox = $('#allDistrictsCheckbox');
 
-        if (isChecked) {
-            $select.val([]);
-            $select.val(['-1']).find('option').prop('selected', true); // Deselect individual districts
+    function updateSelectState() {
+
+        if ($checkbox.is(':checked')) {
+            // Hide spinner since we're not loading anything
+            // Set dropdown to "All Districts"
+            $select.empty().append('<option value="-1" selected>All Districts</option>');
         } else {
-            $('#SelectedDistrictIds option').prop('selected', false);
+            // Show spinner while loading
+            // Enable dropdown and reload districts
+            $select.empty(); // Clear options
+
+            const countryId = $("#SelectedCountryId").val();
+            const stateId = $("#SelectedStateId").val();
+
+            if (countryId && stateId) {
+                loadDistrictData(countryId, stateId);
+            }
         }
+    }
+
+    // Initial state on page load
+    updateSelectState();
+
+    // On checkbox change
+    $checkbox.on('change', function () {
+        updateSelectState();
     });
 
-    // Optional: Pre-select items based on data-selected (on page load)
-    const selectedIds = $('#SelectedDistrictIds').data('selected');
-    if (selectedIds) {
-        selectedIds.toString().split(',').forEach(id => {
-            $(`#SelectedDistrictIds option[value="${id}"]`).prop('selected', true);
-        });
-    }
 });
 /**
  * Preloads field data from hidden fields (e.g., SelectedCountryId).
@@ -128,9 +140,17 @@ function loadStateData(countryId) {
  * Loads district data based on the preloaded Country and State IDs.
  */
 function loadDistrictData(countryId, stateId) {
+    const VendorInvestigationServiceTypeId = $("#VendorInvestigationServiceTypeId").val();
+    const $checkbox = $('#allDistrictsCheckbox');
+    if ($checkbox.is(':checked') && VendorInvestigationServiceTypeId != undefined) {
+        return;
+    }
     const vendorId = $("#vendorId").val();
-    const lob = $("#LineOfBusinessId").val();
+    const lob = $("#InsuranceType").val();
     const serviceId = $("#InvestigationServiceTypeId").val();
+    const $spinner = $("#districtLoadingSpinner");
+
+    $spinner.removeClass("d-none"); // Show spinner
 
     $.ajax({
         url: "/api/Company/GetDistrictNameForAgency",
@@ -160,6 +180,9 @@ function loadDistrictData(countryId, stateId) {
         },
         error: function () {
             console.error("Failed to load district list.");
+        },
+        complete: function () {
+            $spinner.addClass("d-none"); // Hide spinner
         }
     });
 }
@@ -447,17 +470,6 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
             toggleDependentFields(dependentFields, isValid);
         }
     });
-
-    //// Reinitialize dependent fields' autocomplete on focus
-    //$(dependentFields.join(',')).on("focus", function () {
-    //    const $field = $(this);
-
-    //    // Restore autocomplete source dynamically
-    //    const originalSource = $field.data('originalSource'); // Store the original source during initialization
-    //    if (originalSource) {
-    //        $field.autocomplete("option", "source", originalSource);
-    //    }
-    //});
 }
 
 /**

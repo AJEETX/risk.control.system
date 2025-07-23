@@ -380,7 +380,7 @@ namespace risk.control.system.Controllers.Api.Company
             var serviceResponse = new List<AgencyServiceResponse>();
             foreach (var service in services)
             {
-                var IsAllDistrict = (service.AllDistrictsCheckbox);
+                bool isAllDistrict = service.SelectedDistrictIds?.Contains(-1) == true; // how to set this value in case all districts selected
                 string pincodes = $"{ALL_PINCODE}";
                 string rawPincodes = $"{ALL_PINCODE}";
                 serviceResponse.Add(new AgencyServiceResponse
@@ -389,7 +389,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Id = service.VendorInvestigationServiceTypeId,
                     CaseType = service.InsuranceType.GetEnumDisplayName(),
                     ServiceType = service.InvestigationServiceType.Name,
-                    District = IsAllDistrict ? ALL_DISTRICT : string.Join(",", _context.District.Where(d => service.SelectedDistrictIds.Contains(d.DistrictId)).Select(s => s.Name)),
+                    District = isAllDistrict ? ALL_DISTRICT : string.Join(", ", _context.District.Where(d => service.SelectedDistrictIds.Contains(d.DistrictId)).Select(s => s.Name)),
                     State = service.State.Code,
                     Country = service.Country.Code,
                     Flag = "/flags/" + service.Country.Code.ToLower() + ".png",

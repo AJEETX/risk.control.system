@@ -27,37 +27,37 @@ namespace risk.control.system.Seeds
             // seed INDIA
             string COUNTRY_CODE = "IN";
             string PINCODE = "122003";
-            //var india = countries.FirstOrDefault(c => c.Code.ToLower() == COUNTRY_CODE.ToLower());
-            //var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
-            //var indianStates = indiaPincodes.Where(s =>
-            //    s.StateName.ToLower() == "haryana"
-            //    ||
-            //    s.StateName.ToLower() == "delhi"
-            //    ||
-            //    s.StateCode.ToLower() == "up"
-            //    ).Select(g => g.StateCode).Distinct()?.ToList();
-            //var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
-            //await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
-            //await context.SaveChangesAsync(null, false);
+            var india = countries.FirstOrDefault(c => c.Code.ToLower() == COUNTRY_CODE.ToLower());
+            var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
+            var indianStates = indiaPincodes.Where(s =>
+                s.StateName.ToLower() == "haryana"
+                ||
+                s.StateName.ToLower() == "delhi"
+                ||
+                s.StateCode.ToLower() == "up"
+                ).Select(g => g.StateCode).Distinct()?.ToList();
+            var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
+            await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
+            await context.SaveChangesAsync(null, false);
 
             var proper = new SeedInput { COUNTRY = COUNTRY_CODE, DOMAIN = "proper.com", PHOTO = "/img/proper.png", NAME = "Proper", ADDRESSLINE = "12 MG Road", BRANCH = "Main Office", BANK = "SBI", PINCODE = PINCODE };
             var honest = new SeedInput { COUNTRY = COUNTRY_CODE, DOMAIN = "honest.com", PHOTO = "/img/honest.png", NAME = "Honest", ADDRESSLINE = "67 Mehrauli Road", BRANCH = "Gurgaon", BANK = "ICICI", PINCODE = PINCODE };
             var agencies = new List<SeedInput> { proper, honest };
             var vendors = new List<Vendor> { };
 
-            //foreach (var agency in agencies)
-            //{
-            //    var vendor = await AgencyCheckerSeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes);
-            //    vendors.Add(vendor);
-            //}
+            foreach (var agency in agencies)
+            {
+                var vendor = await AgencyCheckerSeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes);
+                vendors.Add(vendor);
+            }
 
             var insurer = new SeedInput { COUNTRY = COUNTRY_CODE, DOMAIN = "canara.com", NAME = "Canara", PHOTO = "/img/insurer.jpg", ADDRESSLINE = "139 Sector 44", BRANCH = "Head Office", BANK = "HDFC", PINCODE = PINCODE };
             var companies = new List<SeedInput> { insurer };
-            //foreach (var company in companies)
-            //{
-            //    _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company);
-            //}
-            //await context.SaveChangesAsync(null, false);
+            foreach (var company in companies)
+            {
+                _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company);
+            }
+            await context.SaveChangesAsync(null, false);
 
             // end seed INDIA
 
