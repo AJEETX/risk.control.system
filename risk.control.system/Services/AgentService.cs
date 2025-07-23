@@ -11,7 +11,8 @@ namespace risk.control.system.Services
     {
         Task<VendorApplicationUser> GetAgent(string mobile, bool sendSMS = false);
 
-        Task<VendorApplicationUser> ResetUid(string mobile, bool sendSMS = false);
+        Task<VendorApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false);
+        Task<VendorApplicationUser> GetPin(string agentEmail, string portal_base_url);
     }
 
     public class AgentService : IAgentService
@@ -45,7 +46,18 @@ namespace risk.control.system.Services
             return null!;
         }
 
-        public async Task<VendorApplicationUser> ResetUid(string mobile, bool sendSMS = false)
+        public async Task<VendorApplicationUser> GetPin(string agentEmail, string portal_base_url)
+        {
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+
+            var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == agentEmail);
+
+            var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
+            if (isAgent)
+                return user2Onboard;
+            return null!;
+        }
+        public async Task<VendorApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false)
         {
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
@@ -64,16 +76,13 @@ namespace risk.control.system.Services
 
                     if (sendSMS)
                     {
-                        var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                        var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                        var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
                         //SEND SMS
                         string message = $"Dear {user2Onboard.Email}";
                         message += $"Uid reset for mobile: {mobile}";
                         message += $"                                          ";
                         message += $"Thanks";
                         message += $"                                          ";
-                        message += $"{BaseUrl}";
+                        message += $"{portal_base_url}";
                         await smsService.DoSendSmsAsync(mobile, message);
                     }
                     return user2Onboard;

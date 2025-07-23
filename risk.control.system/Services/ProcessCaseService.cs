@@ -156,7 +156,8 @@ namespace risk.control.system.Services
                         serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
                         serviceType.InsuranceType == claimsInvestigation.PolicyDetail.InsuranceType &&
                         (serviceType.StateId == pincodeDistrictState.StateId &&
-                         (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
+                         (serviceType.SelectedDistrictIds?.Contains(-1) == true
+                         || serviceType.SelectedDistrictIds.Contains(pincodeDistrictState.DistrictId.Value)))
                     ))
                     .Select(v => v.VendorId) // Select only VendorId
                     .Distinct() // Ensure uniqueness
@@ -223,8 +224,9 @@ namespace risk.control.system.Services
                     serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
                     serviceType.InsuranceType == claimsInvestigation.PolicyDetail.InsuranceType &&
                     (serviceType.StateId == pincodeDistrictState.StateId &&
-                     (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
-                ))
+                      (serviceType.SelectedDistrictIds?.Contains(-1) == true
+                         || serviceType.SelectedDistrictIds.Contains(pincodeDistrictState.DistrictId.Value)))
+                    ))
                 .Select(v => v.VendorId) // Select only VendorId
                 .Distinct() // Ensure uniqueness
                 .ToList();

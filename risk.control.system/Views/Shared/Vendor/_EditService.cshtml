@@ -43,9 +43,6 @@
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
         </div>
-        
-    </div>
-    <div class="col-md-6">
         <div class="form-group">
             <label class="input-group-label" for="StateId"> State:</label>
             <div class="input-group mb-3 autocomplete-wrapper">
@@ -65,21 +62,41 @@
                 </div>
             </div>
         </div>
-        <div class="form-group">
-            <label class="input-group-label" for="DistrictId">District:</label>
-            <div class="input-group mb-3 autocomplete-wrapper">
+    </div>
+    <div class="col-md-6">
+        <div class="form-group multi-select-district">
+            <label class="input-group-label" for="SelectedDistrictIds">Districts:</label>
+            <!-- ALL DISTRICTS checkbox -->
+            <div class="form-check mb-2">
+                <input type="checkbox"
+                       class="form-check-input"
+                       id="allDistrictsCheckbox"
+                       value="-1"
+                       @(Model.SelectedDistrictIds?.Contains(-1) == true ? "checked" : "") />
+                <label class="form-check-label" for="allDistrictsCheckbox">
+                    All Districts
+                </label>
+
+            </div>
+            <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" for="DistrictId">
+                    <span class="input-group-text" for="SelectedDistrictIds">
                         <i class="fas fa-city"></i>
                         <i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
-                <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Search district ..." asp-for="DistrictId" required />
-                <span asp-validation-for="DistrictId" class="text-danger"></span>
-                <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
-                <div id="district-loading" class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
+                <select id="SelectedDistrictIds"
+                        name="SelectedDistrictIds"
+                        class="form-control remarks"
+                        multiple
+                        required
+                        data-selected="@string.Join(",", Model.SelectedDistrictIds ?? new List<long>())">
+                </select>
+                <div id="districtLoadingSpinner" class="spinner-border text-primary d-none district-spinner" role="status">
+                    <span class="visually-hidden"></span>
                 </div>
+
+                <span asp-validation-for="SelectedDistrictIds" class="text-danger"></span>
             </div>
         </div>
     </div>

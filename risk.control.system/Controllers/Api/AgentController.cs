@@ -74,6 +74,37 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpPost("pin")]
+        public async Task<IActionResult> GetAgentPin(string agentEmail)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(agentEmail))
+                {
+                    return BadRequest($"Empty email");
+                }
+                var user2Onboard = await agentService.GetPin(agentEmail, portal_base_url);
+
+                if (user2Onboard == null)
+                {
+                    return BadRequest($"Agent does not exist");
+                }
+
+                return Ok(new
+                {
+                    Email = user2Onboard.Email,
+                    Phone = user2Onboard.PhoneNumber,
+                    Pin = user2Onboard.SecretPin
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return BadRequest($"Agent does not exist or Error");
+            }
+        }
+
+        [AllowAnonymous]
         [HttpPost("ResetUid")]
         public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)
         {
@@ -83,7 +114,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest($"Empty mobile number");
                 }
-                var user2Onboard = await agentService.ResetUid(mobile.TrimStart('+'), sendSMS);
+                var user2Onboard = await agentService.ResetUid(mobile.TrimStart('+'), portal_base_url, sendSMS);
 
                 if (user2Onboard == null)
                 {
@@ -140,7 +171,7 @@ namespace risk.control.system.Controllers.Api
                             message += $"                                      ";
                             message += $"Thanks                           ";
                             message += $"                                ";
-                            message += $"https://icheckify.co.in";
+                            message += $"{portal_base_url}";
                             await smsService.DoSendSmsAsync(request.Mobile, message);
                         }
 

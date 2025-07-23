@@ -1,75 +1,4 @@
 ﻿$("#CountryId").val('');
-
-function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
-    $(dropDownId).empty();
-    $(dropDownId).val('');
-    if (showDefaultOption)
-        $(dropDownId).append(option)
-    if (list == '' || list && list.length == 0) {
-        $('#DistrictId').empty();
-        $('#DistrictId').val('');
-        $('#DistrictId').focus();
-        $.alert({
-            title: "SERVICE EXISTS",
-            content: "Please select other option.",
-            icon: 'fas fa-exclamation-triangle',
-            type: 'red',
-            closeIcon: true,
-            buttons: {
-                ok: {
-                    text: "OK",
-                    btnClass: 'btn-danger',
-                    action: function () {
-                        $('#DistrictId').focus(); // Focus on the input element after clicking OK
-                    }
-                }
-            }
-        });
-    }
-    else if (list && list.length == 1 && list[0].pinCodeId == -1) {
-        $(dropDownId).empty(); // Clear existing options
-        $(dropDownId).append("<option class='all-pincodes' value='-1'> -- ALL PIN CODES -- </option>"); // Add "ALL PIN CODES" option
-
-        // Setting the value to '-1' to select the "ALL PIN CODES" option
-        $(dropDownId).val('-1'); // This will set the "ALL PIN CODES" option as selected
-        $(dropDownId).trigger('change'); // Trigger change event if you want to do any additional processing after selection
-
-
-        $.alert({
-            title: "ALL PIN CODES",
-            content: "District ALL PIN CODES selected.",
-            icon: 'fa fa-info-circle', // Using a more specific icon
-            type: 'blue', // Info type alert
-            closeIcon: true, // Show close icon
-            buttons: {
-                ok: {
-                    text: "OK",
-                    btnClass: 'btn-info', // Large button style
-                    action: function () {
-                        $(dropDownId).focus();
-                    }
-                }
-            },
-            backgroundDismiss: true, // Allow dismiss by clicking outside the box
-            contentTextAlign: 'center', // Center the text content
-            autoClose: '3000', // Automatically close after 3 seconds
-            onOpen: function () {
-                // Optional: Add custom animations or additional functionality when the alert opens
-                $(this).addClass('animated fadeIn'); // Adding a fade-in animation
-            },
-            onClose: function () {
-                // Optional: Add custom functionality when the alert closes
-                $(this).removeClass('animated fadeIn'); // Remove fade-in animation when closed
-            }
-        });
-    }
-    else if (list && list.length > 0) {
-        $.each(list, function (index, row) {
-            $(dropDownId).append("<option value='" + row.pinCodeId + "'>" + row.name + " -- " + row.code + "</option>");
-            //$('#create').prop('disabled', false);
-        });
-    }
-}
 function PopulateInvestigationServices(dropDownId, list, option) {
     $(dropDownId).empty();
     $(dropDownId).append(option)
@@ -98,8 +27,12 @@ $(document).ready(function () {
     });
    
     $("#StateId").on("blur change", function () {
-        // Call the GetRemainingServicePinCode function with the necessary parameters
-        console.log('state changes');
+        const countryId = $("#SelectedCountryId").val();
+        const stateId = $("#SelectedStateId").val();
+        
+        if (countryId && stateId) {
+            loadDistrictData(countryId, stateId);
+        }
     });
 
     // Bind the change event to the dropdown
@@ -141,10 +74,39 @@ $(document).ready(function () {
     $('input.auto-dropdown').on('focus', function () {
         $(this).select();
     });
+
+    const $select = $('#SelectedDistrictIds');
+    const $checkbox = $('#allDistrictsCheckbox');
+
+    function updateSelectState() {
+
+        if ($checkbox.is(':checked')) {
+            // Hide spinner since we're not loading anything
+            // Set dropdown to "All Districts"
+            $select.empty().append('<option value="-1" selected>All Districts</option>');
+        } else {
+            // Show spinner while loading
+            // Enable dropdown and reload districts
+            $select.empty(); // Clear options
+
+            const countryId = $("#SelectedCountryId").val();
+            const stateId = $("#SelectedStateId").val();
+
+            if (countryId && stateId) {
+                loadDistrictData(countryId, stateId);
+            }
+        }
+    }
+
+    // Initial state on page load
+    updateSelectState();
+
+    // On checkbox change
+    $checkbox.on('change', function () {
+        updateSelectState();
+    });
+
 });
-
-
-
 /**
  * Preloads field data from hidden fields (e.g., SelectedCountryId).
  */
@@ -178,26 +140,51 @@ function loadStateData(countryId) {
  * Loads district data based on the preloaded Country and State IDs.
  */
 function loadDistrictData(countryId, stateId) {
-    var preloadedDistrictId = $("#SelectedDistrictId").val();
-    const districtId = $("#DistrictId").val();
-    if (preloadedDistrictId || !districtId) {
-        if (!preloadedDistrictId && !districtId) {
-            preloadedDistrictId = -1;
-        }
-        console.log("Preloaded District ID: ", preloadedDistrictId);
-        fetchAndSetFieldValue("/api/Company/GetDistrictNameForAgency",
-            {
-                id: preloadedDistrictId,
-                stateId: stateId,
-                countryId: countryId,
-                lob: $("#LineOfBusinessId").val(),
-                serviceId: $("#InvestigationServiceTypeId").val(),
-                vendorId: $("#vendorId").val()
-            }, "#DistrictId", "districtName", () => {
-            // After District is loaded, load Pincode based on preloaded values
-            //loadPincodeData(countryId, stateId, preloadedDistrictId);
-        });
+    const VendorInvestigationServiceTypeId = $("#VendorInvestigationServiceTypeId").val();
+    const $checkbox = $('#allDistrictsCheckbox');
+    if ($checkbox.is(':checked') && VendorInvestigationServiceTypeId != undefined) {
+        return;
     }
+    const vendorId = $("#vendorId").val();
+    const lob = $("#InsuranceType").val();
+    const serviceId = $("#InvestigationServiceTypeId").val();
+    const $spinner = $("#districtLoadingSpinner");
+
+    $spinner.removeClass("d-none"); // Show spinner
+
+    $.ajax({
+        url: "/api/Company/GetDistrictNameForAgency",
+        type: "GET",
+        data: {
+            stateId: stateId,
+            countryId: countryId,
+            lob: lob,
+            serviceId: serviceId,
+            vendorId: vendorId
+        },
+        success: function (response) {
+            const $districtSelect = $("#SelectedDistrictIds");
+            $districtSelect.empty();
+
+            if (response && response.length > 0) {
+                response.forEach(d => {
+                    $districtSelect.append(`<option value="${d.districtId}">${d.districtName}</option>`);
+                });
+
+                // Optional: Pre-select if there are existing values
+                const preselected = $("#SelectedDistrictIds").data("selected")?.toString().split(",") || [];
+                $districtSelect.val(preselected);
+            } else {
+                $districtSelect.append(`<option disabled>No districts found</option>`);
+            }
+        },
+        error: function () {
+            console.error("Failed to load district list.");
+        },
+        complete: function () {
+            $spinner.addClass("d-none"); // Hide spinner
+        }
+    });
 }
 
 /**
@@ -258,16 +245,16 @@ function initializeAutocomplete() {
             onSelect: (ui) => handleAutocompleteSelect(ui, "#StateId", "#SelectedStateId", stateDependentFields),
             dependentFields: stateDependentFields
         },
-        {
-            field: "#DistrictId",
-            url: "/api/Company/SearchDistrict",
-            extraData: () => ({
-                countryId: $("#SelectedCountryId").val(),
-                stateId: $("#SelectedStateId").val()
-            }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", null),
-            dependentFields: []
-        },
+        //{
+        //    field: "#DistrictId",
+        //    url: "/api/Company/SearchDistrict",
+        //    extraData: () => ({
+        //        countryId: $("#SelectedCountryId").val(),
+        //        stateId: $("#SelectedStateId").val()
+        //    }),
+        //    onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", null),
+        //    dependentFields: []
+        //},
         //{
         //    field: "#PinCodeId",
         //    url: "/api/Company/SearchPincode",
@@ -483,17 +470,6 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
             toggleDependentFields(dependentFields, isValid);
         }
     });
-
-    //// Reinitialize dependent fields' autocomplete on focus
-    //$(dependentFields.join(',')).on("focus", function () {
-    //    const $field = $(this);
-
-    //    // Restore autocomplete source dynamically
-    //    const originalSource = $field.data('originalSource'); // Store the original source during initialization
-    //    if (originalSource) {
-    //        $field.autocomplete("option", "source", originalSource);
-    //    }
-    //});
 }
 
 /**
@@ -524,11 +500,9 @@ function updatePlaceholdersBasedOnState() {
  * Initializes field validation and toggling for dependencies.
  */
 function initializeFieldValidations() {
-    handleFieldValidation("#CountryId", ["#StateId", "#DistrictId"]);
-    handleFieldValidation("#StateId", ["#DistrictId"]);
-    handleFieldValidation("#DistrictId");
+    handleFieldValidation("#CountryId", ["#StateId"]);
+    handleFieldValidation("#StateId");
 }
-
 /**
  * Validates a parent field and toggles its dependent fields based on validity.
  */
