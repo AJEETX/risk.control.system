@@ -12,6 +12,7 @@ namespace risk.control.system.Services
         Task<VendorApplicationUser> GetAgent(string mobile, bool sendSMS = false);
 
         Task<VendorApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false);
+        Task<VendorApplicationUser> GetPin(string agentEmail, string portal_base_url);
     }
 
     public class AgentService : IAgentService
@@ -45,6 +46,17 @@ namespace risk.control.system.Services
             return null!;
         }
 
+        public async Task<VendorApplicationUser> GetPin(string agentEmail, string portal_base_url)
+        {
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+
+            var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == agentEmail);
+
+            var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
+            if (isAgent)
+                return user2Onboard;
+            return null!;
+        }
         public async Task<VendorApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false)
         {
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
