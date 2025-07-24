@@ -57,16 +57,13 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.LiClasses = "breadcrumb-item";
     options.ActiveLiClasses = "breadcrumb-item active";
 });
+// Set up logging
 var logDirectory = Path.Combine(builder.Environment.ContentRootPath, "Logs");
-Directory.CreateDirectory(logDirectory);
-
-// Cleanup: delete logs older than 7 days
 LogCleanup.DeleteOldLogFiles(logDirectory, maxAgeInDays: 7);
 
-// Logging
 builder.Logging.ClearProviders();
+builder.Logging.SetMinimumLevel(LogLevel.Error); // Optional global filter
 builder.Logging.AddProvider(new CsvLoggerProvider(logDirectory));
-builder.Logging.SetMinimumLevel(LogLevel.Error);
 
 //builder.Services.AddWorkflow();
 //builder.Services.AddTransient<InvestigationTaskWorkflow>();

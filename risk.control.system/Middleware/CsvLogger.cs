@@ -43,7 +43,6 @@ namespace risk.control.system.Middleware
             File.AppendAllText(GetLogFilePath(), logLine, Encoding.UTF8);
         }
     }
-
     public class CsvLoggerProvider : ILoggerProvider
     {
         private readonly string _logDirectory;
@@ -60,7 +59,6 @@ namespace risk.control.system.Middleware
 
         public void Dispose() { }
     }
-
     public static class LogCleanup
     {
         public static void DeleteOldLogFiles(string logDirectory, int maxAgeInDays)
