@@ -227,9 +227,7 @@ namespace risk.control.system.Controllers.Api.Company
                 {
                     Id = u.VendorId,
                     Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
-                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ?
-                        $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>" :
-                        u.Email,
+                    Domain = u.Email,
                     Name = u.Name,
                     Code = u.Code,
                     Phone = $"(+{u.Country.ISDCode}) {u.PhoneNumber}",
@@ -329,7 +327,7 @@ namespace risk.control.system.Controllers.Api.Company
                 {
                     Id = u.VendorId,
                     Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
-                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
+                    Domain = u.Email,
                     Name = u.Name,
                     Code = u.Code,
                     Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,

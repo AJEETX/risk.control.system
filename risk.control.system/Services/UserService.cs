@@ -237,8 +237,8 @@ namespace risk.control.system.Services
                     Id = user.Id,
                     Name = user.FirstName + " " + user.LastName,
                     Email = (user.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(user.MobileUId) || user.UserRole != AgencyRole.AGENT) ?
-                    "<a href=/Vendors/EditUser?userId=" + user.Id + ">" + user.Email + "</a>" :
-                    "<a href=/Vendors/EditUser?userId=" + user.Id + ">" + user.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
+                    user.Email :
+                    user.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),

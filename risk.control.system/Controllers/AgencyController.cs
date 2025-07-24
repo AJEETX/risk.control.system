@@ -33,6 +33,8 @@ namespace risk.control.system.Controllers
         private readonly IAgencyService agencyService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private string portal_base_url = string.Empty;
 
         public AgencyController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
@@ -43,6 +45,7 @@ namespace risk.control.system.Controllers
             ISmsService SmsService,
             IAgencyService agencyService,
             IFeatureManager featureManager,
+            IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -53,8 +56,12 @@ namespace risk.control.system.Controllers
             this.customApiCLient = customApiCLient;
             smsService = SmsService;
             this.featureManager = featureManager;
+            this.httpContextAccessor = httpContextAccessor;
             this.agencyService = agencyService;
             this.webHostEnvironment = webHostEnvironment;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [Breadcrumb("Admin Settings ")]
@@ -342,7 +349,7 @@ namespace risk.control.system.Controllers
                                 message += "                                                                                ";
                                 message += $"Thanks";
                                 message += "                                                                                ";
-                                message += $"https://icheckify.co.in";
+                                message += $"{portal_base_url}";
                                 await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
@@ -532,7 +539,7 @@ namespace risk.control.system.Controllers
                             {
                                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
 
-                                System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
+                                var address = new Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
                                 System.Net.WebClient client = new System.Net.WebClient();
                                 string tinyUrl = client.DownloadString(address);
 
@@ -544,7 +551,7 @@ namespace risk.control.system.Controllers
                                 message += "                                                                                ";
                                 message += $"Thanks";
                                 message += "                                                                                ";
-                                message += $"https://icheckify.co.in";
+                                message += $"{portal_base_url}";
                                 await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                             }

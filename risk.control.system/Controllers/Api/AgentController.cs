@@ -187,7 +187,6 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-
         [AllowAnonymous]
         [HttpPost("VerifyId")]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)

@@ -2,7 +2,7 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/GetAvailableVendors',
-            dataSrc:'',
+            dataSrc: '',
             data: function (result) {
                 console.log("Data before sending:", result); // Debugging
             },
@@ -23,10 +23,10 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-        //{
-        //    className: 'max-width-column-name', // Apply the CSS class,
-        //    targets: 3                      // Index of the column to style
-        //    },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 3                      // Index of the column to style
+            },
             {
                 className: 'max-width-column', // Apply the CSS class,
                 targets: 5                      // Index of the column to style

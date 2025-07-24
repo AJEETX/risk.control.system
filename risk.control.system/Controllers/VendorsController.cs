@@ -74,7 +74,6 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EmpanelledVendors(List<string> vendors)
