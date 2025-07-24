@@ -41,7 +41,7 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 IsSuperAdmin = true,
                 Active = true,
-                Addressline = "100, Admin Road",
+                Addressline = "11, Main Road",
                 IsClientAdmin = true,
                 IsVendorAdmin = true,
                 PhoneNumberConfirmed = true,

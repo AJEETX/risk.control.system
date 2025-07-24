@@ -8,6 +8,7 @@ namespace risk.control.system.Seeds
 {
     public static class StartCountryWiseSeed
     {
+        static string randomPinCode = string.Empty;
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, UserManager<VendorApplicationUser> vendorUserManager,
             UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiCLient customApiCLient, IHttpContextAccessor httpAccessor)
         {
@@ -21,8 +22,8 @@ namespace risk.control.system.Seeds
             await PinCodeStateSeed.CurrenciesCode(context);
             await PinCodeStateSeed.Currencies(context);
             var countries = await PinCodeStateSeed.Countries(context);
-            var randomPinIndiaCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
-            var randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+            randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+            randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
 
             // seed USA
             //var us = countries.FirstOrDefault(c => c.Code.ToLower() == "us");
