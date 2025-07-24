@@ -114,7 +114,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="BankAccountNumber"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="20">
+                                <input type="text" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20">
                                 <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -211,7 +211,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address" maxlength="50" />
+                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Enter Street Address" maxlength="70" />
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>
