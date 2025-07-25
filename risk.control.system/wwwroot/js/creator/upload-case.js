@@ -147,7 +147,7 @@
                     //} else {
                     //    img += '<button class="btn-xs btn-danger disabled" disabled title="Can\'t Delete row"><i class="fas fa-trash"></i> </button>';
                     //}
-                    //img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete row"><i class="fas fa-trash"></i> </button>';
+                    img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete row"><i class="fas fa-trash"></i> </button>';
 
                    
                     return img;
