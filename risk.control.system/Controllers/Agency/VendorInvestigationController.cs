@@ -21,18 +21,21 @@ namespace risk.control.system.Controllers.Agency
         private readonly IInvoiceService invoiceService;
         private readonly IInvestigationService investigationService;
         private readonly IVendorInvestigationService vendorInvestigationService;
+        private readonly ILogger<VendorInvestigationController> logger;
         private readonly ICaseVendorService vendorService;
 
         public VendorInvestigationController(INotyfService notifyService,
             IInvoiceService invoiceService,
             IInvestigationService investigationService,
             IVendorInvestigationService vendorInvestigationService,
+            ILogger<VendorInvestigationController> logger,
             ICaseVendorService vendorService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
             this.investigationService = investigationService;
             this.vendorInvestigationService = vendorInvestigationService;
+            this.logger = logger;
             this.vendorService = vendorService;
         }
         public IActionResult Index()
@@ -49,6 +52,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -70,6 +74,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -101,6 +106,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -131,6 +137,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -174,6 +181,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 System.IO.File.AppendAllText("admin.txt", ex.Message + Environment.NewLine);
@@ -217,6 +225,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -245,6 +254,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -287,6 +297,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -344,6 +355,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -375,6 +387,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

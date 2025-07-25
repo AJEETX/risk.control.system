@@ -86,7 +86,7 @@
                 "data": "agent",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span class="badge badge-light" title="' + row.agent + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.agent + '" data-toggle="tooltip">' + data + '</span>';
                 }
                 ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },

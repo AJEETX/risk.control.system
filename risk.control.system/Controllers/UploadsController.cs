@@ -23,18 +23,21 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly IClaimsAgentService agentService;
         private readonly IAgentIdService agentIdService;
+        private readonly ILogger<UploadsController> logger;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public UploadsController(ApplicationDbContext context,
             INotyfService notifyService,
             IClaimsAgentService agentService,
             IAgentIdService agentIdService,
+            ILogger<UploadsController> logger,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.notifyService = notifyService;
             this.agentService = agentService;
             this.agentIdService = agentIdService;
+            this.logger = logger;
             this.webHostEnvironment = webHostEnvironment;
         }
 
@@ -58,6 +61,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -80,6 +84,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -108,6 +113,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 return BadRequest(new { success = false, message = "Error deleting file: " + ex.Message });
             }
         }

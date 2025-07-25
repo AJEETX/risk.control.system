@@ -1,16 +1,22 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Security.Claims;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Hangfire;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
-using System.Security.Claims;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
@@ -21,14 +27,17 @@ namespace risk.control.system.Controllers.Company
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<CaseActiveController> logger;
         private readonly IInvestigationService investigationService;
 
         public CaseActiveController(ApplicationDbContext context,
             INotyfService notifyService,
+            ILogger<CaseActiveController> logger,
             IInvestigationService investigationService)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
             this.investigationService = investigationService;
         }
 
@@ -62,6 +71,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -96,6 +106,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -122,12 +133,11 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-
     }
-
 }

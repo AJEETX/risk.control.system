@@ -59,11 +59,12 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 });
 // Set up logging
 var logDirectory = Path.Combine(builder.Environment.ContentRootPath, "Logs");
+Directory.CreateDirectory(logDirectory);
 LogCleanup.DeleteOldLogFiles(logDirectory, maxAgeInDays: 7);
 
 builder.Logging.ClearProviders();
 builder.Logging.SetMinimumLevel(LogLevel.Error); // Optional global filter
-builder.Logging.AddProvider(new CsvLoggerProvider(logDirectory));
+builder.Logging.AddProvider(new CsvLoggerProvider(logDirectory, LogLevel.Error));
 
 //builder.Services.AddWorkflow();
 //builder.Services.AddTransient<InvestigationTaskWorkflow>();

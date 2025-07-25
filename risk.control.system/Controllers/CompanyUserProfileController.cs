@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -26,6 +27,7 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ILogger<CompanyUserProfileController> logger;
         private readonly ISmsService smsService;
 
         public CompanyUserProfileController(ApplicationDbContext context,
@@ -34,6 +36,7 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
              IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment,
+            ILogger<CompanyUserProfileController> logger,
             ISmsService SmsService)
         {
             this._context = context;
@@ -42,6 +45,7 @@ namespace risk.control.system.Controllers
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
             this.webHostEnvironment = webHostEnvironment;
+            this.logger = logger;
             smsService = SmsService;
             UserList = new List<UsersViewModel>();
         }
@@ -91,6 +95,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -169,6 +174,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -200,6 +206,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -282,6 +289,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

@@ -30,6 +30,7 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
+        private readonly ILogger<AgencyUserProfileController> logger;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public AgencyUserProfileController(ApplicationDbContext context,
@@ -40,6 +41,7 @@ namespace risk.control.system.Controllers
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             ISmsService SmsService,
+            ILogger<AgencyUserProfileController> logger,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -50,6 +52,7 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             smsService = SmsService;
+            this.logger = logger;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
         }
@@ -70,6 +73,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -108,6 +112,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -190,6 +195,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -211,6 +217,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -296,6 +303,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -319,6 +327,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -326,7 +335,6 @@ namespace risk.control.system.Controllers
             notifyService.Error("Error to create Agency user!");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
-
 
         private void Errors(IdentityResult result)
         {

@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
         private readonly IAccountService accountService;
-        private readonly ILogger _logger;
+        private readonly ILogger<AccountController> _logger;
         private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
@@ -331,7 +331,7 @@ namespace risk.control.system.Controllers
                 }
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                _logger.LogWarning("User can't login.");
+                _logger.LogCritical("User can't login.");
                 model.LoginError = "User can't login.";
                 return View(model);
             }
@@ -347,7 +347,7 @@ namespace risk.control.system.Controllers
                 }
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                _logger.LogWarning("User account locked out.");
+                _logger.LogError("User account locked out.");
                 model.LoginError = "User account locked out.";
                 return View(model);
             }
@@ -365,8 +365,10 @@ namespace risk.control.system.Controllers
                 model.LoginError = $"{nameof(result.IsNotAllowed)}. Contact admin.";
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                _logger.LogError("User account not allowed.");
                 return View(model);
             }
+            _logger.LogError("Invalid credentials. Try again.");
             ModelState.AddModelError(string.Empty, "Bad Request.");
             model.LoginError = "Invalid credentials. Try again";
             model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
@@ -494,6 +496,7 @@ namespace risk.control.system.Controllers
                                 }
                                 catch (Exception ex)
                                 {
+                                    _logger.LogError(ex.StackTrace);
                                     Console.WriteLine(ex.ToString());
                                 }
                             }
@@ -508,7 +511,7 @@ namespace risk.control.system.Controllers
                 {
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string failedMessage = $"Dear {admin.Email}, ";
-                    failedMessage += $"Locked user {user.Email} logged in.  ";
+                    failedMessage += $"User {user.Email} password updated.  ";
                     failedMessage += $"Thanks, ";
                     failedMessage += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);

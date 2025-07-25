@@ -27,6 +27,7 @@ namespace risk.control.system.Controllers.Agency
         private readonly IVendorInvestigationService vendorInvestigationService;
         private readonly INotyfService notifyService;
         private readonly IMailService mailboxService;
+        private readonly ILogger<CaseVendorPostController> logger;
         private readonly ApplicationDbContext _context;
         private readonly IBackgroundJobClient backgroundJobClient;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -38,12 +39,14 @@ namespace risk.control.system.Controllers.Agency
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
             IMailService mailboxService,
+            ILogger<CaseVendorPostController> logger,
             ApplicationDbContext context)
         {
             this.processCaseService = processCaseService;
             this.vendorInvestigationService = vendorInvestigationService;
             this.notifyService = notifyService;
             this.mailboxService = mailboxService;
+            this.logger = logger;
             this.backgroundJobClient = backgroundJobClient;
             this.httpContextAccessor = httpContextAccessor;
             _context = context;
@@ -93,6 +96,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -132,6 +136,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
@@ -204,6 +209,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), new { selectedcase = claimId });
@@ -244,6 +250,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
@@ -284,6 +291,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
@@ -334,6 +342,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");

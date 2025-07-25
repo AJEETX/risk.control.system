@@ -18,11 +18,13 @@ namespace risk.control.system.Controllers.Agency
     {
         private readonly INotyfService notifyService;
         private readonly ICaseVendorService vendorService;
+        private readonly ILogger<AgentController> logger;
 
-        public AgentController(INotyfService notifyService, ICaseVendorService vendorService)
+        public AgentController(INotyfService notifyService, ICaseVendorService vendorService, ILogger<AgentController> logger)
         {
             this.notifyService = notifyService;
             this.vendorService = vendorService;
+            this.logger = logger;
         }
         public IActionResult Index()
         {
@@ -66,6 +68,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 System.IO.File.AppendAllText("agent.txt", ex.Message + Environment.NewLine);
@@ -108,6 +111,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

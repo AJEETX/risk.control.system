@@ -33,6 +33,7 @@ namespace risk.control.system.Controllers
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
         private readonly IFeatureManager featureManager;
+        private readonly ILogger<CompanyUserController> logger;
 
         public CompanyUserController(UserManager<ClientCompanyApplicationUser> userManager,
             IPasswordHasher<ClientCompanyApplicationUser> passwordHasher,
@@ -41,6 +42,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             ISmsService SmsService,
             IFeatureManager featureManager,
+            ILogger<CompanyUserController> logger,
             ApplicationDbContext context)
         {
             this.userManager = userManager;
@@ -50,6 +52,7 @@ namespace risk.control.system.Controllers
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
             this.featureManager = featureManager;
+            this.logger = logger;
             this._context = context;
             UserList = new List<UsersViewModel>();
         }
@@ -110,7 +113,6 @@ namespace risk.control.system.Controllers
             var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Create", "CompanyUser", $"Add User") { Parent = createPage };
             ViewData["BreadcrumbNode"] = editPage;
-
 
             return View(model);
         }
@@ -279,6 +281,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.Message);
             }
             notifyService.Error("OOPS !!!..Contact Admin");
