@@ -25,11 +25,27 @@ $(document).ready(function () {
             });
         }
     });
-   
+
+    function toggleDistrictFields() {
+        const stateValue = $('#StateId').val().trim();
+        const isStateSelected = stateValue !== '';
+
+        // Enable/disable All Districts checkbox
+        $('#allDistrictsCheckbox').prop('disabled', !isStateSelected);
+
+        // Clear selected districts if state is not selected
+        if (!isStateSelected) {
+            $('#SelectedDistrictIds').val([]); // Clear all selections
+            $('#allDistrictsCheckbox').prop('checked', false); // Uncheck All Districts
+        }
+    }
+    toggleDistrictFields();
+
     $("#StateId").on("blur change", function () {
         const countryId = $("#SelectedCountryId").val();
         const stateId = $("#SelectedStateId").val();
-        
+        toggleDistrictFields();
+
         if (countryId && stateId) {
             loadDistrictData(countryId, stateId);
         }
