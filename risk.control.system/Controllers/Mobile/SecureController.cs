@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Security.Claims;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Mobile
@@ -240,12 +243,11 @@ namespace risk.control.system.Controllers.Mobile
 
         [AllowAnonymous]
         [HttpGet("test-sms")]
-        public async Task<IActionResult> Sms(string mobile = "61432854196")
+        public async Task<IActionResult> Sms(string mobile = "61432854196", string message = "Testing by icheckify")
         {
-            var respone = await SmsService.SendSmsAsync(mobile);
+            var respone = await SmsService.SendSmsAsync(mobile, message);
             return Ok(new { message = respone });
         }
-
 
         [AllowAnonymous]
         [HttpGet("pdf")]

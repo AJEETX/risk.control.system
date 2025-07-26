@@ -2996,3 +2996,7 @@ th.col-match {
     height: 1.5rem;
     margin-left: 0.5rem; /* optional spacing */
 }
+.upload-success {
+    border: 1px solid forestgreen;
+
+}
