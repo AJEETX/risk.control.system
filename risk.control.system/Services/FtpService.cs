@@ -157,24 +157,19 @@ namespace risk.control.system.Services
 
                 if (uploadedCaseResult.Count > 0)
                 {
-                    var rowNum = 1;
-                    sb.AppendLine("Row #, FieldName, Error"); // CSV header
+                    var rowNum = 0;
+                    sb.AppendLine("Row #, [FieldName = Error detail]"); // CSV header
                     foreach (var result in uploadedCaseResult)
                     {
                         var errorList = result.ErrorDetail;
-                        if (errorList.Count > 0)
+                        var caseErrors = result.Errors;
+                        if (caseErrors.Count > 0)
                         {
-                            foreach (var err in errorList)
-                            {
-                                var uploadData = err.UploadData?.Replace("\"", "\"\"") ?? "";
-                                var errorMsg = err.Error?.Replace("\"", "\"\"") ?? "";
-
-                                sb.AppendLine($"\"{rowNum}\",\"{uploadData}\",\"{errorMsg}\"");
-                            }
-                            rowNum++;
+                            ++rowNum;
+                            sb.AppendLine($"\"{rowNum}\", {string.Join(",", caseErrors)}");
                         }
                     }
-                    if (rowNum > 1)
+                    if (rowNum > 0)
                     {
                         SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
                         byte[] errorBytes = Encoding.UTF8.GetBytes(sb.ToString());

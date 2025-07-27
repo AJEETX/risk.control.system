@@ -4,6 +4,7 @@
     {
         public InvestigationTask InvestigationTask { get; set; }
         public List<UploadError> ErrorDetail { get; set; }
+        public List<string> Errors { get; set; }
     }
     public class UploadError
     {
