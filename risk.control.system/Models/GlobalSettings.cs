@@ -1,6 +1,7 @@
-﻿using risk.control.system.AppConstant;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Models
 {
@@ -32,12 +33,12 @@ namespace risk.control.system.Models
         public bool EnableUnderwriting { get; set; } = false;
 
         public string SmsUri { get; set; } = "https://api.sms-gate.app/3rdparty/v1/message";
-        public string SmsUser { get; set; } = "EO66GF";
-        public string SmsData { get; set; } = "-lkoxvqoag8aep";
+        public string SmsUser { get; set; }
+        public string SmsData { get; set; }
 
         public string FtpUri { get; set; } = "ftp://ftp.drivehq.com/holosync/";
         public string FtpUser { get; set; } = "its.aby@email.com";
-        public string FtpData { get; set; } = "C0##ect10n";
+        public string FtpData { get; set; } = Environment.GetEnvironmentVariable("FtpKey") ?? "test";
 
         public string AddressUri { get; set; } = "https://api.geoapify.com/v1/geocode/reverse";
         public string AddressUriData { get; set; } = "f2a54c0ec9ba4dfdbd450116509c6313";
@@ -56,6 +57,6 @@ namespace risk.control.system.Models
         public string WhitelistIpAddress { get; set; } = "::1;202.7.251.53";
 
         public string AiApiUrl { get; set; } = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"; // HUGGING FACE
-        public string AiApiData { get; set; } = Environment.GetEnvironmentVariable("HUGING_FACE") ?? "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"; // HUGGING FACE
+        public string AiApiData { get; set; } = Environment.GetEnvironmentVariable("HUGING_FACE"); // HUGGING FACE
     }
 }
