@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers.Mobile
         private readonly IFeatureManager featureManager;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
-
+        private readonly string baseUrl;
         public SecureController(UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
@@ -56,6 +56,9 @@ namespace risk.control.system.Controllers.Mobile
             this.featureManager = featureManager;
             smsService = SmsService;
             this.tokenService = tokenService;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [AllowAnonymous]
@@ -72,9 +75,7 @@ namespace risk.control.system.Controllers.Mobile
             var email = System.Web.HttpUtility.HtmlEncode(model.Email);
             var pwd = System.Web.HttpUtility.HtmlEncode(model.Password);
             var result = await _signInManager.PasswordSignInAsync(email, pwd, false, lockoutOnFailure: false);
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(email);
@@ -108,7 +109,7 @@ namespace risk.control.system.Controllers.Mobile
                                 message += $"Thanks                                         ";
                                 message += $"                                       ";
                                 message += $"                                       ";
-                                message += $"{BaseUrl}";
+                                message += $"{baseUrl}";
                                 try
                                 {
                                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
@@ -125,7 +126,7 @@ namespace risk.control.system.Controllers.Mobile
                             message += $"Thanks                                         ";
                             message += $"                                       ";
                             message += $"                                       ";
-                            message += $"{BaseUrl}";
+                            message += $"{baseUrl}";
                             try
                             {
                                 await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
@@ -245,8 +246,11 @@ namespace risk.control.system.Controllers.Mobile
         [HttpGet("test-sms")]
         public async Task<IActionResult> Sms(string mobile = "61432854196", string message = "Testing by icheckify")
         {
-            var respone = await SmsService.SendSmsAsync(mobile, message);
-            return Ok(new { message = respone });
+            string msg = $"Dear {mobile} user,\n\n" +
+                             $"iCheckify: {message}\n\n" +
+                             $"Thanks\n{baseUrl}";
+            var response = await SmsService.SendSmsAsync(mobile, msg);
+            return Ok(new { message = response });
         }
 
         [AllowAnonymous]

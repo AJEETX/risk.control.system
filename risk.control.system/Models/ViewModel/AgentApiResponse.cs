@@ -158,7 +158,7 @@
         public string Mobile { get; set; }
         public string Uid { get; set; }
         public bool CheckUid { get; set; } = false;
-        public bool SendSMS { get; set; } = false;
+        public bool SendSMSForRetry { get; set; } = false;
     }
 
     public class VerifyIdRequest

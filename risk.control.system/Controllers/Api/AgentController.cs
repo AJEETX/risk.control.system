@@ -134,58 +134,61 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("VerifyMobile")]
         public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
         {
+            if (request is null || string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
+            {
+                return BadRequest("Invalid request parameters.");
+            }
             try
             {
-                if (request is null || string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
+                var normalizedMobile = request.Mobile.TrimStart('+');
+                var userWithUid = await _context.VendorApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
+                if (!request.SendSMSForRetry)
                 {
-                    return BadRequest($"{nameof(request)} invalid");
-                }
-                if (request.CheckUid)
-                {
-                    var mobileUidExist = _context.VendorApplicationUser.Any(
-                                    v => v.MobileUId == request.Uid);
-                    if (mobileUidExist)
+                    if (userWithUid != null)
                     {
-                        return BadRequest($"{nameof(request.Uid)} {request.Uid} exists");
+                        return BadRequest($"UID {request.Uid} already exists.");
                     }
-                }
 
-                var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
-                var user2Onboards = _context.VendorApplicationUser.Include(u => u.Country).Where(
-                    u => u.Country.ISDCode + u.PhoneNumber == request.Mobile.TrimStart('+'));
-                foreach (var user2Onboard in user2Onboards)
-                {
-                    var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
-                    if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId) && user2Onboard.Active)
+                    var agentRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+                    var matchingUsers = await _context.VendorApplicationUser.Include(u => u.Country).Where(u => (u.Country.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
+                    foreach (var user in matchingUsers)
                     {
-                        user2Onboard.MobileUId = request.Uid;
-                        user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
-                        _context.VendorApplicationUser.Update(user2Onboard);
-                        await _context.SaveChangesAsync();
-                        if (request.SendSMS)
+                        var isAgent = await userVendorManager.IsInRoleAsync(user, agentRole.Name);
+                        if (isAgent && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active)
                         {
-                            //SEND SMS
-                            string message = $"Dear {user2Onboard.Email}, ";
-                            message += $"                                ";
-                            message += $"icheckifyApp Pin:{user2Onboard.SecretPin}";
-                            message += $"                                      ";
-                            message += $"Thanks                           ";
-                            message += $"                                ";
-                            message += $"{portal_base_url}";
-                            await smsService.DoSendSmsAsync(request.Mobile, message);
+                            user.MobileUId = request.Uid;
+                            user.SecretPin = randomNumber.Next(1000, 9999).ToString();
+                            _context.VendorApplicationUser.Update(user);
+                            await _context.SaveChangesAsync();
+                            await SendVerificationSmsAsync(user.Email, request.Mobile, user.SecretPin);
+                            return Ok(new { user.Email, Pin = user.SecretPin });
                         }
-
-                        return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
                     }
                 }
-                return BadRequest($"Err");
+                else if (request.SendSMSForRetry && userWithUid != null)
+                {
+                    await SendVerificationSmsAsync(userWithUid.Email, request.Mobile, userWithUid.SecretPin);
+                    return Ok(new { userWithUid.Email, Pin = userWithUid.SecretPin });
+                }
+
+                return BadRequest("Mobile number and/or eligible agent not found.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
-                return BadRequest($"mobile number and/or Agent does not exist");
+                Console.WriteLine($"[VerifyMobile Error] {ex}");
+                return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
+
+
+        private async Task SendVerificationSmsAsync(string email, string mobile, string pin)
+        {
+            string message = $"Dear {email},\n\n" +
+                             $"iCheckify-App PIN: {pin}\n\n" +
+                             $"Thanks\n{portal_base_url}";
+            await smsService.DoSendSmsAsync(mobile, message);
+        }
+
 
         [AllowAnonymous]
         [HttpPost("VerifyId")]
