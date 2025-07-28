@@ -68,9 +68,6 @@
 
 ### 3. Notification Service: [web-portal for all user]
 
-    Internal Domain-based Mailbox to:
-        Receive QuickEMAIL notification or communication
-        Send QuickEMAIL to System Users only
     SMS 
         Claim allocation [to agency and/or agent]
         Password change PIN

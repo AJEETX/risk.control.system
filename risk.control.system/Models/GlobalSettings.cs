@@ -57,6 +57,6 @@ namespace risk.control.system.Models
         public string WhitelistIpAddress { get; set; } = "::1;202.7.251.53";
 
         public string AiApiUrl { get; set; } = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"; // HUGGING FACE
-        public string AiApiData { get; set; } = Environment.GetEnvironmentVariable("HUGING_FACE"); // HUGGING FACE
+        public string AiApiData { get; set; } = Environment.GetEnvironmentVariable("HUGING_FACE") ?? "test"; // HUGGING FACE
     }
 }
