@@ -32,9 +32,9 @@ namespace risk.control.system.Models
         public bool EnableClaim { get; set; } = false;
         public bool EnableUnderwriting { get; set; } = false;
 
-        public string SmsUri { get; set; } = "https://api.sms-gate.app/3rdparty/v1/message";
-        public string SmsUser { get; set; }
-        public string SmsData { get; set; }
+        public string SmsUri { get; set; } = Environment.GetEnvironmentVariable("SMS_Url") ?? "test";
+        public string SmsUser { get; set; } = Environment.GetEnvironmentVariable("SMS_User") ?? "test";
+        public string SmsData { get; set; } = Environment.GetEnvironmentVariable("SMS_Pwd") ?? "test";
 
         public string FtpUri { get; set; } = "ftp://ftp.drivehq.com/holosync/";
         public string FtpUser { get; set; } = "its.aby@email.com";
