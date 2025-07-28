@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Web;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Services;
-using System.Web;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -114,7 +116,7 @@ namespace risk.control.system.Controllers.Api
         {
             string logo = "https://icheckify-demo.azurewebsites.net/img/iCheckifyLogo.png";
             string? attachments = $"<a href='{logo}'>team</a>";
-            var finalMessage = $"{message} Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")} {logo}";
+            var finalMessage = $"{message}\n\n Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")}\n\n {logo}";
             await smsService.DoSendSmsAsync("+" + mobile, finalMessage);
             return Ok();
         }

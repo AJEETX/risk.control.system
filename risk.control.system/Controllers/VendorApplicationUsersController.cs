@@ -193,13 +193,13 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. \n\nEmail : " + user.Email);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
                     {
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \n\nEmail : " + user.Email);
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     }
                     return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
@@ -329,7 +329,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. \n\nEmail : " + user.Email);
                                 notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                             }
                         }
@@ -341,7 +341,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. \n\nEmail : " + user.Email);
                                 notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
                             }
                         }

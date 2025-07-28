@@ -77,7 +77,7 @@ namespace risk.control.system.Services
             var rowsAffected = await context.SaveChangesAsync();
             if (rowsAffected > 0)
             {
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency account created. \n\nDomain : " + vendor.Email);
                 return true;
             }
             return false;

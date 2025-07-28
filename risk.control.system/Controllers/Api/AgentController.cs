@@ -185,10 +185,9 @@ namespace risk.control.system.Controllers.Api
         {
             string message = $"Dear {email},\n\n" +
                              $"iCheckify-App PIN: {pin}\n\n" +
-                             $"Thanks\n{portal_base_url}";
+                             $"{portal_base_url}";
             await smsService.DoSendSmsAsync(mobile, message);
         }
-
 
         [AllowAnonymous]
         [HttpPost("VerifyId")]

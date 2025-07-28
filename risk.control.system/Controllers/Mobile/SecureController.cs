@@ -101,15 +101,9 @@ namespace risk.control.system.Controllers.Mobile
                             var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(u => u.IsSuperAdmin);
                             if (admin != null)
                             {
-                                message = $"Dear {admin.Email}";
-                                message += $"                                       ";
-                                message += $"                       ";
-                                message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
-                                message += $"                                       ";
-                                message += $"Thanks                                         ";
-                                message += $"                                       ";
-                                message += $"                                       ";
-                                message += $"{baseUrl}";
+                                message = $"Dear {admin.Email}\n\n" +
+                                $"User {user.Email} logged in from IP address {ipApiResponse.query}\n\n" +
+                                $"{baseUrl}";
                                 try
                                 {
                                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
@@ -119,14 +113,9 @@ namespace risk.control.system.Controllers.Mobile
                                     Console.WriteLine(ex.ToString());
                                 }
                             }
-                            message += $"                                       ";
-                            message += $"                       ";
-                            message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
-                            message += $"                                       ";
-                            message += $"Thanks                                         ";
-                            message += $"                                       ";
-                            message += $"                                       ";
-                            message += $"{baseUrl}";
+                            message = string.Empty;
+                            message += $"User {user.Email} logged in from IP address {ipApiResponse.query}\n\n" +
+                            $"{baseUrl}";
                             try
                             {
                                 await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
@@ -203,16 +192,13 @@ namespace risk.control.system.Controllers.Mobile
         [HttpPost("logout")]
         public async Task<IActionResult> RevokeToken([FromBody] string refreshToken)
         {
-            var tokenEntity = await _context.RefreshTokens
-                .FirstOrDefaultAsync(t => t.Token == refreshToken);
-
+            var tokenEntity = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshToken);
             if (tokenEntity == null)
                 return NotFound("Token not found.");
 
             tokenEntity.IsRevoked = true;
             _context.RefreshTokens.Update(tokenEntity);
             await _context.SaveChangesAsync();
-
             return Ok("Token revoked successfully.");
         }
 
@@ -229,7 +215,6 @@ namespace risk.control.system.Controllers.Mobile
             await Task.Delay(10);
             return Ok(new { token });
         }
-
         // This endpoint requires JWT authentication.
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("test-2-access-secure-api")]

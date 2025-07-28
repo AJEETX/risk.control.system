@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers
                     {
                         notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
                         var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User edited . Email : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User edited . \n\nEmail : " + user.Email);
                         return RedirectToAction(nameof(Index), "Dashboard");
                     }
                 }
@@ -242,15 +242,9 @@ namespace risk.control.system.Controllers
 
                     if (!result.Succeeded)
                     {
-                        string failedMessage = $"Dear {admin.Email}";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"                       ";
-                        failedMessage += $"User {user.Email} failed changed password. New password: {model.NewPassword}";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"Thanks                                         ";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"{BaseUrl}";
+                        string failedMessage = $"Dear {admin.Email}\n\n" +
+                        $"User {user.Email} failed changed password. New password: {model.NewPassword}" +
+                        $"{BaseUrl}";
                         await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
                         notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
@@ -258,28 +252,14 @@ namespace risk.control.system.Controllers
 
                     await signInManager.RefreshSignInAsync(user);
 
-                    string message = $"Dear {admin.Email}";
-                    message += $"                                       ";
-                    message += $"                       ";
-                    message += $"User {user.Email} changed password. New password: {model.NewPassword}";
-                    message += $"                                       ";
-                    message += $"Thanks                                         ";
-                    message += $"                                       ";
-                    message += $"                                       ";
-                    message += $"{BaseUrl}";
+                    string message = $"Dear {admin.Email}\n\n" +
+                    $"User {user.Email} changed password. New password: {model.NewPassword}\n\n" +
+                    $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-
-
                     message = string.Empty;
-                    message = $"Dear {user.Email}";
-                    message += $"                                       ";
-                    message += $"                       ";
-                    message += $"Your changed password: {model.NewPassword}";
-                    message += $"                                       ";
-                    message += $"Thanks                                         ";
-                    message += $"                                       ";
-                    message += $"                                       ";
-                    message += $"{BaseUrl}";
+                    message = $"Dear {user.Email}\n\n" +
+                    $"Your changed password: {model.NewPassword}\n\n" +
+                    $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + user.PhoneNumber, message);
 
                     return View("ChangePasswordConfirmation");

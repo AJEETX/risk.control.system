@@ -165,7 +165,7 @@ namespace risk.control.system.Controllers
             {
                 await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                 var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account created. Domain : " + user.Email);
+                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account created. \n\nDomain : " + user.Email);
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
 
                 return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
@@ -273,7 +273,7 @@ namespace risk.control.system.Controllers
                         await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                         notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
                         var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account edited. Domain : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account edited. \n\nDomain : " + user.Email);
 
                         return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
                     }

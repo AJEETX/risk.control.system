@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -37,12 +38,8 @@ namespace risk.control.system.Services
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                string message = $"Dear {useremail}";
-                message += $"                                          ";
-                message += $"{passwordString}";
-                message += $"                                          ";
-                message += $"Thanks";
-                message += $"                                          ";
+                string message = $"Dear {useremail}\n\n";
+                message += $"{passwordString}\n\n";
                 message += $"{BaseUrl}";
                 if (user != null)
                 {

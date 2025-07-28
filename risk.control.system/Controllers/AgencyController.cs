@@ -321,7 +321,7 @@ namespace risk.control.system.Controllers
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
                             notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-lock");
-                            await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "Agency user created. \n\nEmail : " + user.Email);
                             if (txn == "agency")
                             {
                                 return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -348,21 +348,16 @@ namespace risk.control.system.Controllers
                                 System.Net.WebClient client = new System.Net.WebClient();
                                 string tinyUrl = client.DownloadString(address);
 
-                                var message = $"Dear {user.FirstName}, ";
-                                message += "                                                                                ";
-                                message += $"Click on link below to install the mobile app";
-                                message += "                                                                                ";
-                                message += $"{tinyUrl}";
-                                message += "                                                                                ";
-                                message += $"Thanks";
-                                message += "                                                                                ";
-                                message += $"{portal_base_url}";
+                                var message = $"Dear {user.FirstName},\n\n " +
+                                $"Click on link below to install the mobile app\n\n" +
+                                $"{tinyUrl}\n\n" +
+                                $"{portal_base_url}";
                                 await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "User created. Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "User created. \n\nEmail : " + user.Email);
                                 notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-check");
                             }
                         }
@@ -552,21 +547,16 @@ namespace risk.control.system.Controllers
                                 System.Net.WebClient client = new System.Net.WebClient();
                                 string tinyUrl = client.DownloadString(address);
 
-                                var message = $"Dear {user.FirstName}";
-                                message += "                                                                                ";
-                                message += $"Click on link below to install the mobile app";
-                                message += "                                                                                ";
-                                message += $"{tinyUrl}";
-                                message += "                                                                                ";
-                                message += $"Thanks";
-                                message += "                                                                                ";
-                                message += $"{portal_base_url}";
+                                var message = $"Dear {user.FirstName}\n\n" +
+                                $"Click on link below to install the mobile app\n\n" +
+                                $"{tinyUrl}\n\n" +
+                                $"{portal_base_url}";
                                 await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "User edited and unlocked. Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "User edited and unlocked. \n\nEmail : " + user.Email);
                                 notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-check");
                             }
                         }
@@ -738,15 +728,10 @@ namespace risk.control.system.Controllers
             System.Net.WebClient client = new System.Net.WebClient();
             string tinyUrl = client.DownloadString(address);
 
-            var message = $"Dear {user.FirstName}";
-            message += "                                                                                ";
-            message += $"Click on link below to install the mobile app";
-            message += "                                                                                ";
-            message += $"{tinyUrl}";
-            message += "                                                                                ";
-            message += $"Thanks";
-            message += "                                                                                ";
-            message += $"https://icheckify.co.in";
+            var message = $"Dear {user.FirstName}\n\n" +
+            $"Click on link below to install the mobile app\n\n" +
+            $"{tinyUrl}\n\n" +
+            $"{portal_base_url}";
             if (onboardAgent)
             {
                 var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;

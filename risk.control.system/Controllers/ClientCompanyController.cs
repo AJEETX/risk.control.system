@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -103,7 +104,7 @@ namespace risk.control.system.Controllers
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
             var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == clientCompany.SelectedCountryId)?.ISDCode;
-            await smsService.DoSendSmsAsync(isdCode + clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
+            await smsService.DoSendSmsAsync(isdCode + clientCompany.PhoneNumber, "Company account created. \n\nDomain : " + clientCompany.Email);
 
             //clientCompany.Description = "New company added.";
             clientCompany.AgreementDate = DateTime.Now;
@@ -175,7 +176,7 @@ namespace risk.control.system.Controllers
                 }
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(clientCompany.Country.ISDCode + clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(clientCompany.Country.ISDCode + clientCompany.PhoneNumber, "Company account deleted. \n\nDomain : " + clientCompany.Email);
 
                 notifyService.Custom($"Company {clientCompany.Email} deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
@@ -299,7 +300,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company account edited. \n\nDomain : " + clientCompany.Email);
                 notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }

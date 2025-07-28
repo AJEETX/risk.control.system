@@ -431,14 +431,14 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. \n\nEmail : " + user.Email);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
                     {
 
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \n\nEmail : " + user.Email);
 
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
 
@@ -450,14 +450,9 @@ namespace risk.control.system.Controllers
                             System.Net.WebClient client = new System.Net.WebClient();
                             string tinyUrl = client.DownloadString(address);
 
-                            var message = $"Dear {user.FirstName}";
-                            message += "                                                                                ";
-                            message += $"Click on link below to install the mobile app";
-                            message += "                                                                                ";
-                            message += $"{tinyUrl}";
-                            message += "                                                                                ";
-                            message += $"Thanks";
-                            message += "                                                                                ";
+                            var message = $"Dear {user.FirstName}\n\n";
+                            message += $"Click on link below to install the mobile app\n\n";
+                            message += $"{tinyUrl}\n\n";
                             message += $"https://icheckify.co.in";
 
                             await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
@@ -465,7 +460,7 @@ namespace risk.control.system.Controllers
                         }
                         else
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. \n\nEmail : " + user.Email);
                         }
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     }
@@ -620,7 +615,7 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. \n\nEmail : " + user.Email);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
@@ -640,14 +635,9 @@ namespace risk.control.system.Controllers
                                 System.Net.WebClient client = new System.Net.WebClient();
                                 string tinyUrl = client.DownloadString(address);
 
-                                var message = $"Dear {user.FirstName}";
-                                message += "                                                                                ";
-                                message += $"Click on link below to install the mobile app";
-                                message += "                                                                                ";
-                                message += $"{tinyUrl}";
-                                message += "                                                                                ";
-                                message += $"Thanks";
-                                message += "                                                                                ";
+                                var message = $"Dear {user.FirstName}\n\n";
+                                message += $"Click on link below to install the mobile app\n\n";
+                                message += $"{tinyUrl}\n\n";
                                 message += $"https://icheckify.co.in";
                                 await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "orange", "fas fa-user-check");
@@ -840,14 +830,9 @@ namespace risk.control.system.Controllers
             System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
             System.Net.WebClient client = new System.Net.WebClient();
             string tinyUrl = client.DownloadString(address);
-            var message = $"Dear {user.FirstName}";
-            message += "                                                                                ";
-            message += $"Please click on the link below to install the mobile";
-            message += "                                                                                ";
-            message += $"{tinyUrl}";
-            message += "                                                                                ";
-            message += $"Thanks";
-            message += "                                                                                ";
+            var message = $"Dear {user.FirstName}\n\n";
+            message += $"Please click on the link below to install the mobile\n\n";
+            message += $"{tinyUrl}\n\n";
             message += $"https://icheckify.co.in";
             if (onboardAgent)
             {
@@ -968,7 +953,7 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
+                    await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \n\nDomain : " + vendor.Email);
                 }
 
                 notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
@@ -1082,7 +1067,7 @@ namespace risk.control.system.Controllers
 
                 _context.Vendor.Update(vendor);
 
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. Domain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \n\nDomain : " + vendor.Email);
 
                 await _context.SaveChangesAsync();
             }

@@ -505,18 +505,12 @@ namespace risk.control.system.Services
             {
                 return string.Empty;
             }
-            var message = $"Dear {claim.CustomerDetail.Name}";
-            message += "                                                                                ";
-            message += $"{sms}";
-            message += "                                                                                ";
-            message += $"Thanks";
-            message += "                                                                                ";
-            message += $"{user.FirstName} {user.LastName}";
-            message += "                                                                                ";
-            message += $"Policy #:{claim.PolicyDetail.ContractNumber}";
-            message += "                                                                                ";
-            message += $"{company}";
-            message += "                                                                                ";
+            var message = $"Dear {claim.CustomerDetail.Name}\n\n";
+            message += $"{sms}\n\n";
+            message += $"Thanks\n\n";
+            message += $"{user.FirstName} {user.LastName}\n\n";
+            message += $"Policy #:{claim.PolicyDetail.ContractNumber}\n\n";
+            message += $"{company}\n\n";
             message += $"{logo}";
 
             var scheduleMessage = new CaseMessage
@@ -627,18 +621,12 @@ namespace risk.control.system.Services
             {
                 return string.Empty;
             }
-            var message = $"Dear {beneficiary.Name}";
-            message += "                                                                                ";
-            message += $"{sms}";
-            message += "                                                                                ";
-            message += $"Thanks";
-            message += "                                                                                ";
-            message += $"{user.FirstName} {user.LastName}";
-            message += "                                                                                ";
-            message += $"Policy #:{beneficiary.InvestigationTask.PolicyDetail.ContractNumber}";
-            message += "                                                                                ";
-            message += $"{company}";
-            message += "                                                                                ";
+            var message = $"Dear {beneficiary.Name}\n\n";
+            message += $"{sms}\n\n";
+            message += $"Thanks\n\n";
+            message += $"{user.FirstName} {user.LastName}\n\n";
+            message += $"Policy #:{beneficiary.InvestigationTask.PolicyDetail.ContractNumber}\n\n";
+            message += $"{company}\n\n";
             message += $"{logo}";
 
             var scheduleMessage = new CaseMessage
