@@ -9,13 +9,13 @@ using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Seeds;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("Admin Settings ")]
@@ -117,6 +117,9 @@ namespace risk.control.system.Controllers
             clientCompany.Updated = DateTime.Now;
             clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
             var addedCompany = _context.Add(clientCompany);
+            await _context.SaveChangesAsync();
+            var claimTemplate = ReportTemplateSeed.QuestionsCLAIM(_context, clientCompany);
+            var underwriting = ReportTemplateSeed.QuestionsUNDERWRITING(_context, clientCompany);
             await _context.SaveChangesAsync();
             notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
             return RedirectToAction(nameof(Companies));
