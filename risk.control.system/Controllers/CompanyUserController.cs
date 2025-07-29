@@ -31,9 +31,11 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ApplicationDbContext _context;
         private readonly IFeatureManager featureManager;
         private readonly ILogger<CompanyUserController> logger;
+        private string portal_base_url = string.Empty;
 
         public CompanyUserController(UserManager<ClientCompanyApplicationUser> userManager,
             IPasswordHasher<ClientCompanyApplicationUser> passwordHasher,
@@ -41,6 +43,7 @@ namespace risk.control.system.Controllers
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             ISmsService SmsService,
+             IHttpContextAccessor httpContextAccessor,
             IFeatureManager featureManager,
             ILogger<CompanyUserController> logger,
             ApplicationDbContext context)
@@ -51,10 +54,14 @@ namespace risk.control.system.Controllers
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
+            this.httpContextAccessor = httpContextAccessor;
             this.featureManager = featureManager;
             this.logger = logger;
             this._context = context;
             UserList = new List<UsersViewModel>();
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         public IActionResult Index(long id)
@@ -165,7 +172,7 @@ namespace risk.control.system.Controllers
             {
                 await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                 var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account created. \n\nDomain : " + user.Email);
+                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account created. \nDomain : " + user.Email + "\n" + portal_base_url);
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
 
                 return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
@@ -273,7 +280,7 @@ namespace risk.control.system.Controllers
                         await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                         notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
                         var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account edited. \n\nDomain : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account edited. \nDomain : " + user.Email + "\n" + portal_base_url);
 
                         return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
                     }

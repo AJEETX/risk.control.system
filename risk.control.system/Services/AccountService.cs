@@ -38,8 +38,8 @@ namespace risk.control.system.Services
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                string message = $"Dear {useremail}\n\n";
-                message += $"{passwordString}\n\n";
+                string message = $"Dear {useremail}\n";
+                message += $"{passwordString}\n";
                 message += $"{BaseUrl}";
                 if (user != null)
                 {

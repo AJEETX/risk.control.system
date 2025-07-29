@@ -37,6 +37,7 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
+        private readonly string BaseUrl;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -64,6 +65,9 @@ namespace risk.control.system.Controllers
             this.featureManager = featureManager;
             this.notifyService = notifyService;
             smsService = SmsService;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [Authorize]
@@ -137,8 +141,8 @@ namespace risk.control.system.Controllers
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                await Response.WriteAsync($"data: ERROR_UserNotFound\n\n");
-                await Response.WriteAsync($"data: done\n\n");
+                await Response.WriteAsync($"data: ERROR_UserNotFound\n");
+                await Response.WriteAsync($"data: done\n");
                 await Response.Body.FlushAsync(cancellationToken);
                 return;
             }
@@ -151,7 +155,7 @@ namespace risk.control.system.Controllers
                 profilePicture = Convert.ToBase64String(user.ProfilePicture) // Ensure it's Base64
             });
 
-            await Response.WriteAsync($"data: PASSWORD_UPDATE|{passwordModelJson}\n\n");
+            await Response.WriteAsync($"data: PASSWORD_UPDATE|{passwordModelJson}\n");
             await Response.Body.FlushAsync(cancellationToken);
             await Task.Delay(1000, cancellationToken); // Small delay to ensure UI updates first
 
@@ -165,13 +169,13 @@ namespace risk.control.system.Controllers
 
             foreach (var message in messages)
             {
-                await Response.WriteAsync($"data: {message}\n\n");
+                await Response.WriteAsync($"data: {message}\n");
                 await Response.Body.FlushAsync(cancellationToken);
                 await Task.Delay(1500, cancellationToken); // Simulate delay between messages
             }
 
             // Indicate completion
-            await Response.WriteAsync($"data: done\n\n");
+            await Response.WriteAsync($"data: done\n");
             await Response.Body.FlushAsync(cancellationToken);
         }
 
@@ -213,9 +217,7 @@ namespace risk.control.system.Controllers
                 return View(model);
             }
 
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
             var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
             if (admin is null || admin.Country is null)
             {
@@ -289,8 +291,8 @@ namespace risk.control.system.Controllers
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
-                    string failedMessage = $"Dear {admin.Email} ,\n\n" +
-                             $"User {user.Email} can't log in. \n\n" +
+                    string failedMessage = $"Dear {admin.Email} ,\n" +
+                             $"User {user.Email} can't log in. \n" +
                              $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }
@@ -304,8 +306,8 @@ namespace risk.control.system.Controllers
             {
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    string message = $"Dear {admin.Email}, \n\n" +
-                        $"{model.Email} locked out.\n\n " +
+                    string message = $"Dear {admin.Email}, \n" +
+                        $"{model.Email} locked out.\n " +
                         $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
@@ -319,8 +321,8 @@ namespace risk.control.system.Controllers
             {
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    string message = $"Dear {admin.Email}, \n\n" +
-                        $"{model.Email} failed login attempt. {nameof(result.IsNotAllowed)}. \n\n" +
+                    string message = $"Dear {admin.Email}, \n" +
+                        $"{model.Email} failed login attempt. {nameof(result.IsNotAllowed)}. \n" +
                         $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
@@ -449,8 +451,8 @@ namespace risk.control.system.Controllers
                             string message = string.Empty;
                             if (admin != null)
                             {
-                                message = $"Dear {admin.Email}, \n\n" +
-                                $"User {user.Email} logged in. \n\n" +
+                                message = $"Dear {admin.Email}, \n" +
+                                $"User {user.Email} logged in. \n" +
                                 $"{BaseUrl}";
                                 try
                                 {
@@ -472,8 +474,8 @@ namespace risk.control.system.Controllers
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
                 {
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
-                    string failedMessage = $"Dear {admin.Email}, \n\n" +
-                        $"User {user.Email} password updated.  \n\n" +
+                    string failedMessage = $"Dear {admin.Email}, \n" +
+                        $"User {user.Email} password updated.  \n" +
                         $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }
@@ -517,7 +519,7 @@ namespace risk.control.system.Controllers
             var smsSent2User = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
             if (smsSent2User != null)
             {
-                model.Message = $"{input.CountryId} (0) {input.Mobile}\n\n";
+                model.Message = $"{input.CountryId} (0) {input.Mobile}\n";
                 model.Flag = $"/flags/{smsSent2User.Country.Code}.png";
                 model.ProfilePicture = smsSent2User.ProfilePicture;
                 model.Reset = true;

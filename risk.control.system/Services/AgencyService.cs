@@ -7,7 +7,7 @@ namespace risk.control.system.Services
 {
     public interface IAgencyService
     {
-        Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail);
+        Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail, string portal_base_url);
     }
     public class AgencyService : IAgencyService
     {
@@ -24,7 +24,7 @@ namespace risk.control.system.Services
             this.context = context;
             smsService = SmsService;
         }
-        public async Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail)
+        public async Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail, string portal_base_url)
         {
             if (vendorDocument is not null)
             {
@@ -77,7 +77,7 @@ namespace risk.control.system.Services
             var rowsAffected = await context.SaveChangesAsync();
             if (rowsAffected > 0)
             {
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency account created. \n\nDomain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency account created. \n\nDomain : " + vendor.Email + "\n" + portal_base_url);
                 return true;
             }
             return false;

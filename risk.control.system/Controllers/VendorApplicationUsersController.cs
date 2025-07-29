@@ -32,6 +32,8 @@ namespace risk.control.system.Controllers
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private string portal_base_url = string.Empty;
 
         public VendorApplicationUsersController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
@@ -39,6 +41,7 @@ namespace risk.control.system.Controllers
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
             IFeatureManager featureManager,
+             IHttpContextAccessor httpContextAccessor,
             ISmsService SmsService,
             IWebHostEnvironment webHostEnvironment)
         {
@@ -50,6 +53,10 @@ namespace risk.control.system.Controllers
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
+            this.httpContextAccessor = httpContextAccessor;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         // GET: VendorApplicationUsers
@@ -193,7 +200,7 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. \n\nEmail : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
@@ -329,7 +336,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. \n\nEmail : " + user.Email);
+                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
                                 notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                             }
                         }

@@ -77,8 +77,8 @@ namespace risk.control.system.Services
                     if (sendSMS)
                     {
                         //SEND SMS
-                        string message = $"Dear {user2Onboard.Email}\n\n";
-                        message += $"Uid reset for mobile: {mobile}\n\n";
+                        string message = $"Dear {user2Onboard.Email}\n";
+                        message += $"Uid reset for mobile: {mobile}\n";
                         message += $"{portal_base_url}";
                         await smsService.DoSendSmsAsync(mobile, message);
                     }

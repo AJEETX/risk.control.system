@@ -36,8 +36,9 @@ namespace risk.control.system.Controllers
         private readonly ISmsService smsService;
         private readonly IFeatureManager featureManager;
         private readonly IInvestigationService service;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ILogger<CompanyController> logger;
-
+        private readonly string baseUrl;
         public CompanyController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
             UserManager<VendorApplicationUser> userAgencyManager,
@@ -48,6 +49,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
             IInvestigationService service,
+             IHttpContextAccessor httpContextAccessor,
             ILogger<CompanyController> logger,
             ISmsService SmsService)
         {
@@ -62,7 +64,11 @@ namespace risk.control.system.Controllers
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
             this.service = service;
+            this.httpContextAccessor = httpContextAccessor;
             this.logger = logger;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [Breadcrumb("Manage Company")]
@@ -217,8 +223,8 @@ namespace risk.control.system.Controllers
                 existCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(existCompany);
                 await _context.SaveChangesAsync();
-
-                await smsService.DoSendSmsAsync(existCompany.Country.ISDCode + existCompany.PhoneNumber, "Company edited. \n\nDomain : " + clientCompany.Email);
+                string message = "Company edited. \nDomain : " + clientCompany.Email + "\n" + baseUrl;
+                await smsService.DoSendSmsAsync(existCompany.Country.ISDCode + existCompany.PhoneNumber, message);
             }
 
             catch (Exception ex)
@@ -346,7 +352,8 @@ namespace risk.control.system.Controllers
                     roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
                     var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;
                     notifyService.Custom($"User {user.Email} created successfully.", 3, "green", "fas fa-user-plus");
-                    await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User created . \n\nEmail : " + user.Email);
+                    string message = "User created . \nEmail : " + user.Email + "\n" + baseUrl;
+                    await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message);
                     return RedirectToAction(nameof(CompanyController.Users), "Company");
                 }
                 notifyService.Error("OOPs !!!..Contact Admin");
@@ -494,8 +501,9 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                notifyService.Custom($"User {createdUser.Email} edited and locked.", 3, "orange", "fas fa-user-lock");
-                                await smsService.DoSendSmsAsync(isdCode + createdUser.PhoneNumber, "User created and locked. \n\nEmail : " + createdUser.Email);
+                                notifyService.Custom($"User {createdUser.Email} edited.", 3, "orange", "fas fa-user-lock");
+                                string message = "User edited. \nEmail : " + createdUser.Email + "\n" + baseUrl;
+                                await smsService.DoSendSmsAsync(isdCode + createdUser.PhoneNumber, message);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
@@ -508,7 +516,7 @@ namespace risk.control.system.Controllers
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
                                 notifyService.Custom($"User {createdUser.Email} edited.", 3, "orange", "fas fa-user-check");
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User created . \n\nEmail : " + user.Email);
+                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User edited . \nEmail : " + user.Email + "\n" + baseUrl);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
@@ -767,7 +775,7 @@ namespace risk.control.system.Controllers
                 _context.Vendor.Update(vendor);
                 var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == vendor.CountryId).ISDCode;
 
-                await smsService.DoSendSmsAsync(isdCode + vendor.PhoneNumber, "Agency edited. \n\nDomain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(isdCode + vendor.PhoneNumber, "Agency edited. \n Domain : " + vendor.Email + "\n" + baseUrl);
 
                 await _context.SaveChangesAsync();
             }
@@ -911,14 +919,14 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. \n\nEmail : " + user.Email);
-                            notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + baseUrl);
+                            notifyService.Custom($"User created.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
                     {
 
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \n\nEmail : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + baseUrl);
 
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
 
@@ -930,17 +938,17 @@ namespace risk.control.system.Controllers
                             System.Net.WebClient client = new System.Net.WebClient();
                             string tinyUrl = client.DownloadString(address);
 
-                            var message = $"Dear {user.FirstName}\n\n" +
-                            $"Click on link below to install the mobile app\n\n" +
-                            $"{tinyUrl}\n\n" +
-                            $"https://icheckify.co.in";
+                            var message = $"Dear {user.FirstName}\n" +
+                            $"Click on link below to install the mobile app\n" +
+                            $"{tinyUrl}\n" +
+                            $"{baseUrl}";
 
                             await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
                             notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                         }
                         else
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. \n\nEmail : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + baseUrl);
                         }
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     }
@@ -1656,7 +1664,7 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;
-                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User role edited . \n\nEmail : " + user.Email);
+                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User role edited . \nEmail : " + user.Email + "\n" + baseUrl);
 
                 notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
                 return RedirectToAction(nameof(CompanyController.Users));
