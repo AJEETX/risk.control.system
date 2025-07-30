@@ -348,9 +348,10 @@ namespace risk.control.system.Controllers
                                 System.Net.WebClient client = new System.Net.WebClient();
                                 string tinyUrl = client.DownloadString(address);
 
-                                var message = $"Dear {user.FirstName},\n " +
-                                $"Click on link below to install the mobile app\n" +
-                                $"{tinyUrl}\n" +
+                                var message = $"Dear {user.FirstName},\n" +
+                                $"Click on link below to install the mobile app\n\n" +
+                                $"{tinyUrl}\n\n" +
+                                $"Thanks\n\n" +
                                 $"{portal_base_url}";
                                 await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
@@ -548,8 +549,9 @@ namespace risk.control.system.Controllers
                                 string tinyUrl = client.DownloadString(address);
 
                                 var message = $"Dear {user.FirstName}\n" +
-                                $"Click on link below to install the mobile app\n" +
-                                $"{tinyUrl}\n" +
+                                $"Click on link below to install the mobile app\n\n" +
+                                $"{tinyUrl}\n\n" +
+                                $"Thanks\n\n" +
                                 $"{portal_base_url}";
                                 await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
@@ -729,8 +731,9 @@ namespace risk.control.system.Controllers
             string tinyUrl = client.DownloadString(address);
 
             var message = $"Dear {user.FirstName}\n" +
-            $"Click on link below to install the mobile app\n" +
-            $"{tinyUrl}\n" +
+            $"Click on link below to install the mobile app\n\n" +
+            $"{tinyUrl}\n\n" +
+            $"Thanks\n\n" +
             $"{portal_base_url}";
             if (onboardAgent)
             {

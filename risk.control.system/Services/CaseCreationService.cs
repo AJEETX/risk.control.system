@@ -2,7 +2,6 @@
 using System.IO.Compression;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -82,7 +81,7 @@ namespace risk.control.system.Services
                 if (string.IsNullOrWhiteSpace(uploadCase.ServiceType))
                 {
                     case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.ServiceType)} :null/empty]", Error = "null/empty" });
-                    caseErrors.Add($"[{nameof(uploadCase.ServiceType)} :null/empty]");
+                    caseErrors.Add($"[{nameof(uploadCase.ServiceType)} : null/empty]");
                 }
                 var servicetype = string.IsNullOrWhiteSpace(uploadCase.ServiceType)
                     ? context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == caseType)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
@@ -94,8 +93,8 @@ namespace risk.control.system.Services
                 var savedNewImage = GetImagesWithDataInSubfolder(model.ByteData, uploadCase.CaseId?.ToLower(), POLICY_IMAGE);
                 if (savedNewImage == null)
                 {
-                    case_errors.Add(new UploadError { UploadData = "[Policy image/doc : null/not found]", Error = "null/not found" });
-                    caseErrors.Add($"[Policy image/doc : null/not found]");
+                    case_errors.Add(new UploadError { UploadData = "[Policy Image: null/not found]", Error = "null/not found" });
+                    caseErrors.Add($"[Policy Image : null/not found]");
                 }
                 if (!string.IsNullOrWhiteSpace(uploadCase.Amount) && decimal.TryParse(uploadCase.Amount, out var amount))
                 {
@@ -113,13 +112,14 @@ namespace risk.control.system.Services
                 // Validate IssueDate
                 if (!string.IsNullOrWhiteSpace(uploadCase.IssueDate) && DateTime.TryParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out issueDate))
                 {
-                    if (issueDate >= DateTime.Today)
+                    if (issueDate > DateTime.Today)
                     {
                         case_errors.Add(new UploadError
                         {
-                            UploadData = "Issue date",
+                            UploadData = "Issue Date",
                             Error = $"Issue date ({issueDate:dd-MM-yyyy}) cannot be in the future"
                         });
+                        caseErrors.Add($"{nameof(uploadCase.IssueDate)} ({issueDate:dd-MM-yyyy}) cannot be in the future");
                     }
                     else
                     {
@@ -145,6 +145,7 @@ namespace risk.control.system.Services
                             UploadData = "Incident date",
                             Error = $"Incident date ({dateOfIncident:dd-MM-yyyy}) cannot be in the future"
                         });
+                        caseErrors.Add($"{nameof(uploadCase.IncidentDate)} ({dateOfIncident:dd-MM-yyyy}) cannot be in the future");
                     }
                     else
                     {
@@ -161,14 +162,14 @@ namespace risk.control.system.Services
                 }
 
                 // Check chronological order
-                if (isIssueDateValid && isIncidentDateValid && issueDate > dateOfIncident)
+                if (isIssueDateValid && isIncidentDateValid && issueDate >= dateOfIncident)
                 {
                     case_errors.Add(new UploadError
                     {
                         UploadData = $"[Date comparison : Issue date ({uploadCase.IssueDate}) must be on or before Incident date ({uploadCase.IncidentDate})]",
                         Error = $"Issue date ({uploadCase.IssueDate}) must be on or before Incident date ({uploadCase.IncidentDate})"
                     });
-                    caseErrors.Add($"[Date comparison : Issue date ({uploadCase.IssueDate}) must be on or before Incident date ({uploadCase.IncidentDate})]");
+                    caseErrors.Add($"[Date comparison : {nameof(uploadCase.IssueDate)} ({uploadCase.IssueDate}) must be on or before {nameof(uploadCase.IncidentDate)} ({uploadCase.IncidentDate})]");
                 }
 
                 if (string.IsNullOrWhiteSpace(uploadCase.Reason))
@@ -251,7 +252,7 @@ namespace risk.control.system.Services
                 claim.IsReady2Assign = claim.IsValidCaseData();
                 case_errors.AddRange(customer_errors);
                 case_errors.AddRange(beneficiary_errors);
-                
+
                 return new UploadResult { InvestigationTask = claim, ErrorDetail = case_errors, Errors = caseErrors };
             }
             catch (Exception ex)
@@ -320,10 +321,10 @@ namespace risk.control.system.Services
                     {
                         errors.Add(new UploadError
                         {
-                            UploadData = $"[Customer pincode/district : Pincode {uploadCase.CustomerPincode} And/OrDistrict {uploadCase.CustomerDistrictName} not found]",
-                            Error = $"Pincode {uploadCase.CustomerPincode} And/OrDistrict {uploadCase.CustomerDistrictName} not found"
+                            UploadData = $"[Customer Pincode {uploadCase.CustomerPincode} And/Or District {uploadCase.CustomerDistrictName} not found]",
+                            Error = $"Pincode {uploadCase.CustomerPincode} And/Or District {uploadCase.CustomerDistrictName} not found"
                         });
-                        errorCustomer.Add($"[Customer pincode/district : Pincode {uploadCase.CustomerPincode} And/OrDistrict {uploadCase.CustomerDistrictName} not found]");
+                        errorCustomer.Add($"[Customer Pincode {uploadCase.CustomerPincode} And/Or District {uploadCase.CustomerDistrictName} not found]");
                     }
                 }
                 if (string.IsNullOrWhiteSpace(uploadCase.CaseId))
@@ -340,7 +341,7 @@ namespace risk.control.system.Services
                         UploadData = $"[Customer image : Image {CUSTOMER_IMAGE} null/not found]",
                         Error = $"Image {CUSTOMER_IMAGE} null/not found"
                     });
-                    errorCustomer.Add($"[Customer image : Image {CUSTOMER_IMAGE} null/not found]");
+                    errorCustomer.Add($"[Customer Image : {CUSTOMER_IMAGE} null/not found]");
                 }
                 if (string.IsNullOrWhiteSpace(uploadCase.CustomerAddressLine))
                 {
@@ -500,10 +501,10 @@ namespace risk.control.system.Services
                     {
                         errors.Add(new UploadError
                         {
-                            UploadData = $"[Beneficiary pincode: {uploadCase?.BeneficiaryPincode}/district : {uploadCase?.BeneficiaryDistrictName} not found]",
+                            UploadData = $"[Beneficiary Pincode: {uploadCase?.BeneficiaryPincode}And / Or District : {uploadCase?.BeneficiaryDistrictName} not found]",
                             Error = $"pincode {uploadCase?.BeneficiaryPincode}/district {uploadCase?.BeneficiaryDistrictName} not found"
                         });
-                        errorBeneficiary.Add($"[Beneficiary pincode: {uploadCase?.BeneficiaryPincode}/district : {uploadCase?.BeneficiaryDistrictName} not found]");
+                        errorBeneficiary.Add($"[Beneficiary Pincode: {uploadCase?.BeneficiaryPincode} And / Or District : {uploadCase?.BeneficiaryDistrictName} not found]");
                     }
                 }
 

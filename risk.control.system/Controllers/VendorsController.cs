@@ -458,9 +458,10 @@ namespace risk.control.system.Controllers
                             string tinyUrl = client.DownloadString(address);
 
                             var message = $"Dear {user.FirstName}\n";
-                            message += $"Click on link below to install the mobile app\n";
-                            message += $"{tinyUrl}\n";
-                            message += $"https://icheckify.co.in";
+                            message += $"Click on link below to install the mobile app\n\n";
+                            message += $"{tinyUrl}\n\n";
+                            message += $"Thanks\n\n";
+                            message += $"{portal_base_url}";
 
                             await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
                             notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
@@ -643,8 +644,9 @@ namespace risk.control.system.Controllers
                                 string tinyUrl = client.DownloadString(address);
 
                                 var message = $"Dear {user.FirstName}\n";
-                                message += $"Click on link below to install the mobile app\n";
-                                message += $"{tinyUrl}\n";
+                                message += $"Click on link below to install the mobile app\n\n";
+                                message += $"{tinyUrl}\n\n";
+                                message += $"Thanks\n\n";
                                 message += $"{portal_base_url}";
                                 await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "orange", "fas fa-user-check");

@@ -939,8 +939,9 @@ namespace risk.control.system.Controllers
                             string tinyUrl = client.DownloadString(address);
 
                             var message = $"Dear {user.FirstName}\n" +
-                            $"Click on link below to install the mobile app\n" +
-                            $"{tinyUrl}\n" +
+                            $"Click on link below to install the mobile app\n\n" +
+                            $"{tinyUrl}\n\n" +
+                            $"Thanks\n\n" +
                             $"{baseUrl}";
 
                             await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
