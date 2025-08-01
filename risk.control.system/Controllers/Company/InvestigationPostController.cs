@@ -555,7 +555,7 @@ namespace risk.control.system.Controllers.Company
                 // AUTO ALLOCATION COUNT
                 var distinctClaims = claims.Distinct().ToList();
                 var affectedRows = await processCaseService.UpdateCaseAllocationStatus(currentUserEmail, distinctClaims);
-                if (affectedRows <= distinctClaims.Count)
+                if (affectedRows < distinctClaims.Count)
                 {
                     notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(InvestigationController.New), "Investigation");

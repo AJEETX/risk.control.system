@@ -213,7 +213,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
                     customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
-                    customerDetail.ProfilePicture = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(customerDocument.FileName));
+                    customerDetail.ProfilePicture = dataStream.ToArray();
                 }
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
@@ -268,7 +268,7 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     await customerDocument.CopyToAsync(dataStream);
                     customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
-                    customerDetail.ProfilePicture = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(customerDocument.FileName));
+                    customerDetail.ProfilePicture = dataStream.ToArray();
                 }
                 else
                 {
@@ -331,7 +331,7 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
-                    beneficiary.ProfilePicture = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(customerDocument.FileName));
+                    beneficiary.ProfilePicture = dataStream.ToArray();
                     beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
@@ -386,7 +386,7 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
-                    beneficiary.ProfilePicture = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(customerDocument.FileName));
+                    beneficiary.ProfilePicture = dataStream.ToArray();
                     beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
                 }
                 else

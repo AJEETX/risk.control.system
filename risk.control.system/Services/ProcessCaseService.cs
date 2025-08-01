@@ -85,12 +85,8 @@ namespace risk.control.system.Services
                 // Update the status only for cases that are not already PENDING
                 foreach (var claimsCase in cases)
                 {
-                    if (claimsCase.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS)
-                    {
-                        claimsCase.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS;
-                        claimsCase.UpdatedBy = userEmail;
-                        claimsCase.Updated = DateTime.Now;
-                    }
+                    claimsCase.UpdatedBy = userEmail;
+                    claimsCase.Updated = DateTime.Now;
                 }
 
                 context.Investigations.UpdateRange(cases);
