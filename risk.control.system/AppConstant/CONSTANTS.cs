@@ -40,6 +40,7 @@
             public const string EMPLOYMENT_ADDRESS = "EMPLOYMENT";
             public const string CHEMIST_ADDRESS = "CHEMIST";
             public const string LA_ADDRESS = "LA ADDRESS";
+            public const string BENEFICIARY_ADDRESS = "BENEFICIARY ADDRESS";
             public const string BUSINESS_ADDRESS = "BUSINESS";
 
             public const string HOSPITAL_ADDRESS = "HOSPITAL";

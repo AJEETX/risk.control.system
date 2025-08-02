@@ -118,8 +118,8 @@ namespace risk.control.system.Controllers
             clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
             var addedCompany = _context.Add(clientCompany);
             await _context.SaveChangesAsync();
-            var claimTemplate = ReportTemplateSeed.QuestionsCLAIM(_context, clientCompany);
-            var underwriting = ReportTemplateSeed.QuestionsUNDERWRITING(_context, clientCompany);
+            var claimTemplate = ReportTemplateSeed.CLAIM(_context, clientCompany);
+            var underwriting = ReportTemplateSeed.UNDERWRITING(_context, clientCompany);
             await _context.SaveChangesAsync();
             notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
             return RedirectToAction(nameof(Companies));

@@ -91,8 +91,8 @@ namespace risk.control.system.Seeds
 
             var creator = await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, insurerCompany.Entity);
 
-            var claimTemplate = ReportTemplateSeed.QuestionsCLAIM(context, insurer);
-            var underwriting = ReportTemplateSeed.QuestionsUNDERWRITING(context, insurer);
+            var claimTemplate = ReportTemplateSeed.CLAIM(context, insurer);
+            var underwriting = ReportTemplateSeed.UNDERWRITING(context, insurer);
 
             await context.SaveChangesAsync(null, false);
 
