@@ -147,7 +147,6 @@ public class AgentIdService : IAgentIdService
             var weatherData = await weatherTask;
             var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
-
             face.IdImageLocationUrl = map;
             face.Duration = duration;
             face.Distance = distance;
@@ -155,23 +154,20 @@ public class AgentIdService : IAgentIdService
             face.DurationInSeconds = durationInSecs;
 
 
-            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                $"\r\n" +
-                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                $"\r\n" +
-                $"\r\nElevation(sea level):{weatherData.elevation} metres";
+            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\n" +
+                $"Windspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}\r\n" +
+                $"Elevation(sea level):{weatherData.elevation} metres";
 
             face.IdImageData = weatherCustomData;
             face.IdImage = compressImage;
             face.DigitalIdImageMatchConfidence = confidence;
-            face.IdImageLocationAddress = $"(Latitude = {latitude} Longitude ={longitude} ) {address}";
+            face.IdImageLocationAddress = $"(Latitude={latitude} Longitude={longitude} ) {address}";
             face.ValidationExecuted = true;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
             _context.AgentIdReport.Update(face);
             var updateClaim = _context.Investigations.Update(claim);
             var rows = await _context.SaveChangesAsync(null, false);
-
 
             return new AppiCheckifyResponse
             {
@@ -314,13 +310,11 @@ public class AgentIdService : IAgentIdService
             var weatherData = await weatherTask;
             var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
-
             face.IdImageLocationUrl = map;
             face.Duration = duration;
             face.Distance = distance;
             face.DistanceInMetres = distanceInMetres;
             face.DurationInSeconds = durationInSecs;
-
 
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
                 $"\r\n" +
@@ -331,7 +325,7 @@ public class AgentIdService : IAgentIdService
             face.IdImageData = weatherCustomData;
             face.IdImage = compressImage;
             face.MatchConfidence = confidence;
-            face.IdImageLocationAddress = $"(Latitude = {latitude} Longitude ={longitude} ) {address}";
+            face.IdImageLocationAddress = $"(Latitude={latitude} Longitude={longitude} ) {address}";
             face.ValidationExecuted = true;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
@@ -484,9 +478,7 @@ public class AgentIdService : IAgentIdService
                     var allText = imageReadOnly.FirstOrDefault().Description;
                     doc.IdImageData = allText;
                 }
-
             }
-
             else
             {
                 doc.IdImage = CompressImage.ProcessCompress(doc.IdImage, onlyExtension);
@@ -496,15 +488,11 @@ public class AgentIdService : IAgentIdService
             }
 
             var rawAddress = await addressTask;
-            doc.IdImageLocationAddress = $"(Latitude = {latitude}, Longitude = {longitude}) {rawAddress}";
+            doc.IdImageLocationAddress = $"(Latitude={latitude}, Longitude={longitude}) {rawAddress}";
             doc.ValidationExecuted = true;
-
             _context.DocumentIdReport.Update(doc);
             _context.Investigations.Update(claim);
-
             var rows = await _context.SaveChangesAsync(null, false);
-
-
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
@@ -602,7 +590,6 @@ public class AgentIdService : IAgentIdService
             var weatherData = await weatherTask;
             var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
-
             media.IdImageLocationUrl = map;
             media.Duration = duration;
             media.Distance = distance;
@@ -616,12 +603,11 @@ public class AgentIdService : IAgentIdService
                 $"\r\n" +
                 $"\r\nElevation(sea level):{weatherData.elevation} metres";
 
-
             media.IdImageExtension = extension;
             media.MediaExtension = extension.TrimStart('.');
             media.ValidationExecuted = true;
             media.IdImageValid = true;
-            media.IdImageLocationAddress = $"(Latitude = {latitude} Longitude ={longitude} ) {address}";
+            media.IdImageLocationAddress = $"(Latitude={latitude} Longitude={longitude} ) {address}";
             media.IdImageData = weatherCustomData;
             media.IdImageLongLat = $"{latitude}/{longitude}";
             media.IdImageLongLatTime = DateTime.UtcNow;

@@ -441,7 +441,7 @@ namespace risk.control.system.Controllers
             {
                 if (id != applicationUser.Id.ToString() || applicationUser == null)
                 {
-                    notifyService.Error("Err !!! bad Request");
+                    notifyService.Error("Err !!! Bad Request");
                     return RedirectToAction(nameof(AgencyController.Users), "Agency");
                 }
                 var user = await userManager.FindByIdAsync(id);
