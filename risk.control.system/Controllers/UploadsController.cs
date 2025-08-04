@@ -78,7 +78,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var fileBytes = file.ErrorByteData;
-                var fileName = $"ErrorLog_{id}.csv"; // Or use a timestamp
+                var fileName = $"{file.Name}_UploadError_{id}.csv"; // Or use a timestamp
 
                 return File(fileBytes, "text/csv", fileName);
             }

@@ -73,13 +73,13 @@ namespace risk.control.system.Services
                         UploadData = $"[Customer gender : Invalid {uploadCase.Gender}]",
                         Error = $"gender {uploadCase.Gender} invalid"
                     });
-                    errorCustomer.Add($"[Customer gender=`{uploadCase.Gender}` invalid ]");
+                    errorCustomer.Add($"[Customer gender=`{uploadCase.Gender}`null/ invalid ]");
                 }
 
                 if (string.IsNullOrWhiteSpace(uploadCase.CustomerPincode))
                 {
                     errors.Add(new UploadError { UploadData = $"{nameof(uploadCase.CustomerPincode)}: null/empty]", Error = "null/empty" });
-                    errorCustomer.Add($"{nameof(uploadCase.CustomerPincode)}=null/empty]");
+                    errorCustomer.Add($"[{nameof(uploadCase.CustomerPincode)}=null/empty]");
                 }
 
                 if (string.IsNullOrWhiteSpace(uploadCase.CustomerDistrictName))
@@ -139,7 +139,7 @@ namespace risk.control.system.Services
                         UploadData = $"[Customer education : {uploadCase.Education} invalid]",
                         Error = $"Education {uploadCase.Education} invalid"
                     });
-                    errorCustomer.Add($"[Customer education =`{uploadCase.Education}` invalid]");
+                    errorCustomer.Add($"[Customer education =`{uploadCase.Education}`null/ invalid]");
                 }
                 if (!string.IsNullOrWhiteSpace(uploadCase.Occupation) && Enum.TryParse<Occupation>(uploadCase.Occupation, true, out var occupationEnum))
                 {
@@ -152,7 +152,7 @@ namespace risk.control.system.Services
                         UploadData = $"[Customer occupation : {uploadCase.Occupation} invalid]",
                         Error = $"occupation {uploadCase.Occupation} invalid"
                     });
-                    errorCustomer.Add($"[Customer occupation=`{uploadCase.Occupation}` invalid]");
+                    errorCustomer.Add($"[Customer occupation=`{uploadCase.Occupation}` null/invalid]");
                 }
 
                 if (!string.IsNullOrWhiteSpace(uploadCase.Income) && Enum.TryParse<Income>(uploadCase.Income, true, out var incomeEnum))
@@ -166,7 +166,7 @@ namespace risk.control.system.Services
                         UploadData = $"[Customer income : {uploadCase.Income} invalid]",
                         Error = $"income {uploadCase.Income} invalid"
                     });
-                    errorCustomer.Add($"[Customer income=`{uploadCase.Income}` invalid]");
+                    errorCustomer.Add($"[Customer income=`{uploadCase.Income}` null/invalid]");
                 }
 
                 if (!string.IsNullOrWhiteSpace(uploadCase.CustomerDob) && DateTime.TryParseExact(uploadCase.CustomerDob, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var customerDob))
@@ -180,7 +180,7 @@ namespace risk.control.system.Services
                         UploadData = $"[Customer Date of Birth : {uploadCase.CustomerDob} invalid]",
                         Error = $"Date of Birth={uploadCase.CustomerDob} invalid"
                     });
-                    errorCustomer.Add($"[Customer Date of Birth=`{uploadCase.CustomerDob}` invalid]");
+                    errorCustomer.Add($"[Customer Date of Birth=`{uploadCase.CustomerDob}` null/invalid]");
                 }
 
                 string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", CUSTOMER_IMAGE);

@@ -106,7 +106,7 @@ namespace risk.control.system.Services
                 else
                 {
                     case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.Amount)}: Invalid]", Error = $"Invalid assured amount {uploadCase.Amount}" });
-                    caseErrors.Add($"[{nameof(uploadCase.Amount)}=`{uploadCase.Amount}` invalid]");
+                    caseErrors.Add($"[{nameof(uploadCase.Amount)}=`{uploadCase.Amount}` null/invalid]");
 
                 }
                 DateTime issueDate, dateOfIncident;
@@ -122,7 +122,7 @@ namespace risk.control.system.Services
                             UploadData = "Issue Date",
                             Error = $"Issue date ({issueDate:dd-MM-yyyy}) cannot be in the future"
                         });
-                        caseErrors.Add($"{nameof(uploadCase.IssueDate)} =`{issueDate:dd-MM-yyyy}` cannot be in the future");
+                        caseErrors.Add($"[{nameof(uploadCase.IssueDate)} =`{issueDate:dd-MM-yyyy}` cannot be in the future]");
                     }
                     else
                     {
@@ -135,7 +135,7 @@ namespace risk.control.system.Services
                     issueDate = DateTime.Now;
                     uploadCase.IssueDate = issueDate.ToString("dd-MM-yyyy");
                     case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.IssueDate)}: {uploadCase.IssueDate} Invalid]", Error = $"Invalid issue date {uploadCase.IssueDate}" });
-                    caseErrors.Add($"[{nameof(uploadCase.IssueDate)}=`{uploadCase.IssueDate}` invalid]");
+                    caseErrors.Add($"[{nameof(uploadCase.IssueDate)}=`{uploadCase.IssueDate}` null/invalid]");
                 }
 
                 // Validate IncidentDate
@@ -148,7 +148,7 @@ namespace risk.control.system.Services
                             UploadData = "Incident date",
                             Error = $"Incident date ({dateOfIncident:dd-MM-yyyy}) cannot be in the future"
                         });
-                        caseErrors.Add($"{nameof(uploadCase.IncidentDate)}=`{dateOfIncident:dd-MM-yyyy}` cannot be in the future");
+                        caseErrors.Add($"[{nameof(uploadCase.IncidentDate)}=`{dateOfIncident:dd-MM-yyyy}` cannot be in the future]");
                     }
                     else
                     {
@@ -161,7 +161,7 @@ namespace risk.control.system.Services
                     dateOfIncident = DateTime.Now;
                     uploadCase.IncidentDate = dateOfIncident.ToString("dd-MM-yyyy");
                     case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.IncidentDate)}: {uploadCase.IncidentDate} Invalid]", Error = $"Invalid incident date {uploadCase.IncidentDate}" });
-                    caseErrors.Add($"[{nameof(uploadCase.IncidentDate)}=`{uploadCase.IncidentDate}` invalid]");
+                    caseErrors.Add($"[{nameof(uploadCase.IncidentDate)}=`{uploadCase.IncidentDate}` null/invalid]");
                 }
 
                 // Check chronological order

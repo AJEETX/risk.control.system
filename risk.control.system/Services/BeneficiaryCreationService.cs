@@ -57,7 +57,7 @@ namespace risk.control.system.Services
                     errorBeneficiary.Add($"[Beneficiary relation=`{uploadCase.Relation}` null/empty]");
                 }
 
-                if (string.IsNullOrWhiteSpace(uploadCase.CustomerPincode))
+                if (string.IsNullOrWhiteSpace(uploadCase.BeneficiaryPincode))
                 {
                     errors.Add(new UploadError { UploadData = "[Beneficiary pincode: null/empty]", Error = "null/empty" });
                     errorBeneficiary.Add("[Beneficiary pincode=null/empty]");
@@ -113,7 +113,7 @@ namespace risk.control.system.Services
                         UploadData = $"Beneficiary income : {uploadCase.BeneficiaryIncome} invalid]",
                         Error = $"income {uploadCase.BeneficiaryIncome} invalid"
                     });
-                    errorBeneficiary.Add($"Beneficiary income=`{uploadCase.BeneficiaryIncome}` invalid]");
+                    errorBeneficiary.Add($"[Beneficiary income=`{uploadCase.BeneficiaryIncome}`null/ invalid]");
                 }
                 if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryDob) && DateTime.TryParseExact(uploadCase.BeneficiaryDob, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var beneficiaryDob))
                 {
@@ -126,7 +126,7 @@ namespace risk.control.system.Services
                         UploadData = $"[Beneficiary Date of Birth: Invalid {uploadCase.BeneficiaryDob}]",
                         Error = $"Invalid {uploadCase.BeneficiaryDob}"
                     });
-                    errorBeneficiary.Add($"[Beneficiary Date of Birth=`{uploadCase.BeneficiaryDob}` invalid ]");
+                    errorBeneficiary.Add($"[Beneficiary Date of Birth=`{uploadCase.BeneficiaryDob}` invalid]");
                 }
 
                 if (string.IsNullOrWhiteSpace(uploadCase.BeneficiaryAddressLine))
