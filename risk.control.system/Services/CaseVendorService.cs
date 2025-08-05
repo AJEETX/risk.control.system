@@ -60,7 +60,10 @@ namespace risk.control.system.Services
                 .Include(c => c.CaseNotes)
                 .Include(t => t.InvestigationReport)
                 .FirstOrDefaultAsync(c => c.Id == selectedcase);
-
+            if (claim is null)
+            {
+                return null;
+            }
             var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
             claim.CustomerDetail.ContactNumber = customerContactMasked;
 
@@ -130,6 +133,7 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            if (claim is null) return null;
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
@@ -219,6 +223,7 @@ namespace risk.control.system.Services
                .Include(c => c.CaseNotes)
                .Include(c => c.CaseMessages)
                .FirstOrDefaultAsync(c => c.Id == selectedcase);
+            if (claim is null) return null;
 
             var beneficiaryDetails = await _context.BeneficiaryDetail
                 .Include(c => c.PinCode)

@@ -24,9 +24,21 @@
                 }
             },
             {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-claim', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
+            },
+            {
                 className: 'max-width-column', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
-            },],
+            },        ],
         order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
