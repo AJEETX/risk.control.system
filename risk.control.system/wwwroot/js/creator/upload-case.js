@@ -88,7 +88,7 @@
             {
                 "data": "timeTaken",
                 "mRender": function (data, type, row) {
-                    return '<i title="Time taken = ' + data + '" data-toggle="tooltip">' + data + '</i>';
+                    return '<i>' + data + '</i>';
                 }
             },
             {
@@ -135,7 +135,7 @@
                     var img = '';
                     var title = row.directAssign ? "Direct Assign" : "Only Upload";
                     if (row.hasError) {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn-xs btn-danger' title='Download Error file'><i class='fa fa-download'></i> </a> &nbsp;`;
+                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn-xs btn-danger' title='Download Error file'><i class='fa fa-download'></i> Error </a> &nbsp;`;
                     }
                     else if (!row.hasError && row.status == 'Completed') {
                         img += `<span class='btn-xs i-green upload-success' title='${title} Success'><i class='fa fa-check'></i> </span>&nbsp;`;

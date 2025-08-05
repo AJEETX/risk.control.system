@@ -130,9 +130,8 @@
                         : '<span class="i-red fw-bold small"> <i class="fa fa-times i-grey"></i></span>';
 
                     let tooltipText = row.hasService
-                        ? 'SERVICE AVAILABLE\r\n  Total number of current cases = ' + row.caseCount
-                        : ' NO SERVICE AVAILABLE\r\n Total number of current cases = ' + row.caseCount;
-
+                        ? 'SERVICE AVAILABLE.\n\n  Total number of current cases = ' + row.caseCount
+                        : ' NO SERVICE AVAILABLE.\n\n Total number of current cases = ' + row.caseCount;
                     return `
             <span data-toggle="tooltip" data-html="true" title="${tooltipText}">
                 ${statusText}
