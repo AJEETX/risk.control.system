@@ -396,14 +396,6 @@ public class AgentIdService : IAgentIdService
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CaseNotes)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.CaseQuestionnaire)
-                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.PanIdReport)
-                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.AgentIdReport)
                 .FirstOrDefaultAsync(c => c.Id == data.CaseId);
 
             var location = claim.InvestigationReport.ReportTemplate.LocationTemplate.FirstOrDefault(l => l.LocationName == data.LocationName);

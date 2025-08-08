@@ -11,7 +11,7 @@ namespace risk.control.system.Models
 
         public string Sender { get; set; }
         public string Comment { get; set; }
-        public ClaimNote? ParentClaimNote { get; set; }
+        public CaseNote? ParentCaseNote { get; set; }
         public override string ToString()
         {
             return $"CaseNote Information:\n" +

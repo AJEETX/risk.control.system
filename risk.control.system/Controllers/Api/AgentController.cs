@@ -484,10 +484,6 @@ namespace risk.control.system.Controllers.Api
                     }
                 }
                 var claim = _context.Investigations
-                    .Include(c => c.InvestigationReport)
-                    .ThenInclude(c => c.DigitalIdReport)
-                    .Include(c => c.InvestigationReport)
-                    .ThenInclude(c => c.PanIdReport)
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(c => c.CostCentre)
                     .Include(c => c.PolicyDetail)

@@ -135,12 +135,12 @@
                     var img = '';
                     var title = row.directAssign ? "Direct Assign" : "Only Upload";
                     if (row.hasError) {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn-xs btn-danger' title='Download Error file'><i class='fa fa-download'></i> Error </a> &nbsp;`;
+                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn-xs btn-danger' title='Download Error file'><i class='fa fa-download'></i> Error File</a> &nbsp;`;
                     }
                     else if (!row.hasError && row.status == 'Completed') {
-                        img += `<span class='btn-xs i-green upload-success' title='${title} Success'><i class='fa fa-check'></i> </span>&nbsp;`;
+                        img += `<span class='btn-xs i-green upload-success' title='${title} Success'><i class='fa fa-check'></i> Success </span>&nbsp;`;
                     } else {
-                        img += `<i class='fas fa-sync fa-spin i-grey'></i>&nbsp;`;
+                        img += `<span class='upload-progress'><i class='fas fa-sync fa-spin i-grey'></i> </span>&nbsp;`;
                     }
 
                     img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file"><i class="nav-icon fa fa-download"></i> Download</a> ';

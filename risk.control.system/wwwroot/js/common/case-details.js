@@ -388,7 +388,7 @@
                                                 const formattedTime = `${hours}:${minutes}:${seconds}`;
 
                                                 return $.ajax({
-                                                    url: '/api/ClaimsInvestigation/GetPolicyNotes?claimId=' + $('#claimId').val(),
+                                                    url: '/api/CaseInvestigation/GetPolicyNotes?claimId=' + $('#claimId').val(),
                                                     dataType: 'json',
                                                     method: 'get'
                                                 }).done(function (response) {

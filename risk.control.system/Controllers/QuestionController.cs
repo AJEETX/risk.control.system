@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.RegularExpressions;
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
-using System.Text.RegularExpressions;
 
 namespace risk.control.system.Controllers
 {
@@ -16,71 +18,71 @@ namespace risk.control.system.Controllers
             this._context = context;
             this.webHostEnvironment = webHostEnvironment;
         }
-        public IActionResult Index(InsuranceType insuranceType = InsuranceType.CLAIM)
-        {
-            var currentUserEmail = HttpContext.User.Identity.Name;
+        //public IActionResult Index(InsuranceType insuranceType = InsuranceType.CLAIM)
+        //{
+        //    var currentUserEmail = HttpContext.User.Identity.Name;
 
-            var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(x => x.Email == currentUserEmail);
+        //    var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(x => x.Email == currentUserEmail);
 
-            var questions = _context.CaseQuestionnaire.Include(c => c.Questions).FirstOrDefault(x =>
-            x.ClientCompanyId == currentUser.ClientCompanyId &&
-            x.InsuranceType == insuranceType &&
-            x.Questions.Count > 0);
+        //    var questions = _context.CaseQuestionnaire.Include(c => c.Questions).FirstOrDefault(x =>
+        //    x.ClientCompanyId == currentUser.ClientCompanyId &&
+        //    x.InsuranceType == insuranceType &&
+        //    x.Questions.Count > 0);
 
-            if (questions != null)
-            {
-                var model = new QuestionFormViewModel
-                {
-                    InsuranceType = insuranceType,
-                    Questions = questions.Questions.ToList()
-                };
-                return View(model);
-            }
-            var newmodel = new QuestionFormViewModel
-            {
-                InsuranceType = insuranceType,
-                Questions = new List<Question>()
-            };
+        //    if (questions != null)
+        //    {
+        //        var model = new QuestionFormViewModel
+        //        {
+        //            InsuranceType = insuranceType,
+        //            Questions = questions.Questions.ToList()
+        //        };
+        //        return View(model);
+        //    }
+        //    var newmodel = new QuestionFormViewModel
+        //    {
+        //        InsuranceType = insuranceType,
+        //        Questions = new List<Question>()
+        //    };
 
-            return View(newmodel);
-        }
+        //    return View(newmodel);
+        //}
 
         [HttpPost]
         public IActionResult AddQuestion(QuestionFormViewModel model)
         {
-            var currentUserEmail = HttpContext.User.Identity.Name;
+            //var currentUserEmail = HttpContext.User.Identity.Name;
 
-            var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(x => x.Email == currentUserEmail);
-            if (ModelState.IsValid)
-            {
-                var question = new Question
-                {
-                    QuestionText = model.QuestionText,
-                    QuestionType = model.QuestionType,
-                    Options = model.Options,
-                    IsRequired = model.IsRequired,
-                };
-                var existingQuestion = _context.CaseQuestionnaire.Include(c => c.Questions)
-                    .FirstOrDefault(x => x.ClientCompanyId == currentUser.ClientCompanyId && x.InsuranceType == model.InsuranceType);
-                if (existingQuestion != null)
-                {
-                    existingQuestion.Questions.Add(question);
-                    _context.CaseQuestionnaire.Update(existingQuestion);
-                }
-                else
-                {
-                    var caseQuestionnaire = new CaseQuestionnaire
-                    {
-                        ClientCompanyId = currentUser.ClientCompanyId,
-                        InsuranceType = model.InsuranceType,
-                        CreatedUser = currentUserEmail
-                    };
-                    caseQuestionnaire.Questions.Add(question);
-                    _context.CaseQuestionnaire.Add(caseQuestionnaire);
-                }
-                _context.SaveChanges();
+            //var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(x => x.Email == currentUserEmail);
+            //if (ModelState.IsValid)
+            //{
+            //    var question = new Question
+            //    {
+            //        QuestionText = model.QuestionText,
+            //        QuestionType = model.QuestionType,
+            //        Options = model.Options,
+            //        IsRequired = model.IsRequired,
+            //    };
+            //    var existingQuestion = _context.CaseQuestionnaire.Include(c => c.Questions)
+            //        .FirstOrDefault(x => x.ClientCompanyId == currentUser.ClientCompanyId && x.InsuranceType == model.InsuranceType);
+            //    if (existingQuestion != null)
+            //    {
+            //        existingQuestion.Questions.Add(question);
+            //        _context.CaseQuestionnaire.Update(existingQuestion);
+            //    }
+            //    else
+            //    {
+            //        var caseQuestionnaire = new CaseQuestionnaire
+            //        {
+            //            ClientCompanyId = currentUser.ClientCompanyId,
+            //            InsuranceType = model.InsuranceType,
+            //            CreatedUser = currentUserEmail
+            //        };
+            //        caseQuestionnaire.Questions.Add(question);
+            //        _context.CaseQuestionnaire.Add(caseQuestionnaire);
+            //    }
+            //    _context.SaveChanges();
 
-            }
+            //}
             return RedirectToAction("Index");
         }
 

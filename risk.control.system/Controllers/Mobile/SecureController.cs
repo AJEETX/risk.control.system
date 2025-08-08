@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers.Mobile
                     {
                         var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                         string message = string.Empty;
-                        var ipApiResponse = await service.GetAgentIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, model.Latlong);
+                        //var ipApiResponse = await service.GetAgentIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, model.Latlong);
 
                         if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null)
                         {
@@ -102,7 +102,6 @@ namespace risk.control.system.Controllers.Mobile
                             if (admin != null)
                             {
                                 message = $"Dear {admin.Email}\n\n" +
-                                $"User {user.Email} logged in from IP address {ipApiResponse.query}\n\n" +
                                 $"{baseUrl}";
                                 try
                                 {
@@ -114,7 +113,7 @@ namespace risk.control.system.Controllers.Mobile
                                 }
                             }
                             message = string.Empty;
-                            message += $"User {user.Email} logged in from IP address {ipApiResponse.query}\n\n" +
+                            message += $"User {user.Email} logged in\n\n" +
                             $"{baseUrl}";
                             try
                             {

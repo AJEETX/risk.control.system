@@ -118,11 +118,11 @@ namespace risk.control.system.Controllers.Api
             return Ok(userEmails);
         }
 
-        [HttpGet("GetIpAddress")]
-        public async Task<IActionResult> GetIpAddress()
-        {
-            var ipAddresses = await context.IpApiResponse.ToListAsync();
-            return Ok(ipAddresses);
-        }
+        //[HttpGet("GetIpAddress")]
+        //public async Task<IActionResult> GetIpAddress()
+        //{
+        //    var ipAddresses = await context.IpApiResponse.ToListAsync();
+        //    return Ok(ipAddresses);
+        //}
     }
 }

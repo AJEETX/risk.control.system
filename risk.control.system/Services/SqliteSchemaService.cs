@@ -4,6 +4,7 @@ namespace risk.control.system.Services
     public interface ISqliteSchemaService
     {
         List<string> GetAllTables();
+        List<Dictionary<string, object>> GetTableData(string tableName);
         List<(string ColumnName, string DataType, bool NotNull)> GetTableSchema(string tableName);
     }
     public class SqliteSchemaService : ISqliteSchemaService
@@ -34,6 +35,32 @@ namespace risk.control.system.Services
             }
 
             return tables;
+        }
+        public List<Dictionary<string, object>> GetTableData(string tableName)
+        {
+            var rows = new List<Dictionary<string, object>>();
+
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $"SELECT * FROM [{tableName}]";
+
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                var row = new Dictionary<string, object>();
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    var columnName = reader.GetName(i);
+                    var value = reader.IsDBNull(i) ? null : reader.GetValue(i);
+                    row[columnName] = value;
+                }
+                rows.Add(row);
+            }
+
+            return rows;
         }
 
         public List<(string ColumnName, string DataType, bool NotNull)> GetTableSchema(string tableName)

@@ -3,11 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 using static risk.control.system.AppConstant.Applicationsettings;
-using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Seeds
 {
@@ -92,21 +90,21 @@ namespace risk.control.system.Seeds
 
                 //ADD PERMISSIONS
 
-                var moduleList = new List<string> { nameof(Underwriting), nameof(Claim) };
-                var modules = context.PermissionModule.ToList();
+                //var moduleList = new List<string> { nameof(Underwriting), nameof(Claim) };
+                //var modules = context.PermissionModule.ToList();
 
-                foreach (var module in moduleList)
-                {
-                    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
+                //foreach (var module in moduleList)
+                //{
+                //    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
 
-                    foreach (var modulePermission in modulePermissions)
-                    {
-                        if (!allClaims.Any(a => a.Type == PERMISSION && a.Value == modulePermission))
-                        {
-                            await roleManager.AddClaimAsync(adminRole, new System.Security.Claims.Claim(PERMISSION, modulePermission));
-                        }
-                    }
-                }
+                //    foreach (var modulePermission in modulePermissions)
+                //    {
+                //        if (!allClaims.Any(a => a.Type == PERMISSION && a.Value == modulePermission))
+                //        {
+                //            await roleManager.AddClaimAsync(adminRole, new System.Security.Claims.Claim(PERMISSION, modulePermission));
+                //        }
+                //    }
+                //}
             }
         }
     }

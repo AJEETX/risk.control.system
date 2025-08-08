@@ -769,8 +769,6 @@ namespace risk.control.system.Services
                 var assignedToAgent = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
                 var claim = context.Investigations
                     .Include(c => c.InvestigationReport)
-                    .ThenInclude(c => c.CaseQuestionnaire)
-                    .ThenInclude(c => c.Questions)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
                     .Include(c => c.BeneficiaryDetail)
@@ -831,10 +829,7 @@ namespace risk.control.system.Services
 
                 var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
 
-                var claim = GetCases()
-                    .Include(r => r.InvestigationReport)
-                    .ThenInclude(r => r.CaseQuestionnaire)
-                    .ThenInclude(r => r.Questions)
+                var claim = GetCases().Include(c => c.InvestigationReport)
                     .FirstOrDefault(c => c.Id == claimsInvestigationId);
 
                 claim.Updated = DateTime.Now;
