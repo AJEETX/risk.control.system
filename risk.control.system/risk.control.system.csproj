@@ -8,33 +8,35 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCoreHero.ToastNotification" Version="1.1.0" />
-    <PackageReference Include="AWSSDK.Core" Version="4.0.0.19" />
+    <PackageReference Include="AWSSDK.Core" Version="4.0.0.21" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.2.1" />
-    <PackageReference Include="AWSSDK.Rekognition" Version="4.0.1.10" />
-    <PackageReference Include="AWSSDK.S3" Version="4.0.6.2" />
-    <PackageReference Include="AWSSDK.Textract" Version="4.0.1.4" />
-    <PackageReference Include="AWSSDK.TranscribeService" Version="4.0.2.4" />
+    <PackageReference Include="AWSSDK.Rekognition" Version="4.0.1.12" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.6.4" />
+    <PackageReference Include="AWSSDK.Textract" Version="4.0.1.6" />
+    <PackageReference Include="AWSSDK.TranscribeService" Version="4.0.2.6" />
     <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="Google.Cloud.Vision.V1" Version="3.7.0" />
     <PackageReference Include="Hangfire" Version="1.8.20" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.2" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.4.6.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.19" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.19" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.19">
       <PrivateAssets>all</PrivateAssets>
 		<ExcludeAssets>runtime; build; native; contentfiles; analyzers;buildtransitive;</ExcludeAssets>
+		<IncludeAssets>compile</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.19" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.19" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.19">
       <PrivateAssets>all</PrivateAssets>
 		<ExcludeAssets>runtime; build; native; contentfiles; analyzers;buildtransitive;</ExcludeAssets>
+		<IncludeAssets>compile</IncludeAssets>
 	</PackageReference>
     <PackageReference Include="Microsoft.FeatureManagement" Version="4.2.1" />
     <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="4.2.1" />
@@ -51,8 +53,8 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.7" />
-    <PackageReference Include="System.Text.Json" Version="9.0.7" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.8" />
+    <PackageReference Include="System.Text.Json" Version="9.0.8" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="WorkflowCore" Version="3.14.0" />
   </ItemGroup>
