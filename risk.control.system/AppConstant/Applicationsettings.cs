@@ -15,8 +15,8 @@
         public static readonly string ValidIssuer = "icheckify";
         public static readonly string ValidAudience = "canarahdfclife";
         public static readonly int TokenTimeoutMinutes = 5;
-        //public const string APP_DEMO_URL = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk";
-        public const string APP_URL = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/prod/app-release.apk";
+        public const string APP_URL = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk";
+        //public const string APP_URL = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/prod/app-release.apk";
         public const string AZURE_APP_DEMO_URL = "icheckify-demo.azurewebsites.net";
         public const string AZURE_APP_URL = "icheckify.azurewebsites.net";
 
