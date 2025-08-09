@@ -181,9 +181,7 @@ namespace risk.control.system.Controllers.Agency
                 logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
-                System.IO.File.AppendAllText("admin.txt", ex.Message + Environment.NewLine);
-                throw ex;
-                //return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
         }

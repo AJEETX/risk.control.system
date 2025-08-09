@@ -215,7 +215,7 @@
 							<div class="card-body scrollable-body">
 								<div class="row">
 									<div class="col-md-12">
-										@if (!locations.All(l => l.AgentValidated && l.FaceIdsValidated && l.DocumentsValidated))
+										@if (!locations.Where(locations=>locations.IsRequired).All(l => l.AgentValidated && l.FaceIdsValidated && l.DocumentsValidated))
 										{
 											<div class="form-group">
 												<div class="form-check form-switch">

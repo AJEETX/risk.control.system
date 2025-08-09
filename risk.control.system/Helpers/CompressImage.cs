@@ -18,7 +18,7 @@ namespace risk.control.system.Helpers
 {
     public static class CompressImage
     {
-        public static byte[] ProcessCompress(byte[] imageByte, string onlyExtension, float cornerRadius = 10, int quality = 99)
+        public static byte[] ProcessCompress(byte[] imageByte, string onlyExtension, float cornerRadius = 10, int quality = 99, Amazon.Rekognition.Model.BoundingBox? faceBox = null)
         {
             using var stream = new MemoryStream(imageByte);
             using var image = SixLabors.ImageSharp.Image.Load(stream);
@@ -44,8 +44,26 @@ namespace risk.control.system.Helpers
             }
 
             image.Mutate(x => x.Resize(image.Width / 2, image.Height / 2, KnownResamplers.Triangle));
+            if (faceBox != null)
+            {
+                int imgWidth = image.Width;
+                int imgHeight = image.Height;
 
+                int left = (int)(faceBox.Left * imgWidth);
+                int top = (int)(faceBox.Top * imgHeight);
+                int width = (int)(faceBox.Width * imgWidth);
+                int height = (int)(faceBox.Height * imgHeight);
 
+                var rect = new SixLabors.ImageSharp.Rectangle(left, top, width, height);
+
+                image.Mutate(ctx =>
+                {
+                    ctx.Draw(
+                        Pens.Solid(Color.Red, 4), // red rectangle, 4px thick
+                        rect
+                    );
+                });
+            }
             var encoder = new JpegEncoder
             {
                 Quality = quality, // Adjust this value for desired compression quality

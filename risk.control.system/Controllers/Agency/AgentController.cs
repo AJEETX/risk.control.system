@@ -71,9 +71,7 @@ namespace risk.control.system.Controllers.Agency
                 logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                System.IO.File.AppendAllText("agent.txt", ex.Message + Environment.NewLine);
-                throw ex;
-                //return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
 
@@ -91,7 +89,7 @@ namespace risk.control.system.Controllers.Agency
         [Breadcrumb(title: " Detail", FromAction = "Submitted")]
         public async Task<IActionResult> SubmittedDetail(long id)
         {
-            if (id == null)
+            if (id == 0)
             {
                 notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");

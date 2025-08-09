@@ -233,7 +233,7 @@ namespace risk.control.system.Controllers.Api
 
                 //var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
 
-                var matched = await compareFaces.Do(mobileUidExist.ProfilePicture, image);
+                var matched = await compareFaces.DoFaceMatch(mobileUidExist.ProfilePicture, image);
                 if (matched.Item1)
                 {
                     return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
