@@ -58,7 +58,8 @@
                     <i class="fas fa-arrow-left"></i>
                     Back
                 </a>
-                <a href="/Report/PrintPdfReport?Id=@Model.ClaimsInvestigation.Id" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>
+                <a id="printInvoiceButton" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>
+                @* <a href="/Report/PrintPdfReport?Id=@Model.ClaimsInvestigation.Id" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a> *@
                 <a class="btn  btn-xs  bg-teal" asp-controller="Assessor" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
                     <i class="fa fa-print"> Invoice</i>
                 </a>

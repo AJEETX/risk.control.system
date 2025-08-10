@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-using Hangfire;
+﻿using Hangfire;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -70,20 +68,13 @@ namespace risk.control.system.Services
                .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == investigation.ReportTemplateId);
-
-
-            //create invoice
-
             var vendor = context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation.VendorId);
             var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == policy.InvestigationServiceTypeId);
-
-            //THIS SHOULD NOT HAPPEN IN PROD : demo purpose
             if (investigationServiced == null)
             {
                 investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault();
             }
-            //END
             var investigatService = context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == policy.InvestigationServiceTypeId);
 
             var invoice = new VendorInvoice
@@ -105,31 +96,10 @@ namespace risk.control.system.Services
 
             context.VendorInvoice.Add(invoice);
             await context.SaveChangesAsync(null, false);
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                // Export the report template to JSON for debugging purposes
-                //await Export2JsonReportTemplatesAsync(investigationReport);
-            }
             var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
-
 
             return reportFilename;
         }
 
-        private async Task Export2JsonReportTemplatesAsync(ReportTemplate template)
-        {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-            };
-
-            string jsonString = JsonSerializer.Serialize(template, options);
-
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "report", "reportTemplate.json");
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath)); // Ensure folder exists
-
-            await File.WriteAllTextAsync(filePath, jsonString);
-        }
     }
 }

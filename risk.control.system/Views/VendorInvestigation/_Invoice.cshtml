@@ -55,7 +55,8 @@
             <div class="card-footer">
                 <div class="text-right">
                     <a id="back" asp-action="Completed" class="btn btn-xs btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                    <a href="/Report/PrintPdfReport?Id=@Model.ClaimsInvestigation.Id" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>
+                    @* <a id="printInvoiceButton" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a> *@
+                    @* <a href="/Report/PrintPdfReport?Id=@Model.ClaimsInvestigation.Id" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a> *@
 
                     <a class="btn btn-xs btn-primary" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
                         <i class="fa fa-print"> Invoice</i>
