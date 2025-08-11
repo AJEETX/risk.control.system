@@ -10,10 +10,10 @@
     var roleCode = string.Empty;
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
 
-        @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
+        @if (UserManager.GetUserAsync(User).Result?.ProfilePicture != null)
         {
             <div class="image">
-                <img class="elevation-2 sidebar-profile img-circle" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
+                <img class="elevation-2 sidebar-profile img-circle" src="data:image/*;base64,@(Convert.ToBase64String(@UserManager.GetUserAsync(User).Result.ProfilePicture))">
             </div>
         }
         else
@@ -23,7 +23,7 @@
             </div>
         }
         <a  class="d-block">
-            @UserManager.GetUserAsync(User).Result?.FirstName
+            @UserManager.GetUserAsync(User).Result?.FirstName.ToLower()
             @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
             {
                 roleCode = @Applicationsettings.AGENCY_ADMIN.CODE;

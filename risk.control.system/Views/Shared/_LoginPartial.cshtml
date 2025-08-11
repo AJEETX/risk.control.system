@@ -7,8 +7,10 @@
         Login
         <sup class="fa fa-info-circle password-info-icon"></sup>
     </div>
-    @Html.AntiForgeryToken()
     <form id="login-form" asp-controller="Account" method="post">
+        <input name="agent_login" title="agent_login" type="text" id="agent_login" value="">
+
+        @Html.AntiForgeryToken()
         <div class="input-boxes">
 
             <div class="input-box autocomplete-wrapper">
@@ -26,17 +28,17 @@
                 {
                     <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
                 }
-                else
+                else 
                 {
                     <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" autocomplete="off" required />
-
+                
                 }
                 <!-- Eye Icon for Toggling Password Visibility -->
-                <div class="password-toggle remarks">
+                @* <div class="password-toggle remarks">
                     <span class="input-group-text toggle-password-visibility" data-target="Password">
                         <i id="eyeIconCurrent" class="fa fa-eye-slash"></i>
                     </span>
-                </div>
+                </div> *@
             </div>
 
             <p class="account">By clicking <strong><span class="fa fa-key" aria-hidden="true"></span> Login</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>

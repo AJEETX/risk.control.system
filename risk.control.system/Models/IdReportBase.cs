@@ -10,6 +10,7 @@ namespace risk.control.system.Models
         public bool Selected { get; set; } = false;
         public string? ReportName { get; set; }
         public string? IdName { get; set; }
+        public string? FilePath { get; set; }
         public byte[]? IdImage { get; set; }
         public byte[]? IdOriginalImage { get; set; }
         public string? IdImageExtension { get; set; }

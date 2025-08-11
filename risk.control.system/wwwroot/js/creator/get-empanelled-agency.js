@@ -24,9 +24,21 @@
                 }
             },
             {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-claim', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
+            },
+            {
                 className: 'max-width-column', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
-            },],
+            },        ],
         order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -115,12 +127,11 @@
                 "mRender": function (data, type, row) {
                     let statusText = row.hasService
                         ? '<span class="text-success fw-bold small"> <i class="fas fa-check-circle i-green"></i></span>'
-                        : '<span class="i-red fw-bold small"> <i class="fa fa-times i-grey></i></span>';
+                        : '<span class="i-red fw-bold small"> <i class="fa fa-times i-grey"></i></span>';
 
                     let tooltipText = row.hasService
-                        ? 'SERVICE AVAILABLE\r\n  Total number of current cases = ' + row.caseCount
-                        : ' NO SERVICE AVAILABLE\r\n Total number of current cases = ' + row.caseCount;
-
+                        ? 'SERVICE AVAILABLE.\n\n  Total number of current cases = ' + row.caseCount
+                        : ' NO SERVICE AVAILABLE.\n\n Total number of current cases = ' + row.caseCount;
                     return `
             <span data-toggle="tooltip" data-html="true" title="${tooltipText}">
                 ${statusText}

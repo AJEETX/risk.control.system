@@ -54,10 +54,15 @@
                         <i class="fas fa-arrow-left"></i>
                         <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
                     </a>
-                    @if (@Model.ClaimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
+                   @*  @if (@Model.ClaimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
                     {
                         <button id="withdraw-case" type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
                     }
+                    else
+                    {
+                        <button id="withdraw-case" disabled class="btn btn-danger" title="Can't  be withdrawn"><i class="fas fa-undo"></i> Withdraw</button>
+                    } *@
+                    <button id="withdraw-case" disabled class="btn btn-danger" title="Can't  be withdrawn"><i class="fas fa-undo"></i> Withdraw</button>
 
                 </div>
             </div>

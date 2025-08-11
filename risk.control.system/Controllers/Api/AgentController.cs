@@ -1,16 +1,19 @@
-﻿using Hangfire;
+﻿using System.ComponentModel.DataAnnotations;
+
+using Hangfire;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -71,6 +74,37 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpPost("pin")]
+        public async Task<IActionResult> GetAgentPin(string agentEmail)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(agentEmail))
+                {
+                    return BadRequest($"Empty email");
+                }
+                var user2Onboard = await agentService.GetPin(agentEmail, portal_base_url);
+
+                if (user2Onboard == null)
+                {
+                    return BadRequest($"Agent does not exist");
+                }
+
+                return Ok(new
+                {
+                    Email = user2Onboard.Email,
+                    Phone = user2Onboard.PhoneNumber,
+                    Pin = user2Onboard.SecretPin
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return BadRequest($"Agent does not exist or Error");
+            }
+        }
+
+        [AllowAnonymous]
         [HttpPost("ResetUid")]
         public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)
         {
@@ -80,7 +114,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest($"Empty mobile number");
                 }
-                var user2Onboard = await agentService.ResetUid(mobile.TrimStart('+'), sendSMS);
+                var user2Onboard = await agentService.ResetUid(mobile.TrimStart('+'), portal_base_url, sendSMS);
 
                 if (user2Onboard == null)
                 {
@@ -100,59 +134,60 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("VerifyMobile")]
         public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
         {
+            if (request is null || string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
+            {
+                return BadRequest("Invalid request parameters.");
+            }
             try
             {
-                if (request is null || string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
+                var normalizedMobile = request.Mobile.TrimStart('+');
+                var userWithUid = await _context.VendorApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
+                if (!request.SendSMSForRetry)
                 {
-                    return BadRequest($"{nameof(request)} invalid");
-                }
-                if (request.CheckUid)
-                {
-                    var mobileUidExist = _context.VendorApplicationUser.Any(
-                                    v => v.MobileUId == request.Uid);
-                    if (mobileUidExist)
+                    if (userWithUid != null)
                     {
-                        return BadRequest($"{nameof(request.Uid)} {request.Uid} exists");
+                        return BadRequest($"UID {request.Uid} already exists.");
                     }
-                }
 
-                var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
-                var user2Onboards = _context.VendorApplicationUser.Include(u => u.Country).Where(
-                    u => u.Country.ISDCode + u.PhoneNumber == request.Mobile.TrimStart('+'));
-                foreach (var user2Onboard in user2Onboards)
-                {
-                    var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
-                    if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId) && user2Onboard.Active)
+                    var agentRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+                    var matchingUsers = await _context.VendorApplicationUser.Include(u => u.Country).Where(u => (u.Country.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
+                    foreach (var user in matchingUsers)
                     {
-                        user2Onboard.MobileUId = request.Uid;
-                        user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
-                        _context.VendorApplicationUser.Update(user2Onboard);
-                        await _context.SaveChangesAsync();
-                        if (request.SendSMS)
+                        var isAgent = await userVendorManager.IsInRoleAsync(user, agentRole.Name);
+                        if (isAgent && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active)
                         {
-                            //SEND SMS
-                            string message = $"Dear {user2Onboard.Email}, ";
-                            message += $"                                ";
-                            message += $"icheckifyApp Pin:{user2Onboard.SecretPin}";
-                            message += $"                                      ";
-                            message += $"Thanks                           ";
-                            message += $"                                ";
-                            message += $"https://icheckify.co.in";
-                            await smsService.DoSendSmsAsync(request.Mobile, message);
+                            user.MobileUId = request.Uid;
+                            user.SecretPin = randomNumber.Next(1000, 9999).ToString();
+                            _context.VendorApplicationUser.Update(user);
+                            await _context.SaveChangesAsync();
+                            await SendVerificationSmsAsync(user.Email, request.Mobile, user.SecretPin);
+                            return Ok(new { user.Email, Pin = user.SecretPin });
                         }
-
-                        return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
                     }
                 }
-                return BadRequest($"Err");
+                else if (request.SendSMSForRetry && userWithUid != null)
+                {
+                    await SendVerificationSmsAsync(userWithUid.Email, request.Mobile, userWithUid.SecretPin);
+                    return Ok(new { userWithUid.Email, Pin = userWithUid.SecretPin });
+                }
+
+                return BadRequest("Mobile number and/or eligible agent not found.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
-                return BadRequest($"mobile number and/or Agent does not exist");
+                Console.WriteLine($"[VerifyMobile Error] {ex}");
+                return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
 
+
+        private async Task SendVerificationSmsAsync(string email, string mobile, string pin)
+        {
+            string message = $"Dear {email},\n\n" +
+                             $"iCheckify-App PIN: {pin}\n\n" +
+                             $"{portal_base_url}";
+            await smsService.DoSendSmsAsync(mobile, message);
+        }
 
         [AllowAnonymous]
         [HttpPost("VerifyId")]
@@ -198,7 +233,7 @@ namespace risk.control.system.Controllers.Api
 
                 //var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
 
-                var matched = await compareFaces.Do(mobileUidExist.ProfilePicture, image);
+                var matched = await compareFaces.DoFaceMatch(mobileUidExist.ProfilePicture, image);
                 if (matched.Item1)
                 {
                     return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
@@ -281,7 +316,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -372,7 +407,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -443,16 +478,12 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
                 var claim = _context.Investigations
-                    .Include(c => c.InvestigationReport)
-                    .ThenInclude(c => c.DigitalIdReport)
-                    .Include(c => c.InvestigationReport)
-                    .ThenInclude(c => c.PanIdReport)
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(c => c.CostCentre)
                     .Include(c => c.PolicyDetail)
@@ -578,7 +609,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -622,7 +653,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -648,6 +679,13 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest();
                 }
+
+                var extension = Path.GetExtension(data.Image.FileName).ToLower();
+
+                var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
+                if (!supportedExtensions.Contains(extension))
+                    return BadRequest("Unsupported media format.");
+
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
@@ -656,7 +694,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -721,7 +759,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (!string.IsNullOrWhiteSpace(agent.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }

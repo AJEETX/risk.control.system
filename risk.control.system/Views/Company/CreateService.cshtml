@@ -1,9 +1,7 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
-
 @{
     ViewData["Title"] = @Applicationsettings.CREATE;
 }
-
 <section class="content">
     <form id="create-form" asp-action="CreateService" enctype="multipart/form-data">
         <input id="vendorId" type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
@@ -16,8 +14,8 @@
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
                 <partial name="Vendor/_CreateService" model="Model" />
-
             </div>
+            <br />
             <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">

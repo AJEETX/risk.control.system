@@ -14,6 +14,7 @@
         public const string SLIM_LOGIN = "SLIM_LOGIN";
         public const string ONBOARDING_ENABLED = "ONBOARDING_ENABLED";
         public const string FIRST_LOGIN_CONFIRMATION = "FIRST_LOGIN_CONFIRMATION";
+        public const string SHOW_PASSWORD = "SHOW_PASSWORD";
         public const string OTP_LOGIN = "OTP_LOGIN";
         public const string AGENT_LOGIN_DISABLED_ON_PORTAL = "AGENT_LOGIN_DISABLED_ON_PORTAL";
         public const string ENABLE_MAILBOX_FOR_PORTAL_ADMIN = "ENABLE_MAILBOX_FOR_PORTAL_ADMIN";

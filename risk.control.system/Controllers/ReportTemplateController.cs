@@ -3,11 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb(" Report Templates")]
+    [Breadcrumb("Report Template")]
     public class ReportTemplateController : Controller
     {
         private readonly ApplicationDbContext context;

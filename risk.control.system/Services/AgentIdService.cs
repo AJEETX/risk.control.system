@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -13,7 +14,6 @@ public interface IAgentIdService
     Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
     Task<AppiCheckifyResponse> GetMedia(DocumentData data);
     Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions);
-
 }
 
 public class AgentIdService : IAgentIdService
@@ -21,6 +21,7 @@ public class AgentIdService : IAgentIdService
     private readonly ApplicationDbContext _context;
     private readonly IPanCardService panCardService;
     private readonly IGoogleApi googleApi;
+    private readonly IWebHostEnvironment webHostEnvironment;
     private readonly IHttpClientService httpClientService;
     private readonly ICustomApiCLient customApiCLient;
     private readonly IFaceMatchService faceMatchService;
@@ -31,6 +32,7 @@ public class AgentIdService : IAgentIdService
     public AgentIdService(ApplicationDbContext context,
         IPanCardService panCardService,
         IGoogleApi googleApi,
+        IWebHostEnvironment webHostEnvironment,
         IHttpClientService httpClientService,
         ICustomApiCLient customApiCLient,
         IFaceMatchService faceMatchService)
@@ -38,6 +40,7 @@ public class AgentIdService : IAgentIdService
         this._context = context;
         this.panCardService = panCardService;
         this.googleApi = googleApi;
+        this.webHostEnvironment = webHostEnvironment;
         this.httpClientService = httpClientService;
         this.customApiCLient = customApiCLient;
         this.faceMatchService = faceMatchService;
@@ -96,7 +99,6 @@ public class AgentIdService : IAgentIdService
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
-                face.IdOriginalImage = stream.ToArray();
                 face.IdImage = stream.ToArray();
             }
 
@@ -145,7 +147,6 @@ public class AgentIdService : IAgentIdService
             var weatherData = await weatherTask;
             var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
-
             face.IdImageLocationUrl = map;
             face.Duration = duration;
             face.Distance = distance;
@@ -153,23 +154,20 @@ public class AgentIdService : IAgentIdService
             face.DurationInSeconds = durationInSecs;
 
 
-            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                $"\r\n" +
-                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                $"\r\n" +
-                $"\r\nElevation(sea level):{weatherData.elevation} metres";
+            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\n" +
+                $"Windspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}\r\n" +
+                $"Elevation(sea level):{weatherData.elevation} metres";
 
             face.IdImageData = weatherCustomData;
             face.IdImage = compressImage;
             face.DigitalIdImageMatchConfidence = confidence;
-            face.IdImageLocationAddress = address;
+            face.IdImageLocationAddress = $"(Latitude={latitude} Longitude={longitude} ) {address}";
             face.ValidationExecuted = true;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
             _context.AgentIdReport.Update(face);
             var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync();
-
+            var rows = await _context.SaveChangesAsync(null, false);
 
             return new AppiCheckifyResponse
             {
@@ -184,7 +182,7 @@ public class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            face.IdImageData = "No Weather Data";
+            face.IdImageData = "No Data";
             face.DigitalIdImageMatchConfidence = string.Empty;
             face.IdImageLocationAddress = "No Address data";
             face.ValidationExecuted = true;
@@ -256,7 +254,6 @@ public class AgentIdService : IAgentIdService
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
-                face.IdOriginalImage = stream.ToArray();
                 face.IdImage = stream.ToArray();
             }
 
@@ -313,13 +310,11 @@ public class AgentIdService : IAgentIdService
             var weatherData = await weatherTask;
             var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
-
             face.IdImageLocationUrl = map;
             face.Duration = duration;
             face.Distance = distance;
             face.DistanceInMetres = distanceInMetres;
             face.DurationInSeconds = durationInSecs;
-
 
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
                 $"\r\n" +
@@ -330,13 +325,13 @@ public class AgentIdService : IAgentIdService
             face.IdImageData = weatherCustomData;
             face.IdImage = compressImage;
             face.MatchConfidence = confidence;
-            face.IdImageLocationAddress = address;
+            face.IdImageLocationAddress = $"(Latitude={latitude} Longitude={longitude} ) {address}";
             face.ValidationExecuted = true;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
             _context.DigitalIdReport.Update(face);
             var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync(null, false);
 
             return new AppiCheckifyResponse
             {
@@ -351,7 +346,7 @@ public class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            face.IdImageData = "No Weather Data";
+            face.IdImageData = "No Data";
             face.MatchConfidence = string.Empty;
             face.IdImageLocationAddress = "No Address data";
             face.ValidationExecuted = true;
@@ -401,14 +396,6 @@ public class AgentIdService : IAgentIdService
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CaseNotes)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.CaseQuestionnaire)
-                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.PanIdReport)
-                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.AgentIdReport)
                 .FirstOrDefaultAsync(c => c.Id == data.CaseId);
 
             var location = claim.InvestigationReport.ReportTemplate.LocationTemplate.FirstOrDefault(l => l.LocationName == data.LocationName);
@@ -425,7 +412,6 @@ public class AgentIdService : IAgentIdService
             using (var stream = new MemoryStream())
             {
                 await data.Image.CopyToAsync(stream);
-                doc.IdOriginalImage = stream.ToArray();
                 doc.IdImage = stream.ToArray();
             }
 
@@ -484,9 +470,7 @@ public class AgentIdService : IAgentIdService
                     var allText = imageReadOnly.FirstOrDefault().Description;
                     doc.IdImageData = allText;
                 }
-
             }
-
             else
             {
                 doc.IdImage = CompressImage.ProcessCompress(doc.IdImage, onlyExtension);
@@ -496,15 +480,11 @@ public class AgentIdService : IAgentIdService
             }
 
             var rawAddress = await addressTask;
-            doc.IdImageLocationAddress = rawAddress;
+            doc.IdImageLocationAddress = $"(Latitude={latitude}, Longitude={longitude}) {rawAddress}";
             doc.ValidationExecuted = true;
-
             _context.DocumentIdReport.Update(doc);
             _context.Investigations.Update(claim);
-
-            var rows = await _context.SaveChangesAsync();
-
-
+            var rows = await _context.SaveChangesAsync(null, false);
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
@@ -518,7 +498,7 @@ public class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            doc.IdImageData = "No Weather Data";
+            doc.IdImageData = "No Data";
             doc.IdImageValid = false;
             doc.IdImageLocationAddress = "No Address data";
             doc.ValidationExecuted = true;
@@ -543,24 +523,35 @@ public class AgentIdService : IAgentIdService
         InvestigationTask claim = null;
         MediaReport media = null;
         Task<string> addressTask = null;
-
+        byte[] fileBytes = null; ;
         try
         {
             var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == data.Email);
 
             using var memoryStream = new MemoryStream();
             await data.Image.CopyToAsync(memoryStream);
-            var fileBytes = memoryStream.ToArray();
+            fileBytes = memoryStream.ToArray();
             var extension = Path.GetExtension(data.Image.FileName).ToLower();
+            var fileName = Guid.NewGuid().ToString() + extension;
+            var mediaPath = Path.Combine(webHostEnvironment.WebRootPath, "media");
 
-            // Optional: Validate supported formats
+            // Ensure directory exists
+            if (!Directory.Exists(mediaPath))
+            {
+                Directory.CreateDirectory(mediaPath);
+            }
+
+            // Full file path
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "media", fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await data.Image.CopyToAsync(stream);
+            }
 
             claim = await _context.Investigations
                  .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.ReportTemplate)
                 .ThenInclude(c => c.LocationTemplate)
-                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.AgentIdReport)
                 .FirstOrDefaultAsync(c => c.Id == data.CaseId);
 
             var location = claim.InvestigationReport.ReportTemplate.LocationTemplate.FirstOrDefault(l => l.LocationName == data.LocationName);
@@ -591,27 +582,26 @@ public class AgentIdService : IAgentIdService
             var weatherData = await weatherTask;
             var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
-
             media.IdImageLocationUrl = map;
             media.Duration = duration;
             media.Distance = distance;
             media.DistanceInMetres = distanceInMetres;
             media.DurationInSeconds = durationInSecs;
-
+            media.FilePath = "/media/" + fileName;
 
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
                 $"\r\n" +
                 $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
                 $"\r\n" +
                 $"\r\nElevation(sea level):{weatherData.elevation} metres";
-            media.IdImage = fileBytes;
+
             media.IdImageExtension = extension;
             media.MediaExtension = extension.TrimStart('.');
             media.ValidationExecuted = true;
-            media.IdImageValid = true; // Optional validation logic
-            media.IdImageLocationAddress = address;
+            media.IdImageValid = true;
+            media.IdImageLocationAddress = $"(Latitude={latitude} Longitude={longitude} ) {address}";
             media.IdImageData = weatherCustomData;
-            media.IdImageLongLat = $"{latitude},{longitude}";
+            media.IdImageLongLat = $"{latitude}/{longitude}";
             media.IdImageLongLatTime = DateTime.UtcNow;
             var mimeType = data.Image.ContentType.ToLower();
 
@@ -619,17 +609,18 @@ public class AgentIdService : IAgentIdService
             bool isVideo = mimeType.StartsWith("video/") || videoExtensions.Contains(extension);
 
             media.MediaType = isVideo ? MediaType.VIDEO : MediaType.AUDIO;
-            await _context.SaveChangesAsync();
+
+            await _context.SaveChangesAsync(null, false);
 
             return new AppiCheckifyResponse
             {
-                Image = media.IdImage,
+                Image = fileBytes,
             };
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            media.IdImageData = "No Weather Data";
+            media.IdImageData = "No Data";
             media.IdImageValid = false;
             media.IdImageLocationAddress = "No Address data";
             media.ValidationExecuted = true;
@@ -640,14 +631,15 @@ public class AgentIdService : IAgentIdService
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-                Image = media.IdImage,
-                LocationImage = Convert.ToBase64String(media?.IdImage),
+                Image = fileBytes,
+                LocationImage = Convert.ToBase64String(fileBytes),
                 LocationLongLat = media?.IdImageLongLat,
                 LocationTime = media?.IdImageLongLatTime,
                 Valid = media?.IdImageValid
             };
         }
     }
+
     public async Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
     {
         var claim = await _context.Investigations
@@ -678,7 +670,7 @@ public class AgentIdService : IAgentIdService
         locationTemplate.ValidationExecuted = true;
         locationTemplate.Updated = DateTime.Now;
         _context.LocationTemplate.Update(locationTemplate);
-        var rowsAffected = await _context.SaveChangesAsync();
+        var rowsAffected = await _context.SaveChangesAsync(null, false);
         return rowsAffected > 0;
     }
 }

@@ -1,18 +1,22 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -32,7 +36,9 @@ namespace risk.control.system.Controllers
         private readonly ISmsService smsService;
         private readonly IFeatureManager featureManager;
         private readonly IInvestigationService service;
-
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ILogger<CompanyController> logger;
+        private readonly string baseUrl;
         public CompanyController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
             UserManager<VendorApplicationUser> userAgencyManager,
@@ -43,6 +49,8 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
             IInvestigationService service,
+             IHttpContextAccessor httpContextAccessor,
+            ILogger<CompanyController> logger,
             ISmsService SmsService)
         {
             this._context = context;
@@ -56,6 +64,11 @@ namespace risk.control.system.Controllers
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
             this.service = service;
+            this.httpContextAccessor = httpContextAccessor;
+            this.logger = logger;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [Breadcrumb("Manage Company")]
@@ -210,12 +223,13 @@ namespace risk.control.system.Controllers
                 existCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(existCompany);
                 await _context.SaveChangesAsync();
-
-                await smsService.DoSendSmsAsync(existCompany.Country.ISDCode + existCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
+                string message = "Company edited. \nDomain : " + clientCompany.Email + "\n" + baseUrl;
+                await smsService.DoSendSmsAsync(existCompany.Country.ISDCode + existCompany.PhoneNumber, message);
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -254,11 +268,24 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = new ClientCompanyApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId };
+                var existingUsers = _context.ClientCompanyApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                var isManagerTaken = existingUsers.Any(u => u.UserRole == CompanyRole.MANAGER);
+                var availableRoles = Enum.GetValues(typeof(CompanyRole))
+                    .Cast<CompanyRole>()
+                    .Where(role => role != CompanyRole.COMPANY_ADMIN && (isManagerTaken ? role != CompanyRole.MANAGER : true))
+                    .Select(role => new SelectListItem
+                    {
+                        Value = role.ToString(),
+                        Text = role.ToString()
+                    })
+                    .ToList();
+
+                var model = new ClientCompanyApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId, AvailableRoles = availableRoles };
                 return View(model);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -325,7 +352,8 @@ namespace risk.control.system.Controllers
                     roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
                     var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;
                     notifyService.Custom($"User {user.Email} created successfully.", 3, "green", "fas fa-user-plus");
-                    await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User created . Email : " + user.Email);
+                    string message = "User created . \nEmail : " + user.Email + "\n" + baseUrl;
+                    await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message);
                     return RedirectToAction(nameof(CompanyController.Users), "Company");
                 }
                 notifyService.Error("OOPs !!!..Contact Admin");
@@ -333,6 +361,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -362,11 +391,25 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                var existingUsers = _context.ClientCompanyApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
+                var isManagerTaken = existingUsers.Any(u => u.UserRole == CompanyRole.MANAGER);
+                var availableRoles = Enum.GetValues(typeof(CompanyRole))
+                    .Cast<CompanyRole>()
+                    .Where(role => role != CompanyRole.COMPANY_ADMIN && (isManagerTaken ? role != CompanyRole.MANAGER : true))
+                    .Select(role => new SelectListItem
+                    {
+                        Value = role.ToString(),
+                        Text = role.ToString()
+                    })
+                    .ToList();
+
                 clientCompanyApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !clientCompanyApplicationUser.IsPasswordChangeRequired : true;
+                clientCompanyApplicationUser.AvailableRoles = availableRoles;
                 return View(clientCompanyApplicationUser);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -458,8 +501,9 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                notifyService.Custom($"User {createdUser.Email} edited and locked.", 3, "orange", "fas fa-user-lock");
-                                await smsService.DoSendSmsAsync(isdCode + createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
+                                notifyService.Custom($"User {createdUser.Email} edited.", 3, "orange", "fas fa-user-lock");
+                                string message = "User edited. \nEmail : " + createdUser.Email + "\n" + baseUrl;
+                                await smsService.DoSendSmsAsync(isdCode + createdUser.PhoneNumber, message);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
@@ -472,7 +516,7 @@ namespace risk.control.system.Controllers
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
                                 notifyService.Custom($"User {createdUser.Email} edited.", 3, "orange", "fas fa-user-check");
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User created . Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User edited . \nEmail : " + user.Email + "\n" + baseUrl);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
@@ -481,6 +525,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error($"Error to create Company user.", 3);
                 return RedirectToAction(nameof(CompanyController.Users), "Company");
@@ -513,6 +558,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -550,6 +596,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -623,6 +670,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -656,6 +704,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -726,12 +775,13 @@ namespace risk.control.system.Controllers
                 _context.Vendor.Update(vendor);
                 var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == vendor.CountryId).ISDCode;
 
-                await smsService.DoSendSmsAsync(isdCode + vendor.PhoneNumber, "Agency edited. Domain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(isdCode + vendor.PhoneNumber, "Agency edited. \n Domain : " + vendor.Email + "\n" + baseUrl);
 
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -750,7 +800,6 @@ namespace risk.control.system.Controllers
             var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("AgencyUsers", "Company", $"Manage Users") { Parent = detailsPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
-
 
             return View();
         }
@@ -870,14 +919,14 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
-                            notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + baseUrl);
+                            notifyService.Custom($"User created.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
                     {
 
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + baseUrl);
 
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
 
@@ -889,22 +938,18 @@ namespace risk.control.system.Controllers
                             System.Net.WebClient client = new System.Net.WebClient();
                             string tinyUrl = client.DownloadString(address);
 
-                            var message = $"Dear {user.FirstName}";
-                            message += "                                                                                ";
-                            message += $"Click on link below to install the mobile app";
-                            message += "                                                                                ";
-                            message += $"{tinyUrl}";
-                            message += "                                                                                ";
-                            message += $"Thanks";
-                            message += "                                                                                ";
-                            message += $"https://icheckify.co.in";
+                            var message = $"Dear {user.FirstName}\n" +
+                            $"Click on link below to install the mobile app\n\n" +
+                            $"{tinyUrl}\n\n" +
+                            $"Thanks\n\n" +
+                            $"{baseUrl}";
 
                             await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
                             notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                         }
                         else
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + baseUrl);
                         }
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     }
@@ -916,6 +961,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -955,6 +1001,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1000,6 +1047,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1036,6 +1084,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1094,7 +1143,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateService(VendorInvestigationServiceType service, long VendorId)
         {
-            if (service == null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 || (service.SelectedDistrictId < 1 && service.SelectedDistrictId != -1) || VendorId < 1)
+            if (service == null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 || (service.SelectedDistrictIds.Count <= 0) || VendorId < 1)
             {
                 notifyService.Custom("OOPs !!!..Invalid Data.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(CompanyController.Service), "Company", new { id = VendorId });
@@ -1103,32 +1152,31 @@ namespace risk.control.system.Controllers
             {
                 var isCountryValid = await _context.Country.AnyAsync(c => c.CountryId == service.SelectedCountryId);
                 var isStateValid = await _context.State.AnyAsync(s => s.StateId == service.SelectedStateId);
-                var isDistrictValid = service.SelectedDistrictId == -1 ||
-                                      await _context.District.AnyAsync(d => d.DistrictId == service.SelectedDistrictId);
 
-                if (!isCountryValid || !isStateValid || !isDistrictValid)
+                if (!isCountryValid || !isStateValid)
                 {
                     notifyService.Error("Invalid country, state, or district selected.");
                     return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = VendorId });
                 }
 
-                var stateWideService = _context.VendorInvestigationServiceType
+                var stateWideServices = _context.VendorInvestigationServiceType
                        .AsEnumerable() // Switch to client-side evaluation
                        .Where(v =>
                            v.VendorId == VendorId &&
                            v.InsuranceType == service.InsuranceType &&
                            v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
-                           v.CountryId == (long?)service.SelectedCountryId &&
-                           v.StateId == (long?)service.SelectedStateId)?
+                           v.CountryId == service.SelectedCountryId &&
+                           v.StateId == service.SelectedStateId)?
                        .ToList();
+                bool isAllDistricts = service.SelectedDistrictIds?.Contains(-1) == true; // how to set this value in case all districts selected
 
                 // Handle state-wide service existence
-                if (service.SelectedDistrictId == -1)
+                if (isAllDistricts)
                 {
                     // Handle state-wide service creation
-                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId == null))
+                    if (stateWideServices is not null && stateWideServices.Any(s => s.SelectedDistrictIds?.Contains(-1) == true))
                     {
-                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        var currentService = stateWideServices.FirstOrDefault(s => s.SelectedDistrictIds?.Contains(-1) == true);
                         currentService.IsUpdated = true;
                         _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
@@ -1139,10 +1187,9 @@ namespace risk.control.system.Controllers
                 else
                 {
                     // Handle state-wide service creation
-                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId))
+                    if (stateWideServices != null && stateWideServices.Any(s => s.SelectedDistrictIds != null && s.SelectedDistrictIds.Intersect(service.SelectedDistrictIds ?? new List<long>()).Any()))
                     {
-                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId
-                        );
+                        var currentService = stateWideServices.FirstOrDefault(s => s.SelectedDistrictIds != null && s.SelectedDistrictIds.Intersect(service.SelectedDistrictIds ?? new List<long>()).Any());
                         currentService.IsUpdated = true;
                         _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
@@ -1154,23 +1201,13 @@ namespace risk.control.system.Controllers
                 service.VendorId = VendorId;
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
-
-                if (service.SelectedDistrictId == -1)
-                {
-                    service.DistrictId = null;
-                }
-                else
-                {
-                    service.DistrictId = service.SelectedDistrictId;
-                }
-
                 service.Updated = DateTime.Now;
                 service.UpdatedBy = HttpContext.User?.Identity?.Name;
                 service.Created = DateTime.Now;
 
                 _context.Add(service);
                 await _context.SaveChangesAsync();
-                if (service.DistrictId == null)
+                if (isAllDistricts)
                 {
                     notifyService.Custom($"Service [{ALL_DISTRICT}] added successfully.", 3, "orange", "fas fa-truck");
                 }
@@ -1183,6 +1220,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1212,23 +1250,17 @@ namespace risk.control.system.Controllers
 
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.InsuranceType == vendorInvestigationServiceType.InsuranceType), "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
 
-                if (vendorInvestigationServiceType.DistrictId == null)
-                {
-                    vendorInvestigationServiceType.SelectedDistrictId = -1;
-                }
-
                 var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
                 var editPage = new MvcBreadcrumbNode("Service", "Company", $"Manage Service") { Parent = detailsPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
                 var addPage = new MvcBreadcrumbNode("EditService", "Company", $"Edit Service") { Parent = editPage };
                 ViewData["BreadcrumbNode"] = addPage;
-
-
                 return View(vendorInvestigationServiceType);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1240,7 +1272,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> EditService(long VendorInvestigationServiceTypeId, VendorInvestigationServiceType service, long VendorId)
         {
             if (VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId || service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 ||
-                (service.SelectedDistrictId != -1 && service.SelectedDistrictId < 1 && service.SelectedDistrictId != 0) || VendorId < 1)
+                (service.SelectedDistrictIds.Count <= 0) || VendorId < 1)
             {
                 notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(EditService), "VendorService", new { id = VendorInvestigationServiceTypeId });
@@ -1253,16 +1285,18 @@ namespace risk.control.system.Controllers
                            v.VendorId == VendorId &&
                            v.InsuranceType == service.InsuranceType &&
                            v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
-                           v.CountryId == (long?)service.SelectedCountryId &&
-                           v.StateId == (long?)service.SelectedStateId &&
+                           v.CountryId == service.SelectedCountryId &&
+                           v.StateId == service.SelectedStateId &&
                            v.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId)?
                        .ToList();
-                if (service.SelectedDistrictId == 0 || service.SelectedDistrictId == -1)
+                bool isAllDistricts = service.SelectedDistrictIds?.Contains(-1) == true; // how to set this value in case all districts selected
+
+                if (isAllDistricts)
                 {
                     // Handle state-wide service creation
-                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.DistrictId == null))
+                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.SelectedDistrictIds?.Contains(-1) == true))
                     {
-                        var currentService = existingVendorServices.FirstOrDefault(s => s.DistrictId == null);
+                        var currentService = existingVendorServices.FirstOrDefault(s => s.SelectedDistrictIds?.Contains(-1) == true);
                         currentService.IsUpdated = true;
                         _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
@@ -1273,9 +1307,9 @@ namespace risk.control.system.Controllers
                 else
                 {
                     // Handle state-wide service creation
-                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId))
+                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.SelectedDistrictIds != null && s.SelectedDistrictIds.Intersect(service.SelectedDistrictIds ?? new List<long>()).Any()))
                     {
-                        var currentService = existingVendorServices.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId);
+                        var currentService = existingVendorServices.FirstOrDefault(s => s.SelectedDistrictIds != null && s.SelectedDistrictIds.Intersect(service.SelectedDistrictIds ?? new List<long>()).Any());
                         currentService.IsUpdated = true;
                         _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
@@ -1285,15 +1319,6 @@ namespace risk.control.system.Controllers
                 }
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
-                if (service.SelectedDistrictId == 0 || service.SelectedDistrictId == -1)
-                {
-                    service.DistrictId = null;
-                }
-                else
-                {
-                    service.DistrictId = service.SelectedDistrictId;
-                }
-
                 service.Updated = DateTime.Now;
                 service.UpdatedBy = HttpContext.User?.Identity?.Name;
                 service.IsUpdated = true;
@@ -1304,6 +1329,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1346,6 +1372,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1381,6 +1408,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1426,6 +1454,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1483,6 +1512,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1522,6 +1552,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1561,6 +1592,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1633,7 +1665,7 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;
-                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User role edited . Email : " + user.Email);
+                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User role edited . \nEmail : " + user.Email + "\n" + baseUrl);
 
                 notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
                 return RedirectToAction(nameof(CompanyController.Users));

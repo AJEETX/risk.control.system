@@ -38,6 +38,10 @@ $(document).ready(function () {
                 targets:11                      // Index of the column to style
             },
             {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 12                      // Index of the column to style
+            },
+            {
                 'targets': 17, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],

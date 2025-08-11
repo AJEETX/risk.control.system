@@ -66,16 +66,32 @@
                 targets: 1                      // Index of the column to style
             },
             {
-                className: 'max-width-column-name', // Apply the CSS class,
+                className: 'max-width-column-number', // Apply the CSS class,
                 targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
             },
             {
-                className: 'max-width-column', // Apply the CSS class,
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 11                      // Index of the column to style
             }],
         order: [[14, 'asc']],
         fixedHeader: true,
@@ -116,7 +132,7 @@
                 "data": "company",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span class="badge badge-light" title="' + data + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>';
 
                 }
             },

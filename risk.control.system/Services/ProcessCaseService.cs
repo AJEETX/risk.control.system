@@ -1,5 +1,7 @@
 ﻿using Hangfire;
+
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
@@ -83,16 +85,12 @@ namespace risk.control.system.Services
                 // Update the status only for cases that are not already PENDING
                 foreach (var claimsCase in cases)
                 {
-                    if (claimsCase.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS)
-                    {
-                        claimsCase.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS;
-                        claimsCase.UpdatedBy = userEmail;
-                        claimsCase.Updated = DateTime.Now;
-                    }
+                    claimsCase.UpdatedBy = userEmail;
+                    claimsCase.Updated = DateTime.Now;
                 }
 
                 context.Investigations.UpdateRange(cases);
-                return await context.SaveChangesAsync();
+                return await context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -154,7 +152,8 @@ namespace risk.control.system.Services
                         serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
                         serviceType.InsuranceType == claimsInvestigation.PolicyDetail.InsuranceType &&
                         (serviceType.StateId == pincodeDistrictState.StateId &&
-                         (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
+                         (serviceType.SelectedDistrictIds?.Contains(-1) == true
+                         || serviceType.SelectedDistrictIds.Contains(pincodeDistrictState.DistrictId.Value)))
                     ))
                     .Select(v => v.VendorId) // Select only VendorId
                     .Distinct() // Ensure uniqueness
@@ -221,8 +220,9 @@ namespace risk.control.system.Services
                     serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
                     serviceType.InsuranceType == claimsInvestigation.PolicyDetail.InsuranceType &&
                     (serviceType.StateId == pincodeDistrictState.StateId &&
-                     (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
-                ))
+                      (serviceType.SelectedDistrictIds?.Contains(-1) == true
+                         || serviceType.SelectedDistrictIds.Contains(pincodeDistrictState.DistrictId.Value)))
+                    ))
                 .Select(v => v.VendorId) // Select only VendorId
                 .Distinct() // Ensure uniqueness
                 .ToList();
@@ -275,7 +275,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.SubStatus = assigned;
             }
             context.Investigations.UpdateRange(cases2Assign);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(null, false);
 
             var autoAllocatedTasks = cases2Assign.ToList().Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
 
@@ -334,7 +334,7 @@ namespace risk.control.system.Services
 
                 // Save InvestigationReport
                 context.InvestigationReport.Add(investigationReport);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 // Link the InvestigationReport back to the InvestigationTask
                 claimsCase.InvestigationReportId = investigationReport.Id;
@@ -343,7 +343,7 @@ namespace risk.control.system.Services
 
                 context.Investigations.Update(claimsCase);
                 // Save changes
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 await timelineService.UpdateTaskStatus(claimsCase.Id, currentUser.Email);
 
@@ -376,7 +376,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.Vendor = null;
                 claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY;
                 context.Investigations.Update(claimsInvestigation);
-                var rows = await context.SaveChangesAsync() < 0;
+                var rows = await context.SaveChangesAsync(null, false) > 0;
 
                 await timelineService.UpdateTaskStatus(claimsInvestigation.Id, currentUser.Email);
 
@@ -404,7 +404,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.UpdatedBy = currentUser.Email;
                 claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
                 context.Investigations.Update(claimsInvestigation);
-                var rows = await context.SaveChangesAsync();
+                var rows = await context.SaveChangesAsync(null, false);
 
                 await timelineService.UpdateTaskStatus(claimsInvestigation.Id, currentUser.Email);
 
@@ -437,7 +437,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.Vendor = null;
                 claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY;
                 context.Investigations.Update(claimsInvestigation);
-                var rows = await context.SaveChangesAsync();
+                var rows = await context.SaveChangesAsync(null, false);
                 await timelineService.UpdateTaskStatus(claimsInvestigation.Id, currentUser.Email);
                 return currentUser.Vendor;
             }
@@ -534,7 +534,7 @@ namespace risk.control.system.Services
                 }
 
                 context.Investigations.Update(claim);
-                var rowsAffected = await context.SaveChangesAsync() > 0;
+                var rowsAffected = await context.SaveChangesAsync(null, false) > 0;
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
@@ -561,10 +561,10 @@ namespace risk.control.system.Services
                     .Include(p => p.ClientCompany)
                     .FirstOrDefault(v => v.Id == claimsInvestigationId);
 
-                var report = claimsCaseToAllocateToVendor.InvestigationReport;
-                report.SupervisorRemarkType = reportUpdateStatus;
-                report.SupervisorRemarks = supervisorRemarks;
-
+                //var report = claimsCaseToAllocateToVendor.InvestigationReport;
+                //report.SupervisorRemarkType = reportUpdateStatus;
+                //report.SupervisorRemarks = supervisorRemarks;
+                claimsCaseToAllocateToVendor.CaseOwner = agencyUser.Email;
                 claimsCaseToAllocateToVendor.TaskedAgentEmail = agencyUser.Email;
                 claimsCaseToAllocateToVendor.Updated = DateTime.Now;
                 claimsCaseToAllocateToVendor.UpdatedBy = userEmail;
@@ -572,7 +572,7 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.TaskToAgentTime = DateTime.Now;
                 context.Investigations.Update(claimsCaseToAllocateToVendor);
 
-                var rowsAffected = await context.SaveChangesAsync() > 0;
+                var rowsAffected = await context.SaveChangesAsync(null, false) > 0;
 
                 await timelineService.UpdateTaskStatus(claimsCaseToAllocateToVendor.Id, userEmail);
                 return rowsAffected ? claimsCaseToAllocateToVendor : null;
@@ -600,7 +600,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.Id == claimId);
 
                 var replyByAgency = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR;
-
+                claim.CaseOwner = claim.ClientCompany.Email;
                 claim.SubStatus = replyByAgency;
                 claim.UpdatedBy = userEmail;
                 claim.AssignedToAgency = false;
@@ -644,7 +644,7 @@ namespace risk.control.system.Services
                 context.QueryRequest.Update(enquiryRequest);
                 claim.InvestigationReport.EnquiryRequests.Add(enquiryRequest);
                 context.Investigations.Update(claim);
-                var rowsUpdated = await context.SaveChangesAsync() > 0;
+                var rowsUpdated = await context.SaveChangesAsync(null, false) > 0;
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
                 return rowsUpdated ? claim : null;
@@ -701,7 +701,7 @@ namespace risk.control.system.Services
                 claim.CaseOwner = claim.ClientCompany.Email;
                 context.Investigations.Update(claim);
 
-                var saveCount = await context.SaveChangesAsync();
+                var saveCount = await context.SaveChangesAsync(null, false);
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
@@ -746,7 +746,7 @@ namespace risk.control.system.Services
                 claim.SubmittedAssessordEmail = userEmail;
                 context.Investigations.Update(claim);
 
-                var saveCount = await context.SaveChangesAsync();
+                var saveCount = await context.SaveChangesAsync(null, false);
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
@@ -799,7 +799,7 @@ namespace risk.control.system.Services
                 context.QueryRequest.Update(request);
                 context.Investigations.Update(claim);
 
-                var saved = await context.SaveChangesAsync() > 0;
+                var saved = await context.SaveChangesAsync(null, false) > 0;
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
@@ -826,7 +826,7 @@ namespace risk.control.system.Services
                 UpdatedBy = userEmail
             });
             context.Investigations.Update(claim);
-            return await context.SaveChangesAsync() > 0;
+            return await context.SaveChangesAsync(null, false) > 0;
         }
     }
 }

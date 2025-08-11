@@ -19,6 +19,7 @@ namespace risk.control.system.Services
         Task NotifyClaimAssignmentToAssigner(string userEmail, List<long> claims, string url = "");
 
         Task NotifyClaimWithdrawlToCompany(string senderUserEmail, long claimId, long vendorId, string url = "");
+        Task NotifyClaimWithdrawlFromAgent(string senderUserEmail, long claimId, long vendorId, string url = "");
 
         Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, long claimId, string agentEmail, long vendorId, string url = "");
 
@@ -58,9 +59,6 @@ namespace risk.control.system.Services
             this.httpContextAccessor = httpContextAccessor;
             this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-
             this.userManager = userManager;
             this.userVendorManager = userVendorManager;
         }
@@ -87,10 +85,9 @@ namespace risk.control.system.Services
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {applicationUser.Email}, ";
-                        message += $"Assign of {file.RecordCount} cases finished ";
-                        message += $"Thanks, ";
-                        message += $"{applicationUser.Email}, ";
+                        string message = $"Dear {applicationUser.Email}, \n";
+                        message += $"Assign of {file.RecordCount} cases finished \n";
+                        message += $"{applicationUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
@@ -110,16 +107,15 @@ namespace risk.control.system.Services
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {applicationUser.Email}, ";
-                        message += $"JobId: {file.Id} Assign Error. ";
-                        message += $"Thanks, ";
-                        message += $"{applicationUser.Email}, ";
+                        string message = $"Dear {applicationUser.Email},\n ";
+                        message += $"JobId: {file.Id} Assign Error. \n";
+                        message += $"{applicationUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -136,7 +132,7 @@ namespace risk.control.system.Services
 
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
-                if(file.Completed.GetValueOrDefault())
+                if (file.Completed.GetValueOrDefault())
                 {
                     var notification = new StatusNotification
                     {
@@ -151,10 +147,9 @@ namespace risk.control.system.Services
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {applicationUser.Email}, ";
-                        message += $"Upload of {file.RecordCount} cases finished ";
-                        message += $"Thanks, ";
-                        message += $"{applicationUser.Email}, ";
+                        string message = $"Dear {applicationUser.Email},\n ";
+                        message += $"Upload of {file.RecordCount} cases finished \n";
+                        message += $"{applicationUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
@@ -167,23 +162,22 @@ namespace risk.control.system.Services
                         Company = applicationUser.ClientCompany,
                         Symbol = "fa fa-times i-orangered",
                         Message = $"Upload Error",
-                        Status = $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR}",
+                        Status = $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_ERR}",
                         NotifierUserEmail = senderUserEmail
                     };
                     _context.Notifications.Add(notification);
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {applicationUser.Email}, ";
-                        message += $"JobId: {file.Id} Upload Error. ";
-                        message += $"Thanks, ";
-                        message += $"{applicationUser.Email}, ";
+                        string message = $"Dear {applicationUser.Email},\n ";
+                        message += $"JobId: {file.Id} Upload Error. \n";
+                        message += $"{applicationUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -257,10 +251,9 @@ namespace risk.control.system.Services
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {userEmailToSend.Email}, ";
-                        message += $"Case #{policy} : {claimsInvestigation.SubStatus}, ";
-                        message += $"Thanks, ";
-                        message += $"{clientCompanyUser.Email}, ";
+                        string message = $"Dear {userEmailToSend.Email}, \n";
+                        message += $"Case #{policy} : {claimsInvestigation.SubStatus}, \n";
+                        message += $"{clientCompanyUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
@@ -268,7 +261,7 @@ namespace risk.control.system.Services
                     //SMS ::END
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -328,14 +321,13 @@ namespace risk.control.system.Services
 
                 foreach (var userEmailToSend in userEmailsToSend)
                 {
-                   
+
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {userEmailToSend.Email}, ";
-                        message += $"Case #{policy} : {claimsInvestigation.SubStatus}, ";
-                        message += $"Thanks, ";
-                        message += $"{clientCompanyUser.Email}, ";
+                        string message = $"Dear {userEmailToSend.Email}, \n";
+                        message += $"Case #{policy} : {claimsInvestigation.SubStatus}, \n";
+                        message += $"{clientCompanyUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
@@ -343,7 +335,7 @@ namespace risk.control.system.Services
                     //SMS ::END
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -381,19 +373,18 @@ namespace risk.control.system.Services
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {applicationUser.Email}, ";
-                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. ";
-                        message += $"Thanks, ";
-                        message += $"{applicationUser.Email}, ";
+                        string message = $"Dear {applicationUser.Email}, \n";
+                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
+                        message += $"{applicationUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = applicationUser.Email, RecepicientPhone = applicationUser.PhoneNumber, Message = message });
                     }
                     //SMS ::END
                 }
-                
 
-                var rows = await _context.SaveChangesAsync();
+
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -424,15 +415,14 @@ namespace risk.control.system.Services
                 //SEND SMS
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    string message = $"Dear {applicationUser.Email}, ";
-                    message += $"Assigning finished of {autoAllocatedCasesCount + notAutoAllocatedCasesCount} cases, Auto-assigned count = {autoAllocatedCasesCount}. ";
-                    message += $"Thanks, ";
-                    message += $"{applicationUser.Email}, ";
+                    string message = $"Dear {applicationUser.Email}, \n";
+                    message += $"Assigning finished of {autoAllocatedCasesCount + notAutoAllocatedCasesCount} cases, Auto-assigned count = {autoAllocatedCasesCount}. \n";
+                    message += $"{applicationUser.Email}, \n";
                     message += $"{url}";
                     await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -462,15 +452,14 @@ namespace risk.control.system.Services
                 //SEND SMS
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    string message = $"Dear {applicationUser.Email}, ";
-                    message += $"Assigning finished of {autoAllocatedCases.Count + notAutoAllocatedCases.Count} cases, Auto-assigned count = {autoAllocatedCases.Count}. ";
-                    message += $"Thanks, ";
-                    message += $"{applicationUser.Email}, ";
+                    string message = $"Dear {applicationUser.Email}, \n";
+                    message += $"Assigning finished of {autoAllocatedCases.Count + notAutoAllocatedCases.Count} cases, Auto-assigned count = {autoAllocatedCases.Count}.\n ";
+                    message += $"{applicationUser.Email},\n ";
                     message += $"{url}";
                     await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -516,7 +505,6 @@ namespace risk.control.system.Services
                     NotifierUserEmail = senderUserEmail
                 };
                 _context.Notifications.Add(vendorNotification);
-                //claim.Notifications.Add(vendorNotification);
 
                 var notification = new StatusNotification
                 {
@@ -525,7 +513,7 @@ namespace risk.control.system.Services
                     Symbol = "fa fa-times i-orangered",
                     Message = $"Case #{claim.PolicyDetail.ContractNumber}",
                     Status = claim.SubStatus,
-                    NotifierUserEmail = senderUserEmail
+                    NotifierUserEmail = claim.CreatedUser
                 };
                 _context.Notifications.Add(notification);
                 //claim.Notifications.Add(notification);
@@ -534,17 +522,16 @@ namespace risk.control.system.Services
                 {
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {user.Email}, ";
-                        message += $"Case #{claim.PolicyDetail.ContractNumber} : {claim.SubStatus}, ";
-                        message += $"Thanks, ";
-                        message += $"{senderUserEmail}, ";
+                        string message = $"Dear {user.Email}, \n";
+                        message += $"Case #{claim.PolicyDetail.ContractNumber} : {claim.SubStatus}, \n";
+                        message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
                         //claim.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -578,14 +565,13 @@ namespace risk.control.system.Services
                 };
                 _context.Notifications.Add(notification);
                 //claimsInvestigation.Notifications.Add(notification);
-                
-                var rows = await _context.SaveChangesAsync();
+
+                var rows = await _context.SaveChangesAsync(null, false);
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    string message = $"Dear {recepientUser.Email}, ";
-                    message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}, ";
-                    message += $"Thanks, ";
-                    message += $"{userEmail}, ";
+                    string message = $"Dear {recepientUser.Email}, \n";
+                    message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}, \n";
+                    message += $"{userEmail},\n ";
                     message += $"{url}";
                     await smsService.DoSendSmsAsync(recepientUser.Country.ISDCode + recepientUser.PhoneNumber, message);
                     //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = recepientUser.Email, RecepicientPhone = recepientUser.PhoneNumber, Message = message });
@@ -623,12 +609,12 @@ namespace risk.control.system.Services
                     }
                 }
             }
-            
+
             try
             {
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -699,17 +685,16 @@ namespace risk.control.system.Services
                 {
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {user.Email}, ";
-                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}, ";
-                        message += $"Thanks, ";
-                        message += $"{senderUserEmail}, ";
+                        string message = $"Dear {user.Email}, \n";
+                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}, \n";
+                        message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -756,17 +741,16 @@ namespace risk.control.system.Services
                 {
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {user.Email}, ";
-                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. ";
-                        message += $"Thanks, ";
-                        message += $"{senderUserEmail}, ";
+                        string message = $"Dear {user.Email}, \n";
+                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
+                        message += $"{senderUserEmail},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -801,7 +785,7 @@ namespace risk.control.system.Services
                         users.Add(user);
                     }
                 }
-                
+
                 var claimsInvestigation = _context.Investigations
                     .Include(i => i.Vendor)
                     .Include(i => i.PolicyDetail)
@@ -818,22 +802,21 @@ namespace risk.control.system.Services
                     NotifierUserEmail = senderUserEmail
                 };
                 _context.Notifications.Add(notification);
-                
+
                 foreach (var user in users)
                 {
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {user.Email}, ";
-                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. ";
-                        message += $"Thanks, ";
-                        message += $"{senderUserEmail}, ";
+                        string message = $"Dear {user.Email}, \n";
+                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
+                        message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -874,7 +857,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                
+
 
                 var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == senderUserEmail);
 
@@ -890,16 +873,15 @@ namespace risk.control.system.Services
                     NotifierUserEmail = senderUserEmail
                 };
                 _context.Notifications.Add(notification);
-                
+
                 foreach (var userEmailToSend in userEmailsToSend)
                 {
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {userEmailToSend.Email}, ";
-                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. ";
-                        message += $"Thanks, ";
-                        message += $"{clientCompanyUser.Email}, ";
+                        string message = $"Dear {userEmailToSend.Email}, \n";
+                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
+                        message += $"{clientCompanyUser.Email}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
@@ -907,7 +889,7 @@ namespace risk.control.system.Services
                     //SMS ::END
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
@@ -937,7 +919,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-               
+
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
                 var notification = new StatusNotification
@@ -949,22 +931,69 @@ namespace risk.control.system.Services
                     NotifierUserEmail = senderUserEmail
                 };
                 _context.Notifications.Add(notification);
-                
+
                 foreach (var user in users)
                 {
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {user.Email}, ";
-                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. ";
-                        message += $"Thanks, ";
-                        message += $"{senderUserEmail}, ";
+                        string message = $"Dear {user.Email}, \n";
+                        message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
+                        message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
-                var rows = await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync(null, false);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
+        }
+
+        public async Task NotifyClaimWithdrawlFromAgent(string senderUserEmail, long claimId, long vendorId, string url = "")
+        {
+            try
+            {
+                var claim = _context.Investigations
+                    .Include(i => i.PolicyDetail)
+                    .FirstOrDefault(v => v.Id == claimId);
+
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
+
+                var users = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId && u.UserRole == AgencyRole.AGENCY_ADMIN || u.UserRole == AgencyRole.SUPERVISOR);
+
+                var vendorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+
+                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
+                var vendorNotification = new StatusNotification
+                {
+                    Role = vendorRole,
+                    Agency = vendor,
+                    Symbol = "fa fa-times i-orangered",
+                    Message = $"Case #{claim.PolicyDetail.ContractNumber}",
+                    Status = claim.SubStatus,
+                    NotifierUserEmail = senderUserEmail
+                };
+                _context.Notifications.Add(vendorNotification);
+
+                foreach (var user in users)
+                {
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                    {
+                        string message = $"Dear {user.Email}, \n";
+                        message += $"Case #{claim.PolicyDetail.ContractNumber} : {claim.SubStatus}, \n";
+                        message += $"{senderUserEmail}, \n";
+                        message += $"{url}";
+                        await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
+                        //claim.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
+                    }
+                }
+
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {

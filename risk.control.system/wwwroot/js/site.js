@@ -30,6 +30,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+function checkInternetConnection() {
+    if (!navigator.onLine) {
+        $.confirm({
+            title: 'No Internet Connection',
+            content: 'It looks like your internet connection is down. Please check and try again.',
+            type: 'red',
+            buttons: {
+                tryAgain: {
+                    text: 'Retry',
+                    action: function () {
+                        checkInternetConnection(); // Retry check
+                    }
+                },
+                close: function () {
+                    // Do nothing
+                }
+            }
+        });
+    }
+}
 function checkFormCompletion(formSelector, create = false) {
     let isFormComplete = true;
 
@@ -344,6 +364,7 @@ function clearAllNotifications() {
 
 $(document).ready(function () {
 
+    checkInternetConnection();
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -461,7 +482,7 @@ $(document).ready(function () {
         disableAllInteractiveElements();
     });
 
-    $('.nav-item a.actual-link,.nav-item a.navlink-border').on('click', function (e) {
+    $('.nav-item a.actual-link,.nav-item a.navlink-border, a.details-page').on('click', function (e) {
         if (!window.matchMedia("(max-width: 767px)").matches) {
             $("body").addClass("submit-progress-bg");
             // Wrap in setTimeout so the UI
@@ -537,336 +558,6 @@ $(document).ready(function () {
         $('#checkall').prop('checked', allChecked);
         $('#manage-vendors').prop('disabled', !anyChecked)
     });
-
-    $('.face-Image').click(function () {
-        var data;
-        $.confirm({
-            type: 'green',
-            closeIcon: true,
-
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/CaseInvestigationDetails/GetInvestigationFaceIdData?claimId=' + $('#claimId').val() + '&faceId=' + $('#faceId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Photo <span class="badge badge-light">uploaded</span>');
-                    self.setContent('<span class="badge badge-light"><i class="far fa-image"></i> Photo Scanned Image</span>');
-                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
-                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> ');
-                    self.setContentAppend('<br><i>' + response.locationData + '</i>');
-                    showFaceMap = true;
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            },
-            onContentReady: function () {
-
-            }
-        })
-    })
-
-    $('.locationImage').click(function () {
-        var data;
-        $.confirm({
-            type: 'green',
-            closeIcon: true,
-            columnClass: 'medium',
-
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationFaceIdData?claimId=' + $('#claimId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Photo <span class="badge badge-light">Uploaded location</span>');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
-                    self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-map"></div>')
-                    self.setContentAppend('</div>')
-                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
-                    self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
-                    showLocationMap = true;
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            },
-            onContentReady: function () {
-                if (showLocationMap) {
-                    showLocationMap = false;
-                    initPopMap(data.facePosition, data.imageAddress);
-                }
-            }
-        })
-    })
-
-    $('.olocationImage').click(function () {
-        var data;
-        $.confirm({
-            type: 'green',
-            closeIcon: true,
-            columnClass: 'medium',
-
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationPanData?claimId=' + $('#claimId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Pan card <span class="badge badge-light">uploaded location</span>');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
-                    self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-map"></div>')
-                    self.setContentAppend('</div>')
-                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
-                    self.setContentAppend('<br><i>' + response.ocrAddress + '</i>');
-                    showOcrMap = true;
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            },
-            onContentReady: function () {
-                if (showOcrMap) {
-                    showOcrMap = false;
-                    initPopMap(data.ocrPosition, data.ocrAddress);
-                }
-            }
-        })
-    })
-
-    $('.passportlocationImage').click(function () {
-        var data;
-        $.confirm({
-            type: 'green',
-            closeIcon: true,
-            columnClass: 'medium',
-
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationPassportData?claimId=' + $('#claimId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Passport <span class="badge badge-light">uploaded location</span>');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
-                    self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-map"></div>')
-                    self.setContentAppend('</div>')
-                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
-                    self.setContentAppend('<br><i>' + response.passportAddress + '</i>');
-                    showOcrMap = true;
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            },
-            onContentReady: function () {
-                if (showOcrMap) {
-                    showOcrMap = false;
-                    initPopMap(data.passportPosition, data.passportAddress);
-                }
-            }
-        })
-    })
-
-    $('.audiolocationImage').click(function () {
-        var data;
-        $.confirm({
-            type: 'green',
-            closeIcon: true,
-            columnClass: 'medium',
-
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationAudioData?claimId=' + $('#claimId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Audio <span class="badge badge-light">uploaded location</span>');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
-                    self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-map"></div>')
-                    self.setContentAppend('</div>')
-                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
-                    self.setContentAppend('<br><i>' + response.audioAddress + '</i>');
-                    showOcrMap = true;
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            },
-            onContentReady: function () {
-                if (showOcrMap) {
-                    showOcrMap = false;
-                    initPopMap(data.audioPosition, data.audioAddress);
-                }
-            }
-        })
-    })
-
-    $('.videolocationImage').click(function () {
-        var data;
-        $.confirm({
-            type: 'green',
-            closeIcon: true,
-            columnClass: 'medium',
-
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationVideoData?claimId=' + $('#claimId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Video <span class="badge badge-light">uploaded location</span>');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
-                    self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-map"></div>')
-                    self.setContentAppend('</div>')
-                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
-                    self.setContentAppend('<br><i>' + response.videoAddress + '</i>');
-                    showOcrMap = true;
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            },
-            onContentReady: function () {
-                if (showOcrMap) {
-                    showOcrMap = false;
-                    initPopMap(data.videoPosition, data.videoAddress);
-                }
-            }
-        })
-    })
-
-    $('.ocr-Image').click(function () {
-        $.confirm({
-            type: 'green',
-            closeIcon: true,
-
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationPanData?claimId=' + $('#claimId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    self.setTitle('<i class="fas fa-portrait"></i> Pan card <span class="badge badge-light">Uploaded</span>');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-film"></i> Pan card scanned Image</span>');
-                    self.setContentAppend('<br><img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
-                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span> ');
-                    self.setContentAppend('<br><i>' + response.qrData + '</i>');
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            }
-        })
-    })
-
-    $('.passport-Image').click(function () {
-        $.confirm({
-            type: 'green',
-            closeIcon: true,
-
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationPassportData?claimId=' + $('#claimId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    self.setTitle('<i class="fas fa-portrait"></i> Passport <span class="badge badge-light">Uploaded</span>');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-film"></i> Passport scanned Image</span>');
-                    self.setContentAppend('<br><img id="agentPassportPicture" class="img-fluid investigation-actual-image" src="' + response.passportImage + '" /> ');
-                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span> ');
-                    self.setContentAppend('<br><i>' + response.passportData + '</i>');
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            }
-        })
-    })
 
 });
 
@@ -945,5 +636,10 @@ window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
 
 fetchIpInfo();
 
-    // Load notifications on page load WITHOUT keeping it open
-    loadNotifications(false);
+// Load notifications on page load WITHOUT keeping it open
+loadNotifications(false);
+
+// Optional: Listen for offline events
+window.addEventListener('offline', function () {
+    checkInternetConnection();
+});

@@ -41,7 +41,7 @@
         order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
             {
-                className: 'max-width-column', // Apply the CSS class,
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 2                      // Index of the column to style
             },
             {

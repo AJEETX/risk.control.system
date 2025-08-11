@@ -35,6 +35,8 @@ namespace risk.control.system.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
+        [NotMapped]
+        public string Address { get; set; } = "Life-Assured";
 
         public long? ReportTemplateId { get; set; }
         public ReportTemplate? ReportTemplate { get; set; }

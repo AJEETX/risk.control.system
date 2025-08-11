@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿
+var ALL_DISTRICTS = "All Districts";
+$(document).ready(function () {
     // Utility to disable all buttons, links, and inputs
     function disableAllElements() {
         $('button, input[type="submit"], a').prop('disabled', true);
@@ -78,7 +80,10 @@
             } },
         order: [[10, 'desc'], [11, 'desc']],
         columnDefs: [
-            { className: 'max-width-column', targets: 7 },
+            { className: 'max-width-column-number', targets: 1 },
+            { className: 'max-width-column-number', targets: 2 },
+            { className: 'max-width-column-picodes', targets: 4 },
+            { className: 'max-width-column-number', targets: 7 },
             { className: 'max-width-column-name', targets: 8 }
         ],
         fixedHeader: true,
@@ -93,7 +98,18 @@
             { data: "caseType", mRender: (data, type, row) => `<span title="${row.caseType}" data-toggle="tooltip">${data}</span>` },
             { data: "serviceType", mRender: (data, type, row) => `<span title="${row.serviceType}" data-toggle="tooltip">${data}</span>` },
             { data: "rate", mRender: (data, type, row) => `<span title="${row.rate}" data-toggle="tooltip">${data}</span>` },
-            { data: "district", mRender: (data, type, row) => `<span title="${row.district}" data-toggle="tooltip">${data}</span>` },
+            {
+                data: "district",
+                mRender: (data, type, row) => {
+                    const fullText = row.district || '';
+                    if (fullText == ALL_DISTRICTS) {
+                        return `<span title="${fullText}" data-toggle="tooltip"> ${fullText} </span>`;
+                    } else {
+                        const shortText = fullText.length > 50 ? fullText.substring(0, 50) + '...' : fullText;
+                        return `<span title="${fullText}" data-toggle="tooltip"><small> ${shortText} </small></span>`;
+                    }
+                }
+            },
             { data: "state", mRender: (data, type, row) => `<span title="${row.state}" data-toggle="tooltip">${data}</span>` },
             { data: "country", mRender: (data, type, row) => `<span title="${row.country}" data-toggle="tooltip"> <img alt="${data}" title="${data}" src="${row.flag}" class="flag-icon" />(${row.country})</span>` },
             { data: "updatedBy", mRender: (data, type, row) => `<span title="${row.updatedBy}" data-toggle="tooltip">${data}</span>` },
@@ -119,10 +135,8 @@
             const rowNode = this.node();
 
             // Convert to lowercase for case-insensitive comparison
-            const district = data.district ? data.district.toLowerCase() : '';
-            const pincodes = data.pincodes ? data.pincodes.toLowerCase() : '';
-
-            if (district === 'all districts') {
+            const district = data.district ? data.district : '';
+            if (district === ALL_DISTRICTS) {
                 $(rowNode).find('td:nth-child(4)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(5)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(6)').addClass('text-light-green'); // Column index starts from 1
@@ -133,7 +147,6 @@
             }
 
             if (data.isUpdated) {
-
                 $(rowNode).addClass('highlight-new-user');
                 setTimeout(() => {
                     $(rowNode).removeClass('highlight-new-user');

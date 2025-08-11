@@ -19,21 +19,18 @@ namespace risk.control.system.Controllers.Company
     public class CaseUploadController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly IFtpService ftpService;
         private readonly IInvestigationService service;
+        private readonly ILogger<CaseUploadController> logger;
         private readonly INotyfService notifyService;
 
         public CaseUploadController(ApplicationDbContext context,
-            IEmpanelledAgencyService empanelledAgencyService,
-            IFtpService ftpService,
             IInvestigationService service,
+            ILogger<CaseUploadController> logger,
             INotyfService notifyService)
         {
             _context = context;
-            this.empanelledAgencyService = empanelledAgencyService;
-            this.ftpService = ftpService;
             this.service = service;
+            this.logger = logger;
             this.notifyService = notifyService;
         }
 
@@ -67,6 +64,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -118,6 +116,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Uploads), "ClaimsLog");

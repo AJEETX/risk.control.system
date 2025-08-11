@@ -1,4 +1,5 @@
-﻿$(document).ready(function () {
+﻿var ALL_DISTRICTS = "All Districts";
+$(document).ready(function () {
     $('a.create-agency-service').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -32,18 +33,11 @@
         },
         order: [[10, 'desc'], [11, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
-            }],
+            { className: 'max-width-column-number', targets: 1 },
+            { className: 'max-width-column-number', targets: 2 },
+            { className: 'max-width-column-picodes', targets: 4 },
+            { className: 'max-width-column-number', targets: 7 },
+            { className: 'max-width-column-name', targets: 8 }],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -76,9 +70,15 @@
                 }
             },
             {
-                "data": "district",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.district + '" data-toggle="tooltip">' + data + '</span>';
+                data: "district",
+                mRender: (data, type, row) => {
+                    const fullText = row.district || '';
+                    if (fullText == ALL_DISTRICTS) {
+                        return `<span title="${fullText}" data-toggle="tooltip"> ${fullText} </span>`;
+                    } else {
+                        const shortText = fullText.length > 50 ? fullText.substring(0, 50) + '...' : fullText;
+                        return `<span title="${fullText}" data-toggle="tooltip"><small> ${shortText} </small></span>`;
+                    }
                 }
             },
             {
@@ -147,10 +147,9 @@
             const rowNode = this.node();
 
             // Convert to lowercase for case-insensitive comparison
-            const district = data.district ? data.district.toLowerCase() : '';
-            const pincodes = data.pincodes ? data.pincodes.toLowerCase() : '';
+            const district = data.district ? data.district : '';
 
-            if (district === 'all districts') {
+            if (district === ALL_DISTRICTS) {
                 $(rowNode).find('td:nth-child(4)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(5)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(6)').addClass('text-light-green'); // Column index starts from 1

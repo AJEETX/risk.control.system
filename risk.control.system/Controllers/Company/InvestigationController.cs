@@ -1,16 +1,20 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
@@ -19,13 +23,15 @@ namespace risk.control.system.Controllers.Company
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     public class InvestigationController : Controller
     {
+        private readonly ILogger<InvestigationController> logger;
         private readonly ApplicationDbContext context;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService service;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
 
-        public InvestigationController(ApplicationDbContext context, INotyfService notifyService, IInvestigationService service, IEmpanelledAgencyService empanelledAgencyService)
+        public InvestigationController(ILogger<InvestigationController> logger, ApplicationDbContext context, INotyfService notifyService, IInvestigationService service, IEmpanelledAgencyService empanelledAgencyService)
         {
+            this.logger = logger;
             this.context = context;
             this.notifyService = notifyService;
             this.service = service;
@@ -46,6 +52,7 @@ namespace risk.control.system.Controllers.Company
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -91,6 +98,7 @@ namespace risk.control.system.Controllers.Company
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(New));
             }
@@ -117,6 +125,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Try Again");
                 return RedirectToAction(nameof(Create));
@@ -148,6 +157,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Try Again");
                 return RedirectToAction(nameof(CreatePolicy));
@@ -192,6 +202,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Try Again");
                 return RedirectToAction(nameof(CreatePolicy));
@@ -251,6 +262,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Try Again");
                 return RedirectToAction(nameof(CreatePolicy));
@@ -292,6 +304,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -356,6 +369,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -394,6 +408,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -426,6 +441,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -458,6 +474,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -482,6 +499,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -541,6 +559,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

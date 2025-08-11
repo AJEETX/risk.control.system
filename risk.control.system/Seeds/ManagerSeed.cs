@@ -38,7 +38,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = true,
                 Active = true,
                 PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
-                Addressline = "22 Golden Road",
+                Addressline = "139 Sector 44",
                 IsVendorAdmin = false,
                 ClientCompany = clientCompany,
                 Country = pinCode.Country,

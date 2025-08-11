@@ -1,10 +1,14 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Helpers;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
@@ -15,14 +19,17 @@ namespace risk.control.system.Controllers.Company
     {
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
+        private readonly ILogger<ManagerController> logger;
         private readonly IInvestigationService investigativeService;
 
         public ManagerController(INotyfService notifyService,
             IInvoiceService invoiceService,
+            ILogger<ManagerController> logger,
             IInvestigationService investigativeService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
+            this.logger = logger;
             this.investigativeService = investigativeService;
         }
         public IActionResult Index()
@@ -44,6 +51,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -74,6 +82,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -94,6 +103,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -123,6 +133,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -163,6 +174,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -205,6 +217,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -242,6 +255,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -272,6 +286,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

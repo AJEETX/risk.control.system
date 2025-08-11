@@ -41,7 +41,7 @@ namespace risk.control.system.Services
 
                 var username = Environment.GetEnvironmentVariable("SMS_User");
                 var password = Environment.GetEnvironmentVariable("SMS_Pwd");
-                var sim = Environment.GetEnvironmentVariable("SMS_Sin") ?? "1";
+                var sim = Environment.GetEnvironmentVariable("SMS_Sim") ?? "1";
                 var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
                 mobile = mobile.StartsWith("+") ? mobile : "+" + mobile;

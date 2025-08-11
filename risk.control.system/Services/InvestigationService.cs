@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
@@ -24,6 +25,7 @@ namespace risk.control.system.Services
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
+        Task<CaseTransactionModel> GetClaimDetailsAiReportSummary(CaseTransactionModel model);
         Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id);
         Task<CaseTransactionModel> GetPdfReport(long id);
     }
@@ -31,6 +33,7 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext context;
         private readonly INumberSequenceService numberService;
+        private readonly IChatSummarizer chatSummarizer;
         private readonly ICloneReportService cloneService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ITimelineService timelineService;
@@ -38,6 +41,7 @@ namespace risk.control.system.Services
 
         public InvestigationService(ApplicationDbContext context,
             INumberSequenceService numberService,
+            IChatSummarizer chatSummarizer,
             ICloneReportService cloneService,
             IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
@@ -45,6 +49,7 @@ namespace risk.control.system.Services
         {
             this.context = context;
             this.numberService = numberService;
+            this.chatSummarizer = chatSummarizer;
             this.cloneService = cloneService;
             this.webHostEnvironment = webHostEnvironment;
             this.timelineService = timelineService;
@@ -106,7 +111,6 @@ namespace risk.control.system.Services
             };
             return model;
         }
-
         public async Task<InvestigationTask> CreatePolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument)
         {
             try
@@ -117,8 +121,8 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
-                    claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                     claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
+                    claimsInvestigation.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
                 }
 
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
@@ -150,7 +154,6 @@ namespace risk.control.system.Services
                 return null!;
             }
         }
-
         public async Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument)
         {
             try
@@ -176,10 +179,13 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
-                    existingPolicy.PolicyDetail.DocumentImage = dataStream.ToArray();
                     claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
+                    existingPolicy.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
                 }
-
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
+                existingPolicy.ReportTemplate = reportTemplate;
+                existingPolicy.ReportTemplateId = reportTemplate.Id;
                 context.Investigations.Update(existingPolicy);
 
                 var saved = await context.SaveChangesAsync() > 0;
@@ -206,8 +212,8 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
-                    customerDetail.ProfilePicture = dataStream.ToArray();
                     customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
+                    customerDetail.ProfilePicture = dataStream.ToArray();
                 }
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
@@ -261,8 +267,8 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     await customerDocument.CopyToAsync(dataStream);
-                    customerDetail.ProfilePicture = dataStream.ToArray();
                     customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
+                    customerDetail.ProfilePicture = dataStream.ToArray();
                 }
                 else
                 {
@@ -368,7 +374,6 @@ namespace risk.control.system.Services
                 return null;
             }
         }
-
         public async Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument)
         {
             try
@@ -467,7 +472,10 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
+            var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claim.CustomerDetail.ContactNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+            claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
             var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
@@ -526,10 +534,15 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
+            var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claim.CustomerDetail.ContactNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+            claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+
             var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-
-            var timeTaken = DateTime.Now - claim.Created;
+            var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
+            var timeTaken = endTIme - claim.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
               $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
@@ -541,8 +554,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
-                  .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.MediaReports)
+              //.Include(r => r.LocationTemplate)
+              // .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -577,6 +590,12 @@ namespace risk.control.system.Services
             return model;
         }
 
+        public async Task<CaseTransactionModel> GetClaimDetailsAiReportSummary(CaseTransactionModel model)
+        {
+            var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+            model.ReportAiSummary = investigationSummary;
+            return model;
+        }
         public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
         {
             var claim = await context.Investigations
@@ -611,7 +630,10 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
+            var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claim.CustomerDetail.ContactNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+            claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
             var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
@@ -627,8 +649,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
-                  .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.MediaReports)
+              //.Include(r => r.LocationTemplate)
+              // .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -710,7 +732,10 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
+            var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claim.CustomerDetail.ContactNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+            claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
             var timeTaken = DateTime.Now - claim.Created;
@@ -725,8 +750,8 @@ namespace risk.control.system.Services
             var templates = await context.ReportTemplates
                .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.AgentIdReport)
-                  .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.MediaReports)
+              //.Include(r => r.LocationTemplate)
+              // .ThenInclude(l => l.MediaReports)
               .Include(r => r.LocationTemplate)
                   .ThenInclude(l => l.FaceIds)
               .Include(r => r.LocationTemplate)
@@ -1031,6 +1056,10 @@ namespace risk.control.system.Services
 
             var subStatus = new[]
             {
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
@@ -1216,7 +1245,6 @@ namespace risk.control.system.Services
             return response;
 
         }
-
         public async Task<object> GetManagerActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var companyUser = await context.ClientCompanyApplicationUser
@@ -1246,7 +1274,7 @@ namespace risk.control.system.Services
                 .ThenInclude(i => i.State)
                 .Include(i => i.BeneficiaryDetail)
                 .ThenInclude(i => i.Country)
-                .Where(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
+                .Where(a => !a.Deleted && a.ClientCompanyId == companyUser.ClientCompanyId &&
                     a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                     (a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
                     a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR ||
@@ -1406,7 +1434,7 @@ namespace risk.control.system.Services
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNewAssignedToManager = false;
 
-                await context.SaveChangesAsync(); // mark as viewed
+                await context.SaveChangesAsync(null, false); // mark as viewed
             }
             var response = new
             {
@@ -1418,7 +1446,6 @@ namespace risk.control.system.Services
 
             return response;
         }
-
         private static string GetManagerActiveTimePending(InvestigationTask a)
         {
             if (a.CreatorSla == 0)

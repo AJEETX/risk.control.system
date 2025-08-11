@@ -10,16 +10,6 @@ namespace risk.control.system.Models
         public long Id { get; set; }
         public long? ReportTemplateId { get; set; }
         public ReportTemplate? ReportTemplate { get; set; }
-        public long? DigitalIdReportId { get; set; }
-        public DigitalIdReport? DigitalIdReport { get; set; } = new();
-
-        public long? AgentIdReportId { get; set; }
-        public DigitalIdReport? AgentIdReport { get; set; } = new();
-
-        public long? PanIdReportId { get; set; } = new();
-        public DocumentIdReport? PanIdReport { get; set; } = new();
-        public long CaseQuestionnaireId { get; set; }
-        public CaseQuestionnaire CaseQuestionnaire { get; set; } = new();
 
         public string? AgentEmail { get; set; }
         public DateTime? AgentRemarksUpdated { get; set; }

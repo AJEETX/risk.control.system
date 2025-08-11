@@ -5,7 +5,7 @@ namespace risk.control.system.Services
 {
     public interface IUploadService
     {
-        Task<List<InvestigationTask>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model);
+        Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model);
     }
     public class UploadService : IUploadService
     {
@@ -19,15 +19,15 @@ namespace risk.control.system.Services
             this.uploadProgressService = uploadProgressService;
         }
 
-        public async Task<List<InvestigationTask>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model)
+        public async Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model)
         {
+            var uploadedClaims = new List<UploadResult>();
             try
             {
                 if (customData == null || customData.Count == 0)
                 {
                     return null; // Return 0 if no CSV data is found
                 }
-                var uploadedClaims = new List<InvestigationTask>();
                 var uploadedRecordsCount = 0;
                 var totalCount = customData.Count;
                 foreach (var row in customData)
@@ -47,7 +47,7 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return null;
+                return uploadedClaims;
             }
         }
     }

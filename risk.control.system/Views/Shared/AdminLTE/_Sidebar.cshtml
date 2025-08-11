@@ -65,7 +65,7 @@
                         <i class="nav-icon fas fa-shield-alt"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.ADMIN_SETTINGS
-                            <i class="right fas fa-angle-right"></i>
+                            <i class="right fas fa-angle-down"></i>
                         </p>
                     </a>
                 </li>
@@ -78,15 +78,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
-                            <i class="fas fa-handshake nav-icon"></i>
-                          <p>
-                              @Applicationsettings.INVESTIGATION_UNDERWRITINGS ^
-                        </p>
-                    </a>
-                </li>
-               
+                
                 <li class="nav-item">
                     <a is-active-page asp-controller="ClientCompany" asp-action="Companies" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Index")
                                                     @Url.MakeActiveClass("ClientCompany","Details")
@@ -124,7 +116,7 @@
                         <i class="nav-icon fas fa-user-cog"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.USER_ROLES
-                            <i class="right fas fa-angle-right"></i>
+                            <i class="right fas fa-angle-down"></i>
                         </p>
                     </a>
                 </li>
@@ -154,7 +146,7 @@
                         <i class="nav-icon fas fa-cog"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.COMPANY_SETTINGS
-                            <i class="right fas fa-angle-right"></i>
+                            <i class="right fas fa-angle-down"></i>
                         </p>
                     </a>
                 </li>
@@ -165,7 +157,7 @@
                             @Applicationsettings.LINE_OF_BUSINESS
                         </p>
                     </a>
-                </li> *@
+                </li> 
                 <li class="nav-item">
                     <a is-active-page asp-controller="InvestigationServiceTypes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationServiceTypes","")">
                         <i class="fas fa-tools nav-icon"></i>
@@ -190,6 +182,7 @@
                         </p>
                     </a>
                 </li>
+                *@
                 <li class="nav-item">
                     <a is-active-page asp-controller="CaseEnabler" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler","")">
                         <i class="fas fa-sun nav-icon"></i>
@@ -206,14 +199,14 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                @* <li class="nav-item">
                     <a is-active-page asp-controller="InvestigationCaseOutcome" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationCaseOutcome","")">
                         <i class="fas fa-clipboard-check nav-icon"></i>
                         <p>
                             @Applicationsettings.CASE_OUTCOME
                         </p>
                     </a>
-                </li>
+                </li> *@
                 <li class="nav-item">
                     <a is-active-page asp-controller="BeneficiaryRelation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("BeneficiaryRelation","")">
                         <i class="fas fa-user-tie nav-icon"></i>
@@ -230,7 +223,7 @@
                         <i class="nav-icon fas fa-wrench"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.GENERAL_SETUP
-                            <i class="right fas fa-angle-right"></i>
+                            <i class="right fas fa-angle-down"></i>
                         </p>
                     </a>
                 </li>
@@ -275,14 +268,14 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                @* <li class="nav-item">
                     <a is-active-page asp-controller="IpAddress" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("IpAddress","")">
                         <i class="fas fa-sitemap nav-icon"></i>
                         <p>
                             IP Tracking
                         </p>
                     </a>
-                </li>
+                </li> *@
                 <li class="nav-item">
                     <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
                         <i class="nav-icon fa fa-align-center"></i>

@@ -38,11 +38,19 @@
         },
         {
             className: 'max-width-column-name', // Apply the CSS class,
-            targets: 6                      // Index of the column to style
-        },
+            targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 6                      // Index of the column to style
+            },
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 8                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -82,7 +90,7 @@
                 "data": "agent",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span class="badge badge-light" title="' + row.agent + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.agent + '" data-toggle="tooltip">' + data + '</span>';
                 }
                 ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },

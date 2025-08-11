@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
 
@@ -39,7 +40,7 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.Id == selectedcase);
-            var claimCase = _context.BeneficiaryDetail
+            var beneficiary = _context.BeneficiaryDetail
                .Include(c => c.PinCode)
                .Include(c => c.BeneficiaryRelation)
                .Include(c => c.District)
@@ -48,7 +49,7 @@ namespace risk.control.system.Services
                .FirstOrDefault(c => c.InvestigationTaskId == selectedcase);
             return new CaseInvestigationVendorsModel
             {
-                Location = claimCase,
+                Location = beneficiary,
                 //Vendors = vendorWithCaseCounts, 
                 ClaimsInvestigation = claimsInvestigation
             };

@@ -1,12 +1,17 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using SmartBreadcrumbs.Attributes;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -220,20 +225,17 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, PinCode pinCode)
         {
-            if (id != pinCode.PinCodeId)
-            {
-                notifyService.Error("pincode not found!");
-                return NotFound();
-            }
             try
             {
-                pinCode.Updated = DateTime.Now;
-                pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
-                pinCode.CountryId = pinCode.SelectedCountryId;
-                pinCode.StateId = pinCode.SelectedStateId;
-                pinCode.DistrictId = pinCode.SelectedDistrictId;
-
-                _context.Update(pinCode);
+                var existingPincode = await _context.PinCode.FindAsync(id);
+                existingPincode.Code = pinCode.Code;
+                existingPincode.Name = pinCode.Name;
+                existingPincode.Updated = DateTime.Now;
+                existingPincode.UpdatedBy = HttpContext.User?.Identity?.Name;
+                existingPincode.CountryId = pinCode.SelectedCountryId;
+                existingPincode.StateId = pinCode.SelectedStateId;
+                existingPincode.DistrictId = pinCode.SelectedDistrictId;
+                _context.Update(existingPincode);
                 if (await _context.SaveChangesAsync() > 0)
                 {
                     notifyService.Success("pincode edited successfully!");

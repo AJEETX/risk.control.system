@@ -1,9 +1,13 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Helpers;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Agency
@@ -14,11 +18,13 @@ namespace risk.control.system.Controllers.Agency
     {
         private readonly INotyfService notifyService;
         private readonly ICaseVendorService vendorService;
+        private readonly ILogger<AgentController> logger;
 
-        public AgentController(INotyfService notifyService, ICaseVendorService vendorService)
+        public AgentController(INotyfService notifyService, ICaseVendorService vendorService, ILogger<AgentController> logger)
         {
             this.notifyService = notifyService;
             this.vendorService = vendorService;
+            this.logger = logger;
         }
         public IActionResult Index()
         {
@@ -62,7 +68,8 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex.StackTrace);
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -82,7 +89,7 @@ namespace risk.control.system.Controllers.Agency
         [Breadcrumb(title: " Detail", FromAction = "Submitted")]
         public async Task<IActionResult> SubmittedDetail(long id)
         {
-            if (id == null)
+            if (id == 0)
             {
                 notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -95,13 +102,14 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorService.GetInvestigateReport(currentUserEmail, id);
+                var model = await vendorService.GetInvestigatedForAgent(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

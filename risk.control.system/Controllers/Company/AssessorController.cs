@@ -1,12 +1,15 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Helpers;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
-//using QuestPDF.Fluent;
 namespace risk.control.system.Controllers.Company
 {
     [Breadcrumb(" Cases")]
@@ -17,18 +20,21 @@ namespace risk.control.system.Controllers.Company
         private readonly ICaseVendorService caseVendorService;
         private readonly IInvoiceService invoiceService;
         private readonly IInvestigationService investigationService;
+        private readonly ILogger<AssessorController> logger;
         private readonly IChatSummarizer chatSummarizer;
 
         public AssessorController(INotyfService notifyService,
             ICaseVendorService caseVendorService,
             IInvoiceService invoiceService,
             IInvestigationService investigationService,
+            ILogger<AssessorController> logger,
             IChatSummarizer chatSummarizer)
         {
             this.notifyService = notifyService;
             this.caseVendorService = caseVendorService;
             this.invoiceService = invoiceService;
             this.investigationService = investigationService;
+            this.logger = logger;
             this.chatSummarizer = chatSummarizer;
         }
         public IActionResult Index()
@@ -52,6 +58,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -87,6 +94,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -121,6 +129,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -143,6 +152,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -172,6 +182,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -201,17 +212,16 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
-                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
+                if (model != null && model.ReportAiSummary == null && model.ClaimsInvestigation.AiEnabled)
                 {
-                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
-                    model.ReportAiSummary = investigationSummary;
+                    model = await investigationService.GetClaimDetailsAiReportSummary(model);
                 }
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-
                 return View(model);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -262,6 +272,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -298,6 +309,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -328,6 +340,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

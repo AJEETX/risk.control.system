@@ -1,4 +1,4 @@
-﻿@model CaseInvestigationVendorsModel
+﻿@* @model CaseInvestigationVendorsModel
 
 @{
     var imageCapturedTime = @Model.InvestigationReport?.AgentIdReport?.IdImageLongLatTime != null ? @Model.InvestigationReport?.AgentIdReport?.IdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
@@ -202,3 +202,4 @@
         </div>
     </div>
 }
+ *@

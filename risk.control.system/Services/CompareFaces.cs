@@ -1,13 +1,13 @@
-﻿using Amazon.Rekognition.Model;
-using Amazon.Rekognition;
-using Amazon.Textract.Model;
+﻿using Amazon.Rekognition;
+using Amazon.Rekognition.Model;
 using Amazon.Textract;
+using Amazon.Textract.Model;
 
 namespace risk.control.system.Services
 {
     public interface ICompareFaces
     {
-        Task<(bool, float)> Do(byte[] data, byte[] tdata);
+        Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> DoFaceMatch(byte[] data, byte[] tdata);
     }
     public class CompareFaces : ICompareFaces
     {
@@ -19,7 +19,7 @@ namespace risk.control.system.Services
             this.rekognitionClient = rekognitionClient;
             this.textractClient = textractClient;
         }
-        public async Task<(bool, float)> Do(byte[] data, byte[] tdata)
+        public async Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> DoFaceMatch(byte[] data, byte[] tdata)
         {
             float similarityThreshold = 70F;
 
@@ -34,7 +34,7 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine($"Failed to load source image:");
-                return (false, 0);
+                return (false, 0, null);
             }
 
             Image imageTarget = new();
@@ -48,7 +48,7 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine($"Failed to load source image:");
-                return (false, 0);
+                return (false, 0, null);
             }
 
             var compareFacesRequest = new CompareFacesRequest
@@ -61,8 +61,9 @@ namespace risk.control.system.Services
             // Call operation
             var compareFacesResponse = await rekognitionClient.CompareFacesAsync(compareFacesRequest);
 
-            var result = compareFacesResponse.FaceMatches.Count == 1 && compareFacesResponse.UnmatchedFaces.Count == 0 && compareFacesResponse.FaceMatches[0].Similarity >= similarityThreshold;
-
+            var result = compareFacesResponse.FaceMatches.Count >= 1 && compareFacesResponse.UnmatchedFaces.Count == 0 && compareFacesResponse.FaceMatches[0].Similarity >= similarityThreshold;
+            var faceBox = result ? compareFacesResponse.FaceMatches[0].Face.BoundingBox : compareFacesResponse.UnmatchedFaces[0].BoundingBox;
+            var similarity = result ? compareFacesResponse.FaceMatches[0].Similarity.GetValueOrDefault() : 0;
             //// Display results
             //compareFacesResponse.FaceMatches.ForEach(match =>
             //{
@@ -72,7 +73,7 @@ namespace risk.control.system.Services
             //});
 
             //Console.WriteLine($"Found {compareFacesResponse.UnmatchedFaces.Count} face(s) that did not match.");
-            return (result, compareFacesResponse.FaceMatches[0].Similarity.GetValueOrDefault());
+            return (result, similarity, faceBox);
         }
 
         public async Task DetectSampleAsync(byte[] bytes)

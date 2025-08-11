@@ -33,6 +33,9 @@ namespace risk.control.system.Controllers
         private readonly IInvestigationService service;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ILogger<VendorsController> logger;
+        private string portal_base_url = string.Empty;
 
         public VendorsController(
             ApplicationDbContext context,
@@ -43,6 +46,8 @@ namespace risk.control.system.Controllers
             ISmsService SmsService,
             IInvestigationService service,
             IFeatureManager featureManager,
+             IHttpContextAccessor httpContextAccessor,
+            ILogger<VendorsController> logger,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -53,7 +58,12 @@ namespace risk.control.system.Controllers
             smsService = SmsService;
             this.service = service;
             this.featureManager = featureManager;
+            this.httpContextAccessor = httpContextAccessor;
+            this.logger = logger;
             this.webHostEnvironment = webHostEnvironment;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         // GET: Vendors
@@ -73,7 +83,6 @@ namespace risk.control.system.Controllers
         {
             return View();
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -119,6 +128,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -170,6 +180,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -287,6 +298,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -426,14 +438,14 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
-                            notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
+                            notifyService.Custom($"User created.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
                     {
 
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
 
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
 
@@ -445,22 +457,18 @@ namespace risk.control.system.Controllers
                             System.Net.WebClient client = new System.Net.WebClient();
                             string tinyUrl = client.DownloadString(address);
 
-                            var message = $"Dear {user.FirstName}";
-                            message += "                                                                                ";
-                            message += $"Click on link below to install the mobile app";
-                            message += "                                                                                ";
-                            message += $"{tinyUrl}";
-                            message += "                                                                                ";
-                            message += $"Thanks";
-                            message += "                                                                                ";
-                            message += $"https://icheckify.co.in";
+                            var message = $"Dear {user.FirstName}\n";
+                            message += $"Click on link below to install the mobile app\n\n";
+                            message += $"{tinyUrl}\n\n";
+                            message += $"Thanks\n\n";
+                            message += $"{portal_base_url}";
 
                             await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
                             notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                         }
                         else
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
                         }
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     }
@@ -472,6 +480,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -512,6 +521,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -613,7 +623,7 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
@@ -633,21 +643,17 @@ namespace risk.control.system.Controllers
                                 System.Net.WebClient client = new System.Net.WebClient();
                                 string tinyUrl = client.DownloadString(address);
 
-                                var message = $"Dear {user.FirstName}";
-                                message += "                                                                                ";
-                                message += $"Click on link below to install the mobile app";
-                                message += "                                                                                ";
-                                message += $"{tinyUrl}";
-                                message += "                                                                                ";
-                                message += $"Thanks";
-                                message += "                                                                                ";
-                                message += $"https://icheckify.co.in";
+                                var message = $"Dear {user.FirstName}\n";
+                                message += $"Click on link below to install the mobile app\n\n";
+                                message += $"{tinyUrl}\n\n";
+                                message += $"Thanks\n\n";
+                                message += $"{portal_base_url}";
                                 await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "orange", "fas fa-user-check");
                             }
                             else
                             {
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited.\n Email : " + user.Email + "\n" + portal_base_url);
                                 notifyService.Custom($"User edited.", 3, "orange", "fas fa-user-check");
                             }
                         }
@@ -669,6 +675,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
             }
             notifyService.Error("OOPS !!!..Contact Admin");
@@ -714,6 +721,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -750,6 +758,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -830,15 +839,10 @@ namespace risk.control.system.Controllers
             System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
             System.Net.WebClient client = new System.Net.WebClient();
             string tinyUrl = client.DownloadString(address);
-            var message = $"Dear {user.FirstName}";
-            message += "                                                                                ";
-            message += $"Please click on the link below to install the mobile";
-            message += "                                                                                ";
-            message += $"{tinyUrl}";
-            message += "                                                                                ";
-            message += $"Thanks";
-            message += "                                                                                ";
-            message += $"https://icheckify.co.in";
+            var message = $"Dear {user.FirstName}\n";
+            message += $"Please click on the link below to install the mobile\n";
+            message += $"{tinyUrl}\n";
+            message += $"{portal_base_url}";
             if (onboardAgent)
             {
                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
@@ -958,7 +962,7 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
+                    await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
                 }
 
                 notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
@@ -966,6 +970,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -989,7 +994,9 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var isSuperAdmin = await _context.ApplicationUser.AnyAsync(u => u.Email.ToLower() == currentUserEmail.ToLower() && u.IsSuperAdmin);
+                vendor.SelectedByCompany = isSuperAdmin;
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
                 var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
                 var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
@@ -1000,6 +1007,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1068,12 +1076,13 @@ namespace risk.control.system.Controllers
 
                 _context.Vendor.Update(vendor);
 
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. Domain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \nDomain : " + vendor.Email + "\n" + portal_base_url);
 
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1135,6 +1144,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -1183,6 +1193,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

@@ -14,17 +14,17 @@
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
                         <tr>
                             <th>
-                                @Html.DisplayNameFor(model => model.Name)
+                                Name
                             </th>
                             <th>
-                                @Html.DisplayNameFor(model => model.Code)
+                                Code
                             </th>
                             <th>Date Updated</th>
-                            <th>Edit/ Delete</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -62,3 +62,8 @@
         </div>
     </form>
 </section>
+
+@section Scripts {
+    <script src="~/js/company-admin/beneficiary.js">
+    </script>
+}

@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using System.Data;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Data;
-using System.Globalization;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Company
@@ -20,19 +21,13 @@ namespace risk.control.system.Controllers.Api.Company
     [ApiController]
     public class CompanyController : ControllerBase
     {
-        private static CultureInfo hindi = new CultureInfo("hi-IN");
-        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
-        private readonly string noUserImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
         private readonly IUserService userService;
-        private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
-        public CompanyController(ApplicationDbContext context, IUserService userService, UserManager<ClientCompanyApplicationUser> userManager)
+        public CompanyController(ApplicationDbContext context, IUserService userService)
         {
-            this.userManager = userManager;
             _context = context;
             this.userService = userService;
-            noUserImagefilePath = "/img/no-user.png";
         }
 
         [HttpGet("AllCompanies")]
@@ -67,7 +62,7 @@ namespace risk.control.system.Controllers.Api.Company
                     LastModified = u.Updated
                 })?.ToArray();
             companies.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(result);
         }
 
@@ -170,7 +165,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             // Update vendors in the context
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
 
             return Ok(result);
         }
@@ -232,9 +227,7 @@ namespace risk.control.system.Controllers.Api.Company
                 {
                     Id = u.VendorId,
                     Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
-                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ?
-                        $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>" :
-                        u.Email,
+                    Domain = u.Email,
                     Name = u.Name,
                     Code = u.Code,
                     Phone = $"(+{u.Country.ISDCode}) {u.PhoneNumber}",
@@ -257,7 +250,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             // Update vendors in the context
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
 
             return Ok(result);
         }
@@ -334,7 +327,7 @@ namespace risk.control.system.Controllers.Api.Company
                 {
                     Id = u.VendorId,
                     Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
-                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
+                    Domain = u.Email,
                     Name = u.Name,
                     Code = u.Code,
                     Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
@@ -356,7 +349,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Deletable = u.CreatedUser == userEmail
                 })?.ToArray();
             availableVendors?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(result);
         }
 
@@ -385,7 +378,7 @@ namespace risk.control.system.Controllers.Api.Company
             var serviceResponse = new List<AgencyServiceResponse>();
             foreach (var service in services)
             {
-                var IsAllDistrict = (service.DistrictId == null);
+                bool isAllDistrict = service.SelectedDistrictIds?.Contains(-1) == true; // how to set this value in case all districts selected
                 string pincodes = $"{ALL_PINCODE}";
                 string rawPincodes = $"{ALL_PINCODE}";
                 serviceResponse.Add(new AgencyServiceResponse
@@ -394,7 +387,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Id = service.VendorInvestigationServiceTypeId,
                     CaseType = service.InsuranceType.GetEnumDisplayName(),
                     ServiceType = service.InvestigationServiceType.Name,
-                    District = IsAllDistrict ? ALL_DISTRICT : service.District.Name,
+                    District = isAllDistrict ? ALL_DISTRICT : string.Join(", ", _context.District.Where(d => service.SelectedDistrictIds.Contains(d.DistrictId)).Select(s => s.Name)),
                     State = service.State.Code,
                     Country = service.Country.Code,
                     Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
@@ -409,7 +402,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
 
             vendor.VendorInvestigationServiceTypes?.ToList().ForEach(i => i.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(serviceResponse);
         }
 
@@ -679,19 +672,20 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetDistrictNameForAgency")]
         public IActionResult GetDistrictName(long id, long stateId, long countryId, long lob, long serviceId, long vendorId)
         {
-            if (id == -1)
-            {
-                var result = new
-                {
-                    DistrictId = -1, // Special value for "ALL DISTRICTS"
-                    DistrictName = Applicationsettings.ALL_DISTRICT
-                };
-                return Ok(result);
-            }
-            var pincode = _context.District.Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
-                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+            var districts = _context.District.Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
+                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).ToList(); // Format for jQuery UI Autocomplete
 
-            return Ok(pincode);
+            var result = new List<object>
+            {
+                new {
+                    DistrictId = -1,
+                    DistrictName = Applicationsettings.ALL_DISTRICT
+                }
+            };
+
+            result.AddRange(districts);
+
+            return Ok(districts);
         }
 
         [HttpGet("GetPincodeName")]

@@ -1,5 +1,6 @@
-﻿$(document).ready(function () {
+﻿var ALL_DISTRICTS = "All Districts";
 
+$(document).ready(function () {
     function disableAllElements() {
         $('button, input[type="submit"], a').prop('disabled', true);
         $('a').addClass('disabled-anchor').on('click', function (e) {
@@ -89,8 +90,10 @@
         },
         order: [[10, 'desc'], [11, 'desc']],
         columnDefs: [
-            { className: 'max-width-column-name', targets: 1 },
-            { className: 'max-width-column', targets: 7 },
+            { className: 'max-width-column-number', targets: 1 },
+            { className: 'max-width-column-number', targets: 2 },
+            { className: 'max-width-column-picodes', targets: 4 },
+            { className: 'max-width-column-number', targets: 7 },
             { className: 'max-width-column-name', targets: 8 }
         ],
         fixedHeader: true,
@@ -116,7 +119,15 @@
             },
             {
                 data: "district",
-                render: (data, type, row) => `<span title="${row.district}" data-toggle="tooltip">${data}</span>`
+                mRender: (data, type, row) => {
+                    const fullText = row.district || '';
+                    if (fullText == ALL_DISTRICTS) {
+                        return `<span title="${fullText}" data-toggle="tooltip"> ${fullText} </span>`;
+                    } else {
+                        const shortText = fullText.length > 50 ? fullText.substring(0, 50) + '...' : fullText;
+                        return `<span title="${fullText}" data-toggle="tooltip"><small> ${shortText} </small></span>`;
+                    }
+                }
             },
             {
                 data: "state",
@@ -168,10 +179,9 @@
             const rowNode = this.node();
 
             // Convert to lowercase for case-insensitive comparison
-            const district = data.district ? data.district.toLowerCase() : '';
-            const pincodes = data.pincodes ? data.pincodes.toLowerCase() : '';
+            const district = data.district ? data.district : '';
 
-            if (district === 'all districts') {
+            if (district === ALL_DISTRICTS) {
                 $(rowNode).find('td:nth-child(4)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(5)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(6)').addClass('text-light-green'); // Column index starts from 1

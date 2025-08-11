@@ -24,7 +24,7 @@
 		<tbody>
 			@foreach (var doc in location.MediaReports.Where(d => d.Selected))
 			{
-				var accept = "audio/mpeg,audio/wav";
+					var accept = "audio/mpeg, audio/wav, audio/aac, audio / vnd.dlna.adts";
 				if(doc.MediaType == MediaType.VIDEO)
 				{
 					accept = "video/mp4,video/webm";
@@ -41,35 +41,20 @@
 						@if (doc.ValidationExecuted)
 						{
 							<div id="doc-img-@doc.Id">
-								@if (doc.IdImage != null)
-								{
-									if (doc.MediaType == MediaType.VIDEO)
+									@if (doc.MediaType == MediaType.VIDEO)
 									{
-										<video class="media-view" controls>
-											<source src="data:video/@doc.MediaExtension;base64,@Convert.ToBase64String(doc.IdImage)" type="video/@doc.MediaExtension">
-											Your browser does not support the video tag.
-										</video>
+									<video class="media-view" controls>
+										<source src="@doc.FilePath" type="video/@doc.MediaExtension">
+										Your browser does not support the video tag.
+									</video>
 									}
 									else if (doc.MediaType == MediaType.AUDIO)
 									{
-										<audio controls>
-											<source src="data:audio/@doc.MediaExtension;base64,@Convert.ToBase64String(doc.IdImage)" type="audio/@doc.MediaExtension" />
-										</audio>
+									<audio controls>
+											<source src="@doc.FilePath" type="audio/@doc.MediaExtension" />
+									</audio>
 									}
-								}
-								else
-								{
-									if (doc.MediaType == MediaType.VIDEO)
-									{
-										<img src="~/img/no-video.png" class="thumbnail profile-image doc-profile-image" />
-									}
-									else{
-										<img src="~/img/no-audio.png" class="thumbnail profile-image doc-profile-image" />
-									}
-
-								}
 							</div>
-
 						}
 						else
 						{
@@ -84,7 +69,7 @@
 
 					</td>
 					<td>
-						@if (doc.ValidationExecuted)
+						@if (doc.ValidationExecuted && doc.IdImageLocationUrl != null)
 						{
 							<img id="face-img-@doc.Id"
 								 src="@string.Format(@doc.IdImageLocationUrl, "300","300")"

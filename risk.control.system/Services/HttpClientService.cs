@@ -314,6 +314,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return null!;
             }
         }

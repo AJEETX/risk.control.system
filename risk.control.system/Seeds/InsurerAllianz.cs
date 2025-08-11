@@ -11,7 +11,6 @@ namespace risk.control.system.Seeds
 {
     public class InsurerAllianz
     {
-        private const string vendorMapSize = "800x800";
         private const string companyMapSize = "800x800";
         public static async Task<ClientCompany> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
                     ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, SeedInput input)
@@ -20,9 +19,9 @@ namespace risk.control.system.Seeds
 
             var globalSettings = context.GlobalSettings.FirstOrDefault();
 
-            var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
+            var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY.ToLower() && s.Code == input.PINCODE);
 
-            var companyAddressline = "34 Lasiandra Avenue ";
+            var companyAddressline = input.ADDRESSLINE;
             var companyAddress = companyAddressline + ", " + companyPinCode.District.Name + ", " + companyPinCode.State.Name + ", " + companyPinCode.Country.Code;
             var companyAddressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
             var companyAddressCoordinatesLatLong = companyAddressCoordinates.Latitude + "," + companyAddressCoordinates.Longitude;
@@ -42,10 +41,10 @@ namespace risk.control.system.Seeds
             {
                 Name = input.NAME,
                 Addressline = companyAddressline,
-                Branch = "FOREST HILL CHASE",
+                Branch = input.BRANCH,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
-                BankName = "NAB",
+                BankName = input.BANK,
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
                 PinCode = companyPinCode,
@@ -92,8 +91,8 @@ namespace risk.control.system.Seeds
 
             var creator = await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, insurerCompany.Entity);
 
-            var claimTemplate = ReportTemplateSeed.QuestionsCLAIM(context, insurer);
-            var underwriting = ReportTemplateSeed.QuestionsUNDERWRITING(context, insurer);
+            var claimTemplate = ReportTemplateSeed.CLAIM(context, insurer);
+            var underwriting = ReportTemplateSeed.UNDERWRITING(context, insurer);
 
             await context.SaveChangesAsync(null, false);
 

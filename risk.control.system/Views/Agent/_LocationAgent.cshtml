@@ -55,7 +55,7 @@
 
 			</td>
 			<td>
-				@if (agent.ValidationExecuted)
+				@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
 				{
 					<img src="@string.Format(@agent.IdImageLocationUrl, "400","400")"
 						 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
@@ -93,7 +93,7 @@
 				{
 					<i class='fa fa-times i-grey' aria-hidden='true'></i>
 				}
-
+				@agent.Similarity
 			</td>
 			<td>
 				<input type="file" class="form-control remarks document-image-input face-upload" data-faceid="@agent.Id" accept="image/*"

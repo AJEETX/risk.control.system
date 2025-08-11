@@ -1,15 +1,20 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Net;
+using System.Web;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Hangfire;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Net;
-using System.Web;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Agency
@@ -22,6 +27,7 @@ namespace risk.control.system.Controllers.Agency
         private readonly IVendorInvestigationService vendorInvestigationService;
         private readonly INotyfService notifyService;
         private readonly IMailService mailboxService;
+        private readonly ILogger<CaseVendorPostController> logger;
         private readonly ApplicationDbContext _context;
         private readonly IBackgroundJobClient backgroundJobClient;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -33,12 +39,14 @@ namespace risk.control.system.Controllers.Agency
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
             IMailService mailboxService,
+            ILogger<CaseVendorPostController> logger,
             ApplicationDbContext context)
         {
             this.processCaseService = processCaseService;
             this.vendorInvestigationService = vendorInvestigationService;
             this.notifyService = notifyService;
             this.mailboxService = mailboxService;
+            this.logger = logger;
             this.backgroundJobClient = backgroundJobClient;
             this.httpContextAccessor = httpContextAccessor;
             _context = context;
@@ -88,6 +96,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -127,6 +136,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
@@ -155,8 +165,6 @@ namespace risk.control.system.Controllers.Agency
             }
             return "N/A";
         }
-
-        // Usage
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -201,6 +209,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), new { selectedcase = claimId });
@@ -241,6 +250,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
@@ -273,7 +283,7 @@ namespace risk.control.system.Controllers.Agency
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId, baseUrl));
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlFromAgent(userEmail, claimId, agency.VendorId, baseUrl));
 
                 notifyService.Custom($"Case #{policyNumber} withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
 
@@ -281,6 +291,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
@@ -331,6 +342,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");

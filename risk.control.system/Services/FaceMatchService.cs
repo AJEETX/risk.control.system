@@ -19,8 +19,8 @@ namespace risk.control.system.Services
             string ImageData = string.Empty;
             try
             {
-                var matched = await compareFaces.Do(registeredImage, face2Verify);
-                return matched.Item1 ? (matched.Item2.ToString(), CompressImage.ProcessCompress(face2Verify, onlyExtension), matched.Item2) : ("0", CompressImage.ProcessCompress(face2Verify, onlyExtension), 0);
+                var matched = await compareFaces.DoFaceMatch(registeredImage, face2Verify);
+                return matched.Item1 ? (matched.Item2.ToString(), CompressImage.ProcessCompress(face2Verify, onlyExtension, 10, 99, matched.Item3), matched.Item2) : ("0", CompressImage.ProcessCompress(face2Verify, onlyExtension, 10, 99, matched.Item3), 0);
             }
             catch (Exception)
             {

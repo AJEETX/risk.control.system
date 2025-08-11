@@ -1,13 +1,17 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Data;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Data;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -19,18 +23,21 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly IClaimsAgentService agentService;
         private readonly IAgentIdService agentIdService;
+        private readonly ILogger<UploadsController> logger;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public UploadsController(ApplicationDbContext context,
             INotyfService notifyService,
             IClaimsAgentService agentService,
             IAgentIdService agentIdService,
+            ILogger<UploadsController> logger,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.notifyService = notifyService;
             this.agentService = agentService;
             this.agentIdService = agentIdService;
+            this.logger = logger;
             this.webHostEnvironment = webHostEnvironment;
         }
 
@@ -54,12 +61,35 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+        public async Task<IActionResult> DownloadErrorLog(long id)
+        {
+            try
+            {
+                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+                if (file == null)
+                {
+                    notifyService.Error("OOPs !!!.. Download error");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var fileBytes = file.ErrorByteData;
+                var fileName = $"{file.Name}_UploadError_{id}.csv"; // Or use a timestamp
 
+                return File(fileBytes, "text/csv", fileName);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.StackTrace);
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
         [HttpPost]
         public IActionResult DeleteLog(int id)
         {
@@ -83,12 +113,12 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 return BadRequest(new { success = false, message = "Error deleting file: " + ex.Message });
             }
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> UploadFaceImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image, bool isAgent = false)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
@@ -111,7 +141,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> UploadDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
@@ -141,7 +170,7 @@ namespace risk.control.system.Controllers
             var currentUserEmail = HttpContext.User.Identity.Name;
             var extension = Path.GetExtension(Image.FileName).ToLower();
 
-            var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav" };
+            var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
             if (!supportedExtensions.Contains(extension))
                 return Json(new { success = false, message = "Unsupported media format." });
             var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
@@ -162,7 +191,6 @@ namespace risk.control.system.Controllers
                 extension = extension.TrimStart('.'),
                 fileData = Convert.ToBase64String(response.Image)
             });
-
         }
 
         [HttpGet]

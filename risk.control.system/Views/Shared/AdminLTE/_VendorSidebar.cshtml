@@ -7,9 +7,9 @@
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
         <div>
-            @if (Model?.DocumentUrl is not null)
+            @if (Model?.DocumentImage is not null)
             {
-                <img src="@Model.DocumentUrl" alt="logo" class="brand-image elevation-2">
+                <img src="data:image/*;base64,@(Convert.ToBase64String(Model.DocumentImage))" alt="logo" class="brand-image elevation-2">
             }
             else
             {
@@ -19,7 +19,8 @@
         <div>
             @if (Model?.Name is not null)
             {
-                <span class="brand-text font-weight-bold">@Model.Name </span>
+                var displayName = Model.Name.Length > 15 ? Model.Name.Substring(0, 15) + "..." : Model.Name;
+                <span class="brand-text font-weight-bold" title="@Model.Name">@displayName</span>
             }
             else
             {

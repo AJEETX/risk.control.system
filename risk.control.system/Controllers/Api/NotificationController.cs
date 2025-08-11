@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Services;
-using System.Web;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -14,13 +13,11 @@ namespace risk.control.system.Controllers.Api
         private readonly int maxCountReached = 10;
         private readonly INotificationService service;
         private readonly ISmsService smsService;
-        private readonly IHttpClientService httpClientService;
 
-        public NotificationController(INotificationService service, ISmsService smsService, IHttpClientService httpClientService)
+        public NotificationController(INotificationService service, ISmsService smsService)
         {
             this.service = service;
             this.smsService = smsService;
-            this.httpClientService = httpClientService;
         }
         [HttpPost("ClearAll")]
         public async Task<IActionResult> ClearAllNotifications()
@@ -45,47 +42,47 @@ namespace risk.control.system.Controllers.Api
             var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, n.Status, CreatedAt = GetTimeAgo(n.CreatedAt), user = n.NotifierUserEmail });
             return Ok(new { Data = activeNotifications?.Take(maxCountReached).ToList(), total = notifications.Count, MaxCountReached = notifications.Count > maxCountReached, MaxCount = maxCountReached });
         }
-        [AllowAnonymous]
-        [HttpGet("GetClientIp")]
-        public async Task<ActionResult> GetClientIp(CancellationToken ct, string url = "", string latlong = "")
-        {
-            try
-            {
-                var decodedUrl = HttpUtility.UrlDecode(url);
-                var user = HttpContext.User.Identity.Name;
-                var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-                var ipAddressWithoutPort = ipAddress?.Split(':')[0];
-                var isWhiteListed = service.IsWhiteListIpAddress(HttpContext.Connection.RemoteIpAddress);
+        //[AllowAnonymous]
+        //[HttpGet("GetClientIp")]
+        //public async Task<ActionResult> GetClientIp(CancellationToken ct, string url = "", string latlong = "")
+        //{
+        //    try
+        //    {
+        //        var decodedUrl = HttpUtility.UrlDecode(url);
+        //        var user = HttpContext.User.Identity.Name;
+        //        var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+        //        var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+        //        var ipAddressWithoutPort = ipAddress?.Split(':')[0];
+        //        var isWhiteListed = service.IsWhiteListIpAddress(HttpContext.Connection.RemoteIpAddress);
 
-                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl, user, isAuthenticated, latlong);
-                if (ipApiResponse == null)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Error getting IP address");
-                }
-                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=15&size=600x250&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                ipApiResponse.MapUrl = mapUrl;
-                var response = new
-                {
-                    IpAddress = string.IsNullOrWhiteSpace(ipAddressWithoutPort) ? ipApiResponse?.query : ipAddressWithoutPort,
-                    Country = ipApiResponse.country,
-                    Region = ipApiResponse?.regionName,
-                    City = ipApiResponse?.city,
-                    District = ipApiResponse?.district ?? ipApiResponse?.city,
-                    PostCode = ipApiResponse?.zip,
-                    Isp = ipApiResponse?.isp,
-                    Longitude = ipApiResponse.lon,
-                    Latitude = ipApiResponse.lat,
-                    mapUrl = ipApiResponse.MapUrl,
-                    whiteListed = false,
-                };
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+        //        var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl, user, isAuthenticated, latlong);
+        //        if (ipApiResponse == null)
+        //        {
+        //            return StatusCode(StatusCodes.Status500InternalServerError, "Error getting IP address");
+        //        }
+        //        var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=15&size=600x250&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+        //        ipApiResponse.MapUrl = mapUrl;
+        //        var response = new
+        //        {
+        //            IpAddress = string.IsNullOrWhiteSpace(ipAddressWithoutPort) ? ipApiResponse?.query : ipAddressWithoutPort,
+        //            Country = ipApiResponse.country,
+        //            Region = ipApiResponse?.regionName,
+        //            City = ipApiResponse?.city,
+        //            District = ipApiResponse?.district ?? ipApiResponse?.city,
+        //            PostCode = ipApiResponse?.zip,
+        //            Isp = ipApiResponse?.isp,
+        //            Longitude = ipApiResponse.lon,
+        //            Latitude = ipApiResponse.lat,
+        //            mapUrl = ipApiResponse.MapUrl,
+        //            whiteListed = false,
+        //        };
+        //        return Ok(response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        //    }
+        //}
 
         //[HttpPost("schedule")]
         //public async Task<IActionResult> Schedule(ClientSchedulingMessage message)
@@ -116,7 +113,7 @@ namespace risk.control.system.Controllers.Api
         {
             string logo = "https://icheckify-demo.azurewebsites.net/img/iCheckifyLogo.png";
             string? attachments = $"<a href='{logo}'>team</a>";
-            var finalMessage = $"{message} Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")} {logo}";
+            var finalMessage = $"{message}\n\n Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")}\n\n {logo}";
             await smsService.DoSendSmsAsync("+" + mobile, finalMessage);
             return Ok();
         }

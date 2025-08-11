@@ -1,4 +1,8 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Text;
+using System.Web;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -9,36 +13,36 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Text;
-using System.Web;
 
 namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<Models.ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly SignInManager<Models.ApplicationUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration config;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
         private readonly IAccountService accountService;
-        private readonly ILogger _logger;
+        private readonly ILogger<AccountController> _logger;
         private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
+        private readonly string BaseUrl;
 
         public AccountController(
-            UserManager<Models.ApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
-            SignInManager<Models.ApplicationUser> signInManager,
+            SignInManager<ApplicationUser> signInManager,
             IConfiguration config,
              IHttpContextAccessor httpContextAccessor,
             INotificationService service,
@@ -61,6 +65,9 @@ namespace risk.control.system.Controllers
             this.featureManager = featureManager;
             this.notifyService = notifyService;
             smsService = SmsService;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [Authorize]
@@ -96,7 +103,7 @@ namespace risk.control.system.Controllers
                             CurrentPage = request.CurrentPage,
                         };
                         _context.UserSessionAlive.Add(userSessionAlive);
-                        await _context.SaveChangesAsync();
+                        await _context.SaveChangesAsync(null, false);
                         return Ok(userDetails);
                     }
                 }
@@ -134,8 +141,8 @@ namespace risk.control.system.Controllers
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                await Response.WriteAsync($"data: ERROR_UserNotFound\n\n");
-                await Response.WriteAsync($"data: done\n\n");
+                await Response.WriteAsync($"data: ERROR_UserNotFound\n");
+                await Response.WriteAsync($"data: done\n");
                 await Response.Body.FlushAsync(cancellationToken);
                 return;
             }
@@ -148,7 +155,7 @@ namespace risk.control.system.Controllers
                 profilePicture = Convert.ToBase64String(user.ProfilePicture) // Ensure it's Base64
             });
 
-            await Response.WriteAsync($"data: PASSWORD_UPDATE|{passwordModelJson}\n\n");
+            await Response.WriteAsync($"data: PASSWORD_UPDATE|{passwordModelJson}\n");
             await Response.Body.FlushAsync(cancellationToken);
             await Task.Delay(1000, cancellationToken); // Small delay to ensure UI updates first
 
@@ -162,17 +169,15 @@ namespace risk.control.system.Controllers
 
             foreach (var message in messages)
             {
-                await Response.WriteAsync($"data: {message}\n\n");
+                await Response.WriteAsync($"data: {message}\n");
                 await Response.Body.FlushAsync(cancellationToken);
                 await Task.Delay(1500, cancellationToken); // Simulate delay between messages
             }
 
             // Indicate completion
-            await Response.WriteAsync($"data: done\n\n");
+            await Response.WriteAsync($"data: done\n");
             await Response.Body.FlushAsync(cancellationToken);
         }
-
-
 
         [HttpGet]
         [AllowAnonymous]
@@ -182,27 +187,17 @@ namespace risk.control.system.Controllers
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
-            var dontSetPassword = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+            var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
             var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
-            if (showgtrialUsers)
-            {
-                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted && !u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
-            }
-            else
-            {
-                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
-            }
 
-            return View(new LoginViewModel { SetPassword = !dontSetPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
+            return View(new LoginViewModel { SetPassword = setPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model, string agent_login = "", string returnUrl = null)
         {
-            //var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-            //var ipAddressWithoutPort = ipAddress?.Split(':')[0];
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
@@ -223,9 +218,6 @@ namespace risk.control.system.Controllers
             }
 
 
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
             var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
             if (admin is null || admin.Country is null)
             {
@@ -253,27 +245,28 @@ namespace risk.control.system.Controllers
                     var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
                     bool vendorIsActive = false;
                     bool companyIsActive = false;
-
                     if (companyUser != null)
                     {
                         companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
-
                     }
                     else if (vendorUser != null)
                     {
                         vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-                        if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
+                        if (agent_login != "agent_login")
                         {
-                            var userIsAgent = vendorUser.Role == AppRoles.AGENT;
-                            if (userIsAgent)
+                            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
                             {
-                                if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
+                                var userIsAgent = vendorUser.Role == AppRoles.AGENT;
+                                if (userIsAgent)
                                 {
-                                    vendorIsActive = false;
-                                }
-                                else
-                                {
-                                    vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                                    if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
+                                    {
+                                        vendorIsActive = false;
+                                    }
+                                    else
+                                    {
+                                        vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                                    }
                                 }
                             }
                         }
@@ -287,67 +280,40 @@ namespace risk.control.system.Controllers
                             ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout ?? "900")), // Reset expiry time
                         };
                         await _signInManager.SignInAsync(user, properties);
-
                         if (User is null || User.Identity is null)
                         {
                             return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
                         }
-
-                        var isAuthenticated = User.Identity.IsAuthenticated;
-
-                        if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
-                        {
-                            string message = string.Empty;
-                            if (admin != null)
-                            {
-                                message = $"Dear {admin.Email}, ";
-                                message += $"User {user.Email} logged in. ";
-                                message += $"Thanks, ";
-                                message += $"{BaseUrl}";
-                                try
-                                {
-                                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine(ex.ToString());
-                                }
-                            }
-                        }
-
                         notifyService.Success("Login successful");
                         return RedirectToAction("Index", "Dashboard");
                     }
                 }
-
-                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
-                    string failedMessage = $"Dear {admin.Email}, ";
-                    failedMessage += $"Locked user {user.Email} logged in. ";
-                    failedMessage += $"Thanks, ";
-                    failedMessage += $"{BaseUrl}";
+                    string failedMessage = $"Dear {admin.Email} ,\n" +
+                             $"User {user.Email} can't log in. \n" +
+                             $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                _logger.LogWarning("User account locked out.");
-                model.LoginError = "User account locked out.";
+                _logger.LogCritical("User can't login.");
+                model.LoginError = "User can't login.";
                 return View(model);
             }
             else if (result.IsLockedOut)
             {
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    string message = $"Dear {admin.Email}, ";
-                    message += $"{model.Email} locked out. ";
-                    message += $"Thanks, ";
-                    message += $"{BaseUrl}";
+                    string message = $"Dear {admin.Email}, \n" +
+                        $"{model.Email} locked out.\n " +
+                        $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                _logger.LogWarning("User account locked out.");
+                _logger.LogError("User account locked out.");
                 model.LoginError = "User account locked out.";
                 return View(model);
             }
@@ -355,18 +321,19 @@ namespace risk.control.system.Controllers
             {
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    string message = $"Dear {admin.Email}, ";
-                    message += $"{model.Email} failed login attempt. {nameof(result.IsNotAllowed)}. Contact admin. ";
-                    message += $"Thanks, ";
-                    message += $"{BaseUrl}";
+                    string message = $"Dear {admin.Email}, \n" +
+                        $"{model.Email} failed login attempt. {nameof(result.IsNotAllowed)}. \n" +
+                        $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 model.LoginError = $"{nameof(result.IsNotAllowed)}. Contact admin.";
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                _logger.LogError("User account not allowed.");
                 return View(model);
             }
+            _logger.LogError("Invalid credentials. Try again.");
             ModelState.AddModelError(string.Empty, "Bad Request.");
             model.LoginError = "Invalid credentials. Try again";
             model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
@@ -484,16 +451,16 @@ namespace risk.control.system.Controllers
                             string message = string.Empty;
                             if (admin != null)
                             {
-                                message = $"Dear {admin.Email}, ";
-                                message += $"User {user.Email} logged in. ";
-                                message += $"Thanks, ";
-                                message += $"{BaseUrl}";
+                                message = $"Dear {admin.Email}, \n" +
+                                $"User {user.Email} logged in. \n" +
+                                $"{BaseUrl}";
                                 try
                                 {
                                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                                 }
                                 catch (Exception ex)
                                 {
+                                    _logger.LogError(ex.StackTrace);
                                     Console.WriteLine(ex.ToString());
                                 }
                             }
@@ -507,10 +474,9 @@ namespace risk.control.system.Controllers
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
                 {
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
-                    string failedMessage = $"Dear {admin.Email}, ";
-                    failedMessage += $"Locked user {user.Email} logged in.  ";
-                    failedMessage += $"Thanks, ";
-                    failedMessage += $"{BaseUrl}";
+                    string failedMessage = $"Dear {admin.Email}, \n" +
+                        $"User {user.Email} password updated.  \n" +
+                        $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }
                 notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
@@ -553,7 +519,7 @@ namespace risk.control.system.Controllers
             var smsSent2User = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
             if (smsSent2User != null)
             {
-                model.Message = $"{input.CountryId} (0) {input.Mobile}";
+                model.Message = $"{input.CountryId} (0) {input.Mobile}\n";
                 model.Flag = $"/flags/{smsSent2User.Country.Code}.png";
                 model.ProfilePicture = smsSent2User.ProfilePicture;
                 model.Reset = true;
@@ -608,7 +574,7 @@ namespace risk.control.system.Controllers
                 LoggedOut = true
             };
             _context.UserSessionAlive.Add(userSessionAlive);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(AccountController.Login), "Account");
@@ -660,21 +626,9 @@ namespace risk.control.system.Controllers
 
             return userCount == 0 ? 0 : 1;
         }
-
     }
     public class KeepSessionRequest
     {
         public string CurrentPage { get; set; }
-    }
-    // DTOs
-    public class SendOtpRequest
-    {
-        public string Email { get; set; }
-    }
-
-    public class VerifyOtpRequest
-    {
-        public string Email { get; set; }
-        public string Otp { get; set; }
     }
 }

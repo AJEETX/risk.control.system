@@ -225,11 +225,23 @@ $(document).ready(function () {
         formData.append("__RequestVerificationToken", token);
         statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
         button.prop("disabled", true);
-        const allowedTypes = ['video/mp4', 'video/webm', 'audio/mpeg', 'audio/wav'];
+        const allowedTypes = [
+            'video/mp4',
+            'video/webm',
+            'audio/mpeg',
+            'audio/wav',
+            'audio/aac',
+            'audio/mp4',
+            'audio/x-aac',
+            'audio/vnd.dlna.adts'
+        ];
+
         if (!allowedTypes.includes(file.type)) {
-            alert("Unsupported file format. Please upload MP4, WebM, MP3, or WAV.");
+            alert("Unsupported file format. Please upload MP4, WebM, MP3, AAC, or WAV.");
             return;
         }
+        console.log("Uploaded file type:", file.type);
+
 
         $.ajax({
             url: '/Uploads/UploadMediaFile',

@@ -471,20 +471,25 @@ namespace risk.control.system.Services
 
         private int GetCreatorActive(string userEmail, InsuranceType insuranceType)
         {
+            var subStatus = new[]
+           {
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
+            };
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            var count = cases.Count(a => a.Status != finished &&
-                     a.CreatedUser == companyUser.Email &&
-            a.ClientCompanyId == companyUser.ClientCompanyId
-            && a.SubStatus != created &&
-            a.SubStatus != withdrawnByCompany
-            && a.SubStatus != withdrawnByAgency
-            && a.SubStatus != assigned
-            && a.SubStatus != uploaded
-            && a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR
-            && a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR
-            );
+            var count = cases.Count(a => !a.Deleted && a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
+                            a.ClientCompanyId == companyUser.ClientCompanyId && a.CreatedUser == userEmail &&
+                            !subStatus
+                            .Contains(a.SubStatus));
 
             return count;
         }

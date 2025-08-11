@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Global-settings not found!");
                 return NotFound();
             }
-            manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
+            await manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
             if (ModelState.IsValid)
             {
                 try

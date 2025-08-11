@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Net;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-using System.Net;
 
 namespace risk.control.system.Services
 {
@@ -17,8 +18,8 @@ namespace risk.control.system.Services
 
         //Task<ClaimsInvestigation> ReplyVerifySchedule(string id, string confirm = "N");
 
-        Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "");
-        Task<IpApiResponse?> GetAgentIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "");
+        //Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "");
+        //Task<IpApiResponse?> GetAgentIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "");
 
         //Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
 
@@ -53,139 +54,139 @@ namespace risk.control.system.Services
             this.featureManager = featureManager;
         }
 
-        public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "")
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(latlong))
-                {
-                    var route = $"{IP_BASE_URL}/json/{ipAddress}";
-                    page = page == "/" ? "dashboard" : page;
-                    var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
-                    var lat = latlong.Substring(0, latlong.IndexOf(","));
-                    var lng = latlong.Substring(latlong.IndexOf(",") + 1);
-                    //var newAddress = await customerApiclient.GetAddressFromLatLong(double.Parse(lat), double.Parse(lng));
-                    var address = await httpClientService.GetAddress(lat, lng);
-                    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=15&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+        //public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "")
+        //{
+        //    try
+        //    {
+        //        if (!string.IsNullOrWhiteSpace(latlong))
+        //        {
+        //            var route = $"{IP_BASE_URL}/json/{ipAddress}";
+        //            page = page == "/" ? "dashboard" : page;
+        //            var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
+        //            var lat = latlong.Substring(0, latlong.IndexOf(","));
+        //            var lng = latlong.Substring(latlong.IndexOf(",") + 1);
+        //            //var newAddress = await customerApiclient.GetAddressFromLatLong(double.Parse(lat), double.Parse(lng));
+        //            var address = await httpClientService.GetAddress(lat, lng);
+        //            var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=15&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
-                    if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
-                    {
-                        response.country = address?.features[0].properties.country;
-                        response.regionName = address?.features[0].properties?.state;
-                        response.city = address?.features[0].properties?.county ?? response.city;
-                        response.district = address?.features[0].properties?.city;
-                        response.zip = address?.features[0].properties?.postcode;
-                        response.lat = address?.features[0].properties.lat;
-                        response.lon = address?.features[0].properties.lon;
-                        response.user = !string.IsNullOrWhiteSpace(userEmail) ? userEmail : "Guest";
-                        response.MapUrl = mapUrl;
-                        response.page = page;
-                        response.isAuthenticated = isAuthenticated;
-                        if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
-                        {
-                            var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
-                            if (user != null)
-                            {
-                                var userSessionAlive = new UserSessionAlive
-                                {
-                                    Updated = DateTime.Now,
-                                    ActiveUser = user,
-                                    CurrentPage = page,
-                                    Created = DateTime.Now,
-                                    IsUpdated = false,
-                                    UpdatedBy = user.Email
-                                };
-                                context.UserSessionAlive.Add(userSessionAlive);
-                            }
-                            context.IpApiResponse.Add(response);
-                            await context.SaveChangesAsync(false);
-                        }
-                        return response;
-                    }
-                }
-                //else
-                //{
-                //    var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
-                //    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                //    response.page = page;
-                //    response.user = userEmail;
-                //    response.isAuthenticated = isAuthenticated;
-                //    response.MapUrl = mapUrl;
-                //    context.IpApiResponse.Add(response);
-                //    await context.SaveChangesAsync();
-                //}
+        //            if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
+        //            {
+        //                response.country = address?.features[0].properties.country;
+        //                response.regionName = address?.features[0].properties?.state;
+        //                response.city = address?.features[0].properties?.county ?? response.city;
+        //                response.district = address?.features[0].properties?.city;
+        //                response.zip = address?.features[0].properties?.postcode;
+        //                response.lat = address?.features[0].properties.lat;
+        //                response.lon = address?.features[0].properties.lon;
+        //                response.user = !string.IsNullOrWhiteSpace(userEmail) ? userEmail : "Guest";
+        //                response.MapUrl = mapUrl;
+        //                response.page = page;
+        //                response.isAuthenticated = isAuthenticated;
+        //                if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
+        //                {
+        //                    var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
+        //                    if (user != null)
+        //                    {
+        //                        var userSessionAlive = new UserSessionAlive
+        //                        {
+        //                            Updated = DateTime.Now,
+        //                            ActiveUser = user,
+        //                            CurrentPage = page,
+        //                            Created = DateTime.Now,
+        //                            IsUpdated = false,
+        //                            UpdatedBy = user.Email
+        //                        };
+        //                        context.UserSessionAlive.Add(userSessionAlive);
+        //                    }
+        //                    context.IpApiResponse.Add(response);
+        //                    await context.SaveChangesAsync(null, false);
+        //                }
+        //                return response;
+        //            }
+        //        }
+        //        //else
+        //        //{
+        //        //    var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
+        //        //    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+        //        //    response.page = page;
+        //        //    response.user = userEmail;
+        //        //    response.isAuthenticated = isAuthenticated;
+        //        //    response.MapUrl = mapUrl;
+        //        //    context.IpApiResponse.Add(response);
+        //        //    await context.SaveChangesAsync();
+        //        //}
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
-            return null!;
-        }
-        public async Task<IpApiResponse?> GetAgentIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "")
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(latlong))
-                {
-                    var route = $"{IP_BASE_URL}/json/{ipAddress}";
-                    page = page == "/" ? "dashboard" : page;
-                    var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
-                    var lat = latlong.Substring(0, latlong.IndexOf(","));
-                    var lng = latlong.Substring(latlong.IndexOf(",") + 1);
-                    //var newAddress = await customerApiclient.GetAddressFromLatLong(double.Parse(lat), double.Parse(lng));
-                    var address = await httpClientService.GetAddress(lat, lng);
-                    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.StackTrace);
+        //    }
+        //    return null!;
+        //}
+        //public async Task<IpApiResponse?> GetAgentIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "")
+        //{
+        //    try
+        //    {
+        //        if (!string.IsNullOrWhiteSpace(latlong))
+        //        {
+        //            var route = $"{IP_BASE_URL}/json/{ipAddress}";
+        //            page = page == "/" ? "dashboard" : page;
+        //            var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
+        //            var lat = latlong.Substring(0, latlong.IndexOf(","));
+        //            var lng = latlong.Substring(latlong.IndexOf(",") + 1);
+        //            //var newAddress = await customerApiclient.GetAddressFromLatLong(double.Parse(lat), double.Parse(lng));
+        //            var address = await httpClientService.GetAddress(lat, lng);
+        //            var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
-                    if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
-                    {
-                        response.country = address?.features[0].properties.country;
-                        response.regionName = address?.features[0].properties?.state;
-                        response.city = address?.features[0].properties?.county ?? response.city;
-                        response.district = address?.features[0].properties?.city;
-                        response.zip = address?.features[0].properties?.postcode;
-                        response.lat = address?.features[0].properties.lat;
-                        response.lon = address?.features[0].properties.lon;
-                        response.user = !string.IsNullOrWhiteSpace(userEmail) ? userEmail : "Guest";
-                        response.MapUrl = mapUrl;
-                        response.page = page;
-                        response.isAuthenticated = isAuthenticated;
-                        if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
-                        {
-                            var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
-                            var userSessionAlive = new UserSessionAlive
-                            {
-                                Updated = DateTime.Now,
-                                ActiveUser = user,
-                                CurrentPage = page
-                            };
-                            context.UserSessionAlive.Add(userSessionAlive);
+        //            if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
+        //            {
+        //                response.country = address?.features[0].properties.country;
+        //                response.regionName = address?.features[0].properties?.state;
+        //                response.city = address?.features[0].properties?.county ?? response.city;
+        //                response.district = address?.features[0].properties?.city;
+        //                response.zip = address?.features[0].properties?.postcode;
+        //                response.lat = address?.features[0].properties.lat;
+        //                response.lon = address?.features[0].properties.lon;
+        //                response.user = !string.IsNullOrWhiteSpace(userEmail) ? userEmail : "Guest";
+        //                response.MapUrl = mapUrl;
+        //                response.page = page;
+        //                response.isAuthenticated = isAuthenticated;
+        //                if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
+        //                {
+        //                    var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
+        //                    var userSessionAlive = new UserSessionAlive
+        //                    {
+        //                        Updated = DateTime.Now,
+        //                        ActiveUser = user,
+        //                        CurrentPage = page
+        //                    };
+        //                    context.UserSessionAlive.Add(userSessionAlive);
 
-                            context.IpApiResponse.Add(response);
-                            await context.SaveChangesAsync(false);
-                        }
-                        return response;
-                    }
-                }
-                //else
-                //{
-                //    var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
-                //    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                //    response.page = page;
-                //    response.user = userEmail;
-                //    response.isAuthenticated = isAuthenticated;
-                //    response.MapUrl = mapUrl;
-                //    context.IpApiResponse.Add(response);
-                //    await context.SaveChangesAsync();
-                //}
+        //                    context.IpApiResponse.Add(response);
+        //                    await context.SaveChangesAsync(null, false);
+        //                }
+        //                return response;
+        //            }
+        //        }
+        //        //else
+        //        //{
+        //        //    var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
+        //        //    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+        //        //    response.page = page;
+        //        //    response.user = userEmail;
+        //        //    response.isAuthenticated = isAuthenticated;
+        //        //    response.MapUrl = mapUrl;
+        //        //    context.IpApiResponse.Add(response);
+        //        //    await context.SaveChangesAsync();
+        //        //}
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
-            return null!;
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.StackTrace);
+        //    }
+        //    return null!;
+        //}
         public bool IsWhiteListIpAddress(IPAddress remoteIp)
         {
             var bytes = remoteIp.GetAddressBytes();
@@ -503,18 +504,12 @@ namespace risk.control.system.Services
             {
                 return string.Empty;
             }
-            var message = $"Dear {claim.CustomerDetail.Name}";
-            message += "                                                                                ";
-            message += $"{sms}";
-            message += "                                                                                ";
-            message += $"Thanks";
-            message += "                                                                                ";
-            message += $"{user.FirstName} {user.LastName}";
-            message += "                                                                                ";
-            message += $"Policy #:{claim.PolicyDetail.ContractNumber}";
-            message += "                                                                                ";
-            message += $"{company}";
-            message += "                                                                                ";
+            var message = $"Dear {claim.CustomerDetail.Name}\n\n";
+            message += $"{sms}\n\n";
+            message += $"Thanks\n\n";
+            message += $"{user.FirstName} {user.LastName}\n\n";
+            message += $"Policy #:{claim.PolicyDetail.ContractNumber}\n\n";
+            message += $"{company}\n\n";
             message += $"{logo}";
 
             var scheduleMessage = new CaseMessage
@@ -526,7 +521,7 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now
             };
             claim.CaseMessages.Add(scheduleMessage);
-            context.SaveChanges();
+            await context.SaveChangesAsync(null, false);
             await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
             return claim.CustomerDetail.Name;
         }
@@ -625,18 +620,12 @@ namespace risk.control.system.Services
             {
                 return string.Empty;
             }
-            var message = $"Dear {beneficiary.Name}";
-            message += "                                                                                ";
-            message += $"{sms}";
-            message += "                                                                                ";
-            message += $"Thanks";
-            message += "                                                                                ";
-            message += $"{user.FirstName} {user.LastName}";
-            message += "                                                                                ";
-            message += $"Policy #:{beneficiary.InvestigationTask.PolicyDetail.ContractNumber}";
-            message += "                                                                                ";
-            message += $"{company}";
-            message += "                                                                                ";
+            var message = $"Dear {beneficiary.Name}\n\n";
+            message += $"{sms}\n\n";
+            message += $"Thanks\n\n";
+            message += $"{user.FirstName} {user.LastName}\n\n";
+            message += $"Policy #:{beneficiary.InvestigationTask.PolicyDetail.ContractNumber}\n\n";
+            message += $"{company}\n\n";
             message += $"{logo}";
 
             var scheduleMessage = new CaseMessage
@@ -655,7 +644,7 @@ namespace risk.control.system.Services
                .ThenInclude(c => c.PinCode)
             .FirstOrDefault(c => c.Id == claimId);
             claim.CaseMessages.Add(scheduleMessage);
-            context.SaveChanges();
+            await context.SaveChangesAsync(null, false);
             await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
             return beneficiary.Name;
         }
@@ -752,7 +741,7 @@ namespace risk.control.system.Services
 
                 else if (role.Name == AppRoles.CREATOR.ToString())
                 {
-                    notifications = notifications.Where(n => (n.Role == role && n.NotifierUserEmail == userEmail || n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY) && !n.IsReadByCreator);
+                    notifications = notifications.Where(n => (n.Role == role && n.NotifierUserEmail == userEmail) && !n.IsReadByCreator);
                 }
 
                 var activeNotifications = await notifications
@@ -811,7 +800,7 @@ namespace risk.control.system.Services
             {
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
                 company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                var notification = context.Notifications.FirstOrDefault(s => s.Role == role && s.Company == company && s.StatusNotificationId == id);
+                var notification = context.Notifications.FirstOrDefault(s => s.StatusNotificationId == id);
                 if (notification == null)
                 {
                     return;
@@ -830,7 +819,7 @@ namespace risk.control.system.Services
                     notification.IsReadByCreator = true;
                 }
                 context.Notifications.Update(notification);
-                var rows = await context.SaveChangesAsync();
+                var rows = await context.SaveChangesAsync(null, false);
             }
             else if (vendorUser != null)
             {
@@ -851,7 +840,7 @@ namespace risk.control.system.Services
                     notification.IsReadByVendorAgent = true;
                 }
                 context.Notifications.Update(notification);
-                var rows = await context.SaveChangesAsync();
+                var rows = await context.SaveChangesAsync(null, false);
             }
         }
 

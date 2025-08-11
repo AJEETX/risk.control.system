@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization; // Required for AllowAnonymous
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api
@@ -90,25 +93,36 @@ namespace risk.control.system.Controllers.Api
         [AllowAnonymous]
         public async Task<IActionResult> GetUserBySearch(string search = "")
         {
-            var applicationUsers = new List<ApplicationUser>();
-            if (string.IsNullOrWhiteSpace(search))
+            // First, get IDs of VendorApplicationUsers who are AGENTs
+            var vendorAgentIds = await context.Set<VendorApplicationUser>()
+                .Where(v => v.UserRole == AgencyRole.AGENT)
+                .Select(v => v.Id)
+                .ToListAsync();
+
+            IQueryable<ApplicationUser> query = context.ApplicationUser
+                .Where(a => a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower() &&
+                            !vendorAgentIds.Contains(a.Id));
+
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                return Ok(context.ApplicationUser?.Where(a => a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower()).OrderBy(o => o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList());
+                string loweredSearch = search.Trim().ToLower();
+                query = query.Where(a => a.Email.ToLower().StartsWith(loweredSearch));
             }
-            if (!string.IsNullOrEmpty(search))
-            {
-                applicationUsers = await context.ApplicationUser.Where(s =>
-                   (!string.IsNullOrEmpty(search) && s.Email.ToLower().StartsWith(search.Trim().ToLower()))
-                ).ToListAsync();
-            }
-            return Ok(applicationUsers?.OrderBy(o => o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList());
+
+            var userEmails = await query
+                .OrderBy(a => a.Email)
+                .Take(10)
+                .Select(a => a.Email)
+                .ToListAsync();
+
+            return Ok(userEmails);
         }
 
-        [HttpGet("GetIpAddress")]
-        public async Task<IActionResult> GetIpAddress()
-        {
-            var ipAddresses = await context.IpApiResponse.ToListAsync();
-            return Ok(ipAddresses);
-        }
+        //[HttpGet("GetIpAddress")]
+        //public async Task<IActionResult> GetIpAddress()
+        //{
+        //    var ipAddresses = await context.IpApiResponse.ToListAsync();
+        //    return Ok(ipAddresses);
+        //}
     }
 }

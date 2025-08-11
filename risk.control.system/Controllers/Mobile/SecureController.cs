@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Security.Claims;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Mobile
@@ -29,7 +32,7 @@ namespace risk.control.system.Controllers.Mobile
         private readonly IFeatureManager featureManager;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
-
+        private readonly string baseUrl;
         public SecureController(UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
@@ -53,6 +56,9 @@ namespace risk.control.system.Controllers.Mobile
             this.featureManager = featureManager;
             smsService = SmsService;
             this.tokenService = tokenService;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [AllowAnonymous]
@@ -69,9 +75,7 @@ namespace risk.control.system.Controllers.Mobile
             var email = System.Web.HttpUtility.HtmlEncode(model.Email);
             var pwd = System.Web.HttpUtility.HtmlEncode(model.Password);
             var result = await _signInManager.PasswordSignInAsync(email, pwd, false, lockoutOnFailure: false);
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(email);
@@ -90,22 +94,15 @@ namespace risk.control.system.Controllers.Mobile
                     {
                         var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                         string message = string.Empty;
-                        var ipApiResponse = await service.GetAgentIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, model.Latlong);
+                        //var ipApiResponse = await service.GetAgentIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, model.Latlong);
 
                         if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null)
                         {
                             var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(u => u.IsSuperAdmin);
                             if (admin != null)
                             {
-                                message = $"Dear {admin.Email}";
-                                message += $"                                       ";
-                                message += $"                       ";
-                                message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
-                                message += $"                                       ";
-                                message += $"Thanks                                         ";
-                                message += $"                                       ";
-                                message += $"                                       ";
-                                message += $"{BaseUrl}";
+                                message = $"Dear {admin.Email}\n\n" +
+                                $"{baseUrl}";
                                 try
                                 {
                                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
@@ -115,14 +112,9 @@ namespace risk.control.system.Controllers.Mobile
                                     Console.WriteLine(ex.ToString());
                                 }
                             }
-                            message += $"                                       ";
-                            message += $"                       ";
-                            message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
-                            message += $"                                       ";
-                            message += $"Thanks                                         ";
-                            message += $"                                       ";
-                            message += $"                                       ";
-                            message += $"{BaseUrl}";
+                            message = string.Empty;
+                            message += $"User {user.Email} logged in\n\n" +
+                            $"{baseUrl}";
                             try
                             {
                                 await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
@@ -199,16 +191,13 @@ namespace risk.control.system.Controllers.Mobile
         [HttpPost("logout")]
         public async Task<IActionResult> RevokeToken([FromBody] string refreshToken)
         {
-            var tokenEntity = await _context.RefreshTokens
-                .FirstOrDefaultAsync(t => t.Token == refreshToken);
-
+            var tokenEntity = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshToken);
             if (tokenEntity == null)
                 return NotFound("Token not found.");
 
             tokenEntity.IsRevoked = true;
             _context.RefreshTokens.Update(tokenEntity);
             await _context.SaveChangesAsync();
-
             return Ok("Token revoked successfully.");
         }
 
@@ -225,7 +214,6 @@ namespace risk.control.system.Controllers.Mobile
             await Task.Delay(10);
             return Ok(new { token });
         }
-
         // This endpoint requires JWT authentication.
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("test-2-access-secure-api")]
@@ -240,12 +228,14 @@ namespace risk.control.system.Controllers.Mobile
 
         [AllowAnonymous]
         [HttpGet("test-sms")]
-        public async Task<IActionResult> Sms(string mobile = "61432854196")
+        public async Task<IActionResult> Sms(string mobile = "61432854196", string message = "Testing by icheckify")
         {
-            var respone = await SmsService.SendSmsAsync(mobile);
-            return Ok(new { message = respone });
+            string msg = $"Dear {mobile} user,\n\n" +
+                             $"iCheckify: {message}\n\n" +
+                             $"Thanks\n{baseUrl}";
+            var response = await SmsService.SendSmsAsync(mobile, msg);
+            return Ok(new { message = response });
         }
-
 
         [AllowAnonymous]
         [HttpGet("pdf")]

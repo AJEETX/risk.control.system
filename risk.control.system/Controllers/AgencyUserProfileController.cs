@@ -1,14 +1,18 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -26,7 +30,9 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
+        private readonly ILogger<AgencyUserProfileController> logger;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private string portal_base_url = string.Empty;
 
         public AgencyUserProfileController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
@@ -36,6 +42,7 @@ namespace risk.control.system.Controllers
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             ISmsService SmsService,
+            ILogger<AgencyUserProfileController> logger,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -46,8 +53,12 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             smsService = SmsService;
+            this.logger = logger;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         public IActionResult Index()
@@ -66,6 +77,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -104,6 +116,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -114,7 +127,6 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
         {
@@ -175,7 +187,7 @@ namespace risk.control.system.Controllers
                         notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
 
                         var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited. Email : " + user.Email);
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited. \n Email : " + user.Email + "\n" + portal_base_url);
 
                         return RedirectToAction(nameof(Index), "Dashboard");
                     }
@@ -187,6 +199,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -208,6 +221,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -246,14 +260,8 @@ namespace risk.control.system.Controllers
 
                     if (!result.Succeeded)
                     {
-                        string failedMessage = $"Dear {admin.Email}";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"                       ";
-                        failedMessage += $"User {user.Email} changed password. New password: {model.NewPassword}";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"Thanks                                         ";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"                                       ";
+                        string failedMessage = $"Dear {admin.Email}\n";
+                        failedMessage += $"User {user.Email} changed password. New password: {model.NewPassword}\n";
                         failedMessage += $"{BaseUrl}";
                         await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
                         notifyService.Error("OOPS !!!..Contact Admin");
@@ -262,27 +270,15 @@ namespace risk.control.system.Controllers
 
                     await signInManager.RefreshSignInAsync(user);
 
-                    string message = $"Dear {admin.Email}";
-                    message += $"                                       ";
-                    message += $"                       ";
-                    message += $"User {user.Email} changed password. New password: {model.NewPassword}";
-                    message += $"                                       ";
-                    message += $"Thanks                                         ";
-                    message += $"                                       ";
-                    message += $"                                       ";
+                    string message = $"Dear {admin.Email}\n";
+                    message += $"User {user.Email} changed password. New password: {model.NewPassword}\n";
                     message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
 
 
                     message = string.Empty;
-                    message = $"Dear {user.Email}";
-                    message += $"                                       ";
-                    message += $"                       ";
-                    message += $"Your changed password: {model.NewPassword}";
-                    message += $"                                       ";
-                    message += $"Thanks                                         ";
-                    message += $"                                       ";
-                    message += $"                                       ";
+                    message = $"Dear {user.Email}\n";
+                    message += $"Your changed password: {model.NewPassword}\n";
                     message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + user.PhoneNumber, message);
 
@@ -293,6 +289,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -316,6 +313,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -323,7 +321,6 @@ namespace risk.control.system.Controllers
             notifyService.Error("Error to create Agency user!");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
-
 
         private void Errors(IdentityResult result)
         {

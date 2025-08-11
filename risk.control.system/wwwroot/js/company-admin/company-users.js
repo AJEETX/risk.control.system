@@ -23,17 +23,21 @@
             }
         },
         {
-            className: 'max-width-column', // Apply the CSS class,
+            className: 'max-width-column-name', // Apply the CSS class,
             targets: 2                      // Index of the column to style
         },
         {
-            className: 'max-width-column', // Apply the CSS class,
+            className: 'max-width-column-name', // Apply the CSS class,
             targets: 4                      // Index of the column to style
         },
         {
             className: 'max-width-column-name', // Apply the CSS class,
-            targets: 10                      // Index of the column to style
-        }],
+            targets: 8                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
+            }],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -87,7 +91,7 @@
             {
                 "data": "email",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + row.rawEmail + '</span>'
                 }
             },
             {

@@ -8,6 +8,7 @@
 
     </div>
     <form id="reset-form" asp-controller="Account" asp-action="Forgot" method="post" autocomplete="off">
+        @Html.AntiForgeryToken()
         <div class="input-boxes">
             <div class="input-box">
                 <div class="input-box autocomplete-wrapper">

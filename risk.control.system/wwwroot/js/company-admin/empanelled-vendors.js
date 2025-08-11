@@ -24,19 +24,19 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 2                      // Index of the column to style
             },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
-            },
+            //{
+            //    className: 'max-width-column-name', // Apply the CSS class,
+            //    targets: 3                      // Index of the column to style
+            //},
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
+                targets: 9                      // Index of the column to style
             }],
-        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -88,12 +88,12 @@
                     return '<span title="' + row.name + '" data-toggle="tooltip"><a id="edit' + row.id + '" href="/Company/AgencyDetail?Id=' + row.id + '"> ' + data +'</a></span>' + '<br /> ' + img;
                 }
             },
-            {
-                "data": "name",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
+            //{
+            //    "data": "name",
+            //    "mRender": function (data, type, row) {
+            //        return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+            //    }
+            //},
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {

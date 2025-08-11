@@ -1,8 +1,10 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Utils;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 
@@ -76,10 +78,11 @@ namespace risk.control.system.Services
 
             SectionBuilder section = builder.AddSection();
             section.SetOrientation(PageOrientation.Landscape);
-
+            bool isClaim = true;
             //CASE DETAIL
             if (policy.InsuranceType == InsuranceType.UNDERWRITING)
             {
+                isClaim = false;
                 section = detailService.BuildUnderwritng(section, investigation, policy, customer, beneficiary);
             }
             else
@@ -88,7 +91,7 @@ namespace risk.control.system.Services
             }
 
             //CASE DETAIL   Investigation Report Section
-            section = await detailReportService.Build(section, investigation, investigationReport);
+            section = await detailReportService.Build(section, investigation, investigationReport, isClaim);
 
             section.AddParagraph().AddText("");
 
@@ -112,7 +115,7 @@ namespace risk.control.system.Services
             investigation.InvestigationReport.PdfReportFilePath = ReportFilePath;
 
             context.Investigations.Update(investigation);
-            context.SaveChanges();
+            await context.SaveChangesAsync(null, false);
             return reportFilename;
         }
 

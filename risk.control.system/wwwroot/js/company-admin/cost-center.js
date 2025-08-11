@@ -1,4 +1,7 @@
 ﻿$(document).ready(function () {
+
+    var table = $("#customerTable").DataTable();
+
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {

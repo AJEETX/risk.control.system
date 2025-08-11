@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Helpers;
 using risk.control.system.Services;
 
@@ -18,20 +19,20 @@ namespace risk.control.system.Controllers.Agency
     {
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
-        private readonly IInvestigationService investigationService;
         private readonly IVendorInvestigationService vendorInvestigationService;
+        private readonly ILogger<VendorInvestigationController> logger;
         private readonly ICaseVendorService vendorService;
 
         public VendorInvestigationController(INotyfService notifyService,
             IInvoiceService invoiceService,
-            IInvestigationService investigationService,
             IVendorInvestigationService vendorInvestigationService,
+            ILogger<VendorInvestigationController> logger,
             ICaseVendorService vendorService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
-            this.investigationService = investigationService;
             this.vendorInvestigationService = vendorInvestigationService;
+            this.logger = logger;
             this.vendorService = vendorService;
         }
         public IActionResult Index()
@@ -48,6 +49,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -69,6 +71,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -100,6 +103,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -130,6 +134,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -150,7 +155,6 @@ namespace risk.control.system.Controllers.Agency
 
 
         [Breadcrumb("Submit", FromAction = "ClaimReport")]
-
         public async Task<IActionResult> GetInvestigateReport(long selectedcase)
         {
             try
@@ -174,6 +178,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -215,6 +220,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -243,6 +249,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -278,13 +285,14 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
+                var model = await vendorInvestigationService.GetClaimDetailsReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -342,6 +350,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -373,6 +382,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

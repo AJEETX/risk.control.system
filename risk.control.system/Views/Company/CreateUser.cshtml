@@ -27,17 +27,17 @@
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="input-group-label"> Email:</label>
+                        <label class="input-group-label"> Email: <small>(minimum 5 character)</small></label>
                         <div class="input-group mb-3">
                             <div class="input-group-append">
                                 <span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                             </div>
                             <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address remarks" value="" required
-                                   placeholder="username" maxlength="15" autocomplete="name">
-                            <div class="input-group-append">
+                                   placeholder="email" maxlength="15" autocomplete="name" title="Enter unique email with 5 minimum character" />
+                            <div class="input-group-append" title="domain name">
                                 <span class="input-group-text" id="Email">@@@email</span>
                             </div>
-                            <div class="input-group-append">
+                            <div class="input-group-append" title="Click to validate email">
                                 <button disabled id="check-email" class="input-group-text">
                                     <i class="far fa-question-circle"></i>
                                 </button>
@@ -136,18 +136,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                @{
-                                    // Get the enum values except the one you want to exclude
-                                    var roles = Enum.GetValues(typeof(CompanyRole))
-                                    .Cast<CompanyRole>()
-                                    .Where(role => role != CompanyRole.COMPANY_ADMIN) // Replace RoleToExclude with the actual enum value
-                                    .Select(role => new SelectListItem
-                                    {
-                                        Value = role.ToString(),
-                                        Text = role.ToString()
-                                    });
-                                 }
-                                <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="@roles">
+                                <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="@Model.AvailableRoles">
                                     <option value="">--- SELECT ---</option>
                                 </select>
                                 <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
@@ -164,7 +153,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Enter Address line" required maxlength="50" autocomplete="off" />
+                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Enter Street Address" required maxlength="70" autocomplete="off" />
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>

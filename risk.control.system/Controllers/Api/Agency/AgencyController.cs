@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using System.Collections.Concurrent;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-using System.Collections.Concurrent;
-using System.Globalization;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Agency
@@ -21,31 +22,21 @@ namespace risk.control.system.Controllers.Api.Agency
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class AgencyController : ControllerBase
     {
-        private const string UNDERWRITING = "underwriting";
-        private static CultureInfo hindi = new CultureInfo("hi-IN");
-        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly string noUserImagefilePath = string.Empty;
         private readonly string noDataImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
         private readonly IUserService userService;
         private readonly ICustomApiCLient customApiCLient;
-        private static HttpClient httpClient = new();
 
         public AgencyController(ApplicationDbContext context,
-            UserManager<VendorApplicationUser> userManager,
-            IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
             IUserService userService,
             ICustomApiCLient customApiCLient,
             IDashboardService dashboardService)
         {
-            this.userManager = userManager;
             this.dashboardService = dashboardService;
-            this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
             this.userService = userService;
             this.customApiCLient = customApiCLient;
@@ -96,7 +87,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 })?.ToArray();
 
             users?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(result);
         }
 
@@ -118,7 +109,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 new
                 {
                     Id = u.VendorId,
-                    Document = string.IsNullOrEmpty(u.DocumentUrl) ? noDataImagefilePath : u.DocumentUrl,
+                    Document = u.DocumentImage == null ? noDataImagefilePath : $"data:image/*;base64,{Convert.ToBase64String(u.DocumentImage)}",
                     Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
@@ -137,7 +128,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 })?.ToArray();
 
             allAgencies?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
 
             return Ok(result);
         }
@@ -172,7 +163,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 })?.ToArray();
 
             agencies?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(result);
         }
 
@@ -201,7 +192,7 @@ namespace risk.control.system.Controllers.Api.Agency
             var serviceResponse = new List<AgencyServiceResponse>();
             foreach (var service in services)
             {
-                var IsAllDistrict = (service.DistrictId == null);
+                bool isAllDistrict = service.SelectedDistrictIds?.Contains(-1) == true; // how to set this value in case all districts selected
                 string pincodes = $"{ALL_PINCODE}";
                 string rawPincodes = $"{ALL_PINCODE}";
 
@@ -211,7 +202,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Id = service.VendorInvestigationServiceTypeId,
                     CaseType = service.InsuranceType.GetEnumDisplayName(),
                     ServiceType = service.InvestigationServiceType.Name,
-                    District = IsAllDistrict ? ALL_DISTRICT : service.District.Name,
+                    District = isAllDistrict ? ALL_DISTRICT : string.Join(", ", _context.District.Where(d => service.SelectedDistrictIds.Contains(d.DistrictId)).Select(s => s.Name)),
                     State = service.State.Code,
                     Country = service.Country.Code,
                     Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
@@ -226,7 +217,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
 
             vendor.VendorInvestigationServiceTypes?.ToList().ForEach(i => i.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             return Ok(serviceResponse);
         }
 

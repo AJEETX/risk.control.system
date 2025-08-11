@@ -148,6 +148,8 @@
                 }
                 @if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
                 {
+                    var map = string.Format(@Model.ClaimsInvestigation?.CustomerDetail.CustomerLocationMap, "200", "200");
+
                     <div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">
                             <div class="card-header text-muted border-bottom-0">
@@ -212,7 +214,7 @@
                                             }
                                         </p>
                                         <p class="text-muted text-sm">
-                                            <img id="customerGoogleMap" class="img-fluid block-data" src="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap" />
+                                            <img id="customerGoogleMap" class="img-fluid block-data" src="@map" />
 
                                     </div>
                                 </div>
@@ -232,6 +234,8 @@
                 }
                 @if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
                 {
+                    var map = string.Format(Model.Location.BeneficiaryLocationMap, "200", "200");
+
                     <div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">
                             <div class="card-header text-muted border-bottom-0">
@@ -296,7 +300,7 @@
                                             }
                                         </p>
                                         <p class="text-muted text-sm">
-                                            <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap" />
+                                            <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" />
                                         </p>
                                     </div>
                                 </div>

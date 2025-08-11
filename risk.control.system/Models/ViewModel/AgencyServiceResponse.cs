@@ -7,6 +7,7 @@
         public string CaseType { get; set; }
         public string ServiceType { get; set; }
         public string District { get; set; }
+        public string Districts { get; set; }
         public string State { get; set; }
         public string Country { get; set; }
         public string Flag { get; set; }

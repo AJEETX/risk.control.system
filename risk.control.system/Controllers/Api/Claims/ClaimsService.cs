@@ -7,7 +7,6 @@ namespace risk.control.system.Controllers.Api.Claims
 {
     public interface IClaimsService
     {
-        //IQueryable<ClaimsInvestigation> GetClaims();
         IQueryable<InvestigationTask> GetCasesWithDetail();
     }
     public class ClaimsService : IClaimsService
