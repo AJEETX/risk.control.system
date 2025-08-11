@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.VendorApplicationUser == null)
+                if (id == 0 || _context.VendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
