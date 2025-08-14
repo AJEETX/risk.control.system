@@ -25,6 +25,7 @@ namespace risk.control.system.Controllers
     public class VendorApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<VendorApplicationUsersController> logger;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly RoleManager<ApplicationRole> roleManager;
@@ -36,6 +37,7 @@ namespace risk.control.system.Controllers
         private string portal_base_url = string.Empty;
 
         public VendorApplicationUsersController(ApplicationDbContext context,
+            ILogger<VendorApplicationUsersController> logger,
             UserManager<VendorApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
@@ -46,6 +48,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this.logger = logger;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.roleManager = roleManager;
@@ -72,7 +75,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.VendorApplicationUser == null)
+                if (id == null || id == 0 || _context.VendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -101,6 +104,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -113,7 +117,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.VendorApplicationUser == null)
+                if (id == 0 || _context.VendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -133,15 +137,13 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
 
-        // POST: VendorApplicationUsers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VendorApplicationUser user, string emailSuffix)
@@ -222,6 +224,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -242,8 +245,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorApplicationUser = await _context.VendorApplicationUser
-                    .Include(v => v.Vendor).Include(v => v.Country)?.FirstOrDefaultAsync(v => v.Id == userId);
+                var vendorApplicationUser = await _context.VendorApplicationUser.Include(v => v.Vendor).Include(v => v.Country)?.FirstOrDefaultAsync(v => v.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..User Not found");
@@ -261,6 +263,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -276,6 +279,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var user = await userManager.FindByIdAsync(id);
@@ -358,6 +364,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -371,14 +378,12 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<VendorUserRoleViewModel>();
-            //ViewBag.userId = userId;
             VendorApplicationUser user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 notifyService.Error("user not found!");
                 return NotFound();
             }
-            //ViewBag.UserName = user.UserName;
             foreach (var role in roleManager.Roles.Where(r =>
                 r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()) ||
                 r.Name.Contains(AppRoles.SUPERVISOR.ToString()) ||
@@ -514,6 +519,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

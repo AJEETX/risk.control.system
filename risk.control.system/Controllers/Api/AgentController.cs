@@ -180,7 +180,6 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-
         private async Task SendVerificationSmsAsync(string email, string mobile, string pin)
         {
             string message = $"Dear {email},\n\n" +
@@ -776,6 +775,5 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(500, ex.StackTrace);
             }
         }
-
     }
 }
