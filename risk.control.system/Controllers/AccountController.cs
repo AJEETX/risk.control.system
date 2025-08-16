@@ -184,19 +184,16 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Login()
         {
             var timer = DateTime.Now;
-            // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
             var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
-            var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
-
             return View(new LoginViewModel { SetPassword = setPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model, string agent_login = "", string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model, string agent_login = "")
         {
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
             {
@@ -216,8 +213,6 @@ namespace risk.control.system.Controllers
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
             }
-
-
             var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
             if (admin is null || admin.Country is null)
             {
@@ -594,7 +589,6 @@ namespace risk.control.system.Controllers
             var userCount = await _userManager.Users.CountAsync(u => u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain);
 
             return userCount == 0 ? 0 : 1;
-
         }
 
         [HttpGet]

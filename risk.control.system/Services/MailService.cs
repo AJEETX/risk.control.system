@@ -87,7 +87,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {applicationUser.Email}, \n";
                         message += $"Assign of {file.RecordCount} cases finished \n";
-                        message += $"{applicationUser.Email},\n ";
+                        message += $"Thanks,\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
@@ -109,7 +109,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {applicationUser.Email},\n ";
                         message += $"JobId: {file.Id} Assign Error. \n";
-                        message += $"{applicationUser.Email},\n ";
+                        message += $"Thanks,\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
@@ -149,7 +149,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {applicationUser.Email},\n ";
                         message += $"Upload of {file.RecordCount} cases finished \n";
-                        message += $"{applicationUser.Email},\n ";
+                        message += $"Thanks,\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
@@ -171,7 +171,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {applicationUser.Email},\n ";
                         message += $"JobId: {file.Id} Upload Error. \n";
-                        message += $"{applicationUser.Email},\n ";
+                        message += $"Thanks,\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
@@ -253,6 +253,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {userEmailToSend.Email}, \n";
                         message += $"Case #{policy} : {claimsInvestigation.SubStatus}, \n";
+                        message += $"Thanks,\n ";
                         message += $"{clientCompanyUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
@@ -327,6 +328,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {userEmailToSend.Email}, \n";
                         message += $"Case #{policy} : {claimsInvestigation.SubStatus}, \n";
+                        message += $"Thanks,\n ";
                         message += $"{clientCompanyUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
@@ -375,7 +377,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {applicationUser.Email}, \n";
                         message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
-                        message += $"{applicationUser.Email},\n ";
+                        message += $"Thanks,\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = applicationUser.Email, RecepicientPhone = applicationUser.PhoneNumber, Message = message });
@@ -417,7 +419,7 @@ namespace risk.control.system.Services
                 {
                     string message = $"Dear {applicationUser.Email}, \n";
                     message += $"Assigning finished of {autoAllocatedCasesCount + notAutoAllocatedCasesCount} cases, Auto-assigned count = {autoAllocatedCasesCount}. \n";
-                    message += $"{applicationUser.Email}, \n";
+                    message += $"Thanks,\n ";
                     message += $"{url}";
                     await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                 }
@@ -454,7 +456,7 @@ namespace risk.control.system.Services
                 {
                     string message = $"Dear {applicationUser.Email}, \n";
                     message += $"Assigning finished of {autoAllocatedCases.Count + notAutoAllocatedCases.Count} cases, Auto-assigned count = {autoAllocatedCases.Count}.\n ";
-                    message += $"{applicationUser.Email},\n ";
+                    message += $"Thanks,\n ";
                     message += $"{url}";
                     await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                 }
@@ -524,6 +526,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {user.Email}, \n";
                         message += $"Case #{claim.PolicyDetail.ContractNumber} : {claim.SubStatus}, \n";
+                        message += $"Thanks,\n ";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
@@ -571,6 +574,7 @@ namespace risk.control.system.Services
                 {
                     string message = $"Dear {recepientUser.Email}, \n";
                     message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}, \n";
+                    message += $"Thanks,\n ";
                     message += $"{userEmail},\n ";
                     message += $"{url}";
                     await smsService.DoSendSmsAsync(recepientUser.Country.ISDCode + recepientUser.PhoneNumber, message);
@@ -687,6 +691,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {user.Email}, \n";
                         message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}, \n";
+                        message += $"Thanks,\n ";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
@@ -743,6 +748,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {user.Email}, \n";
                         message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
+                        message += $"Thanks,\n ";
                         message += $"{senderUserEmail},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
@@ -809,6 +815,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {user.Email}, \n";
                         message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
+                        message += $"Thanks,\n ";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
@@ -881,6 +888,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {userEmailToSend.Email}, \n";
                         message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
+                        message += $"Thanks,\n ";
                         message += $"{clientCompanyUser.Email}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
@@ -938,6 +946,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {user.Email}, \n";
                         message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
+                        message += $"Thanks,\n ";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
@@ -986,6 +995,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {user.Email}, \n";
                         message += $"Case #{claim.PolicyDetail.ContractNumber} : {claim.SubStatus}, \n";
+                        message += $"Thanks,\n ";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);

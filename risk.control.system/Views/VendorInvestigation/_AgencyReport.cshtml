@@ -1,7 +1,6 @@
 ﻿@using risk.control.system.Helpers
 @model CaseInvestigationVendorsModel
 
-
 <article>
     <div class="bb-blog-inner">
  
@@ -33,13 +32,12 @@
             
             <div class="card-body">
                 <div class="row">
-
-                    @{
-                        var template = Model.InvestigationReport.ReportTemplate;
-                        template.CaseId = Model.ClaimsInvestigation.Id;
-                    }
                     <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
-                    <partial name="_Location" model="@template" />
+                    @await Component.InvokeAsync("Location", new {
+                    reportTemplateId = Model.ClaimsInvestigation.ReportTemplateId,
+                                        caseId = Model.ClaimsInvestigation.Id,
+                                        insuranceType = Model.ClaimsInvestigation.PolicyDetail.InsuranceType
+                                        })
 
                 </div>
                 <div class="row">

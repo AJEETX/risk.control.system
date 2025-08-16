@@ -1,0 +1,114 @@
+﻿@using risk.control.system.Helpers;
+@model List<LocationTemplate>
+@{
+	var locations = Model;
+}
+<div class="col-sm-6 d-flex align-items-stretch flex-column">
+	<div class="card bg-light equal-height-card">
+		<div class="card-footer text-muted border-bottom-0">
+			<i class="fas fa-newspaper"></i> <strong> Report Summary </strong>
+		</div>
+		<div class="card-body scrollable-body">
+			<table class="table table-bordered table-hover table-sm">
+				<thead class="thead-light">
+					<tr>
+						<th title="Location (Time spent on the location)"><i class="fas fa-map-marker-alt"></i> [Time spent]</th>
+						<th>Agent</th>
+						<th>Face ID</th>
+						<th>Document ID</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var location in locations)
+					{
+						var duration = location.Updated.GetValueOrDefault().Subtract(location.AgentIdReport.Updated.GetValueOrDefault());
+						var durationText = (duration.Hours > 0 ? $"{duration.Hours}h " : "") +
+						(duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
+
+						<tr>
+							<td>
+								<span class="badge  @location.LocationStatusButton" title="Location (Time spent on the location)">
+									@location.LocationName
+								</span>
+								<span>
+									@if (location.ValidationExecuted)
+									{
+										@durationText
+									}
+									@if (location.IsRequired)
+									{
+										<span class="required-asterisk" title="Mandatory Location">*</span>
+									}
+								</span>
+							</td>
+
+							<td>
+								@if (location.AgentIdReport.ValidationExecuted)
+								{
+									@if (location.AgentIdReport.IdImageValid.GetValueOrDefault())
+									{
+										<i class='fas fa-check-circle i-green'></i>
+									}
+									else
+									{
+										<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+									}
+								}
+								else
+								{
+									<span>--</span>
+								}
+							</td>
+							<td>
+								@foreach (var face in location.FaceIds.Where(f => f.Selected))
+								{
+									<div>
+										@if (face.ValidationExecuted)
+										{
+											@if (face.IdImageValid.GetValueOrDefault())
+											{
+												<i class='fas fa-check-circle i-green'></i>
+											}
+											else
+											{
+												<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+											}
+											<span class="badge"> @face.ReportName</span>
+										}
+										else
+										{
+											<span>--</span>
+										}
+									</div>
+								}
+							</td>
+							<td>
+								@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+								{
+									<div>
+										@if (doc.ValidationExecuted)
+										{
+											@if (doc.IdImageValid.GetValueOrDefault())
+											{
+												<i class='fas fa-check-circle i-green'></i>
+											}
+											else
+											{
+												<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+											}
+											<span class="badge"> @doc.ReportName</span>
+										}
+										else
+										{
+											<span>--</span>
+										}
+									</div>
+								}
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

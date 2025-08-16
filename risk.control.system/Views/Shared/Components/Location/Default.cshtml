@@ -19,7 +19,6 @@
 						<span class="required-asterisk" title="Mandatory Location">*</span>
 					}
 				</h5>
-
 				<button class="btn btn-sm @location.LocationStatusButton  mb-2" type="button"
 						data-toggle="collapse"
 						data-target="#location-@location.Id"
@@ -28,13 +27,8 @@
 					 <i class="fas fa-chevron-down"></i>
 				</button>
 			</div>
-			
-
 			<div id="location-@location.Id" class="collapse">
-
 				<div class="card-body bg-light">
-					@* Insert all the current content here (the agent table, face/doc/questions) *@
-
 					@Html.AntiForgeryToken()
 					<button class="btn btn-sm @location.AgentStatus mb-2" type="button"
 							data-toggle="collapse"
@@ -152,13 +146,10 @@
 					</div>
 					<!-- FaceIds Table -->
 					<partial name="_LocationFaceId" model="@location" />
-
 					<!-- DocumentIds Table -->
-
 					<partial name="_LocationDocId" model="@location" />
-
 					<!-- Media Table -->
-					@* <partial name="_LocationMedia" model="@location" /> *@
+					<partial name="_LocationMedia" model="@location" />
 					<!-- Questions Table -->
 					<partial name="_LocationQuestion" model="@location" />
 				</div> <!-- card-body -->

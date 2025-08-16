@@ -19,16 +19,19 @@ namespace risk.control.system.Controllers.Company
     {
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
+        private readonly ICaseVendorService caseVendorService;
         private readonly ILogger<ManagerController> logger;
         private readonly IInvestigationService investigativeService;
 
         public ManagerController(INotyfService notifyService,
             IInvoiceService invoiceService,
+            ICaseVendorService caseVendorService,
             ILogger<ManagerController> logger,
             IInvestigationService investigativeService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
+            this.caseVendorService = caseVendorService;
             this.logger = logger;
             this.investigativeService = investigativeService;
         }
@@ -126,7 +129,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
+                var model = await caseVendorService.GetInvestigatedReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);

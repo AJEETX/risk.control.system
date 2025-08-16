@@ -1,27 +1,20 @@
 ﻿@using risk.control.system.Helpers;
 @model CaseInvestigationVendorsModel
-
-
 <article>
     <div class="bb-blog-inner">
- 
         <div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
             <div class="card-header bg-light text-white text-center">
                 <h3 class="card-title">
                     <i class="fas fa-print nav-icon"></i> Agency Report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span>
-
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
                             <span>
-
                                 <i class="fas fa-user-shield"></i><b> @Model.ClaimsInvestigation.Vendor.Email</b> report 
                             </span>
-
                         </span>
                     </span>
                 </h3>
-
                 <div class="card-tools">
                     <span data-toggle="tooltip" title="Agency report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): @Model.ClaimsInvestigation.Vendor.Email" class="badge badge-light">
                         <i class='far fa-hand-point-right'></i>
@@ -33,17 +26,14 @@
             </div>
             
             <div class="card-body">
-
                 <div class="row">
-
-                    @{
-                        var template = Model.InvestigationReport.ReportTemplate;
-                        template.CaseId = Model.ClaimsInvestigation.Id;
-                    }
                     <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
                     <input type="hidden" id="address" value="@Model.Address" />
-                    <partial name="_Location" model="@template" />
-
+                    @await Component.InvokeAsync("Location", new {
+                                        reportTemplateId = Model.ClaimsInvestigation.ReportTemplateId,
+                                        caseId = Model.ClaimsInvestigation.Id,
+                                        insuranceType = Model.ClaimsInvestigation.PolicyDetail.InsuranceType
+                                        })
                 </div>
                 <div class="row">
                     <partial name="_AgencyAgentAnswer" model="@Model" />

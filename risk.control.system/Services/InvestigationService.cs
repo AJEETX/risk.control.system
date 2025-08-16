@@ -199,7 +199,6 @@ namespace risk.control.system.Services
                 return null!;
             }
         }
-
         public async Task<ClientCompany> CreateCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument)
         {
             try
@@ -589,7 +588,6 @@ namespace risk.control.system.Services
 
             return model;
         }
-
         public async Task<CaseTransactionModel> GetClaimDetailsAiReportSummary(CaseTransactionModel model)
         {
             var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);

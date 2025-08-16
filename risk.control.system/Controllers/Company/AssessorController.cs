@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index));
                 }
-                var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
+                var model = await caseVendorService.GetAgencyReport(currentUserEmail, selectedcase);
                 if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index));
                 }
-                var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
+                var model = await caseVendorService.GetAgencyReport(currentUserEmail, selectedcase);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Cases");
@@ -175,7 +175,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
+                var model = await caseVendorService.GetInvestigatedReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -261,7 +261,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
+                var model = await caseVendorService.GetInvestigatedReport(currentUserEmail, id);
                 if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);

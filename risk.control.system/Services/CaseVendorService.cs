@@ -14,7 +14,10 @@ namespace risk.control.system.Services
         Task<CaseTransactionModel> GetInvestigatedForAgent(string currentUserEmail, long id);
 
         Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase);
+        Task<CaseInvestigationVendorsModel> GetAgencyReport(string userEmail, long selectedcase);
+        Task<CaseTransactionModel> GetInvestigatedReport(string currentUserEmail, long id);
 
+        Task<CaseInvestigationVendorsModel> GetAgencyEnquiry(string userEmail, long selectedcase);
     }
 
     public class CaseVendorService : ICaseVendorService
@@ -185,6 +188,152 @@ namespace risk.control.system.Services
 
             return model;
         }
+
+        public async Task<CaseInvestigationVendorsModel> GetAgencyEnquiry(string userEmail, long selectedcase)
+        {
+            var claim = await _context.Investigations
+               //.Include(c => c.InvestigationTimeline)
+               .Include(c => c.InvestigationReport)
+               .ThenInclude(c => c.EnquiryRequest)
+               .Include(c => c.InvestigationReport)
+               .ThenInclude(c => c.EnquiryRequests)
+               .Include(c => c.Vendor)
+               .Include(c => c.ClientCompany)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.BeneficiaryRelation)
+               .Include(c => c.CaseNotes)
+               .Include(c => c.CaseMessages)
+               .FirstOrDefaultAsync(c => c.Id == selectedcase);
+            if (claim is null) return null!;
+
+            var beneficiaryDetails = await _context.BeneficiaryDetail
+                .Include(c => c.PinCode)
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.District)
+                .Include(c => c.Country)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claim.BeneficiaryDetail.BeneficiaryDetailId);
+
+            var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claim.CustomerDetail.ContactNumber = customerContactMasked;
+
+            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+
+            claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+
+            beneficiaryDetails.ContactNumber = beneficairyContactMasked;
+
+            return (new CaseInvestigationVendorsModel
+            {
+                InvestigationReport = claim.InvestigationReport,
+                Location = beneficiaryDetails,
+                ClaimsInvestigation = claim,
+                Address = claim.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured"
+            });
+        }
+        public async Task<CaseInvestigationVendorsModel> GetAgencyReport(string userEmail, long selectedcase)
+        {
+            var claim = await _context.Investigations
+               //.Include(c => c.InvestigationTimeline)
+               .Include(c => c.InvestigationReport)
+               //.ThenInclude(c => c.EnquiryRequest)
+               //.Include(c => c.InvestigationReport)
+               //.ThenInclude(c => c.EnquiryRequests)
+               .Include(c => c.Vendor)
+               .Include(c => c.ClientCompany)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.BeneficiaryRelation)
+               .Include(c => c.CaseNotes)
+               .Include(c => c.CaseMessages)
+               .FirstOrDefaultAsync(c => c.Id == selectedcase);
+            if (claim is null) return null!;
+
+            var beneficiaryDetails = await _context.BeneficiaryDetail
+                .Include(c => c.PinCode)
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.District)
+                .Include(c => c.Country)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claim.BeneficiaryDetail.BeneficiaryDetailId);
+
+            var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claim.CustomerDetail.ContactNumber = customerContactMasked;
+
+            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+
+            claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+
+            beneficiaryDetails.ContactNumber = beneficairyContactMasked;
+
+            //var caseReportTemplate = await _context.ReportTemplates
+            //    .Include(r => r.LocationTemplate)
+            //       .ThenInclude(l => l.AgentIdReport)
+            //   //.Include(r => r.LocationTemplate)
+            //   //.ThenInclude(l => l.MediaReports)
+            //   .Include(r => r.LocationTemplate)
+            //       .ThenInclude(l => l.FaceIds)
+            //   .Include(r => r.LocationTemplate)
+            //       .ThenInclude(l => l.DocumentIds)
+            //   .Include(r => r.LocationTemplate)
+            //       .ThenInclude(l => l.Questions)
+            //       .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+
+            //claim.InvestigationReport.ReportTemplate = caseReportTemplate;
+
+            return (new CaseInvestigationVendorsModel
+            {
+                InvestigationReport = claim.InvestigationReport,
+                Location = beneficiaryDetails,
+                ClaimsInvestigation = claim,
+                Address = claim.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured"
+            });
+        }
         public async Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
             var claim = await _context.Investigations
@@ -223,7 +372,7 @@ namespace risk.control.system.Services
                .Include(c => c.CaseNotes)
                .Include(c => c.CaseMessages)
                .FirstOrDefaultAsync(c => c.Id == selectedcase);
-            if (claim is null) return null;
+            if (claim is null) return null!;
 
             var beneficiaryDetails = await _context.BeneficiaryDetail
                 .Include(c => c.PinCode)
@@ -242,20 +391,20 @@ namespace risk.control.system.Services
 
             beneficiaryDetails.ContactNumber = beneficairyContactMasked;
 
-            var caseReportTemplate = await _context.ReportTemplates
-                .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.AgentIdReport)
-               //.Include(r => r.LocationTemplate)
-               //.ThenInclude(l => l.MediaReports)
-               .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.FaceIds)
-               .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationTemplate)
-                   .ThenInclude(l => l.Questions)
-                   .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+            //var caseReportTemplate = await _context.ReportTemplates
+            //    .Include(r => r.LocationTemplate)
+            //       .ThenInclude(l => l.AgentIdReport)
+            //   //.Include(r => r.LocationTemplate)
+            //   //.ThenInclude(l => l.MediaReports)
+            //   .Include(r => r.LocationTemplate)
+            //       .ThenInclude(l => l.FaceIds)
+            //   .Include(r => r.LocationTemplate)
+            //       .ThenInclude(l => l.DocumentIds)
+            //   .Include(r => r.LocationTemplate)
+            //       .ThenInclude(l => l.Questions)
+            //       .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 
-            claim.InvestigationReport.ReportTemplate = caseReportTemplate;
+            //claim.InvestigationReport.ReportTemplate = caseReportTemplate;
 
             return (new CaseInvestigationVendorsModel
             {
@@ -264,6 +413,72 @@ namespace risk.control.system.Services
                 ClaimsInvestigation = claim,
                 Address = claim.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured"
             });
+        }
+
+        public async Task<CaseTransactionModel> GetInvestigatedReport(string currentUserEmail, long id)
+        {
+            var claim = await _context.Investigations
+              .Include(c => c.InvestigationTimeline)
+              .Include(c => c.InvestigationReport)
+              .ThenInclude(c => c.EnquiryRequest)
+              .Include(c => c.InvestigationReport)
+              .ThenInclude(c => c.EnquiryRequests)
+              .Include(c => c.Vendor)
+              .Include(c => c.ClientCompany)
+              .ThenInclude(c => c.Country)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.InvestigationServiceType)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.CostCentre)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.CaseEnabler)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.PinCode)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.District)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.State)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.Country)
+              .Include(c => c.BeneficiaryDetail)
+              .ThenInclude(c => c.PinCode)
+              .Include(c => c.BeneficiaryDetail)
+              .ThenInclude(c => c.District)
+              .Include(c => c.BeneficiaryDetail)
+              .ThenInclude(c => c.State)
+              .Include(c => c.BeneficiaryDetail)
+              .ThenInclude(c => c.Country)
+              .Include(c => c.BeneficiaryDetail)
+              .ThenInclude(c => c.BeneficiaryRelation)
+              .Include(c => c.CaseNotes)
+              .Include(c => c.CaseMessages)
+              .FirstOrDefaultAsync(c => c.Id == id);
+            if (claim is null) return null!;
+
+            var beneficiaryDetails = await _context.BeneficiaryDetail
+                .Include(c => c.PinCode)
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.District)
+                .Include(c => c.Country)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claim.BeneficiaryDetail.BeneficiaryDetailId);
+
+            var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claim.CustomerDetail.ContactNumber = customerContactMasked;
+
+            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+
+            claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+
+            beneficiaryDetails.ContactNumber = beneficairyContactMasked;
+            var model = new CaseTransactionModel
+            {
+                ClaimsInvestigation = claim,
+                CaseIsValidToAssign = claim.IsValidCaseData(),
+                Location = claim.BeneficiaryDetail,
+            };
+
+            return model;
         }
     }
 }
