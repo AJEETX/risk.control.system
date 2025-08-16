@@ -705,7 +705,7 @@ namespace risk.control.system.Services
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
-                //backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(claimsInvestigationId, userEmail));
+                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(claimsInvestigationId, userEmail));
 
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
@@ -750,7 +750,7 @@ namespace risk.control.system.Services
 
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);
 
-                //backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(claimsInvestigationId, userEmail));
+                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(claimsInvestigationId, userEmail));
 
                 return saveCount > 0 ? (claim.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }

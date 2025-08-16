@@ -471,11 +471,15 @@ namespace risk.control.system.Services
             claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
 
             beneficiaryDetails.ContactNumber = beneficairyContactMasked;
+
+            var invoice = _context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+
             var model = new CaseTransactionModel
             {
                 ClaimsInvestigation = claim,
                 CaseIsValidToAssign = claim.IsValidCaseData(),
                 Location = claim.BeneficiaryDetail,
+                VendorInvoice = invoice
             };
 
             return model;
