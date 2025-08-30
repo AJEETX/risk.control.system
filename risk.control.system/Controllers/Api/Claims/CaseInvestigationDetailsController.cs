@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -54,9 +55,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var response = new
             {
                 Document =
-                    policy.DocumentImage != null ?
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(policy.DocumentImage)) :
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                    policy.DocumentPath != null ? policy.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
                 ContractNumber = policy.ContractNumber,
                 ClaimType = policy.InsuranceType.GetEnumDisplayName(),
                 ContractIssueDate = policy.ContractIssueDate.ToString("dd-MMM-yyyy"),
@@ -106,8 +105,7 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(
                 new
                 {
-                    Customer = customer?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(customer.ProfilePicture)) :
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                    Customer = customer?.ImagePath != null ? customer.ImagePath : "/img/user.png",
                     CustomerName = customer.Name,
                     ContactNumber = new string('*', customer.ContactNumber.ToString().Length - 4) + customer.ContactNumber.ToString().Substring(customer.ContactNumber.ToString().Length - 4),
                     Address = customer.Addressline + "  " + customer.District.Name + "  " + customer.State.Name + "  " + customer.Country.Name + "  " + customer.PinCode.Code,
@@ -137,8 +135,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             return Ok(new
             {
-                Beneficiary = beneficiary?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture)) :
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                Beneficiary = beneficiary?.ImagePath != null ? beneficiary?.ImagePath : "/img/user.png",
                 BeneficiaryName = beneficiary.Name,
                 Dob = (int)beneficiary.DateOfBirth.GetValueOrDefault().Subtract(DateTime.Now).TotalDays / 365,
                 Income = beneficiary.Income.GetEnumDisplayName(),
@@ -157,10 +154,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
-
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-image.png");
-
-            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
             var latitude = customer.Latitude;
             var longitude = customer.Longitude.Trim();
@@ -190,10 +183,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.InvestigationTaskId == claimId);
-
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-image.png");
-
-            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
             var latitude = beneficiary.Latitude;
             var longitude = beneficiary.Longitude.Trim();

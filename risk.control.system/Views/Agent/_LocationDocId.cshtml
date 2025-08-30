@@ -37,7 +37,7 @@
 						@if (doc.ValidationExecuted)
 						{
 							<img id="doc-img-@doc.Id"
-								 src="data:image/*;base64,@(Convert.ToBase64String(doc?.IdImage))"
+								 src="@(doc?.FilePath)"
 								 class="thumbnail-image thumbnail profile-image doc-profile-image preview-image"
 								 title="Click to view document" />
 						}

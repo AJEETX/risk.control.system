@@ -36,8 +36,8 @@
 						@if (face.ValidationExecuted)
 						{
 							<img id="face-img-@face.Id"
-								 src="data:image/*;base64,@(Convert.ToBase64String(face?.IdImage))"
-									 class="thumbnail-image thumbnail profile-image doc-profile-image preview-image"
+								 src="@(face?.FilePath)"
+									 class="mobile-capture-info preview-image"
 								 title="Click to view face photo" />
 						}
 						else
@@ -49,7 +49,7 @@
 						@if (face.ValidationExecuted && face.IdImageLocationUrl != null)
 						{
 								<img src="@string.Format(face.IdImageLocationUrl, "500","500")"
-									 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
+									 class="mobile-capture-map map-image"
 								 data-faceid="@face.Id"
 								 data-locationid="@location.Id"
 								 data-source="face"

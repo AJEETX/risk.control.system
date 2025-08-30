@@ -356,7 +356,7 @@ namespace risk.control.system.Controllers.Api
                         claimId = c.Id,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                         claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
-                        DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
+                        DocumentPhoto = c.PolicyDetail.DocumentPath != null ? c.PolicyDetail.DocumentPath :
                         Applicationsettings.NO_POLICY_IMAGE,
                         CustomerName = c.CustomerDetail.Name,
                         CustomerEmail = email,
@@ -364,7 +364,7 @@ namespace risk.control.system.Controllers.Api
                         Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
                         c.CustomerDetail.Addressline,
                         c.CustomerDetail.PinCode.Code,
-                        CustomerPhoto = c?.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c?.CustomerDetail.ProfilePicture)) :
+                        CustomerPhoto = c?.CustomerDetail.ImagePath != null ? c?.CustomerDetail.ImagePath :
                         Applicationsettings.USER_PHOTO,
                         Country = c.CustomerDetail.Country.Name,
                         State = c.CustomerDetail.State.Name,
@@ -373,7 +373,7 @@ namespace risk.control.system.Controllers.Api
                         Locations = new
                         {
                             c.BeneficiaryDetail.BeneficiaryDetailId,
-                            Photo = c.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.BeneficiaryDetail.ProfilePicture)) :
+                            Photo = c.BeneficiaryDetail?.ImagePath != null ? c.BeneficiaryDetail.ImagePath :
                             Applicationsettings.USER_PHOTO,
                             c.BeneficiaryDetail.Country.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
@@ -521,9 +521,7 @@ namespace risk.control.system.Controllers.Api
                             ClaimId = claim.Id,
                             PolicyNumber = claim.PolicyDetail.ContractNumber,
                             ClaimType = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
-                            Document = claim.PolicyDetail.DocumentImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.PolicyDetail.DocumentImage)) :
-                            Applicationsettings.NO_POLICY_IMAGE,
+                            Document = claim.PolicyDetail.DocumentPath != null ? claim.PolicyDetail.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
                             IssueDate = claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
                             IncidentDate = claim.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
                             Amount = claim.PolicyDetail.SumAssuredValue,
@@ -534,9 +532,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             BeneficiaryId = beneficiary.BeneficiaryDetailId,
                             Name = beneficiary.Name,
-                            Photo = beneficiary.ProfilePicture != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture)) :
-                            Applicationsettings.USER_PHOTO,
+                            Photo = beneficiary.ImagePath != null ? beneficiary.ImagePath : Applicationsettings.USER_PHOTO,
                             Relation = beneficiary.BeneficiaryRelation.Name,
                             Income = beneficiary.Income.GetEnumDisplayName(),
                             Phone = beneficiary.ContactNumber,
@@ -547,8 +543,8 @@ namespace risk.control.system.Controllers.Api
                         {
                             Name = claim.CustomerDetail.Name,
                             Occupation = claim.CustomerDetail.Occupation.GetEnumDisplayName(),
-                            Photo = claim.CustomerDetail.ProfilePicture != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.CustomerDetail.ProfilePicture)) :
+                            Photo = claim.CustomerDetail.ImagePath != null ?
+                            claim.CustomerDetail.ImagePath :
                             Applicationsettings.USER_PHOTO,
                             Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
                             Phone = claim.CustomerDetail.ContactNumber,

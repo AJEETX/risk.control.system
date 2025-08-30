@@ -92,6 +92,8 @@ namespace risk.control.system.Services
                     : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower()) // Get matching record
                     ?? context.BeneficiaryRelation.FirstOrDefault();
 
+                var extension = Path.GetExtension(BENEFICIARY_IMAGE).ToLower();
+                var fileName = Guid.NewGuid().ToString() + extension;
                 var beneficiaryNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), BENEFICIARY_IMAGE);
                 if (beneficiaryNewImage == null)
                 {
@@ -101,6 +103,16 @@ namespace risk.control.system.Services
                         Error = "null/empty"
                     });
                     errorBeneficiary.Add($"[Beneficiary image=`{BENEFICIARY_IMAGE}` null/not found]");
+                }
+                else
+                {
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary");
+                    if (!Directory.Exists(imagePath))
+                    {
+                        Directory.CreateDirectory(imagePath);
+                    }
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary", fileName);
+                    await File.WriteAllBytesAsync(filePath, beneficiaryNewImage);
                 }
                 if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryIncome) && Enum.TryParse<Income>(uploadCase.BeneficiaryIncome, true, out var incomeEnum))
                 {
@@ -152,7 +164,8 @@ namespace risk.control.system.Services
                     DistrictId = pinCode?.DistrictId,
                     StateId = pinCode?.StateId,
                     CountryId = pinCode?.CountryId,
-                    ProfilePicture = beneficiaryNewImage,
+                    //ProfilePicture = beneficiaryNewImage,
+                    ImagePath = "/beneficiary/" + fileName,
                     ProfilePictureExtension = Path.GetExtension(BENEFICIARY_IMAGE),
                     Updated = DateTime.Now,
                     UpdatedBy = companyUser.Email

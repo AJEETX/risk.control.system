@@ -169,9 +169,9 @@
                 <div class="form-group">
                     <label class="input-group-label"> Customer Photo:</label>
                     <div class="input-group mb-3">
-                        @if (Model?.ProfilePicture is not null)
+                        @if (Model?.ImagePath is not null)
                         {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" data-toggle="tooltip" title="Upload Customer Photo" />
+                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.ImagePath" data-toggle="tooltip" title="Upload Customer Photo" />
                             <i class="fa fa-asterisk asterik-style"></i>
                             <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Upload Customer Photo" />
                         }
@@ -181,7 +181,7 @@
                             <i class="fa fa-asterisk asterik-style"></i>
                             <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required />
                         }
-                        <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                        <span asp-validation-for="ImagePath" class="text-danger"></span>
 
                     </div>
                 </div>

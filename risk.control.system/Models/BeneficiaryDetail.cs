@@ -25,12 +25,8 @@ namespace risk.control.system.Models
         [Display(Name = "Annual Income")]
         public Income? Income { get; set; }
 
-        [FileExtensions(Extensions = "jpg,jpeg,png")]
-        [Display(Name = "Beneficiary Photo")]
-        public string? ProfilePictureUrl { get; set; }
+        public string? ImagePath { get; set; }
 
-        [Display(Name = "Photo")]
-        public byte[]? ProfilePicture { get; set; }
         public string? ProfilePictureExtension { get; set; }
 
         [Display(Name = "Photo")]

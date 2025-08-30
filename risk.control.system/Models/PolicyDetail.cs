@@ -1,6 +1,7 @@
-﻿using risk.control.system.Helpers;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Models
 {
@@ -55,6 +56,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Case Document")]
         public string? DocumentImageExtension { get; set; }
+        public string? DocumentPath { get; set; }
         public byte[]? DocumentImage { get; set; } = default!;
 
         [Display(Name = "Case remarks")]

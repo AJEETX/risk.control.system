@@ -12,7 +12,7 @@
         public string? Icon { get; set; } = "fas fa-sync fa-spin i-grey";
         public string? Status { get; set; } = "Processing";
         public string? Message { get; set; } = "Upload In progress";
-        public byte[] ByteData { get; set; }
+        public byte[]? ByteData { get; set; }
         public byte[]? ErrorByteData { get; set; }
         public int RecordCount { get; set; } = 0;
         public List<long>? CaseIds { get; set; } = new();

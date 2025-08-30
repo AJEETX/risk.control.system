@@ -6,7 +6,7 @@ namespace risk.control.system.Middleware
         private readonly string _categoryName;
         private readonly string _logDirectory;
         private readonly LogLevel _minLogLevel;
-
+        private static readonly object _fileLock = new object();
         public CsvLogger(string categoryName, string logDirectory, LogLevel minLogLevel)
         {
             _categoryName = categoryName;
@@ -30,7 +30,16 @@ namespace risk.control.system.Middleware
             var exceptionDetails = exception?.ToString().Replace("\"", "\"\"") ?? "";
 
             var logLine = $"\"{timestamp}\",\"{logLevel}\",\"{_categoryName}\",\"{message}\",\"{exceptionDetails}\"\n";
-            File.AppendAllText(filePath, logLine, Encoding.UTF8);
+
+            lock (_fileLock)
+            {
+                using (var stream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                {
+                    writer.WriteLine(logLine);
+                }
+            }
+            //File.AppendAllText(filePath, logLine, Encoding.UTF8);
         }
 
         private string GetLogFilePath()

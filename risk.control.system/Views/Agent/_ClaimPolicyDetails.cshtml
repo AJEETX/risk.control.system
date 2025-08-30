@@ -78,9 +78,9 @@
                     </div>
                     <div class="col-5 text-center">
                         <p class="text-muted text-sm">
-                            @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
+                            @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentPath is not null)
                             {
-                                <img id="documentImage" class="img-fluid" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))" data-toggle="tooltip" title="@Model?.ClaimsInvestigation?.PolicyDetail.ContractNumber Document">
+                                <img id="documentImage" class="img-fluid" src="@Model?.ClaimsInvestigation?.PolicyDetail.DocumentPath" data-toggle="tooltip" title="@Model?.ClaimsInvestigation?.PolicyDetail.ContractNumber Document">
                             }
                             else
                             {

@@ -5,7 +5,7 @@ namespace risk.control.system.Services
 {
     public interface ICaseCreationService
     {
-        Task<UploadResult> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model);
+        Task<UploadResult> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] model, ORIGIN fileOrFTP);
     }
     public class CaseCreationService : ICaseCreationService
     {
@@ -19,7 +19,7 @@ namespace risk.control.system.Services
             this.logger = logger;
         }
 
-        public async Task<UploadResult> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model)
+        public async Task<UploadResult> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] model, ORIGIN fileOrFTP)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace risk.control.system.Services
                     logger.LogCritical($"Either company User and/or Upload case is null or No case saved");
                     return null;
                 }
-                var claimUploaded = await caseDetailCreationService.AddCaseDetail(uploadCase, companyUser, model);
+                var claimUploaded = await caseDetailCreationService.AddCaseDetail(uploadCase, companyUser, model, fileOrFTP);
                 if (claimUploaded == null)
                 {
                     logger.LogCritical($"Upload case(s) is null.");

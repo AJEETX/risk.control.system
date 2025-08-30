@@ -163,7 +163,7 @@ $(document).ready(function () {
             {
                 "data": "location",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.status + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-toggle="tooltip"><small>' + data + '</small></span>'
                 }
             },
             {

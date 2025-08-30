@@ -122,7 +122,16 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
-                    claimsInvestigation.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
+                    //claimsInvestigation.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(claimDocument.FileName);
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "policy");
+                    if (!Directory.Exists(imagePath))
+                    {
+                        Directory.CreateDirectory(imagePath);
+                    }
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "policy", fileName);
+                    await File.WriteAllBytesAsync(filePath, dataStream.ToArray());
+                    claimsInvestigation.PolicyDetail.DocumentPath = "/policy/" + fileName;
                 }
 
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
@@ -180,7 +189,12 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
-                    existingPolicy.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
+                    //existingPolicy.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(claimDocument.FileName);
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "policy");
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "policy", fileName);
+                    await File.WriteAllBytesAsync(filePath, dataStream.ToArray());
+                    claimsInvestigation.PolicyDetail.DocumentPath = "/policy/" + fileName;
                 }
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
@@ -213,7 +227,17 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
                     customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
-                    customerDetail.ProfilePicture = dataStream.ToArray();
+                    //customerDetail.ProfilePicture = dataStream.ToArray();
+
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(customerDocument.FileName);
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "customer");
+                    if (!Directory.Exists(imagePath))
+                    {
+                        Directory.CreateDirectory(imagePath);
+                    }
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "customer", fileName);
+                    await File.WriteAllBytesAsync(filePath, dataStream.ToArray());
+                    customerDetail.ImagePath = "/customer/" + fileName;
                 }
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
@@ -268,15 +292,24 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     await customerDocument.CopyToAsync(dataStream);
                     customerDetail.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
-                    customerDetail.ProfilePicture = dataStream.ToArray();
+                    //customerDetail.ProfilePicture = dataStream.ToArray();
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(customerDocument.FileName);
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "customer");
+                    if (!Directory.Exists(imagePath))
+                    {
+                        Directory.CreateDirectory(imagePath);
+                    }
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "customer", fileName);
+                    await File.WriteAllBytesAsync(filePath, dataStream.ToArray());
+                    customerDetail.ImagePath = "/customer/" + fileName;
                 }
                 else
                 {
-                    // Fetch existing customer to retain the existing ProfilePicture
                     var existingCustomer = await context.CustomerDetail
                         .AsNoTracking()
                         .FirstOrDefaultAsync(c => c.InvestigationTaskId == customerDetail.InvestigationTaskId);
-                    customerDetail.ProfilePicture ??= existingCustomer.ProfilePicture;
+                    //customerDetail.ProfilePicture ??= existingCustomer.ProfilePicture;
+                    customerDetail.ImagePath = existingCustomer.ImagePath;
                 }
                 claimsInvestigation.IsNew = true;
                 claimsInvestigation.UpdatedBy = userEmail;
@@ -303,7 +336,6 @@ namespace risk.control.system.Services
                     customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
                 customerDetail.CustomerLocationMap = url;
 
-                // Attach the customerDetail object to the context and mark it as modified
                 context.CustomerDetail.Attach(customerDetail);
                 context.Entry(customerDetail).State = EntityState.Modified;
                 context.Investigations.Update(claimsInvestigation);
@@ -331,8 +363,17 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
-                    beneficiary.ProfilePicture = dataStream.ToArray();
+                    //beneficiary.ProfilePicture = dataStream.ToArray();
                     beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(customerDocument.FileName);
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary");
+                    if (!Directory.Exists(imagePath))
+                    {
+                        Directory.CreateDirectory(imagePath);
+                    }
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary", fileName);
+                    await File.WriteAllBytesAsync(filePath, dataStream.ToArray());
+                    beneficiary.ImagePath = "/beneficiary/" + fileName;
                 }
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == ClaimsInvestigationId);
@@ -386,15 +427,20 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
-                    beneficiary.ProfilePicture = dataStream.ToArray();
+                    //beneficiary.ProfilePicture = dataStream.ToArray();
                     beneficiary.ProfilePictureExtension = Path.GetExtension(customerDocument.FileName);
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(customerDocument.FileName);
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary");
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary", fileName);
+                    await File.WriteAllBytesAsync(filePath, dataStream.ToArray());
+                    beneficiary.ImagePath = "/beneficiary/" + fileName;
                 }
                 else
                 {
                     var existingBeneficiary = context.BeneficiaryDetail.AsNoTracking().Where(c => c.BeneficiaryDetailId == beneficiaryDetailId).FirstOrDefault();
-                    if (existingBeneficiary.ProfilePicture != null)
+                    if (existingBeneficiary.ImagePath != null)
                     {
-                        beneficiary.ProfilePicture = existingBeneficiary.ProfilePicture;
+                        beneficiary.ImagePath = existingBeneficiary.ImagePath;
                     }
                 }
 
@@ -512,6 +558,8 @@ namespace risk.control.system.Services
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
                 .Include(c => c.InvestigationTimeline)
+                .Include(c => c.InvestigationReport.EnquiryRequest)
+                .Include(c => c.InvestigationReport.EnquiryRequests)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
                  .Include(c => c.PolicyDetail)
@@ -540,11 +588,16 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claim.CustomerDetail.ContactNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
-            claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
-
+            if (claim.CustomerDetail != null)
+            {
+                var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+                claim.CustomerDetail.ContactNumber = maskedCustomerContact;
+            }
+            if (claim.BeneficiaryDetail != null)
+            {
+                var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+                claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+            }
             var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
@@ -896,8 +949,8 @@ namespace risk.control.system.Services
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeCode = ClaimsInvestigationExtension.GetPincodeCode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
+                Document = a.PolicyDetail?.DocumentPath != null ? a.PolicyDetail?.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ImagePath != null ? a.CustomerDetail?.ImagePath : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-light\">customer name</span>",
                 Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
                 IsUploaded = a.IsUploaded,
@@ -910,7 +963,7 @@ namespace risk.control.system.Services
                 ServiceType = $"{a.PolicyDetail?.InsuranceType.GetEnumDisplayName()} ( {a.PolicyDetail.InvestigationServiceType.Name})",
                 timePending = GetDraftedTimePending(a),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? a.BeneficiaryDetail?.ImagePath : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-light\">beneficiary name</span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
                 BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
@@ -1140,8 +1193,8 @@ namespace risk.control.system.Services
                 CaseWithPerson = a.CaseOwner,
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
+                Document = a.PolicyDetail?.DocumentPath != null ? a.PolicyDetail?.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ImagePath != null ? a.CustomerDetail?.ImagePath : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
                 Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
                 Status = a.ORIGIN.GetEnumDisplayName(),
@@ -1153,7 +1206,7 @@ namespace risk.control.system.Services
                 Created = a.Created.ToString("dd-MM-yyyy"),
                 timePending = a.GetCreatorTimePending(),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds, // Calculate here
                 PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
@@ -1330,11 +1383,11 @@ namespace risk.control.system.Services
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeCode = ClaimsInvestigationExtension.GetPincodeCode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                Document = a.PolicyDetail?.DocumentImage != null
-                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage))
+                Document = a.PolicyDetail?.DocumentPath != null
+                        ? a.PolicyDetail?.DocumentPath
                         : Applicationsettings.NO_POLICY_IMAGE,
-                Customer = a.CustomerDetail?.ProfilePicture != null
-                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture))
+                Customer = a.CustomerDetail?.ImagePath != null
+                        ? a.CustomerDetail?.ImagePath
                         : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i> </span>",
                 Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
@@ -1347,8 +1400,8 @@ namespace risk.control.system.Services
                 Created = a.Created.ToString("dd-MM-yyyy"),
                 timePending = GetManagerActiveTimePending(a),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null
-                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture))
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null
+                        ? a.BeneficiaryDetail?.ImagePath
                         : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name)
                         ? "<span class=\"badge badge-danger\"><i class=\"fas fa-exclamation-triangle\"></i></span>"

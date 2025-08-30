@@ -96,10 +96,9 @@ namespace risk.control.system.Services
 
             context.VendorInvoice.Add(invoice);
             await context.SaveChangesAsync(null, false);
-            var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
+            //var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
 
-            return reportFilename;
+            return "reportFilename";
         }
-
     }
 }

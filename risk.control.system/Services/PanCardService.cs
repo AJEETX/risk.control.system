@@ -19,17 +19,21 @@ namespace risk.control.system.Services
         private static readonly Regex panRegex = new Regex(@"[A-Z]{5}\d{4}[A-Z]{1}");
         private readonly IGoogleMaskHelper googleHelper;
         private readonly IHttpClientService httpClientService;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public PanCardService(IGoogleMaskHelper googleHelper, IHttpClientService httpClientService)
+        public PanCardService(IGoogleMaskHelper googleHelper, IHttpClientService httpClientService, IWebHostEnvironment webHostEnvironment)
         {
             this.googleHelper = googleHelper;
             this.httpClientService = httpClientService;
+            this.webHostEnvironment = webHostEnvironment;
         }
         public async Task<DocumentIdReport> Process(byte[] IdImage, IReadOnlyList<EntityAnnotation> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension)
         {
             string panNumber = string.Empty;
             string docyTypePan = string.Empty;
             byte[]? ocrImaged = null;
+            var filePath = Path.ChangeExtension(webHostEnvironment.WebRootPath, doc.FilePath);
+
             var allPanText = imageReadOnly.FirstOrDefault().Description;
             var panTextPre = allPanText.IndexOf(panNumber2Find);
             if (panTextPre > 0)
@@ -80,7 +84,8 @@ namespace risk.control.system.Services
 
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
                 var savedMaskedImage = CompressImage.ProcessCompress(image, onlyExtension);
-                doc.IdImage = savedMaskedImage;
+                await System.IO.File.WriteAllBytesAsync(filePath, savedMaskedImage);
+
                 doc.IdImageData = maskedImage.DocType + " data: ";
 
                 if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
@@ -93,7 +98,7 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                doc.IdImage = CompressImage.ProcessCompress(image, onlyExtension);
+                await File.WriteAllBytesAsync(filePath, CompressImage.ProcessCompress(image, onlyExtension));
                 doc.IdImageLongLatTime = DateTime.Now;
                 doc.IdImageData = "no data: ";
             }

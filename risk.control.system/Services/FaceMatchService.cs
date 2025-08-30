@@ -4,7 +4,7 @@ namespace risk.control.system.Services
 {
     public interface IFaceMatchService
     {
-        Task<(string, byte[], float)> GetFaceMatchAsync(byte[] registeredImage, byte[] face2Verify, string onlyExtension);
+        Task<(string, byte[], float)> GetFaceMatchAsync(byte[] registeredImage, byte[] faceImageBytes, string onlyExtension);
     }
     public class FaceMatchService : IFaceMatchService
     {
@@ -14,17 +14,17 @@ namespace risk.control.system.Services
         {
             this.compareFaces = compareFaces;
         }
-        public async Task<(string, byte[], float)> GetFaceMatchAsync(byte[] registeredImage, byte[] face2Verify, string onlyExtension)
+        public async Task<(string, byte[], float)> GetFaceMatchAsync(byte[] registeredImage, byte[] faceImageBytes, string onlyExtension)
         {
             string ImageData = string.Empty;
             try
             {
-                var matched = await compareFaces.DoFaceMatch(registeredImage, face2Verify);
-                return matched.Item1 ? (matched.Item2.ToString(), CompressImage.ProcessCompress(face2Verify, onlyExtension, 10, 99, matched.Item3), matched.Item2) : ("0", CompressImage.ProcessCompress(face2Verify, onlyExtension, 10, 99, matched.Item3), 0);
+                var matched = await compareFaces.DoFaceMatch(registeredImage, faceImageBytes);
+                return matched.Item1 ? (matched.Item2.ToString(), CompressImage.ProcessCompress(faceImageBytes, onlyExtension, 10, 99, matched.Item3), matched.Item2) : ("0", CompressImage.ProcessCompress(faceImageBytes, onlyExtension, 10, 99, matched.Item3), 0);
             }
             catch (Exception)
             {
-                return ("0", CompressImage.ProcessCompress(face2Verify, onlyExtension), 0);
+                return ("0", CompressImage.ProcessCompress(faceImageBytes, onlyExtension), 0);
             }
         }
     }

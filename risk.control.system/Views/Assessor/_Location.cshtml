@@ -73,8 +73,8 @@
 												@if (agent.ValidationExecuted)
 												{
 													<img id="face-img-@agent.Id"
-														 src="data:image/*;base64,@(Convert.ToBase64String(agent?.IdImage))"
-														 class="img-thumbnail rounded"
+														 src="@(agent?.FilePath)"
+														 class="mobile-capture-info"
 														 title="@location.AgentEmail photo" />
 												}
 												else
@@ -88,7 +88,7 @@
 												@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
 												{
 													<img src="@string.Format(@agent.IdImageLocationUrl, "600","500")"
-														 class="img-thumbnail"
+														 class="mobile-capture-info"
 														 data-faceid="@agent.Id"
 														 data-locationid="@location.Id"
 														 data-caseid="@Model.CaseId"
