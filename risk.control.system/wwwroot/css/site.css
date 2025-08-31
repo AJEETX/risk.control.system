@@ -3002,20 +3002,18 @@ th.col-match {
 .upload-progress{
     width:70px;
 }
-.mobile-capture-info {
+img.mobile-capture-info {
     padding: .25rem;
     background-color: #fff;
     border: 1px solid #dee2e6;
     border-radius:.3rem;
-    height: 200px;
-    width: 200px;
+    width: 300px;
 }
-.mobile-capture-map {
+img.mobile-capture-map {
     padding: .25rem;
     background-color: #fff;
     border: 1px solid #dee2e6;
     border-radius: .3rem;
-    height: 200px;
-    width: 200px;
+    width: 300px;
     cursor: pointer;
 }

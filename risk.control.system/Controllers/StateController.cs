@@ -164,7 +164,7 @@ namespace risk.control.system.Controllers
             return View(state);
         }
 
-        [Breadcrumb("Add New", FromAction = "Profile")]
+        [Breadcrumb("Add State", FromAction = "Profile")]
         public IActionResult Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Edit/5
-        [Breadcrumb("Edit", FromAction = "Profile")]
+        [Breadcrumb("Edit State", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1 || _context.State == null)
@@ -245,7 +245,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Delete/5
-        [Breadcrumb("Delete", FromAction = "Profile")]
+        [Breadcrumb("Delete State", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id < 1 || _context.State == null)
