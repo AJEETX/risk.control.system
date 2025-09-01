@@ -3003,17 +3003,17 @@ th.col-match {
     width:70px;
 }
 img.mobile-capture-info {
-    padding: .25rem;
+    padding: .1rem;
     background-color: #fff;
     border: 1px solid #dee2e6;
     border-radius:.3rem;
-    width: 300px;
+    width: 180px;
 }
 img.mobile-capture-map {
-    padding: .25rem;
+    padding: .1rem;
     background-color: #fff;
     border: 1px solid #dee2e6;
     border-radius: .3rem;
-    width: 300px;
+    width: 180px;
     cursor: pointer;
 }

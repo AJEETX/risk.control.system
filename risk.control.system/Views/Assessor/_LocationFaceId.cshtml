@@ -10,12 +10,10 @@
 		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 		<thead class="table-light">
 			<tr>
-					<th class="col-verifier-name" title="Verifier Name"><img class="action-image" src="~/headers/customer.gif" /></th>
 					<th class="col-face-photo">
 					<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-toggle="tooltip"></i>
 				</th>
-					<th class="col-pin-img" title="Indicative Address route"><img class="action-image" src="~/headers/pincode.gif" /></th>
-					<th class="col-address">Indicative Address</th>
+					<th class="col-pin-img" title="Indicative Address Info"><img class="action-image" src="~/headers/pincode.gif" /></th>
 					<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" /></th>
 					<th class="col-match">Match</th>
 			</tr>
@@ -24,13 +22,6 @@
 			@foreach (var face in location.FaceIds.Where(f => f.Selected && f.ValidationExecuted))
 			{
 				<tr>
-					<td>
-						<small>@face.ReportName</small>
-							@if (face.IsRequired)
-							{
-								<span class="required-asterisk" title="Mandatory Location">*</span>
-							}
-					</td>
 					
 					<td>
 						@if (face.ValidationExecuted)
@@ -39,6 +30,13 @@
 								 src="@(face?.FilePath)"
 									 class="mobile-capture-info preview-image"
 								 title="Click to view face photo" />
+								 <div>
+									 <small>@face.ReportName</small>
+										@if (face.IsRequired)
+										{
+											<span class="required-asterisk" title="Mandatory Location">*</span>
+										}
+								 </div>
 						}
 						else
 						{
@@ -54,18 +52,18 @@
 								 data-locationid="@location.Id"
 								 data-source="face"
 								 title="Click to view map" />
-
+								<div>
+									<div>@face.IdImageLongLat</div>
+									<small>@face.IdImageLocationAddress</small>
+									<div class="badge badge-light">
+										Indicative Distance from  @location.Address Address @face.Distance
+									</div>
+								</div>
 						}
 						else
 						{
 							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
 						}
-					</td>
-					<td>
-							<small>@face.IdImageLocationAddress</small>
-							<span class="badge badge-light">
-								Indicative Distance from @location.Address Address @face.Distance
-							</span>
 					</td>
 					<td>
 						<small>@face.IdImageData</small>

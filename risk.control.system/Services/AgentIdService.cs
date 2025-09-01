@@ -174,7 +174,8 @@ public class AgentIdService : IAgentIdService
             await File.WriteAllBytesAsync(filePath, compressImage);
             //face.IdImage = compressImage;
             face.DigitalIdImageMatchConfidence = confidence;
-            face.IdImageLocationAddress = $"(Latitude={latitude} Longitude={longitude} ) {address}";
+            face.IdImageLocationAddress = $"{address}";
+            face.IdImageLongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             face.ValidationExecuted = true;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
@@ -359,7 +360,8 @@ public class AgentIdService : IAgentIdService
             await File.WriteAllBytesAsync(filePath, compressImage);
             //face.IdImage = compressImage;
             face.MatchConfidence = confidence;
-            face.IdImageLocationAddress = $"(Latitude={latitude} Longitude={longitude} ) {address}";
+            face.IdImageLocationAddress = $" {address}";
+            face.IdImageLongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             face.ValidationExecuted = true;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
@@ -530,7 +532,8 @@ public class AgentIdService : IAgentIdService
             }
 
             var rawAddress = await addressTask;
-            doc.IdImageLocationAddress = $"(Latitude={latitude}, Longitude={longitude}) {rawAddress}";
+            doc.IdImageLocationAddress = $"{rawAddress}";
+            doc.IdImageLongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             doc.ValidationExecuted = true;
             _context.DocumentIdReport.Update(doc);
             _context.Investigations.Update(claim);
@@ -648,9 +651,9 @@ public class AgentIdService : IAgentIdService
             media.MediaExtension = extension.TrimStart('.');
             media.ValidationExecuted = true;
             media.IdImageValid = true;
-            media.IdImageLocationAddress = $"(Latitude={latitude} Longitude={longitude} ) {address}";
+            media.IdImageLocationAddress = $"{address}";
             media.IdImageData = weatherCustomData;
-            media.IdImageLongLat = $"{latitude}/{longitude}";
+            media.IdImageLongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             media.IdImageLongLatTime = DateTime.UtcNow;
             var mimeType = data.Image.ContentType.ToLower();
 

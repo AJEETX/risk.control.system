@@ -36,38 +36,17 @@
 						@Html.AntiForgeryToken()
 						<div class="expand" id="agent-@location.Id">
 							<div class="table-responsive">
-								<table class="table table-bordered table-hover text-center align-middle">
+								<table class="table table-bordered table-hover align-middle">
 									<thead class="thead-light">
 										<tr>
-											<th>Agent </th>
 											<th>Captured Photo</th>
-											<th>Indicative Map Route</th>
-											<th> Captured Address Info</th>
+											<th>Captured Indicative Route</th>
 											<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" /></th>
 											<th>Match</th>
 										</tr>
 									</thead>
 									<tbody>
 										<tr>
-											<!-- Email or Report Type -->
-											<td>
-												<small>
-												@if (agent.ValidationExecuted)
-												{
-													@location.AgentEmail
-												}
-												else
-												{
-													@agent.ReportType.GetEnumDisplayName()
-												}
-												</small>
-												@if (agent.IsRequired)
-												{
-													<span class="required-asterisk" title="Mandatory Location">*</span>
-												}
-											</td>
-
-
 											<!-- ID Photo -->
 											<td>
 												@if (agent.ValidationExecuted)
@@ -76,6 +55,15 @@
 														 src="@(agent?.FilePath)"
 														 class="mobile-capture-info"
 														 title="@location.AgentEmail photo" />
+														 <div>
+															<small>
+																@location.AgentEmail
+																@if (agent.IsRequired)
+																{
+																	<span class="required-asterisk" title="Mandatory Location">*</span>
+																}
+															</small>
+														 </div>
 												}
 												else
 												{
@@ -93,6 +81,13 @@
 														 data-locationid="@location.Id"
 														 data-caseid="@Model.CaseId"
 														 data-source="agent"/>
+														 <div>
+															<div>@agent.IdImageLongLat</div>
+																<small>@agent.IdImageLocationAddress</small>
+																<div class="badge badge-light">
+																	Indicative Distance from  @location.Address Address @agent.Distance
+																</div>
+														</div>
 												}
 												else
 												{
@@ -100,20 +95,6 @@
 												}
 											</td>
 
-											<!-- Address or fallback -->
-											<td>
-												@if (agent.ValidationExecuted)
-												{
-													<small>@agent.IdImageLocationAddress</small>
-													<span class="badge badge-light">
-														Indicative Distance from  @location.Address Address @agent.Distance
-													</span>
-												}
-												else
-												{
-													<img src="~/img/no-map-image.jpeg" class="img-thumbnail img-fluid profile-image" />
-												}
-											</td>
 											<td>
 												<small>@agent.IdImageData</small>
 
@@ -136,7 +117,9 @@
 												{
 													<i class="fa fa-times-circle text-muted" title="Not validated" data-toggle="tooltip"></i>
 												}
+												<div>
 												@agent.Similarity
+												</div>
 											</td>
 										</tr>
 									</tbody>

@@ -10,12 +10,10 @@
 	<table class="table table-bordered table-striped">
 		<thead class="table-light">
 			<tr>
-				<th>Document</th>
 				<th>
 					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
 				</th>
-					<th title="Indicative Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
-					<th>Indicative Captured Address</th>
+					<th title="Indicative Captured Address Map/Info"><img class="action-image" src="~/headers/pincode.gif" /></th>
 				<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
 				<th>Valid</th>
 			</tr>
@@ -23,18 +21,7 @@
 		<tbody>
 			@foreach (var doc in location.DocumentIds.Where(d => d.Selected && d.ValidationExecuted))
 			{
-
 				<tr>
-					<td>
-							<small>
-						@doc.ReportName
-								</small>
-							@if (doc.IsRequired)
-							{
-								<span class="required-asterisk" title="Mandatory Location">*</span>
-							}
-					</td>
-					
 					<td>
 						@if (doc.ValidationExecuted)
 						{
@@ -42,6 +29,15 @@
 								 src="@(doc?.FilePath)"
 									 class="mobile-capture-info preview-image"
 								 title="Click to view document" />
+								 <div>
+									<small>
+										@doc.ReportName
+									</small>
+									@if (doc.IsRequired)
+									{
+										<span class="required-asterisk" title="Mandatory Location">*</span>
+									}
+								 </div>
 						}
 						else
 						{
@@ -59,20 +55,20 @@
 								 data-locationid="@location.Id"
 								 data-source="document"
 								 title="Click to view map" />
+								<div>
+									<div>@doc.IdImageLongLat</div>
+									<small>@doc.IdImageLocationAddress</small>
+									<div class="badge badge-light">
+										Indicative Distance from  @location.Address Address @doc.Distance
+									</div>
+								</div>
 						}
 						else
 						{
 							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
 						}
 					</td>
-					<td>
-							<small>
-						@doc.IdImageLocationAddress
-								</small>
-							<span class="badge badge-light">
-								Indicative Distance from @location.Address Address @doc.Distance
-							</span>
-					</td>
+					
 					<td>
 							<small>
 						@doc.IdImageData

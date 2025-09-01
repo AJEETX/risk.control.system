@@ -53,7 +53,6 @@
 								<table class="table table-bordered table-hover text-center align-middle">
 									<thead class="thead-light">
 										<tr>
-											<th>Agent</th>
 											<th>Captured Photo</th>
 											<th>Indicative Map Route</th>
 											<th> Captured Address Info</th>
@@ -63,33 +62,23 @@
 									</thead>
 									<tbody>
 										<tr>
-											<!-- Email or Report Type -->
-											<td>
-												<small>
-												@if (agent.ValidationExecuted)
-												{
-													@location.AgentEmail
-												}
-												else
-												{
-													@agent.ReportType.GetEnumDisplayName()
-												}
-												</small>
-												@if (agent.IsRequired)
-												{
-													<span class="required-asterisk" title="Mandatory Location">*</span>
-												}
-											</td>
-
-
 											<!-- ID Photo -->
 											<td>
 												@if (agent.ValidationExecuted)
 												{
 													<img id="face-img-@agent.Id"
 														 src="@(agent?.FilePath)"
-														 class="img-thumbnail rounded"
-														 title="Click to view @location.AgentEmail photo" />
+														 class="mobile-capture-info"
+														 title="@location.AgentEmail photo" />
+														 <div>
+															<small>
+																@location.AgentEmail
+																@if (agent.IsRequired)
+																{
+																	<span class="required-asterisk" title="Mandatory Location">*</span>
+																}
+															</small>
+														 </div>
 												}
 												else
 												{
@@ -102,12 +91,12 @@
 											@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
 												{
 													<img src="@string.Format(@agent.IdImageLocationUrl, "500","500")"
-														 class="img-thumbnail"
+														 class="mobile-capture-info"
 														 data-faceid="@agent.Id"
 														 data-locationid="@location.Id"
 														 data-caseid="@Model.CaseId"
 														 data-source="agent"
-														 title="Click to view map" />
+														 title=" map" />
 												}
 												else
 												{

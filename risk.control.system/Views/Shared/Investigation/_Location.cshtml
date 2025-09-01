@@ -46,7 +46,6 @@
 								<table class="table table-bordered table-hover text-center align-middle">
 									<thead class="thead-light">
 										<tr>
-											<th>Agent</th>
 											<th><i class="far fa-user text-primary" title="Agent icon" data-toggle="tooltip"></i></th>
 											<th>Captured Photo</th>
 											<th>Indicative Map Route</th>
@@ -57,38 +56,24 @@
 									</thead>
 									<tbody>
 										<tr>
-											<!-- Email or Report Type -->
-											<td>
-												<small>
-												@if (agent.ValidationExecuted)
-												{
-													@location.AgentEmail
-												}
-												else
-												{
-													@agent.ReportType.GetEnumDisplayName()
-												}
-												</small>
-												@if (agent.IsRequired)
-												{
-													<span class="required-asterisk" title="Mandatory Location">*</span>
-												}
-											</td>
-
-											<!-- Agent icon with required indicator -->
-											<td>
-												<i class="far fa-user text-primary" title="Single person" data-toggle="tooltip"></i>
-												<i class="fa fa-asterisk text-danger ml-1" title="Required" data-toggle="tooltip"></i>
-											</td>
-
+											
 											<!-- ID Photo -->
 											<td>
 												@if (agent.ValidationExecuted)
 												{
 													<img id="face-img-@agent.Id"
-														 src="@agent?.FilePath"
-														 class="img-thumbnail rounded"
+														 src="@(agent?.FilePath)"
+														 class="mobile-capture-info"
 														 title="@location.AgentEmail photo" />
+														 <div>
+															<small>
+																@location.AgentEmail
+																@if (agent.IsRequired)
+																{
+																	<span class="required-asterisk" title="Mandatory Location">*</span>
+																}
+															</small>
+														 </div>
 												}
 												else
 												{
@@ -119,9 +104,9 @@
 												@if (agent.ValidationExecuted)
 												{
 													<small>@agent.IdImageLocationAddress</small>
-													<span class="badge badge-light">
+													<div class="badge badge-light">
 														Indicative Distance from @location.Address Address  @agent.Distance
-													</span>
+													</div>
 												}
 												else
 												{
