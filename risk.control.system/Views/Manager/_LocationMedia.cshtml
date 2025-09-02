@@ -18,7 +18,8 @@
 				</th>
 				<th title="Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
 				<th>Captured Address</th>
-			</tr>
+					<th class="col-weather" title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
+				</tr>
 		</thead>
 		<tbody>
 			@foreach (var doc in location.MediaReports.Where(d => d.Selected))
@@ -86,10 +87,19 @@
 							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
 						}
 					</td>
-					<td>
-						@doc.IdImageLocationAddress
-
-					</td>
+						<td>
+							<small>
+								@doc.IdImageLocationAddress
+							</small>
+							<span class="badge badge-light">
+								Indicative Distance from @location.Address Address @doc.Distance
+							</span>
+						</td>
+						<td>
+							<small>
+								@doc.IdImageData
+							</small>
+						</td>
 					
 				</tr>
 			}

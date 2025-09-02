@@ -34,6 +34,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IAgentService agentService;
         private readonly IFeatureManager featureManager;
         private readonly IBackgroundJobClient backgroundJobClient;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
         private readonly IMailService mailboxService;
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
@@ -53,6 +54,7 @@ namespace risk.control.system.Controllers.Api
             IAgentService agentService,
             IFeatureManager featureManager,
             IBackgroundJobClient backgroundJobClient,
+            IWebHostEnvironment webHostEnvironment,
             ISmsService SmsService,
             IMailService mailboxService)
         {
@@ -66,6 +68,7 @@ namespace risk.control.system.Controllers.Api
             this.agentService = agentService;
             this.featureManager = featureManager;
             this.backgroundJobClient = backgroundJobClient;
+            this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
             this.mailboxService = mailboxService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
@@ -373,7 +376,7 @@ namespace risk.control.system.Controllers.Api
                         Locations = new
                         {
                             c.BeneficiaryDetail.BeneficiaryDetailId,
-                            Photo = c.BeneficiaryDetail?.ImagePath != null ? c.BeneficiaryDetail.ImagePath :
+                            Photo = c.BeneficiaryDetail?.ImagePath != null ? Path.Combine(webHostEnvironment.WebRootPath, c.BeneficiaryDetail.ImagePath) :
                             Applicationsettings.USER_PHOTO,
                             c.BeneficiaryDetail.Country.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
@@ -521,7 +524,7 @@ namespace risk.control.system.Controllers.Api
                             ClaimId = claim.Id,
                             PolicyNumber = claim.PolicyDetail.ContractNumber,
                             ClaimType = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
-                            Document = claim.PolicyDetail.DocumentPath != null ? claim.PolicyDetail.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
+                            Document = claim.PolicyDetail.DocumentPath != null ? Path.Combine(webHostEnvironment.WebRootPath, claim.PolicyDetail.DocumentPath) : Applicationsettings.NO_POLICY_IMAGE,
                             IssueDate = claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
                             IncidentDate = claim.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
                             Amount = claim.PolicyDetail.SumAssuredValue,
@@ -532,7 +535,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             BeneficiaryId = beneficiary.BeneficiaryDetailId,
                             Name = beneficiary.Name,
-                            Photo = beneficiary.ImagePath != null ? beneficiary.ImagePath : Applicationsettings.USER_PHOTO,
+                            Photo = beneficiary.ImagePath != null ? Path.Combine(webHostEnvironment.WebRootPath, beneficiary.ImagePath) : Applicationsettings.USER_PHOTO,
                             Relation = beneficiary.BeneficiaryRelation.Name,
                             Income = beneficiary.Income.GetEnumDisplayName(),
                             Phone = beneficiary.ContactNumber,
@@ -543,9 +546,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             Name = claim.CustomerDetail.Name,
                             Occupation = claim.CustomerDetail.Occupation.GetEnumDisplayName(),
-                            Photo = claim.CustomerDetail.ImagePath != null ?
-                            claim.CustomerDetail.ImagePath :
-                            Applicationsettings.USER_PHOTO,
+                            Photo = claim.CustomerDetail.ImagePath != null ? Path.Combine(webHostEnvironment.WebRootPath, claim.CustomerDetail.ImagePath) : Applicationsettings.USER_PHOTO,
                             Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
                             Phone = claim.CustomerDetail.ContactNumber,
                             DateOfBirth = claim.CustomerDetail.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
