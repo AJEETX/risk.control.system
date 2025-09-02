@@ -359,7 +359,8 @@ namespace risk.control.system.Controllers.Api
                         claimId = c.Id,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                         claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
-                        DocumentPhoto = c.PolicyDetail.DocumentPath != null ? c.PolicyDetail.DocumentPath :
+                        DocumentPhoto = c.PolicyDetail.DocumentPath != null ?
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c.PolicyDetail.DocumentPath.Substring(1)))) :
                         Applicationsettings.NO_POLICY_IMAGE,
                         CustomerName = c.CustomerDetail.Name,
                         CustomerEmail = email,
@@ -367,7 +368,8 @@ namespace risk.control.system.Controllers.Api
                         Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
                         c.CustomerDetail.Addressline,
                         c.CustomerDetail.PinCode.Code,
-                        CustomerPhoto = c?.CustomerDetail.ImagePath != null ? c?.CustomerDetail.ImagePath :
+                        CustomerPhoto = c?.CustomerDetail.ImagePath != null ?
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c?.CustomerDetail.ImagePath.Substring(1)))) :
                         Applicationsettings.USER_PHOTO,
                         Country = c.CustomerDetail.Country.Name,
                         State = c.CustomerDetail.State.Name,
@@ -376,7 +378,8 @@ namespace risk.control.system.Controllers.Api
                         Locations = new
                         {
                             c.BeneficiaryDetail.BeneficiaryDetailId,
-                            Photo = c.BeneficiaryDetail?.ImagePath != null ? Path.Combine(webHostEnvironment.WebRootPath, c.BeneficiaryDetail.ImagePath) :
+                            Photo = c.BeneficiaryDetail?.ImagePath != null ?
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c.BeneficiaryDetail.ImagePath.Substring(1)))) :
                             Applicationsettings.USER_PHOTO,
                             c.BeneficiaryDetail.Country.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
@@ -515,7 +518,14 @@ namespace risk.control.system.Controllers.Api
                 {
                     locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
                 }
-
+                var docPath = Path.Combine(webHostEnvironment.WebRootPath, claim.PolicyDetail.DocumentPath.Substring(1));
+                var docByte = System.IO.File.ReadAllBytes(docPath);
+                var docBase64 = Convert.ToBase64String(docByte);
+                var documentPhoto = claim.PolicyDetail.DocumentPath != null ? docBase64 : Applicationsettings.NO_POLICY_IMAGE;
+                var customerPhoto = claim.CustomerDetail.ImagePath != null ?
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, claim.CustomerDetail.ImagePath.Substring(1)))) : Applicationsettings.USER_PHOTO;
+                var beneficiaryPhoto = beneficiary.ImagePath != null ?
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, beneficiary.ImagePath.Substring(1)))) : Applicationsettings.USER_PHOTO;
                 return Ok(
                     new
                     {
@@ -524,7 +534,7 @@ namespace risk.control.system.Controllers.Api
                             ClaimId = claim.Id,
                             PolicyNumber = claim.PolicyDetail.ContractNumber,
                             ClaimType = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
-                            Document = claim.PolicyDetail.DocumentPath != null ? Path.Combine(webHostEnvironment.WebRootPath, claim.PolicyDetail.DocumentPath) : Applicationsettings.NO_POLICY_IMAGE,
+                            Document = documentPhoto,
                             IssueDate = claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
                             IncidentDate = claim.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
                             Amount = claim.PolicyDetail.SumAssuredValue,
@@ -535,7 +545,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             BeneficiaryId = beneficiary.BeneficiaryDetailId,
                             Name = beneficiary.Name,
-                            Photo = beneficiary.ImagePath != null ? Path.Combine(webHostEnvironment.WebRootPath, beneficiary.ImagePath) : Applicationsettings.USER_PHOTO,
+                            Photo = beneficiaryPhoto,
                             Relation = beneficiary.BeneficiaryRelation.Name,
                             Income = beneficiary.Income.GetEnumDisplayName(),
                             Phone = beneficiary.ContactNumber,
@@ -546,7 +556,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             Name = claim.CustomerDetail.Name,
                             Occupation = claim.CustomerDetail.Occupation.GetEnumDisplayName(),
-                            Photo = claim.CustomerDetail.ImagePath != null ? Path.Combine(webHostEnvironment.WebRootPath, claim.CustomerDetail.ImagePath) : Applicationsettings.USER_PHOTO,
+                            Photo = customerPhoto,
                             Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
                             Phone = claim.CustomerDetail.ContactNumber,
                             DateOfBirth = claim.CustomerDetail.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),

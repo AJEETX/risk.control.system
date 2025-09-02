@@ -169,10 +169,8 @@ public class AgentIdService : IAgentIdService
                 $"Elevation(sea level):{weatherData.elevation} metres";
 
             face.IdImageData = weatherCustomData;
-            var faceImagePath = Path.Combine(webHostEnvironment.WebRootPath, face.FilePath);
 
             await File.WriteAllBytesAsync(filePath, compressImage);
-            //face.IdImage = compressImage;
             face.DigitalIdImageMatchConfidence = confidence;
             face.IdImageLocationAddress = $"{address}";
             face.IdImageLongLat = $"Latitude = {latitude}, Longitude = {longitude}";
