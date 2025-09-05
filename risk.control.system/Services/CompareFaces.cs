@@ -61,7 +61,9 @@ namespace risk.control.system.Services
             // Call operation
             var compareFacesResponse = await rekognitionClient.CompareFacesAsync(compareFacesRequest);
 
-            var result = compareFacesResponse.FaceMatches.Count >= 1 && compareFacesResponse.UnmatchedFaces.Count == 0 && compareFacesResponse.FaceMatches[0].Similarity >= similarityThreshold;
+            var result = compareFacesResponse.FaceMatches.Count >= 1
+                //&& compareFacesResponse.UnmatchedFaces.Count == 0 
+                && compareFacesResponse.FaceMatches[0].Similarity >= similarityThreshold;
             var faceBox = result ? compareFacesResponse.FaceMatches[0].Face.BoundingBox : compareFacesResponse.UnmatchedFaces[0].BoundingBox;
             var similarity = result ? compareFacesResponse.FaceMatches[0].Similarity.GetValueOrDefault() : 0;
             //// Display results
