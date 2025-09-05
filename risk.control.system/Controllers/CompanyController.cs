@@ -29,6 +29,7 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly ICustomApiCLient customApiCLient;
         private readonly ApplicationDbContext _context;
+        private readonly ITinyUrlService urlService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userAgencyManager;
         private readonly RoleManager<ApplicationRole> roleManager;
@@ -40,6 +41,7 @@ namespace risk.control.system.Controllers
         private readonly ILogger<CompanyController> logger;
         private readonly string baseUrl;
         public CompanyController(ApplicationDbContext context,
+            ITinyUrlService urlService,
             UserManager<ClientCompanyApplicationUser> userManager,
             UserManager<VendorApplicationUser> userAgencyManager,
             SignInManager<ApplicationUser> signInManager,
@@ -54,6 +56,7 @@ namespace risk.control.system.Controllers
             ISmsService SmsService)
         {
             this._context = context;
+            this.urlService = urlService;
             this.signInManager = signInManager;
             this.notifyService = notifyService;
             this.customApiCLient = customApiCLient;
@@ -934,9 +937,7 @@ namespace risk.control.system.Controllers
                         {
                             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
 
-                            System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
-                            System.Net.WebClient client = new System.Net.WebClient();
-                            string tinyUrl = client.DownloadString(address);
+                            string tinyUrl = await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
 
                             var message = $"Dear {user.FirstName}\n" +
                             $"Click on link below to install the mobile app\n\n" +

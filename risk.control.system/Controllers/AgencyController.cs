@@ -25,6 +25,7 @@ namespace risk.control.system.Controllers
     {
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ApplicationDbContext _context;
+        private readonly ITinyUrlService urlService;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
@@ -38,6 +39,7 @@ namespace risk.control.system.Controllers
         private string portal_base_url = string.Empty;
 
         public AgencyController(ApplicationDbContext context,
+            ITinyUrlService urlService,
             UserManager<VendorApplicationUser> userManager,
             INotyfService notifyService,
             SignInManager<ApplicationUser> signInManager,
@@ -51,6 +53,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this.urlService = urlService;
             this.signInManager = signInManager;
             this.userManager = userManager;
             this.notifyService = notifyService;
@@ -343,10 +346,7 @@ namespace risk.control.system.Controllers
                             if (onboardAgent)
                             {
                                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
-
-                                System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
-                                System.Net.WebClient client = new System.Net.WebClient();
-                                string tinyUrl = client.DownloadString(address);
+                                string tinyUrl = await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
 
                                 var message = $"Dear {user.FirstName},\n" +
                                 $"Click on link below to install the mobile app\n\n" +
@@ -544,9 +544,7 @@ namespace risk.control.system.Controllers
                             {
                                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
 
-                                var address = new Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
-                                System.Net.WebClient client = new System.Net.WebClient();
-                                string tinyUrl = client.DownloadString(address);
+                                string tinyUrl =await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
 
                                 var message = $"Dear {user.FirstName}\n" +
                                 $"Click on link below to install the mobile app\n\n" +
@@ -726,9 +724,7 @@ namespace risk.control.system.Controllers
             var onboardAgent = newRoles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active;
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
 
-            System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
-            System.Net.WebClient client = new System.Net.WebClient();
-            string tinyUrl = client.DownloadString(address);
+            string tinyUrl =await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
 
             var message = $"Dear {user.FirstName}\n" +
             $"Click on link below to install the mobile app\n\n" +
