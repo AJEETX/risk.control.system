@@ -39,7 +39,7 @@
 								<table class="table table-bordered table-hover align-middle">
 									<thead class="thead-light">
 										<tr>
-											<th>Captured Photo</th>
+											<th>Agent Photo</th>
 											<th>Captured Indicative Route</th>
 											<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" /></th>
 											<th>Match</th>
@@ -75,7 +75,7 @@
 											<td>
 												@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
 												{
-													<img src="@string.Format(@agent.IdImageLocationUrl, "600","500")"
+													<img src="@string.Format(@agent.IdImageLocationUrl, "500","500")"
 														 class="mobile-capture-info"
 														 data-faceid="@agent.Id"
 														 data-locationid="@location.Id"
@@ -84,10 +84,10 @@
 														 <div>
 															<div>@agent.IdImageLongLat</div>
 																<small>@agent.IdImageLocationAddress</small>
-																<div class="badge badge-light">
+														</div>
+														<div class="badge badge-light">
 																	Indicative Distance from  @location.Address Address @agent.Distance
 																</div>
-														</div>
 												}
 												else
 												{
