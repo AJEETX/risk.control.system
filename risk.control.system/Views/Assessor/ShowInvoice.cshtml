@@ -58,9 +58,9 @@
                                         <strong>@Model.ClientCompany.Name</strong><br>
                                         @Model.ClientCompany.Branch<br>
                                         @Model.ClientCompany.Addressline <br>
-                                        @Model.ClientCompany.District.Name<br>
+                                        @Model.ClientCompany.District.Name (@Model.ClientCompany.State.Code)<br>
                                         @Model.ClientCompany.Email<br>
-                                        attn: @Model.ClientCompany.PhoneNumber
+                                        (0) @Model.ClientCompany.PhoneNumber
                                     </address>
                                 </div>
                                 <!-- /.col -->
@@ -70,9 +70,9 @@
                                         <strong>@Model.Vendor.Name</strong><br>
                                         @Model.Vendor.Branch<br>
                                         @Model.Vendor.Addressline<br>
-                                        @Model.Vendor.District.Name<br>
+                                        @Model.Vendor.District.Name  (@Model.Vendor.State.Code)<br>
                                         @Model.Vendor.Email<br>
-                                        attn: @Model.Vendor.PhoneNumber
+                                        (0) @Model.Vendor.PhoneNumber
 
                                     </address>
                                 </div>
