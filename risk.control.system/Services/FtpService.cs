@@ -70,18 +70,12 @@ namespace risk.control.system.Services
                 await postedFile.CopyToAsync(dataStream);
                 await File.WriteAllBytesAsync(uploadFilePath, dataStream.ToArray());
             }
-            byte[] byteData;
-            using (MemoryStream ms = new MemoryStream())
-            {
-                postedFile.CopyTo(ms);
-                byteData = ms.ToArray();
-            }
 
-            var uploadId = await SaveUpload(postedFile, uploadFilePath, fileName, userEmail, byteData, autoOrManual, ORIGIN.FILE, uploadAndAssign);
+            var uploadId = await SaveUpload(postedFile, uploadFilePath, fileName, userEmail, autoOrManual, ORIGIN.FILE, uploadAndAssign);
             return uploadId;
         }
 
-        private async Task<int> SaveUpload(IFormFile file, string filePath, string description, string uploadedBy, byte[] byteData, CREATEDBY autoOrManual, ORIGIN fileOrFtp, bool uploadAndAssign = false)
+        private async Task<int> SaveUpload(IFormFile file, string filePath, string description, string uploadedBy, CREATEDBY autoOrManual, ORIGIN fileOrFtp, bool uploadAndAssign = false)
         {
             var fileName = Path.GetFileName(file.FileName);
             var extension = Path.GetExtension(file.FileName);
@@ -102,7 +96,6 @@ namespace risk.control.system.Services
                 FilePath = filePath,
                 UploadedBy = uploadedBy,
                 CompanyId = company.ClientCompanyId,
-                //ByteData = byteData,
                 AutoOrManual = autoOrManual,
                 Message = uploadAndAssign ? "Assign In progress" : "Upload In progress",
                 FileOrFtp = fileOrFtp,

@@ -62,7 +62,7 @@
 													<li class="mb-2">
 														<div class="border rounded p-2  bg-light">
 															<div class="form-check">
-																<input class="form-check-input" type="checkbox" id="face_@face.Id" @(face.Selected ? "checked" : "") />
+																<input disabled class="form-check-input" type="checkbox" id="face_@face.Id" @(face.Selected ? "checked" : "") />
 																<label class="form-check-label" for="face_@face.Id">
 																	@if (face.Has2Face)
 																	{
@@ -94,7 +94,7 @@
 													<li class="mb-2">
 														<div class="border rounded p-2 bg-light">
 															<div class="form-check">
-																<input class="form-check-input" type="checkbox" id="doc_@doc.Id" @(doc.Selected ? "checked" : "") />
+																<input disabled class="form-check-input" type="checkbox" id="doc_@doc.Id" @(doc.Selected ? "checked" : "") />
 																<label class="form-check-label" for="doc_@doc.Id">
 																	@if (doc.HasBackImage)
 																	{
@@ -126,7 +126,7 @@
 													<li class="mb-2">
 														<div class="border rounded p-2 bg-light">
 															<div class="form-check">
-																<input class="form-check-input" type="checkbox" id="doc_@doc.Id" @(doc.Selected ? "checked" : "") />
+																<input disabled class="form-check-input" type="checkbox" id="doc_@doc.Id" @(doc.Selected ? "checked" : "") />
 																<label class="form-check-label" for="doc_@doc.Id">
 																	<i class="far fa-file text-muted me-1"></i>
 
@@ -170,7 +170,7 @@
 															}
 
 															<div class="mt-2">
-																<button class="btn btn-sm btn-outline-warning update-question-btn" data-questionid="@question.Id">
+																<button disabled class="btn btn-sm btn-outline-warning update-question-btn" data-questionid="@question.Id">
 																	<i class="fas fa-edit me-1"></i> Update
 																</button>
 															</div>
@@ -182,7 +182,7 @@
 
 										<!-- Delete Button -->
 										<div class="col-md-1 text-end">
-											<button class="btn btn-sm btn-danger mt-4">
+											<button disabled class="btn btn-sm btn-danger mt-4">
 												<i class="fas fa-trash"></i> Delete
 											</button>
 										</div>
