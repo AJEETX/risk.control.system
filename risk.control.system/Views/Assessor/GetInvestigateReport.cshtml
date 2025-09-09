@@ -67,9 +67,7 @@
 			<partial name="_EnquiryReport" model="@data" />
 		}
 
-		<div class="submit-progress hidden">
-			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-		</div>
+		
 		@if (Model.ClaimsInvestigation.AiEnabled)
 		{
 			<partial name="_AgencyAiReport" model="@Model" />
@@ -95,6 +93,9 @@
 				</h3>
 			</div>
 			<div class="card-body">
+				<div class="submit-progress hidden">
+					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+				</div>
 				<div class="row">
 					<div class="col-sm-6 d-flex align-items-stretch flex-column">
 						<div class="card bg-light equal-height-card">

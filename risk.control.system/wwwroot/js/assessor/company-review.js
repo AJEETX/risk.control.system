@@ -21,7 +21,11 @@
         {
             className: 'max-width-column-number', // Apply the CSS class,
             targets: 1                      // Index of the column to style
-        },
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            },
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 8                      // Index of the column to style
@@ -93,7 +97,7 @@
             {
                 "data": "duration",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.duration + '" data-toggle="tooltip"><small>' + data + '</small></span>'
                 }
             },
             {

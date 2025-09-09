@@ -39,9 +39,7 @@
 
         <partial name="_AgencyReport" model="@Model" />
 
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
+        
 
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
@@ -63,6 +61,9 @@
             </div>
 
             <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
                 <div class="row">
                     <div class="col-sm-6 d-flex align-items-stretch flex-column">
 
@@ -205,7 +206,7 @@
                         <div class="btn btn-default btn-file">
                             <i class="fas fa-paperclip"></i> Attachment
                             <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
-                            <input id="document" name="document" asp-for="ClaimsInvestigation.InvestigationReport.EnquiryRequest.AnswerImageAttachment" type="file" accept="*.png, *.jpeg" class="form-control remarks" />
+                            <input id="document" name="document" asp-for="ClaimsInvestigation.InvestigationReport.EnquiryRequest.AnswerImageAttachment" type="file" accept=".png, .jpg, .jpeg, image/png, image/jpeg" class="form-control remarks" />
                         </div>
                         <span class="help-block">Max. 2MB</span>
                         <div class="float-right">

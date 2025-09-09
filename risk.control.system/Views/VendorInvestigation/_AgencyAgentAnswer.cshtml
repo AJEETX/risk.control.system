@@ -51,7 +51,14 @@
                     }
                     else
                     {
-                        @Model.InvestigationReport?.AgentRemarks
+                        @if (string.IsNullOrWhiteSpace(Model.InvestigationReport.AgentRemarksEdit))
+                        {
+                                @Model.InvestigationReport?.AgentRemarks
+                            }
+                            else
+                            {
+                                @Model.InvestigationReport?.AgentRemarksEdit
+                            }
 
                     }
                 </p>
