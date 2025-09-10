@@ -577,8 +577,6 @@ public class AgentIdService : IAgentIdService
         byte[] fileBytes = null; ;
         try
         {
-            var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == data.Email);
-
             using var memoryStream = new MemoryStream();
             await data.Image.CopyToAsync(memoryStream);
             fileBytes = memoryStream.ToArray();
@@ -621,7 +619,19 @@ public class AgentIdService : IAgentIdService
 
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
 
-            var mapTask = customApiCLient.GetMap(double.Parse(latitude), double.Parse(longitude), double.Parse(agent.AddressLatitude), double.Parse(agent.AddressLongitude), "A", "X", "300", "300", "green", "red");
+            var expectedLat = string.Empty;
+            var expectedLong = string.Empty;
+            if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+            {
+                expectedLat = claim.CustomerDetail.Latitude;
+                expectedLong = claim.CustomerDetail.Longitude;
+            }
+            else
+            {
+                expectedLat = claim.BeneficiaryDetail.Latitude;
+                expectedLong = claim.BeneficiaryDetail.Longitude;
+            }
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             addressTask = httpClientService.GetRawAddress(latitude, longitude);
