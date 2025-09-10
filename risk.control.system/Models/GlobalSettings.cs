@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using risk.control.system.AppConstant;
-
 namespace risk.control.system.Models
 {
     public class GlobalSettings : BaseEntity
@@ -52,9 +50,6 @@ namespace risk.control.system.Models
         public string? PassportApiUrl { get; set; } = "https://document-ocr1.p.rapidapi.com/idr";
         public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
-
-        public string? MobileAppUrl { get; set; } = Applicationsettings.APP_URL;
-        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.53";
 
         public string AiApiUrl { get; set; } = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"; // HUGGING FACE
         public string AiApiData { get; set; } = Environment.GetEnvironmentVariable("HUGING_FACE") ?? "test"; // HUGGING FACE
