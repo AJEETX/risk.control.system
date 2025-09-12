@@ -8,7 +8,8 @@
         public const string PERMISSION = "Permission";
         public static readonly string ADMIN_MOBILE = "404723089";
         //public static readonly string PORTAL_ADMIN_MOBILE = "432854196";
-        public static readonly string PORTAL_ADMIN_MOBILE = "9956312800";
+        public static readonly string SAMPLE_MOBILE_INDIA = Environment.GetEnvironmentVariable("SAMPLE_MOBILE_INDIA");
+        public static readonly string SAMPLE_MOBILE_AUSTRALIA = Environment.GetEnvironmentVariable("SAMPLE_MOBILE_AUSTRALIA");
 
         public static readonly string USER_MOBILE = "400000000";
         public static readonly string HEXdATA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -16,7 +17,7 @@
         public static readonly string ValidAudience = "canarahdfclife";
         public static readonly int TokenTimeoutMinutes = 5;
         //public const string APP_URL = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk";
-        public const string APP_URL = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/prod/app-release.apk";
+        public static string APP_URL = Environment.GetEnvironmentVariable("APP_URL");
         public const string AZURE_APP_DEMO_URL = "icheckify-demo.azurewebsites.net";
         public const string AZURE_APP_URL = "icheckify.azurewebsites.net";
 

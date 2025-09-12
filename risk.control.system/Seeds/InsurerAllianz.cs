@@ -65,7 +65,6 @@ namespace risk.control.system.Seeds
                 BulkUpload = globalSettings.BulkUpload,
                 Updated = DateTime.Now,
                 Deleted = false,
-                MobileAppUrl = globalSettings.MobileAppUrl,
                 VerifyPan = globalSettings.VerifyPan,
                 VerifyPassport = globalSettings.VerifyPassport,
                 EnableMedia = globalSettings.EnableMedia,

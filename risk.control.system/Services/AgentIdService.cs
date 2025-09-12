@@ -597,6 +597,7 @@ public class AgentIdService : IAgentIdService
                 await data.Image.CopyToAsync(stream);
             }
             claim = await _context.Investigations
+                 .Include(c => c.PolicyDetail)
                  .Include(c => c.CustomerDetail)
                  .Include(c => c.BeneficiaryDetail)
                  .Include(c => c.InvestigationReport)

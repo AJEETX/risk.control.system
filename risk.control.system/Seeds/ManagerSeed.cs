@@ -37,7 +37,7 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = true,
                 Active = true,
-                PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
+                PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 Addressline = "139 Sector 44",
                 IsVendorAdmin = false,
                 ClientCompany = clientCompany,
