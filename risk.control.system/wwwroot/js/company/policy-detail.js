@@ -210,8 +210,8 @@ $(document).ready(function () {
     $('#withdraw-information-popup').on('click', function (e) {
         $.alert(
             {
-                title: " Withdraw Claim !",
-                content: "The case can not be withdrawn. See <i class='fas fa-clock'></i> Timeline section  for more info",
+                title: " Withdraw Case !",
+                content: "<small>The case can not be withdrawn. <br />See <i class='fas fa-clock'></i> Timeline section  for more info</small>",
                 icon: 'fas fa-info',
                 animationBounce: 2.5,
                 type: 'red',
