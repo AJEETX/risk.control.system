@@ -177,8 +177,8 @@ $(document).ready(function () {
                 if (response.success) {
                     $('#questionUpdateModal').find('input[name="QuestionId"]').val(response.question.Id);
                     $('#questionUpdateModal').find('input[name="LocationId"]').val(locationId);
-                    $('#questionUpdateModal').find('input[name="NewQuestionText"]').val(response.question.QuestionText);
-                    $('#questionUpdateModal').find('select[name="NewQuestionType"]').val(response.question.QuestionType);
+                    $('#questionUpdateModal').find('input[name="QuestionText"]').val(response.question.questionText);
+                    $('#questionUpdateModal').find('select[name="QuestionType"]').val(response.question.questionType);
                     $('#questionUpdateModal').modal('show');
                 }
             }
