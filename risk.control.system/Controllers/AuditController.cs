@@ -28,6 +28,11 @@ namespace risk.control.system.Controllers
         // GET: Audit
         public IActionResult Index()
         {
+            return RedirectToAction("Profile");
+        }
+        [Breadcrumb("Audit Log")]
+        public IActionResult Profile()
+        {
             return View();
         }
         [HttpGet] // keep it simple
@@ -126,7 +131,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Audit/Details/5
-        [Breadcrumb("Details ")]
+        [Breadcrumb("Details ", FromAction = "Profile")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.AuditLogs == null)
