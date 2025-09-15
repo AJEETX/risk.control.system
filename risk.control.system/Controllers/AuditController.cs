@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,43 +26,103 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Audit
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public IActionResult Index()
         {
+            return View();
+        }
+        [HttpGet] // keep it simple
+        public async Task<IActionResult> GetAudit(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
+        {
+            var query = _context.AuditLogs.Where(a => !string.IsNullOrWhiteSpace(a.NewValues) &&
+            !string.IsNullOrWhiteSpace(a.UserId) &&
+            a.TableName != "StatusNotification").AsQueryable();
 
-            if (searchString != null)
+            int recordsTotal = await query.CountAsync();
+
+            if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
             {
-                currentPage = 1;
+                search = search.Trim().Replace("%", "[%]")
+                   .Replace("_", "[_]")
+                   .Replace("[", "[[]");
+                query = query.Where(p =>
+                    EF.Functions.Like(p.UserId, $"%{search}%") ||
+                    EF.Functions.Like(p.TableName, $"%{search}%") ||
+                    EF.Functions.Like(p.Type, $"%{search}%") ||
+                    EF.Functions.Like(p.OldValues, $"%{search}%") ||
+                    EF.Functions.Like(p.NewValues, $"%{search}%"));
+            }
+            string sortColumn = orderColumn switch
+            {
+                0 => "UserId",          // First column (index 0) - Code
+                1 => "TableName",          // Second column (index 1) - Name
+                2 => "Type",    // Third column (index 2) - State
+                3 => "DateTime",  // Fourth column (index 3) - Country
+                4 => "OldValues",  // Fourth column (index 3) - Country
+                5 => "NewValues",  // Fourth column (index 3) - Country
+                _ => "DateTime"           // Default to "Code" if no column is specified
+            };
+
+            // Determine sort direction
+            bool isAscending = orderDirection?.ToLower() == "asc";
+
+            // Dynamically apply sorting using reflection
+            var parameter = Expression.Parameter(typeof(Audit), "p");
+            Expression propertyExpression = parameter;
+
+            if (sortColumn.Contains('.'))
+            {
+                var parts = sortColumn.Split('.');
+                foreach (var part in parts)
+                {
+                    propertyExpression = Expression.Property(propertyExpression, part);
+                }
             }
             else
             {
-                searchString = currentFilter;
+                propertyExpression = Expression.Property(parameter, sortColumn);
             }
 
-            ViewBag.CurrentFilter = searchString;
-            var audits = _context.AuditLogs.AsQueryable();
-            if (!String.IsNullOrEmpty(searchString))
+            var lambda = Expression.Lambda<Func<Audit, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
+
+            // Apply sorting
+            query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
+            int totalRecords = await query.CountAsync();
+
+            var rawData = await query
+                .Skip(start)
+                .Take(length)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.UserId,
+                    p.TableName,
+                    p.Type,
+                    p.DateTime,
+                    p.OldValues,
+                    p.NewValues
+                })
+                .ToListAsync();
+
+            var data = rawData.Select(p => new
             {
-                audits = audits.Where(s =>
-                 s.TableName.ToLower().Contains(searchString.Trim().ToLower()) ||
-                 s.Type.ToLower().Contains(searchString.Trim().ToLower()) ||
-                 s.OldValues.ToLower().Contains(searchString.Trim().ToLower()) ||
-                 s.NewValues.ToLower().Contains(searchString.Trim().ToLower())
-                 );
-            }
+                p.Id,
+                p.UserId,
+                p.TableName,
+                p.Type,
+                DateTime = p.DateTime.ToString("dd-MMM-yyyy HH:mm"),
+                p.OldValues,
+                p.NewValues
+            }).ToList();
 
-            int pageNumber = (currentPage ?? 1);
-            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(audits.Count(), pageSize));
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(audits.Count(), pageSize));
-            ViewBag.ShowFirst = pageNumber != 1;
-            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(audits.Count(), pageSize));
+            var response = new
+            {
+                draw = draw,
+                recordsTotal = totalRecords,
+                recordsFiltered = totalRecords,
+                data = data
+            };
 
-            var auditsResult = await audits.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-            return _context.AuditLogs != null ?
-                        View(auditsResult) :
-                        Problem("Entity set 'ApplicationDbContext.AuditLogs'  is null.");
+            return Json(response);
         }
 
         // GET: Audit/Details/5
