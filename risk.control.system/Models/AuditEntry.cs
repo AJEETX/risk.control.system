@@ -12,6 +12,7 @@ namespace risk.control.system.Models
         }
         public EntityEntry Entry { get; }
         public string UserId { get; set; }
+        public long? CompanyId { get; set; }
         public string TableName { get; set; }
         public Dictionary<string, object> KeyValues { get; } = new Dictionary<string, object>();
         public Dictionary<string, object> OldValues { get; } = new Dictionary<string, object>();
@@ -22,6 +23,7 @@ namespace risk.control.system.Models
         {
             var audit = new Audit();
             audit.UserId = UserId;
+            audit.CompanyId = CompanyId;
             audit.Type = AuditType.ToString();
             audit.TableName = TableName;
             audit.DateTime = DateTime.Now;
