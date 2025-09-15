@@ -1,4 +1,5 @@
-﻿@model risk.control.system.Models.Audit
+﻿@using System.Text.Json
+@model risk.control.system.Models.Audit
 
 @{
     ViewData["Title"] = "Audit Details";
@@ -21,33 +22,86 @@
                 </div>
 
                 <dl class="row border-top pt-3">
-                    <dt class="col-sm-3 font-weight-bold"> @Html.DisplayNameFor(m => m.UserId) </dt>
-                    <dd class="col-sm-9 border-bottom pb-2"> @Html.DisplayFor(m => m.UserId) </dd>
+                    <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.UserId) </dt>
+                    <dd class="col-sm-10 border-bottom pb-2"> @Html.DisplayFor(m => m.UserId) </dd>
 
-                    <dt class="col-sm-3 font-weight-bold"> @Html.DisplayNameFor(m => m.Type) </dt>
-                    <dd class="col-sm-9 border-bottom pb-2"> @Html.DisplayFor(m => m.Type) </dd>
+                    <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.Type) </dt>
+                    <dd class="col-sm-10 border-bottom pb-2"> @Html.DisplayFor(m => m.Type) </dd>
 
-                    <dt class="col-sm-3 font-weight-bold"> @Html.DisplayNameFor(m => m.TableName) </dt>
-                    <dd class="col-sm-9 border-bottom pb-2"> @Html.DisplayFor(m => m.TableName) </dd>
+                    <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.TableName) </dt>
+                    <dd class="col-sm-10 border-bottom pb-2"> @Html.DisplayFor(m => m.TableName) </dd>
 
-                    <dt class="col-sm-3 font-weight-bold"> @Html.DisplayNameFor(m => m.DateTime) </dt>
-                    <dd class="col-sm-9 border-bottom pb-2"> @Html.DisplayFor(m => m.DateTime) </dd>
+                    <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.DateTime) </dt>
+                    <dd class="col-sm-10 border-bottom pb-2"> @Html.DisplayFor(m => m.DateTime) </dd>
 
-                    <dt class="col-sm-3 font-weight-bold"> @Html.DisplayNameFor(m => m.OldValues) </dt>
-                    <dd class="col-sm-9 border-bottom pb-2 text-break"> @Html.DisplayFor(m => m.OldValues) </dd>
+                    <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.OldValues) </dt>
+                    <dd class="col-sm-10 border-bottom pb-2 text-break">
+                        @{
+                            if (!string.IsNullOrEmpty(Model.OldValues))
+                            {
+                                try
+                                {
+                                    var jsonElement = JsonSerializer.Deserialize<JsonElement>(Model.OldValues);
+                                    var formatted = JsonSerializer.Serialize(jsonElement, new JsonSerializerOptions { WriteIndented = true });
+                                    @:<pre>@formatted</pre>
+                                }
+                                catch
+                                {
+                                    @Model.OldValues
+                                    // fallback if it's not valid JSON
+                                }
+                            }
+                        }
+                    </dd>
 
-                    <dt class="col-sm-3 font-weight-bold"> @Html.DisplayNameFor(m => m.NewValues) </dt>
-                    <dd class="col-sm-9 border-bottom pb-2 text-break"> @Html.DisplayFor(m => m.NewValues) </dd>
+                    <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.NewValues) </dt>
+                    <dd class="col-sm-10 border-bottom pb-2 text-break">
+                        @{
+                            if (!string.IsNullOrEmpty(Model.NewValues))
+                            {
+                                try
+                                {
+                                    var jsonElement = JsonSerializer.Deserialize<JsonElement>(Model.NewValues);
+                                    var formatted = JsonSerializer.Serialize(jsonElement, new JsonSerializerOptions { WriteIndented = true });
+                                    @:<pre>@formatted</pre>
+                                }
+                                catch
+                                {
+                                    @Model.NewValues
+                                    // fallback if it's not valid JSON
+                                }
+                            }
+                        }
+                    </dd>
 
-                    <dt class="col-sm-3 font-weight-bold"> @Html.DisplayNameFor(m => m.AffectedColumns) </dt>
-                    <dd class="col-sm-9 border-bottom pb-2 text-break"> @Html.DisplayFor(m => m.AffectedColumns) </dd>
+                    <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.AffectedColumns) </dt>
+                    <dd class="col-sm-10 border-bottom pb-2 text-break">
+                        @{
+                            if (!string.IsNullOrEmpty(Model.AffectedColumns))
+                            {
+                                try
+                                {
+                                    var jsonElement = JsonSerializer.Deserialize<JsonElement>(Model.AffectedColumns);
+                                    var formatted = JsonSerializer.Serialize(jsonElement, new JsonSerializerOptions { WriteIndented = true });
+                                    @:<pre>@formatted</pre>
+                                }
+                                catch
+                                {
+                                    @Model.AffectedColumns
+                                    // fallback if it's not valid JSON
+                                }
+                            }
+                        }
+                    </dd>
 
-                    <dt class="col-sm-3 font-weight-bold"> @Html.DisplayNameFor(m => m.PrimaryKey) </dt>
-                    <dd class="col-sm-9 border-bottom pb-2 text-break"> @Html.DisplayFor(m => m.PrimaryKey) </dd>
+
+
+                    <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.PrimaryKey) </dt>
+                    <dd class="col-sm-10 border-bottom pb-2 text-break"> @Html.DisplayFor(m => m.PrimaryKey) </dd>
                 </dl>
 
                 <div class="text-right mt-4">
-                    <a asp-action="Index" class="btn btn-secondary">
+                    <a id="back" asp-action="Index" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> @Applicationsettings.BACK
                     </a>
                 </div>
