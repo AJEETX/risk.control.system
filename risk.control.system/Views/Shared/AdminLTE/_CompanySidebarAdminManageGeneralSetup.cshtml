@@ -43,5 +43,16 @@
                 </p>
             </a>
         </li>
+        if(System.Diagnostics.Debugger.IsAttached)
+        {
+            <li class="nav-item">
+                <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
+                    <i class="nav-icon fa fa-align-center"></i>
+                    <p>
+                        @Applicationsettings.AUDIT_LOG
+                    </p>
+                </a>
+            </li>
+        }
     }
 }
