@@ -13,6 +13,7 @@ namespace risk.control.system.Models
             //Id = new Random().Next();
         }
         public string? UserId { get; set; }
+        public long? CompanyId { get; set; }
         public string Type { get; set; }
         public string? TableName { get; set; }
         public DateTime DateTime { get; set; } = DateTime.Now;
