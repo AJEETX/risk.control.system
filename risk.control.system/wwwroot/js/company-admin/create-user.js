@@ -47,7 +47,7 @@ $(document).ready(function () {
     });
 
     $("#documentImageInput").on('change', function () {
-        var MaxSizeInBytes = 2097152;
+        var MaxSizeInBytes = 5242880; //5 MB
         //Get count of selected files
         var countFiles = $(this)[0].files.length;
 
@@ -66,7 +66,7 @@ $(document).ready(function () {
                         $.alert(
                             {
                                 title: " Image UPLOAD issue !",
-                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 2 MB!",
+                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 5 MB!",
                                 icon: 'fas fa-exclamation-triangle',
                                 type: 'red',
                                 closeIcon: true,

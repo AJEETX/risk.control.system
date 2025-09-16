@@ -83,7 +83,6 @@
     <Folder Include="Logs\" />
     <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\report\" />
-    <Folder Include="wwwroot\upload-file\" />
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 </Project>
