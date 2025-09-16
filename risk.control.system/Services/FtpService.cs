@@ -102,7 +102,7 @@ namespace risk.control.system.Services
                 DirectAssign = uploadAndAssign
             };
             var uploadData = _context.FilesOnFileSystem.Add(fileModel);
-            await _context.SaveChangesAsync(null, false);
+            await _context.SaveChangesAsync();
             return uploadData.Entity.Id;
         }
 
@@ -212,7 +212,7 @@ namespace risk.control.system.Services
 
                 _context.Investigations.AddRange(uploadedCases);
 
-                var ros = await _context.SaveChangesAsync(null, false);
+                var ros = await _context.SaveChangesAsync();
 
                 try
                 {
@@ -276,7 +276,7 @@ namespace risk.control.system.Services
                 using var reader = new StreamReader(csvEntry.Open());
                 using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    Delimiter = ",", // 👈 Pipe-delimited
+                    Delimiter = "|", // 👈 Pipe-delimited
                     TrimOptions = TrimOptions.Trim,
                     HeaderValidated = null,
                     MissingFieldFound = null,
