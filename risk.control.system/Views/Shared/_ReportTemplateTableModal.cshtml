@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="faceIdUpdateModalLabel">Update FaceId</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="faceIdUpdateForm">
                 <div class="modal-body">
@@ -36,7 +36,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="documentIdUpdateModalLabel">Update Document ID</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismisss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="documentIdUpdateForm">
@@ -74,7 +74,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="questionUpdateModalLabel">Update Question</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> X </button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"> X </button>
             </div>
             <div class="modal-body">
                 <form id="questionUpdateForm">
@@ -87,18 +87,30 @@
                         <label for="QuestionText" class="form-label">Question Text</label>
                         <input type="text" class="form-control" id="QuestionText" name="QuestionText" required>
                     </div>
-
-                    <!-- Question Type -->
                     <div class="mb-3">
                         <label for="QuestionType" class="form-label">Question Type</label>
-                        <select class="form-select" id="QuestionType" name="QuestionType" required>
-                            <option value="0">Select Question Type</option>
-                            <option value="TEXT">Text</option>
-                            <option value="YESNO">Yes/No</option>
-                            <option value="MULTIPLE">Multiple Choice</option>
+                        <select disabled class="form-select" id="QuestionType" name="QuestionType" required>
+                            <option value="">-- Select Question Type --</option>
+                            <option value="text">Text</option>
+                            <option value="dropdown">Dropdown</option>
+                            <option value="date">Date</option>
+                            <option value="radiobutton">Radio Button</option>
+                            <option value="checkbox">Checkbox</option>
                         </select>
                     </div>
 
+                    <!-- Question Type -->
+                    <div class="mb-3 hidden" id="optionsContainer">
+                        <label for="Options" class="form-label">Options</label>
+                        <select disabled multiple class="form-select" id="Options" name="Options">
+                            <!-- values will be populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="mb-3 hidden" id="dateContainer">
+                        <label for="AnswerDate" class="form-label">Select Date</label>
+                        <input disabled type="date" class="form-control" id="AnswerDate" name="AnswerDate" />
+                    </div>
                     <!-- Save Button -->
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </form>

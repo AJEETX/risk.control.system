@@ -175,14 +175,57 @@ $(document).ready(function () {
             data: { questionId: questionId },
             success: function (response) {
                 if (response.success) {
-                    $('#questionUpdateModal').find('input[name="QuestionId"]').val(response.question.Id);
+                    $('#questionUpdateModal').find('input[name="QuestionId"]').val(response.question.id);
                     $('#questionUpdateModal').find('input[name="LocationId"]').val(locationId);
                     $('#questionUpdateModal').find('input[name="QuestionText"]').val(response.question.questionText);
                     $('#questionUpdateModal').find('select[name="QuestionType"]').val(response.question.questionType);
+                    $('#questionUpdateModal')
+                        .find('select[name="QuestionType"]')
+                        .val(response.question.questionType?.toLowerCase());
+
+                    let type = response.question.questionType?.toLowerCase();
+
+                    if (type === "dropdown" || type === "radiobutton" || type === "checkbox") {
+                        let options = response.question.options.split(',').map(o => o.trim());
+
+                        let $optionsSelect = $('#Options');
+                        $optionsSelect.empty(); // clear existing
+                        options.forEach(opt => {
+                            let isSelected = response.question.options?.split(',').includes(opt);
+                            $optionsSelect.append(
+                                `<option value="${opt}" ${isSelected ? "selected" : ""}>${opt}</option>`
+                            );
+                        });
+                        $('#optionsContainer').removeClass('hidden');
+                        $('#dateContainer').addClass('hidden');
+                    } else if (response.question.questionType === "date") {
+                        $('#dateContainer').removeClass('hidden');
+                        $('#optionsContainer').addClass('hidden');
+                    }
+                    else {
+                        $('#optionsContainer, #dateContainer').addClass('hidden');
+                    }
                     $('#questionUpdateModal').modal('show');
                 }
             }
         });
+    });
+
+    $('#QuestionType').on('change', function () {
+        let type = $(this).val();
+
+        if (type === "dropdown" || type === "radiobutton" || type === "checkbox") {
+            $('#optionsContainer').removeClass('hidden');
+            $('#dateContainer').addClass('hidden');
+        }
+        else if (type === "date") {
+            $('#dateContainer').removeClass('hidden');
+            $('#optionsContainer').addClass('hidden');
+        }
+        else {
+            // text or empty
+            $('#optionsContainer, #dateContainer').addClass('hidden');
+        }
     });
 
     // Handle Question update form submission
