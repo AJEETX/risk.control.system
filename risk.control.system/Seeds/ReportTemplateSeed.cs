@@ -22,6 +22,7 @@ namespace risk.control.system.Seeds
                         IsRequired = true,
                         AgentIdReport = new AgentIdReport
                         {
+                                Selected = true,
                             IsRequired = true,
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName(),                                          // You can set other properties of Agent here if needed
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
@@ -97,6 +98,7 @@ namespace risk.control.system.Seeds
                         AgentIdReport = new AgentIdReport
                         {
                             IsRequired = true,
+                                Selected = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
                         },
@@ -151,6 +153,7 @@ namespace risk.control.system.Seeds
                         AgentIdReport = new AgentIdReport
                         {
                             IsRequired = true,
+                                Selected = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                            // You can set other properties of Agent here if needed
                         },
@@ -171,6 +174,7 @@ namespace risk.control.system.Seeds
                         IsRequired = false,
                         AgentIdReport = new AgentIdReport
                         {
+                                Selected = true,
                             IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
@@ -193,6 +197,7 @@ namespace risk.control.system.Seeds
                          IsRequired = false,
                         AgentIdReport = new AgentIdReport
                         {
+                                Selected = true,
                                 IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
@@ -214,6 +219,7 @@ namespace risk.control.system.Seeds
                          IsRequired = false,
                         AgentIdReport = new AgentIdReport
                         {
+                                Selected = true,
                                 IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
@@ -236,6 +242,7 @@ namespace risk.control.system.Seeds
                         IsRequired = true,
                         AgentIdReport = new AgentIdReport
                         {
+                                Selected = true,
                                 IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                              // You can set other properties of Agent here if needed
@@ -258,6 +265,7 @@ namespace risk.control.system.Seeds
                         IsRequired = false,
                         AgentIdReport = new AgentIdReport
                         {
+                                Selected = true,
                                 IsRequired = true,
                             ReportType = DigitalIdReportType.AGENT_FACE,  // Default agent
                             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()                                            // You can set other properties of Agent here if needed

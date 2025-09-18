@@ -42,6 +42,8 @@ namespace risk.control.system.Controllers
         {
             var template = await context.ReportTemplates
                 .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.AgentIdReport)
+                .Include(r => r.LocationTemplate)
                     .ThenInclude(l => l.MediaReports)
                 .Include(r => r.LocationTemplate)
                     .ThenInclude(l => l.FaceIds)
@@ -307,6 +309,7 @@ namespace risk.control.system.Controllers
         public IActionResult SaveLocation([FromBody] SaveLocationDto model)
         {
             var location = context.LocationTemplate
+                .Include(l => l.AgentIdReport)
                 .Include(l => l.FaceIds)
                 .Include(l => l.DocumentIds)
                 .Include(l => l.MediaReports)
@@ -314,6 +317,11 @@ namespace risk.control.system.Controllers
 
             if (location == null)
                 return Json(new { success = false, message = "Location not found." });
+
+            // Update AgentId
+            var agent = location.AgentIdReport;
+            if (agent != null)
+                agent.Selected = model.AgentId.Selected;
 
             // Update FaceIds
             foreach (var f in model.FaceIds)

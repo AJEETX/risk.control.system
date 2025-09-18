@@ -293,7 +293,7 @@ $(document).ready(function () {
                             optionsHtml +
                             '</div>' +
                             '<div class="col-md-2">' +
-                            '<button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="' + q.Id + '">' +
+                            '<button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="' + q.id + '">' +
                             '<i class="fas fa-trash me-1"></i> Delete' +
                             '</button>' +
                             '</div>' +
@@ -303,9 +303,9 @@ $(document).ready(function () {
 
                         // find the add button for this location and insert into its question list
                         var $addBtn = $('button.add-question-btn[data-locationid="' + locationId + '"]');
-                        var $list = $addBtn.closest('.col-md-8').find('ul.list-unstyled').first();
+                        var $list = $addBtn.closest('.col-md-8').find('ul.list-unstyled');
                         if ($list.length) {
-                            $list.prepend(newHtml);
+                            $list.append(newHtml);
                         }
                     }
                 } else {
@@ -459,6 +459,16 @@ $(document).ready(function () {
         var locationId = $(this).data("locationid");
         var $card = $(this).closest(".card"); // scope to this location card
 
+        // Collect AgentId
+        var agentId = null;
+        var $agentCheckbox = $card.find("input[id^='agent_']");
+        if ($agentCheckbox.length) {
+            agentId = {
+                Id: $agentCheckbox.attr("id").replace("agent_", ""),
+                Selected: $agentCheckbox.is(":checked")
+            };
+        }
+
         // Collect selected FaceIds
         var faceIds = [];
         $card.find("input[id^='face_']").each(function () {
@@ -491,6 +501,7 @@ $(document).ready(function () {
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
+                AgentId: agentId,
                 LocationId: locationId,
                 FaceIds: faceIds,
                 DocumentIds: documentIds,

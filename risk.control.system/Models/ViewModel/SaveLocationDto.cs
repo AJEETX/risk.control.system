@@ -3,6 +3,7 @@
     public class SaveLocationDto
     {
         public long LocationId { get; set; }
+        public ChildSelectionDto AgentId { get; set; }
         public List<ChildSelectionDto> FaceIds { get; set; } = new();
         public List<ChildSelectionDto> DocumentIds { get; set; } = new();
         public List<ChildSelectionDto> MediaReports { get; set; } = new();

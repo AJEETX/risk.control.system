@@ -53,8 +53,38 @@
                                 <div class="card-body">
                                     <div class="row g-3 align-items-start">
 
+                                        <!-- Agent ID -->
+                                        <div class="col-md-3 border rounded p-2">
+                                            <h6 class="text-muted"><i class="far fa-user"></i> Agent ID</h6>
+                                            <ul class="list-unstyled mb-3">
+                                                <li class="mb-2">
+                                                    <div class="border rounded p-2  bg-light">
+                                                        <div class="form-check">
+                                                            <input readonly class="form-check-input" type="checkbox" id="agent_@location.AgentIdReport.Id" @(location.AgentIdReport.Selected ? "checked" : "") />
+                                                            <label class="form-check-label" for="agent_@location.AgentIdReport.Id">
+                                                                @if (location.AgentIdReport.Has2Face)
+                                                                {
+                                                                    <i class="fas fa-users text-info me-1"></i>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="far fa-user text-info me-1"></i>
+                                                                }
+                                                                @location.AgentIdReport.ReportName
+                                                                @if (location.AgentIdReport.IsRequired)
+                                                                {
+                                                                    <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+
                                         <!-- Face IDs -->
-                                        <div class="col-md-4 border rounded p-2">
+                                        <div class="col-md-3 border rounded p-2">
                                             <h6 class="text-muted"><i class="far fa-user"></i> Face IDs</h6>
                                             <ul class="list-unstyled mb-3">
                                                 @foreach (var face in location.FaceIds ?? new List<DigitalIdReport>())
@@ -86,7 +116,7 @@
                                         </div>
 
                                         <!-- Document IDs -->
-                                        <div class="col-md-4 border rounded p-2">
+                                        <div class="col-md-3 border rounded p-2">
                                             <h6 class="text-muted"><i class="far fa-file-alt"></i> Document IDs</h6>
                                             <ul class="list-unstyled mb-3">
                                                 @foreach (var doc in location.DocumentIds ?? new List<DocumentIdReport>())
@@ -118,7 +148,7 @@
                                         </div>
 
                                         <!-- Media IDs -->
-                                        <div class="col-md-4 border rounded p-2">
+                                        <div class="col-md-3 border rounded p-2">
                                             <h6 class="text-muted"><i class="far fa-file-alt"></i> Media</h6>
                                             <ul class="list-unstyled mb-3">
                                                 @foreach (var doc in location.MediaReports ?? new List<MediaReport>())
@@ -144,7 +174,7 @@
                                         </div>
 
                                         <!-- Questions -->
-                                        <div class="col-md-8 border rounded p-2">
+                                        <div class="col-md-9 border rounded p-2">
                                             <h6 class="text-muted"><i class="fas fa-question-circle"></i> Questions</h6>
                                             <ul class="list-unstyled">
                                                 @foreach (var question in location.Questions ?? new List<Question>())
@@ -152,7 +182,7 @@
                                                     <li class="mb-2">
                                                         <div class="border rounded p-2 bg-light">
                                                             <div class="row">
-                                                                <div class="col-md-10">
+                                                                <div class="col-md-11">
                                                                     <span>@question.QuestionText</span>
                                                                     @if (question.IsRequired)
                                                                     {
@@ -170,17 +200,10 @@
                                                                         </div>
                                                                     }
                                                                 </div>
-                                                                <div class="col-md-2">
-                                                                    @* <span class="mt-2">
-                                                                        <button class="btn btn-sm btn-outline-warning update-question-btn" data-questionid="@question.Id">
-                                                                            <i class="fas fa-edit me-1"></i> Update
-                                                                        </button>
-                                                                    </span> *@
-                                                                    <span class="mt-2">
-                                                                        <button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="@question.Id">
-                                                                            <i class="fas fa-trash me-1"></i> Delete
-                                                                        </button>
-                                                                    </span>
+                                                                <div class="col-md-1">
+                                                                    <button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="@question.Id">
+                                                                        <i class="fas fa-trash me-1"></i><small> Delete </small>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -189,13 +212,14 @@
                                             </ul>
                                             <span class="mt-2">
                                                 <button class="btn btn-sm btn-outline-success add-question-btn" data-locationid="@location.Id">
-                                                    <i class="fas fa-edit me-1"></i> Add
+                                                    <i class="fas fa-edit me-1"></i> Add Question
                                                 </button>
                                             </span>
                                         </div>
 
+
                                         <!-- Delete Button -->
-                                        <div class="col-md-3 text-end">
+                                        <div class="col-md-2 text-end">
                                             <button class="btn btn-sm btn-outline-success mt-4 save-location-btn" data-locationid="@location.Id">
                                                 <i class="fas fa-edit me-1"></i> Save
                                             </button>
