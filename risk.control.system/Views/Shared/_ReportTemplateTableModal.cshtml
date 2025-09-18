@@ -68,6 +68,53 @@
     </div>
 </div>
 
+<!-- Modal for Question Add -->
+<div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="questionAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionAddModalLabel">Add Question</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"> X </button>
+            </div>
+            <div class="modal-body">
+                <form id="questionAddForm">
+                    <input type="hidden" name="LocationId">
+
+                    <div class="mb-3">
+                        <label for="QuestionText" class="form-label">Question Text</label>
+                        <input type="text" class="form-control remarks" id="QuestionText" name="QuestionText" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="QuestionType" class="form-label">Question Type</label>
+                        <select class="form-select" id="QuestionType" name="QuestionType" required>
+                            <option value="">-- Select Question Type --</option>
+                            <option value="text">Text</option>
+                            <option value="dropdown">Dropdown</option>
+                            <option value="date">Date</option>
+                            <option value="radiobutton">Radio Button</option>
+                            <option value="checkbox">Checkbox</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 hidden" id="optionsContainer">
+                        <label class="form-label fw-bold">Options (comma-separated)</label>
+                        <input type="text" name="options" id="optionsInput" class="form-control" placeholder="e.g. Yes,No,Maybe" />
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input remarks" id="isRequired" name="isRequired" />
+                        <label class="form-label fw-bold" for="isRequired">Required ?</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal for Question Update -->
 <div class="modal fade" id="questionUpdateModal" tabindex="-1" aria-labelledby="questionUpdateModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -100,16 +147,20 @@
                     </div>
 
                     <!-- Question Type -->
-                    <div class="mb-3 hidden" id="optionsContainer">
+                    <div class="mb-3" id="optionsContainer">
                         <label for="Options" class="form-label">Options</label>
                         <select disabled multiple class="form-select" id="Options" name="Options">
                             <!-- values will be populated dynamically -->
                         </select>
                     </div>
 
-                    <div class="mb-3 hidden" id="dateContainer">
+                    <div class="mb-3" id="dateContainer">
                         <label for="AnswerDate" class="form-label">Select Date</label>
                         <input disabled type="date" class="form-control" id="AnswerDate" name="AnswerDate" />
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input remarks" id="isRequired" />
+                        <label class="form-label  fw-bold" for="isRequired">Required ?</label>
                     </div>
                     <!-- Save Button -->
                     <button type="submit" class="btn btn-primary">Save Changes</button>

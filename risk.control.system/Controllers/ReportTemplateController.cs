@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 using SmartBreadcrumbs.Attributes;
 
@@ -222,7 +223,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateQuestion(long id, string newQuestionText, string newQuestionType)
+        public IActionResult UpdateQuestion(long id, long locationId, string optionsInput, bool isRequired, string newQuestionText, string newQuestionType)
         {
             var question = context.Questions.FirstOrDefault(q => q.Id == id);
             if (question == null)
@@ -231,11 +232,116 @@ namespace risk.control.system.Controllers
             }
 
             question.QuestionText = newQuestionText;
-            question.QuestionType = newQuestionType;
+            question.Options = optionsInput;
 
             context.SaveChanges();
 
             return Json(new { success = true, updatedQuestion = question });
+        }
+
+        [HttpPost]
+        public IActionResult AddQuestion(long locationId, string? optionsInput, bool isRequired, string newQuestionText, string newQuestionType)
+        {
+            var location = context.LocationTemplate.Include(q => q.Questions).FirstOrDefault(q => q.Id == locationId);
+            if (location == null)
+            {
+                return Json(new { success = false, message = "location not found." });
+            }
+            var question = new Question
+            {
+                QuestionText = newQuestionText,
+                QuestionType = newQuestionType,
+                Options = optionsInput,
+                IsRequired = isRequired
+            };
+            location.Questions.Add(question);
+
+            context.SaveChanges();
+
+            return Json(new { success = true, updatedQuestion = question });
+        }
+        [HttpPost]
+        public IActionResult DeleteQuestion(long id)
+        {
+            var question = context.Questions.FirstOrDefault(q => q.Id == id);
+            if (question == null)
+            {
+                return Json(new { success = false, message = "Question not found." });
+            }
+
+            context.Questions.Remove(question);
+
+            context.SaveChanges();
+
+            return Json(new { success = true, Id = id });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteLocation(long id)
+        {
+            var location = context.LocationTemplate
+                .Include(l => l.Questions)
+                .Include(l => l.AgentIdReport)
+                .Include(l => l.FaceIds)
+                .Include(l => l.DocumentIds)
+                .Include(l => l.MediaReports)
+                .FirstOrDefault(l => l.Id == id);
+
+            if (location == null)
+            {
+                return Json(new { success = false, message = "Location not found." });
+            }
+
+            context.Questions.RemoveRange(location.Questions);
+            context.AgentIdReport.Remove(location.AgentIdReport);
+            context.DigitalIdReport.RemoveRange(location.FaceIds);
+            context.DocumentIdReport.RemoveRange(location.DocumentIds);
+            context.MediaReport.RemoveRange(location.MediaReports);
+
+            context.LocationTemplate.Remove(location);
+            context.SaveChanges();
+
+            return Json(new { success = true, Id = id });
+        }
+        [HttpPost]
+        public IActionResult SaveLocation([FromBody] SaveLocationDto model)
+        {
+            var location = context.LocationTemplate
+                .Include(l => l.FaceIds)
+                .Include(l => l.DocumentIds)
+                .Include(l => l.MediaReports)
+                .FirstOrDefault(l => l.Id == model.LocationId);
+
+            if (location == null)
+                return Json(new { success = false, message = "Location not found." });
+
+            // Update FaceIds
+            foreach (var f in model.FaceIds)
+            {
+                var face = location.FaceIds.FirstOrDefault(x => x.Id == f.Id);
+                if (face != null)
+                    face.Selected = f.Selected;
+            }
+
+            // Update DocumentIds
+            foreach (var d in model.DocumentIds)
+            {
+                var doc = location.DocumentIds.FirstOrDefault(x => x.Id == d.Id);
+                if (doc != null)
+                    doc.Selected = d.Selected;
+            }
+
+            // Update MediaReports
+            foreach (var m in model.MediaReports)
+            {
+                var media = location.MediaReports.FirstOrDefault(x => x.Id == m.Id);
+                if (media != null)
+                    media.Selected = m.Selected;
+            }
+
+            context.SaveChanges();
+
+            return Json(new { success = true });
         }
 
     }

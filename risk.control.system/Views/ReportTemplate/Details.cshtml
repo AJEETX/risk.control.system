@@ -171,9 +171,14 @@
                                                                     }
                                                                 </div>
                                                                 <div class="col-md-2">
-                                                                    <span class="mt-2">
+                                                                    @* <span class="mt-2">
                                                                         <button class="btn btn-sm btn-outline-warning update-question-btn" data-questionid="@question.Id">
                                                                             <i class="fas fa-edit me-1"></i> Update
+                                                                        </button>
+                                                                    </span> *@
+                                                                    <span class="mt-2">
+                                                                        <button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="@question.Id">
+                                                                            <i class="fas fa-trash me-1"></i> Delete
                                                                         </button>
                                                                     </span>
                                                                 </div>
@@ -182,14 +187,19 @@
                                                     </li>
                                                 }
                                             </ul>
+                                            <span class="mt-2">
+                                                <button class="btn btn-sm btn-outline-success add-question-btn" data-locationid="@location.Id">
+                                                    <i class="fas fa-edit me-1"></i> Add
+                                                </button>
+                                            </span>
                                         </div>
 
                                         <!-- Delete Button -->
                                         <div class="col-md-3 text-end">
-                                            <button class="btn btn-sm btn-outline-success mt-4 save-location-btn" data-questionid="@location.Id">
+                                            <button class="btn btn-sm btn-outline-success mt-4 save-location-btn" data-locationid="@location.Id">
                                                 <i class="fas fa-edit me-1"></i> Save
                                             </button>
-                                            <button class="btn btn-sm btn-outline-danger mt-4 delete-location-btn" data-questionid="@location.Id">
+                                            <button class="btn btn-sm btn-outline-danger mt-4 delete-location-btn" data-locationid="@location.Id">
                                                 <i class="fas fa-trash"></i> Delete
                                             </button>
                                         </div>
@@ -206,6 +216,9 @@
         <div class="card-footer">
 
             <div class="col-md-12">
+                @* <div class="col-md-2">
+                    <button disabled class="btn btn-outline-success"><i class="fas fa-map-marker-alt"></i> Add Location</a>
+                </div> *@
                 <div class="col-md-1 text-end">
                     <a id="back" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
                 </div>
