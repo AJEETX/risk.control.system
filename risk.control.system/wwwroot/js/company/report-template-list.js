@@ -233,6 +233,7 @@ $(document).ready(function () {
         }
     });
 
+    // Handle Question Add form submission
     $(document).on('submit', '#questionAddForm', function (e) {
         e.preventDefault();
 
@@ -287,14 +288,14 @@ $(document).ready(function () {
                         var newHtml = '<li class="mb-2">' +
                             '<div class="border rounded p-2 bg-light">' +
                             '<div class="row">' +
-                            '<div class="col-md-10">' +
+                            '<div class="col-md-11">' +
                             '<span>' + escapeHtml(q.questionText) + '</span>' + requiredHtml +
                             ' <small class="text-muted">[' + escapeHtml(q.questionType) + ']</small>' +
                             optionsHtml +
                             '</div>' +
-                            '<div class="col-md-2">' +
+                            '<div class="col-md-1">' +
                             '<button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="' + q.id + '">' +
-                            '<i class="fas fa-trash me-1"></i> Delete' +
+                            '<i class="fas fa-trash me-1"></i><small> Delete </small>' +
                             '</button>' +
                             '</div>' +
                             '</div>' +
@@ -303,7 +304,7 @@ $(document).ready(function () {
 
                         // find the add button for this location and insert into its question list
                         var $addBtn = $('button.add-question-btn[data-locationid="' + locationId + '"]');
-                        var $list = $addBtn.closest('.col-md-8').find('ul.list-unstyled');
+                        var $list = $addBtn.closest('.col-md-9').find('ul.list-unstyled').first();
                         if ($list.length) {
                             $list.append(newHtml);
                         }
