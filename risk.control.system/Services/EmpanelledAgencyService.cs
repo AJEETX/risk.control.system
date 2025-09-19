@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
@@ -8,7 +9,7 @@ namespace risk.control.system.Services
     public interface IEmpanelledAgencyService
     {
         Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase);
-
+        Task<ReportTemplate> GetReportTemplate(long caseId);
     }
 
     public class EmpanelledAgencyService : IEmpanelledAgencyService
@@ -54,5 +55,27 @@ namespace risk.control.system.Services
                 ClaimsInvestigation = claimsInvestigation
             };
         }
+        public async Task<ReportTemplate> GetReportTemplate(long caseId)
+        {
+            var claimsInvestigation = await _context.Investigations
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == caseId);
+
+            var template = await _context.ReportTemplates
+                .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.AgentIdReport)
+                .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.MediaReports)
+                .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.FaceIds)
+                .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.DocumentIds)
+                .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.Questions)
+                .FirstOrDefaultAsync(r => r.Id == claimsInvestigation.ReportTemplateId);
+
+            return template;
+        }
+
     }
 }

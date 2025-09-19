@@ -481,6 +481,14 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetReportTemplate(long caseId)
+        {
+            var template = await empanelledAgencyService.GetReportTemplate(caseId);
+
+            return PartialView("_ReportTemplate", template);
+        }
+
         [Breadcrumb("Details", FromAction = "New")]
         public async Task<IActionResult> Details(long id)
         {

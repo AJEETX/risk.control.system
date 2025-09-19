@@ -80,9 +80,24 @@
                             <partial name="Investigation/_DeleteBeneficiary" model="@detailedModel" />
                         </div>
                     </div>
+                    
+
                 </div>
             </div> <!-- class bb-blog-inner -->
         </article>
+        <div class="card shadow-lg border-1 rounded-lg">
+            <button id="loadTemplate" class="btn btn-default" type="button" data-toggle="collapse" data-target="#reportTemplateContainer"
+                    aria-expanded="false" aria-controls="reportTemplateContainer">
+                <i class="fas fa-file-alt"></i> Edit Report Template
+            </button>
+
+            <div id="reportTemplateContainer" class="collapse p-0">
+                <!-- Report template will load here -->
+            </div>
+
+        </div>
+
+        <input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
         <div class="card shadow-lg border-1 rounded-lg">
             <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
         </div>
@@ -149,4 +164,5 @@
 @section Scripts {
     <script src="~/js/creator/get-empanelled-agency.js"></script>
     <script src="~/js/common/case-details.js"></script>
+    <script src="~/js/company/report-template-list.js"></script>
 }

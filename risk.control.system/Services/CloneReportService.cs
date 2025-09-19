@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -47,6 +48,7 @@ namespace risk.control.system.Services
                     IsRequired = loc.IsRequired,
                     AgentIdReport = new AgentIdReport
                     {
+                        Selected = loc.AgentIdReport.Selected,
                         IsRequired = loc.AgentIdReport.IsRequired,
                         ReportType = loc.AgentIdReport.ReportType,
                         ReportName = loc.AgentIdReport.ReportName,
