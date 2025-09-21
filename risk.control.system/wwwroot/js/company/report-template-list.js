@@ -19,6 +19,13 @@ $(document).ready(function () {
     $(document).on('click', '.add-question-btn', function () {
         var locationId = $(this).data('locationid');
         // Open modal to add Question
+        var questionType = $('#QuestionType');
+        if (questionType === 'dropdown' || t === 'radiobutton' || t === 'checkbox') {
+            $('#optionsContainer').removeClass('hidden').show();
+        } else {
+            $('#optionsContainer').addClass('hidden').hide();
+        }
+        $('#questionAddForm')[0].reset();
         $('#addQuestionModal').find('input[name="LocationId"]').val(locationId);
         $('#addQuestionModal').modal('show');
     });
@@ -129,6 +136,12 @@ $(document).ready(function () {
                             addAnother: {
                                 text: 'Add another',
                                 action: function () {
+                                    var questionType = $('#QuestionType');
+                                    if (questionType === 'dropdown' || t === 'radiobutton' || t === 'checkbox') {
+                                        $('#optionsContainer').removeClass('hidden').show();
+                                    } else {
+                                        $('#optionsContainer').addClass('hidden').hide();
+                                    }
                                     $('#questionAddForm')[0].reset();
                                     $('#addQuestionModal').modal('show');
                                 }
