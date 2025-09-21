@@ -290,11 +290,10 @@ namespace risk.control.system.Controllers
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string failedMessage = $"Dear {admin.Email} ,\n" +
                              $"User {user.Email} can't log in. \n" +
                              $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
+                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
                 }
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
@@ -309,7 +308,7 @@ namespace risk.control.system.Controllers
                     string message = $"Dear {admin.Email}, \n" +
                         $"{model.Email} locked out.\n " +
                         $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
@@ -324,7 +323,7 @@ namespace risk.control.system.Controllers
                     string message = $"Dear {admin.Email}, \n" +
                         $"{model.Email} failed login attempt. {nameof(result.IsNotAllowed)}. \n" +
                         $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 model.LoginError = $"{nameof(result.IsNotAllowed)}. Contact admin.";
@@ -456,7 +455,7 @@ namespace risk.control.system.Controllers
                                 $"{BaseUrl}";
                                 try
                                 {
-                                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+                                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                                 }
                                 catch (Exception ex)
                                 {
@@ -477,7 +476,7 @@ namespace risk.control.system.Controllers
                     string failedMessage = $"Dear {admin.Email}, \n" +
                         $"User {user.Email} password updated.  \n" +
                         $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
+                    await smsService.DoSendSmsAsync(adminForFailed.Country.Code, "+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }
                 notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
                 return RedirectToAction("Index", "Dashboard");

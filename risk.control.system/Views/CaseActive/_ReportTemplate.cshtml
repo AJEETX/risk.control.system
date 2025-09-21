@@ -1,0 +1,212 @@
+﻿@model ReportTemplate
+<div class="row">
+    @foreach (var location in Model.LocationTemplate)
+    {
+        var collapseId = $"collapse_{location.Id}"; // Ensure unique ID per location
+
+        <div class="col-12">
+            <div class="card h-100 shadow-sm border rounded">
+                <div class="card-header bg-light">
+                    <h5 class="card-title">
+                        <i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
+                        @if (location.IsRequired)
+                        {
+                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                        }
+                    </h5>
+                    <div class="card-tools">
+                        <button class="btn btn-sm btn-outline-secondary" type="button"
+                                data-toggle="collapse" data-target="#@collapseId"
+                                aria-expanded="false" aria-controls="@collapseId">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+
+                </div>
+                <div id="@collapseId" class="collapse">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-start">
+
+                            <!-- Agent ID -->
+                            <div class="col-md-3 border rounded p-2">
+                                <h6 class="text-muted"><i class="far fa-user"></i> Agent ID</h6>
+                                <ul class="list-unstyled mb-3">
+                                    <li class="mb-2">
+                                        <div class="border rounded p-2  bg-light">
+                                            <div class="form-check">
+                                                <input disabled class="form-check-input" type="checkbox" id="agent_@location.AgentIdReport.Id" @(location.AgentIdReport.Selected ? "checked" : "") />
+                                                <input type="hidden" name="AgentIdReport.Selected" value="@(location.AgentIdReport.Selected)" />
+                                                <label class="form-check-label" for="agent_@location.AgentIdReport.Id">
+                                                    @if (location.AgentIdReport.Has2Face)
+                                                    {
+                                                        <i class="fas fa-users text-info me-1"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-user text-info me-1"></i>
+                                                    }
+                                                    @location.AgentIdReport.ReportName
+                                                    @if (location.AgentIdReport.IsRequired)
+                                                    {
+                                                        <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                    }
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+
+                            <!-- Face IDs -->
+                            <div class="col-md-3 border rounded p-2">
+                                <h6 class="text-muted"><i class="far fa-user"></i> Face IDs</h6>
+                                <ul class="list-unstyled mb-3">
+                                    @foreach (var face in location.FaceIds ?? new List<DigitalIdReport>())
+                                    {
+                                        <li class="mb-2">
+                                            <div class="border rounded p-2  bg-light">
+                                                <div class="form-check">
+                                                    <input disabled class="form-check-input" type="checkbox" id="face_@face.Id" @(face.Selected ? "checked" : "") />
+                                                    <label class="form-check-label" for="face_@face.Id">
+                                                        @if (face.Has2Face)
+                                                        {
+                                                            <i class="fas fa-users text-info me-1"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="far fa-user text-info me-1"></i>
+                                                        }
+                                                        @face.ReportName
+                                                        @if (face.IsRequired)
+                                                        {
+                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                        }
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+
+                            <!-- Document IDs -->
+                            <div class="col-md-3 border rounded p-2">
+                                <h6 class="text-muted"><i class="far fa-file-alt"></i> Document IDs</h6>
+                                <ul class="list-unstyled mb-3">
+                                    @foreach (var doc in location.DocumentIds ?? new List<DocumentIdReport>())
+                                    {
+                                        <li class="mb-2">
+                                            <div class="border rounded p-2 bg-light">
+                                                <div class="form-check">
+                                                    <input disabled class="form-check-input" type="checkbox" id="doc_@doc.Id" @(doc.Selected ? "checked" : "") />
+                                                    <label class="form-check-label" for="doc_@doc.Id">
+                                                        @if (doc.HasBackImage)
+                                                        {
+                                                            <i class="fas fa-copy text-muted me-1"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="far fa-file text-muted me-1"></i>
+                                                        }
+                                                        @doc.ReportName
+                                                        @if (doc.IsRequired)
+                                                        {
+                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                        }
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+
+                            <!-- Media IDs -->
+                            <div class="col-md-3 border rounded p-2">
+                                <h6 class="text-muted"><i class="far fa-file-alt"></i> Media</h6>
+                                <ul class="list-unstyled mb-3">
+                                    @foreach (var doc in location.MediaReports ?? new List<MediaReport>())
+                                    {
+                                        <li class="mb-2">
+                                            <div class="border rounded p-2 bg-light">
+                                                <div class="form-check">
+                                                    <input disabled class="form-check-input" type="checkbox" id="doc_@doc.Id" @(doc.Selected ? "checked" : "") />
+                                                    <label class="form-check-label" for="doc_@doc.Id">
+                                                        <i class="far fa-file text-muted me-1"></i>
+
+                                                        @doc.ReportName
+                                                        @if (doc.IsRequired)
+                                                        {
+                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                        }
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+
+                            <!-- Questions -->
+                            <div class="col-md-9 border rounded p-2">
+                                <h6 class="text-muted"><i class="fas fa-question-circle"></i> Questions</h6>
+                                <ul class="list-unstyled">
+                                    @foreach (var question in location.Questions ?? new List<Question>())
+                                    {
+                                        <li class="mb-2">
+                                            <div class="border rounded p-2 bg-light">
+                                                <div class="row">
+                                                    <div class="col-md-11">
+                                                        <span>@question.QuestionText</span>
+                                                        @if (question.IsRequired)
+                                                        {
+                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                        }
+                                                        <small class="text-muted">[@question.QuestionType]</small>
+                                                        @if (question.QuestionType != "Text" && !string.IsNullOrEmpty(question.Options))
+                                                        {
+                                                            var options = question.Options.Split(',').Select(o => o.Trim());
+                                                            <div class="mt-4">
+                                                                @foreach (var opt in options)
+                                                                {
+                                                                    <span class="badge bg-light text-dark border me-1">@opt</span>
+                                                                }
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <button disabled class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="@question.Id">
+                                                            <i class="fas fa-trash me-1"></i><small> Delete </small>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                                <span class="mt-2">
+                                    <button disabled class="btn btn-sm btn-outline-success add-question-btn" data-locationid="@location.Id">
+                                        <i class="fas fa-edit me-1"></i> Add Question
+                                    </button>
+                                </span>
+                            </div>
+
+
+                            <!-- Delete Button -->
+                            <div class="col-md-2 text-end">
+                                <button disabled class="btn btn-sm btn-outline-success mt-4 save-location-btn" data-locationid="@location.Id">
+                                    <i class="fas fa-edit me-1"></i> Save
+                                </button>
+                                <button disabled class="btn btn-sm btn-outline-danger mt-4 delete-location-btn" data-locationid="@location.Id">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

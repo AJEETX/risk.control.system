@@ -522,7 +522,7 @@ namespace risk.control.system.Services
             };
             claim.CaseMessages.Add(scheduleMessage);
             await context.SaveChangesAsync(null, false);
-            await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
+            await smsService.DoSendSmsAsync(claim.CustomerDetail.Country.Code, "+" + isdCode + mobile, message);
             return claim.CustomerDetail.Name;
         }
         //public async Task<string> SendSms2Customer(string currentUser, string claimId, string sms)
@@ -645,7 +645,7 @@ namespace risk.control.system.Services
             .FirstOrDefault(c => c.Id == claimId);
             claim.CaseMessages.Add(scheduleMessage);
             await context.SaveChangesAsync(null, false);
-            await smsService.DoSendSmsAsync("+" + isdCode + mobile, message);
+            await smsService.DoSendSmsAsync(beneficiary.Country.Code, "+" + isdCode + mobile, message);
             return beneficiary.Name;
         }
         //public async Task<string> SendSms2Beneficiary(string currentUser, string claimId, string sms)

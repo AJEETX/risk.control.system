@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers
 
                 if (result.Succeeded)
                 {
-                    var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
+                    var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
                     if (!user.Active)
                     {
                         var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -202,13 +202,13 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
+                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
                     {
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \n\nEmail : " + user.Email);
+                        await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \n\nEmail : " + user.Email);
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     }
                     return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
@@ -333,7 +333,7 @@ namespace risk.control.system.Controllers
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
-                        var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
+                        var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
                         if (!user.Active)
                         {
                             var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -342,7 +342,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
+                                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
                                 notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                             }
                         }
@@ -354,7 +354,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. \n\nEmail : " + user.Email);
+                                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and unlocked. \n\nEmail : " + user.Email);
                                 notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
                             }
                         }

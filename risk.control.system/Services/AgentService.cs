@@ -80,7 +80,7 @@ namespace risk.control.system.Services
                         string message = $"Dear {user2Onboard.Email}\n";
                         message += $"Uid reset for mobile: {mobile}\n";
                         message += $"{portal_base_url}";
-                        await smsService.DoSendSmsAsync(mobile, message);
+                        await smsService.DoSendSmsAsync(user2Onboard.Country.Code, mobile, message);
                     }
                     return user2Onboard;
                 }

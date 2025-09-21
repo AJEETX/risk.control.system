@@ -89,7 +89,7 @@ namespace risk.control.system.Services
                         message += $"Assign of {file.RecordCount} cases finished \n";
                         message += $"Thanks \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(applicationUser.Country.Code, applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
                 }
                 else
@@ -111,7 +111,7 @@ namespace risk.control.system.Services
                         message += $"JobId: {file.Id} Assign Error. \n";
                         message += $"Thanks \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(applicationUser.Country.Code, applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
                 }
 
@@ -151,7 +151,7 @@ namespace risk.control.system.Services
                         message += $"Upload of {file.RecordCount} cases finished \n";
                         message += $"Thanks \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(applicationUser.Country.Code, applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
                 }
                 else
@@ -173,7 +173,7 @@ namespace risk.control.system.Services
                         message += $"JobId: {file.Id} Upload Error. \n";
                         message += $"Thanks \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(applicationUser.Country.Code, applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                     }
                 }
 
@@ -256,7 +256,7 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{clientCompanyUser.Email},\n ";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(userEmailToSend.Country.Code, userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
                     }
                     //SMS ::END
@@ -332,7 +332,7 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{clientCompanyUser.Email},\n ";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(userEmailToSend.Country.Code, userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
                     }
                     //SMS ::END
@@ -380,7 +380,7 @@ namespace risk.control.system.Services
                         message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.SubStatus}. \n";
                         message += $"Thanks \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(applicationUser.Country.Code, applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = applicationUser.Email, RecepicientPhone = applicationUser.PhoneNumber, Message = message });
                     }
                     //SMS ::END
@@ -423,7 +423,7 @@ namespace risk.control.system.Services
                     message += $"Assigning finished of {autoAllocatedCasesCount + notAutoAllocatedCasesCount} cases, Auto-assigned count = {autoAllocatedCasesCount}. \n";
                     message += $"Thanks \n";
                     message += $"{url}";
-                    await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(applicationUser.Country.Code, applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                 }
 
                 var rows = await _context.SaveChangesAsync(null, false);
@@ -461,7 +461,7 @@ namespace risk.control.system.Services
                     message += $"Assigning finished of {autoAllocatedCases.Count + notAutoAllocatedCases.Count} cases, Auto-assigned count = {autoAllocatedCases.Count}.\n ";
                     message += $"Thanks \n";
                     message += $"{url}";
-                    await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(applicationUser.Country.Code, applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
                 }
 
                 var rows = await _context.SaveChangesAsync(null, false);
@@ -532,7 +532,7 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
                         //claim.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
@@ -580,7 +580,7 @@ namespace risk.control.system.Services
                     message += $"Thanks \n";
                     message += $"{userEmail},\n ";
                     message += $"{url}";
-                    await smsService.DoSendSmsAsync(recepientUser.Country.ISDCode + recepientUser.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(recepientUser.Country.Code, recepientUser.Country.ISDCode + recepientUser.PhoneNumber, message);
                     //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = recepientUser.Email, RecepicientPhone = recepientUser.PhoneNumber, Message = message });
                 }
             }
@@ -697,7 +697,7 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
@@ -754,7 +754,7 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{senderUserEmail},\n ";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
@@ -821,7 +821,7 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
@@ -894,7 +894,7 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{clientCompanyUser.Email}, \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(userEmailToSend.Country.Code, userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
                     }
                     //SMS ::END
@@ -952,7 +952,7 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
                         //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
@@ -1001,7 +1001,7 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
-                        await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
                         //claim.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }

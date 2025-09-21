@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers.Api
             try
             {
                 var normalizedMobile = request.Mobile.TrimStart('+');
-                var userWithUid = await _context.VendorApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
+                var userWithUid = await _context.VendorApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
                 if (!request.SendSMSForRetry)
                 {
                     if (userWithUid != null)
@@ -163,14 +163,14 @@ namespace risk.control.system.Controllers.Api
                             user.SecretPin = randomNumber.Next(1000, 9999).ToString();
                             _context.VendorApplicationUser.Update(user);
                             await _context.SaveChangesAsync();
-                            await SendVerificationSmsAsync(user.Email, request.Mobile, user.SecretPin);
+                            await SendVerificationSmsAsync(userWithUid.Country.Code, user.Email, request.Mobile, user.SecretPin);
                             return Ok(new { user.Email, Pin = user.SecretPin });
                         }
                     }
                 }
                 else if (request.SendSMSForRetry && userWithUid != null)
                 {
-                    await SendVerificationSmsAsync(userWithUid.Email, request.Mobile, userWithUid.SecretPin);
+                    await SendVerificationSmsAsync(userWithUid.Country.Code, userWithUid.Email, request.Mobile, userWithUid.SecretPin);
                     return Ok(new { userWithUid.Email, Pin = userWithUid.SecretPin });
                 }
 
@@ -183,12 +183,12 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        private async Task SendVerificationSmsAsync(string email, string mobile, string pin)
+        private async Task SendVerificationSmsAsync(string countryCode, string email, string mobile, string pin)
         {
             string message = $"Dear {email},\n\n" +
                              $"iCheckify-App PIN: {pin}\n\n" +
                              $"{portal_base_url}";
-            await smsService.DoSendSmsAsync(mobile, message);
+            await smsService.DoSendSmsAsync(countryCode, mobile, message);
         }
 
         [AllowAnonymous]

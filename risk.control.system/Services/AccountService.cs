@@ -43,7 +43,7 @@ namespace risk.control.system.Services
                 message += $"{BaseUrl}";
                 if (user != null)
                 {
-                    await smsService.DoSendSmsAsync(user.Country.ISDCode + user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
                 }
             }
             //SEND SMS

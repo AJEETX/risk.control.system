@@ -28,16 +28,19 @@ namespace risk.control.system.Controllers.Company
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
         private readonly ILogger<CaseActiveController> logger;
+        private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IInvestigationService investigationService;
 
         public CaseActiveController(ApplicationDbContext context,
             INotyfService notifyService,
             ILogger<CaseActiveController> logger,
+            IEmpanelledAgencyService empanelledAgencyService,
             IInvestigationService investigationService)
         {
             _context = context;
             this.notifyService = notifyService;
             this.logger = logger;
+            this.empanelledAgencyService = empanelledAgencyService;
             this.investigationService = investigationService;
         }
 
@@ -138,6 +141,14 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetReportTemplate(long caseId)
+        {
+            var template = await empanelledAgencyService.GetReportTemplate(caseId);
+
+            return PartialView("_ReportTemplate", template);
         }
     }
 }

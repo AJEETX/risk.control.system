@@ -170,8 +170,8 @@ namespace risk.control.system.Controllers
                     if (result.Succeeded)
                     {
                         notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
-                        var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User edited . \nEmail : " + user.Email + "\n" + portal_base_url);
+                        var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                        await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User edited . \nEmail : " + user.Email + "\n" + portal_base_url);
                         return RedirectToAction(nameof(Index), "Dashboard");
                     }
                 }
@@ -249,7 +249,7 @@ namespace risk.control.system.Controllers
                         string failedMessage = $"Dear {admin.Email}\n" +
                         $"User {user.Email} failed changed password. New password: {model.NewPassword}\n" +
                         $"{BaseUrl}";
-                        await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
+                        await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
                         notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
@@ -259,12 +259,12 @@ namespace risk.control.system.Controllers
                     string message = $"Dear {admin.Email}\n" +
                     $"User {user.Email} changed password. New password: {model.NewPassword}\n" +
                     $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                     message = string.Empty;
                     message = $"Dear {user.Email}\n" +
                     $"Your changed password: {model.NewPassword}\n" +
                     $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + user.PhoneNumber, message);
 
                     return View("ChangePasswordConfirmation");
                 }
