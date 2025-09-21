@@ -27,14 +27,14 @@ namespace risk.control.system.Helpers
             {
                 if (cdetail is not null)
                 {
-                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(cdetail.ProfilePicture));
+                    return (cdetail.ImagePath);
                 }
             }
             else
             {
                 if (beneficiary is not null)
                 {
-                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture));
+                    return beneficiary.ImagePath;
                 }
             }
             return Applicationsettings.NO_USER;

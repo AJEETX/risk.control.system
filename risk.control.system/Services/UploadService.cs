@@ -5,7 +5,7 @@ namespace risk.control.system.Services
 {
     public interface IUploadService
     {
-        Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model);
+        Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP);
     }
     public class UploadService : IUploadService
     {
@@ -19,7 +19,7 @@ namespace risk.control.system.Services
             this.uploadProgressService = uploadProgressService;
         }
 
-        public async Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model)
+        public async Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP)
         {
             var uploadedClaims = new List<UploadResult>();
             try
@@ -28,19 +28,18 @@ namespace risk.control.system.Services
                 {
                     return null; // Return 0 if no CSV data is found
                 }
-                var uploadedRecordsCount = 0;
                 var totalCount = customData.Count;
                 foreach (var row in customData)
                 {
-                    var claimUploaded = await _caseCreationService.FileUpload(companyUser, row, model);
+                    var claimUploaded = await _caseCreationService.FileUpload(companyUser, row, model, fileOrFTP);
                     if (claimUploaded == null)
                     {
                         return null;
                     }
                     uploadedClaims.Add(claimUploaded);
-                    int progress = (int)(((uploadedRecordsCount + 1) / (double)totalCount) * 100);
-                    uploadProgressService.UpdateProgress(model.Id, progress);
-                    uploadedRecordsCount++;
+                    //int progress = (int)(((uploadedRecordsCount + 1) / (double)totalCount) * 100);
+                    //uploadProgressService.UpdateProgress(model.Id, progress);
+                    //uploadedRecordsCount++;
                 }
                 return uploadedClaims;
             }

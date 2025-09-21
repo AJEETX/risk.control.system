@@ -62,21 +62,29 @@
                 @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
                 {
                     <div class="row">
-                        <div class="col-md-12">
-                            <ul class="fa-ul text-muted list-unstyled">
-
-                                <li class="mb-2">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment text-warning"></i>
-                                    </span>
-                                    Edited Remarks?
-                                </li>
-                                
-                                @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
-                            </ul>
-                            
-                        </div>
+                    <!-- Questions Section -->
+                    <div class="col-md-7">
+                        <ul class="fa-ul text-muted list-unstyled">
+                            <li class="mb-2">
+                                <span class="fa-li">
+                                    <i class="far fa-comment text-info"></i>
+                                </span>
+                                Edited Remarks?
+                            </li>
+                        </ul>
                     </div>
+                    <!-- Answers Section -->
+                    <div class="col-md-5">
+                        <ul class="fa-ul list-unstyled">
+                            <li class="mb-2">
+                                <span class="fa-li">
+                                    <i class="far fa-comment text-secondary"></i>
+                                </span>
+                                @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 }
             </div>
 

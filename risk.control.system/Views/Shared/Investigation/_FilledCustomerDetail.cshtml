@@ -65,9 +65,9 @@
 
                 <div class="col-5 text-center">
                     <p class="text-muted text-sm">
-                        @if (customerDetail?.ProfilePicture != null)
+                        @if (customerDetail?.ImagePath != null)
                         {
-                            <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(customerDetail?.ProfilePicture))" data-toggle="tooltip" title="Customer Photo">
+                            <img id="profileImage" class="img-fluid block-data" src="@customerDetail.ImagePath" data-toggle="tooltip" title="Customer Photo">
                         }
                         else
                         {

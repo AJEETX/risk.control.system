@@ -37,7 +37,7 @@ namespace risk.control.system.Seeds
                 Active = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
-                PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
+                PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 Vendor = vendor,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,

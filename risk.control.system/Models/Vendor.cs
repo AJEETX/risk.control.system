@@ -1,8 +1,8 @@
-﻿using risk.control.system.AppConstant;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
@@ -122,10 +122,9 @@ namespace risk.control.system.Models
         }
 
         public virtual ICollection<AgencyRating>? ratings { get; set; }
-        public string? MobileAppUrl { get; set; } = Applicationsettings.APP_URL;
+        public string? MobileAppUrl { get; set; } = Environment.GetEnvironmentVariable("APP_URL");
         public bool CanChangePassword { get; set; } = false;
         public bool HasClaims { get; set; } = false;
-        public bool EnableMailbox { get; set; } = false;
 
         public override string ToString()
         {

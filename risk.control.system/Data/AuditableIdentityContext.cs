@@ -1,19 +1,22 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 using risk.control.system.Models;
-using System.Security.Claims;
 
 namespace risk.control.system.Data
 {
     public abstract class AuditableIdentityContext : IdentityDbContext<ApplicationUser, ApplicationRole, long>
     {
         public IHttpContextAccessor httpContext;
-        public AuditableIdentityContext(DbContextOptions options, IHttpContextAccessor context) : base(options)
+        private readonly IServiceProvider services;
+
+        public AuditableIdentityContext(DbContextOptions options, IHttpContextAccessor context, IServiceProvider services) : base(options)
         {
             this.httpContext = context;
+            this.services = services;
         }
-
+        protected ApplicationDbContext _context => services.GetRequiredService<ApplicationDbContext>();
         public DbSet<Audit> AuditLogs { get; set; }
 
         public virtual async Task<int> SaveChangesAsync(string userId = null, bool notseed = true)
@@ -28,7 +31,8 @@ namespace risk.control.system.Data
 
         private void OnBeforeSaveChanges(string userId)
         {
-            userId = httpContext?.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
+            userId = httpContext?.HttpContext?.User?.Identity.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userId);
             ChangeTracker.DetectChanges();
             var auditEntries = new List<AuditEntry>();
             foreach (var entry in ChangeTracker.Entries())
@@ -38,6 +42,7 @@ namespace risk.control.system.Data
                 var auditEntry = new AuditEntry(entry);
                 auditEntry.TableName = entry.Entity.GetType().Name;
                 auditEntry.UserId = userId;
+                auditEntry.CompanyId = companyUser?.ClientCompanyId;
                 auditEntries.Add(auditEntry);
                 foreach (var property in entry.Properties)
                 {

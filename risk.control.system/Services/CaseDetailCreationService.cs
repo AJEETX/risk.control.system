@@ -12,7 +12,7 @@ namespace risk.control.system.Services
 {
     public interface ICaseDetailCreationService
     {
-        Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model);
+        Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, byte[] model, ORIGIN fileOrFTP);
     }
     public class CaseDetailCreationService : ICaseDetailCreationService
     {
@@ -60,14 +60,14 @@ namespace risk.control.system.Services
             }
             return true;
         }
-        public async Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model)
+        public async Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, byte[] model, ORIGIN fileOrFTP)
         {
             var case_errors = new List<UploadError>();
             var caseErrors = new List<string>();
             try
             {
-                var customerTask = customerCreationService.AddCustomer(companyUser, uploadCase, model.ByteData);
-                var beneficiaryTask = beneficiaryCreationService.AddBeneficiary(companyUser, uploadCase, model.ByteData);
+                var customerTask = customerCreationService.AddCustomer(companyUser, uploadCase, model);
+                var beneficiaryTask = beneficiaryCreationService.AddBeneficiary(companyUser, uploadCase, model);
                 await Task.WhenAll(customerTask, beneficiaryTask);
 
                 // Get the results
@@ -93,11 +93,24 @@ namespace risk.control.system.Services
                       ?? context.InvestigationServiceType
                         .FirstOrDefault(b => b.InsuranceType == caseType);  // Case 3: If no match, retry ignoring LineOfBusinessId
 
-                var savedNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(model.ByteData, uploadCase.CaseId?.ToLower(), POLICY_IMAGE);
+                var savedNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(model, uploadCase.CaseId?.ToLower(), POLICY_IMAGE);
+                var extension = Path.GetExtension(POLICY_IMAGE).ToLower();
+                var fileName = Guid.NewGuid().ToString() + extension;
                 if (savedNewImage == null)
                 {
                     case_errors.Add(new UploadError { UploadData = "[Policy Image: null/not found]", Error = "null/not found" });
                     caseErrors.Add($"[Policy Image=`{POLICY_IMAGE}`  null/not found]");
+                }
+                else
+                {
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "policy");
+                    if (!Directory.Exists(imagePath))
+                    {
+                        Directory.CreateDirectory(imagePath);
+                    }
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "policy", fileName);
+                    await File.WriteAllBytesAsync(filePath, savedNewImage);
+
                 }
                 if (!string.IsNullOrWhiteSpace(uploadCase.Amount) && decimal.TryParse(uploadCase.Amount, out var amount))
                 {
@@ -217,7 +230,8 @@ namespace risk.control.system.Services
                     CaseEnablerId = caseEnabler.CaseEnablerId,
                     CostCentreId = department.CostCentreId,
                     InsuranceType = caseType,
-                    DocumentImage = savedNewImage ?? File.ReadAllBytes(noImagePath),
+                    //DocumentImage = savedNewImage ?? File.ReadAllBytes(noImagePath),
+                    DocumentPath = "/policy/" + fileName,
                     DocumentImageExtension = Path.GetExtension(POLICY_IMAGE),
                     Updated = DateTime.Now,
                     UpdatedBy = companyUser.Email
@@ -242,7 +256,7 @@ namespace risk.control.system.Services
                     Deleted = false,
                     AssignedToAgency = false,
                     IsReady2Assign = ValidateDataCase(uploadCase),
-                    ORIGIN = model.FileOrFtp,
+                    ORIGIN = fileOrFTP,
                     ClientCompanyId = companyUser.ClientCompanyId,
                     CreatorSla = companyUser.ClientCompany.CreatorSla,
                     IsNew = true,

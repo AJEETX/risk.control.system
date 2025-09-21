@@ -58,7 +58,30 @@ $(document).ready(function () {
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            // Disable all buttons, submit inputs, and anchors
+                            $('button, input[type="submit"], a').prop('disabled', true);
+
+                            // Add a class to visually indicate disabled state for anchors
+                            $('a').addClass('disabled-anchor').on('click', function (e) {
+                                e.preventDefault(); // Prevent default action for anchor clicks
+                            });
+                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add District");
+
                             $('#create-form').submit();
+                            var createForm = document.getElementById("create-form");
+                            if (createForm) {
+
+                                var nodes = createForm.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
                         }
                     },
                     cancel: {
@@ -87,7 +110,30 @@ $(document).ready(function () {
                         btnClass: 'btn-warning',
                         action: function () {
                             askEditConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            // Disable all buttons, submit inputs, and anchors
+                            $('button, input[type="submit"], a').prop('disabled', true);
+
+                            // Add a class to visually indicate disabled state for anchors
+                            $('a').addClass('disabled-anchor').on('click', function (e) {
+                                e.preventDefault(); // Prevent default action for anchor clicks
+                            });
+                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit District");
                             $('#edit-form').submit();
+
+                            var createForm = document.getElementById("edit-form");
+                            if (createForm) {
+
+                                var nodes = createForm.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
                         }
                     },
                     cancel: {

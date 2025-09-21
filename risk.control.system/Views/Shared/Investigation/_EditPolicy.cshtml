@@ -164,9 +164,9 @@
                 <div class="form-group">
                     <label class="input-group-label"> Case Document:</label>
                     <div class="input-group mb-3">
-                        @if (Model?.PolicyDetail.DocumentImage is not null)
+                        @if (Model?.PolicyDetail.DocumentPath is not null)
                         {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="data:image/*;base64,@(Convert.ToBase64String(Model?.PolicyDetail.DocumentImage))"
+                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.PolicyDetail.DocumentPath"
                                  data-toggle="tooltip" title="Policy Document" />
                             <i class="fa fa-asterisk asterik-style"></i>
                             <input accept=".jpg,.jpeg,.png" asp-for="PolicyDetail.Document" type="file"
@@ -179,7 +179,7 @@
                             <input accept=".jpg,.jpeg,.png" asp-for="PolicyDetail.Document" type="file"
                                    class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Case Document" data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
                         }
-                        <span asp-validation-for="PolicyDetail.DocumentImage" class="text-danger"></span>
+                        <span asp-validation-for="PolicyDetail.DocumentPath" class="text-danger"></span>
 
                     </div>
                 </div>

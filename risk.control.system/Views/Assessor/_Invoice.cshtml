@@ -39,13 +39,20 @@
                             <span class="fa-li">
                                 <i class="fas fa-sun"></i>
                             </span>
-                            Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name;
+                            Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name
                         </li>
                         <li class="small">
                             <span class="fa-li">
-                                <i class="fas fa-sun"></i>
+                                <i class="fas fa-money"></i>
                             </span>
-                            Total Amount (@ViewBag.Currency): @Model.VendorInvoice.GrandTotal
+                            Tax Amount (@ViewBag.Currency): @Model.VendorInvoice.TaxAmount
+                        </li>
+
+                        <li class="small">
+                            <span class="fa-li">
+                                <i class="fas fa-money"></i>
+                            </span>
+                            Total Amount (@ViewBag.Currency): @(Model.VendorInvoice.GrandTotal + Model.VendorInvoice.TaxAmount)
                         </li>
 
                     </ul>

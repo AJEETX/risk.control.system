@@ -327,7 +327,7 @@ namespace risk.control.system.Controllers.Api.Company
                 {
                     Id = u.VendorId,
                     Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
-                    Domain = u.Email,
+                    Domain = $"<a href='/Vendors/Details?id={u.VendorId}'>{u.Email}</a>",
                     Name = u.Name,
                     Code = u.Code,
                     Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,

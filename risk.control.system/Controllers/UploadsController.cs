@@ -13,7 +13,6 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
@@ -56,8 +55,12 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!.. Download error");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var fileBytes = file.ByteData;
-                return File(fileBytes, file.FileType, file.Name + file.Extension);
+                string zipPath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", file.Name);
+                var fileBytes = System.IO.File.ReadAllBytes(zipPath);
+                return File(fileBytes, "application/zip", Path.GetFileName(zipPath));
+
+                //var fileBytes = file.ByteData;
+                //return File(fileBytes, file.FileType, file.Name + file.Extension);
             }
             catch (Exception ex)
             {
@@ -129,16 +132,6 @@ namespace risk.control.system.Controllers
             }
             return BadRequest("Invalid image.");
         }
-        [HttpGet]
-        public async Task<IActionResult> GetFaceImage(long id)
-        {
-            var face = await _context.DigitalIdReport.FindAsync(id);
-            if (face?.IdImage != null)
-            {
-                return File(face.IdImage, "image/jpeg"); // or "image/png" if PNG
-            }
-            return File("~/img/no-user.png", "image/jpeg");
-        }
 
         [HttpPost]
         public async Task<IActionResult> UploadDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
@@ -150,16 +143,6 @@ namespace risk.control.system.Controllers
                 return Json(new { success = true, image = response.Image });
             }
             return BadRequest("Invalid image.");
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetDocumentImage(long id)
-        {
-            var doc = await _context.DocumentIdReport.FindAsync(id);
-            if (doc?.IdImage != null)
-            {
-                return File(doc.IdImage, "image/jpeg");
-            }
-            return File("~/img/no-user.png", "image/jpeg");
         }
 
         [HttpPost]
@@ -193,21 +176,6 @@ namespace risk.control.system.Controllers
             });
         }
 
-        [HttpGet]
-        public IActionResult GetMediaFile(long id)
-        {
-            var report = _context.MediaReport.Find(id);
-            if (report == null || report.IdImage == null)
-                return NotFound();
-
-            var contentType = report.MediaExtension == "mp4" ? "video/mp4" :
-                              report.MediaExtension == "mp3" ? "audio/mpeg" :
-                              "application/octet-stream";
-
-            return File(report.IdImage, contentType);
-        }
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitLocationAnswers(string locationName, long CaseId, List<QuestionTemplate> Questions)
@@ -237,8 +205,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Error in submitting Answer(s).");
             }
             return Redirect("/Agent/GetInvestigate?selectedcase=" + CaseId);
-
         }
-
     }
 }

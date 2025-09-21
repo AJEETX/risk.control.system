@@ -63,24 +63,21 @@ namespace risk.control.system.Services
             {
                 Directory.CreateDirectory(path);
             }
-            var fileName = Path.GetFileName(postedFile.FileName) + DateTime.Now.ToString("ddMMMyyyyHHMMss");
+            var fileName = Guid.NewGuid().ToString() + Path.GetFileName(postedFile.FileName);
             var uploadFilePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", fileName);
-            //postedFile.CopyTo(new FileStream(uploadFilePath, FileMode.CreateNew));
-
-            byte[] byteData;
-            using (MemoryStream ms = new MemoryStream())
+            using (var dataStream = new MemoryStream())
             {
-                postedFile.CopyTo(ms);
-                byteData = ms.ToArray();
+                await postedFile.CopyToAsync(dataStream);
+                await File.WriteAllBytesAsync(uploadFilePath, dataStream.ToArray());
             }
 
-            var uploadId = await SaveUpload(postedFile, uploadFilePath, "File upload", userEmail, byteData, autoOrManual, ORIGIN.FILE, uploadAndAssign);
+            var uploadId = await SaveUpload(postedFile, uploadFilePath, fileName, userEmail, autoOrManual, ORIGIN.FILE, uploadAndAssign);
             return uploadId;
         }
 
-        private async Task<int> SaveUpload(IFormFile file, string filePath, string description, string uploadedBy, byte[] byteData, CREATEDBY autoOrManual, ORIGIN fileOrFtp, bool uploadAndAssign = false)
+        private async Task<int> SaveUpload(IFormFile file, string filePath, string description, string uploadedBy, CREATEDBY autoOrManual, ORIGIN fileOrFtp, bool uploadAndAssign = false)
         {
-            var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+            var fileName = Path.GetFileName(file.FileName);
             var extension = Path.GetExtension(file.FileName);
             var company = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == uploadedBy);
             int lastCompanySequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).MaxAsync(f => (int?)f.CompanySequenceNumber) ?? 0;
@@ -99,14 +96,13 @@ namespace risk.control.system.Services
                 FilePath = filePath,
                 UploadedBy = uploadedBy,
                 CompanyId = company.ClientCompanyId,
-                ByteData = byteData,
                 AutoOrManual = autoOrManual,
                 Message = uploadAndAssign ? "Assign In progress" : "Upload In progress",
                 FileOrFtp = fileOrFtp,
                 DirectAssign = uploadAndAssign
             };
             var uploadData = _context.FilesOnFileSystem.Add(fileModel);
-            await _context.SaveChangesAsync(null, false);
+            await _context.SaveChangesAsync();
             return uploadData.Entity.Id;
         }
 
@@ -115,7 +111,10 @@ namespace risk.control.system.Services
         {
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
-            var (validRecords, errors) = ReadPipeDelimitedCsvFromZip(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", uploadFileData.Description);
+
+            var zipFileByteData = await File.ReadAllBytesAsync(filePath);
+            var (validRecords, errors) = ReadPipeDelimitedCsvFromZip(zipFileByteData); // Read the first CSV file from the ZIP archive
 
             if (errors.Any())
             {
@@ -152,7 +151,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var uploadedCaseResult = await uploadService.FileUpload(companyUser, validRecords, uploadFileData);
+                var uploadedCaseResult = await uploadService.FileUpload(companyUser, validRecords, zipFileByteData, uploadFileData.FileOrFtp);
                 var sb = new StringBuilder();
 
                 if (uploadedCaseResult.Count > 0)
@@ -213,7 +212,7 @@ namespace risk.control.system.Services
 
                 _context.Investigations.AddRange(uploadedCases);
 
-                var ros = await _context.SaveChangesAsync(null, false);
+                var ros = await _context.SaveChangesAsync();
 
                 try
                 {
@@ -277,7 +276,7 @@ namespace risk.control.system.Services
                 using var reader = new StreamReader(csvEntry.Open());
                 using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    Delimiter = ",", // 👈 Pipe-delimited
+                    Delimiter = "|", // 👈 Pipe-delimited
                     TrimOptions = TrimOptions.Trim,
                     HeaderValidated = null,
                     MissingFieldFound = null,

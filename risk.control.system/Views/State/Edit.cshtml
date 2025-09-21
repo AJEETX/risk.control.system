@@ -9,10 +9,13 @@
             <div class="col-md-12">
                 <div class="card bg-light card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-map-marker-alt"></i>  @Applicationsettings.STATE</h3>
+                        <h3 class="card-title"><i class="fas fa-map-marker-alt"></i>  Edit State</h3>
                     </div>
                     <div class="card-body">
                         <form id="edit-form" asp-action="Edit">
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <input type="hidden" asp-for="StateId" />
                             <div class="form-group">
@@ -21,7 +24,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="@Model.Country.Name" />
+                                    <input readonly type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="@Model.Country.Name" />
                                     <span asp-validation-for="CountryId" class="text-danger"></span>
                                     <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                 </div>
@@ -52,8 +55,8 @@
                                     <i class="fa fa-window-close"></i>
                                     @Applicationsettings.CANCEL
                                 </a>
-                                <button type="submit" class="btn btn-warning">
-                                    <i class="fas fa-map-marker-alt"></i>  @Applicationsettings.EDIT
+                                <button id="edit" type="submit" class="btn btn-warning">
+                                    <i class="fas fa-map-marker-alt"></i>  Edit State
                                 </button>
                             </div>
                         </form>

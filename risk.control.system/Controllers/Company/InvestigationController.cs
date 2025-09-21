@@ -236,7 +236,7 @@ namespace risk.control.system.Controllers.Company
                     {
                         InvestigationTaskId = id,
                         Addressline = random.Next(100, 999) + " GOOD STREET",
-                        ContactNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
+                        ContactNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                         Education = Education.PROFESSIONAL,
                         Income = Income.UPPER_INCOME,
@@ -357,7 +357,7 @@ namespace risk.control.system.Controllers.Company
                         SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault(),
                         PinCodeId = pinCode.PinCodeId,
                         SelectedPincodeId = pinCode.PinCodeId,
-                        ContactNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
+                        ContactNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                     };
                     return View(model);
                 }
@@ -479,6 +479,14 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetReportTemplate(long caseId)
+        {
+            var template = await empanelledAgencyService.GetReportTemplate(caseId);
+
+            return PartialView("_ReportTemplate", template);
         }
 
         [Breadcrumb("Details", FromAction = "New")]

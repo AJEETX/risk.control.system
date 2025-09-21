@@ -48,6 +48,8 @@ namespace risk.control.system.Services
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
                 .Include(c => c.InvestigationTimeline)
+                 .Include(c => c.InvestigationReport.EnquiryRequest)
+                .Include(c => c.InvestigationReport.EnquiryRequests)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
                  .Include(c => c.PolicyDetail)
@@ -297,8 +299,8 @@ namespace risk.control.system.Services
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeCode = ClaimsInvestigationExtension.GetPincodeCode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
+                Document = a.PolicyDetail?.DocumentPath != null ? a.PolicyDetail?.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ImagePath != null ? a.CustomerDetail?.ImagePath : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-light\">customer name</span>",
                 Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
                 IsUploaded = a.IsUploaded,
@@ -311,7 +313,7 @@ namespace risk.control.system.Services
                 ServiceType = $"{a.PolicyDetail?.InsuranceType.GetEnumDisplayName()} ( {a.PolicyDetail.InvestigationServiceType.Name})",
                 timePending = GetDraftedTimePending(a),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? a.BeneficiaryDetail?.ImagePath : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-light\">beneficiary name</span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
                 BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
@@ -531,8 +533,8 @@ namespace risk.control.system.Services
                 CaseWithPerson = a.CaseOwner,
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
+                Document = a.PolicyDetail?.DocumentPath != null ? a.PolicyDetail?.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ImagePath != null ? a.CustomerDetail?.ImagePath : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
                 Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
                 Status = a.ORIGIN.GetEnumDisplayName(),
@@ -544,7 +546,7 @@ namespace risk.control.system.Services
                 Created = a.Created.ToString("dd-MM-yyyy"),
                 timePending = a.GetCreatorTimePending(),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? a.BeneficiaryDetail?.ImagePath : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" : a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds, // Calculate here
                 PersonMapAddressUrl = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?

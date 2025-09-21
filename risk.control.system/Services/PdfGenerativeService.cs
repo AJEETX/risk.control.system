@@ -89,17 +89,16 @@ namespace risk.control.system.Services
                 VendorId = vendor.VendorId,
                 InvestigationReportId = investigation.InvestigationReport?.Id,
                 SubTotal = investigationServiced.Price,
-                TaxAmount = investigationServiced.Price * (1 / 10),
+                TaxAmount = investigationServiced.Price * (1m / 10m),
                 InvestigationServiceType = investigatService,
                 ClaimId = investigationTaskId
             };
 
             context.VendorInvoice.Add(invoice);
             await context.SaveChangesAsync(null, false);
-            var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
+            //var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
 
-            return reportFilename;
+            return "reportFilename";
         }
-
     }
 }

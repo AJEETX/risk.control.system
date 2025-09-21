@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Net;
+using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.FeatureManagement;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using System.Net;
-using System.Security.Claims;
 
 namespace risk.control.system.Middleware
 {
@@ -94,6 +96,7 @@ namespace risk.control.system.Middleware
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 return;
             }

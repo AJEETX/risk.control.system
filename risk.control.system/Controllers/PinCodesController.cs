@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Create
-        [Breadcrumb("Add New", FromAction = "Profile")]
+        [Breadcrumb("Add Pincode", FromAction = "Profile")]
         public IActionResult Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -199,7 +199,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Edit/5
-        [Breadcrumb("Edit ", FromAction = "Profile")]
+        [Breadcrumb("Edit Pincode ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id <= 0)

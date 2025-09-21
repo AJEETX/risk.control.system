@@ -1,5 +1,4 @@
-﻿using risk.control.system.AppConstant;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
@@ -90,10 +89,9 @@ namespace risk.control.system.Models
         public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
         public bool CanChangePassword { get; set; } = false;
-        public string? MobileAppUrl { get; set; } = Applicationsettings.APP_URL;
         public bool BulkUpload { get; set; } = false;
         public string WhitelistIpAddress { get; set; } = "::1;202.7.251.53";
-        public string? WhitelistIpAddressRange { get; set; } = default!;
+        //public string? WhitelistIpAddressRange { get; set; } = default!;
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
 
         [DataType(DataType.DateTime)]
@@ -144,19 +142,12 @@ namespace risk.control.system.Models
                 $"- Passport API URL: {PassportApiUrl}\n" +
                 $"- Passport API Key: {PassportApiKey}\n" +
                 $"- Passport API Host: {PassportApiHost}\n" +
-                $"- Can Change Password: {CanChangePassword}\n" +
-                $"- Mobile App URL: {MobileAppUrl}";
+                $"- Can Change Password: {CanChangePassword}\n";
         }
     }
     public enum CompanyStatus
     {
         ACTIVE,
         INACTIVE,
-    }
-
-    public enum Allocation
-    {
-        MANUAL,
-        AUTO
     }
 }

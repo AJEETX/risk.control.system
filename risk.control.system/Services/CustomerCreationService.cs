@@ -107,7 +107,8 @@ namespace risk.control.system.Services
                         errorCustomer.Add($"[Customer Pincode=`{uploadCase.CustomerPincode}` And/Or District=`{uploadCase.CustomerDistrictName}` not found]");
                     }
                 }
-
+                var extension = Path.GetExtension(CUSTOMER_IMAGE).ToLower();
+                var fileName = Guid.NewGuid().ToString() + extension;
                 var imagesWithData = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), CUSTOMER_IMAGE);
                 if (imagesWithData is null)
                 {
@@ -117,6 +118,16 @@ namespace risk.control.system.Services
                         Error = $"Image {CUSTOMER_IMAGE} null/not found"
                     });
                     errorCustomer.Add($"[Customer Image=`{CUSTOMER_IMAGE}` null/not found]");
+                }
+                else
+                {
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "customer");
+                    if (!Directory.Exists(imagePath))
+                    {
+                        Directory.CreateDirectory(imagePath);
+                    }
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "customer", fileName);
+                    await File.WriteAllBytesAsync(filePath, imagesWithData);
                 }
                 if (string.IsNullOrWhiteSpace(uploadCase.CustomerAddressLine))
                 {
@@ -201,7 +212,8 @@ namespace risk.control.system.Services
                     StateId = pinCode?.StateId,
                     DistrictId = pinCode?.DistrictId,
                     //Description = rowData[20]?.Trim(),
-                    ProfilePicture = imagesWithData,
+                    //ProfilePicture = imagesWithData,
+                    ImagePath = "/customer/" + fileName,
                     ProfilePictureExtension = Path.GetExtension(CUSTOMER_IMAGE),
                     UpdatedBy = companyUser.Email,
                     Updated = DateTime.Now

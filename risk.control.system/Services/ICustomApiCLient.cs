@@ -14,8 +14,12 @@ namespace risk.control.system.Services
     public class CustomApiClient : ICustomApiCLient
     {
         private static readonly string geocodeUrl = "https://maps.googleapis.com/maps/api/geocode/json";
-
+        private readonly ILogger<CustomApiClient> logger;
         private static HttpClient client = new HttpClient();
+        public CustomApiClient(ILogger<CustomApiClient> logger)
+        {
+            this.logger = logger;
+        }
         public async Task<(string Latitude, string Longitude)> GetCoordinatesFromAddressAsync(string address)
         {
             try
@@ -44,12 +48,14 @@ namespace risk.control.system.Services
                 }
                 else
                 {
+                    logger.LogError(jsonResponse.ToString());
                     Console.WriteLine($"Error: {jsonResponse["status"]}");
                     return ("0", "0"); // Return 0,0 if the request was unsuccessful
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError($"An error occurred: {ex.Message}");
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 return ("0", "0"); // Return 0,0 if the request was unsuccessful
             }
@@ -77,11 +83,13 @@ namespace risk.control.system.Services
                 }
                 else
                 {
+                    logger.LogError($"No address found for the given coordinates.");
                     return "No address found for the given coordinates.";
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError($"{ex.Message}");
                 return $"Error: {ex.Message}";
             }
         }
@@ -90,7 +98,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var driving = await GetDrivingDistance((startLat.ToString() +","+ startLong.ToString()),(endLat.ToString() +","+ endLong.ToString()));
+                var driving = await GetDrivingDistance((startLat.ToString() + "," + startLong.ToString()), (endLat.ToString() + "," + endLong.ToString()));
                 string directionsUrl = $"https://maps.googleapis.com/maps/api/directions/json?origin={startLat},{startLong}&destination={endLat},{endLong}&mode=driving&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 var response = await client.GetStringAsync(directionsUrl);
                 var route = ParseRoute(response);
@@ -112,10 +120,11 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
+                logger.LogError($"{ex.Message}");
                 Console.WriteLine(ex.StackTrace);
-                return (null,0, null,0, null);
+                return (null, 0, null, 0, null);
             }
-            
+
         }
         static string ParseRoute(string directionsJson)
         {

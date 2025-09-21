@@ -56,7 +56,7 @@ namespace risk.control.system.Helpers
                 customerDetail.StateId > 0 &&
                 customerDetail.CountryId > 0 &&
                 !string.IsNullOrWhiteSpace(customerDetail.Addressline) &&
-                customerDetail.ProfilePicture != null;
+                customerDetail.ImagePath != null;
         }
         public static bool IsValidCustomerForUpload(this PolicyDetail policyDetail, CustomerDetail customerDetail)
         {
@@ -85,7 +85,7 @@ namespace risk.control.system.Helpers
                 customerDetail.SelectedCountryId > 0 &&
                 customerDetail.SelectedStateId > 0 &&
                 !string.IsNullOrWhiteSpace(customerDetail.Addressline) &&
-                customerDetail.ProfilePicture != null;
+                customerDetail.ImagePath != null;
         }
         public static bool IsValidBeneficiary(this PolicyDetail policyDetail, BeneficiaryDetail beneficiaryDetail)
         {
@@ -100,7 +100,7 @@ namespace risk.control.system.Helpers
                 beneficiaryDetail.StateId > 0 &&
                 beneficiaryDetail.CountryId > 0 &&
                 !string.IsNullOrWhiteSpace(beneficiaryDetail.Addressline) &&
-                beneficiaryDetail.ProfilePicture != null;
+                beneficiaryDetail.ImagePath != null;
         }
         public static bool IsValidBeneficiaryForUpload(this PolicyDetail policyDetail, BeneficiaryDetail beneficiaryDetail)
         {

@@ -245,8 +245,8 @@ namespace risk.control.system.Services
             var caseReportTemplate = await _context.ReportTemplates
                 .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.AgentIdReport)
-               //.Include(r => r.LocationTemplate)
-               //.ThenInclude(l => l.MediaReports)
+               .Include(r => r.LocationTemplate)
+               .ThenInclude(l => l.MediaReports)
                .Include(r => r.LocationTemplate)
                    .ThenInclude(l => l.FaceIds)
                .Include(r => r.LocationTemplate)

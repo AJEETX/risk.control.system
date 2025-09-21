@@ -34,6 +34,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IAgentService agentService;
         private readonly IFeatureManager featureManager;
         private readonly IBackgroundJobClient backgroundJobClient;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
         private readonly IMailService mailboxService;
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
@@ -53,6 +54,7 @@ namespace risk.control.system.Controllers.Api
             IAgentService agentService,
             IFeatureManager featureManager,
             IBackgroundJobClient backgroundJobClient,
+            IWebHostEnvironment webHostEnvironment,
             ISmsService SmsService,
             IMailService mailboxService)
         {
@@ -66,6 +68,7 @@ namespace risk.control.system.Controllers.Api
             this.agentService = agentService;
             this.featureManager = featureManager;
             this.backgroundJobClient = backgroundJobClient;
+            this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
             this.mailboxService = mailboxService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
@@ -179,7 +182,6 @@ namespace risk.control.system.Controllers.Api
                 return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
-
 
         private async Task SendVerificationSmsAsync(string email, string mobile, string pin)
         {
@@ -357,7 +359,8 @@ namespace risk.control.system.Controllers.Api
                         claimId = c.Id,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                         claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
-                        DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
+                        DocumentPhoto = c.PolicyDetail.DocumentPath != null ?
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c.PolicyDetail.DocumentPath.Substring(1)))) :
                         Applicationsettings.NO_POLICY_IMAGE,
                         CustomerName = c.CustomerDetail.Name,
                         CustomerEmail = email,
@@ -365,7 +368,8 @@ namespace risk.control.system.Controllers.Api
                         Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
                         c.CustomerDetail.Addressline,
                         c.CustomerDetail.PinCode.Code,
-                        CustomerPhoto = c?.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c?.CustomerDetail.ProfilePicture)) :
+                        CustomerPhoto = c?.CustomerDetail.ImagePath != null ?
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c?.CustomerDetail.ImagePath.Substring(1)))) :
                         Applicationsettings.USER_PHOTO,
                         Country = c.CustomerDetail.Country.Name,
                         State = c.CustomerDetail.State.Name,
@@ -374,7 +378,8 @@ namespace risk.control.system.Controllers.Api
                         Locations = new
                         {
                             c.BeneficiaryDetail.BeneficiaryDetailId,
-                            Photo = c.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.BeneficiaryDetail.ProfilePicture)) :
+                            Photo = c.BeneficiaryDetail?.ImagePath != null ?
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c.BeneficiaryDetail.ImagePath.Substring(1)))) :
                             Applicationsettings.USER_PHOTO,
                             c.BeneficiaryDetail.Country.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
@@ -513,7 +518,14 @@ namespace risk.control.system.Controllers.Api
                 {
                     locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
                 }
-
+                var docPath = Path.Combine(webHostEnvironment.WebRootPath, claim.PolicyDetail.DocumentPath.Substring(1));
+                var docByte = System.IO.File.ReadAllBytes(docPath);
+                var docBase64 = Convert.ToBase64String(docByte);
+                var documentPhoto = claim.PolicyDetail.DocumentPath != null ? docBase64 : Applicationsettings.NO_POLICY_IMAGE;
+                var customerPhoto = claim.CustomerDetail.ImagePath != null ?
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, claim.CustomerDetail.ImagePath.Substring(1)))) : Applicationsettings.USER_PHOTO;
+                var beneficiaryPhoto = beneficiary.ImagePath != null ?
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, beneficiary.ImagePath.Substring(1)))) : Applicationsettings.USER_PHOTO;
                 return Ok(
                     new
                     {
@@ -522,9 +534,7 @@ namespace risk.control.system.Controllers.Api
                             ClaimId = claim.Id,
                             PolicyNumber = claim.PolicyDetail.ContractNumber,
                             ClaimType = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
-                            Document = claim.PolicyDetail.DocumentImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.PolicyDetail.DocumentImage)) :
-                            Applicationsettings.NO_POLICY_IMAGE,
+                            Document = documentPhoto,
                             IssueDate = claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
                             IncidentDate = claim.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
                             Amount = claim.PolicyDetail.SumAssuredValue,
@@ -535,9 +545,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             BeneficiaryId = beneficiary.BeneficiaryDetailId,
                             Name = beneficiary.Name,
-                            Photo = beneficiary.ProfilePicture != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture)) :
-                            Applicationsettings.USER_PHOTO,
+                            Photo = beneficiaryPhoto,
                             Relation = beneficiary.BeneficiaryRelation.Name,
                             Income = beneficiary.Income.GetEnumDisplayName(),
                             Phone = beneficiary.ContactNumber,
@@ -548,9 +556,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             Name = claim.CustomerDetail.Name,
                             Occupation = claim.CustomerDetail.Occupation.GetEnumDisplayName(),
-                            Photo = claim.CustomerDetail.ProfilePicture != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.CustomerDetail.ProfilePicture)) :
-                            Applicationsettings.USER_PHOTO,
+                            Photo = customerPhoto,
                             Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
                             Phone = claim.CustomerDetail.ContactNumber,
                             DateOfBirth = claim.CustomerDetail.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
@@ -776,6 +782,5 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(500, ex.StackTrace);
             }
         }
-
     }
 }

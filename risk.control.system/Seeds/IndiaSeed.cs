@@ -39,7 +39,7 @@ namespace risk.control.system.Seeds
                 vendors.Add(vendor);
             }
 
-            var insurer = new SeedInput { COUNTRY = COUNTRY_CODE, DOMAIN = "canara.com", NAME = "Canara", PHOTO = "/img/insurer.jpg", ADDRESSLINE = "139 Sector 44", BRANCH = "Head Office", BANK = "HDFC", PINCODE = PINCODE };
+            var insurer = new SeedInput { COUNTRY = COUNTRY_CODE, DOMAIN = "can-hsbc.com", NAME = "Can-Hsbc", PHOTO = "/img/insurer.jpg", ADDRESSLINE = "139 Sector 44", BRANCH = "Head Office", BANK = "HDFC", PINCODE = PINCODE };
             var companies = new List<SeedInput> { insurer };
             foreach (var company in companies)
             {

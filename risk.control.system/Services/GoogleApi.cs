@@ -4,7 +4,7 @@ namespace risk.control.system.Services
 {
     public interface IGoogleApi
     {
-        Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(byte[] byteImage);
+        Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath);
     }
     public class GoogleApi : IGoogleApi
     {
@@ -14,7 +14,7 @@ namespace risk.control.system.Services
         {
             this.webHostEnvironment = webHostEnvironment;
         }
-        public async Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(byte[] byteImage)
+        public async Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace risk.control.system.Services
                     Credential = googleCredential
                 }.Build();
 
-                var image = Image.FromBytes(byteImage);
+                var image = Image.FromFile(imagePath);
                 return await client.DetectTextAsync(image);
 
             }

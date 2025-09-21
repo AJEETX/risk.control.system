@@ -98,9 +98,9 @@
                 </div>
                 <div class="col-5 text-center">
                     <p class="text-muted text-sm">
-                        @if (Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture is not null)
+                        @if (Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath is not null)
                         {
-                            <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture))">
+                            <img id="profileImage" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath">
                         }
                         else
                         {

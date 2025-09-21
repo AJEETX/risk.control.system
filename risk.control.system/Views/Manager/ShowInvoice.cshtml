@@ -103,7 +103,7 @@
                                                 <td>@Model.Vendor.Name</td>
                                                 <td>@Model.InvestigationServiceType.Name</td>
                                                 <td>(@ViewBag.Currency) @Model.SubTotal</td>
-                                                <td>(@ViewBag.Currency) @Model.GrandTotal</td>
+                                                <td>(@ViewBag.Currency) @Model.GrandTotal + @Model.TaxAmount</td>
                                             </tr>
 
                                         </tbody>
@@ -136,7 +136,7 @@
                                             </tr>
                                             <tr>
                                                 <th>Total:</th>
-                                                <td>(@ViewBag.Currency) @Model.GrandTotal</td>
+                                                <td>(@ViewBag.Currency) @(Model.GrandTotal + Model.TaxAmount)</td>
                                             </tr>
                                         </table>
                                     </div>

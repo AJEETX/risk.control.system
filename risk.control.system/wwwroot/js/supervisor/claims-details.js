@@ -3,8 +3,8 @@
     $('#decline-information-popup').on('click', function (e) {
         $.alert(
             {
-                title: " Decline Claim !",
-                content: "This CLAIM can not be declined as per the status.",
+                title: " Decline Case !",
+                content: "This Case can not be declined as per the status.",
                 icon: 'fas fa-info',
                 animationBounce: 2.5,
                 type: 'red',

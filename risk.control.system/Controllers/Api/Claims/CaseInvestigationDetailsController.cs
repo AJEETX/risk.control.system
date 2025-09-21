@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -54,9 +55,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var response = new
             {
                 Document =
-                    policy.DocumentImage != null ?
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(policy.DocumentImage)) :
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                    policy.DocumentPath != null ? policy.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
                 ContractNumber = policy.ContractNumber,
                 ClaimType = policy.InsuranceType.GetEnumDisplayName(),
                 ContractIssueDate = policy.ContractIssueDate.ToString("dd-MMM-yyyy"),
@@ -106,8 +105,7 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(
                 new
                 {
-                    Customer = customer?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(customer.ProfilePicture)) :
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                    Customer = customer?.ImagePath != null ? customer.ImagePath : "/img/user.png",
                     CustomerName = customer.Name,
                     ContactNumber = new string('*', customer.ContactNumber.ToString().Length - 4) + customer.ContactNumber.ToString().Substring(customer.ContactNumber.ToString().Length - 4),
                     Address = customer.Addressline + "  " + customer.District.Name + "  " + customer.State.Name + "  " + customer.Country.Name + "  " + customer.PinCode.Code,
@@ -137,8 +135,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             return Ok(new
             {
-                Beneficiary = beneficiary?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture)) :
-                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                Beneficiary = beneficiary?.ImagePath != null ? beneficiary?.ImagePath : "/img/user.png",
                 BeneficiaryName = beneficiary.Name,
                 Dob = (int)beneficiary.DateOfBirth.GetValueOrDefault().Subtract(DateTime.Now).TotalDays / 365,
                 Income = beneficiary.Income.GetEnumDisplayName(),
@@ -157,10 +154,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
-
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-image.png");
-
-            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
             var latitude = customer.Latitude;
             var longitude = customer.Longitude.Trim();
@@ -191,10 +184,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.InvestigationTaskId == claimId);
 
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-image.png");
-
-            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
-
             var latitude = beneficiary.Latitude;
             var longitude = beneficiary.Longitude.Trim();
             var latLongString = latitude + "," + longitude;
@@ -220,6 +209,14 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefault(c => c.Id == caseId);
             var agentReport = _context.AgentIdReport.FirstOrDefault(l => l.Id == faceId);
 
+            var longLat = agentReport.IdImageLongLat.IndexOf(",");
+            var lat = agentReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+            var LatitudeIndex = lat.IndexOf("=");
+            var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
+            var longi = agentReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+            var LongitudeIndex = longi.IndexOf("=");
+            var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
+
             if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
@@ -227,9 +224,6 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 if (agentReport is not null)
                 {
-                    var longLat = agentReport.IdImageLongLat.IndexOf("/");
-                    var latitude = agentReport.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = agentReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
@@ -250,9 +244,6 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 if (agentReport is not null)
                 {
-                    var longLat = agentReport.IdImageLongLat.IndexOf("/");
-                    var latitude = agentReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = agentReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
@@ -275,6 +266,14 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefault(c => c.Id == caseId);
             var faceReport = _context.DigitalIdReport.FirstOrDefault(l => l.Id == faceId);
 
+            var longLat = faceReport.IdImageLongLat.IndexOf(",");
+            var lat = faceReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+            var LatitudeIndex = lat.IndexOf("=");
+            var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
+            var longi = faceReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+            var LongitudeIndex = longi.IndexOf("=");
+            var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
+
             if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
@@ -282,9 +281,6 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 if (faceReport is not null)
                 {
-                    var longLat = faceReport.IdImageLongLat.IndexOf("/");
-                    var latitude = faceReport.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = faceReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
@@ -305,9 +301,6 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 if (faceReport is not null)
                 {
-                    var longLat = faceReport.IdImageLongLat.IndexOf("/");
-                    var latitude = faceReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = faceReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
@@ -330,6 +323,14 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefault(c => c.Id == caseId);
             var docReport = _context.DocumentIdReport.FirstOrDefault(l => l.Id == docId);
 
+            var longLat = docReport.IdImageLongLat.IndexOf(",");
+            var lat = docReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+            var LatitudeIndex = lat.IndexOf("=");
+            var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
+            var longi = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+            var LongitudeIndex = longi.IndexOf("=");
+            var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
+
             if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
@@ -337,9 +338,6 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 if (docReport is not null)
                 {
-                    var longLat = docReport.IdImageLongLat.IndexOf("/");
-                    var latitude = docReport.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
@@ -360,9 +358,6 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 if (docReport is not null)
                 {
-                    var longLat = docReport.IdImageLongLat.IndexOf("/");
-                    var latitude = docReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
@@ -387,6 +382,14 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefault(c => c.Id == caseId);
             var docReport = _context.MediaReport.FirstOrDefault(l => l.Id == docId);
 
+            var longLat = docReport.IdImageLongLat.IndexOf(",");
+            var lat = docReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+            var LatitudeIndex = lat.IndexOf("=");
+            var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
+            var longi = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+            var LongitudeIndex = longi.IndexOf("=");
+            var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
+
             if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
@@ -394,9 +397,6 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 if (docReport is not null)
                 {
-                    var longLat = docReport.IdImageLongLat.IndexOf("/");
-                    var latitude = docReport.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {
@@ -417,9 +417,6 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 if (docReport is not null)
                 {
-                    var longLat = docReport.IdImageLongLat.IndexOf("/");
-                    var latitude = docReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new
                     {

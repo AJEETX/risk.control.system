@@ -1,6 +1,7 @@
-﻿using risk.control.system.Helpers;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Models
 {
@@ -82,10 +83,8 @@ namespace risk.control.system.Models
         [Display(Name = "Education")]
         public Education? Education { get; set; }
 
-        [FileExtensions(Extensions = "jpg,jpeg,png")]
-        public string? ProfilePictureUrl { get; set; }
-
         public byte[]? ProfilePicture { get; set; }
+        public string? ImagePath { get; set; }
         public string? ProfilePictureExtension { get; set; }
 
         [Display(Name = "Image")]
