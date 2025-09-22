@@ -259,6 +259,104 @@ $(document).ready(function () {
         }
     });
 
+    $("#add-question").on("click", function () {
+        var questionIndex = $(".question-card").length; // ensure unique index each time
+        let template = `
+        <div class="card bg-light mb-3 p-3 question-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="input-group-label">Multiple choice question${questionIndex + 1}:</span>
+                <button type="button" class="btn btn-sm btn-outline-danger remove-question">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
+                        </span>
+                    </div>
+                    <input class="form-control remarks" 
+                           name="InvestigationReport.EnquiryRequests[${questionIndex}].Subject" 
+                           placeholder="Enter Enquiry subject detail" required value="Sample question ${questionIndex + 1}?">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span class="input-group-label">Choice 1:</span>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
+                                </span>
+                            </div>
+                            <input class="form-control remarks" 
+                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerA" 
+                                   placeholder="Answer A" required value="Answer A.">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span class="input-group-label">Choice 2:</span>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
+                                </span>
+                            </div>
+                            <input class="form-control remarks" 
+                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerB" 
+                                   placeholder="Answer B" required value="Answer B.">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span class="input-group-label">Choice 3:</span>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
+                                </span>
+                            </div>
+                            <input class="form-control remarks" 
+                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerC" 
+                                   placeholder="Answer C" required value="Answer C.">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span class="input-group-label">Choice 4:</span>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
+                                </span>
+                            </div>
+                            <input class="form-control remarks" 
+                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerD" 
+                                   placeholder="Answer D" required value="Answer D.">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        $("#question-added").append(template);
+    });
+
+    // Event delegation for delete button
+    $(document).on("click", ".remove-question", function () {
+        $(this).closest(".question-card").remove();
+    });
+
     $('#query-form').on('submit', function (e) {
         var enquiry = $('#description').val();
 

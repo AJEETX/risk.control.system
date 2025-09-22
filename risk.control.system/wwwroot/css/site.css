@@ -3017,3 +3017,6 @@ img.mobile-capture-map {
     width: 180px;
     cursor: pointer;
 }
+#description{
+    min-height:100px;
+}

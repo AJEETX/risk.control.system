@@ -26,7 +26,7 @@ namespace risk.control.system.Services
         Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long claimsInvestigationId, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "");
 
         Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType reportUpdateStatus, string reportAiSummary);
-        Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long claimId, EnquiryRequest request, IFormFile messageDocument);
+        Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long claimId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile messageDocument);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<bool> SubmitNotes(string userEmail, long claimId, string notes);
     }
@@ -761,7 +761,7 @@ namespace risk.control.system.Services
             return (null!, string.Empty);
         }
 
-        public async Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long claimId, EnquiryRequest request, IFormFile messageDocument)
+        public async Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long claimId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile messageDocument)
         {
 
             try
@@ -770,6 +770,8 @@ namespace risk.control.system.Services
                 .Include(c => c.Vendor)
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.EnquiryRequest)
+                .Include(c => c.InvestigationReport)
+                .ThenInclude(c => c.EnquiryRequests)
                 .Include(c => c.Vendor)
                 .FirstOrDefault(c => c.Id == claimId);
 
@@ -791,6 +793,7 @@ namespace risk.control.system.Services
                     request.QuestionImageFileType = messageDocument.ContentType;
                 }
                 claim.InvestigationReport.EnquiryRequest = request;
+                claim.InvestigationReport.EnquiryRequests = requests;
                 claim.InvestigationReport.Updated = DateTime.Now;
                 claim.InvestigationReport.UpdatedBy = userEmail;
                 claim.InvestigationReport.EnquiryRequest.Updated = DateTime.Now;
