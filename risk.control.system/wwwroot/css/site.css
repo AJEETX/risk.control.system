@@ -3020,3 +3020,6 @@ img.mobile-capture-map {
 #description{
     min-height:100px;
 }
+#answer {
+    min-height: 100px;
+}

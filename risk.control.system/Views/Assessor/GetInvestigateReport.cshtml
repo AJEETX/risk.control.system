@@ -286,10 +286,14 @@
 						<a id="back" asp-controller="Assessor" class="btn btn-outline-secondary" asp-action="Assessor">
 							<i class="fas fa-arrow-left" aria-hidden="true"></i> Back
 						</a>
-						<a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
-						   asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-warning">
-							<i class="fa fa-edit"></i>  ENQUIRE
-						</a>
+						@if(Model.InvestigationReport.EnquiryRequest == null)
+									{
+							<a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
+							   asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-warning">
+								<i class="fa fa-edit"></i>  ENQUIRE
+							</a>
+						}
+						
 						<button id="approve-case" type="submit" class="btn btn-info">
 							<i class="fas fa-glasses" aria-hidden="true"></i> SUBMIT
 						</button>

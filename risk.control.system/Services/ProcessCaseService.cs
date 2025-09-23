@@ -22,7 +22,7 @@ namespace risk.control.system.Services
         Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long claimId);
         Task<Vendor> WithdrawCaseFromAgent(string userEmail, CaseTransactionModel model, long claimId);
 
-        Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
+        Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long claimId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile messageDocument);
         Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long claimsInvestigationId, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "");
 
         Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType reportUpdateStatus, string reportAiSummary);
@@ -585,7 +585,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault)
+        public async Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long claimId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile messageDocument)
         {
             try
             {
@@ -608,23 +608,6 @@ namespace risk.control.system.Services
                 claim.SubmittedToAssessorTime = DateTime.Now;
                 var enquiryRequest = claim.InvestigationReport.EnquiryRequest;
                 enquiryRequest.Answer = request.Answer;
-                if (flexRadioDefault[0] == "a")
-                {
-                    enquiryRequest.AnswerSelected = enquiryRequest.AnswerA;
-                }
-                else if (flexRadioDefault[0] == "b")
-                {
-                    enquiryRequest.AnswerSelected = enquiryRequest.AnswerB;
-                }
-                else if (flexRadioDefault[0] == "c")
-                {
-                    enquiryRequest.AnswerSelected = enquiryRequest.AnswerC;
-                }
-
-                else if (flexRadioDefault[0] == "d")
-                {
-                    enquiryRequest.AnswerSelected = enquiryRequest.AnswerD;
-                }
 
                 enquiryRequest.Updated = DateTime.Now;
                 enquiryRequest.UpdatedBy = userEmail;
@@ -639,10 +622,20 @@ namespace risk.control.system.Services
                     enquiryRequest.AnswerImageFileType = messageDocument.ContentType;
                 }
 
-                claim.InvestigationReport.EnquiryRequests.Add(enquiryRequest);
-
                 context.QueryRequest.Update(enquiryRequest);
-                claim.InvestigationReport.EnquiryRequests.Add(enquiryRequest);
+                foreach (var enquiry in requests)
+                {
+                    var dbEnquiry = claim.InvestigationReport.EnquiryRequests
+                        .FirstOrDefault(e => e.QueryRequestId == enquiry.QueryRequestId);
+
+                    if (dbEnquiry != null)
+                    {
+                        dbEnquiry.AnswerSelected = enquiry.AnswerSelected;
+                        dbEnquiry.Updated = DateTime.Now;
+                        dbEnquiry.UpdatedBy = userEmail;
+                    }
+                }
+
                 context.Investigations.Update(claim);
                 var rowsUpdated = await context.SaveChangesAsync(null, false) > 0;
                 await timelineService.UpdateTaskStatus(claim.Id, userEmail);

@@ -39,8 +39,6 @@
 
         <partial name="_AgencyReport" model="@Model" />
 
-        
-
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title">
@@ -65,150 +63,157 @@
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
                 <div class="row">
-                    <div class="col-sm-6 d-flex align-items-stretch flex-column">
-
-                        <div class="card bg-light d-flex flex-fill">
-                            <div class="card-footer text-muted border-bottom-0">
-                                <i class="fas fa-newspaper"></i> <strong> Enquiry Info </strong>
-                            </div>
-                            <div class="card-body">
-
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <b>  <i class="fa fa-comment"></i> Objective Question </b>:  @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Subject
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="AnswerA" value="a" checked>
-                                                <label class="form-check-label" for="AnswerA">
-                                                    <span class="process-case"> @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.AnswerA</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="AnswerB" value="b">
-                                                <label class="form-check-label" for="AnswerB">
-                                                    <span class="process-case"> @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.AnswerB</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="AnswerC" value="c">
-                                                <label class="form-check-label" for="AnswerC">
-                                                    <span class="process-case"> @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.AnswerC</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="AnswerD" value="d">
-                                                <label class="form-check-label" for="AnswerD">
-                                                    <span class="process-case"> @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.AnswerD</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-sm-6 d-flex align-items-stretch flex-column">
+                    <div class="col-sm-12 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">
                             <div class="card-footer text-muted border-bottom-0">
                                 <i class="far fa-file-powerpoint"></i> <strong> Enquiry Response </strong>
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-9">
+                                    <div class="col-md-11">
                                         <div class="form-group">
                                             <div class="col-lg-12">
                                                 <div class="input-group">
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <b>  <i class="fa fa-comment"></i> Descriptive Question </b>:  @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Description
+                                                            <b>  <i class="fa fa-comment"></i> Descriptive Question </b>:  @Model.InvestigationReport.EnquiryRequest.Description
                                                         </div>
-
-
                                                     </div>
-
                                                 </div>
                                             </div>
-
                                         </div>
-
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <div class="col-lg-12">
-
-                                                <label class="input-group-label">File Sent</label>
-                                                <div class="input-group">
-                                                    @if (@Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.QuestionImageAttachment is not null)
-                                                    {
-                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.QuestionImageAttachment))">
-                                                        <a asp-controller="Download" asp-action="EnquiryFileAttachment"
-                                                           asp-route-id="@Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.QueryRequestId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i></a>
-                                                    }
-                                                    else
-                                                    {
-                                                        <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                                    }
-
-
-                                                </div>
-                                            </div>
-
+                                    <div class="col-md-1">
+                                        <div class="btn btn-default btn-file">
+                                            <small>File Sent</small>
+                                            @if (Model.InvestigationReport.EnquiryRequest.QuestionImageAttachment is not null)
+                                            {
+                                                <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.InvestigationReport.EnquiryRequest.QuestionImageAttachment))">
+                                                <a asp-controller="Download" asp-action="EnquiryFileAttachment" asp-route-id="InvestigationReport.EnquiryRequest.QueryRequestId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i></a>
+                                            }
+                                            else
+                                            {
+                                                <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
                                         </div>
-
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12">
 
+                                <div class="row">
+                                    <div class="col-md-11">
                                         <div class="form-group">
                                             <div class="col-lg-12">
-                                                <textarea id="answer" class="form-control remarks message-content" asp-for="ClaimsInvestigation.InvestigationReport.EnquiryRequest.Answer"
-                                                          required>
-                                            </textarea>
+                                                <textarea id="description" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.Answer" placeholder="Enquiry Description" rows="3" required>this is test </textarea>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="btn btn-default btn-file">
+                                            <i class="fas fa-paperclip"></i><small>Attachment</small>
+                                            <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
+                                            <input id="document" name="document" asp-for="InvestigationReport.EnquiryRequest.AnswerImageAttachment" type="file" accept=".png, .jpg, .jpeg, image/png, image/jpeg" class="form-control remarks" />
+                                        </div>
+                                        <div class="help-block text-center"><small>Max. size 2MB</small> </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    @if(Model.InvestigationReport.EnquiryRequests.Count > 0)
+                    {
+                        <div class="col-sm-12 d-flex align-items-stretch flex-column">
+
+                        <div class="card bg-light d-flex flex-fill">
+                            <div class="card-footer text-muted border-bottom-0">
+                                <i class="fas fa-newspaper"></i> <strong> Enquiry Info </strong>
+                            </div>
+                            <div class="card-body">
+                            @for (int i = 0; i < Model.InvestigationReport.EnquiryRequests.Count; i++)
+                            {
+                                <input type="hidden" name="InvestigationReport.EnquiryRequests[@i].QueryRequestId" asp-for="InvestigationReport.EnquiryRequests[@i].QueryRequestId" value="@Model.InvestigationReport.EnquiryRequests[i].QueryRequestId"/>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <b><i class="fa fa-comment"></i> Multiple Choice Question @(i + 1)</b>:
+                                                        @Model.InvestigationReport.EnquiryRequests[i].Subject
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input asp-for="InvestigationReport.EnquiryRequests[@i].AnswerSelected"
+                                            name="InvestigationReport.EnquiryRequests[@i].AnswerSelected"
+                                                   class="form-check-input selected-case"
+                                                   type="radio"
+                                                   checked
+                                                   value="@Model.InvestigationReport.EnquiryRequests[i].AnswerA" />
+                                            <label class="form-check-label">
+                                                @Model.InvestigationReport.EnquiryRequests[i].AnswerA
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input asp-for="InvestigationReport.EnquiryRequests[@i].AnswerSelected"
+                                            name="InvestigationReport.EnquiryRequests[@i].AnswerSelected"
+                                                   class="form-check-input selected-case"
+                                                   type="radio"
+                                                   value="@Model.InvestigationReport.EnquiryRequests[i].AnswerB" />
+                                            <label class="form-check-label">
+                                                @Model.InvestigationReport.EnquiryRequests[i].AnswerB
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input asp-for="InvestigationReport.EnquiryRequests[@i].AnswerSelected"
+                                            name="InvestigationReport.EnquiryRequests[@i].AnswerSelected"
+                                                   class="form-check-input selected-case"
+                                                   type="radio"
+                                                   value="@Model.InvestigationReport.EnquiryRequests[i].AnswerC"  />
+                                            <label class="form-check-label">
+                                                @Model.InvestigationReport.EnquiryRequests[i].AnswerC
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input asp-for="InvestigationReport.EnquiryRequests[@i].AnswerSelected"
+                                            name="InvestigationReport.EnquiryRequests[@i].AnswerSelected"
+                                                   class="form-check-input selected-case"
+                                                   type="radio"
+                                                   value="@Model.InvestigationReport.EnquiryRequests[i].AnswerD" />
+                                            <label class="form-check-label">
+                                                @Model.InvestigationReport.EnquiryRequests[i].AnswerD
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        </div>
+                    </div>
+                    }
+                    
                 </div>
             </div>
 
             <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="btn btn-default btn-file">
-                            <i class="fas fa-paperclip"></i> Attachment
-                            <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
-                            <input id="document" name="document" asp-for="ClaimsInvestigation.InvestigationReport.EnquiryRequest.AnswerImageAttachment" type="file" accept=".png, .jpg, .jpeg, image/png, image/jpeg" class="form-control remarks" />
-                        </div>
-                        <span class="help-block">Max. 2MB</span>
                         <div class="float-right">
                             <a asp-controller="VendorInvestigation" asp-action="Allocate" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> @Applicationsettings.CANCEL
