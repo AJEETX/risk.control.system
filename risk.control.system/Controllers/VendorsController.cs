@@ -432,7 +432,7 @@ namespace risk.control.system.Controllers
                 {
                     var roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
                     var roles = await userManager.GetRolesAsync(user);
-                    var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;
+                    var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
                     if (!user.Active)
                     {
                         var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -441,14 +441,14 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
+                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
                             notifyService.Custom($"User created.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
                     {
 
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
+                        await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
 
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
 
@@ -464,12 +464,12 @@ namespace risk.control.system.Controllers
                             message += $"Thanks\n\n";
                             message += $"{portal_base_url}";
 
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
+                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, message, true);
                             notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                         }
                         else
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
+                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
                         }
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     }
@@ -615,7 +615,7 @@ namespace risk.control.system.Controllers
                     var roles = await userManager.GetRolesAsync(user);
                     var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                     await userManager.AddToRoleAsync(user, user.UserRole.ToString());
-                    var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;
+                    var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
                     if (!user.Active)
                     {
                         var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -624,7 +624,7 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
+                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
@@ -646,12 +646,12 @@ namespace risk.control.system.Controllers
                                 message += $"{tinyUrl}\n\n";
                                 message += $"Thanks\n\n";
                                 message += $"{portal_base_url}";
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message, true);
+                                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "orange", "fas fa-user-check");
                             }
                             else
                             {
-                                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited.\n Email : " + user.Email + "\n" + portal_base_url);
+                                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited.\n Email : " + user.Email + "\n" + portal_base_url);
                                 notifyService.Custom($"User edited.", 3, "orange", "fas fa-user-check");
                             }
                         }
@@ -958,7 +958,7 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
+                    await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
                 }
 
                 notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
@@ -1072,7 +1072,7 @@ namespace risk.control.system.Controllers
 
                 _context.Vendor.Update(vendor);
 
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \nDomain : " + vendor.Email + "\n" + portal_base_url);
+                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \nDomain : " + vendor.Email + "\n" + portal_base_url);
 
                 await _context.SaveChangesAsync();
             }

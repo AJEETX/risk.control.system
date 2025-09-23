@@ -131,7 +131,6 @@
                 </div>
             </div>
 
-
             @{
                 var address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
                 var baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Runtime.Serialization;
+
+using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.Services;
 
@@ -109,12 +111,12 @@ namespace risk.control.system.Controllers.Api
         //}
 
         [HttpPost("sms")]
-        public async Task<IActionResult> SendSingleSMS(string mobile = "61432854196", string message = "SMS fom iCheckify team")
+        public async Task<IActionResult> SendSingleSMS(string countryCode = "au", string mobile = "61432854196", string message = "SMS fom iCheckify team")
         {
             string logo = "https://icheckify-demo.azurewebsites.net/img/iCheckifyLogo.png";
             string? attachments = $"<a href='{logo}'>team</a>";
             var finalMessage = $"{message}\n\n Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")}\n\n {logo}";
-            await smsService.DoSendSmsAsync("+" + mobile, finalMessage);
+            await smsService.DoSendSmsAsync(countryCode.ToLower(), "+" + mobile, finalMessage);
             return Ok();
         }
 
@@ -135,6 +137,15 @@ namespace risk.control.system.Controllers.Api
 
             return $"{(int)timeSpan.TotalDays} days ago";
         }
+    }
+
+    public enum CountryCode
+    {
+        [EnumMember(Value = "au")]
+        au,
+
+        [EnumMember(Value = "in")]
+        In // capitalized, avoids keyword issue
     }
     public class NotificationRequest
     {

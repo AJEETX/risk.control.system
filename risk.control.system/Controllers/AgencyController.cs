@@ -324,7 +324,7 @@ namespace risk.control.system.Controllers
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
                             notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-lock");
-                            await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
+                            await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
                             if (txn == "agency")
                             {
                                 return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -353,12 +353,12 @@ namespace risk.control.system.Controllers
                                 $"{tinyUrl}\n\n" +
                                 $"Thanks\n\n" +
                                 $"{portal_base_url}";
-                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
+                                await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "User created. \nEmail : " + user.Email + "\n" + portal_base_url);
+                                await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "User created. \nEmail : " + user.Email + "\n" + portal_base_url);
                                 notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-check");
                             }
                         }
@@ -528,7 +528,7 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "User edited. \nEmail : " + user.Email + "\n" + portal_base_url);
+                            await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "User edited. \nEmail : " + user.Email + "\n" + portal_base_url);
                             notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-lock");
                         }
                     }
@@ -544,19 +544,19 @@ namespace risk.control.system.Controllers
                             {
                                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
 
-                                string tinyUrl =await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
+                                string tinyUrl = await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
 
                                 var message = $"Dear {user.FirstName}\n" +
                                 $"Click on link below to install the mobile app\n\n" +
                                 $"{tinyUrl}\n\n" +
                                 $"Thanks\n\n" +
                                 $"{portal_base_url}";
-                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
+                                await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "User edited and unlocked. \nEmail : " + user.Email + "\n" + portal_base_url);
+                                await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "User edited and unlocked. \nEmail : " + user.Email + "\n" + portal_base_url);
                                 notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-check");
                             }
                         }
@@ -724,7 +724,7 @@ namespace risk.control.system.Controllers
             var onboardAgent = newRoles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active;
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
 
-            string tinyUrl =await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
+            string tinyUrl = await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
 
             var message = $"Dear {user.FirstName}\n" +
             $"Click on link below to install the mobile app\n\n" +
@@ -733,8 +733,8 @@ namespace risk.control.system.Controllers
             $"{portal_base_url}";
             if (onboardAgent)
             {
-                var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;
-                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message);
+                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, message);
                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
             }
             else

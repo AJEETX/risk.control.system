@@ -302,7 +302,7 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> ReplyQuery(long claimId, CaseInvestigationVendorsModel request, List<string> flexRadioDefault)
+        public async Task<IActionResult> ReplyQuery(long claimId, CaseInvestigationVendorsModel request, EnquiryRequest enquiryRequest, List<EnquiryRequest> enquiryRequests)
         {
             try
             {
@@ -318,11 +318,11 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
 
                 }
-                request.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Answer = HttpUtility.HtmlEncode(request.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Answer);
+                request.InvestigationReport.EnquiryRequest.Answer = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.Answer);
 
                 IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 
-                var claim = await processCaseService.SubmitQueryReplyToCompany(currentUserEmail, claimId, request.ClaimsInvestigation.InvestigationReport.EnquiryRequest, messageDocument, flexRadioDefault);
+                var claim = await processCaseService.SubmitQueryReplyToCompany(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, messageDocument);
 
                 if (claim != null)
                 {

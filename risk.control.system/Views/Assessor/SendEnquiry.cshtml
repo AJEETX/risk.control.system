@@ -45,7 +45,7 @@
                             <span class="tooltip-text" id="information">
                                 <li>
 
-                                    <i class='far fa-hand-point-right'></i> Request Info  <i class="fas fa-newspaper"></i>
+                                    <i class='far fa-hand-point-right'></i> Enquiry Info  <i class="fas fa-newspaper"></i>
                                 </li>
                                 <li>
 
@@ -57,135 +57,57 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-
-                        <div class="col-sm-6 d-flex align-items-stretch flex-column">
-
+                        <div class="col-sm-12 d-flex align-items-stretch flex-column">
+                            <div class="card bg-light d-flex flex-fill">
+                                <div class="card-footer text-muted border-bottom-0">
+                                    <i class="far fa-file-powerpoint"></i> <strong> Enquiry Descriptive question </strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-11">
+                                            <div class="form-group">
+                                                <div class="col-lg-12">
+                                                    <textarea id="description" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.Description"
+                                                              placeholder="Enquiry Description" rows="3" required>this is test </textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <div class="btn btn-default btn-file">
+                                                <i class="fas fa-paperclip"></i><small>Attachment</small>
+                                                <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
+                                                <input id="document" name="document" asp-for="InvestigationReport.EnquiryRequest.QuestionImageAttachment" type="file" accept=".png, .jpg, .jpeg, image/png, image/jpeg" class="form-control remarks" />
+                                            </div>
+                                            <div class="help-block text-center"><small>Max. size 2MB</small> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 d-flex align-items-stretch flex-column">
                             <div class="card bg-light d-flex flex-fill">
                                 <div class="card-footer text-muted border-bottom-0">
                                     <i class="fas fa-newspaper"></i> <strong> Enquiry Info </strong>
                                 </div>
                                 <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <span class="input-group-label"> Multiple choice question:</span>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.Subject"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                                    </div>
-                                                    <input id="enquiryinput" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.Subject" placeholder="Enter Enquiry subject detail" required value="What is your greatest concern about the person ?">
-
-                                                    <span asp-validation-for="InvestigationReport.EnquiryRequest.Subject" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <table>
-                                                <tr>
-                                                    <td>
-                                                        <div class="form-group">
-                                                            <span class="input-group-label"> Choice 1:</span>
-                                                            <div class="input-group mb-3">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.AnswerA"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                                                </div>
-                                                                <input class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.AnswerA" placeholder="Answer A" required value="The person is genuine.">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-
-                                                    <td>
-                                                        <div class="form-group">
-                                                            <span class="input-group-label"> Choice 2:</span>
-                                                            <div class="input-group mb-3">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.AnswerB"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                                                </div>
-                                                                <input class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.AnswerB" placeholder="Answer B" required value="The person seems to be dodgy.">
-
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div class="form-group">
-                                                            <span class="input-group-label"> Choice 3:</span>
-                                                            <div class="input-group mb-3">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.AnswerB"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                                                </div>
-                                                                <input class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.AnswerC" placeholder="Answer C" required value="The person is temperamental.">
-
-                                                            </div>
-                                                        </div>
-                                                    </td>
-
-                                                    <td>
-                                                        <div class="form-group">
-                                                            <span class="input-group-label"> Choice 4:</span>
-                                                            <div class="input-group mb-3">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text" asp-for="InvestigationReport.QueryRequest.AnswerB"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                                                </div>
-                                                                <input class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.AnswerD" placeholder="Answer D" required value="Not sure about the person.">
-
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </table>
-
-                                        </div>
-
-
-                                    </div>
+                                    
+                                    <span id="question-added"></span>
+                                    <button id="add-question" type="button" class="btn btn-sm btn-primary" id="add-question">
+                                        <i class="fas fa-plus"></i> Add Question
+                                    </button>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-sm-6 d-flex align-items-stretch flex-column">
-                            <div class="card bg-light d-flex flex-fill">
-                                <div class="card-footer text-muted border-bottom-0">
-                                    <i class="far fa-file-powerpoint"></i> <strong> Enquiry Description </strong>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <div class="col-lg-12">
-                                                    <textarea id="description" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.Description"
-                                                              placeholder="Enquiry Description" rows="3" required>this is test
-
-                                                </textarea>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="btn btn-default btn-file">
-                                                <i class="fas fa-paperclip"></i> Attachment
-                                                <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
-                                                <input id="document" name="document" asp-for="InvestigationReport.EnquiryRequest.QuestionImageAttachment" type="file" accept=".png, .jpg, .jpeg, image/png, image/jpeg" class="form-control remarks" />
-                                            </div>
-                                            <span class="help-block">Max. 2MB</span>
-
-                                            <div class="float-right">
-                                                <a asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-secondary">
-                                                    <i class="fas fa-times"></i> @Applicationsettings.CANCEL
-                                                </a>
-                                                <button id="send-query" type="submit" class="btn btn-warning">
-                                                    <i class="fa fa-edit"></i>  Send Enquiry
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="float-right">
+                                <a asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> @Applicationsettings.CANCEL
+                                </a>
+                                <button id="send-query" type="submit" class="btn btn-warning">
+                                    <i class="fa fa-edit"></i>  Send Enquiry
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -193,7 +115,7 @@
             </div>
         </div>
 
-       
+
 
     </form>
 </section>

@@ -756,7 +756,7 @@ namespace risk.control.system.Controllers.Company
 
                 IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 
-                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, messageDocument);
+                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, messageDocument);
                 if (model != null)
                 {
                     var company = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);

@@ -171,8 +171,8 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, user.UserRole.ToString());
-                var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account created. \nDomain : " + user.Email + "\n" + portal_base_url);
+                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Company account created. \nDomain : " + user.Email + "\n" + portal_base_url);
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
 
                 return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
@@ -279,8 +279,8 @@ namespace risk.control.system.Controllers
                         var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                         await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                         notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
-                        var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Company account edited. \nDomain : " + user.Email + "\n" + portal_base_url);
+                        var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                        await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Company account edited. \nDomain : " + user.Email + "\n" + portal_base_url);
 
                         return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
                     }

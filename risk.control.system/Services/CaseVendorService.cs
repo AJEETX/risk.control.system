@@ -21,7 +21,6 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext _context;
 
-
         public CaseVendorService(
             ApplicationDbContext context)
         {

@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers.Mobile
                                 $"{baseUrl}";
                                 try
                                 {
-                                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+                                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                                 }
                                 catch (Exception ex)
                                 {
@@ -117,7 +117,7 @@ namespace risk.control.system.Controllers.Mobile
                             $"{baseUrl}";
                             try
                             {
-                                await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+                                await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                             }
                             catch (Exception ex)
                             {
@@ -228,12 +228,12 @@ namespace risk.control.system.Controllers.Mobile
 
         [AllowAnonymous]
         [HttpGet("test-sms")]
-        public async Task<IActionResult> Sms(string mobile = "61432854196", string message = "Testing by icheckify")
+        public async Task<IActionResult> Sms(string countryCode = "au", string mobile = "61432854196", string message = "Testing by icheckify")
         {
             string msg = $"Dear {mobile} user,\n\n" +
                              $"iCheckify: {message}\n\n" +
                              $"Thanks\n{baseUrl}";
-            var response = await SmsService.SendSmsAsync(mobile, msg);
+            var response = await SmsService.SendSmsAsync(countryCode, mobile, msg);
             return Ok(new { message = response });
         }
 
