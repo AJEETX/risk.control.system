@@ -18,10 +18,21 @@
             {
                 foreach (var template in Model)
                 {
-                    var faceCount = @template.LocationTemplate.Where(l => l.FaceIds.All(i => i.Selected))?.Count();
-                    var docCount = @template.LocationTemplate.Where(l => l.DocumentIds.All(i => i.Selected))?.Count();
-                    var mediaCount = @template.LocationTemplate.Where(l => l.MediaReports.All(i => i.Selected))?.Count();
-                    var questionCount = @template.LocationTemplate.Where(l => l.Questions.All(i => true))?.Count();
+                    var faceCount = template.LocationTemplate
+                    .SelectMany(l => l.FaceIds)
+                    .Count(i => i.Selected);
+
+                    var docCount = template.LocationTemplate
+                    .SelectMany(l => l.DocumentIds)
+                    .Count(i => i.Selected);
+
+                    var mediaCount = template.LocationTemplate
+                    .SelectMany(l => l.MediaReports)
+                    .Count(i => i.Selected);
+
+                    var questionCount = template.LocationTemplate
+                    .SelectMany(l => l.Questions)
+                    .Count(); // all questions, no "Selected" property
 
                     <tr>
                         <td>@template.Name</td>

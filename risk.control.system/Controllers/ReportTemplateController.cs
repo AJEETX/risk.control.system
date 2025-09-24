@@ -9,7 +9,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Report Template")]
+    [Breadcrumb("General Setup")]
     public class ReportTemplateController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -18,7 +18,12 @@ namespace risk.control.system.Controllers
         {
             this.context = context;
         }
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
+        {
+            return RedirectToAction("Profile");
+        }
+        [Breadcrumb(" Report Template", FromAction = "Index")]
+        public async Task<IActionResult> Profile()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             var companyUser = context.ClientCompanyApplicationUser
@@ -29,6 +34,8 @@ namespace risk.control.system.Controllers
                     .ThenInclude(l => l.FaceIds)
                 .Include(r => r.LocationTemplate)
                     .ThenInclude(l => l.DocumentIds)
+                     .Include(r => r.LocationTemplate)
+                    .ThenInclude(l => l.MediaReports)
                 .Include(r => r.LocationTemplate)
                     .ThenInclude(l => l.Questions)
                     .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && q.Basetemplate && q.OriginalTemplateId == null)
@@ -37,7 +44,7 @@ namespace risk.control.system.Controllers
             return View(templates);
         }
 
-        [Breadcrumb(" Detail", FromAction = "Index")]
+        [Breadcrumb(" Detail", FromAction = "Profile")]
         public async Task<IActionResult> Details(long id)
         {
             var template = await context.ReportTemplates
