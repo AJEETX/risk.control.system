@@ -22,10 +22,23 @@ namespace risk.control.system.Seeds
             await PinCodeStateSeed.CurrenciesCode(context);
             await PinCodeStateSeed.Currencies(context);
             var countries = await PinCodeStateSeed.Countries(context);
-            randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
-            randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+            var country = Environment.GetEnvironmentVariable("COUNTRY");
+            if (country == "IN")
+            {
+                randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+            }
+            else if (country == "AU")
+            {
+                randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+            }
+            else if (country == "ALL" || string.IsNullOrWhiteSpace(country))
+            {
+                randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+                randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+            }
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode);
         }
+
     }
 }
