@@ -31,7 +31,7 @@ namespace risk.control.system.Seeds
             {
                 randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
             }
-            else if (country == "ALL" || string.IsNullOrWhiteSpace(country))
+            else
             {
                 randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
                 randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
@@ -39,6 +39,5 @@ namespace risk.control.system.Seeds
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode);
         }
-
     }
 }
