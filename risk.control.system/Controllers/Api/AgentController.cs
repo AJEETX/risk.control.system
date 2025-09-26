@@ -163,7 +163,7 @@ namespace risk.control.system.Controllers.Api
                             user.SecretPin = randomNumber.Next(1000, 9999).ToString();
                             _context.VendorApplicationUser.Update(user);
                             await _context.SaveChangesAsync();
-                            await SendVerificationSmsAsync(userWithUid.Country.Code, user.Email, request.Mobile, user.SecretPin);
+                            await SendVerificationSmsAsync(user.Country.Code, user.Email, request.Mobile, user.SecretPin);
                             return Ok(new { user.Email, Pin = user.SecretPin });
                         }
                     }
