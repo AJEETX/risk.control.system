@@ -13,7 +13,7 @@ $(document).ready(function () {
 
     var descriptioninput = document.getElementById('description');
     if (descriptioninput) {
-        descriptioninput.value = "Please provide brief information about the person previous claim. Attached document shall be duly completed and sent in the reply."
+        descriptioninput.value = "The person detailed information is that there is no previous claim. Attached is the duly completed and signed document."
         descriptioninput.focus();
     }
 
