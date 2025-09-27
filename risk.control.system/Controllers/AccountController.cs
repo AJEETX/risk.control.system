@@ -188,8 +188,6 @@ namespace risk.control.system.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
             var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
-            var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
-
             return View(new LoginViewModel { SetPassword = setPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
         }
 

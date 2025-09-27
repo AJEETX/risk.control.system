@@ -18,7 +18,7 @@ namespace risk.control.system.Seeds
             var au = countries.FirstOrDefault(c => c.Code.ToLower() == COUNTRY_CODE.ToLower());
             var auPincodes = await PinCodeStateSeed.CsvRead_Au(0);
             var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "vic"
-                || s.StateCode.ToLower() == "qld"
+                //|| s.StateCode.ToLower() == "qld"
                 || s.StateCode.ToLower() == "nsw"
                 ).Select(g => g.StateCode).Distinct()?.ToList();
             var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();

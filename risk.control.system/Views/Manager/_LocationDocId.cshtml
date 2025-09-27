@@ -7,7 +7,7 @@
 @if (location.DocumentIds?.Any(d => d.Selected) == true)
 {
 	<div class="table-responsive mb-4">
-	<table class="table table-bordered table-striped">
+		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 		<thead class="table-light">
 			<tr>
 				<th>Document</th>
@@ -59,6 +59,13 @@
 								 data-locationid="@location.Id"
 								 data-source="document"
 								 title="Click to view map" />
+								<div>
+									<div>@doc.IdImageLongLat</div>
+									<small>@doc.IdImageLocationAddress</small>
+									<div class="badge badge-light">
+										Indicative Distance from  @location.Address Address @doc.Distance
+									</div>
+								</div>
 						}
 						else
 						{

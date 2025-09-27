@@ -211,7 +211,7 @@ builder.Services.AddNotyf(config =>
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //                        options.UseSqlServer(connectionString));
 
-var connectionString = builder.Configuration.GetConnectionString("Database");
+var connectionString = "Data Source=" + Environment.GetEnvironmentVariable("COUNTRY") + "_" + builder.Configuration.GetConnectionString("Database");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                         options.UseSqlite(connectionString,
         sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));

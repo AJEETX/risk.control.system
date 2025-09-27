@@ -13,7 +13,7 @@
 		location.Address = Model.InsuranceType == InsuranceType.CLAIM ? "Beneficiary" : location.Address;
 		<div class="col-12 mb-4 location-container">
 			<div class="card mb-2 border @location.StatusClass @location.LocationStatus">
-				<div class="card-header bg-light text-white d-flex align-items-center">
+				<div class="card-header bg-light text-white d-flex">
 					<h5 class="mb-0 flex-grow-1 @location.LocationStatus">
 						<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
 						@if (location.IsRequired)
@@ -36,7 +36,7 @@
 						@Html.AntiForgeryToken()
 						<div class="expand" id="agent-@location.Id">
 							<div class="table-responsive">
-								<table class="table table-bordered table-hover align-middle">
+								<table class="table table-bordered table-hover">
 									<thead class="thead-light">
 										<tr>
 											<th>Agent Photo</th>
@@ -80,7 +80,8 @@
 														 data-faceid="@agent.Id"
 														 data-locationid="@location.Id"
 														 data-caseid="@Model.CaseId"
-														 data-source="agent"/>
+														 data-source="agent"
+														 title="Captured map route"/>
 														 <div>
 															<div>@agent.IdImageLongLat</div>
 																<small>@agent.IdImageLocationAddress</small>
