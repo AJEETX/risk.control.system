@@ -11,7 +11,7 @@
 
 	<div class="col-12 mb-4 location-container">
 		<div class="card mb-2 border @location.StatusClass @location.LocationStatus">
-			<div class="card-header bg-light text-white d-flex align-items-center">
+			<div class="card-header bg-light text-white d-flex">
 				<h5 class="mb-0 flex-grow-1 @location.LocationStatus">
 					<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
 					@if (location.IsRequired)
@@ -45,7 +45,7 @@
 					</button>
 					<div class="collapse" id="agent-@location.Id">
 						<div class="table-responsive mb-4">
-							<table class="table table-bordered table-hover text-center align-middle">
+							<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 								<thead class="thead-light">
 									<tr>
 										<th>Agent</th>
@@ -102,6 +102,13 @@
 													 data-caseid="@Model.CaseId"
 													 data-source="agent"
 													 title="Captured map route" />
+													 <div>
+															<div>@agent.IdImageLongLat</div>
+																<small>@agent.IdImageLocationAddress</small>
+														</div>
+														<div class="badge badge-light">
+																	Indicative Distance from  @location.Address Address @agent.Distance
+																</div>
 											}
 											else
 											{

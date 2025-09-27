@@ -56,7 +56,13 @@
 								 data-locationid="@location.Id"
 								 data-source="face"
 								 title="Click to view map" />
-
+								<div>
+									<div>@face.IdImageLongLat</div>
+									<small>@face.IdImageLocationAddress</small>
+									<div class="badge badge-light">
+										Indicative Distance from  @location.Address Address @face.Distance
+									</div>
+								</div>
 						}
 						else
 						{

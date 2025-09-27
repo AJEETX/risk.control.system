@@ -6,7 +6,7 @@
 @if (location.FaceIds?.Any(f => f.Selected) == true)
 {  
 	<div class="table-responsive mb-4">
-		<table class="table table-bordered table-hover text-center align-middle">
+		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 			<thead class="table-light">
 				<tr>
 					<th class="col-verifier-name" title="Verifier Name">
@@ -62,7 +62,13 @@
 								 data-locationid="@location.Id"
 								 data-source="face"
 								 title="Click to view map" />
-
+								<div>
+									<div>@face.IdImageLongLat</div>
+									<small>@face.IdImageLocationAddress</small>
+									<div class="badge badge-light">
+										Indicative Distance from  @location.Address Address @face.Distance
+									</div>
+								</div>
 						}
 						else
 						{
