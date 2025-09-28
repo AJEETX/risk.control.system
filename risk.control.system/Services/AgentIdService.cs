@@ -152,7 +152,6 @@ public class AgentIdService : IAgentIdService
 
             await Task.WhenAll(faceMatchTask, addressTask, weatherTask, mapTask);
 
-            var (confidence, compressImage, similarity) = await faceMatchTask;
             var address = await addressTask;
             var weatherData = await weatherTask;
             var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
@@ -163,18 +162,18 @@ public class AgentIdService : IAgentIdService
             face.DistanceInMetres = distanceInMetres;
             face.DurationInSeconds = durationInSecs;
 
-
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\n" +
                 $"Windspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}\r\n" +
                 $"Elevation(sea level):{weatherData.elevation} metres";
-
-            face.IdImageData = weatherCustomData;
-
-            await File.WriteAllBytesAsync(filePath, compressImage);
-            face.DigitalIdImageMatchConfidence = confidence;
             face.IdImageLocationAddress = $"{address}";
             face.IdImageLongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             face.ValidationExecuted = true;
+
+            face.IdImageData = weatherCustomData;
+            var (confidence, compressImage, similarity) = await faceMatchTask;
+
+            await File.WriteAllBytesAsync(filePath, compressImage);
+            face.DigitalIdImageMatchConfidence = confidence;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
             _context.AgentIdReport.Update(face);
@@ -336,7 +335,6 @@ public class AgentIdService : IAgentIdService
 
             await Task.WhenAll(faceMatchTask, addressTask, weatherTask, mapTask);
 
-            var (confidence, compressImage, similarity) = await faceMatchTask;
             var address = await addressTask;
             var weatherData = await weatherTask;
             var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
@@ -354,13 +352,15 @@ public class AgentIdService : IAgentIdService
                 $"\r\nElevation(sea level):{weatherData.elevation} metres";
 
             face.IdImageData = weatherCustomData;
+            face.IdImageLocationAddress = $" {address}";
+            face.IdImageLongLat = $"Latitude = {latitude}, Longitude = {longitude}";
+            face.ValidationExecuted = true;
+
+            var (confidence, compressImage, similarity) = await faceMatchTask;
 
             await File.WriteAllBytesAsync(filePath, compressImage);
             //face.IdImage = compressImage;
             face.MatchConfidence = confidence;
-            face.IdImageLocationAddress = $" {address}";
-            face.IdImageLongLat = $"Latitude = {latitude}, Longitude = {longitude}";
-            face.ValidationExecuted = true;
             face.Similarity = similarity;
             face.IdImageValid = similarity > 70;
             _context.DigitalIdReport.Update(face);

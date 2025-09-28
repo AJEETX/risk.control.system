@@ -13,36 +13,38 @@ namespace risk.control.system.Services
     {
         private readonly IAmazonRekognition rekognitionClient;
         private readonly IAmazonTextract textractClient;
+        private readonly ILogger<ComparedFace> logger;
 
-        public CompareFaces(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient)
+        public CompareFaces(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, ILogger<ComparedFace> logger)
         {
             this.rekognitionClient = rekognitionClient;
             this.textractClient = textractClient;
+            this.logger = logger;
         }
         public async Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> DoFaceMatch(byte[] data, byte[] tdata)
         {
             float similarityThreshold = 70F;
-
             Image imageSource = new();
-
-            try
-            {
-
-                imageSource.Bytes = new MemoryStream(data);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                Console.WriteLine($"Failed to load source image:");
-                return (false, 0, null);
-            }
-
             Image imageTarget = new();
 
             try
             {
-
+                imageSource.Bytes = new MemoryStream(data);
                 imageTarget.Bytes = new MemoryStream(tdata);
+
+                var compareFacesRequest = new CompareFacesRequest
+                {
+                    SourceImage = imageSource,
+                    TargetImage = imageTarget,
+                    SimilarityThreshold = similarityThreshold,
+                };
+
+                var compareFacesResponse = await rekognitionClient.CompareFacesAsync(compareFacesRequest);
+                var result = compareFacesResponse.FaceMatches.Count >= 1
+                    && compareFacesResponse.FaceMatches[0].Similarity >= similarityThreshold;
+                var faceBox = result ? compareFacesResponse.FaceMatches[0].Face.BoundingBox : compareFacesResponse.UnmatchedFaces[0].BoundingBox;
+                var similarity = result ? compareFacesResponse.FaceMatches[0].Similarity.GetValueOrDefault() : 0;
+                return (result, similarity, faceBox);
             }
             catch (Exception ex)
             {
@@ -50,32 +52,6 @@ namespace risk.control.system.Services
                 Console.WriteLine($"Failed to load source image:");
                 return (false, 0, null);
             }
-
-            var compareFacesRequest = new CompareFacesRequest
-            {
-                SourceImage = imageSource,
-                TargetImage = imageTarget,
-                SimilarityThreshold = similarityThreshold,
-            };
-
-            // Call operation
-            var compareFacesResponse = await rekognitionClient.CompareFacesAsync(compareFacesRequest);
-
-            var result = compareFacesResponse.FaceMatches.Count >= 1
-                //&& compareFacesResponse.UnmatchedFaces.Count == 0 
-                && compareFacesResponse.FaceMatches[0].Similarity >= similarityThreshold;
-            var faceBox = result ? compareFacesResponse.FaceMatches[0].Face.BoundingBox : compareFacesResponse.UnmatchedFaces[0].BoundingBox;
-            var similarity = result ? compareFacesResponse.FaceMatches[0].Similarity.GetValueOrDefault() : 0;
-            //// Display results
-            //compareFacesResponse.FaceMatches.ForEach(match =>
-            //{
-            //    ComparedFace face = match.Face;
-            //    BoundingBox position = face.BoundingBox;
-            //    Console.WriteLine($"Face at {position.Left} {position.Top} matches with {match.Similarity}% confidence.");
-            //});
-
-            //Console.WriteLine($"Found {compareFacesResponse.UnmatchedFaces.Count} face(s) that did not match.");
-            return (result, similarity, faceBox);
         }
 
         public async Task DetectSampleAsync(byte[] bytes)
