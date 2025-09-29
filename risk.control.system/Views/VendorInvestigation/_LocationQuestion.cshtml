@@ -40,9 +40,17 @@
 							<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
 						</td>
 						<td>
-							@if (question.QuestionType == "text" || question.QuestionType == "date")
+							@if (question.QuestionType == "text")
 							{
 								<span class="form-control-plaintext">@question.AnswerText</span>
+							}
+							else if (question.QuestionType == "date")
+							{
+								<span class="form-control-plaintext">
+									@(DateTimeOffset.TryParse(question.AnswerText, out var dto)
+															? dto.ToLocalTime().ToString("dd-MMM-yy hh:mm tt")
+															: question.AnswerText)
+							</span>
 							}
 							else if (question.QuestionType == "radio" || question.QuestionType == "dropdown")
 							{
