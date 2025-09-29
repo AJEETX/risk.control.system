@@ -233,7 +233,7 @@ namespace risk.control.system.Services
             data.UnderwritingCount = underwritingAssessor;
             data.FirstBlockUrl = "/Assessor/Assessor";
 
-            data.SecondBlockName = "Review";
+            data.SecondBlockName = "Enquiry";
             data.SecondBlockCount = claimsReview;
             data.SecondBBlockCount = underwritingReview;
             data.SecondBlockUrl = "/Assessor/Review";

@@ -137,7 +137,7 @@ namespace risk.control.system.Controllers.Company
         }
 
 
-        [Breadcrumb(title: "Review")]
+        [Breadcrumb(title: "Enquiry")]
         public IActionResult Review()
         {
             try

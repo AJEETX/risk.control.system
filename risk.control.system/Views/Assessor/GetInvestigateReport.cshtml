@@ -58,6 +58,9 @@
 
 
 		<partial name="_AgencyReport" model="@Model" />
+		<div class="submit-progress hidden">
+			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+		</div>
 		@if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest != null)
 		{
 			var data = new CaseTransactionModel
@@ -66,14 +69,15 @@
 				};
 			<partial name="_EnquiryReport" model="@data" />
 		}
-
+		
 		
 		@if (Model.ClaimsInvestigation.AiEnabled)
 		{
 			<partial name="_AgencyAiReport" model="@Model" />
 		}
-
+		
 		<div class="card shadow-lg border-1 rounded-lg">
+			
 			<div class="card-header bg-info text-white text-center">
 				<h3 class="card-title">
 					<i class="fas fa-user-check"></i> Assessment
@@ -93,9 +97,7 @@
 				</h3>
 			</div>
 			<div class="card-body">
-				<div class="submit-progress hidden">
-					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-				</div>
+				
 				<div class="row">
 					<div class="col-sm-6 d-flex align-items-stretch flex-column">
 						<div class="card bg-light equal-height-card">
