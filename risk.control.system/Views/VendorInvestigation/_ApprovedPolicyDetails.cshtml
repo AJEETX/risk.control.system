@@ -383,11 +383,7 @@
                                         <i class="nav-icon fas fa-clock"></i>
                                         @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                     </span>
-
                                 </div>
-                            </div>
-                            <div class="card-footer text-muted border-bottom-0">
-                                <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.InvestigationReport.AgentEmail </span>
                             </div>
                             <div class="progress">
                                 <i class="far fa-bookmark bookmark-green"></i>
@@ -395,42 +391,34 @@
                                     remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                                 </div>
                             </div>
+                            <div class="card-footer text-muted border-bottom-0">
+                                <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.InvestigationReport.AgentEmail </span>
+                            </div>
+                            
                             <div class="card-body">
-
                                 <div class="row">
 
-                                    <div class="col-7">
-                                        <p class="text-muted text-sm">
-                                            <br />
-                                            <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                
-                                                <li class="small">
-                                                    Remarks?
-                                                    <span class="fa-li">
-                                                        <i class="far fa-comment"></i>
-                                                    </span>
-                                                </li>
-                                                
-                                            </ul>
-                                        </p>
+                                    <div class="col-4">
+                                        <span>
+                                            <i class="far fa-comment"></i> Remarks?
+                                        </span>
                                     </div>
 
-                                    <div class="col-5">
-                                        <p class="text-muted text-sm">
-                                            <br />
-                                            <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                <li class="small">
-                                                    <span class="fa-li">
-                                                        <i class="far fa-comment"></i>
-                                                    </span>
-                                                    @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
-                                                </li>
-                                                
-                                            </ul>
-                                        </p>
+                                    <div class="col-8">
+                                        <span>
+                                            <i class="far fa-comment"></i>
+                                            @if (string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport.AgentRemarksEdit))
+                                            {
+                                                @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
+                                            }
+                                            else
+                                            {
+                                                @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksEdit
+                                            }
+                                        </span>
                                     </div>
                                 </div>
-
+                                <br />
                             </div>
                         </div>
                         <div class="text-center">

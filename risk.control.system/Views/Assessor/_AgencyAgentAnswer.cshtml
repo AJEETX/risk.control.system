@@ -36,55 +36,34 @@
             </div>
             <div class="card-body text-muted text-sm">
                 <div class="row">
-                    <!-- Questions Section -->
-                    <div class="col-md-7">
-                        <ul class="fa-ul text-muted list-unstyled">
-                            <li class="mb-2">
-                                <span class="fa-li">
-                                    <i class="far fa-comment text-info"></i>
-                                </span>
-                                Agent Remarks?
-                            </li>
-                        </ul>
+                    <div class="col-4">
+                        <span>
+                            <i class="far fa-comment"></i> Remarks?
+                        </span>
                     </div>
-                    <!-- Answers Section -->
-                    <div class="col-md-5">
-                        <ul class="fa-ul list-unstyled">
-                            <li class="mb-2">
-                                <span class="fa-li">
-                                    <i class="far fa-comment text-secondary"></i>
-                                </span>
-                                @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
-                            </li>
-                        </ul>
+                    <div class="col-8">
+                        <span>
+                            <i class="far fa-comment"></i> @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
+                        </span>
                     </div>
                 </div>
+                <hr />
+
                 @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
                 {
                     <div class="row">
-                    <!-- Questions Section -->
-                    <div class="col-md-7">
-                        <ul class="fa-ul text-muted list-unstyled">
-                            <li class="mb-2">
-                                <span class="fa-li">
-                                    <i class="far fa-comment text-info"></i>
-                                </span>
-                                Edited Remarks?
-                            </li>
-                        </ul>
+                        <div class="col-4">
+                            <span>
+                                <i class="far fa-comment"></i> Edited Remarks?
+                            </span>
+                        </div>
+
+                        <div class="col-8">
+                            <span>
+                                <i class="far fa-comment"></i> @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
+                            </span>
+                        </div>
                     </div>
-                    <!-- Answers Section -->
-                    <div class="col-md-5">
-                        <ul class="fa-ul list-unstyled">
-                            <li class="mb-2">
-                                <span class="fa-li">
-                                    <i class="far fa-comment text-secondary"></i>
-                                </span>
-                                @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
-                            </li>
-                        </ul>
-                    </div>
-                </div>
                 }
             </div>
 

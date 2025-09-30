@@ -10,13 +10,15 @@
 		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 		<thead class="table-light">
 			<tr>
-				<th>Document</th>
+					<th class="col-face-photo">
+						<i class="far fa-file text-primary" title="Document"></i> Document
+					</th>
 				<th>
-					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
+						<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i> Scanned Image
 				</th>
-					<th title="Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
-					<th>Captured Address</th>
-				<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
+					<th title="Indicative Map"><img class="action-image" src="~/headers/pincode.gif" />Indicative Map</th>
+					<th class="col-pin-img" title="Indicative Address Info"> Indicative Address Info</th>
+					<th class="col-weather" title="Document info"><img class="action-image" src="~/headers/information.gif" />Document info</th>
 				<th>Valid</th>
 			</tr>
 		</thead>
@@ -59,13 +61,7 @@
 								 data-locationid="@location.Id"
 								 data-source="document"
 								 title="Click to view map" />
-								<div>
-									<div>@doc.IdImageLongLat</div>
-									<small>@doc.IdImageLocationAddress</small>
-									<div class="badge badge-light">
-										Indicative Distance from  @location.Address Address @doc.Distance
-									</div>
-								</div>
+
 						}
 						else
 						{
@@ -73,6 +69,7 @@
 						}
 					</td>
 					<td>
+									<div>@doc.IdImageLongLat</div>
 							<small>
 						@doc.IdImageLocationAddress
 								</small>

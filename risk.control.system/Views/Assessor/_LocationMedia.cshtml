@@ -12,11 +12,12 @@
 
 		<thead class="table-light">
 			<tr>
-				<th>
-						<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i> Media File
+				<th class="col-face-photo">
+						<i class="far fa-user text-primary" title="Media File"></i> Media File
 				</th>
-					<th title="Indicative Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" />Indicative Captured </th>
-				
+					<th title="Indicative Map"><img class="action-image" src="~/headers/pincode.gif" />Indicative Map</th>
+					<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" />Location info</th>
+				</tr>
 		</thead>
 		<tbody>
 			@foreach (var doc in location.MediaReports.Where(d => d.Selected))

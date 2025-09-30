@@ -12,11 +12,10 @@
 
 		<thead class="table-light">
 			<tr>
-				<th>Media File</th>
-				<th>
-					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
-				</th>
-				<th title="Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
+					<th class="col-face-photo">
+						<i class="far fa-user text-primary" title="Media File"></i> Media File
+					</th>
+					<th title="Indicative Map"><img class="action-image" src="~/headers/pincode.gif" />Indicative Map</th>
 				<th>Captured Address</th>
 					<th class="col-weather" title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
 				</tr>
@@ -30,19 +29,17 @@
 					accept = "video/mp4,video/webm";
 				}
 				<tr>
-					<td>
-							<small>
-						@doc.ReportName
-								</small>
-						@if (doc.IsRequired)
-						{
-							<span class="required-asterisk" title="Mandatory Location">*</span>
-						}
-					</td>
 					
 					<td>
 						@if (doc.ValidationExecuted)
 						{
+								<small>
+									@doc.ReportName
+								</small>
+								@if (doc.IsRequired)
+								{
+									<span class="required-asterisk" title="Mandatory Location">*</span>
+								}
 								<div id="doc-img-@doc.Id">
 									@if (doc.MediaType == MediaType.VIDEO)
 									{
@@ -81,13 +78,7 @@
 								 data-locationid="@location.Id"
 								 data-source="media"
 								 title="Click to view map" />
-								<div>
-									<div>@doc.IdImageLongLat</div>
-									<small>@doc.IdImageLocationAddress</small>
-									<div class="badge badge-light">
-										Indicative Distance from  @location.Address Address @doc.Distance
-									</div>
-								</div>
+
 						}
 						else
 						{
@@ -95,9 +86,12 @@
 						}
 					</td>
 						<td>
+									<div>@doc.IdImageLongLat</div>
+
 							<small>
 								@doc.IdImageLocationAddress
 							</small>
+							<br />
 							<span class="badge badge-light">
 								Indicative Distance from @location.Address Address @doc.Distance
 							</span>

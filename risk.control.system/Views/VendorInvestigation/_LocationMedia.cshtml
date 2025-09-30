@@ -81,13 +81,6 @@
 								 data-locationid="@location.Id"
 								 data-source="media"
 								 title="Click to view map" />
-								<div>
-									<div>@doc.IdImageLongLat</div>
-									<small>@doc.IdImageLocationAddress</small>
-									<div class="badge badge-light">
-										Indicative Distance from  @location.Address Address @doc.Distance
-									</div>
-								</div>
 						}
 						else
 						{
@@ -95,6 +88,7 @@
 						}
 					</td>
 					<td>
+							<div>@doc.IdImageLongLat</div>
 							<small>
 							@doc.IdImageLocationAddress
 								</small>

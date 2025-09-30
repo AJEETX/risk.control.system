@@ -102,13 +102,7 @@
 													 data-caseid="@Model.CaseId"
 													 data-source="agent"
 													 title="Captured map route" />
-													 <div>
-															<div>@agent.IdImageLongLat</div>
-																<small>@agent.IdImageLocationAddress</small>
-														</div>
-														<div class="badge badge-light">
-																	Indicative Distance from  @location.Address Address @agent.Distance
-																</div>
+													 
 											}
 											else
 											{
@@ -120,6 +114,7 @@
 										<td>
 											@if (agent.ValidationExecuted)
 											{
+															<div>@agent.IdImageLongLat</div>
 												<small>@agent.IdImageLocationAddress</small>
 												<span class="badge badge-light">
 														Indicative Distance from @location.Address Address  @agent.Distance

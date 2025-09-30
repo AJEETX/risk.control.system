@@ -53,10 +53,10 @@
 								<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 									<thead class="thead-light">
 										<tr>
-											<th>Captured Photo</th>
-											<th>Indicative Map Route</th>
+											<th>Agent Photo</th>
+											<th>Indicative Map </th>
 											<th> Captured Address Info</th>
-											<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" /></th>
+											<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" /> Location Info</th>
 											<th>Match</th>
 										</tr>
 									</thead>
@@ -108,7 +108,10 @@
 											<td>
 												@if (agent.ValidationExecuted)
 												{
+													<div>@agent.IdImageLongLat</div>
+
 													<small>@agent.IdImageLocationAddress</small>
+													<br />
 													<span class="badge badge-light">
 														Indicative Distance from @location.Address Address  @agent.Distance
 													</span>
