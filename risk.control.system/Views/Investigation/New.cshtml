@@ -18,7 +18,9 @@
                 </select>
             </div>
             <div class="shadow-lg border-1 rounded-lg">
-
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
                 <button id="refreshTable" class="btn btn-light refresh-button">
                     <i id="refreshIcon" class="fas fa-sync"></i> Refresh
                 </button>
@@ -27,9 +29,7 @@
 
         <form id="checkboxes" asp-action="AssignAuto" asp-controller="InvestigationPost" method="post">
             <div class="card-body">
-                <div class="submit-progress hidden">
-                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                </div>
+                
 
                 <table id="customerTableAuto" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
