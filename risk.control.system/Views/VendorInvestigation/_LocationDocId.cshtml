@@ -11,13 +11,15 @@
 		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 			<thead class="table-light">
 				<tr>
-					<th class="col-verifier-name">Document</th>
+					<th class="col-verifier-name"><i class="far fa-file text-muted ms-2" title="Document"></i> Document</th>
 					<th class="col-face-photo">
-						<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
+						<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i> Document Image
 					</th>
-					<th class="col-pin-img" title="Captured Address map"><img class="action-image" src="~/headers/pincode.gif" /></th>
-					<th class="col-address">Indicative Captured Address</th>
-					<th class="col-weather" title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
+					<th class="col-pin-img" title="Indicative Map Route"><img class="action-image" src="~/headers/pincode.gif" />  Indicative Map</th>
+					<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
+					<th class="col-weather" title="Scanned Data">
+						<img class="action-image" src="~/headers/information.gif" /> Scanned Data
+					</th>
 					<th class="col-match">Valid</th>
 				</tr>
 			</thead>
@@ -32,7 +34,7 @@
 								</small>
 							@if (doc.IsRequired)
 							{
-								<span class="required-asterisk" title="Mandatory Location">*</span>
+								<span class="required-asterisk" title="Mandatory Image">*</span>
 							}
 						</td>
 

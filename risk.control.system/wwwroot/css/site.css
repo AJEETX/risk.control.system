@@ -2985,8 +2985,8 @@ th.col-match {
     width: 8%;
 }
 .media-view {
-    width: 200px;
-    height: auto;
+    width: 300px;
+    height: 250px;
 }
 .multidistrict, #SelectedDistrictIds {
     height: 300px;

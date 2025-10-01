@@ -102,7 +102,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="float-right">
-                                <a asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-secondary">
+                                <a id="back" asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-secondary">
                                     <i class="fas fa-times"></i> @Applicationsettings.CANCEL
                                 </a>
                                 <button id="send-query" type="submit" class="btn btn-warning">

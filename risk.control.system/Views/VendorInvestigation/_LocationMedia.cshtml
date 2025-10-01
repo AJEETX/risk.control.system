@@ -12,13 +12,15 @@
 
 		<thead class="table-light">
 			<tr>
-				<th>Media File</th>
+					<th class="col-verifier-name"><i class="far fa-file text-muted ms-2" title="Media File"></i> Media File</th>
 				<th>
-					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
+						<i class="fas fa-copy text-muted ms-2" title="Media File Data"></i> Media File Data
 				</th>
-				<th title="Captured Address Map"><img class="action-image" src="~/headers/pincode.gif" /></th>
-				<th>Captured Address</th>
-					<th class="col-weather" title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
+					<th class="col-pin-img" title="Indicative Map Route"><img class="action-image" src="~/headers/pincode.gif" />  Indicative Map</th>
+					<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
+					<th class="col-weather" title="Location Info">
+						<img class="action-image" src="~/headers/information.gif" /> Location Info
+					</th>
 				</tr>
 		</thead>
 		<tbody>
@@ -36,7 +38,7 @@
 								</small>
 						@if (doc.IsRequired)
 						{
-							<span class="required-asterisk" title="Mandatory Location">*</span>
+							<span class="required-asterisk" title="Mandatory Media">*</span>
 						}
 					</td>
 					
@@ -53,7 +55,7 @@
 									}
 									else if (doc.MediaType == MediaType.AUDIO)
 									{
-										<audio controls>
+										<audio class="media-view" controls>
 											<source src="@doc.FilePath" type="audio/@doc.MediaExtension" />
 										</audio>
 									}
