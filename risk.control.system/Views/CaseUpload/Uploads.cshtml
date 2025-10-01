@@ -7,6 +7,7 @@
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <input type="hidden" id="uploadId" value="@uploadId" />
+        
         @if (Model.IsManager)
         {
             <partial name="Creator/_UploadManagerTitle" model="Model" />
@@ -15,12 +16,16 @@
         {
             <partial name="Creator/_UploadTitle" model="Model" />
         }
-        <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
 
-        <div class="card-body">
+
+        <div class="card shadow-lg border-1 rounded-lg">
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
+            <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
+        </div>
+        <div class="card-body">
+            
             @if (!Model.IsManager)
 
             {

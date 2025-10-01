@@ -398,8 +398,8 @@ namespace risk.control.system.Services
                 foreach (var item in applicationDbContext)
                 {
                     if (item.SubmittingSupervisordEmail == userEmail && item.Status == finished &&
-                        item.SubStatus == approved ||
-                        item.SubStatus == rejectd
+                        (item.SubStatus == approved ||
+                        item.SubStatus == rejectd)
                         )
                     {
                         claimsSubmitted += 1;
