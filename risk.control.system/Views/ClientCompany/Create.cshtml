@@ -80,9 +80,9 @@
                             <span class="input-group-label"> Phone #: </span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone number only (e.g. 123456789)" value="432854196" />
+                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone number only (e.g. 123456789)" value="432854196" />
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>

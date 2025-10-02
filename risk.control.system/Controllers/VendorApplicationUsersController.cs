@@ -182,6 +182,7 @@ namespace risk.control.system.Controllers
                     user.ProfilePictureExtension = fileExtension;
                 }
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
+                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                 //DEMO
                 user.Password = Applicationsettings.Password;
                 user.Email = userFullEmail;
@@ -327,7 +328,7 @@ namespace risk.control.system.Controllers
                     user.Updated = DateTime.Now;
                     user.IsUpdated = true;
                     user.Comments = applicationUser.Comments;
-                    user.PhoneNumber = applicationUser.PhoneNumber;
+                    user.PhoneNumber = applicationUser.PhoneNumber.TrimStart('0');
                     user.UpdatedBy = currentUserEmail;
                     user.SecurityStamp = DateTime.Now.ToString();
                     var result = await userManager.UpdateAsync(user);

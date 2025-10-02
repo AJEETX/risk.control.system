@@ -364,6 +364,13 @@ function clearAllNotifications() {
 
 $(document).ready(function () {
 
+    // Prevent typing first character as 0
+    $("#PhoneNumber, #ContactNumber").on("input", function () {
+        let val = $(this).val();
+        if (val.length === 1 && val === "0") {
+            $(this).val(""); // clear the input
+        }
+    });
     checkInternetConnection();
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({

@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers
                 existCompany.PinCodeId = clientCompany.PinCodeId;
                 existCompany.Name = clientCompany.Name;
                 //existCompany.Code = clientCompany.Code;
-                existCompany.PhoneNumber = clientCompany.PhoneNumber;
+                existCompany.PhoneNumber = clientCompany.PhoneNumber.TrimStart('0');
                 existCompany.Branch = clientCompany.Branch;
                 existCompany.BankName = clientCompany.BankName;
                 existCompany.BankAccountNumber = clientCompany.BankAccountNumber;
@@ -336,7 +336,7 @@ namespace risk.control.system.Controllers
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
-
+                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                 user.CountryId = user.SelectedCountryId;
                 user.StateId = user.SelectedStateId;
                 user.DistrictId = user.SelectedDistrictId;
@@ -482,7 +482,7 @@ namespace risk.control.system.Controllers
                     user.IsUpdated = true;
                     user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;
-                    user.PhoneNumber = applicationUser.PhoneNumber;
+                    user.PhoneNumber = applicationUser.PhoneNumber.TrimStart('0');
                     user.UserRole = applicationUser.UserRole;
                     user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                     user.IsClientAdmin = user.UserRole == CompanyRole.COMPANY_ADMIN;
@@ -760,7 +760,7 @@ namespace risk.control.system.Controllers
                 vendor.IsUpdated = true;
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = currentUserEmail;
-
+                vendor.PhoneNumber = vendor.PhoneNumber.TrimStart('0');
                 vendor.PinCodeId = vendor.SelectedPincodeId;
                 vendor.DistrictId = vendor.SelectedDistrictId;
                 vendor.StateId = vendor.SelectedStateId;
@@ -887,7 +887,7 @@ namespace risk.control.system.Controllers
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
-
+                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                 user.PinCodeId = user.SelectedPincodeId;
                 user.DistrictId = user.SelectedDistrictId;
                 user.StateId = user.SelectedStateId;

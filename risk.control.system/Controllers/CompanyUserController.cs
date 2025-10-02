@@ -156,7 +156,7 @@ namespace risk.control.system.Controllers
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
-
+            user.PhoneNumber = user.PhoneNumber.TrimStart('0');
             user.PinCodeId = user.SelectedPincodeId;
             user.DistrictId = user.SelectedDistrictId;
             user.StateId = user.SelectedStateId;
@@ -259,7 +259,7 @@ namespace risk.control.system.Controllers
                     }
                     user.Addressline = applicationUser.Addressline;
                     user.Active = applicationUser.Active;
-
+                    user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                     user.CountryId = applicationUser.SelectedCountryId;
                     user.StateId = applicationUser.SelectedStateId;
                     user.DistrictId = applicationUser.SelectedDistrictId;

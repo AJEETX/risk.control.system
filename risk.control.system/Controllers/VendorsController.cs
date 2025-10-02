@@ -406,7 +406,7 @@ namespace risk.control.system.Controllers
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
-
+                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                 user.PinCodeId = user.SelectedPincodeId;
                 user.DistrictId = user.SelectedDistrictId;
                 user.StateId = user.SelectedStateId;
@@ -575,6 +575,7 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                 user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
                 user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                 user.FirstName = applicationUser?.FirstName;
                 user.LastName = applicationUser?.LastName;
                 if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
@@ -925,7 +926,7 @@ namespace risk.control.system.Controllers
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = currentUserEmail;
                 vendor.CreatedUser = currentUserEmail;
-
+                vendor.PhoneNumber = vendor.PhoneNumber.TrimStart('0');
                 vendor.PinCodeId = vendor.SelectedPincodeId;
                 vendor.DistrictId = vendor.SelectedDistrictId;
                 vendor.StateId = vendor.SelectedStateId;
@@ -1055,6 +1056,7 @@ namespace risk.control.system.Controllers
                 vendor.IsUpdated = true;
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
+                vendor.PhoneNumber = vendor.PhoneNumber.TrimStart('0');
 
                 vendor.PinCodeId = vendor.SelectedPincodeId;
                 vendor.DistrictId = vendor.SelectedDistrictId;

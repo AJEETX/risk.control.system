@@ -163,7 +163,7 @@ namespace risk.control.system.Controllers
                     user.Updated = DateTime.Now;
                     user.IsUpdated = true;
                     user.Comments = applicationUser.Comments;
-                    user.PhoneNumber = applicationUser.PhoneNumber;
+                    user.PhoneNumber = applicationUser.PhoneNumber.TrimStart('0');
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
                     user.SecurityStamp = DateTime.Now.ToString();
                     var result = await userManager.UpdateAsync(user);

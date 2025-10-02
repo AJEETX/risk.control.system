@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
             clientCompany.DistrictId = clientCompany.SelectedDistrictId;
             clientCompany.StateId = clientCompany.SelectedStateId;
             clientCompany.CountryId = clientCompany.SelectedCountryId;
-
+            clientCompany.PhoneNumber = clientCompany.PhoneNumber.TrimStart('0');
             clientCompany.Updated = DateTime.Now;
             clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
             var addedCompany = _context.Add(clientCompany);
@@ -297,6 +297,7 @@ namespace risk.control.system.Controllers
                 clientCompany.DistrictId = clientCompany.SelectedDistrictId;
                 clientCompany.StateId = clientCompany.SelectedStateId;
                 clientCompany.CountryId = clientCompany.SelectedCountryId;
+                clientCompany.PhoneNumber = clientCompany.PhoneNumber.TrimStart('0');
 
                 clientCompany.Updated = DateTime.Now;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;

@@ -80,7 +80,7 @@ namespace risk.control.system.Controllers
             user.UserName = user.Email;
             user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
-
+            user.PhoneNumber = user.PhoneNumber.TrimStart('0');
             user.PinCodeId = user.SelectedPincodeId;
             user.StateId = user.SelectedStateId;
             user.DistrictId = user.SelectedDistrictId;
@@ -170,6 +170,7 @@ namespace risk.control.system.Controllers
                         user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                         user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                         user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                        user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                         user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
                         user.FirstName = applicationUser?.FirstName;
                         user.LastName = applicationUser?.LastName;

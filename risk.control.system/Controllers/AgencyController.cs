@@ -290,7 +290,7 @@ namespace risk.control.system.Controllers
                 user.DistrictId = user.SelectedDistrictId;
                 user.StateId = user.SelectedStateId;
                 user.CountryId = user.SelectedCountryId;
-
+                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
@@ -498,7 +498,7 @@ namespace risk.control.system.Controllers
                 user.IsUpdated = true;
                 user.Updated = DateTime.Now;
                 user.Comments = applicationUser.Comments;
-                user.PhoneNumber = applicationUser.PhoneNumber;
+                user.PhoneNumber = applicationUser.PhoneNumber.TrimStart('0');
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.SecurityStamp = DateTime.Now.ToString();
                 user.UserRole = applicationUser.UserRole;

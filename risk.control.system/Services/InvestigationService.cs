@@ -244,6 +244,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
 
+                customerDetail.ContactNumber = customerDetail.ContactNumber.TrimStart('0');
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
@@ -315,6 +316,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
+                customerDetail.ContactNumber = customerDetail.ContactNumber.TrimStart('0');
 
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
@@ -383,6 +385,8 @@ namespace risk.control.system.Services
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.IsReady2Assign = true;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
+                beneficiary.ContactNumber = beneficiary.ContactNumber.TrimStart('0');
+
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
@@ -450,6 +454,8 @@ namespace risk.control.system.Services
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
                 claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
                 claimsInvestigation.IsReady2Assign = true;
+                beneficiary.ContactNumber = beneficiary.ContactNumber.TrimStart('0');
+
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
