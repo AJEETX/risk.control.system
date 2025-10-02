@@ -12,8 +12,7 @@
                 <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
             </span>
         </div>
-        <input id="ContactNumber" type="text" asp-for="ContactNumber" class="form-control remarks" required maxlength="10" autocomplete="off"
-               placeholder="Phone number only (e.g., 1234567890)" />
+        <input id="ContactNumber" type="text" asp-for="ContactNumber" class="form-control remarks" required maxlength="10" autocomplete="off" placeholder="Phone number only (e.g., 9876543210)" />
         <span asp-validation-for="ContactNumber" class="text-danger"></span>
     </div>
 </div>

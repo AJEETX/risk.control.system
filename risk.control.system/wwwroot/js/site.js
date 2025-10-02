@@ -363,6 +363,30 @@ function clearAllNotifications() {
 }
 
 $(document).ready(function () {
+    $("#PhoneNumber, #ContactNumber").on("keydown", function (e) {
+        // Prevent first character being 0 (also covers numpad 0)
+        if (this.selectionStart === 0 && (e.key === "0" || e.code === "Numpad0")) {
+            e.preventDefault();
+        }
+    });
+
+    $("#PhoneNumber, #ContactNumber").on("paste", function (e) {
+        let pasteData = (e.originalEvent || e).clipboardData.getData('text');
+
+        // If the pasted text starts with 0, block it or fix it
+        if (pasteData.startsWith("0")) {
+            e.preventDefault();
+
+            // Option 1: strip leading zeros automatically
+            let cleaned = pasteData.replace(/^0+/, "");
+            if (cleaned.length > 0) {
+                document.execCommand("insertText", false, cleaned);
+            }
+
+            // Option 2 (stricter): block paste completely
+            // e.preventDefault();
+        }
+    });
 
     // Prevent typing first character as 0
     $("#PhoneNumber, #ContactNumber").on("input", function () {

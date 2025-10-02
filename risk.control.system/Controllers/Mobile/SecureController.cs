@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers.Mobile
 
         [AllowAnonymous]
         [HttpGet("test-2-get-jwt-token")]
-        public async Task<IActionResult> Jwt(string username = "agentx@verify.com")
+        public async Task<IActionResult> Jwt(string username = "agent@verify.com")
         {
             var model = new AgentLoginModel
             {
@@ -237,27 +237,27 @@ namespace risk.control.system.Controllers.Mobile
             return Ok(new { message = response });
         }
 
-        [AllowAnonymous]
-        [HttpGet("pdf")]
-        public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
-        {
-            try
-            {
-                var reportFilename = await pdfGenerativeService.Generate(id, currentUserEmail);
+        //[AllowAnonymous]
+        //[HttpGet("pdf")]
+        //public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
+        //{
+        //    try
+        //    {
+        //        var reportFilename = await pdfGenerativeService.Generate(id, currentUserEmail);
 
-                var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
-                var memory = new MemoryStream();
-                using var stream = new FileStream(ReportFilePath, FileMode.Open);
-                await stream.CopyToAsync(memory);
-                memory.Position = 0;
-                //notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
-                return File(memory, "application/pdf", reportFilename);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing case report");
-                return StatusCode(500, "Internal server error");
-            }
-        }
+        //        var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
+        //        var memory = new MemoryStream();
+        //        using var stream = new FileStream(ReportFilePath, FileMode.Open);
+        //        await stream.CopyToAsync(memory);
+        //        memory.Position = 0;
+        //        //notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
+        //        return File(memory, "application/pdf", reportFilename);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error processing case report");
+        //        return StatusCode(500, "Internal server error");
+        //    }
+        //}
     }
 }

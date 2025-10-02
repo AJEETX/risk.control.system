@@ -56,7 +56,7 @@
                                             }
 
                                             <i class="fa fa-asterisk asterik-style"></i>
-                                            <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                            <input asp-for="ProfileImage" class="form-control remarks" type="file"  />
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -65,7 +65,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20">
+                                            <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20" />
                                             <span asp-validation-for="FirstName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -76,7 +76,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20">
+                                            <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
                                             <span asp-validation-for="LastName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -92,8 +92,7 @@
                                                     <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                                                 </span>
                                             </div>
-                                            <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10"
-                                                   placeholder="Phone number only (e.g. 1234567890)" />
+                                            <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone number only (e.g. 9876543210)" />
                                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -129,7 +128,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="50" />
+                                            <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="70" />
                                         </div>
                                     </div>
                                     <div class="form-group">

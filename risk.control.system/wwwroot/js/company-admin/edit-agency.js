@@ -42,10 +42,5 @@ $.validator.setDefaults({
     }
 });
 $(document).ready(function () {
-    $('#txtInput').on("cut copy paste", function (e) {
-        e.preventDefault();
-    });
-
-    $("#edit-form").validate();
-    
+    $("#edit-form").validate();   
 });
