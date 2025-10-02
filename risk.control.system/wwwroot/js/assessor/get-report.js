@@ -353,8 +353,29 @@ $(document).ready(function () {
     });
 
     // Event delegation for delete button
-    $(document).on("click", ".remove-question", function () {
-        $(this).closest(".question-card").remove();
+    $(document).on("click", ".remove-question", function (e) {
+        e.preventDefault(); // stop default action if it's a link or button
+
+        let $card = $(this).closest(".question-card");
+
+        $.confirm({
+            title: 'Confirm Deletion',
+            content: 'Are you sure you want to delete this question?',
+            type: 'red',
+            buttons: {
+                confirm: {
+                    text: 'Yes, Delete',
+                    btnClass: 'btn-danger',
+                    action: function () {
+                        $card.remove(); // delete on confirm
+                    }
+                },
+                cancel: {
+                    text: 'Cancel',
+                    btnClass: 'btn-secondary'
+                }
+            }
+        });
     });
 
     $('#query-form').on('submit', function (e) {

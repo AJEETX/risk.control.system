@@ -24,7 +24,11 @@
 							@(duration.Hours > 0 ? $"{duration.Hours}h " : "")@(duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min")
 						</span>
 					</h5>
-
+					<div class="card-tools">
+                <span data-toggle="tooltip" title=" Time :  @location.Created.ToString("dd-MMM-yy hh:mm tt")" class="badge badge-light">
+                    <i class="nav-icon fas fa-clock"></i> @location.Created.ToString("dd-MMM-yy hh:mm tt")
+                </span>
+            </div>
 				</div>
 
 

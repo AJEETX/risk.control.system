@@ -5,12 +5,10 @@
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-user-check"></i> Enquiry Reply : <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span> </h3>
             <div class="card-tools">
-                <span data-toggle="tooltip" title="Assessor: : @Model.ClaimsInvestigation.Vendor.Email" class="badge badge-light">
-                        <i class='far fa-hand-point-right'></i>
+                <span data-toggle="tooltip" title="Response Time: @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Updated.Value.ToString("dd-MMM-yy hh:mm tt")" class="badge badge-light">
+                    <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Updated.Value.ToString("dd-MMM-yy hh:mm tt")
                     </span>
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                </button>
+                
             </div>
         </div>
         <div class="card-body">
@@ -18,16 +16,12 @@
                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
                         <tr>
-                            
                             <th>
                                 Document Requested
                             </th>
                             <th>
                                 Assessor Question
                             </th>
-                        <th>
-                            Time of response
-                        </th>
                         <th>
                             Document Sent
                         </th>
@@ -53,7 +47,6 @@
                     <td>
                         @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Description
                     </td>
-                    <td><span class=" badge badge-light"> @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Updated.Value.ToString("dd-MMM-yy hh:mm tt")</span></td>
 
                     <td>
                         @if (Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.AnswerImageAttachment != null)
@@ -82,14 +75,12 @@
                         <thead>
                             <tr>
                                 <th>
-                                    Assessor Question
+                                    Multiple choice Question
                                 </th>
                                     <th>
                                         Question Options
                                     </th>
-                                    <th>
-                                        Time of response
-                                    </th>
+                                    
                                 <th>
                                     Agency Response
                                 </th>
@@ -115,9 +106,7 @@
                                         </li>
                                     </ul>
                                 </td>
-                                <td>
-                                    <span class="badge badge-light">@request.Updated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
-                                </td>
+                                
                             <td>
                                 <i class="fas fa-user-check"></i> @request.AnswerSelected
                             </td>

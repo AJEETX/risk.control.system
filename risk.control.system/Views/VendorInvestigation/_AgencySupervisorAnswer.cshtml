@@ -39,9 +39,6 @@
                         <thead>
                             <tr>
                                 <th>
-                                    Time
-                                </th>
-                                <th>
                                     Supervisor Remarks
                                 </th>
                                 <th>
@@ -51,21 +48,6 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>
-                                    @{
-                                        string displayTime = string.Empty;
-                                        var time = @Model.InvestigationReport?.SupervisorRemarksUpdated;
-                                        if (time is not null)
-                                        {
-                                            displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
-                                        }
-                                        if (time == null)
-                                        {
-                                            displayTime = @Model.InvestigationReport.Created.ToString("dd-MMM-yyy HH:mm");
-                                        }
-                                    }
-                                    <span class="badge badge-light">@displayTime</span>
-                                </td>
                                 <td>
                                     @Model.InvestigationReport?.SupervisorRemarks
 

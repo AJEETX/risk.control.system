@@ -41,25 +41,15 @@
                 <div class="col-12">
                    
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm table-hover align-middle text-center">
+                        <table class="table table-bordered table-sm table-hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <th class="w-25">Time</th>
                                     <th>Supervisor Remarks</th>
                                     <th class="w-30">Document</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>
-                                        @{
-                                            var updateTime = Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated
-                                            ?? Model.ClaimsInvestigation.InvestigationReport.Created;
-                                            string displayTime = updateTime.ToString("dd-MMM-yyyy HH:mm");
-                                        }
-                                        <span class="badge badge-light">@displayTime</span>
-                                    </td>
-
                                     <td class="text-start">
                                         <div class="bg-light rounded p-2 text-muted">
                                             @Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarks
