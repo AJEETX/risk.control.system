@@ -3023,3 +3023,6 @@ img.mobile-capture-map {
 #answer {
     min-height: 100px;
 }
+.multiple-question{
+    padding-left:2em;
+}

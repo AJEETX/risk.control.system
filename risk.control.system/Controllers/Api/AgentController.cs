@@ -306,7 +306,7 @@ namespace risk.control.system.Controllers.Api
         [AllowAnonymous]
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("agent")]
-        public async Task<IActionResult> GetAll(string email = "agentx@verify.com")
+        public async Task<IActionResult> GetAll(string email = "agent@verify.com")
         {
             try
             {
@@ -400,7 +400,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("agent-map")]
-        public async Task<IActionResult> IndexMap(string email = "agentx@verify.com")
+        public async Task<IActionResult> IndexMap(string email = "agent@verify.com")
         {
             try
             {
@@ -471,7 +471,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("get")]
-        public async Task<IActionResult> Get(long caseId, string email = "agentx@verify.com")
+        public async Task<IActionResult> Get(long caseId, string email = "agent@verify.com")
         {
             try
             {
