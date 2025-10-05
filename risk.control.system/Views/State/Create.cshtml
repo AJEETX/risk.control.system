@@ -40,9 +40,9 @@
                     <span class="input-group-label"> State:</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="Name"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="State Name" value="" maxlength="20">
+                        <input id="Name" type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="State Name" value="" maxlength="20">
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>

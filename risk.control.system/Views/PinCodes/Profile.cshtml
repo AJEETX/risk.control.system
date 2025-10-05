@@ -35,8 +35,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                                    <a class="btn btn-success" asp-controller="Pincodes" asp-action="Create"><i class="fas fa-map-pin"></i>  @Applicationsettings.CREATE New</a>
-
+                                    <a class="btn btn-success create" asp-controller="Pincodes" asp-action="Create"><i class="fas fa-map-pin"></i>  @Applicationsettings.CREATE Pincode</a>
                                 </div>
                             </div>
                         </div>
@@ -47,6 +46,5 @@
     </div>
 </section>
 @section Scripts {
-    <script src="~/js/company-admin/pincode-edit.js">
-    </script>
+    <script src="~/js/company-admin/pincode-edit.js"></script>
 }

@@ -85,9 +85,9 @@
                                 <span class="input-group-label"> Pincode:</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Name"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Pincode Name" value="" maxlength="30">
+                                    <input id="Name" type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Pincode Name" value="" maxlength="30">
                                     <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
                             </div>
@@ -96,9 +96,9 @@
                                 <span class="input-group-label"> Code:</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Pincode Code" value="" maxlength="6">
+                                    <input id="Code" type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Pincode Code" value="" maxlength="6">
                                     <span asp-validation-for="Code" class="text-danger"></span>
                                 </div>
                             </div>
