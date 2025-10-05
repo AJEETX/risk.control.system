@@ -91,7 +91,7 @@ $(function () {
         $('a').addClass('disabled-anchor').on('click', function (e) {
             e.preventDefault(); // Prevent default action for anchor clicks
         });
-        $('.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Agent(s)");
+        $('.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Users");
 
         var article = document.getElementById("article");
         if (article) {

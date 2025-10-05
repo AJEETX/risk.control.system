@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers
                           (c.SubStatus == approvedStatus ||
                           c.SubStatus == rejectedStatus));
 
-                var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted && c.Role == AppRoles.AGENT);
+                var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
 
                 // HACKY
                 var currentCases = service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
