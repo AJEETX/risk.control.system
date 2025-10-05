@@ -1,4 +1,5 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -139,25 +140,6 @@ namespace risk.control.system.Controllers
             return View(beneficiaryRelation);
         }
 
-        // GET: BeneficiaryRelation/Delete/5
-        [Breadcrumb("Delete", FromAction = "Profile")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            if (id < 1 || _context.BeneficiaryRelation == null)
-            {
-                return NotFound();
-            }
-
-            var beneficiaryRelation = await _context.BeneficiaryRelation
-                .FirstOrDefaultAsync(m => m.BeneficiaryRelationId == id);
-            if (beneficiaryRelation == null)
-            {
-                return NotFound();
-            }
-
-            return View(beneficiaryRelation);
-        }
-
         // POST: BeneficiaryRelation/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -177,7 +159,7 @@ namespace risk.control.system.Controllers
 
             await _context.SaveChangesAsync();
             notifyService.Success("beneficiary relation deleted successfully!");
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true, message = "Beneficiary relation deleted successfully!" });
         }
 
         private bool BeneficiaryRelationExists(long id)

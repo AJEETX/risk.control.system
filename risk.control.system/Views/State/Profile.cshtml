@@ -1,48 +1,40 @@
 ﻿@model List<State>
 
 <section class="content">
-    <div class="container-fluid">
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary border-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> State</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="submit-progress hidden">
-                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                        </div>
-                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                            <thead>
-                                <tr>
-                                    <th>State code</th>
-                                    <th>State name</th>
-                                    <th>Country name</th>
-                                    <th>Date Updated</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- The body will be populated dynamically via DataTables -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                                    <a class="btn btn-success" asp-controller="State" asp-action="Create"><i class="fas fa-map-marker-alt"></i> Add State</a>
-                                </div>
-                            </div>
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+                <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> State</h3>
+            </div>
+            <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>State code</th>
+                            <th>State name</th>
+                            <th>Country name</th>
+                            <th>Date Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- The body will be populated dynamically via DataTables -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                            <a class="btn btn-success" asp-controller="State" asp-action="Create"><i class="fas fa-map-marker-alt"></i> Add State</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-       
-    </div>
 </section>
 @section Scripts {
     <script src="~/js/company-admin/state.js">

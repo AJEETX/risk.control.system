@@ -3,10 +3,9 @@
     ViewData["Title"] = @Applicationsettings.COST_CENTRE;
 }
 
-
 <section class="content">
-    <div class="card card-secondary border-secondary">
-        <div class="card-header">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title"><i class="fas fa-money-check-alt"></i> Budget Centre</h3>
 
         </div>
@@ -14,6 +13,9 @@
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
+            <form id="antiForgeryForm">
+                @Html.AntiForgeryToken()
+            </form>
             <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                 <thead>
                     <tr>
@@ -43,8 +45,12 @@
                             </td>
                             <td>
                                 <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.CostCentreId"><i class="fas fa-money-check-alt"></i> @Applicationsettings.EDIT</a> &nbsp;
-                                <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.CostCentreId"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
-                                <input type="hidden" value="@item.CostCentreId" />
+
+                                <button type="button"
+                                        class="btn btn-xs btn-danger delete-item"
+                                        data-id="@item.CostCentreId">
+                                    <i class="fas fa-trash"></i> @Applicationsettings.DELETE
+                                </button>
                             </td>
                         </tr>
                     }

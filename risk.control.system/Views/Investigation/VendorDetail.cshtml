@@ -5,10 +5,7 @@
 }
 
 <section class="content">
-    <input type="hidden" id="Latitude" asp-for="PinCode.Latitude" />
-    <input type="hidden" id="Longitude" asp-for="PinCode.Longitude" />
     <input type="hidden" id="vendorId" value="@Model.VendorId" />
-    <div class="container-fluid">
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title"><i class="fas fa-building"></i>  Agency Profile</h3>
@@ -183,8 +180,6 @@
                 </div>
             </div>
         </div>
-
-    </div>
 </section>
 
 @section Scripts {

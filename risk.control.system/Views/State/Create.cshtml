@@ -4,75 +4,69 @@
     ViewData["Title"] = @Applicationsettings.CREATE;
 }
 <section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card bg-light card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> Add State</h3>
-                    </div>
-                    <div class="card-body">
-                        <form id="create-form" asp-action="Create">
-                            <div class="submit-progress hidden">
-                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                            </div>
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <div class="form-group">
-                                <span class="input-group-label" for="CountryId"> Country:</span>
-                                <div class="input-group mb-3 autocomplete-wrapper">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>
-                                    @if (Model != null && Model.CountryId > 0)
-                                    {
-                                        <input readonly type="text" id="CountryId" class="form-control remarks" data-placeholder="country" asp-for="CountryId" value="@Model.Country.Name"/>
-                                    }
-                                    else
-                                    {
-                                        <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
-                                    }
-                                    <span asp-validation-for="CountryId" class="text-danger"></span>
-                                    <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-                                    <div id="country-loading" class="loading-spinner">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <span class="input-group-label"> State:</span>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Name"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>
-                                    <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="State Name" value="" maxlength="20">
-                                    <span asp-validation-for="Name" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <span class="input-group-label"> State Code:</span>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>
-                                    <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="State Code" value="" maxlength="5">
-                                    <span asp-validation-for="Code" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group text-right">
-                                <a id="back" asp-action="Index" class="btn btn-secondary">
-                                    <i class="fa fa-window-close"></i>
-                                    @Applicationsettings.CANCEL
-                                </a>
-                                <button id="create" type="submit" class="btn btn-success">
-                                    <i class="fas fa-map-marker-alt"></i> Add State
-                                </button>
-                            </div>
-                        </form>
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> Add State</h3>
+        </div>
+        <div class="card-body">
+            <form id="create-form" asp-action="Create">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <span class="input-group-label" for="CountryId"> Country:</span>
+                    <div class="input-group mb-3 autocomplete-wrapper">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        @if (Model != null && Model.CountryId > 0)
+                        {
+                            <input readonly type="text" id="CountryId" class="form-control remarks" data-placeholder="country" asp-for="CountryId" value="@Model.Country.Name" />
+                        }
+                        else
+                        {
+                            <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
+                        }
+                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                        <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+                        <div id="country-loading" class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <span class="input-group-label"> State:</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="Name"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="State Name" value="" maxlength="20">
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <span class="input-group-label"> State Code:</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="State Code" value="" maxlength="5">
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group text-right">
+                    <a id="back" asp-action="Index" class="btn btn-secondary">
+                        <i class="fa fa-window-close"></i>
+                        @Applicationsettings.CANCEL
+                    </a>
+                    <button id="create" type="submit" class="btn btn-success">
+                        <i class="fas fa-map-marker-alt"></i> Add State
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </section>

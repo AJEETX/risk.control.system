@@ -71,4 +71,49 @@
             });
         }
     })
+
+    $(".delete-item").on("click", function () {
+        var id = $(this).data("id");
+        var row = $(this).closest("tr");
+
+        $.confirm({
+            title: 'Confirm Deletion',
+            content: 'Are you sure you want to delete ?',
+            type: 'red',
+            typeAnimated: true,
+            buttons: {
+                confirm: {
+                    text: 'Yes, Delete',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $.ajax({
+                            url: '/BeneficiaryRelation/Delete',
+                            type: 'POST',
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: id
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    row.fadeOut(500, function () {
+                                        $(this).remove();
+                                    });
+                                    $.alert(response.message);
+                                } else {
+                                    $.alert(response.message);
+                                }
+                            },
+                            error: function (e) {
+                                $.alert('Error while deleting.');
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Cancel',
+                    btnClass: 'btn-secondary'
+                }
+            }
+        });
+    });
 });

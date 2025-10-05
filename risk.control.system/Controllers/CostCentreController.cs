@@ -1,4 +1,5 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -139,25 +140,6 @@ namespace risk.control.system.Controllers
             return View(costCentre);
         }
 
-        // GET: CostCentre/Delete/5
-        [Breadcrumb("Delete ", FromAction = "Profile")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            if (id <= 0)
-            {
-                return NotFound();
-            }
-
-            var costCentre = await _context.CostCentre
-                .FirstOrDefaultAsync(m => m.CostCentreId == id);
-            if (costCentre == null)
-            {
-                return NotFound();
-            }
-
-            return View(costCentre);
-        }
-
         // POST: CostCentre/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -177,7 +159,7 @@ namespace risk.control.system.Controllers
 
             await _context.SaveChangesAsync();
             notifyService.Success("cost centre deleted successfully!");
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true, message = "Cost centre deleted successfully!" });
         }
 
         private bool CostCentreExists(long id)

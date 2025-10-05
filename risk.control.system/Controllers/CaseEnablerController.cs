@@ -1,4 +1,5 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -138,25 +139,6 @@ namespace risk.control.system.Controllers
             return View(caseEnabler);
         }
 
-        // GET: CaseEnabler/Delete/5
-        [Breadcrumb("Delete ", FromAction = "Profile")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            if (id < 1 || _context.CaseEnabler == null)
-            {
-                return NotFound();
-            }
-
-            var caseEnabler = await _context.CaseEnabler
-                .FirstOrDefaultAsync(m => m.CaseEnablerId == id);
-            if (caseEnabler == null)
-            {
-                return NotFound();
-            }
-
-            return View(caseEnabler);
-        }
-
         // POST: CaseEnabler/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -175,8 +157,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            notifyService.Success("case enabler deleted successfully!");
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true, message = "Case enabler deleted successfully!" });
         }
 
         private bool CaseEnablerExists(long id)
