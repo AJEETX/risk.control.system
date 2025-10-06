@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(costCentre);
                 await _context.SaveChangesAsync();
-                notifyService.Success("Budget centre edited successfully!");
+                notifyService.Warning("Budget centre edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)

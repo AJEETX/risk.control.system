@@ -138,7 +138,7 @@ namespace risk.control.system.Controllers
                     beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(beneficiaryRelation);
                     await _context.SaveChangesAsync();
-                    notifyService.Success("Beneficiary relation edited successfully!");
+                    notifyService.Warning("Beneficiary relation edited successfully!");
                     return RedirectToAction(nameof(Profile));
                 }
                 catch (Exception ex)

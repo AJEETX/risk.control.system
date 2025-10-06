@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(caseEnabler);
                 await _context.SaveChangesAsync();
-                notifyService.Success("Reason edited successfully!");
+                notifyService.Warning("Reason edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)

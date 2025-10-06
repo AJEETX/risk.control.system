@@ -91,7 +91,8 @@ $(function () {
         $('a').addClass('disabled-anchor').on('click', function (e) {
             e.preventDefault(); // Prevent default action for anchor clicks
         });
-        $('.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Users");
+        var userCount = $('#UserCount').val();
+        $('.btn.btn-success').html(`<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Users (${userCount})`);
 
         var article = document.getElementById("article");
         if (article) {
@@ -117,7 +118,8 @@ $(function () {
         $('a').addClass('disabled-anchor').on('click', function (e) {
             e.preventDefault(); // Prevent default action for anchor clicks
         });
-        $('.btn.btn-danger').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Service(s)");
+        var serviceCount = $('#ServiceCount').val();
+        $('.btn.btn-danger').html(`<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Service (${serviceCount})`);
 
         var article = document.getElementById("article");
         if (article) {

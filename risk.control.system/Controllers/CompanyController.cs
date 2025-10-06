@@ -817,7 +817,8 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList();
-
+            AgencyRole? role = null;
+            string? adminEmail = null;
             var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
             if (vendor == null)
             {
@@ -825,15 +826,19 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             var currentVendorUserCount = _context.VendorApplicationUser.Count(v => v.VendorId == id);
+            bool status = false;
             if (currentVendorUserCount == 0)
             {
+                adminEmail = "admin";
+                role = AgencyRole.AGENCY_ADMIN;
+                status = true;
                 allRoles = allRoles.Where(r => r == AgencyRole.AGENCY_ADMIN).ToList();
             }
             else
             {
                 allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
             }
-            var model = new VendorApplicationUser { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles };
+            var model = new VendorApplicationUser { Email = adminEmail, Active = status, Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles, UserRole = role };
 
             var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
             var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
