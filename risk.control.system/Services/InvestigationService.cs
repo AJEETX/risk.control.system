@@ -1581,7 +1581,7 @@ namespace risk.control.system.Services
             }
             return noDataimage;
         }
-        public string GetOwner(InvestigationTask a)
+        private string GetOwner(InvestigationTask a)
         {
             if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
                 a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||

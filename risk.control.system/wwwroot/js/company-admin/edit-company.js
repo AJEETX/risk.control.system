@@ -43,6 +43,7 @@
 });
 
 $(document).ready(function () {
+    $('#Name').focus();
     $("#edit-form").validate();
 });
 const ExpiryDate = document.getElementById("ExpiryDate");

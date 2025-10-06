@@ -19,42 +19,12 @@
             <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                 <thead>
                     <tr>
-                        <th>
-                            Name
-                        </th>
-                        <th>
-                            Code
-                        </th>
+                        <th>Name</th>
+                        <th>Code</th>
                         <th>Date Updated</th>
-
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                @item.Name
-                            </td>
-                            <td>
-                                @item.Code
-                            </td>
-                            <td>
-                                @item.Updated
-                            </td>
-                            <td>
-                                <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.CostCentreId"><i class="fas fa-money-check-alt"></i> @Applicationsettings.EDIT</a> &nbsp;
-
-                                <button type="button"
-                                        class="btn btn-xs btn-danger delete-item"
-                                        data-id="@item.CostCentreId">
-                                    <i class="fas fa-trash"></i> @Applicationsettings.DELETE
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
             </table>
         </div>
         <div class="card-footer">

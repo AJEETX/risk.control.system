@@ -33,27 +33,39 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Budget Centre")]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            return _context.CostCentre != null ?
-                        View(await _context.CostCentre.ToListAsync()) :
-                        Problem("Entity set 'ApplicationDbContext.CostCentre'  is null.");
+            return View();
         }
+        public IActionResult GetCostCentres()
+        {
+            var data = _context.CostCentre
+                .Select(c => new
+                {
+                    c.CostCentreId,
+                    c.Name,
+                    c.Code,
+                    Updated = c.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")
+                }).ToList();
 
+            return Json(new { data });
+        }
         // GET: CostCentre/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
         {
             if (id < 1 || _context.CostCentre == null)
             {
-                return NotFound();
+                notifyService.Error("Budget centre  Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var costCentre = await _context.CostCentre
                 .FirstOrDefaultAsync(m => m.CostCentreId == id);
             if (costCentre == null)
             {
-                return NotFound();
+                notifyService.Error("Budget centre  Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             return View(costCentre);
@@ -80,7 +92,7 @@ namespace risk.control.system.Controllers
                 _context.Add(costCentre);
                 await _context.SaveChangesAsync();
                 notifyService.Success("cost centre created successfully!");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Profile));
             }
             return View(costCentre);
         }
@@ -91,13 +103,15 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                return NotFound();
+                notifyService.Error("Budget centre  Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var costCentre = await _context.CostCentre.FindAsync(id);
             if (costCentre == null)
             {
-                return NotFound();
+                notifyService.Error("Budget centre  Not found!");
+                return RedirectToAction(nameof(Profile));
             }
             return View(costCentre);
         }
@@ -111,33 +125,25 @@ namespace risk.control.system.Controllers
         {
             if (id != costCentre.CostCentreId)
             {
-                return NotFound();
+                notifyService.Error("Budget centre  Not found!");
+                return RedirectToAction(nameof(Profile));
+            }
+            try
+            {
+                costCentre.Updated = DateTime.Now;
+                costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.Update(costCentre);
+                await _context.SaveChangesAsync();
+                notifyService.Success("Budget centre edited successfully!");
+                return RedirectToAction(nameof(Profile));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error editing Budget centre !");
+                return RedirectToAction(nameof(Profile));
             }
 
-            if (costCentre is not null)
-            {
-                try
-                {
-                    costCentre.Updated = DateTime.Now;
-                    costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    _context.Update(costCentre);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CostCentreExists(costCentre.CostCentreId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                notifyService.Success("cost centre edited successfully!");
-                return RedirectToAction(nameof(Index));
-            }
-            return View(costCentre);
         }
 
         // POST: CostCentre/Delete/5
@@ -145,9 +151,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (_context.CostCentre == null)
+            if (id <= 0)
             {
-                return Problem("Entity set 'ApplicationDbContext.CostCentre'  is null.");
+                return Json(new { success = false, message = "Budget centre Not found!" });
             }
             var costCentre = await _context.CostCentre.FindAsync(id);
             if (costCentre != null)
@@ -158,8 +164,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            notifyService.Success("cost centre deleted successfully!");
-            return Json(new { success = true, message = "Cost centre deleted successfully!" });
+            return Json(new { success = true, message = "Budget centre deleted successfully!" });
         }
 
         private bool CostCentreExists(long id)

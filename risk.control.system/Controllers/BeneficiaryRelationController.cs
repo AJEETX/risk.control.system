@@ -33,27 +33,40 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Beneficairy Relation ")]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            return _context.BeneficiaryRelation != null ?
-                        View(await _context.BeneficiaryRelation.ToListAsync()) :
-                        Problem("Entity set 'ApplicationDbContext.BeneficiaryRelation'  is null.");
+            return View();
         }
 
+        public IActionResult GetBeneficiaryRelations()
+        {
+            var data = _context.BeneficiaryRelation
+                .Select(c => new
+                {
+                    c.BeneficiaryRelationId,
+                    c.Name,
+                    c.Code,
+                    Updated = c.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")
+                }).ToList();
+
+            return Json(new { data });
+        }
         // GET: BeneficiaryRelation/Details/5
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(long id)
         {
             if (id < 1 || _context.BeneficiaryRelation == null)
             {
-                return NotFound();
+                notifyService.Error("Beneficiary relation Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var beneficiaryRelation = await _context.BeneficiaryRelation
                 .FirstOrDefaultAsync(m => m.BeneficiaryRelationId == id);
             if (beneficiaryRelation == null)
             {
-                return NotFound();
+                notifyService.Error("Beneficiary relation Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             return View(beneficiaryRelation);
@@ -79,7 +92,7 @@ namespace risk.control.system.Controllers
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(beneficiaryRelation);
                 await _context.SaveChangesAsync();
-                notifyService.Success("beneficiary relation created successfully!");
+                notifyService.Success("Beneficiary relation created successfully!");
                 return RedirectToAction(nameof(Index));
             }
             return View(beneficiaryRelation);
@@ -91,13 +104,15 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.BeneficiaryRelation == null)
             {
-                return NotFound();
+                notifyService.Error("Beneficiary relation Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var beneficiaryRelation = await _context.BeneficiaryRelation.FindAsync(id);
             if (beneficiaryRelation == null)
             {
-                return NotFound();
+                notifyService.Error("Beneficiary relation Not found!");
+                return RedirectToAction(nameof(Profile));
             }
             return View(beneficiaryRelation);
         }
@@ -111,7 +126,8 @@ namespace risk.control.system.Controllers
         {
             if (id != beneficiaryRelation.BeneficiaryRelationId)
             {
-                return NotFound();
+                notifyService.Error("Beneficiary relation Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             if (beneficiaryRelation is not null)
@@ -122,20 +138,16 @@ namespace risk.control.system.Controllers
                     beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(beneficiaryRelation);
                     await _context.SaveChangesAsync();
+                    notifyService.Success("Beneficiary relation edited successfully!");
+                    return RedirectToAction(nameof(Profile));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!BeneficiaryRelationExists(beneficiaryRelation.BeneficiaryRelationId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    Console.WriteLine(ex.StackTrace);
+                    notifyService.Error("Error editing Beneficiary relation!");
+                    return RedirectToAction(nameof(Profile));
                 }
-                notifyService.Success("beneficiary relation edited successfully!");
-                return RedirectToAction(nameof(Index));
+
             }
             return View(beneficiaryRelation);
         }
@@ -145,9 +157,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (_context.BeneficiaryRelation == null)
+            if (id <= 0)
             {
-                return Problem("Entity set 'ApplicationDbContext.BeneficiaryRelation'  is null.");
+                return Json(new { success = false, message = "Beneficiary relation Not found!" });
             }
             var beneficiaryRelation = await _context.BeneficiaryRelation.FindAsync(id);
             if (beneficiaryRelation != null)
@@ -158,13 +170,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            notifyService.Success("beneficiary relation deleted successfully!");
             return Json(new { success = true, message = "Beneficiary relation deleted successfully!" });
-        }
-
-        private bool BeneficiaryRelationExists(long id)
-        {
-            return (_context.BeneficiaryRelation?.Any(e => e.BeneficiaryRelationId == id)).GetValueOrDefault();
         }
     }
 }

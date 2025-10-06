@@ -42,5 +42,7 @@ $.validator.setDefaults({
     }
 });
 $(document).ready(function () {
+    $('#Name').focus();
+
     $("#edit-form").validate();   
 });

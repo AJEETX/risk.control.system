@@ -1,7 +1,47 @@
 ﻿$(document).ready(function () {
     $('#Name').focus();
 
-    var table = $("#customerTable").DataTable();
+    $('#customerTable').DataTable({
+        ajax: {
+            url: '/CaseEnabler/GetCaseEnablers',
+            type: 'GET',
+            datatype: 'json'
+        },
+        responsive: true,
+        fixedHeader: true,
+        processing: true,
+        paging: true,
+        language: {
+            loadingRecords: '&nbsp;',
+            processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
+        },
+        columns: [
+            { data: 'name' },
+            { data: 'code' },
+            { data: 'updated' },
+            {
+                data: 'caseEnablerId',
+                render: function (data) {
+                    return `
+                        <a id="edit${data}" class="btn btn-xs btn-warning" href="/CaseEnabler/Edit/${data}">
+                            <i class="fas fa-puzzle-piece"></i> Edit
+                        </a>
+                        &nbsp;
+                        <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>`;
+                }
+            }
+        ],
+        "drawCallback": function (setting) {
+            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                showedit(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+        }
+    });
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
@@ -19,6 +59,12 @@
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
                             // Disable all buttons, submit inputs, and anchors
                             $('button, input[type="submit"], a').prop('disabled', true);
 
@@ -26,6 +72,8 @@
                             $('a').addClass('disabled-anchor').on('click', function (e) {
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
+                            $('button#create').html("<i class='fas fa-sync fa-spin'></i> Add New");
+
                             $('#create-form').submit();
                         }
                     },
@@ -46,7 +94,7 @@
                 title: "Confirm Edit",
                 content: "Are you sure to edit?",
 
-                icon: 'fas fa-sun',
+                icon: 'fas fa-puzzle-piece',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
@@ -55,13 +103,22 @@
                         btnClass: 'btn-warning ',
                         action: function () {
                             askEditConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
                             // Disable all buttons, submit inputs, and anchors
                             $('button, input[type="submit"], a').prop('disabled', true);
 
                             // Add a class to visually indicate disabled state for anchors
                             $('a').addClass('disabled-anchor').on('click', function (e) {
                                 e.preventDefault(); // Prevent default action for anchor clicks
-                            }); $('#edit-form').submit();
+                            });
+                            $('button#edit').html("<i class='fas fa-sync fa-spin'></i> Edit");
+
+                            $('#edit-form').submit();
                         }
                     },
                     cancel: {
@@ -73,15 +130,15 @@
         }
     })
 
-    $(".delete-item").on("click", function () {
+    $(document).on("click", ".delete-item", function () {
         var id = $(this).data("id");
         var row = $(this).closest("tr");
+        var table = $('#customerTable').DataTable();
 
         $.confirm({
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete ?',
             type: 'red',
-            typeAnimated: true,
             buttons: {
                 confirm: {
                     text: 'Yes, Delete',
@@ -96,10 +153,12 @@
                             },
                             success: function (response) {
                                 if (response.success) {
-                                    row.fadeOut(500, function () {
-                                        $(this).remove();
+                                    table.row(row).remove().draw(false); // correct DataTable removal
+                                    $.alert({
+                                        title: 'Deleted',
+                                        content: response.message,
+                                        type: 'red'
                                     });
-                                    $.alert(response.message);
                                 } else {
                                     $.alert(response.message);
                                 }
@@ -144,3 +203,23 @@
         }
     });
 });
+function showedit(id) {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+
+    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
+
+    disableAllInteractiveElements();
+
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    }
+}

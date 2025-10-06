@@ -32,27 +32,40 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Reason To Verify ")]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            return _context.CaseEnabler != null ?
-                        View(await _context.CaseEnabler.ToListAsync()) :
-                        Problem("Entity set 'ApplicationDbContext.CaseEnabler'  is null.");
+            return View();
         }
 
+        public IActionResult GetCaseEnablers()
+        {
+            var data = _context.CaseEnabler
+                .Select(c => new
+                {
+                    c.CaseEnablerId,
+                    c.Name,
+                    c.Code,
+                    Updated = c.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")
+                }).ToList();
+
+            return Json(new { data });
+        }
         // GET: CaseEnabler/Details/5
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(int id)
         {
             if (id < 1 || _context.CaseEnabler == null)
             {
-                return NotFound();
+                notifyService.Error("Reason Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var caseEnabler = await _context.CaseEnabler
                 .FirstOrDefaultAsync(m => m.CaseEnablerId == id);
             if (caseEnabler == null)
             {
-                return NotFound();
+                notifyService.Error("Reason Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             return View(caseEnabler);
@@ -78,8 +91,8 @@ namespace risk.control.system.Controllers
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(caseEnabler);
                 await _context.SaveChangesAsync();
-                notifyService.Success("case enabler created successfully!");
-                return RedirectToAction(nameof(Index));
+                notifyService.Success("Reason created successfully!");
+                return RedirectToAction(nameof(Profile));
             }
             return View(caseEnabler);
         }
@@ -90,13 +103,15 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.CaseEnabler == null)
             {
-                return NotFound();
+                notifyService.Error("Reason Not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var caseEnabler = await _context.CaseEnabler.FindAsync(id);
             if (caseEnabler == null)
             {
-                return NotFound();
+                notifyService.Error("Reason Not found!");
+                return RedirectToAction(nameof(Profile));
             }
             return View(caseEnabler);
         }
@@ -110,33 +125,24 @@ namespace risk.control.system.Controllers
         {
             if (id != caseEnabler.CaseEnablerId)
             {
-                return NotFound();
+                notifyService.Error("Reason Not found!");
+                return RedirectToAction(nameof(Profile));
             }
-
-            if (caseEnabler is not null)
+            try
             {
-                try
-                {
-                    caseEnabler.Updated = DateTime.Now;
-                    caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    _context.Update(caseEnabler);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CaseEnablerExists(caseEnabler.CaseEnablerId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                notifyService.Success("case enabler edited successfully!");
-                return RedirectToAction(nameof(Index));
+                caseEnabler.Updated = DateTime.Now;
+                caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.Update(caseEnabler);
+                await _context.SaveChangesAsync();
+                notifyService.Success("Reason edited successfully!");
+                return RedirectToAction(nameof(Profile));
             }
-            return View(caseEnabler);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error editing Reason!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
 
         // POST: CaseEnabler/Delete/5
@@ -144,9 +150,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (_context.CaseEnabler == null)
+            if (id <= 0)
             {
-                return Problem("Entity set 'ApplicationDbContext.CaseEnabler'  is null.");
+                return Json(new { success = false, message = "Reason Not found!" });
             }
             var caseEnabler = await _context.CaseEnabler.FindAsync(id);
             if (caseEnabler != null)
@@ -157,12 +163,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Case enabler deleted successfully!" });
-        }
-
-        private bool CaseEnablerExists(long id)
-        {
-            return (_context.CaseEnabler?.Any(e => e.CaseEnablerId == id)).GetValueOrDefault();
+            return Json(new { success = true, message = "Reason deleted successfully!" });
         }
     }
 }
