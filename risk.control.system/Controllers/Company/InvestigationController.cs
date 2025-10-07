@@ -415,40 +415,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        [Breadcrumb(title: " Delete", FromAction = "New")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (id < 1)
-                {
-                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var model = await service.GetClaimDetails(currentUserEmail, id);
-                var currentUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                if (model == null)
-                {
-                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
-        }
-
         [Breadcrumb(" Empanelled Agencies", FromAction = "New")]
         public async Task<IActionResult> EmpanelledVendors(long id, long vendorId = 0, bool fromEditPage = false)
         {
@@ -561,7 +527,6 @@ namespace risk.control.system.Controllers.Company
                 var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Investigation", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { id = selectedcase } };
                 var editPage = new MvcBreadcrumbNode("VendorDetail", "Investigation", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
-
 
                 return View(vendor);
             }

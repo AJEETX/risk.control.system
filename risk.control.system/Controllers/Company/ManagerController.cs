@@ -193,7 +193,6 @@ namespace risk.control.system.Controllers.Company
             return View();
         }
 
-
         [Breadcrumb(" Details", FromAction = "Rejected")]
         public async Task<IActionResult> RejectDetail(long id)
         {
@@ -223,7 +222,6 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-
 
         [Breadcrumb(title: "Invoice", FromAction = "ApprovedDetail")]
         public async Task<IActionResult> ShowInvoice(long id)

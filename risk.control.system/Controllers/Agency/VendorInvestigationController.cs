@@ -153,7 +153,6 @@ namespace risk.control.system.Controllers.Agency
             return View();
         }
 
-
         [Breadcrumb("Submit", FromAction = "ClaimReport")]
         public async Task<IActionResult> GetInvestigateReport(long selectedcase)
         {

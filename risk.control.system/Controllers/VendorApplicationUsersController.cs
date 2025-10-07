@@ -62,14 +62,11 @@ namespace risk.control.system.Controllers
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        // GET: VendorApplicationUsers
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.District).Include(v => v.PinCode).Include(v => v.State).Include(v => v.Vendor);
             return View(await applicationDbContext.ToListAsync());
         }
-
-        // GET: VendorApplicationUsers/Details/5
 
         public async Task<IActionResult> Details(long? id)
         {
@@ -110,8 +107,6 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-
-        // GET: VendorApplicationUsers/Create
 
         public IActionResult Create(long id)
         {
@@ -232,8 +227,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        // GET: VendorApplicationUsers/Edit/5
-
         public async Task<IActionResult> Edit(long? userId)
         {
             try
@@ -271,9 +264,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        // POST: VendorApplicationUsers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
@@ -375,7 +365,6 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
         }
 
-        // GET: VendorApplicationUsers/Delete/5
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<VendorUserRoleViewModel>();
@@ -496,7 +485,6 @@ namespace risk.control.system.Controllers
             return View(vendorApplicationUser);
         }
 
-        // POST: VendorApplicationUsers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)

@@ -810,6 +810,5 @@ namespace risk.control.system.Controllers.Company
         {
             public List<long> claims { get; set; }
         }
-
     }
 }

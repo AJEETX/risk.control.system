@@ -58,9 +58,6 @@ namespace risk.control.system.Controllers
                 string zipPath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", file.Name);
                 var fileBytes = System.IO.File.ReadAllBytes(zipPath);
                 return File(fileBytes, "application/zip", Path.GetFileName(zipPath));
-
-                //var fileBytes = file.ByteData;
-                //return File(fileBytes, file.FileType, file.Name + file.Extension);
             }
             catch (Exception ex)
             {

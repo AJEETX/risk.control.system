@@ -501,8 +501,6 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(result);
         }
 
-
-
         [HttpGet("SearchPincode")]
         public IActionResult SearchPincode(long districtId, long stateId, long countryId, string term = "")
         {

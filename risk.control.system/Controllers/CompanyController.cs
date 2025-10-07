@@ -152,9 +152,6 @@ namespace risk.control.system.Controllers
 
         }
 
-        // POST: ClientCompanies/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClientCompany clientCompany)
@@ -420,9 +417,6 @@ namespace risk.control.system.Controllers
 
         }
 
-        // POST: ClientCompanyApplicationUser/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(string id, ClientCompanyApplicationUser applicationUser)
@@ -624,7 +618,6 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        // GET: Vendors/Details/5
         [Breadcrumb("Agency Profile", FromAction = "EmpanelledVendors", FromController = typeof(VendorsController))]
         public async Task<IActionResult> AgencyDetail(long id)
         {
@@ -1142,9 +1135,6 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        // POST: VendorService/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateService(VendorInvestigationServiceType service, long VendorId)
@@ -1342,7 +1332,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        // GET: VendorService/Delete/5
         [Breadcrumb(" Delete Service", FromAction = "Service")]
         public async Task<IActionResult> DeleteService(long id)
         {
@@ -1385,7 +1374,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        // POST: VendorService/Delete/5
         [HttpPost, ActionName("DeleteService")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)

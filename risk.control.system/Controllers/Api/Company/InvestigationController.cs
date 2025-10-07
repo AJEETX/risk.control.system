@@ -147,6 +147,5 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalForAssign });
         }
-
     }
 }

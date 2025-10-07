@@ -261,7 +261,6 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(response);
         }
 
-
         private bool CanDownload(long id, string userEmail)
         {
             var tracker = _context.PdfDownloadTracker

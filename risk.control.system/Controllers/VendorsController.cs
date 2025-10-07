@@ -69,7 +69,6 @@ namespace risk.control.system.Controllers
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        // GET: Vendors
         [Breadcrumb("Manage Agency(s)")]
         public IActionResult Index()
         {
@@ -251,7 +250,6 @@ namespace risk.control.system.Controllers
             return Json(new { success = true, message = $"You rated {rating} star(s)", avgRating = avgRating });
         }
 
-        // GET: Vendors/Details/5
         [Breadcrumb("Agency Profile", FromAction = "AvailableVendors")]
         public async Task<IActionResult> Details(long id)
         {
@@ -365,9 +363,6 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        // POST: VendorApplicationUsers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string createdBy = "")
@@ -765,7 +760,6 @@ namespace risk.control.system.Controllers
 
         }
 
-        // GET: VendorApplicationUsers/Delete/5
         [Breadcrumb(" Roles", FromAction = "EditUser")]
         public async Task<IActionResult> UserRoles(string userId)
         {
@@ -872,7 +866,6 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        // GET: Vendors/Create
         [Breadcrumb(" Add Agency")]
         public IActionResult Create()
         {
@@ -1089,7 +1082,6 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = vendorId });
         }
 
-        // GET: Vendors/Delete/5
         public async Task<IActionResult> Delete(long id)
         {
             try
@@ -1149,7 +1141,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        // POST: Vendors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long VendorId)

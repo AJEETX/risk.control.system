@@ -157,6 +157,5 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);
         }
-
     }
 }
