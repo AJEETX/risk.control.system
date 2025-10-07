@@ -122,7 +122,6 @@ namespace risk.control.system.Services
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
-                    //claimsInvestigation.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(claimDocument.FileName);
                     var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "policy");
                     if (!Directory.Exists(imagePath))
@@ -150,7 +149,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.ReportTemplate = reportTemplate;
                 claimsInvestigation.ReportTemplateId = reportTemplate.Id;
                 var aaddedClaimId = context.Investigations.Add(claimsInvestigation);
-
+                numberService.SaveNumberSequence("PX");
                 var saved = await context.SaveChangesAsync() > 0;
 
                 await timelineService.UpdateTaskStatus(claimsInvestigation.Id, userEmail);

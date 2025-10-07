@@ -459,19 +459,19 @@ namespace risk.control.system.Controllers.Company
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteAutoConfirmed(CaseTransactionModel model)
+        public async Task<IActionResult> DeleteAutoConfirmed(long id)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
 
-                if (model is null)
+                if (id <= 0)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var claimsInvestigation = await _context.Investigations.FindAsync(model.ClaimsInvestigation.Id);
+                var claimsInvestigation = await _context.Investigations.FindAsync(id);
                 if (claimsInvestigation == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
@@ -483,8 +483,7 @@ namespace risk.control.system.Controllers.Company
                 claimsInvestigation.Deleted = true;
                 _context.Investigations.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
-                notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                return Json(new { success = true, message = "Case deleted successfully!" });
             }
             catch (Exception ex)
             {

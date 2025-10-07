@@ -253,7 +253,7 @@
 
                     buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;';
 
-                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </a>';
+                    buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
 
                     return buttons;
                 }
@@ -288,12 +288,6 @@
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('assign', ''); // Extract the ID from the button's ID attribute
                 assign(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
-            $('#customerTableAuto tbody').on('click', '.btn-danger', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
             $('#customerTableAuto tbody').on('click', '.btn-warning', function (e) {
@@ -331,21 +325,6 @@
 
         return assignedExists;
     }
-        // Function to check if there are any "Pending" rows
-    function hasPendingRows() {
-        var table = $("#customerTableAuto").DataTable();
-        var pendingExists = false;
-
-        table.rows().every(function () {
-            var data = this.data();
-            if (!data.isUploaded && data.origin == 'file') {
-                pendingExists = true;
-                return false; // Stop iterating once a "Pending" row is found
-            }
-        });
-
-        return pendingExists;
-    }
 
     $('#refreshTable').click(function () {
         var $icon = $('#refreshIcon');
@@ -358,31 +337,63 @@
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');
     });
-    
-    
-    //table.on('mouseenter', '.map-thumbnail', function () {
-    //        const $this = $(this); // Cache the current element
-
-    //        // Set a timeout to show the full map after 1 second
-    //        hoverTimeout = setTimeout(function () {
-    //            $this.find('.full-map').show(); // Show full map
-    //        }, 1000); // Delay of 1 second
-    //    })
-    //    .on('mouseleave', '.map-thumbnail', function () {
-    //        const $this = $(this); // Cache the current element
-
-    //        // Clear the timeout to cancel showing the map
-    //        clearTimeout(hoverTimeout);
-
-    //        // Immediately hide the full map
-    //        $this.find('.full-map').hide();
-    //    });
-
+   
     table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
             html: true
+        });
+    });
+
+    $('#customerTableAuto tbody').on('click', '.btn-danger', function (e) {
+        e.preventDefault();
+
+        var id = $(this).attr('id').replace('details', '');
+        var url = '/InvestigationPost/Delete/' + id; // Replace with your actual API URL
+
+        $.confirm({
+            title: 'Confirm Deletion',
+            content: 'Are you sure you want to delete this case?',
+            type: 'red',
+            buttons: {
+                confirm: {
+                    text: 'Yes, delete it',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: id
+                            },
+                            success: function (response) {
+                                // Show success message
+                                $.alert({
+                                    title: 'Deleted!',
+                                    content: response.message,
+                                    type: 'red'
+                                });
+
+                                // Reload the DataTable
+                                $('#customerTableAuto').DataTable().ajax.reload(null, false); // false = don't reset paging
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Delete failed:", xhr.responseText);
+                                $.alert({
+                                    title: 'Error!',
+                                    content: 'Failed to delete the case.',
+                                    type: 'red'
+                                });
+                            }
+                        });
+                    }
+                },
+                cancel: function () {
+                    // No action on cancel
+                }
+            }
         });
     });
 
