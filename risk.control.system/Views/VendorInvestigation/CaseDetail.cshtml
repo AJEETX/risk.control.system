@@ -5,7 +5,7 @@
 
 }
 <section class="content">
-    <div id="article" class="card shadow-lg border-1 rounded-lg">
+    <div id="article" class="shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title">
                 <i class="fas fa-newspaper"></i> Details
@@ -46,27 +46,31 @@
                 ClaimsInvestigation = Model.ClaimsInvestigation,
             };
     }
+    <div class="card shadow-lg border-1 rounded-lg">
     <div class="card-body">
 
         <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
         <partial name="_PolicyDetailsWithdraw" model="@data" />
-    </div>
 
-    <div class="card-footer">
+        <div class="card-footer">
 
-        <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="CaseVendorPost">
-            <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
-            <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
-            <div class="row">
-                <div class="col-md-12">
-                    <a id="back" asp-action="Allocate" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                    <button id="submit-case" type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> DECLINE</button>
+            <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="CaseVendorPost">
+                <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
+                <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
+                <div class="row">
+                    <div class="col-md-12">
+                        <a id="back" asp-action="Allocate" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                        <button id="submit-case" type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> DECLINE</button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
+    </div>
+
+    
 </section>
 
 

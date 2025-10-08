@@ -16,14 +16,14 @@
         <div class="card-body">
 
                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                    <thead>
+                <thead class="thead-light">
                         <tr>
                         
                             <th>
-                                Document Requested
+                                Document Sent
                             </th>
                             <th>
-                                Assessor Question
+                                Question
                             </th>
                         </tr>
                     </thead>
@@ -59,9 +59,10 @@
                                     </th>
                             </tr>
                         </thead>
-                        <tr>
-                        @foreach (var request in Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests)
-                        {
+                        <tbody>
+                @foreach (var request in Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests)
+                {
+                    <tr>
                             <td>
                                 @request.Subject
                             </td>
@@ -81,8 +82,9 @@
                                     </li>
                                 </ul>
                             </td>
-                        }
                         </tr>
+                        }
+                    </tbody>
                     </table>
             }
         </div>

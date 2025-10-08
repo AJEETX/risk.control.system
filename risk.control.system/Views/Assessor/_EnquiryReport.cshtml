@@ -65,12 +65,9 @@
                     </td>
                 </tr>
                 </table>
-
             @if (Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests.Count > 0)
             {
-                @foreach (var request in Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests)
-                @if (!string.IsNullOrWhiteSpace(request?.AnswerSelected))
-                {
+                
                     <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                         <thead>
                             <tr>
@@ -86,6 +83,9 @@
                                 </th>
                             </tr>
                         </thead>
+                        @foreach (var request in Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests)
+                            @if (!string.IsNullOrWhiteSpace(request?.AnswerSelected))
+                            {
                         <tr>
                             <td>
                                  @request.Subject
@@ -106,14 +106,14 @@
                                         </li>
                                     </ul>
                                 </td>
-                                
                             <td>
                                 <i class="fas fa-user-check"></i> @request.AnswerSelected
                             </td>
                         </tr>
+                        }
                     </table>
-                }
             }
+        
         </div>
     </div>
 </div>

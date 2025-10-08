@@ -72,29 +72,27 @@
                     </td>
                 </tr>
             </table>
-
             @if (Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests.Count > 0)
             {
-                @foreach (var request in Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests)
-                    @if (!string.IsNullOrWhiteSpace(request?.AnswerSelected))
-                    {
-                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        Assessor Question
-                                    </th>
-                                    <th>
-                                        Question Options
-                                    </th>
-                                    <th>
-                                        Time of response
-                                    </th>
-                                    <th>
-                                        Agency Response
-                                    </th>
-                                </tr>
-                            </thead>
+
+                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>
+                                Multiple choice Question
+                            </th>
+                            <th>
+                                Question Options
+                            </th>
+
+                            <th>
+                                Agency Response
+                            </th>
+                        </tr>
+                    </thead>
+                    @foreach (var request in Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests)
+                        @if (!string.IsNullOrWhiteSpace(request?.AnswerSelected))
+                        {
                             <tr>
                                 <td>
                                     @request.Subject
@@ -116,15 +114,13 @@
                                     </ul>
                                 </td>
                                 <td>
-                                    <span class="badge badge-light">@request.Updated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
-                                </td>
-                                <td>
                                     <i class="fas fa-user-check"></i> @request.AnswerSelected
                                 </td>
                             </tr>
-                        </table>
-                    }
+                        }
+                </table>
             }
+
         </div>
     </div>
 </div>
