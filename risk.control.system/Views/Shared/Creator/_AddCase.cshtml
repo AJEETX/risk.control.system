@@ -1,0 +1,48 @@
+﻿@model CreateClaims
+
+<div class="card-header bg-secondary text-white text-center">
+    <h3 class="card-title">
+        <i class="fas fa-random"></i> Add/Assign
+        <span class="hover-text">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltip-text" id="information">
+                    <li>
+                    <i class='far fa-hand-point-right'></i>
+                    @if (Model.BulkUpload)
+                    {
+                        <button class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload File </button>
+                    }
+
+                    else
+                    {
+                        <button disabled class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload File </button>
+                    }
+                </li>
+                @if (Model.HasFileUploads)
+                {
+                    <li>
+                        <i class='far fa-hand-point-down'></i>  <button class='badge badge-primary xs'>
+                            <span class="badge badge-primary"><i class='fa fa-download'></i> </span> Download
+                        </button>
+                    </li>
+
+                    <li>
+                        <i class='far fa-hand-point-down'></i>  <button class='badge badge-danger xs'>
+                            <span class="badge badge-danger"><i class='fas fa-trash'></i> </span> Delete
+                        </button>
+                    </li>
+                }
+            </span>
+
+        </span>
+    </h3>
+    <div class="card-tools">
+        <span data-toggle="tooltip" title="Click to download sample File"><span class="download-file  badge badge-light">
+                <a class="ziplink" href="@Url.Content($"~/headers/{Model.FileSampleIdentifier}.zip")">
+                    <i class="nav-icon fa fa-download"></i>  sample file
+                </a>
+            </span>
+        </span>
+        
+    </div>
+</div>
