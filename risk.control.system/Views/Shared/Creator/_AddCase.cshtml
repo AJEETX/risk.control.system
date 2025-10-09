@@ -2,47 +2,84 @@
 
 <div class="card-header bg-secondary text-white text-center">
     <h3 class="card-title">
-        <i class="fas fa-random"></i> Add/Assign
+        <i class="fas fa-random"></i> Add/Assign<span class="badge badge-secondary"></span>
         <span class="hover-text">
             <i class="fas fa-info-circle"></i>
             <span class="tooltip-text" id="information">
-                    <li>
-                    <i class='far fa-hand-point-right'></i>
-                    @if (Model.BulkUpload)
-                    {
-                        <button class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload File </button>
-                    }
-
-                    else
-                    {
-                        <button disabled class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload File </button>
-                    }
-                </li>
-                @if (Model.HasFileUploads)
+                
+                @if (Model.HasClaims)
                 {
                     <li>
-                        <i class='far fa-hand-point-down'></i>  <button class='badge badge-primary xs'>
-                            <span class="badge badge-primary"><i class='fa fa-download'></i> </span> Download
+                        <i class='far fa-hand-point-right'></i> <button class='badge badge-info xs top-info'>
+                            <span class="badge badge-info"><i class='fas fa-external-link-alt'></i> </span> Assign
                         </button>
                     </li>
 
                     <li>
-                        <i class='far fa-hand-point-down'></i>  <button class='badge badge-danger xs'>
-                            <span class="badge badge-danger"><i class='fas fa-trash'></i> </span> Delete
+                        <i class='far fa-hand-point-right'></i>  <button class='badge badge-warning xs top-info'>
+                            <span class="badge badge-warning"><i class='fas fa-pencil-alt'></i> </span> Edit
+                        </button>
+                    </li>
+                    <li>
+                        <i class='far fa-hand-point-right'></i> <button class='badge badge-danger xs top-info'>
+                            <span class="badge badge-danger"><i class='fa fa-trash'></i> </span> Delete
+                        </button>
+                    </li>
+
+                    <li>
+                        <i class='far fa-hand-point-left'></i> <span class="badge badge-light btn"> <input type='checkbox' /></span>  case(s)
+                    </li>
+                }
+                @if (@Model.UserCanCreate)
+                {
+                    <li>
+                        <i class='fa fa-hand-point-down'></i>
+                        <button class="btn btn-success  btn-xs">
+                            <span class="badge badge-success btn-xs"> <i class="far fa-edit"></i> </span>  <b> ADD </b>
+                        </button>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <i class='far fa-hand-point-down'></i>
+                        <button class="btn btn-success disabled btn-xs">
+                            <span class="disabled badge badge-success btn-xs"> <i class="far fa-edit"></i> </span>  <b> ADD </b>
+                        </button>
+                    </li>
+                }
+                @if (Model.HasClaims)
+                {
+                    <li>
+                        <i class='far fa-hand-point-down'></i>
+                        <button class="btn btn-warning btn-xs top-info">
+                            <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<sub>auto</sub>
+                        </button>
+                    </li>
+                    <li>
+                        <i class='far fa-hand-point-down'></i>
+                        <button class="btn btn-danger btn-xs top-info">
+                            <span class="badge badge-danger btn-xs"> <i class="fas fa-trash"></i> </span> Delete
+                        </button>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <i class='far fa-hand-point-down'></i>
+                        <button disabled class="btn btn-warning btn-xs top-info">
+                            <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<sub>auto</sub>
+                        </button>
+                    </li>
+                    <li>
+                        <i class='far fa-hand-point-down'></i>
+                        <button disabled class="btn btn-danger btn-xs top-info">
+                            <span class="badge badge-danger btn-xs"> <i class="fas fa-trash"></i> </span> Delete
                         </button>
                     </li>
                 }
             </span>
+        </span>
 
-        </span>
     </h3>
-    <div class="card-tools">
-        <span data-toggle="tooltip" title="Click to download sample File"><span class="download-file  badge badge-light">
-                <a class="ziplink" href="@Url.Content($"~/headers/{Model.FileSampleIdentifier}.zip")">
-                    <i class="nav-icon fa fa-download"></i>  sample file
-                </a>
-            </span>
-        </span>
-        
-    </div>
 </div>
