@@ -79,16 +79,24 @@
                 data: 'stateId',
                 render: function (data, type, row) {
                     return `
-                                <a class="btn btn-xs btn-warning" href="/State/Edit/${data}">
+                                <a  id="edit${data}" class="btn btn-xs btn-warning" href="/State/Edit/${data}">
                                     <i class="fas fa-map-marker-alt"></i> Edit
                                 </a>
                                 &nbsp;
-                                <a class="btn btn-xs btn-danger" href="/State/Delete/${data}">
-                                    <i class="fas fa-trash"></i> Delete
-                                </a>`;
+                                <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>`;
                 }
             }
-        ]
+        ],
+        "drawCallback": function (setting) {
+            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                showedit(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+        }
     });
 
     $('.auto-dropdown').on('focus', function () {
@@ -197,6 +205,53 @@
             });
         }
     })
+
+    $(document).on("click", ".delete-item", function () {
+        var id = $(this).data("id");
+        var row = $(this).closest("tr");
+        var table = $('#customerTable').DataTable();
+
+        $.confirm({
+            title: 'Confirm Deletion',
+            content: 'Are you sure you want to delete ?',
+            type: 'red',
+            buttons: {
+                confirm: {
+                    text: 'Yes, Delete',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $.ajax({
+                            url: '/State/Delete',
+                            type: 'POST',
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: id
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    table.row(row).remove().draw(false); // correct DataTable removal
+                                    $.alert({
+                                        title: 'Deleted',
+                                        content: response.message,
+                                        type: 'red'
+                                    });
+                                } else {
+                                    $.alert(response.message);
+                                }
+                            },
+                            error: function (e) {
+                                $.alert('Error while deleting.');
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Cancel',
+                    btnClass: 'btn-secondary'
+                }
+            }
+        });
+    });
 });
 $('a.create').on('click', function () {
     $("body").addClass("submit-progress-bg");
@@ -226,4 +281,25 @@ $('a.create').on('click', function () {
 var state = $('#Name');
 if (state) {
     state.focus();
+}
+
+function showedit(id) {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+
+    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
+
+    disableAllInteractiveElements();
+
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    }
 }

@@ -142,8 +142,8 @@ namespace risk.control.system.Controllers
         {
             if (id == 0 || _context.District == null)
             {
-                notifyService.Error("district not found!");
-                return NotFound();
+                notifyService.Error("District not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var district = await _context.District
@@ -152,8 +152,8 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.DistrictId == id);
             if (district == null)
             {
-                notifyService.Error("district not found!");
-                return NotFound();
+                notifyService.Error("District not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             return View(district);
@@ -178,22 +178,21 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(District district)
         {
-            if (district is not null)
+            if (district is null)
             {
-                district.Updated = DateTime.Now;
-                district.UpdatedBy = HttpContext.User?.Identity?.Name;
-                district.CountryId = district.SelectedCountryId;
-                district.StateId = district.SelectedStateId;
-                _context.Add(district);
-                await _context.SaveChangesAsync();
-                notifyService.Success("district created successfully!");
-                return RedirectToAction(nameof(Index));
+                notifyService.Error("District not found!");
+                return RedirectToAction(nameof(Profile));
             }
-            notifyService.Error("district not found!");
-            return Problem();
+            district.Updated = DateTime.Now;
+            district.UpdatedBy = HttpContext.User?.Identity?.Name;
+            district.CountryId = district.SelectedCountryId;
+            district.StateId = district.SelectedStateId;
+            _context.Add(district);
+            await _context.SaveChangesAsync();
+            notifyService.Success("District created successfully!");
+            return RedirectToAction(nameof(Profile));
         }
 
-        // GET: District/Edit/5
         [Breadcrumb("Edit District", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
@@ -213,9 +212,6 @@ namespace risk.control.system.Controllers
             return View(district);
         }
 
-        // POST: District/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, District district)
@@ -231,51 +227,35 @@ namespace risk.control.system.Controllers
                 existingdistrict.StateId = district.SelectedStateId;
                 _context.Update(existingdistrict);
                 await _context.SaveChangesAsync();
-                notifyService.Success("district edited successfully!");
-                return RedirectToAction(nameof(Index));
+                notifyService.Warning("District edited successfully!");
+                return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
-            notifyService.Error("An error occurred while updating the pincode!");
-            return RedirectToAction(nameof(Index));
+            notifyService.Error("An error occurred while updating the District!");
+            return RedirectToAction(nameof(Profile));
         }
 
-        // GET: District/Delete/5
-        [Breadcrumb("Delete", FromAction = "Profile")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            if (id < 1)
-            {
-                notifyService.Error("district not found!");
-                return NotFound();
-            }
-
-            var district = await _context.District
-                .Include(d => d.Country)
-                .Include(d => d.State)
-                .FirstOrDefaultAsync(m => m.DistrictId == id);
-            if (district == null)
-            {
-                notifyService.Error("district not found!");
-                return NotFound();
-            }
-
-            return View(district);
-        }
-
-        // POST: District/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.District == null)
             {
-                notifyService.Error("district not found!");
-                return Problem("Entity set 'ApplicationDbContext.District'  is null.");
+                return Json(new { success = false, message = "District Not found!" });
             }
             var district = await _context.District.FindAsync(id);
+            if (district is null)
+            {
+                return Json(new { success = false, message = "District Not found!" });
+            }
+            var hasPincode = _context.PinCode.Any(p => p.DistrictId == district.DistrictId);
+            if (hasPincode)
+            {
+                return Json(new { success = false, message = $"Cannot delete District {district.Name}. It has associated Pincodes" });
+            }
             if (district != null)
             {
                 district.Updated = DateTime.Now;
@@ -284,8 +264,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            notifyService.Success("district deleted successfully!");
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true, message = "District deleted successfully!" });
         }
     }
 }

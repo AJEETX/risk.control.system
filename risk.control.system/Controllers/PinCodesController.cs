@@ -150,8 +150,8 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.PinCode == null)
             {
-                notifyService.Error("pincode not found!");
-                return NotFound();
+                notifyService.Error("Pincode not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var pinCode = await _context.PinCode
@@ -161,8 +161,8 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.PinCodeId == id);
             if (pinCode == null)
             {
-                notifyService.Error("pincode not found!");
-                return NotFound();
+                notifyService.Error("Pincode not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             return View(pinCode);
@@ -194,8 +194,8 @@ namespace risk.control.system.Controllers
             pinCode.DistrictId = pinCode.SelectedDistrictId;
             _context.Add(pinCode);
             await _context.SaveChangesAsync();
-            notifyService.Success("pincode created successfully!");
-            return RedirectToAction(nameof(Index));
+            notifyService.Success("Pincode created successfully!");
+            return RedirectToAction(nameof(Profile));
         }
 
         // GET: PinCodes/Edit/5
@@ -204,15 +204,15 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                notifyService.Error("pincode not found!");
-                return NotFound();
+                notifyService.Error("Pincode not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var pinCode = await _context.PinCode.Include(d => d.Country).Include(d => d.State).Include(d => d.District).FirstOrDefaultAsync(p => p.PinCodeId == id);
             if (pinCode == null)
             {
-                notifyService.Error("pincode not found!");
-                return NotFound();
+                notifyService.Error("Pincode not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             return View(pinCode);
@@ -239,7 +239,7 @@ namespace risk.control.system.Controllers
                 if (await _context.SaveChangesAsync() > 0)
                 {
                     notifyService.Success("pincode edited successfully!");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Profile));
                 }
             }
             catch (Exception ex)
@@ -250,36 +250,13 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: PinCodes/Delete/5
-        [Breadcrumb("Delete ", FromAction = "Profile")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            if (id <= 0)
-            {
-                notifyService.Error("pincode not found!");
-                return NotFound();
-            }
-
-            var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District)
-                .FirstOrDefaultAsync(m => m.PinCodeId == id);
-            if (pinCode == null)
-            {
-                notifyService.Error("pincode not found!");
-                return NotFound();
-            }
-
-            return View(pinCode);
-        }
-
-        // POST: PinCodes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.PinCode == null)
             {
-                notifyService.Error("pincode not found!");
-                return Problem("Entity set 'ApplicationDbContext.PinCode'  is null.");
+                return Json(new { success = true, message = "Pincode not found!" });
             }
             var pinCode = await _context.PinCode.FindAsync(id);
             if (pinCode != null)
@@ -290,8 +267,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            notifyService.Success("pincode deleted successfully!");
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true, message = "Pincode deleted successfully!" });
         }
     }
 }

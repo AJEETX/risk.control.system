@@ -149,16 +149,16 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.State == null)
             {
-                notifyService.Error("state not found!");
-                return NotFound();
+                notifyService.Error("State not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             var state = await _context.State.Include(s => s.Country)
                 .FirstOrDefaultAsync(m => m.StateId == id);
             if (state == null)
             {
-                notifyService.Error("state not found!");
-                return NotFound();
+                notifyService.Error("State not found!");
+                return RedirectToAction(nameof(Profile));
             }
 
             return View(state);
@@ -188,8 +188,8 @@ namespace risk.control.system.Controllers
             state.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(state);
             await _context.SaveChangesAsync();
-            notifyService.Success("state created successfully!");
-            return RedirectToAction(nameof(Index));
+            notifyService.Success("State created successfully!");
+            return RedirectToAction(nameof(Profile));
         }
 
         // GET: RiskCaseStatus/Edit/5
@@ -198,15 +198,15 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.State == null)
             {
-                notifyService.Error("state not found!");
+                notifyService.Error("State not found!");
                 return NotFound();
             }
 
             var state = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
             if (state == null)
             {
-                notifyService.Error("state not found!");
-                return NotFound();
+                notifyService.Error("State not found!");
+                return RedirectToAction(nameof(Profile));
             }
             //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", state.CountryId);
 
@@ -233,7 +233,7 @@ namespace risk.control.system.Controllers
                     _context.Update(existingState);
                     await _context.SaveChangesAsync();
                     notifyService.Success("state edited successfully!");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Profile));
                 }
                 catch (Exception ex)
                 {
@@ -241,28 +241,7 @@ namespace risk.control.system.Controllers
                 }
             }
             notifyService.Error("Error to edit state!");
-            return RedirectToAction(nameof(Index));
-        }
-
-        // GET: RiskCaseStatus/Delete/5
-        [Breadcrumb("Delete State", FromAction = "Profile")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            if (id < 1 || _context.State == null)
-            {
-                notifyService.Error("state not found!");
-                return NotFound();
-            }
-
-            var state = await _context.State
-                .FirstOrDefaultAsync(m => m.StateId == id);
-            if (state == null)
-            {
-                notifyService.Error("state not found!");
-                return NotFound();
-            }
-
-            return View(state);
+            return RedirectToAction(nameof(Profile));
         }
 
         // POST: RiskCaseStatus/Delete/5
@@ -270,26 +249,27 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (_context.State == null)
+            if (id <= 0)
             {
-                return Problem("Entity set 'ApplicationDbContext.State'  is null.");
+                return Json(new { success = true, message = "State Not found!" });
             }
             var state = await _context.State.FindAsync(id);
-            if (state != null)
+            if (state == null)
             {
-                state.Updated = DateTime.Now;
-                state.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.State.Remove(state);
+                return Json(new { success = false, message = "State not found!" });
             }
+            var hasDistrict = _context.District.Any(d => d.StateId == id);
+            if (hasDistrict)
+            {
+                return Json(new { success = false, message = $"Cannot delete State {state.Name}. It has associated districts." });
+            }
+            state.Updated = DateTime.Now;
+            state.UpdatedBy = HttpContext.User?.Identity?.Name;
+            _context.State.Remove(state);
 
             await _context.SaveChangesAsync();
-            notifyService.Success("state deleted successfully!");
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool StateExists(long id)
-        {
-            return (_context.State?.Any(e => e.StateId == id)).GetValueOrDefault();
+            notifyService.Success("State deleted successfully!");
+            return Json(new { success = true, message = "State deleted successfully!" });
         }
     }
 }

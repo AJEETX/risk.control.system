@@ -13,6 +13,9 @@
                         <div class="submit-progress hidden">
                             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                         </div>
+                        <form id="antiForgeryForm">
+                            @Html.AntiForgeryToken()
+                        </form>
                         <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
