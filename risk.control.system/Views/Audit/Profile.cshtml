@@ -3,11 +3,10 @@
 }
 
 <section class="content">
-    <div class="card card-secondary border-secondary">
-        <div class="card-header">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title"><i class="fa fa-align-center"></i> @Applicationsettings.AUDIT_LOGS</h3>
         </div>
-    </div>
     <div class="card-body">
         <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
@@ -29,6 +28,8 @@
             </tbody>
         </table>
     </div>
+    </div>
+
 </section>
 @section Scripts {
     <script src="~/js/company-admin/audit.js"></script>

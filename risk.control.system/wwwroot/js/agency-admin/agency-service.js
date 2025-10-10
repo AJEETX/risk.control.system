@@ -105,8 +105,22 @@ $(document).ready(function () {
                     if (fullText == ALL_DISTRICTS) {
                         return `<span title="${fullText}" data-toggle="tooltip"> ${fullText} </span>`;
                     } else {
-                        const shortText = fullText.length > 50 ? fullText.substring(0, 50) + '...' : fullText;
-                        return `<span title="${fullText}" data-toggle="tooltip"><small> ${shortText} </small></span>`;
+                        let display = '';
+                        try {
+                            let obj = JSON.parse(data);
+                            // convert to "key: value" pairs without {}
+                            display = Object.entries(obj)
+                                .map(([k, v]) => `${k}: ${v}`)
+                                .join(', ');
+                        } catch {
+                            display = data;
+                        }
+
+                        let encoded = $('<div/>').text(display).html();
+
+                        return data.length > 50
+                            ? `<div title="${encoded}"><small>${data.substring(0, 50)}...</small></div>`
+                            : `<small>${encoded}</small>`;
                     }
                 }
             },
