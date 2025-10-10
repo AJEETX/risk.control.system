@@ -28,8 +28,8 @@ namespace risk.control.system.Data
         //public virtual DbSet<IpApiResponse> IpApiResponse { get; set; }
         public virtual DbSet<AgencyRating> Ratings { get; set; }
         public virtual DbSet<VendorInvoice> VendorInvoice { get; set; }
-        //public virtual DbSet<PermissionModule> PermissionModule { get; set; }
-        //public virtual DbSet<PermissionType> PermissionType { get; set; }
+        public virtual DbSet<PermissionModule> PermissionModule { get; set; }
+        public virtual DbSet<PermissionType> PermissionType { get; set; }
         public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }
         public virtual DbSet<ClientCompanyApplicationUser> ClientCompanyApplicationUser { get; set; }
         public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
