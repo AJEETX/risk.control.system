@@ -10,7 +10,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Seeds
 {
-    public static class VendorApplicationUserSeed
+    public static class AgencyUserSeed
     {
         private static string noUserImagePath = string.Empty;
 

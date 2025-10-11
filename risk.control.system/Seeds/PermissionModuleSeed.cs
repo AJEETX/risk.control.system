@@ -8,34 +8,6 @@ namespace risk.control.system.Seeds
 {
     public static class PermissionModuleSeed
     {
-        private static List<string> modules = new List<string> { "Mailbox", "Claims", "Setting", "General" };
-
-        public static void SeedMailbox(ApplicationDbContext context)
-        {
-            var permissionTypes = Permissions.GetPermissionTypes();
-            //ModuleName = "Mailbox"
-            string Mailbox = "Mailbox";
-
-            var mailboxPermissionTypes = permissionTypes;
-            foreach (var permissionType in mailboxPermissionTypes)
-            {
-                var hydratedType = ModuleManager.GetModule(Mailbox, permissionType.Name);
-                if (hydratedType != null)
-                {
-                    permissionType.Name = hydratedType;
-                }
-            }
-            context.PermissionType.AddRange(mailboxPermissionTypes);
-
-            var mailboxPermissionModule = new PermissionModule
-            {
-                ModuleName = Mailbox,
-                PermissionTypes = mailboxPermissionTypes,
-            };
-
-            context.PermissionModule.Add(mailboxPermissionModule);
-        }
-
         public static void SeedClaim(ApplicationDbContext context)
         {
             var claimsSubPermissionTypes = Permissions.GetPermissionTypes();

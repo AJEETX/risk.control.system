@@ -30,7 +30,7 @@ namespace risk.control.system.Seeds
             var vendors = new List<Vendor> { };
             foreach (var agency in agencies)
             {
-                var vendor = await AgencyCheckerSeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes);
+                var vendor = await AgencySeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes);
                 vendors.Add(vendor);
             }
             var canara = new SeedInput { COUNTRY = COUNTRY_CODE, DOMAIN = "insurer.com", NAME = "Insurer", PHOTO = "/img/insurer.jpg", ADDRESSLINE = "109 Mahoneys Road", BRANCH = "Forest Hill", BANK = "WPA", PINCODE = PINCODE };

@@ -215,7 +215,6 @@ namespace risk.control.system.Controllers
                 return View(model);
             }
 
-
             var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
             if (admin is null || admin.Country is null)
             {

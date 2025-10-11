@@ -35,7 +35,7 @@ namespace risk.control.system.Seeds
 
             foreach (var agency in agencies)
             {
-                var vendor = await AgencyCheckerSeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes);
+                var vendor = await AgencySeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes);
                 vendors.Add(vendor);
             }
 

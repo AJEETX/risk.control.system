@@ -9,7 +9,7 @@ using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
 {
-    public class AgencyCheckerSeed
+    public class AgencySeed
     {
         private const string vendorMapSize = "800x800";
         public static async Task<Vendor> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
@@ -21,15 +21,15 @@ namespace risk.control.system.Seeds
 
             //CREATE VENDOR COMPANY
 
-            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY.ToLower() && s.Code == input.PINCODE);
-            var checkerAddressline = input.ADDRESSLINE;
+            var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY.ToLower() && s.Code == input.PINCODE);
+            var addressline = input.ADDRESSLINE;
 
             var states = context.State.Include(s => s.Country).Where(s => s.Country.Code.ToLower() == input.COUNTRY.ToLower()).ToList();
 
-            var checkerAddress = checkerAddressline + ", " + checkerPinCode.District.Name + ", " + checkerPinCode.State.Name + ", " + checkerPinCode.Country.Code;
-            var checkerCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(checkerAddress);
-            var checkerLatLong = checkerCoordinates.Latitude + "," + checkerCoordinates.Longitude;
-            var checkerUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={checkerLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{checkerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            var address = addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+            var addressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+            var latLong = addressCoordinates.Latitude + "," + addressCoordinates.Longitude;
+            var addressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
             string checkerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
             var checkerImage = File.ReadAllBytes(checkerImagePath);
@@ -42,19 +42,19 @@ namespace risk.control.system.Seeds
             var checker = new Vendor
             {
                 Name = input.NAME,
-                Addressline = checkerAddressline,
+                Addressline = addressline,
                 Branch = input.BRANCH,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = input.BANK,
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
-                PinCode = checkerPinCode,
-                Country = checkerPinCode.Country,
-                CountryId = checkerPinCode.CountryId,
-                DistrictId = checkerPinCode.DistrictId,
-                StateId = checkerPinCode.StateId,
-                PinCodeId = checkerPinCode.PinCodeId,
+                PinCode = pinCode,
+                Country = pinCode.Country,
+                CountryId = pinCode.CountryId,
+                DistrictId = pinCode.DistrictId,
+                StateId = pinCode.StateId,
+                PinCodeId = pinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = input.DOMAIN,
                 PhoneNumber = "8888004739",
@@ -63,9 +63,9 @@ namespace risk.control.system.Seeds
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
                 CanChangePassword = globalSettings.CanChangePassword,
-                AddressMapLocation = checkerUrl,
-                AddressLatitude = checkerCoordinates.Latitude,
-                AddressLongitude = checkerCoordinates.Longitude
+                AddressMapLocation = addressUrl,
+                AddressLatitude = addressCoordinates.Latitude,
+                AddressLongitude = addressCoordinates.Longitude
             };
 
             var checkerAgency = await context.Vendor.AddAsync(checker);
@@ -94,7 +94,7 @@ namespace risk.control.system.Seeds
             checker.VendorInvestigationServiceTypes = agencyServices;
 
             await context.SaveChangesAsync(null, false);
-            await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, checkerAgency.Entity, customApiCLient);
+            await AgencyUserSeed.Seed(context, webHostEnvironment, vendorUserManager, checkerAgency.Entity, customApiCLient);
 
             return checkerAgency.Entity;
         }

@@ -41,7 +41,7 @@ namespace risk.control.system.Seeds
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.SUPERVISOR.ToString().Substring(0, 2).ToUpper(), AppRoles.SUPERVISOR.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.AGENT.ToString().Substring(0, 2).ToUpper(), AppRoles.AGENT.ToString()));
 
-            PermissionModuleSeed.SeedClaim(context);
+            //PermissionModuleSeed.SeedClaim(context);
 
             await ClientCompanySetupSeed.Seed(context);
 
