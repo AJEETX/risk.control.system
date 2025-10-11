@@ -167,6 +167,23 @@ namespace risk.control.system.Seeds
                                 ReportType = DocumentIdReportType.MEDICAL_CERTIFICATE
                             }
                         ],
+                        MediaReports =
+                        [
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.AUDIO.GetEnumDisplayName(),
+                                MediaType = MediaType.AUDIO,
+                                MediaExtension = "mp3"
+                            },
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.VIDEO.GetEnumDisplayName(),
+                                MediaType = MediaType.VIDEO,
+                                MediaExtension = "mp4"
+                            }
+                        ],
                         Questions = ClaimQuestion.QuestionsCLAIM_HOSPITAL()
                     },
                     new() {
@@ -190,6 +207,23 @@ namespace risk.control.system.Seeds
                                 ReportType = DocumentIdReportType.ITR
                             }
                         ],
+                        MediaReports =
+                        [
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.AUDIO.GetEnumDisplayName(),
+                                MediaType = MediaType.AUDIO,
+                                MediaExtension = "mp3"
+                            },
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.VIDEO.GetEnumDisplayName(),
+                                MediaType = MediaType.VIDEO,
+                                MediaExtension = "mp4"
+                            }
+                        ],
                         Questions = ClaimQuestion.QuestionsCLAIM_BUSINESS_ADDRESS()
                     },
                     new() {
@@ -210,6 +244,23 @@ namespace risk.control.system.Seeds
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.MEDICAL_PRESCRIPTION.GetEnumDisplayName(),
                                 ReportType = DocumentIdReportType.MEDICAL_PRESCRIPTION
+                            }
+                        ],
+                        MediaReports =
+                        [
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.AUDIO.GetEnumDisplayName(),
+                                MediaType = MediaType.AUDIO,
+                                MediaExtension = "mp3"
+                            },
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.VIDEO.GetEnumDisplayName(),
+                                MediaType = MediaType.VIDEO,
+                                MediaExtension = "mp4"
                             }
                         ],
                         Questions = ClaimQuestion.QuestionsCLAIM_CHEMIST_ADDRESS()
@@ -235,6 +286,23 @@ namespace risk.control.system.Seeds
                                 ReportType = DocumentIdReportType.EMPLOYMENT_RECORD
                             }
                         ],
+                        MediaReports =
+                        [
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.AUDIO.GetEnumDisplayName(),
+                                MediaType = MediaType.AUDIO,
+                                MediaExtension = "mp3"
+                            },
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.VIDEO.GetEnumDisplayName(),
+                                MediaType = MediaType.VIDEO,
+                                MediaExtension = "mp4"
+                            }
+                        ],
                         Questions = ClaimQuestion.QuestionsCLAIM_EMPLOYMENT_ADDRESS()
                     },
                     new() {
@@ -258,6 +326,23 @@ namespace risk.control.system.Seeds
                                 ReportType = DocumentIdReportType.DEATH_CERTIFICATE
                             }
                         ],
+                        MediaReports =
+                        [
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.AUDIO.GetEnumDisplayName(),
+                                MediaType = MediaType.AUDIO,
+                                MediaExtension = "mp3"
+                            },
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.VIDEO.GetEnumDisplayName(),
+                                MediaType = MediaType.VIDEO,
+                                MediaExtension = "mp4"
+                            }
+                        ],
                         Questions = ClaimQuestion.QuestionsCLAIM_CEMETERY_ADDRESS()
                     },
                     new() {
@@ -278,6 +363,23 @@ namespace risk.control.system.Seeds
                                 HasBackImage = false,
                                 ReportName = DocumentIdReportType.POLICE_FIR_REPORT.GetEnumDisplayName(),
                                 ReportType = DocumentIdReportType.POLICE_FIR_REPORT
+                            }
+                        ],
+                        MediaReports =
+                        [
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.AUDIO.GetEnumDisplayName(),
+                                MediaType = MediaType.AUDIO,
+                                MediaExtension = "mp3"
+                            },
+                            new() {
+                                IsRequired = false,
+                                Selected = false,
+                                ReportName = MediaType.VIDEO.GetEnumDisplayName(),
+                                MediaType = MediaType.VIDEO,
+                                MediaExtension = "mp4"
                             }
                         ],
                         Questions = ClaimQuestion.QuestionsCLAIM_POLIC_STATION()
