@@ -364,8 +364,8 @@
 
         let caseId = $("#caseIdHidden").val();
         let container = $("#reportTemplateContainer");
-
-        container.html("<div class='text-center p-3'><i class='fas fa-sync fa-spin'></i>...</div>");
+        //fas fa-sync fa-spin fa-4x fa-fw
+        container.html("<div class='text-center p-3'><i class='fas fa-sync fa-spin fa-2x'></i></div>");
 
         $.get("/Investigation/GetReportTemplate", { caseId: caseId })
             .done(function (html) {

@@ -124,6 +124,7 @@ namespace risk.control.system.Services
                     ReportName = m.ReportName,
                     MediaType = m.MediaType,
                     Selected = m.Selected,
+                    MediaExtension = m.MediaExtension
                 }).ToList(),
                 FaceIds = loc.FaceIds.Where(face => face.Selected)?.Select(face => new
                 {

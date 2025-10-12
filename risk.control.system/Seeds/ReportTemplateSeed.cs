@@ -122,6 +122,7 @@ namespace risk.control.system.Seeds
                         FaceIds =
                         [
                             new() {
+                                IsRequired = false,
                                 Selected = false,
                                 ReportName = DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName(),
                                 Has2Face = false,
