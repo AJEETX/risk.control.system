@@ -270,51 +270,65 @@ namespace risk.control.system.Services
 
             var csvEntry = archive.Entries.FirstOrDefault(e =>
                 e.FullName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase));
-
-            if (csvEntry != null)
+            if (csvEntry == null)
             {
-                using var reader = new StreamReader(csvEntry.Open());
-                using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    Delimiter = "|", // 👈 Pipe-delimited
-                    TrimOptions = TrimOptions.Trim,
-                    HeaderValidated = null,
-                    MissingFieldFound = null,
-                    BadDataFound = context =>
-                    {
-                        errors.Add($"Row {context.Field}: Bad data - {context.RawRecord}");
-                    }
-                });
+                errors.Add("No CSV file found in ZIP.");
+                return (validRecords, errors);
+            }
+            string? firstLine;
+            using (var detectReader = new StreamReader(csvEntry.Open()))
+            {
+                firstLine = detectReader.ReadLine();
+            }
+            if (string.IsNullOrWhiteSpace(firstLine))
+            {
+                errors.Add("CSV file is empty or has no header.");
+                return (validRecords, errors);
+            }
+            int pipeCount = firstLine.Count(c => c == '|');
 
-                int rowNumber = 1;
+            if (pipeCount < 27)
+            {
+                errors.Add("The file is not pipe-delimited.");
+                return (validRecords, errors);
+            }
+            using var reader = new StreamReader(csvEntry.Open());
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = "|", // 👈 Pipe-delimited
+                TrimOptions = TrimOptions.Trim,
+                HeaderValidated = null,
+                MissingFieldFound = null,
+                BadDataFound = context =>
+                {
+                    errors.Add($"Row {context.Field}: Bad data - {context.RawRecord}");
+                }
+            });
+
+            int rowNumber = 1;
+            try
+            {
+                csv.Read();
+                csv.ReadHeader();
+            }
+            catch (Exception ex)
+            {
+                errors.Add($"Error reading header: {ex.Message}");
+                return (validRecords, errors);
+            }
+
+            while (csv.Read())
+            {
+                rowNumber++;
                 try
                 {
-                    csv.Read();
-                    csv.ReadHeader();
+                    var record = csv.GetRecord<UploadCase>();
+                    validRecords.Add(record);
                 }
                 catch (Exception ex)
                 {
-                    errors.Add($"Error reading header: {ex.Message}");
-                    return (validRecords, errors);
+                    errors.Add($"Row {rowNumber}: {ex.Message}");
                 }
-
-                while (csv.Read())
-                {
-                    rowNumber++;
-                    try
-                    {
-                        var record = csv.GetRecord<UploadCase>();
-                        validRecords.Add(record);
-                    }
-                    catch (Exception ex)
-                    {
-                        errors.Add($"Row {rowNumber}: {ex.Message}");
-                    }
-                }
-            }
-            else
-            {
-                errors.Add("No CSV file found in ZIP.");
             }
 
             return (validRecords, errors);
