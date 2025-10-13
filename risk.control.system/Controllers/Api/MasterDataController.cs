@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers.Api
                 .ToListAsync();
 
             IQueryable<ApplicationUser> query = context.ApplicationUser
-                .Where(a => a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower() &&
+                .Where(a => !a.Deleted && a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower() &&
                             !vendorAgentIds.Contains(a.Id));
 
             if (!string.IsNullOrWhiteSpace(search))

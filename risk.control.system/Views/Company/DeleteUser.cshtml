@@ -107,9 +107,13 @@
             <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">
-                        <a id="back" asp-action="Users" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                        <input type="hidden" asp-for="Email" name="email" />
-                        <input type="submit" value="Delete" class="btn btn-danger" />
+                        <div class="form-group text-right">
+                            <a id="back" asp-action="Users" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                            <input type="hidden" asp-for="Email" name="email" />
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i> Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

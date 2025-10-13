@@ -54,9 +54,6 @@
                         var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '" data-toggle="tooltip" title="Select Agency to empanel" />';
                         return img;
                     }
-                    else {
-                        return '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn-xs btn-warning" data-toggle="tooltip" title="Agency detail Incomplete"><i class="fas fa-edit"></i> </a>';
-                    }
                 }
             },
             {
@@ -131,6 +128,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
+                    buttons += '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn btn-xs btn-warning" data-toggle="tooltip" title="Agency detail Incomplete"><i class="fas fa-edit"></i> Edit </a>&nbsp;';
                     if (data) {
                         buttons += '<a id="delete' + row.id + '" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
                     }
@@ -349,7 +347,7 @@ function showedit(id) {
     $('a.btn').attr('disabled', 'disabled');
     var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-warning')
 
-    editbtn.html("<i class='fas fa-sync fa-spin'></i> Complete");
+    editbtn.html("<i class='fas fa-sync fa-spin'></i> Edit ");
 
     var article = document.getElementById("article");
     if (article) {

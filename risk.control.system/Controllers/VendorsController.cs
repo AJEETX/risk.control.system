@@ -1171,14 +1171,7 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Agency {vendor.Email} deleted successfully.", 3, "red", "fas fa-building");
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                if (superAdminUser.IsSuperAdmin)
-                {
-                    return RedirectToAction(nameof(Agencies), "Vendors");
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CompanyController.AvailableVendors), "Company");
-                }
+                return RedirectToAction(nameof(AvailableVendors), "Vendors");
             }
             catch (Exception ex)
             {

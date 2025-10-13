@@ -86,13 +86,6 @@
                                             </span>
                                             Address:  @Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code
                                         </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-code"></i>
-                                            </span>
-                                            Mobile App Url : <i class="fas fa-code"></i> <a href="#">  @Model.MobileAppUrl</a>
-                                        </li>
-
                                     </ul>
                                 </div>
                                 <div class="col-5 text-center">
@@ -170,7 +163,10 @@
                         }
                         else
                         {
-                                <input type="submit" value="Delete" class="btn btn-danger" />
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-1"></i> Delete
+                                </button>
+
                         }
                     </div>
                 </div>

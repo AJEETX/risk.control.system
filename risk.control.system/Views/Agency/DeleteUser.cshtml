@@ -106,13 +106,14 @@
             </div>
             <div class="card-footer">
                 <div class="row">
-                    <div class="col-md-12 text-right">
+                    <div class="col-md-12">
+                        <div class="form-group text-right">
                         <a id="back" asp-action="Users" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                         <input type="hidden" asp-for="Email" name="email" />
                         @if (Model.HasClaims)
                         {
                             <span id="withdraw-information-popup" class="badge badge-light">
-                                <div class="btn btn-outline-danger">
+                                    <div class="btn btn-outline-danger" data-toggle="tooltip" title="The user can't be deleted as the Agency has case (s)">
                                     <i class="fa fa-trash"></i>  @Applicationsettings.DELETE <span class="badge badge-danger">
                                         <i class="fas fa-info"></i>
                                     </span>
@@ -121,8 +122,11 @@
                         }
                         else
                         {
-                            <input type="submit" value="Delete" class="btn btn-danger" />
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i> Delete
+                            </button>
                         }
+                    </div>
                     </div>
                 </div>
             </div>
