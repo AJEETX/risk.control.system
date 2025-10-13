@@ -23,14 +23,13 @@
                         <label class="input-group-label"> Email:<small>(minimum 5 character)</small></label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="emailid" title="Email : (minimum 5 character)"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
+                                <span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                             </div>
-                            <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address remarks" value="" 
-                                   required placeholder="email" maxlength="15" autocomplete="name" title="Enter unique email with 5 minimum character" />
-                            <div class="input-group-append" title="domain name">
+                            <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address remarks" required placeholder="email" title="Enter unique email with 5 minimum character" maxlength="15" autocomplete="name" value="" />
+                            <div class="input-group-append">
                                 <span class="input-group-text" id="Email">@@@email</span>
                             </div>
-                            <div class="input-group-append" title="Click to validate email">
+                            <div class="input-group-append">
                                 <button disabled id="check-email" class="input-group-text">
                                     <i class="far fa-question-circle"></i>
                                 </button>
@@ -49,14 +48,11 @@
         </div>
 
         <form id="create-form" asp-controller="Agency" asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
-            <input type="hidden" asp-for="Email" id="mailAddress" name="mailAddress" required />
             <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
             <input type="hidden" id="txn" name="txn" value="company" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="card-body">
                 <partial name="Vendor/_CreateUser" model="Model" />
-
-
             </div>
             <div class="card-footer">
                 <div class="row">
@@ -65,11 +61,11 @@
                             @*  <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                             <i class="fas fa-undo"></i> Reset
                             </button> *@
-                            <a id="cancel" asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                            <a id="cancel" asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                                 <i class="fa fa-window-close"></i>
                                 @Applicationsettings.CANCEL
                             </a>
-                            <button disabled id="create-user" type="submit" class="btn btn-success">
+                            <button disabled id="create" type="submit" class="btn btn-success">
                                 <i class="fas fa-user-plus"></i> Add User
                             </button>
                         </div>

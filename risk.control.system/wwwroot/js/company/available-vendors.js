@@ -128,12 +128,12 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn btn-xs btn-warning" data-toggle="tooltip" title="Agency detail Incomplete"><i class="fas fa-edit"></i> Edit </a>&nbsp;';
+                    buttons += '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn btn-xs btn-warning" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit </a>&nbsp;';
                     if (data) {
-                        buttons += '<a id="delete' + row.id + '" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                        buttons += '<a id="delete' + row.id + '" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger" data-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i> Delete</a>'
                     }
                     else {
-                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>';
+                        buttons += '<button disabled class="btn btn-xs btn-danger" data-toggle="tooltip" title="Delete Disabled"><i class="fas fa-trash"></i> Delete</a>';
                     }
                     return buttons;
                 }

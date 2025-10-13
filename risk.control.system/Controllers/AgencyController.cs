@@ -230,26 +230,48 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string vendorId, string txn = "agency")
         {
-            if (user is null || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
+            if (string.IsNullOrWhiteSpace(txn))
+            {
+                notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (user is null || string.IsNullOrWhiteSpace(emailSuffix) || string.IsNullOrWhiteSpace(vendorId) || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(CreateUser), "Agency");
+                if (txn == "agency")
+                {
+                    return RedirectToAction(nameof(AgencyController.Users), "Agency");
+                }
+                else if (txn == "company")
+                {
+                    return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = vendorId });
+                }
+                else
+                {
+                    return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
+                }
             }
             if (string.IsNullOrWhiteSpace(user.Email))
             {
                 notifyService.Custom($"Empty username.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(CreateUser), "Agency");
+                if (txn == "agency")
+                {
+                    return RedirectToAction(nameof(AgencyController.Users), "Agency");
+                }
+                else if (txn == "company")
+                {
+                    return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = vendorId });
+                }
+                else
+                {
+                    return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
+                }
             }
+
             try
             {
-                if (user == null || string.IsNullOrWhiteSpace(emailSuffix) || string.IsNullOrWhiteSpace(vendorId))
-                {
-                    notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 IFormFile profileFile = null;
                 var files = Request.Form?.Files;
-
                 if (files != null && files.Count > 0)
                 {
                     var file = files.FirstOrDefault(f => f.FileName == user?.ProfileImage?.FileName && f.Name == user?.ProfileImage?.Name);
