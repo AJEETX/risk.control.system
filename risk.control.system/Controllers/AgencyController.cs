@@ -336,7 +336,7 @@ namespace risk.control.system.Controllers
                         var createdUser = await userManager.FindByEmailAsync(user.Email);
                         var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
                         var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
-                        var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
+                        var onboardAgent = createdUser.Role == AppConstant.AppRoles.AGENT && string.IsNullOrWhiteSpace(user.MobileUId);
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
                             if (onboardAgent)

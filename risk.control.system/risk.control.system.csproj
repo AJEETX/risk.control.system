@@ -88,6 +88,7 @@
     <Folder Include="wwwroot\document\" />
     <Folder Include="wwwroot\face\" />
     <Folder Include="wwwroot\media\" />
+    <Folder Include="wwwroot\policy\" />
     <Folder Include="wwwroot\report\" />
     <Folder Include="wwwroot\upload-file\" />
   </ItemGroup>
