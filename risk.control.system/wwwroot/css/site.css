@@ -3026,3 +3026,6 @@ img.mobile-capture-map {
 .multiple-question{
     padding-left:2em;
 }
+.validate-user{
+    border-radius:5px !important;
+}

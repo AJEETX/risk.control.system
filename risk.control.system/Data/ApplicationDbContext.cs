@@ -15,6 +15,7 @@ namespace risk.control.system.Data
         {
             base.OnModelCreating(builder);
         }
+        public virtual DbSet<AnnualIncome> AnnualIncome { get; set; }
         public virtual DbSet<PdfDownloadTracker> PdfDownloadTracker { get; set; }
         public virtual DbSet<InvestigationTask> Investigations { get; set; }
         public DbSet<ReportTemplate> ReportTemplates { get; set; }

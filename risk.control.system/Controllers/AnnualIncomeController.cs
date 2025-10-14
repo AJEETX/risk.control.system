@@ -10,39 +10,36 @@ using risk.control.system.Models;
 using SmartBreadcrumbs.Attributes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class CaseEnablerController : Controller
+    public class AnnualIncomeController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
-
-        public CaseEnablerController(ApplicationDbContext context, INotyfService notifyService)
+        public AnnualIncomeController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
             this.notifyService = notifyService;
         }
-
         public IActionResult Index()
         {
             return RedirectToAction("Profile");
         }
 
-        [Breadcrumb("Reason To Verify ")]
+        [Breadcrumb("Annual Income")]
         public IActionResult Profile()
         {
             return View();
         }
 
-        public IActionResult GetCaseEnablers()
+        public IActionResult GetAnnualIncomes()
         {
-            var data = _context.CaseEnabler
+            var data = _context.AnnualIncome
                 .Select(c => new
                 {
-                    c.CaseEnablerId,
+                    c.Id,
                     c.Name,
                     c.Code,
                     Updated = c.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")
@@ -53,85 +50,85 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(int id)
         {
-            if (id < 1 || _context.CaseEnabler == null)
+            if (id < 1)
             {
-                notifyService.Error("Reason Not found!");
+                notifyService.Error("Income Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
-            var caseEnabler = await _context.CaseEnabler
-                .FirstOrDefaultAsync(m => m.CaseEnablerId == id);
-            if (caseEnabler == null)
+            var income = await _context.AnnualIncome
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (income == null)
             {
-                notifyService.Error("Reason Not found!");
+                notifyService.Error("Income Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
-            return View(caseEnabler);
+            return View(income);
         }
 
         [Breadcrumb("Add  New", FromAction = "Profile")]
-        public IActionResult Create()
+        public ActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CaseEnabler caseEnabler)
+        public async Task<IActionResult> Create(AnnualIncome income)
         {
-            if (caseEnabler is not null)
+            if (income is not null)
             {
-                caseEnabler.Updated = DateTime.Now;
-                caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.Add(caseEnabler);
+                income.Updated = DateTime.Now;
+                income.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.Add(income);
                 await _context.SaveChangesAsync();
-                notifyService.Success("Reason created successfully!");
+                notifyService.Success("Income created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
-            return View(caseEnabler);
+            return View(income);
         }
 
         [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id < 1 || _context.CaseEnabler == null)
+            if (id < 1)
             {
-                notifyService.Error("Reason Not found!");
+                notifyService.Error("Income Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
-            var caseEnabler = await _context.CaseEnabler.FindAsync(id);
-            if (caseEnabler == null)
+            var income = await _context.AnnualIncome.FindAsync(id);
+            if (income == null)
             {
-                notifyService.Error("Reason Not found!");
+                notifyService.Error("Income Not found!");
                 return RedirectToAction(nameof(Profile));
             }
-            return View(caseEnabler);
+            return View(income);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, CaseEnabler caseEnabler)
+        public async Task<IActionResult> Edit(long id, AnnualIncome income)
         {
-            if (id != caseEnabler.CaseEnablerId)
+            if (id != income.Id)
             {
-                notifyService.Error("Reason Not found!");
+                notifyService.Error("Income Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             try
             {
-                caseEnabler.Updated = DateTime.Now;
-                caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.Update(caseEnabler);
+                income.Updated = DateTime.Now;
+                income.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.Update(income);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("Reason edited successfully!");
+                notifyService.Warning("Income edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error editing Reason!");
+                notifyService.Error("Error editing Income!");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -142,18 +139,18 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                return Json(new { success = false, message = "Reason Not found!" });
+                return Json(new { success = false, message = "Income Not found!" });
             }
-            var caseEnabler = await _context.CaseEnabler.FindAsync(id);
-            if (caseEnabler != null)
+            var income = await _context.AnnualIncome.FindAsync(id);
+            if (income != null)
             {
-                caseEnabler.Updated = DateTime.Now;
-                caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.CaseEnabler.Remove(caseEnabler);
+                income.Updated = DateTime.Now;
+                income.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.AnnualIncome.Remove(income);
             }
 
             await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Reason deleted successfully!" });
+            return Json(new { success = true, message = "Income deleted successfully!" });
         }
     }
 }

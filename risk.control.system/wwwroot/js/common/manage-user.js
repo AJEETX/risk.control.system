@@ -161,13 +161,13 @@ function checkUserEmail() {
         $.get(url, { input: name + '@' + emailSuffix }, function (data) {
             if (data == 0) { //available
                 $('#mailAddress').val($('#emailAddress').val());
-                $("#result").html("<span class='available' title='Available' data-toggle='tooltip'> <i class='fas fa-check'></i></span>");
+                $("#result").html("<span class='available' data-toggle='tooltip' title='Available' data-toggle='tooltip'> <i class='fas fa-check'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").removeClass('error-border');
             }
             else if (data == 1) { //domain exists
                 $('#mailAddress').val('');
-                $("#result").html("<span class='unavailable' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
+                $("#result").html("<span class='unavailable' data-toggle='tooltip' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").addClass('error-border');
             }

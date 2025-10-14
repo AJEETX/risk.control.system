@@ -28,8 +28,8 @@
                             <div class="input-group-append">
                                 <select id="domain" name="domain" asp-for="DomainName" required class="form-control remarks" asp-items="Html.GetEnumSelectList<Domain>()">
                                 </select>
-                                <div class="input-group-append">
-                                    <button disabled id="check-domain" class="input-group-text" title="Click to validate domain">
+                                <div class="input-group-append" data-toggle="tooltip" title="Click to validate domain">
+                                    <button disabled id="check-domain" class="input-group-text disabled-btn validate-user">
                                         <i class="far fa-question-circle"></i>
                                     </button>
                                     <span id="result"></span>

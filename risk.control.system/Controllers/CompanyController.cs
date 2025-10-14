@@ -694,7 +694,7 @@ namespace risk.control.system.Controllers
                 var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("EditAgency", "Company", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditAgency", "Company", $"Edit Agency") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 return View(vendor);
             }
