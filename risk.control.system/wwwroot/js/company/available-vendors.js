@@ -47,7 +47,7 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<span><i class='far fa-edit i-blue' data-toggle='tooltip' title='Agency detail Incomplete'></i></span>",
+                "sDefaultContent": "<span><i class='fas fa-exclamation-triangle i-blue' data-toggle='tooltip' title='Incomplete'></i></span>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.canOnboard) {

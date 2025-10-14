@@ -20,6 +20,7 @@ namespace risk.control.system.Models.ViewModel
         public bool SetPassword { get; set; }
 
         public string? LoginError { get; set; }
+        public string? ReturnUrl { get; set; }
         public string? ResetError { get; set; }
         public string? CountryId { get; set; }
         public string? Mobile { get; set; }

@@ -181,20 +181,20 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
             var timer = DateTime.Now;
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
             var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
-            return View(new LoginViewModel { SetPassword = setPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
+            return View(new LoginViewModel { SetPassword = setPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN), ReturnUrl = returnUrl });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model, string agent_login = "", string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model, string agent_login = "")
         {
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
             {
@@ -282,6 +282,9 @@ namespace risk.control.system.Controllers
                             return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
                         }
                         notifyService.Success("Login successful");
+                        if (Url.IsLocalUrl(model.ReturnUrl))
+                            return Redirect(model.ReturnUrl);
+
                         return RedirectToAction("Index", "Dashboard");
                     }
                 }
