@@ -127,7 +127,7 @@ namespace risk.control.system.Controllers
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CompanyProfile));
                 }
                 var clientCompany = await _context.ClientCompany
                     .Include(c => c.Country)
@@ -138,7 +138,7 @@ namespace risk.control.system.Controllers
                 if (clientCompany == null)
                 {
                     notifyService.Error("OOPs !!!..Company Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CompanyProfile));
                 }
 
                 return View(clientCompany);
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(CompanyProfile));
             }
 
         }
@@ -161,7 +161,7 @@ namespace risk.control.system.Controllers
                 if (clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
                 {
                     notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CompanyProfile));
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -169,13 +169,13 @@ namespace risk.control.system.Controllers
                 if (clientCompany.ClientCompanyId < 1)
                 {
                     notifyService.Error("OOPs !!!..Company Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CompanyProfile));
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CompanyProfile));
                 }
 
                 var existCompany = _context.ClientCompany.Include(c => c.Country).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
@@ -231,7 +231,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(CompanyProfile));
             }
             notifyService.Custom($"Company {clientCompany.Email} edited successfully.", 3, "orange", "fas fa-building");
             return RedirectToAction(nameof(CompanyController.CompanyProfile), "Company");
@@ -378,7 +378,7 @@ namespace risk.control.system.Controllers
                 if (userId == null || _context.ClientCompanyApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(Users));
                 }
 
                 var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser
@@ -389,9 +389,9 @@ namespace risk.control.system.Controllers
                 if (clientCompanyApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(Users));
                 }
-                var existingUsers = _context.ClientCompanyApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
+                var existingUsers = _context.ClientCompanyApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId && c.Id != clientCompanyApplicationUser.Id);
                 var isManagerTaken = existingUsers.Any(u => u.UserRole == CompanyRole.MANAGER);
                 var availableRoles = Enum.GetValues(typeof(CompanyRole))
                     .Cast<CompanyRole>()
@@ -412,7 +412,7 @@ namespace risk.control.system.Controllers
                 logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(Users));
             }
 
         }
