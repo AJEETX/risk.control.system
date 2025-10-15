@@ -22,7 +22,7 @@
         //     </a>
         // </li>
         <li class="nav-item">
-            <a is-active-page asp-controller="State" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("State","")">
+            <a is-active-page asp-controller="State" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("State","")">
                 <i class="nav-icon fas fa-map-marker-alt"></i>
                 <p>
                     @Applicationsettings.STATE
@@ -30,7 +30,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a is-active-page asp-controller="District" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("District","")">
+            <a is-active-page asp-controller="District" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("District","")">
                 <i class="nav-icon fas fa-city"></i>
                 <p>
                     @Applicationsettings.DISTRICT
@@ -38,7 +38,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a is-active-page asp-controller="PinCodes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("PinCodes","")">
+            <a is-active-page asp-controller="PinCodes" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("PinCodes","")">
                 <i class="nav-icon fas fa-map-pin"></i>
                 <p>
                     @Applicationsettings.PINCODE
@@ -46,8 +46,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a is-active-page asp-controller="ReportTemplate" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplate", "Index")
-                                    @Url.MakeActiveClass("ReportTemplate", "Profile") @Url.MakeActiveClass("ReportTemplate", "Details")">
+            <a is-active-page asp-controller="ReportTemplate" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplate", "")">
                 <i class="nav-icon far fa-file-powerpoint"></i>
                 <p>
                     Report <sub>template</sub>
@@ -57,7 +56,7 @@
         if(System.Diagnostics.Debugger.IsAttached)
         {
             <li class="nav-item">
-                <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
+                <a is-active-page asp-controller="Audit" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
                     <i class="nav-icon fa fa-align-center"></i>
                     <p>
                         @Applicationsettings.AUDIT_LOG

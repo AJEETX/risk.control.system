@@ -103,15 +103,15 @@ namespace risk.control.system.Models
             return $"Customer Information:\n" +
            $"- Name: {Name}\n" +
            $"- Date of birth: {DateOfBirth}\n" +
-           $"- Gender: ${Gender}\n" +
+           $"- Gender: ${Gender.GetEnumDisplayName()}\n" +
            $"- Address line: {Addressline}\n" +
            $"- City: {District}\n" +
            $"- State: {State}\n" +
            $"- Country: {Country}\n" +
            $"- Contact Number: {ContactNumber}\n" +
-           $"- Income: {Income}\n" +
-           $"- Occupation: {Occupation.GetEnumDisplayName}\n" +
-           $"- Education: {Education.GetEnumDisplayName}\n";
+           $"- Income: {Income.GetEnumDisplayName()}\n" +
+           $"- Occupation: {Occupation.GetEnumDisplayName()}\n" +
+           $"- Education: {Education.GetEnumDisplayName()}\n";
         }
     }
 }

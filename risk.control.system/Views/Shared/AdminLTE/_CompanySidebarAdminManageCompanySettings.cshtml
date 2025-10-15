@@ -6,7 +6,10 @@
             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","")
                                 @Url.MakeActiveClass("InvestigationCaseStatus","") @Url.MakeActiveClass("CaseEnabler","") @Url.MakeActiveClass("Costcentre","")
                                                 @Url.MakeActiveClass("InvestigationCaseOutcome","")
-                                                        @Url.MakeActiveClass("IpAddress","") @Url.MakeActiveClass("Audit","")
+                                                        @Url.MakeActiveClass("IpAddress","") 
+                                            @Url.MakeActiveClass("OccupationType","")
+                                            @Url.MakeActiveClass("EducationType","")
+                                            @Url.MakeActiveClass("AnnualIncome","")
                                         @Url.MakeActiveClass("BeneficiaryRelation","")">
                 <i class="nav-icon fas fa-cog"></i>
                 <p class="sidebar-menu-header-label">
@@ -31,8 +34,37 @@
         //         </p>
         //     </a>
         // </li>
+        @if (System.Diagnostics.Debugger.IsAttached)
+        {
+            
         <li class="nav-item">
-            <a is-active-page asp-controller="CaseEnabler" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler","")">
+            <a is-active-page asp-controller="AnnualIncome" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("AnnualIncome", "")">
+                <i class="fas fa-money nav-icon"></i>
+                <p>
+                    Income Type
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="OccupationType" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("OccupationType", "")">
+                <i class="fas fa-business-time nav-icon"></i>
+                <p>
+                    Occupation Type
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="EducationType" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("EducationType", "")">
+                <i class="fas fa-graduation-cap nav-icon"></i>
+                <p>
+                    Occupation Type
+                </p>
+            </a>
+        </li>
+        }
+
+        <li class="nav-item">
+            <a is-active-page asp-controller="CaseEnabler" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler","")">
                 <i class="fas fa-puzzle-piece nav-icon"></i>
                 <p>
                     @Applicationsettings.CASE_ENABLER
@@ -40,7 +72,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a is-active-page asp-controller="Costcentre" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Costcentre","")">
+            <a is-active-page asp-controller="Costcentre" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Costcentre", "")">
                 <i class="fas fa-money-check-alt nav-icon"></i>
                 <p>
                     Budget Centre
@@ -48,7 +80,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a is-active-page asp-controller="BeneficiaryRelation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("BeneficiaryRelation","")">
+            <a is-active-page asp-controller="BeneficiaryRelation" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("BeneficiaryRelation","")">
                 <i class="fas fa-user-tie nav-icon"></i>
                 <p>
                     @Applicationsettings.BENEFICIARY

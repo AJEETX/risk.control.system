@@ -1,54 +1,51 @@
-﻿@model risk.control.system.Models.CostCentre
+﻿@model risk.control.system.Models.EducationType
 @{
-    ViewData["Title"] = @Applicationsettings.EDIT;
+    ViewData["Title"] = @Applicationsettings.CREATE;
 }
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title"><i class="fas fa-money-check-alt"></i> @Applicationsettings.EDIT </h3>
+            <h3 class="card-title"><i class="fas fa-graduation-cap"></i> @Applicationsettings.CREATE New</h3>
         </div>
         <div class="card-body">
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            <form id="edit-form" asp-action="Edit">
+            <form id="create-form" asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="CostCentreId" />
                 <div class="form-group">
-                    <span class="input-group-label"> Budget Centre Name:</span>
+                    <span class="input-group-label"> Education Name:</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-money-check-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="Name" type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Budget Centre Name" maxlength="50">
+                        <input id="Name" type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Education Name" value="" maxlength="50">
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <span class="input-group-label"> Budget Centre Code:</span>
+                    <span class="input-group-label"> Education Code:</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Budget Centre Code" maxlength="20">
+                        <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Education Code" value="" maxlength="20">
                         <span asp-validation-for="Code" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group text-right">
                     <a id="back" asp-action="Profile" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
-                    <button id="edit" type="submit" class="btn btn-warning"> <i class="fas fa-money-check-alt"></i> @Applicationsettings.EDIT</button>
+                    <button id="create" type="submit" class="btn btn-success"> <i class="fas fa-graduation-cap"></i> @Applicationsettings.CREATE New</button>
                 </div>
             </form>
         </div>
     </div>
 </section>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/cost-center.js" >
-        
+    <script src="~/js/company-admin/occupation.js" >
     </script>
     <script src="~/js/common/form-validation.js"></script>
 }

@@ -3,7 +3,7 @@
 
     $('#customerTable').DataTable({
         ajax: {
-            url: '/AnnualIncome/GetAnnualIncomes',
+            url: '/EducationType/GetEducations',
             type: 'GET',
             datatype: 'json'
         },
@@ -23,8 +23,8 @@
                 data: 'id',
                 render: function (data) {
                     return `
-                        <a id="edit${data}" class="btn btn-xs btn-warning" href="/AnnualIncome/Edit/${data}">
-                            <i class="fas fa-money"></i> Edit
+                        <a id="edit${data}" class="btn btn-xs btn-warning" href="/EducationType/Edit/${data}">
+                            <i class="fas fa-money-check-alt"></i> Edit
                         </a>
                         &nbsp;
                         <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
@@ -42,15 +42,16 @@
             });
         }
     });
+
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
                 title: "Confirm Add New",
-
                 content: "Are you sure to add?",
-                icon: 'fas fa-money',
+
+                icon: 'fas fa-graduation-cap',
                 type: 'green',
                 closeIcon: true,
                 buttons: {
@@ -73,7 +74,6 @@
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
                             $('button#create').html("<i class='fas fa-sync fa-spin'></i> Add New");
-
                             $('#create-form').submit();
                         }
                     },
@@ -93,14 +93,14 @@
             $.confirm({
                 title: "Confirm Edit",
                 content: "Are you sure to edit?",
+                icon: 'fas fa-graduation-cap',
 
-                icon: 'fas fa-money',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Edit",
-                        btnClass: 'btn-warning ',
+                        text: "Edit ",
+                        btnClass: 'btn-warning',
                         action: function () {
                             askEditConfirmation = false;
                             $("body").addClass("submit-progress-bg");
@@ -117,7 +117,6 @@
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
                             $('button#edit').html("<i class='fas fa-sync fa-spin'></i> Edit");
-
                             $('#edit-form').submit();
                         }
                     },
@@ -145,7 +144,7 @@
                     btnClass: 'btn-red',
                     action: function () {
                         $.ajax({
-                            url: '/AnnualIncome/Delete',
+                            url: '/EducationType/Delete',
                             type: 'POST',
                             data: {
                                 icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
@@ -203,6 +202,7 @@
         }
     });
 });
+
 function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI

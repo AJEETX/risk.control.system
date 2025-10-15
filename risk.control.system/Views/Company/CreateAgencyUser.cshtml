@@ -61,7 +61,7 @@
                             @*  <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                             <i class="fas fa-undo"></i> Reset
                             </button> *@
-                            <a id="cancel" asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                            <a id="cancel" asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                                 <i class="fa fa-window-close"></i>
                                 @Applicationsettings.CANCEL
                             </a>
