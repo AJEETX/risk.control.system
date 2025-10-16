@@ -80,6 +80,7 @@
 
   <ItemGroup>
     <Folder Include="Logs\" />
+    <Folder Include="Views\Shared\Vendor\Agent\" />
     <Folder Include="wwwroot\agency\" />
     <Folder Include="wwwroot\agent-face\" />
 	  <Folder Include="wwwroot\beneficiary\" />
