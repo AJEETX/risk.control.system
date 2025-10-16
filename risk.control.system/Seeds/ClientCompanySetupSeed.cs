@@ -165,6 +165,168 @@ namespace risk.control.system.Seeds
             var unknownCostCentreEntity = await context.CostCentre.AddAsync(unknownCostCentre);
             #endregion
 
+            #region INCOME_TYPE
+
+            var unknownIncome = new IncomeType
+            {
+                Name = "UNKNOWN",
+                Code = "UNKNOWN",
+                Updated = DateTime.Now,
+            };
+            await context.IncomeType.AddAsync(unknownIncome);
+
+            var NoIncome = new IncomeType
+            {
+                Name = "None",
+                Code = "None",
+                Updated = DateTime.Now,
+            };
+            await context.IncomeType.AddAsync(NoIncome);
+
+            var lowIncome = new IncomeType
+            {
+                Name = "LowIncome",
+                Code = "LowIncome",
+                Updated = DateTime.Now,
+            };
+            await context.IncomeType.AddAsync(lowIncome);
+
+            var mediumIncome = new IncomeType
+            {
+                Name = "MediumIncome",
+                Code = "MediumIncome",
+                Updated = DateTime.Now,
+            };
+            await context.IncomeType.AddAsync(mediumIncome);
+
+            var highIncome = new IncomeType
+            {
+                Name = "HighIncome",
+                Code = "HighIncome",
+                Updated = DateTime.Now,
+            };
+            await context.IncomeType.AddAsync(highIncome);
+
+            var veryHighIncome = new IncomeType
+            {
+                Name = "VeryHighIncome",
+                Code = "VeryHighIncome",
+                Updated = DateTime.Now,
+            };
+            await context.IncomeType.AddAsync(veryHighIncome);
+
+            #endregion
+
+            #region EDUCATION_TYPE
+
+            var unknownEducation = new EducationType
+            {
+                Name = "UNKNOWN",
+                Code = "UNKNOWN",
+                Updated = DateTime.Now,
+            };
+            await context.EducationType.AddAsync(unknownEducation);
+
+            var illiterate = new EducationType
+            {
+                Name = "NO EDUCATION",
+                Code = "NONE",
+                Updated = DateTime.Now,
+            };
+            await context.EducationType.AddAsync(illiterate);
+
+            var primary = new EducationType
+            {
+                Name = "PRIMARY SCHOOL",
+                Code = "PRIMARY SCHOOL",
+                Updated = DateTime.Now,
+            };
+            await context.EducationType.AddAsync(primary);
+
+            var high = new EducationType
+            {
+                Name = "HIGH SCHOOL",
+                Code = "HIGH SCHOOL",
+                Updated = DateTime.Now,
+            };
+            await context.EducationType.AddAsync(high);
+
+            var twevlth = new EducationType
+            {
+                Name = "12th Class",
+                Code = "12th Class",
+                Updated = DateTime.Now,
+            };
+            await context.EducationType.AddAsync(twevlth);
+
+            var graduate = new EducationType
+            {
+                Name = "GRADUATE",
+                Code = "GRADUATE",
+                Updated = DateTime.Now,
+            };
+            await context.EducationType.AddAsync(graduate);
+
+            var postGraduate = new EducationType
+            {
+                Name = "POST GRADUATE",
+                Code = "POST GRADUATE",
+                Updated = DateTime.Now,
+            };
+            await context.EducationType.AddAsync(postGraduate);
+
+            #endregion
+
+            #region OCCUPATION_TYPE
+            var unknownOccupation = new OccupationType
+            {
+                Name = "UNKNOWN",
+                Code = "UNKNOWN",
+                Updated = DateTime.Now,
+            };
+            await context.OccupationType.AddAsync(unknownOccupation);
+
+            var engineer = new OccupationType
+            {
+                Name = "ENGINEER",
+                Code = "ENGINEER",
+                Updated = DateTime.Now,
+            };
+            await context.OccupationType.AddAsync(engineer);
+
+            var doctor = new OccupationType
+            {
+                Name = "DOCTOR",
+                Code = "DOCTOR",
+                Updated = DateTime.Now,
+            };
+            await context.OccupationType.AddAsync(doctor);
+
+            var accountant = new OccupationType
+            {
+                Name = "ACCOUNTANT",
+                Code = "ACCOUNTANT",
+                Updated = DateTime.Now,
+            };
+            await context.OccupationType.AddAsync(accountant);
+
+            var professional = new OccupationType
+            {
+                Name = "PROFESSIONAL",
+                Code = "PROFESSIONAL",
+                Updated = DateTime.Now,
+            };
+            await context.OccupationType.AddAsync(professional);
+
+            var selfEmployed = new OccupationType
+            {
+                Name = "SELF EMPLOYED",
+                Code = "SELF EMPLOYED",
+                Updated = DateTime.Now,
+            };
+            await context.OccupationType.AddAsync(selfEmployed);
+
+            #endregion
         }
     }
 }

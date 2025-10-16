@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class AnnualIncome : BaseEntity
+    public class IncomeType : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

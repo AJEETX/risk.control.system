@@ -74,14 +74,20 @@ namespace risk.control.system.Models
         [Required]
         [Display(Name = "Annual Income")]
         public Income? Income { get; set; }
+        public long? IncomeTypeId { get; set; }
+        public IncomeType? IncomeType { get; set; }
 
         [Required]
         [Display(Name = "Occupation")]
         public Occupation? Occupation { get; set; }
+        public long? OccupationTypeId { get; set; }
+        public OccupationType? OccupationType { get; set; }
 
         [Required]
         [Display(Name = "Education")]
         public Education? Education { get; set; }
+        public long? EducationTypeId { get; set; }
+        public EducationType? EducationType { get; set; }
 
         public byte[]? ProfilePicture { get; set; }
         public string? ImagePath { get; set; }

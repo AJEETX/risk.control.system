@@ -24,6 +24,8 @@ namespace risk.control.system.Models
 
         [Display(Name = "Annual Income")]
         public Income? Income { get; set; }
+        public long? IncomeTypeId { get; set; }
+        public IncomeType? IncomeType { get; set; }
 
         public string? ImagePath { get; set; }
 

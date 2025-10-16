@@ -17,7 +17,7 @@ namespace risk.control.system.Data
         }
         public virtual DbSet<EducationType> EducationType { get; set; }
         public virtual DbSet<OccupationType> OccupationType { get; set; }
-        public virtual DbSet<AnnualIncome> AnnualIncome { get; set; }
+        public virtual DbSet<IncomeType> IncomeType { get; set; }
         public virtual DbSet<PdfDownloadTracker> PdfDownloadTracker { get; set; }
         public virtual DbSet<InvestigationTask> Investigations { get; set; }
         public DbSet<ReportTemplate> ReportTemplates { get; set; }

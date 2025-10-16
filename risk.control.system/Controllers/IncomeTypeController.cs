@@ -14,11 +14,11 @@ namespace risk.control.system.Controllers
 {
     [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class AnnualIncomeController : Controller
+    public class IncomeTypeController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
-        public AnnualIncomeController(ApplicationDbContext context, INotyfService notifyService)
+        public IncomeTypeController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
             this.notifyService = notifyService;
@@ -36,7 +36,7 @@ namespace risk.control.system.Controllers
 
         public IActionResult GetAnnualIncomes()
         {
-            var data = _context.AnnualIncome
+            var data = _context.IncomeType
                 .Select(c => new
                 {
                     c.Id,
@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Profile));
             }
 
-            var income = await _context.AnnualIncome
+            var income = await _context.IncomeType
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (income == null)
             {
@@ -75,7 +75,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AnnualIncome income)
+        public async Task<IActionResult> Create(IncomeType income)
         {
             if (income is not null)
             {
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Profile));
             }
 
-            var income = await _context.AnnualIncome.FindAsync(id);
+            var income = await _context.IncomeType.FindAsync(id);
             if (income == null)
             {
                 notifyService.Error("Income Type Not found!");
@@ -109,7 +109,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, AnnualIncome income)
+        public async Task<IActionResult> Edit(long id, IncomeType income)
         {
             if (id != income.Id)
             {
@@ -141,12 +141,12 @@ namespace risk.control.system.Controllers
             {
                 return Json(new { success = false, message = "Income Type Not found!" });
             }
-            var income = await _context.AnnualIncome.FindAsync(id);
+            var income = await _context.IncomeType.FindAsync(id);
             if (income != null)
             {
                 income.Updated = DateTime.Now;
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.AnnualIncome.Remove(income);
+                _context.IncomeType.Remove(income);
             }
 
             await _context.SaveChangesAsync();

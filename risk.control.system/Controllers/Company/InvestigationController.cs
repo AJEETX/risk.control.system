@@ -231,6 +231,9 @@ namespace risk.control.system.Controllers.Company
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var pinCode = context.PinCode.Include(s => s.Country).OrderBy(s => s.Name).FirstOrDefault(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
+                    var education = context.EducationType.FirstOrDefault();
+                    var income = context.IncomeType.FirstOrDefault();
+                    var occupation = context.OccupationType.FirstOrDefault();
                     var random = new Random();
                     var customerDetail = new CustomerDetail
                     {
@@ -239,9 +242,12 @@ namespace risk.control.system.Controllers.Company
                         ContactNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                         Education = Education.PROFESSIONAL,
+                        EducationTypeId = education.Id,
                         Income = Income.UPPER_INCOME,
+                        IncomeTypeId = income.Id,
                         Name = NameGenerator.GenerateName(),
                         Occupation = Occupation.SELF_EMPLOYED,
+                        OccupationTypeId = occupation.Id,
                         //CustomerType = CustomerType.HNI,
                         //Description = "DODGY PERSON",
                         Country = pinCode.Country,
@@ -338,6 +344,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     var beneRelationId = context.BeneficiaryRelation.FirstOrDefault().BeneficiaryRelationId;
                     var pinCode = context.PinCode.Include(s => s.Country).OrderBy(p => p.StateId).LastOrDefault(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
+                    var income = context.IncomeType.FirstOrDefault();
                     var random = new Random();
 
                     var model = new BeneficiaryDetail
@@ -346,6 +353,7 @@ namespace risk.control.system.Controllers.Company
                         Addressline = random.Next(100, 999) + " GREAT ROAD",
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
                         Income = Income.MEDIUM_INCOME,
+                        IncomeTypeId = income.Id,
                         Name = NameGenerator.GenerateName(),
                         BeneficiaryRelationId = beneRelationId,
                         Country = pinCode.Country,
