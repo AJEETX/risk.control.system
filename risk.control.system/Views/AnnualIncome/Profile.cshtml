@@ -1,10 +1,10 @@
 ﻿@{
-    ViewData["Title"] = "Annual Income";
+    ViewData["Title"] = "Income Type";
 }
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title"><i class="fas fa-money"></i> Annual Income</h3>
+            <h3 class="card-title"><i class="fas fa-money"></i> Income Type</h3>
         </div>
         <div class="card-body">
             <div class="submit-progress hidden">
@@ -29,7 +29,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                        <a class="btn btn-success create" asp-controller="CaseEnabler" asp-action="Create"><i class="fas fa-money"></i> @Applicationsettings.CREATE New</a>
+                        <a class="btn btn-success create" asp-action="Create"><i class="fas fa-money"></i> @Applicationsettings.CREATE New</a>
                     </div>
                 </div>
             </div>

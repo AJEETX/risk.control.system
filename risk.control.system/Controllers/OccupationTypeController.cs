@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
 
-        [Breadcrumb("Occupation")]
+        [Breadcrumb("Occupation Type")]
         public IActionResult Profile()
         {
             return View();
@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1)
             {
-                notifyService.Error("Occupation Not found!");
+                notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (income == null)
             {
-                notifyService.Error("Occupation Not found!");
+                notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers
                 occupation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.OccupationType.Add(occupation);
                 await _context.SaveChangesAsync();
-                notifyService.Success("Occupation created successfully!");
+                notifyService.Success("Occupation Type created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(occupation);
@@ -94,14 +94,14 @@ namespace risk.control.system.Controllers
         {
             if (id < 1)
             {
-                notifyService.Error("Occupation Not found!");
+                notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
             var occupation = await _context.OccupationType.FindAsync(id);
             if (occupation == null)
             {
-                notifyService.Error("Occupation Not found!");
+                notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(occupation);
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
         {
             if (id != occupation.Id)
             {
-                notifyService.Error("Occupation Not found!");
+                notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -122,13 +122,13 @@ namespace risk.control.system.Controllers
                 occupation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.OccupationType.Update(occupation);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("Occupation edited successfully!");
+                notifyService.Warning("Occupation Type edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error editing Occupation!");
+                notifyService.Error("Error editing Occupation Type!");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                return Json(new { success = false, message = "Occupation Not found!" });
+                return Json(new { success = false, message = "Occupation Type Not found!" });
             }
             var occupation = await _context.OccupationType.FindAsync(id);
             if (occupation != null)
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Occupation deleted successfully!" });
+            return Json(new { success = true, message = "Occupation Type deleted successfully!" });
         }
     }
 }

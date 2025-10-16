@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
 
-        [Breadcrumb("Annual Income")]
+        [Breadcrumb("Income Type")]
         public IActionResult Profile()
         {
             return View();
@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1)
             {
-                notifyService.Error("Income Not found!");
+                notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (income == null)
             {
-                notifyService.Error("Income Not found!");
+                notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(income);
                 await _context.SaveChangesAsync();
-                notifyService.Success("Income created successfully!");
+                notifyService.Success("Income Type created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(income);
@@ -94,14 +94,14 @@ namespace risk.control.system.Controllers
         {
             if (id < 1)
             {
-                notifyService.Error("Income Not found!");
+                notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
             var income = await _context.AnnualIncome.FindAsync(id);
             if (income == null)
             {
-                notifyService.Error("Income Not found!");
+                notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(income);
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
         {
             if (id != income.Id)
             {
-                notifyService.Error("Income Not found!");
+                notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -122,13 +122,13 @@ namespace risk.control.system.Controllers
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(income);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("Income edited successfully!");
+                notifyService.Warning("Income Type edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error editing Income!");
+                notifyService.Error("Error editing Income Type!");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                return Json(new { success = false, message = "Income Not found!" });
+                return Json(new { success = false, message = "Income Type Not found!" });
             }
             var income = await _context.AnnualIncome.FindAsync(id);
             if (income != null)
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Income deleted successfully!" });
+            return Json(new { success = true, message = "Income Type deleted successfully!" });
         }
     }
 }

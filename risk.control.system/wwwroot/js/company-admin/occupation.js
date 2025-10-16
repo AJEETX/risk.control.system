@@ -24,7 +24,7 @@
                 render: function (data) {
                     return `
                         <a id="edit${data}" class="btn btn-xs btn-warning" href="/OccupationType/Edit/${data}">
-                            <i class="fas fa-money-check-alt"></i> Edit
+                            <i class="fas fa-business-time"></i> Edit
                         </a>
                         &nbsp;
                         <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">

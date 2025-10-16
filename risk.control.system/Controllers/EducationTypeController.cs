@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
 
-        [Breadcrumb("Education")]
+        [Breadcrumb("Education Type")]
         public IActionResult Profile()
         {
             return View();
@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1)
             {
-                notifyService.Error("Education Not found!");
+                notifyService.Error("Education Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (income == null)
             {
-                notifyService.Error("Education Not found!");
+                notifyService.Error("Education Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers
                 education.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.EducationType.Add(education);
                 await _context.SaveChangesAsync();
-                notifyService.Success("Education created successfully!");
+                notifyService.Success("Education Type created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(education);
@@ -94,14 +94,14 @@ namespace risk.control.system.Controllers
         {
             if (id < 1)
             {
-                notifyService.Error("Education Not found!");
+                notifyService.Error("Education Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
             var education = await _context.EducationType.FindAsync(id);
             if (education == null)
             {
-                notifyService.Error("Education Not found!");
+                notifyService.Error("Education Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(education);
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
         {
             if (id != education.Id)
             {
-                notifyService.Error("Education Not found!");
+                notifyService.Error("Education Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -122,13 +122,13 @@ namespace risk.control.system.Controllers
                 education.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.EducationType.Update(education);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("Education edited successfully!");
+                notifyService.Warning("Education Type edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error editing Education!");
+                notifyService.Error("Error editing Education Type!");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                return Json(new { success = false, message = "Education Not found!" });
+                return Json(new { success = false, message = "Education Type Not found!" });
             }
             var education = await _context.EducationType.FindAsync(id);
             if (education != null)
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Education deleted successfully!" });
+            return Json(new { success = true, message = "Education Type deleted successfully!" });
         }
     }
 }
