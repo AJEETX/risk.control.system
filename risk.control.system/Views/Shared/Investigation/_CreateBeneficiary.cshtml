@@ -89,12 +89,12 @@
                     <label class="input-group-label">Annual Income (@ViewBag.Currency):</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="Income"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" asp-for="IncomeTypeId"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
-                            <option value="">--- SELECT---</option>
+                        <select required asp-for="IncomeTypeId" class="form-control remarks" asp-items="ViewBag.IncomeTypeId">
+                            <option value="">--- SELECT ---</option>
                         </select>
-                        <span asp-validation-for="Income" class="text-danger"></span>
+                        <span asp-validation-for="IncomeType" class="text-danger"></span>
                     </div>
                 </div>
                 <partial name="Investigation/_BeneficiaryPhoneNumber" model="@Model" />

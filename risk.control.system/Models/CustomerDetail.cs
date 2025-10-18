@@ -71,19 +71,16 @@ namespace risk.control.system.Models
         [Display(Name = "Customer type")]
         public CustomerType? CustomerType { get; set; }
 
-        [Required]
         [Display(Name = "Annual Income")]
         public Income? Income { get; set; }
         public long? IncomeTypeId { get; set; }
         public IncomeType? IncomeType { get; set; }
 
-        [Required]
         [Display(Name = "Occupation")]
         public Occupation? Occupation { get; set; }
         public long? OccupationTypeId { get; set; }
         public OccupationType? OccupationType { get; set; }
 
-        [Required]
         [Display(Name = "Education")]
         public Education? Education { get; set; }
         public long? EducationTypeId { get; set; }

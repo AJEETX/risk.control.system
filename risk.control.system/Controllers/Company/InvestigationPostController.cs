@@ -264,8 +264,8 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.Create), "Investigation");
                 }
                 if (customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 ||
-                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber) ||
-                    customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null || customerDetail.ProfileImage == null)
+                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.IncomeTypeId < 1 || string.IsNullOrWhiteSpace(customerDetail.ContactNumber) ||
+                    customerDetail.DateOfBirth == null || customerDetail.EducationTypeId < 1 || customerDetail.Gender == null || customerDetail.OccupationTypeId < 1 || customerDetail.ProfileImage == null)
                 {
                     notifyService.Error("OOPs !!!..Incomplete/Invalid input");
                     return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
@@ -317,8 +317,8 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.Create), "Investigation");
                 }
                 if (customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 ||
-                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber) ||
-                    customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null)
+                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.IncomeTypeId < 1 || string.IsNullOrWhiteSpace(customerDetail.ContactNumber) ||
+                    customerDetail.DateOfBirth == null || customerDetail.EducationTypeId < 1 || customerDetail.Gender == null || customerDetail.OccupationTypeId < 1)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
                     return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = investigationTaskId });
@@ -366,7 +366,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (beneficiary == null || beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1 ||
                     string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelationId < 1 || string.IsNullOrWhiteSpace(beneficiary.ContactNumber) ||
-                    beneficiary.DateOfBirth == null || beneficiary.Income == null || beneficiary.ProfileImage == null)
+                    beneficiary.DateOfBirth == null || beneficiary.IncomeTypeId < 1 || beneficiary.ProfileImage == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
                     return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
@@ -418,7 +418,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1 ||
                     string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelationId < 1 || string.IsNullOrWhiteSpace(beneficiary.ContactNumber) ||
-                    beneficiary.DateOfBirth == null || beneficiary.Income == null)
+                    beneficiary.DateOfBirth == null || beneficiary.IncomeTypeId < 1)
                 {
                     notifyService.Error("OOPs !!!..Error editing customer");
                     return RedirectToAction(nameof(InvestigationController.Create), "Investigation");

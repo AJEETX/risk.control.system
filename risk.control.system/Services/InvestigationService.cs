@@ -22,7 +22,7 @@ namespace risk.control.system.Services
         Task<ClientCompany> EditCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument);
         Task<ClientCompany> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
         Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
-        Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
+        Task<CaseTransactionModel> GetCaseDetails(string currentUserEmail, long id);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
         Task<CaseTransactionModel> GetClaimDetailsAiReportSummary(CaseTransactionModel model);
@@ -489,7 +489,7 @@ namespace risk.control.system.Services
                 return null;
             }
         }
-        public async Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id)
+        public async Task<CaseTransactionModel> GetCaseDetails(string currentUserEmail, long id)
         {
             var claim = await context.Investigations
                 .Include(c => c.CaseMessages)
@@ -505,6 +505,8 @@ namespace risk.control.system.Services
                 .Include(c => c.ClientCompany)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.IncomeType)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.District)
@@ -514,6 +516,12 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.Country)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.IncomeType)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.EducationType)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.OccupationType)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)
@@ -574,6 +582,8 @@ namespace risk.control.system.Services
                 .Include(c => c.ClientCompany)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.IncomeType)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.District)
@@ -583,6 +593,12 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.Country)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.IncomeType)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.EducationType)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.OccupationType)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)
@@ -778,6 +794,8 @@ namespace risk.control.system.Services
                 .Include(c => c.ClientCompany)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.IncomeType)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.District)
@@ -787,6 +805,12 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.Country)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.IncomeType)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.EducationType)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.OccupationType)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)

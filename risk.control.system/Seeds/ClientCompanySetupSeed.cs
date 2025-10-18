@@ -177,7 +177,7 @@ namespace risk.control.system.Seeds
 
             var NoIncome = new IncomeType
             {
-                Name = "None",
+                Name = "NO INCOME",
                 Code = "None",
                 Updated = DateTime.Now,
             };
@@ -185,7 +185,7 @@ namespace risk.control.system.Seeds
 
             var lowIncome = new IncomeType
             {
-                Name = "LowIncome",
+                Name = "0 - 2.5 Lac",
                 Code = "LowIncome",
                 Updated = DateTime.Now,
             };
@@ -193,7 +193,7 @@ namespace risk.control.system.Seeds
 
             var mediumIncome = new IncomeType
             {
-                Name = "MediumIncome",
+                Name = "2.5 - 5 Lac",
                 Code = "MediumIncome",
                 Updated = DateTime.Now,
             };
@@ -201,7 +201,7 @@ namespace risk.control.system.Seeds
 
             var highIncome = new IncomeType
             {
-                Name = "HighIncome",
+                Name = "5 - 10 Lac",
                 Code = "HighIncome",
                 Updated = DateTime.Now,
             };
@@ -209,12 +209,19 @@ namespace risk.control.system.Seeds
 
             var veryHighIncome = new IncomeType
             {
-                Name = "VeryHighIncome",
+                Name = "10 - 30 Lac",
                 Code = "VeryHighIncome",
                 Updated = DateTime.Now,
             };
             await context.IncomeType.AddAsync(veryHighIncome);
 
+            var ultraHighIncome = new IncomeType
+            {
+                Name = "Above 30 Lac",
+                Code = "UltraHighIncome",
+                Updated = DateTime.Now,
+            };
+            await context.IncomeType.AddAsync(ultraHighIncome);
             #endregion
 
             #region EDUCATION_TYPE
@@ -253,8 +260,8 @@ namespace risk.control.system.Seeds
 
             var twevlth = new EducationType
             {
-                Name = "12th Class",
-                Code = "12th Class",
+                Name = "12th CLASS",
+                Code = "12thClass",
                 Updated = DateTime.Now,
             };
             await context.EducationType.AddAsync(twevlth);
@@ -270,7 +277,7 @@ namespace risk.control.system.Seeds
             var postGraduate = new EducationType
             {
                 Name = "POST GRADUATE",
-                Code = "POST GRADUATE",
+                Code = "POSTGRADUATE",
                 Updated = DateTime.Now,
             };
             await context.EducationType.AddAsync(postGraduate);

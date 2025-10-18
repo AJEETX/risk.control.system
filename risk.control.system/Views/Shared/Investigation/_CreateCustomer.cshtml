@@ -98,7 +98,7 @@
                     </div>
                 </div> *@
                 
-                <div class="form-group">
+                @* <div class="form-group">
                     <label class="input-group-label">Annual Income (@ViewBag.Currency):</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -110,9 +110,8 @@
                         <span asp-validation-for="Income" class="text-danger"></span>
 
                     </div>
-                </div>
-
-                <div class="form-group">
+                </div> *@
+                @*                 <div class="form-group">
                     <label class="input-group-label"> Occupation:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -122,10 +121,9 @@
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Occupation" class="text-danger"></span>
-
                     </div>
-                </div>
-                <div class="form-group">
+                </div> *@
+                @*                 <div class="form-group">
                     <label class="input-group-label"> Education:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -135,10 +133,46 @@
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Education" class="text-danger"></span>
-
+                    </div>
+                </div> *@
+                <div class="form-group">
+                    <label class="input-group-label">Annual Income (@ViewBag.Currency):</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" asp-for="IncomeTypeId"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <select required asp-for="IncomeTypeId" class="form-control remarks" asp-items="ViewBag.IncomeTypeId">
+                            <option value="">--- SELECT ---</option>
+                        </select>
+                        <span asp-validation-for="IncomeType" class="text-danger"></span>
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label class="input-group-label"> Occupation:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" asp-for="OccupationTypeId"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <select required asp-for="OccupationTypeId" class="form-control remarks" asp-items="ViewBag.OccupationTypeId">
+                            <option value="">--- SELECT ---</option>
+                        </select>
+                        <span asp-validation-for="OccupationTypeId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-group-label"> Education:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" asp-for="EducationTypeId"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <select required asp-for="EducationTypeId" class="form-control remarks" asp-items="ViewBag.EducationTypeId">
+                            <option value="">--- SELECT ---</option>
+                        </select>
+                        <span asp-validation-for="EducationTypeId" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
             <div class="col-sm-6">
                 <partial name="Investigation/_CustomerPhoneNumber" model="@Model" />

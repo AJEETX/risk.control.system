@@ -228,6 +228,10 @@ namespace risk.control.system.Controllers.Company
 
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["IncomeTypeId"] = new SelectList(context.IncomeType.OrderBy(s => s.Code), "Id", "Name");
+                ViewData["EducationTypeId"] = new SelectList(context.EducationType.OrderBy(s => s.Code), "Id", "Name");
+                ViewData["OccupationTypeId"] = new SelectList(context.OccupationType.OrderBy(s => s.Code), "Id", "Name");
+
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var pinCode = context.PinCode.Include(s => s.Country).OrderBy(s => s.Name).FirstOrDefault(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
@@ -243,11 +247,14 @@ namespace risk.control.system.Controllers.Company
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                         Education = Education.PROFESSIONAL,
                         EducationTypeId = education.Id,
+                        EducationType = education,
                         Income = Income.UPPER_INCOME,
                         IncomeTypeId = income.Id,
+                        IncomeType = income,
                         Name = NameGenerator.GenerateName(),
                         Occupation = Occupation.SELF_EMPLOYED,
                         OccupationTypeId = occupation.Id,
+                        OccupationType = occupation,
                         //CustomerType = CustomerType.HNI,
                         //Description = "DODGY PERSON",
                         Country = pinCode.Country,
@@ -300,6 +307,9 @@ namespace risk.control.system.Controllers.Company
                 }
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["IncomeTypeId"] = new SelectList(context.IncomeType.OrderBy(s => s.Code), "Id", "Name");
+                ViewData["EducationTypeId"] = new SelectList(context.EducationType.OrderBy(s => s.Code), "Id", "Name");
+                ViewData["OccupationTypeId"] = new SelectList(context.OccupationType.OrderBy(s => s.Code), "Id", "Name");
 
                 var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
@@ -339,6 +349,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["BreadcrumbNode"] = editPage;
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["IncomeTypeId"] = new SelectList(context.IncomeType.OrderBy(s => s.Code), "Id", "Name");
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
@@ -402,6 +413,7 @@ namespace risk.control.system.Controllers.Company
                     .Include(v => v.BeneficiaryRelation)
                     .First(v => v.BeneficiaryDetailId == id);
                 ViewData["BeneficiaryRelationId"] = new SelectList(context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", beneficiary.BeneficiaryRelationId);
+                ViewData["IncomeTypeId"] = new SelectList(context.IncomeType.OrderBy(s => s.Code), "Id", "Name");
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
@@ -476,7 +488,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                var model = await service.GetClaimDetails(currentUserEmail, id);
+                var model = await service.GetCaseDetails(currentUserEmail, id);
                 return View(model);
             }
             catch (Exception ex)
