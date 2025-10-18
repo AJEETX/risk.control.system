@@ -3,7 +3,7 @@
 
     $('#customerTable').DataTable({
         ajax: {
-            url: '/AnnualIncome/GetAnnualIncomes',
+            url: '/IncomeType/GetAnnualIncomes',
             type: 'GET',
             datatype: 'json'
         },
@@ -23,7 +23,7 @@
                 data: 'id',
                 render: function (data) {
                     return `
-                        <a id="edit${data}" class="btn btn-xs btn-warning" href="/AnnualIncome/Edit/${data}">
+                        <a id="edit${data}" class="btn btn-xs btn-warning" href="/IncomeType/Edit/${data}">
                             <i class="fas fa-money"></i> Edit
                         </a>
                         &nbsp;

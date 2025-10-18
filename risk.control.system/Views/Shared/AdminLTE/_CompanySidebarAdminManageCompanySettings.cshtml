@@ -9,7 +9,7 @@
                                                         @Url.MakeActiveClass("IpAddress","") 
                                             @Url.MakeActiveClass("OccupationType","")
                                             @Url.MakeActiveClass("EducationType","")
-                                            @Url.MakeActiveClass("AnnualIncome","")
+                                                    @Url.MakeActiveClass("IncomeType", "")
                                         @Url.MakeActiveClass("BeneficiaryRelation","")">
                 <i class="nav-icon fas fa-cog"></i>
                 <p class="sidebar-menu-header-label">
@@ -38,7 +38,7 @@
         {
             
         <li class="nav-item">
-            <a is-active-page asp-controller="AnnualIncome" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("AnnualIncome", "")">
+                <a is-active-page asp-controller="IncomeType" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("IncomeType", "")">
                 <i class="fas fa-money nav-icon"></i>
                 <p>
                     Income Type
