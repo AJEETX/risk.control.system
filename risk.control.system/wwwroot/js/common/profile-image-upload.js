@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     const noPolicyUrl = '/img/no-policy.jpg'; // Default policy image URL
     const noUserUrl = '/img/no-user.png'; // Default user image URL
-    const MaxSizeInBytes = 2097152; // 2 MB
+    const MaxSizeInBytes = 5242880; // 5 MB
     let originalImageUrl = ''; // To store the original image URL
     let previousFileValue = ''; // Store previous file value to reset input if needed
 
@@ -71,7 +71,7 @@
         if (fileSize > MaxSizeInBytes) {
             showAlert(
                 "IMAGE UPLOAD ISSUE",
-                "<i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 2 MB!",
+                "<i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 5 MB!",
                 'red'
             );
             resetImageInput(inputElement, previewElement, originalImageUrl);

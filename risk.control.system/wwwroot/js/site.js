@@ -90,7 +90,7 @@ function checkFormCompletion(formSelector, create = false) {
 
 // Function to validate file input types
 function validateFileInput(inputElement, allowedExtensions) {
-    var MaxSizeInBytes = 2097152;
+    var MaxSizeInBytes = 5242880;
     if (!inputElement.files || !inputElement.files[0]) {
         return false; // Exit early if no files are selected
     }
@@ -122,7 +122,7 @@ function validateFileInput(inputElement, allowedExtensions) {
         document.getElementById('createImageInput').value = '';
         $.alert({
             title: "Image UPLOAD issue !",
-            content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 2 MB!",
+            content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 5 MB!",
             icon: 'fas fa-exclamation-triangle',
             type: 'red',
             closeIcon: true,
