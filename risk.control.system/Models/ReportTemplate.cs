@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using risk.control.system.Helpers;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Models
 {
@@ -14,7 +16,6 @@ namespace risk.control.system.Models
         public string? AnswerText { get; set; } // <== This will bind input value
     }
 
-
     public class ReportTemplate : BaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,21 +24,24 @@ namespace risk.control.system.Models
         public long? ClientCompanyId { get; set; }
         public ClientCompany? ClientCompany { get; set; }
         public InsuranceType InsuranceType { get; set; } = InsuranceType.CLAIM;
-
-        public List<LocationTemplate> LocationTemplate { get; set; } = new List<LocationTemplate>();
+        public List<LocationReport> LocationReport { get; set; } = new List<LocationReport>();
         public bool Basetemplate { get; set; } = false;
         public long? OriginalTemplateId { get; set; }
         [NotMapped]
         public long CaseId { get; set; }
+        public override string ToString()
+        {
+            return $"Report: \n" +
+                $"Location Report: {LocationReport.ToString()}";
+        }
     }
 
-    public class LocationTemplate : BaseEntity
+    public class LocationReport : BaseEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         [NotMapped]
         public string Address { get; set; } = "Life-Assured";
-
         public long? ReportTemplateId { get; set; }
         public ReportTemplate? ReportTemplate { get; set; }
         public string? LocationName { get; set; }
@@ -50,16 +54,29 @@ namespace risk.control.system.Models
             ReportType = DigitalIdReportType.AGENT_FACE,
             ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()
         };
-
         public List<MediaReport>? MediaReports { get; set; } = new();
-        public List<DigitalIdReport>? FaceIds { get; set; } = new();
+        public List<FaceIdReport>? FaceIds { get; set; } = new();
         public List<DocumentIdReport>? DocumentIds { get; set; } = new();
         public List<Question>? Questions { get; set; } = new List<Question>();
         public bool IsRequired { get; set; } = false;
         public bool ValidationExecuted { get; set; } = false;
+        public override string ToString()
+        {
+            return $"Location Report: " +
+                   $"Id={Id}, " +
+                   $"LocationName={LocationName}, " +
+                   $"Status={Status}, " +
+                   $"Agent Email={AgentEmail}, " +
+                   $"AgentId Report={(AgentIdReport != null ? AgentIdReport.ToString() : "null")}, " +
+                   $"MediaReportsCount={(MediaReports != null ? MediaReports.Count : 0)}, " +
+                   $"FaceIdsCount={(FaceIds != null ? FaceIds.Count : 0)}, " +
+                   $"DocumentIdsCount={(DocumentIds != null ? DocumentIds.Count : 0)}, " +
+                   $"QuestionsCount={(Questions != null ? Questions.Count : 0)}, " +
+                   $"IsRequired={IsRequired}, " +
+                   $"ValidationExecuted={ValidationExecuted}";
+        }
         [NotMapped]
         public long CaseId { get; set; }
-
         [NotMapped]
         public string LocationStatus = "border-secondary";
         [NotMapped]
@@ -72,14 +89,12 @@ namespace risk.control.system.Models
         public string StatusClass = "bg-light i-red";
         [NotMapped]
         public bool AllQuestionsAnswered => Questions.Where(q => q.IsRequired).All(q => !string.IsNullOrWhiteSpace(q.AnswerText));
-
         [NotMapped]
-        public bool DocumentsValidated => DocumentIds?.Where(d => d.Selected && d.IsRequired).All(d => d.IdImageValid.GetValueOrDefault() && d.IsRequired) ?? false;
+        public bool DocumentsValidated => DocumentIds?.Where(d => d.Selected && d.IsRequired).All(d => d.ImageValid.GetValueOrDefault() && d.IsRequired) ?? false;
         [NotMapped]
-        public bool FaceIdsValidated => FaceIds?.Where(f => f.Selected && f.IsRequired).All(f => f.IdImageValid.GetValueOrDefault() && f.IsRequired) ?? false;
+        public bool FaceIdsValidated => FaceIds?.Where(f => f.Selected && f.IsRequired).All(f => f.ImageValid.GetValueOrDefault() && f.IsRequired) ?? false;
         [NotMapped]
-        public bool AgentValidated => AgentIdReport?.IdImageValid ?? false;
-
+        public bool AgentValidated => AgentIdReport?.ImageValid ?? false;
         public void SetStatus()
         {
             if (IsRequired)

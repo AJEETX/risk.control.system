@@ -751,7 +751,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                request.InvestigationReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.Description);
+                request.InvestigationReport.EnquiryRequest.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
 
                 IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 

@@ -70,15 +70,15 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
             var template = await _context.ReportTemplates
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.DocumentIds)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
                 .FirstOrDefaultAsync(r => r.Id == claimsInvestigation.ReportTemplateId);
 

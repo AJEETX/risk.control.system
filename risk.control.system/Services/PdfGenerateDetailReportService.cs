@@ -88,7 +88,7 @@ namespace risk.control.system.Services
                      .SetUnderline();
             int locationCount = 1;
 
-            foreach (var loc in investigationReport.LocationTemplate)
+            foreach (var loc in investigationReport.LocationReport)
             {
                 if (loc.ValidationExecuted)
                 {
@@ -152,10 +152,10 @@ namespace risk.control.system.Services
                 foreach (var request in investigation.InvestigationReport.EnquiryRequests)
                 {
                     var rowBuilder = tableBuilder.AddRow();
-                    rowBuilder.AddCell().AddParagraph().AddText(request.Subject ?? "N/A").SetFontSize(10);
+                    rowBuilder.AddCell().AddParagraph().AddText(request.MultipleQuestionText ?? "N/A").SetFontSize(10);
                     rowBuilder.AddCell().AddParagraph().AddText(request.AnswerSelected ?? "N/A").SetFontSize(10);
-                    rowBuilder.AddCell().AddParagraph().AddText(request.Description ?? "N/A").SetFontSize(10);
-                    rowBuilder.AddCell().AddParagraph().AddText(request.Answer ?? "N/A").SetFontSize(10);
+                    rowBuilder.AddCell().AddParagraph().AddText(request.DescriptiveQuestion ?? "N/A").SetFontSize(10);
+                    rowBuilder.AddCell().AddParagraph().AddText(request.DescriptiveAnswer ?? "N/A").SetFontSize(10);
                     rowBuilder.AddCell().AddParagraph().AddText($"{request.Created:dd-MMM-yy hh:mm tt}").SetFontSize(10);
 
                     // Question Image Cell

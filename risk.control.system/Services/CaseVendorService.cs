@@ -73,15 +73,15 @@ namespace risk.control.system.Services
             claim.InvestigationReport.AgentEmail = userEmail;
 
             var templates = await _context.ReportTemplates
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.AgentIdReport)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.FaceIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                .ThenInclude(l => l.MediaReports)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 
@@ -147,15 +147,15 @@ namespace risk.control.system.Services
 
             var invoice = _context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
             var templates = await _context.ReportTemplates
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
-              .Include(r => r.LocationTemplate)
+              .Include(r => r.LocationReport)
                .ThenInclude(l => l.MediaReports)
-              .Include(r => r.LocationTemplate)
+              .Include(r => r.LocationReport)
                   .ThenInclude(l => l.FaceIds)
-              .Include(r => r.LocationTemplate)
+              .Include(r => r.LocationReport)
                   .ThenInclude(l => l.DocumentIds)
-              .Include(r => r.LocationTemplate)
+              .Include(r => r.LocationReport)
                   .ThenInclude(l => l.Questions)
                   .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 
@@ -242,15 +242,15 @@ namespace risk.control.system.Services
             beneficiaryDetails.ContactNumber = beneficairyContactMasked;
 
             var caseReportTemplate = await _context.ReportTemplates
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.AgentIdReport)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                .ThenInclude(l => l.MediaReports)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.FaceIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
 

@@ -22,15 +22,15 @@ namespace risk.control.system.Services
         public async Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType)
         {
             var originalTemplate = await context.ReportTemplates
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.AgentIdReport)
-                    .Include(r => r.LocationTemplate)
+                    .Include(r => r.LocationReport)
                    .ThenInclude(l => l.MediaReports)
-                   .Include(r => r.LocationTemplate)
+                   .Include(r => r.LocationReport)
                    .ThenInclude(l => l.FaceIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
             .FirstOrDefaultAsync(r => r.ClientCompanyId == clientCompanyId && r.InsuranceType == insuranceType && r.Basetemplate);
             var clone = new ReportTemplate
@@ -42,7 +42,7 @@ namespace risk.control.system.Services
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
                 Created = DateTime.UtcNow,
                 UpdatedBy = "system", // Or current user
-                LocationTemplate = originalTemplate.LocationTemplate.Select(loc => new LocationTemplate
+                LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
                 {
                     LocationName = loc.LocationName,
                     IsRequired = loc.IsRequired,
@@ -60,7 +60,7 @@ namespace risk.control.system.Services
                         MediaType = m.MediaType,
                         Selected = m.Selected,
                     }).ToList(),
-                    FaceIds = loc.FaceIds?.Select(face => new DigitalIdReport
+                    FaceIds = loc.FaceIds?.Select(face => new FaceIdReport
                     {
                         IsRequired = face.IsRequired,
                         ReportType = face.ReportType,
@@ -96,19 +96,19 @@ namespace risk.control.system.Services
             var investigation = await context.Investigations.FindAsync(caseId);
 
             var originalTemplate = await context.ReportTemplates
-                 .Include(r => r.LocationTemplate)
+                 .Include(r => r.LocationReport)
                    .ThenInclude(l => l.AgentIdReport)
-                   .Include(r => r.LocationTemplate)
+                   .Include(r => r.LocationReport)
                    .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.FaceIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
             .FirstOrDefaultAsync(r => r.Id == investigation.ReportTemplateId);
 
-            var locationTemplate = originalTemplate.LocationTemplate.Select(loc => new
+            var locationTemplate = originalTemplate.LocationReport.Select(loc => new
             {
                 LocationName = loc.LocationName,
                 IsRequired = loc.IsRequired,

@@ -2,14 +2,18 @@
 
 namespace risk.control.system.Models
 {
-    public class MediaReport : IdReportBase
+    public class MediaReport : ReportBase
     {
         public MediaType MediaType { get; set; } = MediaType.AUDIO;
         public string MediaExtension { get; set; } = "mp3";
         // Foreign key to LocationTemplate
-        public long? LocationTemplateId { get; set; }  // This is the FK property
-        public LocationTemplate? LocationTemplate { get; set; }  // Navigation property
-
+        public long? LocationReportId { get; set; }  // This is the FK property
+        public LocationReport? LocationReport { get; set; }  // Navigation property
+        public override string ToString()
+        {
+            return $"Document Report:\n" +
+                $"Report Type:{MediaExtension}";
+        }
     }
 
     public enum MediaType

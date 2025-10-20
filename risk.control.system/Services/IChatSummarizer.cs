@@ -1,6 +1,5 @@
 ﻿using System.Text;
-
-using Newtonsoft.Json;
+using System.Text.Json;
 
 using risk.control.system.Models;
 
@@ -21,23 +20,49 @@ public class OpenAISummarizer : IChatSummarizer
     {
         try
         {
-            var requestContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(claimsInvestigation.ToString()), Encoding.UTF8, "application/json");
+            var apiKey = Environment.GetEnvironmentVariable("GEMINI_KEY");
+            if (string.IsNullOrWhiteSpace(apiKey))
+                throw new Exception("API key not found in environment variable 'GEMINI_KEY'.");
 
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {Environment.GetEnvironmentVariable("HUGING_FACE")}");
-            HttpResponseMessage response = await _httpClient.PostAsync("https://api-inference.huggingface.co/models/facebook/bart-large-cnn", requestContent);
+            var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}";
+
+            var requestBody = new
+            {
+                contents = new[]
+                {
+                    new
+                    {
+                        parts = new[]
+                        {
+                            new { text = inputText }
+                        }
+                    }
+                }
+            };
+
+            var json = JsonSerializer.Serialize(requestBody);
+            var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(url, requestContent);
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Error while summarizing data: " + response.ReasonPhrase);
 
             string responseContent = await response.Content.ReadAsStringAsync();
-            dynamic result = JsonConvert.DeserializeObject(responseContent);
 
-            return result[0].summary_text;
+            using var doc = JsonDocument.Parse(responseContent);
+            var text = doc.RootElement
+                          .GetProperty("candidates")[0]
+                          .GetProperty("content")
+                          .GetProperty("parts")[0]
+                          .GetProperty("text")
+                          .GetString();
 
+            return text ?? "No summary found in response.";
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return "Error ||| Could not Summarise";
+            return "Error ||| Could not Summarize";
         }
     }
 }

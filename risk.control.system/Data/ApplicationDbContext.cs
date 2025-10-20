@@ -21,7 +21,7 @@ namespace risk.control.system.Data
         public virtual DbSet<PdfDownloadTracker> PdfDownloadTracker { get; set; }
         public virtual DbSet<InvestigationTask> Investigations { get; set; }
         public DbSet<ReportTemplate> ReportTemplates { get; set; }
-        public DbSet<LocationTemplate> LocationTemplate { get; set; }
+        public DbSet<LocationReport> LocationReport { get; set; }
         public virtual DbSet<Question> Questions { get; set; }
         public virtual DbSet<StatusNotification> Notifications { get; set; }
         public virtual DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
@@ -55,7 +55,7 @@ namespace risk.control.system.Data
         public DbSet<CustomerDetail> CustomerDetail { get; set; } = default!;
         public DbSet<BeneficiaryDetail> BeneficiaryDetail { get; set; } = default!;
         public DbSet<AgentIdReport> AgentIdReport { get; set; } = default!;
-        public DbSet<DigitalIdReport> DigitalIdReport { get; set; } = default!;
+        public DbSet<FaceIdReport> DigitalIdReport { get; set; } = default!;
         public DbSet<DocumentIdReport> DocumentIdReport { get; set; } = default!;
         public DbSet<MediaReport> MediaReport { get; set; } = default!;
         public DbSet<InvestigationReport> InvestigationReport { get; set; } = default!;

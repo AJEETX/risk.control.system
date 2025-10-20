@@ -18,19 +18,19 @@
             {
                 foreach (var template in Model)
                 {
-                    var faceCount = template.LocationTemplate
+                    var faceCount = template.LocationReport
                     .SelectMany(l => l.FaceIds)
                     .Count(i => i.Selected);
 
-                    var docCount = template.LocationTemplate
+                    var docCount = template.LocationReport
                     .SelectMany(l => l.DocumentIds)
                     .Count(i => i.Selected);
 
-                    var mediaCount = template.LocationTemplate
+                    var mediaCount = template.LocationReport
                     .SelectMany(l => l.MediaReports)
                     .Count(i => i.Selected);
 
-                    var questionCount = template.LocationTemplate
+                    var questionCount = template.LocationReport
                     .SelectMany(l => l.Questions)
                     .Count(); // all questions, no "Selected" property
 

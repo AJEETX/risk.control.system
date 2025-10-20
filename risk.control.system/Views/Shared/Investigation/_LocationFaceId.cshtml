@@ -1,5 +1,5 @@
 ﻿@using risk.control.system.Helpers;
-@model LocationTemplate
+@model LocationReport
 @{
 	var location = Model;
 }
@@ -48,17 +48,17 @@
 						}
 					</td>
 					<td>
-						@if (face.ValidationExecuted && face.IdImageLocationUrl != null)
+						@if (face.ValidationExecuted && face.LocationMapUrl != null)
 						{
-								<img src="@string.Format(face.IdImageLocationUrl, "500","500")"
+								<img src="@string.Format(face.LocationMapUrl, "500","500")"
 									 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
 								 data-faceid="@face.Id"
 								 data-locationid="@location.Id"
 								 data-source="face"
 								 title="Click to view map" />
 								<div>
-									<div>@face.IdImageLongLat</div>
-									<small>@face.IdImageLocationAddress</small>
+									<div>@face.LongLat</div>
+									<small>@face.LocationAddress</small>
 									<div class="badge badge-light">
 										Indicative Distance from  @location.Address Address @face.Distance
 									</div>
@@ -71,7 +71,7 @@
 					</td>
 					<td>
 						<small>
-						@face.IdImageLocationAddress
+						@face.LocationAddress
 						</small>
 						<span class="badge badge-light">
 								Indicative Distance from @location.Address Address @face.Distance
@@ -79,13 +79,13 @@
 					</td>
 					<td>
 						<small>
-						@face.IdImageData
+						@face.LocationInfo
 						</small>
 					</td>
 					<td>
 						@if (face.ValidationExecuted)
 						{
-							@if (face.IdImageValid.GetValueOrDefault())
+							@if (face.ImageValid.GetValueOrDefault())
 							{
 								<i class='fas fa-check-circle i-green'></i>
 							}

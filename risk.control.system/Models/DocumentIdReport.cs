@@ -1,14 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using risk.control.system.Helpers;
+
 namespace risk.control.system.Models
 {
-    public class DocumentIdReport : IdReportBase
+    public class DocumentIdReport : ReportBase
     {
         public byte[]? IdImageBack { get; set; }
         public bool HasBackImage { get; set; } = true;
         public DocumentIdReportType ReportType { get; set; } = DocumentIdReportType.PAN;
-        public long? LocationTemplateId { get; set; }  // This is the FK property
-        public LocationTemplate? LocationTemplate { get; set; }  // Navigation property
+        public long? LocationReportId { get; set; }  // This is the FK property
+        public LocationReport? LocationReport { get; set; }  // Navigation property
+        public override string ToString()
+        {
+            return $"Document Report:\n" +
+                $"Report Type:{ReportType.GetEnumDisplayName()}";
+        }
     }
 
     public enum DocumentIdReportType
@@ -70,5 +77,4 @@ namespace risk.control.system.Models
         [Display(Name = "Police Case Diary")]
         POLICE_CASE_DIARY
     }
-
 }

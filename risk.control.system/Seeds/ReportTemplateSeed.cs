@@ -15,7 +15,7 @@ namespace risk.control.system.Seeds
                 InsuranceType = InsuranceType.UNDERWRITING,
                 ClientCompanyId = company.ClientCompanyId,
                 Basetemplate = true,
-                LocationTemplate =
+                LocationReport =
                 [
                     new() {
                         LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
@@ -90,7 +90,7 @@ namespace risk.control.system.Seeds
                 InsuranceType = InsuranceType.CLAIM,
                 ClientCompanyId = company.ClientCompanyId,
                 Basetemplate = true,
-                LocationTemplate =
+                LocationReport =
                 [
                     new() {
                         LocationName = CONSTANTS.LOCATIONS.BENEFICIARY_ADDRESS,

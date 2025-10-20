@@ -45,7 +45,7 @@
 
                     </td>
                     <td>
-                        @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Description
+                        @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.DescriptiveQuestion
                     </td>
 
                     <td>
@@ -61,7 +61,7 @@
                         }
                     </td>
                     <td>
-                        <i class="fas fa-user-check"></i> @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.Answer
+                        <i class="fas fa-user-check"></i> @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest.DescriptiveAnswer
                     </td>
                 </tr>
                 </table>
@@ -88,7 +88,7 @@
                             {
                         <tr>
                             <td>
-                                 @request.Subject
+                                 @request.MultipleQuestionText
                             </td>
                                 <td>
                                     <ul class="multiple-question">

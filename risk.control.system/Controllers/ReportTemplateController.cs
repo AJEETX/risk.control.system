@@ -30,13 +30,13 @@ namespace risk.control.system.Controllers
                 .Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
 
             var templates = await context.ReportTemplates
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.DocumentIds)
-                     .Include(r => r.LocationTemplate)
+                     .Include(r => r.LocationReport)
                     .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
                     .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && q.Basetemplate && q.OriginalTemplateId == null)
                 .ToListAsync();
@@ -48,15 +48,15 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Details(long id)
         {
             var template = await context.ReportTemplates
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.DocumentIds)
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
@@ -96,15 +96,15 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public IActionResult AddFaceId(long locationId, string IdIName, DigitalIdReportType ReportType)
         {
-            var location = context.LocationTemplate.Include(l => l.FaceIds).FirstOrDefault(l => l.Id == locationId);
-            var faceId = new DigitalIdReport
+            var location = context.LocationReport.Include(l => l.FaceIds).FirstOrDefault(l => l.Id == locationId);
+            var faceId = new FaceIdReport
             {
                 IdName = IdIName,
                 ReportType = ReportType
             };
             location.FaceIds.Add(faceId);
 
-            context.LocationTemplate.Update(location);
+            context.LocationReport.Update(location);
             context.SaveChanges();
 
             return Json(new { locationId = locationId, newFaceId = faceId.Id });
@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public IActionResult AddDocId(long locationId, string IdIName, DocumentIdReportType ReportType)
         {
-            var location = context.LocationTemplate.Include(l => l.DocumentIds).FirstOrDefault(l => l.Id == locationId);
+            var location = context.LocationReport.Include(l => l.DocumentIds).FirstOrDefault(l => l.Id == locationId);
             var faceId = new DocumentIdReport
             {
                 IdName = IdIName,
@@ -177,7 +177,7 @@ namespace risk.control.system.Controllers
             };
             location.DocumentIds.Add(faceId);
 
-            context.LocationTemplate.Update(location);
+            context.LocationReport.Update(location);
             context.SaveChanges();
 
             return Json(new { locationId = locationId, newFaceId = faceId.Id });
@@ -251,7 +251,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public IActionResult AddQuestion(long locationId, string? optionsInput, bool isRequired, string newQuestionText, string newQuestionType)
         {
-            var location = context.LocationTemplate.Include(q => q.Questions).FirstOrDefault(q => q.Id == locationId);
+            var location = context.LocationReport.Include(q => q.Questions).FirstOrDefault(q => q.Id == locationId);
             if (location == null)
             {
                 return Json(new { success = false, message = "location not found." });
@@ -288,7 +288,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public IActionResult DeleteLocation(long id)
         {
-            var location = context.LocationTemplate
+            var location = context.LocationReport
                 .Include(l => l.Questions)
                 .Include(l => l.AgentIdReport)
                 .Include(l => l.FaceIds)
@@ -307,7 +307,7 @@ namespace risk.control.system.Controllers
             context.DocumentIdReport.RemoveRange(location.DocumentIds);
             context.MediaReport.RemoveRange(location.MediaReports);
 
-            context.LocationTemplate.Remove(location);
+            context.LocationReport.Remove(location);
             context.SaveChanges();
 
             return Json(new { success = true, Id = id });
@@ -315,7 +315,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public IActionResult SaveLocation([FromBody] SaveLocationDto model)
         {
-            var location = context.LocationTemplate
+            var location = context.LocationReport
                 .Include(l => l.AgentIdReport)
                 .Include(l => l.FaceIds)
                 .Include(l => l.DocumentIds)

@@ -1,5 +1,5 @@
 ﻿@using risk.control.system.Helpers;
-@model LocationTemplate
+@model LocationReport
 @{
 	var location = Model;
 }
@@ -64,18 +64,18 @@
 
 					</td>
 					<td>
-						@if (doc.ValidationExecuted && doc.IdImageLocationUrl != null)
+						@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
 						{
 							<img id="face-img-@doc.Id"
-								 src="@string.Format(@doc.IdImageLocationUrl, "400","400")"
+								 src="@string.Format(@doc.LocationMapUrl, "400","400")"
 									 class="mobile-capture-map map-image"
 								 data-faceid="@doc.Id"
 								 data-locationid="@location.Id"
 								 data-source="media"
 								 title="Click to view map" />
 								<div>
-									<div>@doc.IdImageLongLat</div>
-									<small>@doc.IdImageLocationAddress</small>
+									<div>@doc.LongLat</div>
+									<small>@doc.LocationAddress</small>
 									<br />
 									<div class="badge badge-light">
 										Indicative Distance from  @location.Address Address @doc.Distance
@@ -90,7 +90,7 @@
 						
 						<td>
 							<small>
-								@doc.IdImageData
+								@doc.LocationInfo
 							</small>
 						</td>
 					

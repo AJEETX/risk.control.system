@@ -9,7 +9,7 @@ namespace risk.control.system.Services
 {
     public interface IPdfGenerateQuestionLocationService
     {
-        SectionBuilder Build(SectionBuilder section, LocationTemplate loc);
+        SectionBuilder Build(SectionBuilder section, LocationReport loc);
     }
     public class PdfGenerateQuestionLocationService : IPdfGenerateQuestionLocationService
     {
@@ -40,7 +40,7 @@ namespace risk.control.system.Services
             Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Green);
         internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
         internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
-        public SectionBuilder Build(SectionBuilder section, LocationTemplate loc)
+        public SectionBuilder Build(SectionBuilder section, LocationReport loc)
         {
             // =================== QUESTIONS ====================
             if (loc.Questions?.Any() == true)

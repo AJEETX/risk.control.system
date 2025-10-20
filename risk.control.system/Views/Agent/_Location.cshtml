@@ -3,7 +3,7 @@
 <input type="hidden" id="latitude" />
 <input type="hidden" id="longitude" />
 <input type="hidden" name="caseId" value="@Model.CaseId" />
-@foreach (var location in Model.LocationTemplate)
+@foreach (var location in Model.LocationReport)
 {
 	location.CaseId = Model.CaseId;
 	location.Address = Model.InsuranceType == InsuranceType.CLAIM ? "Beneficiary" : location.Address;

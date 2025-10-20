@@ -59,13 +59,13 @@ namespace risk.control.system.Services
                 .FirstOrDefault(b => b.InvestigationTaskId == investigationTaskId);
 
             var investigationReport = await context.ReportTemplates
-                .Include(r => r.LocationTemplate)
+                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.AgentIdReport)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.FaceIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationTemplate)
+               .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == investigation.ReportTemplateId);
             var vendor = context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation.VendorId);

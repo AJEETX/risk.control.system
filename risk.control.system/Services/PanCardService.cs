@@ -71,13 +71,13 @@ namespace risk.control.system.Services
                     if (panResponse != null && panResponse.valid)
                     {
                         var panMatch = panRegex.Match(maskedImage.DocumentId);
-                        doc.IdImageValid = panMatch.Success && panResponse.valid ? true : false;
+                        doc.ImageValid = panMatch.Success && panResponse.valid ? true : false;
                     }
                 }
                 else
                 {
                     var panMatch = panRegex.Match(maskedImage.DocumentId);
-                    doc.IdImageValid = panMatch.Success ? true : false;
+                    doc.ImageValid = panMatch.Success ? true : false;
                 }
 
                 #endregion PAN IMAGE PROCESSING
@@ -86,11 +86,11 @@ namespace risk.control.system.Services
                 var savedMaskedImage = CompressImage.ProcessCompress(image, onlyExtension);
                 await System.IO.File.WriteAllBytesAsync(filePath, savedMaskedImage);
 
-                doc.IdImageData = maskedImage.DocType + " data: ";
+                doc.LocationInfo = maskedImage.DocType + " data: ";
 
                 if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
                 {
-                    doc.IdImageData = maskedImage.DocType + " data:. \r\n " +
+                    doc.LocationInfo = maskedImage.DocType + " data:. \r\n " +
                         "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                 }
             }
@@ -99,8 +99,8 @@ namespace risk.control.system.Services
                 Console.WriteLine(ex.StackTrace);
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
                 await File.WriteAllBytesAsync(filePath, CompressImage.ProcessCompress(image, onlyExtension));
-                doc.IdImageLongLatTime = DateTime.Now;
-                doc.IdImageData = "no data: ";
+                doc.LongLatTime = DateTime.Now;
+                doc.LocationInfo = "no data: ";
             }
             return doc;
         }
