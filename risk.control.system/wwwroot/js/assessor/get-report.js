@@ -278,7 +278,7 @@ $(document).ready(function () {
                         </span>
                     </div>
                     <input class="form-control remarks" 
-                           name="InvestigationReport.EnquiryRequests[${questionIndex}].Subject" 
+                           name="InvestigationReport.EnquiryRequests[${questionIndex}].MultipleQuestionText" 
                            placeholder="Enter Enquiry subject detail" required value="Sample question ${questionIndex + 1}?">
                 </div>
             </div>
