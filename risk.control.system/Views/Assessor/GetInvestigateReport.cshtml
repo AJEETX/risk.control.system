@@ -2,7 +2,7 @@
 
 @{
 	ViewData["Title"] = "Report ";
-	var locations = Model.InvestigationReport.ReportTemplate.LocationTemplate;
+	var locations = Model.InvestigationReport.ReportTemplate.LocationReport;
 }
 
 <section class="content">
@@ -141,7 +141,7 @@
 												<td>
 													@if (location.AgentIdReport.ValidationExecuted)
 													{
-														@if (location.AgentIdReport.IdImageValid.GetValueOrDefault())
+														@if (location.AgentIdReport.ImageValid.GetValueOrDefault())
 														{
 															<i class='fas fa-check-circle i-green'></i>
 														}
@@ -161,7 +161,7 @@
 														<div>
 															@if (face.ValidationExecuted)
 															{
-																@if (face.IdImageValid.GetValueOrDefault())
+																@if (face.ImageValid.GetValueOrDefault())
 																{
 																	<i class='fas fa-check-circle i-green'></i>
 																}
@@ -184,7 +184,7 @@
 														<div>
 															@if (doc.ValidationExecuted)
 															{
-																@if (doc.IdImageValid.GetValueOrDefault())
+																@if (doc.ImageValid.GetValueOrDefault())
 																{
 																	<i class='fas fa-check-circle i-green'></i>
 																}

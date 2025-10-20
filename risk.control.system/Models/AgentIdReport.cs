@@ -1,6 +1,6 @@
 ﻿namespace risk.control.system.Models
 {
-    public class AgentIdReport : IdReportBase
+    public class AgentIdReport : ReportBase
     {
         public string? DigitalIdImageMatchConfidence { get; set; } = string.Empty;
         public float Similarity { get; set; } = 0;

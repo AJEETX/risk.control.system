@@ -12,7 +12,7 @@ namespace risk.control.system.Services
 {
     public interface IPdfGenerateFaceLocationService
     {
-        Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc, bool isClaim = true);
+        Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true);
     }
     public class PdfGenerateFaceLocationService : IPdfGenerateFaceLocationService
     {
@@ -49,7 +49,7 @@ namespace risk.control.system.Services
         {
             this.webHostEnvironment = webHostEnvironment;
         }
-        public async Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc, bool isClaim = true)
+        public async Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true)
         {
             var imagePath = webHostEnvironment.WebRootPath;
 
@@ -82,11 +82,11 @@ namespace risk.control.system.Services
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(face.ReportName).SetFont(FNT9);
 
-                    if (face.IdImage != null)
+                    if (face.Image != null)
                     {
                         try
                         {
-                            var pngBytes = ImageConverterToPng.ConvertToPng(face.IdImage, face.IdImageExtension);
+                            var pngBytes = ImageConverterToPng.ConvertToPng(face.Image, face.ImageExtension);
                             rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
                         }
                         catch (Exception ex)
@@ -100,18 +100,18 @@ namespace risk.control.system.Services
                         rowBuilder.AddCell().AddParagraph().AddText("No Image").SetFont(FNT9);
                     }
 
-                    var addressData = $"DateTime:{face.IdImageLongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {face.IdImageLocationAddress}";
+                    var addressData = $"DateTime:{face.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {face.LocationAddress}";
                     rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
                     string location = isClaim ? "Beneficiary " : "Life-Assured ";
-                    var locData = $"Indicative Distance from {location} Address :{face.Distance}\r\n {face.IdImageData}";
+                    var locData = $"Indicative Distance from {location} Address :{face.Distance}\r\n {face.LocationInfo}";
                     rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
 
-                    if (face.IdImageLocationUrl != null)
+                    if (face.LocationMapUrl != null)
                     {
                         try
                         {
                             // Download the image
-                            string downloadedImagePath = await DownloadMapImageAsync(string.Format(face.IdImageLocationUrl, "300", "300"), googlePhotoImagePath);
+                            string downloadedImagePath = await DownloadMapImageAsync(string.Format(face.LocationMapUrl, "300", "300"), googlePhotoImagePath);
                             rowBuilder.AddCell()
                                       .AddParagraph()
                                       .AddInlineImage(downloadedImagePath)
@@ -128,9 +128,9 @@ namespace risk.control.system.Services
                         rowBuilder.AddCell().AddParagraph("No Map").SetFontSize(9);
                     }
                     // Match icon using Unicode
-                    string matchResult = face.IdImageValid == true ? "✓" : "✗";
+                    string matchResult = face.ImageValid == true ? "✓" : "✗";
                     rowBuilder.AddCell().AddParagraph(matchResult).SetFontSize(12).SetBold()
-                                .SetFontColor(face.IdImageValid == true ? Gehtsoft.PDFFlow.Models.Shared.Color.Green : Gehtsoft.PDFFlow.Models.Shared.Color.Red);
+                                .SetFontColor(face.ImageValid == true ? Gehtsoft.PDFFlow.Models.Shared.Color.Green : Gehtsoft.PDFFlow.Models.Shared.Color.Red);
                 }
             }
             return section;

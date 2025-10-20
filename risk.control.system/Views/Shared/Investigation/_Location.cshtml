@@ -1,6 +1,6 @@
 ﻿@using risk.control.system.Helpers;
 @model ReportTemplate
-@foreach (var location in Model.LocationTemplate)
+@foreach (var location in Model.LocationReport)
 {
 	if (location.ValidationExecuted)
 	{
@@ -83,9 +83,9 @@
 
 											<!-- Map Image -->
 											<td>
-											@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
+											@if (agent.ValidationExecuted && agent.LocationMapUrl != null)
 												{
-													<img src="@string.Format(@agent.IdImageLocationUrl, "600","500")"
+													<img src="@string.Format(@agent.LocationMapUrl, "600","500")"
 														 class="img-thumbnail"
 														 data-faceid="@agent.Id"
 														 data-locationid="@location.Id"
@@ -103,7 +103,7 @@
 											<td>
 												@if (agent.ValidationExecuted)
 												{
-													<small>@agent.IdImageLocationAddress</small>
+													<small>@agent.LocationAddress</small>
 													<div class="badge badge-light">
 														Indicative Distance from @location.Address Address  @agent.Distance
 													</div>
@@ -114,14 +114,14 @@
 												}
 											</td>
 											<td>
-												<small>@agent.IdImageData</small>
+												<small>@agent.LocationInfo</small>
 
 											</td>
 											<!-- Match status -->
 											<td>
 												@if (agent.ValidationExecuted)
 												{
-													@if (agent.IdImageValid.HasValue && agent.IdImageValid.Value)
+													@if (agent.ImageValid.HasValue && agent.ImageValid.Value)
 													{
 														<i class="fas fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
 													}

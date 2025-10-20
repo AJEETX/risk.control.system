@@ -318,7 +318,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
 
                 }
-                request.InvestigationReport.EnquiryRequest.Answer = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.Answer);
+                request.InvestigationReport.EnquiryRequest.DescriptiveAnswer = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveAnswer);
 
                 IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 

@@ -1,7 +1,7 @@
 ﻿@model ReportTemplate
 
 <div class="row">
-    @foreach (var location in Model.LocationTemplate)
+    @foreach (var location in Model.LocationReport)
     {
         var collapseId = $"collapse_{location.Id}"; // Ensure unique ID per location
 
@@ -64,7 +64,7 @@
                             <div class="col-md-3 border rounded p-2">
                                 <h6 class="text-muted"><i class="far fa-user"></i> Face IDs</h6>
                                 <ul class="list-unstyled mb-3">
-                                    @foreach (var face in location.FaceIds ?? new List<DigitalIdReport>())
+                                    @foreach (var face in location.FaceIds ?? new List<FaceIdReport>())
                                     {
                                         <li class="mb-2">
                                             <div class="border rounded p-2  bg-light">

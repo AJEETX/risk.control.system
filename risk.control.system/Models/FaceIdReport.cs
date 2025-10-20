@@ -1,17 +1,22 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using risk.control.system.Helpers;
+
 namespace risk.control.system.Models
 {
-    public class DigitalIdReport : IdReportBase
+    public class FaceIdReport : ReportBase
     {
         public string? MatchConfidence { get; set; } = string.Empty;
         public float Similarity { get; set; } = 0;
         public bool Has2Face { get; set; } = false;
         public DigitalIdReportType ReportType { get; set; }
-        // Foreign key to LocationTemplate
-        public long? LocationTemplateId { get; set; }  // This is the FK property
-        public LocationTemplate? LocationTemplate { get; set; }  // Navigation property
-
+        public long? LocationReportId { get; set; }  // This is the FK property
+        public LocationReport? LocationReport { get; set; }  // Navigation property
+        public override string ToString()
+        {
+            return $"Face Report:\n" +
+                $"Report Type:{ReportType.GetEnumDisplayName()}";
+        }
     }
 
     public enum DigitalIdReportType

@@ -15,7 +15,7 @@
         </div>
         <div class="card-body">
             @foreach (var request in Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests)
-                @if (!string.IsNullOrWhiteSpace(request?.Answer))
+                @if (!string.IsNullOrWhiteSpace(request?.DescriptiveAnswer))
                 {
                     <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                         <thead>
@@ -51,7 +51,7 @@
                                 }
                             </td>
                             <td>
-                                <i class="fas fa-question" aria-hidden="true"></i> @request.Subject
+                                <i class="fas fa-question" aria-hidden="true"></i> @request.MultipleQuestionText
                             </td>
                             <td>
                                 <i class="fas fa-user-check"></i> @request.AnswerSelected
@@ -74,10 +74,10 @@
 
                             </td>
                             <td>
-                                <i class="fas fa-question" aria-hidden="true"></i>  @request.Description
+                                <i class="fas fa-question" aria-hidden="true"></i>  @request.DescriptiveQuestion
                             </td>
                             <td>
-                                <i class="fas fa-user-check"></i> @request.Answer
+                                <i class="fas fa-user-check"></i> @request.DescriptiveAnswer
                             </td>
 
                         </tr>

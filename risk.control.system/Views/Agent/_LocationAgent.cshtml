@@ -1,5 +1,5 @@
 ﻿@using risk.control.system.Helpers;
-@model LocationTemplate
+@model LocationReport
 <!-- Agent Table -->
 @{
 	var location = Model;
@@ -55,9 +55,9 @@
 
 			</td>
 			<td>
-				@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
+				@if (agent.ValidationExecuted && agent.LocationMapUrl != null)
 				{
-					<img src="@string.Format(@agent.IdImageLocationUrl, "400","400")"
+					<img src="@string.Format(@agent.LocationMapUrl, "400","400")"
 						 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
 						 data-faceid="@agent.Id"
 						 data-locationid="@location.Id"
@@ -70,17 +70,17 @@
 				}
 			</td>
 			<td>
-				@agent.IdImageLocationAddress
+				@agent.LocationAddress
 
 			</td>
 			<td>
-				@agent.IdImageData
+				@agent.LocationInfo
 
 			</td>
 			<td>
 				@if (agent.ValidationExecuted)
 				{
-					@if (agent.IdImageValid.GetValueOrDefault())
+					@if (agent.ImageValid.GetValueOrDefault())
 					{
 						<i class='fas fa-check-circle i-green'></i>
 					}

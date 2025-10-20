@@ -3,6 +3,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using Newtonsoft.Json;
+
 using risk.control.system.Helpers;
 using risk.control.system.Services;
 
@@ -82,11 +84,15 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index));
                 }
                 var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
-                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
+                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled
+                    )
                 {
-                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+                    var report = model.InvestigationReport.ToString();
+                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation, report);
                     model.InvestigationReport.AiSummaryUpdated = DateTime.Now;
-                    model.ReportAiSummary = investigationSummary;
+                    string jsonWrapped = JsonConvert.SerializeObject(new { report = investigationSummary }, Formatting.Indented);
+
+                    model.ReportAiSummary = jsonWrapped;
                 }
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 

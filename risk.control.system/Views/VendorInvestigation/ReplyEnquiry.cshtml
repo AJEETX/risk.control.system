@@ -76,7 +76,7 @@
                                                 <div class="input-group">
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <b>  <i class="fa fa-comment"></i> Descriptive Question </b>:  @Model.InvestigationReport.EnquiryRequest.Description
+                                                            <b>  <i class="fa fa-comment"></i> Descriptive Question </b>:  @Model.InvestigationReport.EnquiryRequest.DescriptiveQuestion
                                                         </div>
                                                     </div>
                                                 </div>
@@ -103,7 +103,7 @@
                                     <div class="col-md-11">
                                         <div class="form-group">
                                             <div class="col-lg-12">
-                                                <textarea id="description" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.Answer" placeholder="Enquiry Description" rows="3" required>this is test </textarea>
+                                                <textarea id="description" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.DescriptiveAnswer" placeholder="Enquiry Description" rows="3" required>this is test </textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -139,7 +139,7 @@
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <b><i class="fa fa-comment"></i> Multiple Choice Question @(i + 1)</b>:
-                                                        @Model.InvestigationReport.EnquiryRequests[i].Subject
+                                                        @Model.InvestigationReport.EnquiryRequests[i].MultipleQuestionText
                                                     </div>
                                                 </div>
                                             </div>

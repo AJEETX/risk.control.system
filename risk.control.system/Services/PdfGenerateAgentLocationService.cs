@@ -9,7 +9,7 @@ namespace risk.control.system.Services
 {
     public interface IPdfGenerateAgentLocationService
     {
-        Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc, bool isClaim = true);
+        Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true);
     }
     public class PdfGenerateAgentLocationService : IPdfGenerateAgentLocationService
     {
@@ -46,14 +46,14 @@ namespace risk.control.system.Services
         {
             this.webHostEnvironment = webHostEnvironment;
         }
-        public async Task<SectionBuilder> Build(SectionBuilder section, LocationTemplate loc, bool isClaim)
+        public async Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim)
         {
             var imagePath = webHostEnvironment.WebRootPath;
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-agent-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
             // =================== AGENT ID REPORT ====================
             if (loc.AgentIdReport != null && loc.AgentIdReport.ValidationExecuted)
             {
-                var duration = loc.Updated.GetValueOrDefault().Subtract(loc.AgentIdReport.IdImageLongLatTime.GetValueOrDefault());
+                var duration = loc.Updated.GetValueOrDefault().Subtract(loc.AgentIdReport.LongLatTime.GetValueOrDefault());
                 var durationDisplay = "Time spent :" + (duration.Hours > 0 ? $"{duration.Hours}h " : "") + (duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
 
                 section.AddParagraph()
@@ -69,7 +69,7 @@ namespace risk.control.system.Services
                 // Section title
                 section.AddParagraph()
                        .SetLineSpacing(2)
-                       .AddText($"Capture Date:{loc.AgentIdReport.IdImageLongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")}")
+                       .AddText($"Capture Date:{loc.AgentIdReport.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")}")
                        .SetFontSize(10)
                        .SetUnderline();
 
@@ -85,11 +85,11 @@ namespace risk.control.system.Services
                     .AddColumnPercentToTable("Match", 5);
 
                 var rowBuilder = tableBuilder.AddRow();
-                if (loc.AgentIdReport.IdImage != null)
+                if (loc.AgentIdReport.Image != null)
                 {
                     try
                     {
-                        var pngBytes = ImageConverterToPng.ConvertToPng(loc.AgentIdReport.IdImage, loc.AgentIdReport.IdImageExtension);
+                        var pngBytes = ImageConverterToPng.ConvertToPng(loc.AgentIdReport.Image, loc.AgentIdReport.ImageExtension);
                         rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes)
                       .SetWidth(100);
                     }
@@ -103,18 +103,18 @@ namespace risk.control.system.Services
                 {
                     rowBuilder.AddCell().AddParagraph().AddText("No Image").SetFont(FNT9);
                 }
-                var addressData = $"DateTime:{loc.AgentIdReport.IdImageLongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {loc.AgentIdReport.IdImageLocationAddress}";
+                var addressData = $"DateTime:{loc.AgentIdReport.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {loc.AgentIdReport.LocationAddress}";
                 rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
                 string location = isClaim ? "Beneficiary " : "Life-Assured ";
-                var locData = $"Indicative Distance from {location} Address :{loc.AgentIdReport.Distance}\r\n {loc.AgentIdReport.IdImageData}";
+                var locData = $"Indicative Distance from {location} Address :{loc.AgentIdReport.Distance}\r\n {loc.AgentIdReport.LocationInfo}";
                 rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
 
-                if (loc.AgentIdReport.IdImageLocationUrl != null)
+                if (loc.AgentIdReport.LocationMapUrl != null)
                 {
                     try
                     {
                         // Download the image
-                        string downloadedImagePath = await DownloadMapImageAsync(string.Format(loc.AgentIdReport.IdImageLocationUrl, "300", "300"), googlePhotoImagePath);
+                        string downloadedImagePath = await DownloadMapImageAsync(string.Format(loc.AgentIdReport.LocationMapUrl, "300", "300"), googlePhotoImagePath);
                         rowBuilder.AddCell()
                                   .AddParagraph()
                                   .AddInlineImage(downloadedImagePath)
@@ -130,9 +130,9 @@ namespace risk.control.system.Services
                     rowBuilder.AddCell().AddParagraph("No Map").SetFontSize(9);
                 }
                 // Match icon using Unicode
-                string matchResult = loc.AgentIdReport.IdImageValid == true ? "✓" : "✗";
+                string matchResult = loc.AgentIdReport.ImageValid == true ? "✓" : "✗";
                 rowBuilder.AddCell().AddParagraph(matchResult).SetFontSize(14).SetBold()
-                            .SetFontColor(loc.AgentIdReport.IdImageValid == true ? Gehtsoft.PDFFlow.Models.Shared.Color.Green : Gehtsoft.PDFFlow.Models.Shared.Color.Red);
+                            .SetFontColor(loc.AgentIdReport.ImageValid == true ? Gehtsoft.PDFFlow.Models.Shared.Color.Green : Gehtsoft.PDFFlow.Models.Shared.Color.Red);
 
             }
             return section;

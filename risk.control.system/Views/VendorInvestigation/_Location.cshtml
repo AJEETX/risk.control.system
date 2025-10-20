@@ -3,7 +3,7 @@
 <input type="hidden" id="latitude" />
 <input type="hidden" id="longitude" />
 <input type="hidden" name="caseId" value="@Model.CaseId" />
-@foreach (var location in Model.LocationTemplate)
+@foreach (var location in Model.LocationReport)
 {
 	location.SetStatus();
 	var agent = location.AgentIdReport;
@@ -101,9 +101,9 @@
 
 										<!-- Map Image -->
 										<td>
-											@if (agent.ValidationExecuted && agent.IdImageLocationUrl != null)
+											@if (agent.ValidationExecuted && agent.LocationMapUrl != null)
 											{
-												<img src="@string.Format(@agent.IdImageLocationUrl, "500","500")"
+												<img src="@string.Format(@agent.LocationMapUrl, "500","500")"
 													 class="mobile-capture-info"
 													 data-faceid="@agent.Id"
 													 data-locationid="@location.Id"
@@ -122,8 +122,8 @@
 										<td>
 											@if (agent.ValidationExecuted)
 											{
-															<div>@agent.IdImageLongLat</div>
-												<small>@agent.IdImageLocationAddress</small>
+															<div>@agent.LongLat</div>
+												<small>@agent.LocationAddress</small>
 												<span class="badge badge-light">
 														Indicative Distance from @location.Address Address  @agent.Distance
 													</span>
@@ -134,14 +134,14 @@
 											}
 										</td>
 										<td>
-												<small>@agent.IdImageData</small>
+												<small>@agent.LocationInfo</small>
 
 											</td>
 										<!-- Match status -->
 										<td>
 											@if (agent.ValidationExecuted)
 											{
-												@if (agent.IdImageValid.HasValue && agent.IdImageValid.Value)
+												@if (agent.ImageValid.HasValue && agent.ImageValid.Value)
 												{
 													<i class="fa fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
 												}

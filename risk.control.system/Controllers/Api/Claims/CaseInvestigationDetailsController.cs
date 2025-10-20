@@ -209,11 +209,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefault(c => c.Id == caseId);
             var agentReport = _context.AgentIdReport.FirstOrDefault(l => l.Id == faceId);
 
-            var longLat = agentReport.IdImageLongLat.IndexOf(",");
-            var lat = agentReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+            var longLat = agentReport.LongLat.IndexOf(",");
+            var lat = agentReport?.LongLat.Substring(0, longLat)?.Trim();
             var LatitudeIndex = lat.IndexOf("=");
             var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
-            var longi = agentReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+            var longi = agentReport?.LongLat.Substring(longLat + 1)?.Trim();
             var LongitudeIndex = longi.IndexOf("=");
             var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
 
@@ -230,7 +230,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = string.Format(agentReport.IdImageLocationUrl, "500", "500"),
+                        url = string.Format(agentReport.LocationMapUrl, "500", "500"),
                         distance = agentReport.Distance,
                         duration = agentReport.Duration,
                         Address = "Life-Assured"
@@ -250,7 +250,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = string.Format(agentReport.IdImageLocationUrl, "500", "500"),
+                        url = string.Format(agentReport.LocationMapUrl, "500", "500"),
                         distance = agentReport.Distance,
                         duration = agentReport.Duration,
                         Address = "Beneficiary"
@@ -266,11 +266,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefault(c => c.Id == caseId);
             var faceReport = _context.DigitalIdReport.FirstOrDefault(l => l.Id == faceId);
 
-            var longLat = faceReport.IdImageLongLat.IndexOf(",");
-            var lat = faceReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+            var longLat = faceReport.LongLat.IndexOf(",");
+            var lat = faceReport?.LongLat.Substring(0, longLat)?.Trim();
             var LatitudeIndex = lat.IndexOf("=");
             var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
-            var longi = faceReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+            var longi = faceReport?.LongLat.Substring(longLat + 1)?.Trim();
             var LongitudeIndex = longi.IndexOf("=");
             var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
 
@@ -287,7 +287,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = string.Format(faceReport.IdImageLocationUrl, "500", "500"),
+                        url = string.Format(faceReport.LocationMapUrl, "500", "500"),
                         distance = faceReport.Distance,
                         duration = faceReport.Duration,
                         Address = "Life-Assured"
@@ -307,7 +307,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = string.Format(faceReport.IdImageLocationUrl, "500", "500"),
+                        url = string.Format(faceReport.LocationMapUrl, "500", "500"),
                         distance = faceReport.Distance,
                         duration = faceReport.Duration,
                         Address = "Beneficiary"
@@ -323,11 +323,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefault(c => c.Id == caseId);
             var docReport = _context.DocumentIdReport.FirstOrDefault(l => l.Id == docId);
 
-            var longLat = docReport.IdImageLongLat.IndexOf(",");
-            var lat = docReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+            var longLat = docReport.LongLat.IndexOf(",");
+            var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();
             var LatitudeIndex = lat.IndexOf("=");
             var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
-            var longi = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+            var longi = docReport?.LongLat.Substring(longLat + 1)?.Trim();
             var LongitudeIndex = longi.IndexOf("=");
             var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
 
@@ -344,7 +344,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
+                        url = string.Format(docReport.LocationMapUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
                         Address = "Life-Assured"
@@ -364,7 +364,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
+                        url = string.Format(docReport.LocationMapUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
                         Address = "Beneficiary"
@@ -382,11 +382,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefault(c => c.Id == caseId);
             var docReport = _context.MediaReport.FirstOrDefault(l => l.Id == docId);
 
-            var longLat = docReport.IdImageLongLat.IndexOf(",");
-            var lat = docReport?.IdImageLongLat.Substring(0, longLat)?.Trim();
+            var longLat = docReport.LongLat.IndexOf(",");
+            var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();
             var LatitudeIndex = lat.IndexOf("=");
             var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
-            var longi = docReport?.IdImageLongLat.Substring(longLat + 1)?.Trim();
+            var longi = docReport?.LongLat.Substring(longLat + 1)?.Trim();
             var LongitudeIndex = longi.IndexOf("=");
             var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
 
@@ -403,7 +403,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
+                        url = string.Format(docReport.LocationMapUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
                         Address = "Life-Assured"
@@ -423,7 +423,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         center,
                         dakota,
                         frick,
-                        url = string.Format(docReport.IdImageLocationUrl, "500", "500"),
+                        url = string.Format(docReport.LocationMapUrl, "500", "500"),
                         distance = docReport.Distance,
                         duration = docReport.Duration,
                         Address = "Beneficiary"

@@ -294,13 +294,13 @@ namespace risk.control.system.Services
                 var claimsCase = await context.Investigations
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationTemplate)
+                    .ThenInclude(c => c.LocationReport)
                     .ThenInclude(c => c.FaceIds)
                     .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationTemplate)
+                    .ThenInclude(c => c.LocationReport)
                     .ThenInclude(c => c.DocumentIds)
                     .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationTemplate)
+                    .ThenInclude(c => c.LocationReport)
                     .ThenInclude(c => c.Questions)
                     .FirstOrDefaultAsync(v => v.Id == claimsInvestigationId);
 
@@ -607,7 +607,7 @@ namespace risk.control.system.Services
                 claim.EnquiryReplyByAssessorTime = DateTime.Now;
                 claim.SubmittedToAssessorTime = DateTime.Now;
                 var enquiryRequest = claim.InvestigationReport.EnquiryRequest;
-                enquiryRequest.Answer = request.Answer;
+                enquiryRequest.DescriptiveAnswer = request.DescriptiveAnswer;
 
                 enquiryRequest.Updated = DateTime.Now;
                 enquiryRequest.UpdatedBy = userEmail;

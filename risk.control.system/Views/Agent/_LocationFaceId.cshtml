@@ -1,5 +1,5 @@
 ﻿@using risk.control.system.Helpers;
-@model LocationTemplate
+@model LocationReport
 @{
 	var location = Model;
 }
@@ -47,9 +47,9 @@
 						}
 					</td>
 					<td>
-						@if (face.ValidationExecuted && face.IdImageLocationUrl != null)
+						@if (face.ValidationExecuted && face.LocationMapUrl != null)
 						{
-							<img src="@string.Format(@face.IdImageLocationUrl, "300","300")"
+							<img src="@string.Format(@face.LocationMapUrl, "300","300")"
 								 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
 								 data-faceid="@face.Id"
 								 data-locationid="@location.Id"
@@ -63,17 +63,17 @@
 						}
 					</td>
 					<td>
-						@face.IdImageLocationAddress
+						@face.LocationAddress
 
 					</td>
 					<td>
-						@face.IdImageData
+						@face.LocationInfo
 
 					</td>
 					<td>
 						@if (face.ValidationExecuted)
 						{
-							@if (face.IdImageValid.GetValueOrDefault())
+							@if (face.ImageValid.GetValueOrDefault())
 							{
 								<i class='fas fa-check-circle i-green'></i>
 							}
