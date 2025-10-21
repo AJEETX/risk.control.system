@@ -35,17 +35,14 @@
                         <p class="text-muted text-sm">
                             <i class="fa fa-star"></i>  <b>Rating: </b>
                         </p>
-
                         <ul class="ml-4 mb-0 fa-ul text-muted">
                             <li class="small">
                                 <div id="agency-rating">
-
                                     <img src="/images/StarFade.gif" class="rating" id="1" />
                                     <img src="/images/StarFade.gif" class="rating" id="2" />
                                     <img src="/images/StarFade.gif" class="rating" id="3" />
                                     <img src="/images/StarFade.gif" class="rating" id="4" />
                                     <img src="/images/StarFade.gif" class="rating" id="5" />
-
                                     <span id="rating-result">
                                         <span class="badge badge-light">(@Model.RateCount)</span>
                                         @if (Model.RateCount != null && Model.RateCount > 0)
@@ -55,18 +52,15 @@
                                         }
                                     </span>
                                     <div class="dropdown-divider"></div>
-
                                     <div id="rating-result-data" class="badge badge-light">
                                     </div>
                                 </div>
                             </li>
                         </ul>
-                        
                         <div class="dropdown-divider"></div>
                         <div class="card-footer">
                             <div class="row">
                                 <div class="col-md-12">
-                                    
                                     <div class="form-group">
                                         <label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Agents (@Model.SelectedCountryId)" data-toggle="tooltip"><i class="fa fa-user-secret"></i>  Agents (@Model.SelectedCountryId)</label>
                                         <label class="card-header shadow-lg rounded-lg text-sm bg-light" title="@Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)" data-toggle="tooltip"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</label>
@@ -86,7 +80,6 @@
                                         <span class="info-box-number"><a href="#">@Model.Email</a></span>
                                     </div>
                                 </div>
-
                                 <div class="info-box">
                                     <span class="info-box-icon bg-success"><i class="fas fa-phone"></i></span>
                                     <div class="info-box-content">
@@ -101,7 +94,6 @@
                                         <span class="info-box-number">@Model.BankName</span>
                                     </div>
                                 </div>
-
                                 <div class="info-box">
                                     <span class="info-box-icon bg-warning"><i class="fab fa-btc"></i></span>
                                     <div class="info-box-content">
@@ -109,7 +101,6 @@
                                         <span class="info-box-number">@Model.BankAccountNumber</span>
                                     </div>
                                 </div>
-
                                 <div class="info-box">
                                     <span class="info-box-icon bg-warning"><i class="fas fa-code"></i></span>
                                     <div class="info-box-content">
@@ -118,7 +109,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <!-- Right Column -->
                             <div class="col-md-6">
                                 <div class="info-box">
@@ -128,7 +118,6 @@
                                         <span class="info-box-number">@Model.Addressline</span>
                                     </div>
                                 </div>
-
                                 <div class="info-box">
                                     <span class="info-box-icon bg-warning"><i class="fas fa-map-pin"></i></span>
                                     <div class="info-box-content">
@@ -143,7 +132,6 @@
                                         <span class="info-box-number">@Model.District.Name</span>
                                     </div>
                                 </div>
-
                                 <div class="info-box">
                                     <span class="info-box-icon bg-danger"><i class="fas fa-flag"></i></span>
                                     <div class="info-box-content">
@@ -151,7 +139,6 @@
                                         <span class="info-box-number">@Model.State.Name</span>
                                     </div>
                                 </div>
-
                                 <div class="info-box">
                                     <span class="info-box-icon bg-dark"><i class="fas fa-globe"></i></span>
                                     <div class="info-box-content">
@@ -159,18 +146,15 @@
                                         <span class="info-box-number">@Model.Country.Name</span>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
             <div class="card-footer">
                 <div class="row float-right">
                     <div class="col-md-12">
                         <div class="form-group">
-
                             <a id="back" asp-controller="Investigation" asp-action="EmpanelledVendors" asp-route-id="@Model.SelectedPincodeId" asp-route-vendorId="@Model.VendorId" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left"></i>
                                 <span class="badge badge-light"> <i class="fas fa-tasks"></i> </span> Back
@@ -181,7 +165,6 @@
             </div>
         </div>
 </section>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

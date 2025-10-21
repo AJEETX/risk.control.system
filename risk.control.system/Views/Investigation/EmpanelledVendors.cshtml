@@ -12,7 +12,6 @@
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <li>
-
                             <i class='far fa-hand-point-right'></i> Case #: <b>
                                 <i class="far fa-file-powerpoint"></i>
                                 @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
@@ -26,10 +25,8 @@
                             <i class='far fa-thumbs-up'></i>
                             <button class='btn btn-info btn-xs'><i class='fas fa-external-link-alt'></i> <b> Assign </b><sub>manual</sub></button>
                         </li>
-
                     </span>
                 </span>
-
             </h3>
         </div>
         @{
@@ -72,7 +69,6 @@
                             </button>
                         </div>
                     </div>
-
                     <div class="card-body">
                         <div class="row">
                             <partial name="Investigation/_DeletePolicy" model="@detailedModel" />
@@ -80,8 +76,6 @@
                             <partial name="Investigation/_DeleteBeneficiary" model="@detailedModel" />
                         </div>
                     </div>
-                    
-
                 </div>
             </div> <!-- class bb-blog-inner -->
         </article>
@@ -90,13 +84,10 @@
                     aria-expanded="false" aria-controls="reportTemplateContainer">
                 <i class="fas fa-file-alt"></i> Edit Report Template
             </button>
-
             <div id="reportTemplateContainer" class="card-body collapse">
                 <!-- Report template will load here -->
             </div>
-
         </div>
-
         <input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
         <div class="card shadow-lg border-1 rounded-lg">
             <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>

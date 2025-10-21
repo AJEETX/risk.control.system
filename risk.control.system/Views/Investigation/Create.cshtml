@@ -1,9 +1,7 @@
 ﻿@model InvestigationCreateModel
-
 @{
     ViewData["Title"] = "Create";
 }
-
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
@@ -45,7 +43,6 @@
                                 </li>
                             }
                         </span>
-
                     </span>
                 </span>
             </h3>
@@ -53,7 +50,6 @@
         <partial name="Investigation/_BlankCase" model="Model" />
         <div class="card-footer d-flex justify-content-center align-items-center">
             <div class="row">
-
                 <div class="col-md-12">
                     <div class="d-flex justify-content-center align-items-center">
                         <span class="detail-wizard"> <i class="far fa-hand-point-up"></i>  Complete  details to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
@@ -74,8 +70,6 @@
         </div>
     </div>
 </section>
-
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

@@ -28,7 +28,6 @@
                         <li>
                             <i class='far fa-hand-point-right'></i>
                             <button class="btn btn-warning btn-xs"><i class="far fa-file-powerpoint"></i>  Edit Case</button>
-
                         </li>
                         @if (customerExist)
                         {
@@ -42,7 +41,6 @@
                             <li>
                                 <i class='far fa-hand-point-right'></i>
                                 <a class="btn btn-success btn-xs"><i class="fa fa-user-plus"></i> Add Customer</a>
-
                             </li>
                         }
 
@@ -72,14 +70,12 @@
                         {
                             <li>
                                 <i class='far fa-hand-point-down'></i>
-
                                 <button class="btn btn-warning  btn-xs disabled">
                                     <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign(auto)</b>
                                 </button>
                             </li>
                             <li>
                                 <i class='far fa-hand-point-down'></i>
-
                                 <button class="btn btn-info  btn-xs disabled">
                                     <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign<sub>manual</sub></b>
                                 </button>
@@ -89,14 +85,12 @@
                         {
                             <li>
                                 <i class='far fa-hand-point-down'></i>
-
                                 <button class="btn btn-warning  btn-xs">
                                     <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b>Assign(auto)</b>
                                 </button>
                             </li>
                             <li>
                                 <i class='far fa-hand-point-down'></i>
-
                                 <button class="btn btn-info  btn-xs">
                                     <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign<sub>manual</sub></b>
                                 </button>
@@ -104,7 +98,6 @@
                         }
                     </span>
                 </span>
-
             </h3>
         </div>
         <div class="container d-flex justify-content-center align-items-center">
@@ -131,7 +124,6 @@
                 <partial name="Investigation/_FilledCase" model="@Model" />
                 <partial name="Investigation/_CustomerAndBeneficiary" model="@Model" />
             </div>
-
         </div>
         <form id="create-form" method="post" asp-controller="InvestigationPost" asp-action="AssignAutoSingle">
             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
@@ -139,18 +131,14 @@
             <input type="hidden" id="claims" name="claims" value="@Model.ClaimsInvestigation.Id" />
             <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
             <div class="card-footer d-flex  justify-content-center align-items-center">
-
                 <div class="row">
-
                     <div class="col-md-12">
-
                         @if (!customerExist || !beneficiaryExist)
                         {
                             <div class="d-flex justify-content-center align-items-center">
                                 <span class="detail-wizard"> <i class="far fa-hand-point-up"></i>  Complete  details to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
                             </div>
                             <div>
-
                                 <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
                                 @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                                 {
@@ -158,7 +146,6 @@
                                         <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
                                     </button>
                                 }
-                                
                                 <button disabled class="btn btn-info disabled">
                                     <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b>Assign</b><sub>manual</sub>
                                 </button>
@@ -169,11 +156,8 @@
                             <div class="d-flex justify-content-center align-items-center">
                                 <span class="detail-wizard-complete"> <i class="far fa-thumbs-up"></i> Detail completed. <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
                             </div>
-
                             <div>
-
                                 <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-
                                 @if (customerExist && beneficiaryExist && Model.CaseIsValidToAssign)
                                 {
                                     @if (Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
@@ -182,7 +166,6 @@
                                             <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign</b><sub>auto</sub>
                                         </button>
                                     }
-                                    
                                     <a id="assign-manual" href="/Investigation/EmpanelledVendors?Id=@Model.ClaimsInvestigation.Id&fromEditPage=true" class="btn btn-info">
                                         <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign</b><sub>manual</sub>
                                     </a>
@@ -190,29 +173,23 @@
                                 else
                                 {
                                     @if (Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
-
                                     {
                                         <button disabled class="btn btn-warning disabled">
                                             <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
                                         </button>
                                     }
-                                   
                                     <button disabled class="btn btn-info disabled">
                                         <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b>Assign</b><sub>manual</sub>
                                     </button>
                                 }
                             </div>
                         }
-
                     </div>
                 </div>
             </div>
         </form>
-
     </div>
 </section>
-
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

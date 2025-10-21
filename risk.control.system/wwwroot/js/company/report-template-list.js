@@ -27,6 +27,7 @@ $(document).ready(function () {
         }
         $('#questionAddForm')[0].reset();
         $('#addQuestionModal').find('input[name="LocationId"]').val(locationId);
+        $('#QuestionText').focus();
         $('#addQuestionModal').modal('show');
     });
 
