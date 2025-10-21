@@ -14,10 +14,7 @@
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            <div class="row">
-                <div class="col-md-3">
-                </div>
-
+            <div class="row justify-content-center">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="input-group-label"> Email:<small>(minimum 5 character)</small></label>
@@ -42,9 +39,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                </div>
-
             </div>
         </div>
 
@@ -54,8 +48,6 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="card-body">
                 <partial name="Vendor/_CreateUser" model="Model" />
-               
-                
             </div>
             <div class="card-footer">
             <div class="row">
@@ -76,10 +68,8 @@
                     </div>
                 </div>
         </form>
-
     </div>
 </section>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
