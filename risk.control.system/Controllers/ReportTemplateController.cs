@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
@@ -13,10 +16,14 @@ namespace risk.control.system.Controllers
     public class ReportTemplateController : Controller
     {
         private readonly ApplicationDbContext context;
+        private readonly ICloneReportService cloneService;
+        private readonly INotyfService notifyService;
 
-        public ReportTemplateController(ApplicationDbContext context)
+        public ReportTemplateController(ApplicationDbContext context, ICloneReportService cloneService, INotyfService notifyService)
         {
             this.context = context;
+            this.cloneService = cloneService;
+            this.notifyService = notifyService;
         }
         public IActionResult Index()
         {
@@ -38,7 +45,7 @@ namespace risk.control.system.Controllers
                     .ThenInclude(l => l.MediaReports)
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
-                    .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && q.Basetemplate && q.OriginalTemplateId == null)
+                    .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted)
                 .ToListAsync();
 
             return View(templates);
@@ -64,8 +71,70 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-
             return View(template);
+        }
+
+        [Breadcrumb("Clone Detail", FromAction = "Profile")]
+        public async Task<IActionResult> CloneDetails(long templateId)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var newTemplate = await cloneService.CreateCloneReportTemplate(templateId, currentUserEmail);
+            notifyService.Success($"Report cloned successfully");
+            return View(newTemplate);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Activate(long id)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            var activated = await cloneService.Activate(id);
+            if (activated)
+            {
+                return Json(new { success = true, message = "Report activated successfully!" });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Report activation failed!" });
+
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteTemplate(long id)
+        {
+            try
+            {
+                var template = await context.ReportTemplates.FindAsync(id);
+                if (template == null)
+                {
+                    return Json(new { success = false, message = "Template not found." });
+                }
+
+                if (template.IsActive)
+                {
+                    return Json(new { success = false, message = "Active templates cannot be deleted." });
+                }
+
+                template.IsDeleted = true;
+                context.ReportTemplates.Update(template);
+                var affected = await context.SaveChangesAsync() > 0;
+                if (affected)
+                {
+                    return Json(new { success = true, message = "Template deleted successfully." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Error to delete Template" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return Json(new { success = false, message = "Exception to delete Template" });
+            }
+
         }
 
         // Controller method for adding FaceId

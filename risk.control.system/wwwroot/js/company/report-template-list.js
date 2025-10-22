@@ -78,7 +78,6 @@ $(document).ready(function () {
         });
     });
 
-
     // helper to escape text (avoid XSS when injecting server text)
     function escapeHtml(text) {
         if (!text) return "";
@@ -407,13 +406,154 @@ $(document).ready(function () {
         });
     });
 
+    //Activate the report
+    $(document).on('click', '.activate-btn', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        $.confirm({
+            title: 'Confirm Activation',
+        content: 'Are you sure you want to activate this report?',
+        type: 'green',
+        typeAnimated: true,
+        buttons: {
+            confirm: {
+            text: 'Yes, Activate',
+            btnClass: 'btn-green',
+            action: function () {
+                $.ajax({
+                    url: '/ReportTemplate/Activate',
+                    type: 'POST',
+                    data: {
+                        icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                        id: id
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            $.alert({
+                                title: 'Success!',
+                                content: response.message,
+                                type: 'green',
+                                buttons: {
+                                    OK: function () {
+                                        location.href = "/ReportTemplate/Profile";
+                                    }
+                                }
+                            });
+                        } else {
+                            $.alert({
+                                title: 'Error!',
+                                content: response.message,
+                                type: 'red'
+                            });
+                        }
+                    },
+                    error: function () {
+                        $.alert({
+                            title: 'Error!',
+                            content: 'Something went wrong while activating the report.',
+                            type: 'red'
+                        });
+                    }
+                });
+                        }
+                },
+            cancel: {
+                text: 'Cancel',
+                btnClass: 'btn-secondary'
+                }
+            }
+        });
+    });
+    var hasClone = true;
+    $(document).on('click', '.clone-template', function (e) {
+        e.preventDefault();
+        var url = $(this).attr("href");
+        if (hasClone) {
+            $.confirm({
+                title: 'Confirm Clone',
+                content: 'Do you want to clone this template?',
+                type: 'blue',
+                typeAnimated: true,
+                buttons: {
+                    confirm: {
+                        text: 'Yes, Clone',
+                        btnClass: 'btn-blue',
+                        action: function () {
+                            hasClone = false;
+                            window.location.href = url; // proceed to clone
+                        }
+                    },
+                    cancel: {
+                        text: 'Cancel',
+                        btnClass: 'btn-gray'
+                    }
+                }
+            });
+        }
+        
+    });
+
+    $(document).on('click', '.delete-template', function () {
+        var id = $(this).data("id");
+        var row = $(this).closest("tr");
+
+        $.confirm({
+            title: 'Confirm Deletion',
+            content: 'Are you sure you want to delete this template?',
+            type: 'red',
+            typeAnimated: true,
+            buttons: {
+                confirm: {
+                    text: 'Yes, Delete',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $.ajax({
+                            url: '/ReportTemplate/DeleteTemplate',
+                            type: 'POST',
+                            data: { id: id },
+                            success: function (response) {
+                                if (response.success) {
+                                    $.alert({
+                                        title: 'Deleted!',
+                                        content: response.message,
+                                        type: 'green'
+                                    });
+                                    row.fadeOut(500, function () {
+                                        $(this).remove();
+                                    });
+                                } else {
+                                    $.alert({
+                                        title: 'Error!',
+                                        content: response.message,
+                                        type: 'red'
+                                    });
+                                }
+                            },
+                            error: function () {
+                                $.alert({
+                                    title: 'Error!',
+                                    content: 'Something went wrong. Please try again.',
+                                    type: 'red'
+                                });
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Cancel',
+                    btnClass: 'btn-secondary'
+                }
+            }
+        });
+    });
+
     $('#claim-tab').click(function () {
             $('#claim-content').addClass('show active');
             $('#underwriting-content').removeClass('show active');
         });
 
-        $('#underwriting-tab').click(function () {
-            $('#underwriting-content').addClass('show active');
-            $('#claim-content').removeClass('show active');
-        });
+    $('#underwriting-tab').click(function () {
+        $('#underwriting-content').addClass('show active');
+        $('#claim-content').removeClass('show active');
+    });
 });
