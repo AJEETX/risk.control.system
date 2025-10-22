@@ -9,6 +9,8 @@ namespace risk.control.system.Services
     public interface ICloneReportService
     {
         Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType);
+        Task<ReportTemplate> CreateCloneReportTemplate(long templateId, string currentUserEmail);
+        Task<bool> Activate(long templateId);
         Task<object> GetReportTemplate(long caseId, string agentEmail);
     }
     public class CloneReportService : ICloneReportService
@@ -19,6 +21,112 @@ namespace risk.control.system.Services
         {
             this.context = context;
         }
+
+        public async Task<bool> Activate(long templateId)
+        {
+            var template = await context.ReportTemplates
+                .FirstOrDefaultAsync(r => r.Id == templateId);
+
+            if (template == null)
+                return false;
+
+            // Deactivate all other templates of same InsuranceType
+            var sameTypeTemplates = await context.ReportTemplates
+                .Where(r => r.InsuranceType == template.InsuranceType && r.Id != templateId)
+                .ToListAsync();
+
+            foreach (var t in sameTypeTemplates)
+            {
+                t.IsActive = false;
+            }
+
+            // Activate selected template
+            template.IsActive = true;
+
+            // Update entities
+            context.ReportTemplates.UpdateRange(sameTypeTemplates);
+            context.ReportTemplates.Update(template);
+
+            var rowsAffected = await context.SaveChangesAsync();
+            return rowsAffected > 0;
+        }
+
+        public async Task<ReportTemplate> CreateCloneReportTemplate(long templateId, string currentUserEmail)
+        {
+            var originalTemplate = await context.ReportTemplates
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.AgentIdReport)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.MediaReports)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.FaceIds)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.DocumentIds)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.Questions)
+                .FirstOrDefaultAsync(r => r.Id == templateId);
+
+            var clone = new ReportTemplate
+            {
+                Name = "Copy_" + originalTemplate.Name,
+                ClientCompanyId = originalTemplate.ClientCompanyId,
+                InsuranceType = originalTemplate.InsuranceType,
+                Basetemplate = false, // Set to false for the cloned template
+                OriginalTemplateId = originalTemplate.Id, // Reference to the original template
+                Created = DateTime.UtcNow,
+                UpdatedBy = currentUserEmail, // Or current user
+                LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
+                {
+                    LocationName = loc.LocationName,
+                    IsRequired = loc.IsRequired,
+                    AgentIdReport = new AgentIdReport
+                    {
+                        Selected = loc.AgentIdReport.Selected,
+                        IsRequired = loc.AgentIdReport.IsRequired,
+                        ReportType = loc.AgentIdReport.ReportType,
+                        ReportName = loc.AgentIdReport.ReportName,
+                    },
+                    MediaReports = loc.MediaReports?.Select(m => new MediaReport
+                    {
+                        IsRequired = m.IsRequired,
+                        ReportName = m.ReportName,
+                        MediaType = m.MediaType,
+                        Selected = m.Selected,
+                    }).ToList(),
+                    FaceIds = loc.FaceIds?.Select(face => new FaceIdReport
+                    {
+                        IsRequired = face.IsRequired,
+                        ReportType = face.ReportType,
+                        Selected = face.Selected,
+                        Has2Face = face.Has2Face,
+                        ReportName = face.ReportName
+                    }).ToList(),
+
+                    DocumentIds = loc.DocumentIds?.Select(doc => new DocumentIdReport
+                    {
+                        IsRequired = doc.IsRequired,
+                        ReportType = doc.ReportType,
+                        ReportName = doc.ReportName,
+                        IdImageBack = doc.IdImageBack,
+                        Selected = doc.Selected,
+                    }).ToList(),
+
+                    Questions = loc.Questions?.Select(q => new Question
+                    {
+                        QuestionText = q.QuestionText,
+                        QuestionType = q.QuestionType,
+                        Options = q.Options,
+                        IsRequired = q.IsRequired,
+                        // Copy other fields
+                    }).ToList()
+                }).ToList()
+            };
+
+            var addedTemplate = await context.ReportTemplates.AddAsync(clone);
+            var rowsAffected = await context.SaveChangesAsync();
+            return addedTemplate.Entity;
+        }
+
         public async Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType)
         {
             var originalTemplate = await context.ReportTemplates
@@ -32,7 +140,8 @@ namespace risk.control.system.Services
                    .ThenInclude(l => l.DocumentIds)
                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
-            .FirstOrDefaultAsync(r => r.ClientCompanyId == clientCompanyId && r.InsuranceType == insuranceType && r.Basetemplate);
+            .FirstOrDefaultAsync(r => r.ClientCompanyId == clientCompanyId && r.InsuranceType == insuranceType && r.IsActive);
+
             var clone = new ReportTemplate
             {
                 Name = originalTemplate.Name,
@@ -88,7 +197,6 @@ namespace risk.control.system.Services
                     }).ToList()
                 }).ToList()
             };
-
             return clone;
         }
         public async Task<object> GetReportTemplate(long caseId, string agentEmail)

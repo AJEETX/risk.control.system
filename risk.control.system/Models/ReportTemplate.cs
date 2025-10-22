@@ -26,7 +26,10 @@ namespace risk.control.system.Models
         public InsuranceType InsuranceType { get; set; } = InsuranceType.CLAIM;
         public List<LocationReport> LocationReport { get; set; } = new List<LocationReport>();
         public bool Basetemplate { get; set; } = false;
+        public bool IsActive { get; set; } = false;
         public long? OriginalTemplateId { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
         [NotMapped]
         public long CaseId { get; set; }
         public override string ToString()

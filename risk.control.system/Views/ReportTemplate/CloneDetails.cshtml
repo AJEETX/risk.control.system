@@ -26,9 +26,6 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <div class="row">
-                <form id="antiForgeryForm">
-                    @Html.AntiForgeryToken()
-                </form>
                 @foreach (var location in Model.LocationReport)
                 {
                     var collapseId = $"collapse_{location.Id}"; // Ensure unique ID per location
@@ -55,6 +52,7 @@
                             <div id="@collapseId" class="collapse">
                                 <div class="card-body">
                                     <div class="row g-3 align-items-start">
+
                                         <!-- Agent ID -->
                                         <div class="col-md-3 border rounded p-2">
                                             <h6 class="text-muted"><i class="far fa-user"></i> Agent ID</h6>
@@ -84,6 +82,8 @@
                                                 </li>
                                             </ul>
                                         </div>
+
+
                                         <!-- Face IDs -->
                                         <div class="col-md-3 border rounded p-2">
                                             <h6 class="text-muted"><i class="far fa-user"></i> Face IDs</h6>
@@ -115,6 +115,7 @@
                                                 }
                                             </ul>
                                         </div>
+
                                         <!-- Document IDs -->
                                         <div class="col-md-3 border rounded p-2">
                                             <h6 class="text-muted"><i class="far fa-file-alt"></i> Document IDs</h6>
@@ -146,6 +147,7 @@
                                                 }
                                             </ul>
                                         </div>
+
                                         <!-- Media IDs -->
                                         <div class="col-md-3 border rounded p-2">
                                             <h6 class="text-muted"><i class="far fa-file-alt"></i> Media</h6>
@@ -171,6 +173,7 @@
                                                 }
                                             </ul>
                                         </div>
+
                                         <!-- Questions -->
                                         <div class="col-md-9 border rounded p-2">
                                             <h6 class="text-muted"><i class="fas fa-question-circle"></i> Questions</h6>
@@ -214,6 +217,8 @@
                                                 </button>
                                             </span>
                                         </div>
+
+
                                         <!-- Delete Button -->
                                         <div class="col-md-2 text-end">
                                             <button class="btn btn-sm btn-outline-success mt-4 save-location-btn" data-locationid="@location.Id">
@@ -223,36 +228,27 @@
                                                 <i class="fas fa-trash"></i> Delete
                                             </button>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 }
+            
             </div>
+
         </div>
         <div class="card-footer">
+
             <div class="row">
-                <div class="col-md-12">
-                    <a id="back" asp-action="Profile" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> <i class="far fa-file-powerpoint"></i> Back
-                    </a>
-                    @if (Model.IsActive)
-                    {
-                        <button disabled class="btn btn-success">
-                            <i class="fas fa-flash igreen"></i><bold> Active</bold>
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-outline-success activate-btn" data-id="@Model.Id">
-                            <i class="fas fa-flash"></i> Activate
-                        </button>
-                    }
+            <div class="col-md-12">
+                @* <button disabled class="btn btn-outline-success">
+                    <i class="fas fa-map-marker-alt"></i> Add Location
+                </button> *@
 
-                    
-                </div>
-
+                <a id="back" asp-action="Profile" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> <i class="far fa-file-powerpoint"></i> Back</a>
+            </div>
             </div>
         </div>
     </div>
