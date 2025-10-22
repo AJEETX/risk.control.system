@@ -68,12 +68,12 @@ namespace risk.control.system.Services
 
             var clone = new ReportTemplate
             {
-                Name = "Copy_" + originalTemplate.Name,
+                Name = "Copy_" + originalTemplate.Name + "_" + DateTime.Now.ToString("dd_MMM_yyyy_HH_mm"),
                 ClientCompanyId = originalTemplate.ClientCompanyId,
                 InsuranceType = originalTemplate.InsuranceType,
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
-                Created = DateTime.UtcNow,
+                Created = DateTime.Now,
                 UpdatedBy = currentUserEmail, // Or current user
                 LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
                 {
@@ -149,7 +149,7 @@ namespace risk.control.system.Services
                 InsuranceType = originalTemplate.InsuranceType,
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
-                Created = DateTime.UtcNow,
+                Created = DateTime.Now,
                 UpdatedBy = "system", // Or current user
                 LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
                 {
