@@ -464,6 +464,7 @@ $(document).ready(function () {
             }
         });
     });
+
     var hasClone = true;
     $(document).on('click', '.clone-template', function (e) {
         e.preventDefault();
@@ -480,6 +481,11 @@ $(document).ready(function () {
                         btnClass: 'btn-blue',
                         action: function () {
                             hasClone = false;
+                            $("body").addClass("submit-progress-bg");
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            disableAllInteractiveElements();
                             window.location.href = url; // proceed to clone
                         }
                     },
@@ -493,6 +499,13 @@ $(document).ready(function () {
         
     });
 
+    $(document).on('click', '.edit-template', function (e) {
+        $("body").addClass("submit-progress-bg");
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        disableAllInteractiveElements();
+    });
     $(document).on('click', '.delete-template', function () {
         var id = $(this).data("id");
         var row = $(this).closest("tr");

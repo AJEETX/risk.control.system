@@ -1,18 +1,17 @@
 ﻿@model List<ReportTemplate>
 
 <div class="table-responsive">
-    <table class="table table-striped table-hover align-middle">
-        <thead class="table-header">
+    <table class="table table-bordered table-striped table-hover dt-responsive nowrap w-100">
+	<thead class="table-light">
             <tr>
-                <th>CLONE</th>
                 <th>Name</th>
-                <th>IsActive</th>
+                <th>Status</th>
                 <th>Created</th>
                 <th title="Face IDs"><i class="fas fa-id-badge"></i> </th>
                 <th title="Documents"><i class="fas fa-file-alt"></i> </th>
                 <th title="Media Files"><i class="fas fa-film"></i> </th>
                 <th title="Questions"><i class="fas fa-question-circle"></i></th>
-                <th>Actions</th>
+                <th data-toggle="tooltip" title="[Clone] | [View] | [Delete]">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -37,40 +36,71 @@
                     .Count(); // all questions, no "Selected" property
 
                     <tr>
-                        <td>
-                            <a  asp-action="CloneDetails" asp-controller="ReportTemplate" asp-route-templateId="@template.Id"
-                               class="btn btn-sm btn-outline-secondary clone-template">
-                                <i class="fas fa-copy"></i> Clone
-                            </a>
+                        <td title="@(template.Name)">
+                            @if (template.Name.Length <= 50)
+                            {
+                                @template.Name
+                            }
+                            else
+                            {
+                                @template.Name.Substring(0, 50) <span>...</span>
+                             }
                         </td>
-                        <td>@template.Name</td>
+
                         <td>
                             @if (template.IsActive)
                             {
-                                <span class="badge bg-success">
-                                    <i class="fas fa-check-circle"></i> Active
+                                <span class="badge bg-success" data-toggle="tooltip" title="Active">
+                                    <i class="fas fa-check-circle"></i> 
                                 </span>
                             }
                             else
                             {
-                                <span class="badge bg-secondary">
-                                    <i class="fas fa-times-circle"></i> Inactive
+                                <span class="badge bg-secondary" data-toggle="tooltip" title="InActive">
+                                    <i class="fas fa-times-circle"></i>
                                 </span>
                             }
                         </td>
-                        <td>
-                            <small> 
-                                @template.Created.ToString("dd-MMM-yyyy") 
+                        <td data-toggle="tooltip" title="@template.Created.ToString("dd-MMM-yyyy HH:mm")">
+                            <small>
+                                @{
+                                    var created = template.Created;
+                                    var now = DateTime.Now;
+                                    var diff = now.Date - created.Date;
+                                    string displayText;
+
+                                    if (diff.TotalDays < 1)
+                                    {
+                                        displayText = $"Today at {created:HH:mm}";
+                                    }
+                                    else if (diff.TotalDays < 2)
+                                    {
+                                        displayText = $"Yesterday at {created:HH:mm}";
+                                    }
+                                    else if (diff.TotalDays < 7)
+                                    {
+                                        displayText = $"{diff.Days} days ago";
+                                    }
+                                    else
+                                    {
+                                        displayText = created.ToString("dd-MMM-yyyy");
+                                    }
+                                }
+                                @displayText
                             </small>
-                         </td>
+                        </td>
                         <td>@faceCount</td>
                         <td>@docCount</td>
                         <td>@mediaCount</td>
                         <td>@questionCount</td>
                         <td>
+                            <a  asp-action="CloneDetails" asp-controller="ReportTemplate" asp-route-templateId="@template.Id"
+                               class="btn btn-sm btn-outline-secondary clone-template">
+                                <i class="fas fa-copy"></i> Clone
+                            </a>
                             <a asp-action="Details" asp-controller="ReportTemplate" asp-route-id="@template.Id"
-                               class="btn btn-sm  btn-outline-secondary">
-                                <i class="fas fa-eye"></i> View
+                               class="btn btn-sm  btn-outline-secondary edit-template">
+                                <i class="fas fa-edit"></i> Edit
                             </a>
                             @if (!template.IsActive)
                             {

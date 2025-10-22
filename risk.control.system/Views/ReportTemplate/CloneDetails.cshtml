@@ -12,7 +12,7 @@
                             <i class='far fa-hand-point-right'></i> View Template <sub>details</sub>
                         </li>
                         <li>
-                            <i class='far fa-thumbs-up'></i> Add Report <sub>template</sub>
+                            <i class='far fa-thumbs-up'></i> Edit Report <sub>template</sub>
                         </li>
                         <li>
                             <i class='fa fa-hand-peace-o'></i> <b> Save</b> Report <sub>template</sub>
@@ -26,6 +26,12 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <div class="row">
+                <div class="col-12 text-center">
+                    <label for="Name">
+                        Template Name :
+                        <span class="btn-outline-success">@Model.Name</span>
+                    </label>
+                </div>
                 @foreach (var location in Model.LocationReport)
                 {
                     var collapseId = $"collapse_{location.Id}"; // Ensure unique ID per location
