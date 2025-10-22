@@ -68,7 +68,7 @@ namespace risk.control.system.Services
 
             var clone = new ReportTemplate
             {
-                Name = "Copy_" + originalTemplate.Name + "_" + DateTime.Now.ToString("dd_MMM_yyyy_HH_mm"),
+                Name = "Copy_" + originalTemplate.Name + "_" + DateTime.Now.ToString("ddMMMyyyyHmmss"),
                 ClientCompanyId = originalTemplate.ClientCompanyId,
                 InsuranceType = originalTemplate.InsuranceType,
                 Basetemplate = false, // Set to false for the cloned template

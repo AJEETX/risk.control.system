@@ -499,6 +499,13 @@ $(document).ready(function () {
         
     });
 
+    $(document).on('click', '.edit-template', function (e) {
+        $("body").addClass("submit-progress-bg");
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        disableAllInteractiveElements();
+    });
     $(document).on('click', '.delete-template', function () {
         var id = $(this).data("id");
         var row = $(this).closest("tr");
