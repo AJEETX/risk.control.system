@@ -1,5 +1,11 @@
 ﻿@model ReportTemplate
 <div class="row">
+    <div class="col-12 text-center">
+        <label for="Name">
+            <small> Template Name </small> :
+            <span class="btn-outline-success">@Model.Name</span>
+        </label>
+    </div>
     @foreach (var location in Model.LocationReport)
     {
         var collapseId = $"collapse_{location.Id}"; // Ensure unique ID per location

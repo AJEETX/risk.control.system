@@ -45,7 +45,7 @@ namespace risk.control.system.Controllers
                     .ThenInclude(l => l.MediaReports)
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
-                    .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted)
+                    .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system")
                 .ToListAsync();
 
             return View(templates);
