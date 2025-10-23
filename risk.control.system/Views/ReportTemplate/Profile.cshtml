@@ -43,6 +43,9 @@
 
             <div class="row">
                 <div class="col-md-12">
+                    <form id="antiForgeryForm">
+                        @Html.AntiForgeryToken()
+                    </form>
                     @{
                         var claimTemplates = Model.Where(t => t.InsuranceType == InsuranceType.CLAIM).ToList();
                         var underwritingTemplates = Model.Where(t => t.InsuranceType == InsuranceType.UNDERWRITING).ToList();

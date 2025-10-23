@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.RegularExpressions;
+
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-
 namespace risk.control.system.Services
 {
     public interface ICloneReportService
@@ -66,9 +67,12 @@ namespace risk.control.system.Services
                     .ThenInclude(l => l.Questions)
                 .FirstOrDefaultAsync(r => r.Id == templateId);
 
+            string baseName = Regex.Replace(originalTemplate.Name, @"_\d{8}_\d{6,9}$", "");
+            string newName = $"{baseName}_{DateTime.Now:yyyyMMdd_HHmmss}";
+
             var clone = new ReportTemplate
             {
-                Name = "Copy_" + originalTemplate.Name + "_" + DateTime.Now.ToString("ddMMMyyyyHmmss"),
+                Name = newName,
                 ClientCompanyId = originalTemplate.ClientCompanyId,
                 InsuranceType = originalTemplate.InsuranceType,
                 Basetemplate = false, // Set to false for the cloned template
@@ -262,6 +266,5 @@ namespace risk.control.system.Services
 
             return locationTemplate;
         }
-
     }
 }
