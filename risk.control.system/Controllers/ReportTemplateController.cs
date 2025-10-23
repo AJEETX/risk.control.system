@@ -77,31 +77,48 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Clone Detail", FromAction = "Profile")]
         public async Task<IActionResult> CloneDetails(long templateId)
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var newTemplate = await cloneService.CreateCloneReportTemplate(templateId, currentUserEmail);
-            notifyService.Success($"Report cloned successfully");
-            return View(newTemplate);
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var newTemplate = await cloneService.CreateCloneReportTemplate(templateId, currentUserEmail);
+                notifyService.Success($"Report cloned successfully");
+                return View(newTemplate);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error($"Issue cloning Report!!!");
+                return RedirectToAction(nameof(Profile));
+            }
+
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Activate(long id)
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var activated = await cloneService.Activate(id);
-            if (activated)
+            try
             {
-                return Json(new { success = true, message = "Report activated successfully!" });
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                var activated = await cloneService.Activate(id);
+                if (activated)
+                {
+                    return Json(new { success = true, message = "Report activated successfully!" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Report activation failed!" });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Report activation failed!" });
-
+                Console.WriteLine(ex.StackTrace);
+                return Json(new { success = false, message = "Report activation failed! Try again" });
             }
-
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteTemplate(long id)
         {
             try
@@ -134,7 +151,6 @@ namespace risk.control.system.Controllers
                 Console.WriteLine(ex.StackTrace);
                 return Json(new { success = false, message = "Exception to delete Template" });
             }
-
         }
 
         // Controller method for adding FaceId

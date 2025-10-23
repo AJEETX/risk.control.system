@@ -523,7 +523,10 @@ $(document).ready(function () {
                         $.ajax({
                             url: '/ReportTemplate/DeleteTemplate',
                             type: 'POST',
-                            data: { id: id },
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: id
+                            },
                             success: function (response) {
                                 if (response.success) {
                                     $.alert({
