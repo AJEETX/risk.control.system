@@ -231,6 +231,7 @@ $(document).ready(function () {
 
         $.confirm({
             title: 'Confirm Delete',
+            icon: 'fas fa-trash',
             content: 'Are you sure you want to delete this question?',
             type: 'red',
             buttons: {
@@ -255,7 +256,7 @@ $(document).ready(function () {
                                     });
                                 } else {
                                     $.alert({
-                                        title: 'Error',
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                         content: response.message || 'Failed to delete question.',
                                         type: 'red'
                                     });
@@ -263,7 +264,7 @@ $(document).ready(function () {
                             },
                             error: function () {
                                 $.alert({
-                                    title: 'Error',
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                     content: 'An error occurred while deleting.',
                                     type: 'red'
                                 });
@@ -287,6 +288,7 @@ $(document).ready(function () {
 
         $.confirm({
             title: 'Confirm Delete',
+            icon: 'fas fa-trash',
             content: 'Are you sure you want to delete this location?',
             type: 'red',
             buttons: {
@@ -299,19 +301,20 @@ $(document).ready(function () {
                             type: 'POST',
                             data: {
                                 icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
-                                id: locationId
+                                id: locationId,
+                                locationDeletable: $('#locationCount').val() > 1
                             },
                             success: function (response) {
                                 if (response.success) {
                                     $card.remove(); // remove location from UI
                                     $.alert({
-                                        title: 'Deleted',
+                                        title: '<span class="i-red"> <i class="fas fa-trash"></i> </span> Deleted!',
                                         content: 'Location deleted successfully!',
-                                        type: 'green'
+                                        type: 'red'
                                     });
                                 } else {
                                     $.alert({
-                                        title: 'Error',
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                         content: response.message || 'Failed to delete location.',
                                         type: 'red'
                                     });
@@ -319,7 +322,7 @@ $(document).ready(function () {
                             },
                             error: function () {
                                 $.alert({
-                                    title: 'Error',
+                                    title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                     content: 'An error occurred while deleting.',
                                     type: 'red'
                                 });
@@ -396,13 +399,13 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.success) {
                     $.alert({
-                        title: "Success",
+                        title: '<span class="i-green"><i class="fas fa-edit"></i> </span> Success',
                         content: "Location saved successfully!",
                         type: "green"
                     });
                 } else {
                     $.alert({
-                        title: "Error",
+                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                         content: response.message || "Failed to save location.",
                         type: "red"
                     });
@@ -411,7 +414,7 @@ $(document).ready(function () {
             error: function (xhr) {
             console.error(xhr.responseText);
             $.alert({
-                title: "Error",
+                title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                 content: "An error occurred while saving.",
                 type: "red"
             });
@@ -425,9 +428,9 @@ $(document).ready(function () {
         var id = $(this).data('id');
         $.confirm({
             title: 'Confirm Activation',
+            icon: 'fas fa-flash',
         content: 'Are you sure you want to activate this report?',
         type: 'green',
-        typeAnimated: true,
         buttons: {
             confirm: {
             text: 'Yes, Activate',
@@ -443,18 +446,22 @@ $(document).ready(function () {
                     success: function (response) {
                         if (response.success) {
                             $.alert({
-                                title: 'Success!',
+                                title: '<span class="i-green"> <i class="fas fas fa-flash"></i> </span> Activated!',
                                 content: response.message,
                                 type: 'green',
                                 buttons: {
-                                    OK: function () {
-                                        location.href = "/ReportTemplate/Profile";
+                                    OK: {
+                                        btnClass: 'btn-green',
+                                        icon: 'fa-flash',
+                                        action: function () {
+                                            location.href = "/ReportTemplate/Profile";
+                                        }
                                     }
                                 }
                             });
                         } else {
                             $.alert({
-                                title: 'Error!',
+                                title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                 content: response.message,
                                 type: 'red'
                             });
@@ -462,17 +469,17 @@ $(document).ready(function () {
                     },
                     error: function () {
                         $.alert({
-                            title: 'Error!',
+                            title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                             content: 'Something went wrong while activating the report.',
                             type: 'red'
                         });
                     }
                 });
-                        }
+                    }
                 },
             cancel: {
                 text: 'Cancel',
-                btnClass: 'btn-secondary'
+                        btnClass: 'btn-default'
                 }
             }
         });
@@ -486,12 +493,13 @@ $(document).ready(function () {
             $.confirm({
                 title: 'Confirm Clone',
                 content: 'Do you want to clone this template?',
-                type: 'blue',
+                                        icon: 'fas fa-copy',
+                type: 'dark',
                 typeAnimated: true,
                 buttons: {
                     confirm: {
                         text: 'Yes, Clone',
-                        btnClass: 'btn-blue',
+                        btnClass: 'btn-dark',
                         action: function () {
                             hasClone = false;
                             $("body").addClass("submit-progress-bg");
@@ -504,7 +512,7 @@ $(document).ready(function () {
                     },
                     cancel: {
                         text: 'Cancel',
-                        btnClass: 'btn-gray'
+                        btnClass: 'btn-default'
                     }
                 }
             });
@@ -518,6 +526,10 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         disableAllInteractiveElements();
+        var $btn = $(this);
+        $btn.prop('disabled', true);         // disable button
+        $btn.addClass('disabled');           // add visual Bootstrap disabled style
+        $btn.html('<i class="fas fa-sync fa-spin"></i> Edit'); // show spinner feedback
     });
 
     //delete template
@@ -529,7 +541,6 @@ $(document).ready(function () {
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete this template?',
             type: 'red',
-            typeAnimated: true,
             buttons: {
                 confirm: {
                     text: 'Yes, Delete',
@@ -545,16 +556,21 @@ $(document).ready(function () {
                             success: function (response) {
                                 if (response.success) {
                                     $.alert({
-                                        title: 'Deleted!',
+                                        title: '<span class="i-orangered"> <i class="fas fa-trash"></i> </span> Deleted!',
                                         content: response.message,
-                                        type: 'green'
+                                        type: 'red',
+                                        buttons: {
+                                            OK: {
+                                                btnClass: 'btn-red',
+                                            }
+                                        }
                                     });
                                     row.fadeOut(500, function () {
                                         $(this).remove();
                                     });
                                 } else {
                                     $.alert({
-                                        title: 'Error!',
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                         content: response.message,
                                         type: 'red'
                                     });
@@ -562,7 +578,7 @@ $(document).ready(function () {
                             },
                             error: function () {
                                 $.alert({
-                                    title: 'Error!',
+                                    title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                     content: 'Something went wrong. Please try again.',
                                     type: 'red'
                                 });
@@ -572,7 +588,7 @@ $(document).ready(function () {
                 },
                 cancel: {
                     text: 'Cancel',
-                    btnClass: 'btn-secondary'
+                        btnClass: 'btn-default'
                 }
             }
         });

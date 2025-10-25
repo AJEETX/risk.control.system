@@ -16,7 +16,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("General Setup")]
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
     public class ReportTemplateController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -376,8 +376,12 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteLocation(long id)
+        public IActionResult DeleteLocation(long id, bool locationDeletable = true)
         {
+            if (!locationDeletable)
+            {
+                return Json(new { success = false, message = "Single Location not DELETED." });
+            }
             var location = context.LocationReport
                 .Include(l => l.Questions)
                 .Include(l => l.AgentIdReport)

@@ -1,6 +1,10 @@
 ﻿@model ReportTemplate
 <div class="row">
+    <form id="antiForgeryForm">
+        @Html.AntiForgeryToken()
+    </form>
     <div class="col-12 text-center">
+        <input type="hidden" id="locationCount" value="@Model.LocationReport.Count" />
         <label for="Name">
             <small> Template Name </small> :
             <span class="btn-outline-success">@Model.Name</span>

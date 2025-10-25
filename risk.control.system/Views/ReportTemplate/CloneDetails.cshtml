@@ -26,15 +26,17 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <div class="row">
+                <form id="antiForgeryForm">
+                    @Html.AntiForgeryToken()
+                </form>
                 <div class="col-12 text-center">
+                    <input type="hidden" id="locationCount" value="@Model.LocationReport.Count" />
                     <label for="Name">
                         Template Name :
                         <span class="btn-outline-success">@Model.Name</span>
                     </label>
                 </div>
-                <form id="antiForgeryForm">
-                    @Html.AntiForgeryToken()
-                </form>
+                
                 @foreach (var location in Model.LocationReport)
                 {
                     var collapseId = $"collapse_{location.Id}"; // Ensure unique ID per location

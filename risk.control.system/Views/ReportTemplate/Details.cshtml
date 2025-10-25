@@ -30,6 +30,7 @@
                     @Html.AntiForgeryToken()
                 </form>
                 <div class="col-12 text-center">
+                    <input type="hidden" id="locationCount" value="@Model.LocationReport.Count" />
                     <label for="Name">
                         Template Name :
                         <span class="btn-outline-success">@Model.Name</span>
@@ -235,6 +236,7 @@
                         </div>
                     </div>
                 }
+            
             </div>
         </div>
         <div class="card-footer">
@@ -255,10 +257,7 @@
                             <i class="fas fa-flash"></i> Activate
                         </button>
                     }
-
-                    
                 </div>
-
             </div>
         </div>
     </div>
