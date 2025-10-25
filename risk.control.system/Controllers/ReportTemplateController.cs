@@ -33,6 +33,7 @@ namespace risk.control.system.Controllers
         {
             return RedirectToAction("Profile");
         }
+
         [Breadcrumb(" Report Template", FromAction = "Index")]
         public async Task<IActionResult> Profile()
         {
@@ -96,6 +97,7 @@ namespace risk.control.system.Controllers
             }
 
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Activate(long id)
@@ -181,6 +183,7 @@ namespace risk.control.system.Controllers
                 faceId = face
             });
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AddFaceId(long locationId, string IdIName, DigitalIdReportType ReportType)
@@ -198,6 +201,7 @@ namespace risk.control.system.Controllers
 
             return Json(new { locationId = locationId, newFaceId = faceId.Id });
         }
+
         [HttpPost]
         public async Task<IActionResult> UpdateFaceId(long id, string newName, string newReportType)
         {
@@ -253,6 +257,7 @@ namespace risk.control.system.Controllers
                 documentId = doc
             });
         }
+
         [HttpPost]
         public IActionResult AddDocId(long locationId, string IdIName, DocumentIdReportType ReportType)
         {
@@ -269,6 +274,7 @@ namespace risk.control.system.Controllers
 
             return Json(new { locationId = locationId, newFaceId = faceId.Id });
         }
+
         [HttpPost]
         public async Task<IActionResult> UpdateDocumentId(long id, string newName, string newDocumentType)
         {
@@ -357,21 +363,27 @@ namespace risk.control.system.Controllers
 
             return Json(new { success = true, updatedQuestion = question });
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteQuestion(long id)
+        public IActionResult DeleteQuestion(long id, long locationId)
         {
             var question = context.Questions.FirstOrDefault(q => q.Id == id);
             if (question == null)
             {
                 return Json(new { success = false, message = "Question not found." });
             }
+            var location = context.LocationReport
+                .Include(l => l.Questions)
+                .FirstOrDefault(l => l.Id == locationId);
 
-            context.Questions.Remove(question);
-
-            context.SaveChanges();
-
-            return Json(new { success = true, Id = id });
+            if (location.Questions.Count > 1)
+            {
+                context.Questions.Remove(question);
+                context.SaveChanges();
+                return Json(new { success = true, Id = id });
+            }
+            return Json(new { success = false, message = "Single Question not deleted." });
         }
 
         [HttpPost]
@@ -406,6 +418,7 @@ namespace risk.control.system.Controllers
 
             return Json(new { success = true, Id = id });
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult SaveLocation([FromBody] SaveLocationDto model)

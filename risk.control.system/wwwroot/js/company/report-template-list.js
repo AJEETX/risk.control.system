@@ -227,6 +227,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         var questionId = $(this).data("questionid");
+        var locationId = $(this).data("locationid");
         var $row = $(this).closest("li"); // question row
 
         $.confirm({
@@ -244,15 +245,16 @@ $(document).ready(function () {
                             type: 'POST',
                             data: {
                                 icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
-                                id: questionId
+                                id: questionId,
+                                locationId: locationId
                             },
                             success: function (response) {
                                 if (response.success) {
                                     $row.remove(); // remove from UI
                                     $.alert({
-                                        title: 'Deleted',
+                                        title: '<span class="i-orangered"> <i class="fas fa-trash"></i> </span> Deleted',
                                         content: 'Question has been deleted successfully!',
-                                        type: 'green'
+                                        type: 'red'
                                     });
                                 } else {
                                     $.alert({
@@ -282,59 +284,69 @@ $(document).ready(function () {
     //Delete location
     $(document).on("click", ".delete-location-btn", function (e) {
         e.preventDefault();
+        var locationDeletable = $('#locationCount').val() > 1;
+        if (!locationDeletable) {
+            $.alert({
+                title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                content: 'Single Location not DELETED.',
+                type: 'red'
+            });
+        } else {
+            var locationId = $(this).data("locationid");
+            var $card = $(this).closest(".col-12"); // outer card for that location
 
-        var locationId = $(this).data("locationid");
-        var $card = $(this).closest(".col-12"); // outer card for that location
-
-        $.confirm({
-            title: 'Confirm Delete',
-            icon: 'fas fa-trash',
-            content: 'Are you sure you want to delete this location?',
-            type: 'red',
-            buttons: {
-                confirm: {
-                    text: 'Yes, delete it',
-                    btnClass: 'btn-red',
-                    action: function () {
-                        $.ajax({
-                            url: '/ReportTemplate/DeleteLocation',
-                            type: 'POST',
-                            data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
-                                id: locationId,
-                                locationDeletable: $('#locationCount').val() > 1
-                            },
-                            success: function (response) {
-                                if (response.success) {
-                                    $card.remove(); // remove location from UI
-                                    $.alert({
-                                        title: '<span class="i-red"> <i class="fas fa-trash"></i> </span> Deleted!',
-                                        content: 'Location deleted successfully!',
-                                        type: 'red'
-                                    });
-                                } else {
+            $.confirm({
+                title: 'Confirm Delete',
+                icon: 'fas fa-trash',
+                content: 'Are you sure you want to delete this location?',
+                type: 'red',
+                buttons: {
+                    confirm: {
+                        text: 'Yes, delete it',
+                        btnClass: 'btn-red',
+                        action: function () {
+                            $.ajax({
+                                url: '/ReportTemplate/DeleteLocation',
+                                type: 'POST',
+                                data: {
+                                    icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                    id: locationId,
+                                    locationDeletable: $('#locationCount').val() > 1
+                                },
+                                success: function (response) {
+                                    if (response.success) {
+                                        $card.remove(); // remove location from UI
+                                        var existingCount = $('#locationCount').val();
+                                        $('#locationCount').val(existingCount - 1);
+                                        $.alert({
+                                            title: '<span class="i-red"> <i class="fas fa-trash"></i> </span> Deleted!',
+                                            content: 'Location deleted successfully!',
+                                            type: 'red'
+                                        });
+                                    } else {
+                                        $.alert({
+                                            title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                            content: response.message || 'Failed to delete location.',
+                                            type: 'red'
+                                        });
+                                    }
+                                },
+                                error: function () {
                                     $.alert({
                                         title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
-                                        content: response.message || 'Failed to delete location.',
+                                        content: 'An error occurred while deleting.',
                                         type: 'red'
                                     });
                                 }
-                            },
-                            error: function () {
-                                $.alert({
-                                    title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
-                                    content: 'An error occurred while deleting.',
-                                    type: 'red'
-                                });
-                            }
-                        });
+                            });
+                        }
+                    },
+                    cancel: function () {
+                        // user canceled
                     }
-                },
-                cancel: function () {
-                    // user canceled
                 }
-            }
-        });
+            });
+        }
     });
 
     //Save locations' FaceId, DocumentIds, ...
