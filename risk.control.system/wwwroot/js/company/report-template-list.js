@@ -115,6 +115,7 @@ $(document).ready(function () {
             url: '/ReportTemplate/AddQuestion',
             method: 'POST',
             data: {
+                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
                 locationId: locationId,
                 optionsInput: optionsInput,
                 newQuestionText: newQuestionText,
@@ -205,6 +206,7 @@ $(document).ready(function () {
             url: '/ReportTemplate/UpdateQuestion',  // Endpoint to update Question
             method: 'POST',
             data: {
+                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
                 id: questionId,
                 newQuestionText: newQuestionText,
                 newQuestionType: newQuestionType
@@ -239,7 +241,10 @@ $(document).ready(function () {
                         $.ajax({
                             url: '/ReportTemplate/DeleteQuestion',
                             type: 'POST',
-                            data: { id: questionId },
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: questionId
+                            },
                             success: function (response) {
                                 if (response.success) {
                                     $row.remove(); // remove from UI
@@ -292,7 +297,10 @@ $(document).ready(function () {
                         $.ajax({
                             url: '/ReportTemplate/DeleteLocation',
                             type: 'POST',
-                            data: { id: locationId },
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: locationId
+                            },
                             success: function (response) {
                                 if (response.success) {
                                     $card.remove(); // remove location from UI
@@ -374,7 +382,11 @@ $(document).ready(function () {
             url: '/ReportTemplate/SaveLocation',
             type: 'POST',
             contentType: 'application/json',
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="icheckifyAntiforgery"]').val()
+            },
             data: JSON.stringify({
+                
                 AgentId: agentId,
                 LocationId: locationId,
                 FaceIds: faceIds,
@@ -396,13 +408,14 @@ $(document).ready(function () {
                     });
                 }
             },
-            error: function () {
-                $.alert({
-                    title: "Error",
-                    content: "An error occurred while saving.",
-                    type: "red"
-                });
-            }
+            error: function (xhr) {
+            console.error(xhr.responseText);
+            $.alert({
+                title: "Error",
+                content: "An error occurred while saving.",
+                type: "red"
+            });
+        }
         });
     });
 
@@ -496,9 +509,9 @@ $(document).ready(function () {
                 }
             });
         }
-        
     });
 
+    //edit template
     $(document).on('click', '.edit-template', function (e) {
         $("body").addClass("submit-progress-bg");
         setTimeout(function () {
@@ -506,6 +519,8 @@ $(document).ready(function () {
         }, 1);
         disableAllInteractiveElements();
     });
+
+    //delete template
     $(document).on('click', '.delete-template', function () {
         var id = $(this).data("id");
         var row = $(this).closest("tr");

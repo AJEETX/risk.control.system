@@ -56,16 +56,4 @@
             </p>
         </a>
     </li>
-@if(System.Diagnostics.Debugger.IsAttached)
-    {
-        <li class="nav-item">
-            <a is-active-page asp-controller="ReportTemplate" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplate", "Index")
-                            @Url.MakeActiveClass("ReportTemplate","Create") @Url.MakeActiveClass("ReportTemplate","Details")">
-                <i class="nav-icon far fa-file-powerpoint"></i>
-                <p>
-                    <span class="badge badge-success">REPORT <sub>template</sub></span>
-                </p>
-            </a>
-        </li>
-    }
 }

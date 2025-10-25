@@ -32,6 +32,9 @@
                         <span class="btn-outline-success">@Model.Name</span>
                     </label>
                 </div>
+                <form id="antiForgeryForm">
+                    @Html.AntiForgeryToken()
+                </form>
                 @foreach (var location in Model.LocationReport)
                 {
                     var collapseId = $"collapse_{location.Id}"; // Ensure unique ID per location
@@ -254,6 +257,18 @@
                 </button> *@
 
                 <a id="back" asp-action="Profile" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> <i class="far fa-file-powerpoint"></i> Back</a>
+                    @if (Model.IsActive)
+                    {
+                        <button disabled class="btn btn-success" data-toggle="tooltip" title="The template is active">
+                            <i class="fas fa-flash igreen"></i><bold> Active</bold>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-outline-success activate-btn" data-id="@Model.Id">
+                            <i class="fas fa-flash"></i> Activate
+                        </button>
+                    }
             </div>
             </div>
         </div>

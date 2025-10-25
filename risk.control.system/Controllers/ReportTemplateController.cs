@@ -1,5 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,12 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("General Setup")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
     public class ReportTemplateController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -153,7 +157,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        // Controller method for adding FaceId
         [HttpGet]
         public async Task<IActionResult> GetFaceIdDetails(long faceId)
         {
@@ -179,6 +182,7 @@ namespace risk.control.system.Controllers
             });
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AddFaceId(long locationId, string IdIName, DigitalIdReportType ReportType)
         {
             var location = context.LocationReport.Include(l => l.FaceIds).FirstOrDefault(l => l.Id == locationId);
@@ -224,8 +228,6 @@ namespace risk.control.system.Controllers
                 }
             });
         }
-
-        // Controller method for adding FaceId
 
         [HttpGet]
         public async Task<IActionResult> GetDocumentIdDetails(long docId)
@@ -334,6 +336,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AddQuestion(long locationId, string? optionsInput, bool isRequired, string newQuestionText, string newQuestionType)
         {
             var location = context.LocationReport.Include(q => q.Questions).FirstOrDefault(q => q.Id == locationId);
@@ -355,6 +358,7 @@ namespace risk.control.system.Controllers
             return Json(new { success = true, updatedQuestion = question });
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteQuestion(long id)
         {
             var question = context.Questions.FirstOrDefault(q => q.Id == id);
@@ -371,6 +375,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteLocation(long id)
         {
             var location = context.LocationReport
@@ -398,6 +403,7 @@ namespace risk.control.system.Controllers
             return Json(new { success = true, Id = id });
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult SaveLocation([FromBody] SaveLocationDto model)
         {
             var location = context.LocationReport
