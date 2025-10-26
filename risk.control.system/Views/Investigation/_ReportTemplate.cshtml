@@ -6,8 +6,8 @@
     <div class="col-12 text-center">
         <input type="hidden" id="locationCount" value="@Model.LocationReport.Count" />
         <label for="Name">
-            <small> Template Name </small> :
-            <span class="btn-outline-success">@Model.Name</span>
+            Template Name :
+            <span class="badge badge-default">@Model.Name</span>
         </label>
     </div>
     @foreach (var location in Model.LocationReport)
@@ -188,7 +188,7 @@
                                 </ul>
                                 <span class="mt-2">
                                     <button class="btn btn-sm btn-outline-success add-question-btn" data-locationid="@location.Id">
-                                        <i class="fas fa-edit me-1"></i> Add Question
+                                        <i class="fas fa-question me-1"></i> Add Question
                                     </button>
                                 </span>
                             </div>

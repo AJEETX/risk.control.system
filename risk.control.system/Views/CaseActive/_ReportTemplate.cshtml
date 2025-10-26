@@ -3,7 +3,7 @@
     <div class="col-12 text-center">
         <label for="Name">
             Template Name :
-            <span class="btn-outline-success">@Model.Name</span>
+            <span class="badge badge-default">@Model.Name</span>
         </label>
     </div>
     @foreach (var location in Model.LocationReport)
@@ -193,7 +193,7 @@
                                 </ul>
                                 <span class="mt-2">
                                     <button disabled class="btn btn-sm btn-outline-success add-question-btn" data-locationid="@location.Id">
-                                        <i class="fas fa-edit me-1"></i> Add Question
+                                        <i class="fas fa-question me-1"></i> Add Question
                                     </button>
                                 </span>
                             </div>

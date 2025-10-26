@@ -1,142 +1,38 @@
-﻿<!-- FaceId Update Modal -->
-<div class="modal fade" id="faceIdUpdateModal" tabindex="-1" aria-labelledby="faceIdUpdateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="faceIdUpdateModalLabel">Update FaceId</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="faceIdUpdateForm">
-                <div class="modal-body">
-                    <input type="hidden" name="FaceId" />
-                    <input type="hidden" name="LocationId" />
-                    <div class="mb-3">
-                        <label for="NewFaceIdName" class="form-label">FaceId Name</label>
-                        <input type="text" class="form-control" id="NewFaceIdName" name="NewFaceIdName" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="NewReportType" class="form-label">Report Type</label>
-                        <select class="form-control" id="NewReportType" name="NewReportType">
-                            <option value="AGENT_FACE">Agent Face</option>
-                            <option value="OTHER_TYPE">Other Type</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update FaceId</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<!-- Modal for DocumentId Update -->
-<div class="modal fade" id="documentIdUpdateModal" tabindex="-1" aria-labelledby="documentIdUpdateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="documentIdUpdateModalLabel">Update Document ID</h5>
-                <button type="button" class="btn-close" data-dismisss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="documentIdUpdateForm">
-                    <!-- Hidden Fields for Ids -->
-                    <input type="hidden" name="DocumentId">
-                    <input type="hidden" name="LocationId">
-                    <!-- New Document Name -->
-                    <div class="mb-3">
-                        <label for="newDocumentIdName" class="form-label">Document ID Name</label>
-                        <input type="text" class="form-control" id="newDocumentIdName" name="NewDocumentIdName" required>
-                    </div>
-
-                    <!-- New Document Type -->
-                    <div class="mb-3">
-                        <label for="newDocumentType" class="form-label">Document Type</label>
-                        <select class="form-select" id="newDocumentType" name="NewDocumentType" required>
-                            <option value="0">Select Document Type</option>
-                            <option value="REPORT_TYPE_1">Report Type 1</option>
-                            <option value="REPORT_TYPE_2">Report Type 2</option>
-                            <option value="REPORT_TYPE_3">Report Type 3</option>
-                        </select>
-                    </div>
-
-                    <!-- Save Button -->
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal for Question Add -->
+﻿<!-- Add Question Modal -->
 <div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="questionAddModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="questionAddModalLabel">Add Question</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"> X </button>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <!-- Centered & slightly larger -->
+        <div class="modal-content shadow-lg border-0 rounded-4">
+
+            <!-- Header -->
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-semibold" id="questionAddModalLabel">
+                    <i class="fas fa-question-circle me-2"></i> Add Question
+                </h5>
+                <!-- Bootstrap 5 close button -->
+                <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close">X</button>
             </div>
+
+            <!-- Body -->
             <div class="modal-body">
-                <form id="questionAddForm">
-                    <input type="hidden" name="LocationId">
-
-                    <div class="mb-3">
-                        <label for="QuestionText" class="form-label">Question Text</label>
-                        <input type="text" class="form-control remarks" id="QuestionText" name="QuestionText" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="QuestionType" class="form-label">Question Type</label>
-                        <select class="form-select" id="QuestionType" name="QuestionType" required>
-                            <option value="">-- Select Question Type --</option>
-                            <option value="text">Text</option>
-                            <option value="dropdown">Dropdown</option>
-                            <option value="date">Date</option>
-                            <option value="radiobutton">Radio Button</option>
-                            <option value="checkbox">Checkbox</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3 hidden" id="optionsContainer">
-                        <label class="form-label fw-bold">Options (comma-separated)</label>
-                        <input type="text" name="options" id="optionsInput" class="form-control" placeholder="e.g. Yes,No,Maybe" />
-                    </div>
-
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input remarks" id="isRequired" name="isRequired" />
-                        <label class="form-label fw-bold" for="isRequired">Required ?</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal for Question Update -->
-<div class="modal fade" id="questionUpdateModal" tabindex="-1" aria-labelledby="questionUpdateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="questionUpdateModalLabel">Update Question</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"> X </button>
-            </div>
-            <div class="modal-body">
-                <form id="questionUpdateForm">
-                    <!-- Hidden Fields for Question ID and Location ID -->
-                    <input type="hidden" name="QuestionId">
-                    <input type="hidden" name="LocationId">
+                <form id="questionAddForm" autocomplete="off">
+                    <input type="hidden" name="LocationId" />
 
                     <!-- Question Text -->
                     <div class="mb-3">
-                        <label for="QuestionText" class="form-label">Question Text</label>
-                        <input type="text" class="form-control" id="QuestionText" name="QuestionText" required>
+                        <label for="QuestionText" class="form-label fw-bold">
+                            Question Text <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control remarks" id="QuestionText" name="QuestionText"
+                               placeholder="Enter your question here..." required autofocus>
                     </div>
+
+                    <!-- Question Type -->
                     <div class="mb-3">
-                        <label for="QuestionType" class="form-label">Question Type</label>
-                        <select disabled class="form-select" id="QuestionType" name="QuestionType" required>
+                        <label for="QuestionType" class="form-label fw-bold">
+                            Question Type <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select form-control remarks" id="QuestionType" name="QuestionType" required>
                             <option value="">-- Select Question Type --</option>
                             <option value="text">Text</option>
                             <option value="dropdown">Dropdown</option>
@@ -146,24 +42,33 @@
                         </select>
                     </div>
 
-                    <!-- Question Type -->
-                    <div class="mb-3" id="optionsContainer">
-                        <label for="Options" class="form-label">Options</label>
-                        <select disabled multiple class="form-select" id="Options" name="Options">
-                            <!-- values will be populated dynamically -->
-                        </select>
+                    <!-- Options (only visible for certain types) -->
+                    <div class="mb-3 d-none" id="optionsContainer">
+                        <label for="optionsInput" class="form-label fw-bold">
+                            Options (comma-separated)
+                        </label>
+                        <input type="text" class="form-control" id="optionsInput" name="options"
+                               placeholder="e.g. Yes,No,Maybe">
+                        <div class="form-text">
+                            Example: <code>Yes,No,Maybe</code>
+                        </div>
                     </div>
 
-                    <div class="mb-3" id="dateContainer">
-                        <label for="AnswerDate" class="form-label">Select Date</label>
-                        <input disabled type="date" class="form-control" id="AnswerDate" name="AnswerDate" />
+                    <!-- Required Toggle -->
+                    <div class="form-check form-switch mb-4">
+                        <input type="checkbox" class="form-check-input" id="isRequired" name="isRequired">
+                        <label class="form-check-label fw-bold" for="isRequired">Mark as Required</label>
                     </div>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input remarks" id="isRequired" />
-                        <label class="form-label  fw-bold" for="isRequired">Required ?</label>
+
+                    <!-- Actions -->
+                    <div class="text-end">
+                        <button type="button" class="btn btn-outline-secondary me-2" data-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-outline-success">
+                            <i class="fas fa-save me-1"></i> Save Question
+                        </button>
                     </div>
-                    <!-- Save Button -->
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
                 </form>
             </div>
         </div>

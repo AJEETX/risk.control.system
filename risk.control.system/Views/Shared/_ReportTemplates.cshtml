@@ -107,31 +107,29 @@
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                                 @if (!template.IsActive)
-                            {
+                                {
+                                    <button class="btn btn-xs btn-success activate-btn" data-id="@template.Id">
+                                        <i class="fas fa-flash"></i> Activate
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button disabled class="btn  btn-xs btn-outline-success" data-toggle="tooltip" title="The template is active">
+                                        <i class="fas fa-flash igreen"></i><bold> Active</bold>
+                                    </button>
+                                }
+                                @if (!template.IsActive)
+                                {
                                 <button class="btn btn-xs btn-danger delete-template" data-id="@template.Id">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
-                            }
+                                }
                             else
-                            {
+                                {
                                 <button disabled class="btn btn-xs btn-outline-danger">
                                     <i class="fas fa-times-circle"></i> Delete
                                 </button>
-                            }
-                            
-                            @if (!template.IsActive)
-                            {
-                                <button class="btn btn-xs btn-success activate-btn" data-id="@template.Id">
-                                    <i class="fas fa-flash"></i> Activate
-                                </button>
-                            }
-                            else
-                            {
-                                <button disabled class="btn  btn-xs btn-outline-success" data-toggle="tooltip" title="The template is active">
-                            <i class="fas fa-flash igreen"></i><bold> Active</bold>
-                        </button>
-                            }
-          
+                                }
                             </div>
                         </td>
                     </tr>
