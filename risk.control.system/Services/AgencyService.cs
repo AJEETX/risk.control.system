@@ -59,16 +59,17 @@ namespace risk.control.system.Services
             vendor.DistrictId = vendor.SelectedDistrictId;
             vendor.StateId = vendor.SelectedStateId;
             vendor.CountryId = vendor.SelectedCountryId;
-
+            vendor.BankName = vendor.BankName.ToUpper();
+            vendor.IFSCCode = vendor.IFSCCode.ToUpper();
             var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
 
-            var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
-            var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
-            var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-            vendor.AddressLatitude = companyCoordinates.Latitude;
-            vendor.AddressLongitude = companyCoordinates.Longitude;
-            vendor.AddressMapLocation = url;
+            //var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+            //var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+            //var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
+            //var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            //vendor.AddressLatitude = companyCoordinates.Latitude;
+            //vendor.AddressLongitude = companyCoordinates.Longitude;
+            //vendor.AddressMapLocation = url;
             vendor.PhoneNumber = vendor.PhoneNumber.TrimStart('0');
             vendor.IsUpdated = true;
             vendor.Updated = DateTime.Now;

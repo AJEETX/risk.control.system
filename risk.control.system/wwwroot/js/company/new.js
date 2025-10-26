@@ -139,6 +139,7 @@
                 }
             },
             {
+                "sDefaultContent": "<i class='fa-map-marker' data-toggle='tooltip' title='No address'></i>",
                 "data": "pincode",
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
@@ -155,13 +156,14 @@
                                  data-img='${formattedUrl}' 
                                  data-title='${row.pincodeName}' />
                         </div>`;
-                                } else {
-                                    return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
-                                }
-                            }
+                    }
+                    else {
+                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
+                    }
+                }
             },
             {
-                "sDefaultContent": "",
+                "sDefaultContent": "<i class='fa-map-marker' data-toggle='tooltip' title='No address'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';

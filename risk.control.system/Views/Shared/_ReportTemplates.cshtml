@@ -1,17 +1,18 @@
 ﻿@model List<ReportTemplate>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-striped table-hover dt-responsive nowrap w-100">
+    <table class="table table-bordered table-striped table-hover report-template-table">
 	<thead class="table-light">
             <tr>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th title="Face IDs"><i class="fas fa-id-badge"></i> </th>
-                <th title="Documents"><i class="fas fa-file-alt"></i> </th>
-                <th title="Media Files"><i class="fas fa-film"></i> </th>
-                <th title="Questions"><i class="fas fa-question-circle"></i></th>
-                <th data-toggle="tooltip" title="[Clone] | [View] | [Delete]">Actions</th>
+                <th data-toggle="tooltip" title="Template name">Name</th>
+                <th data-toggle="tooltip" title="Active/Inactive">Status</th>
+                <th data-toggle="tooltip" title="Created date">Created</th>
+                <th data-toggle="tooltip" title="Locations"><i class="fas fa-location-arrow"></i>  </th>
+                <th data-toggle="tooltip" title="Face IDs"><i class="fas fa-id-badge"></i> </th>
+                <th data-toggle="tooltip" title="Documents"><i class="fas fa-file-alt"></i> </th>
+                <th data-toggle="tooltip" title="Media Files"><i class="fas fa-film"></i> </th>
+                <th data-toggle="tooltip" title="Questions"><i class="fas fa-question-circle"></i></th>
+                <th data-toggle="tooltip" title="[Clone] [Edit] [Delete] [Activate]">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -19,6 +20,7 @@
             {
                 foreach (var template in Model)
                 {
+                    var locations = template.LocationReport.Count;
                     var faceCount = template.LocationReport
                     .SelectMany(l => l.FaceIds)
                     .Count(i => i.Selected);
@@ -39,11 +41,11 @@
                         <td title="@(template.Name)">
                             @if (template.Name.Length <= 50)
                             {
-                                @template.Name
+                               <small> @template.Name</small>
                             }
                             else
                             {
-                                @template.Name.Substring(0, 50) <span>...</span>
+                                <small> @template.Name.Substring(0, 50) <span>...</span></small>
                              }
                         </td>
 
@@ -89,31 +91,48 @@
                                 @displayText
                             </small>
                         </td>
+                        <td>@locations</td>
                         <td>@faceCount</td>
                         <td>@docCount</td>
                         <td>@mediaCount</td>
                         <td>@questionCount</td>
                         <td>
+                            <div class="d-flex flex-wrap">
                             <a  asp-action="CloneDetails" asp-controller="ReportTemplate" asp-route-templateId="@template.Id"
-                               class="btn btn-sm btn-outline-secondary clone-template">
+                               class="btn btn-xs btn-secondary clone-template">
                                 <i class="fas fa-copy"></i> Clone
                             </a>
-                            <a asp-action="Details" asp-controller="ReportTemplate" asp-route-id="@template.Id"
-                               class="btn btn-sm  btn-outline-secondary edit-template">
+                           <a asp-action="Details" asp-controller="ReportTemplate" asp-route-id="@template.Id"
+                               class="btn btn-xs  btn-warning edit-template">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
-                            @if (!template.IsActive)
+                                @if (!template.IsActive)
                             {
-                                <button class="btn btn-sm btn-outline-danger delete-template" data-id="@template.Id">
+                                <button class="btn btn-xs btn-danger delete-template" data-id="@template.Id">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             }
                             else
                             {
-                                <button disabled class="btn btn-sm btn-outline-secondary">
+                                <button disabled class="btn btn-xs btn-outline-danger">
                                     <i class="fas fa-times-circle"></i> Delete
                                 </button>
                             }
+                            
+                            @if (!template.IsActive)
+                            {
+                                <button class="btn btn-xs btn-success activate-btn" data-id="@template.Id">
+                                    <i class="fas fa-flash"></i> Activate
+                                </button>
+                            }
+                            else
+                            {
+                                <button disabled class="btn  btn-xs btn-outline-success" data-toggle="tooltip" title="The template is active">
+                            <i class="fas fa-flash igreen"></i><bold> Active</bold>
+                        </button>
+                            }
+          
+                            </div>
                         </td>
                     </tr>
                 }

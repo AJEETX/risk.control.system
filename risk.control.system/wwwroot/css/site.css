@@ -3029,3 +3029,88 @@ img.mobile-capture-map {
 .validate-user{
     border-radius:5px !important;
 }
+.report-template-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .report-template-table th,
+    .report-template-table td {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+/* === Fixed widths for desktop === */
+@media (min-width: 992px) { /* Desktop */
+    .report-template-table th:nth-child(1) {
+        width: 200px;
+    }
+    /* Name */
+    .report-template-table th:nth-child(2) {
+        width: 50px;
+    }
+    /* Status */
+    .report-template-table th:nth-child(3) {
+        width: 100px;
+    }
+    /* Created */
+    .report-template-table th:nth-child(4),
+    .report-template-table th:nth-child(5),
+    .report-template-table th:nth-child(6),
+    .report-template-table th:nth-child(7),
+    .report-template-table th:nth-child(8) {
+        width: 20px;
+    }
+    /* Count columns */
+    .report-template-table th:nth-child(9) {
+        width: 200px;
+    }
+    /* Actions */
+}
+
+/* === Tablet View (reduce padding & font) === */
+@media (max-width: 991px) and (min-width: 576px) {
+    .report-template-table th,
+    .report-template-table td {
+        font-size: 0.85rem;
+        padding: 0.3rem;
+    }
+
+        .report-template-table th:nth-child(1) {
+            width: 150px;
+        }
+
+        .report-template-table th:nth-child(9) {
+            width: 150px;
+        }
+}
+
+/* === Mobile View (scroll horizontally or stack) === */
+@media (max-width: 575px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .report-template-table th,
+    .report-template-table td {
+        font-size: 0.8rem;
+        padding: 0.25rem;
+        white-space: nowrap;
+    }
+
+        /* Optional: shrink action buttons */
+        .report-template-table td .btn {
+            font-size: 0.7rem;
+            padding: 2px 5px;
+        }
+}
+.report-template-table td {
+    white-space: nowrap;
+}
+
+.report-template-table td .btn {
+    margin: 2px;
+}

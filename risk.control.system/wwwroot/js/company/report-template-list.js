@@ -115,6 +115,7 @@ $(document).ready(function () {
             url: '/ReportTemplate/AddQuestion',
             method: 'POST',
             data: {
+                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
                 locationId: locationId,
                 optionsInput: optionsInput,
                 newQuestionText: newQuestionText,
@@ -205,6 +206,7 @@ $(document).ready(function () {
             url: '/ReportTemplate/UpdateQuestion',  // Endpoint to update Question
             method: 'POST',
             data: {
+                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
                 id: questionId,
                 newQuestionText: newQuestionText,
                 newQuestionType: newQuestionType
@@ -225,10 +227,12 @@ $(document).ready(function () {
         e.preventDefault();
 
         var questionId = $(this).data("questionid");
+        var locationId = $(this).data("locationid");
         var $row = $(this).closest("li"); // question row
 
         $.confirm({
             title: 'Confirm Delete',
+            icon: 'fas fa-trash',
             content: 'Are you sure you want to delete this question?',
             type: 'red',
             buttons: {
@@ -239,18 +243,22 @@ $(document).ready(function () {
                         $.ajax({
                             url: '/ReportTemplate/DeleteQuestion',
                             type: 'POST',
-                            data: { id: questionId },
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: questionId,
+                                locationId: locationId
+                            },
                             success: function (response) {
                                 if (response.success) {
                                     $row.remove(); // remove from UI
                                     $.alert({
-                                        title: 'Deleted',
+                                        title: '<span class="i-orangered"> <i class="fas fa-trash"></i> </span> Deleted',
                                         content: 'Question has been deleted successfully!',
-                                        type: 'green'
+                                        type: 'red'
                                     });
                                 } else {
                                     $.alert({
-                                        title: 'Error',
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                         content: response.message || 'Failed to delete question.',
                                         type: 'red'
                                     });
@@ -258,7 +266,7 @@ $(document).ready(function () {
                             },
                             error: function () {
                                 $.alert({
-                                    title: 'Error',
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                     content: 'An error occurred while deleting.',
                                     type: 'red'
                                 });
@@ -276,62 +284,87 @@ $(document).ready(function () {
     //Delete location
     $(document).on("click", ".delete-location-btn", function (e) {
         e.preventDefault();
+        var locationDeletable = $('#locationCount').val() > 1;
+        if (!locationDeletable) {
+            $.alert({
+                title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                content: 'Single Location not DELETED.',
+                type: 'red'
+            });
+        } else {
+            var locationId = $(this).data("locationid");
+            var $card = $(this).closest(".col-12"); // outer card for that location
 
-        var locationId = $(this).data("locationid");
-        var $card = $(this).closest(".col-12"); // outer card for that location
-
-        $.confirm({
-            title: 'Confirm Delete',
-            content: 'Are you sure you want to delete this location?',
-            type: 'red',
-            buttons: {
-                confirm: {
-                    text: 'Yes, delete it',
-                    btnClass: 'btn-red',
-                    action: function () {
-                        $.ajax({
-                            url: '/ReportTemplate/DeleteLocation',
-                            type: 'POST',
-                            data: { id: locationId },
-                            success: function (response) {
-                                if (response.success) {
-                                    $card.remove(); // remove location from UI
+            $.confirm({
+                title: 'Confirm Delete',
+                icon: 'fas fa-trash',
+                content: 'Are you sure you want to delete this location?',
+                type: 'red',
+                buttons: {
+                    confirm: {
+                        text: 'Yes, delete it',
+                        btnClass: 'btn-red',
+                        action: function () {
+                            $.ajax({
+                                url: '/ReportTemplate/DeleteLocation',
+                                type: 'POST',
+                                data: {
+                                    icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                    id: locationId,
+                                    locationDeletable: $('#locationCount').val() > 1
+                                },
+                                success: function (response) {
+                                    if (response.success) {
+                                        $card.remove(); // remove location from UI
+                                        var existingCount = $('#locationCount').val();
+                                        $('#locationCount').val(existingCount - 1);
+                                        $.alert({
+                                            title: '<span class="i-red"> <i class="fas fa-trash"></i> </span> Deleted!',
+                                            content: 'Location deleted successfully!',
+                                            type: 'red'
+                                        });
+                                    } else {
+                                        $.alert({
+                                            title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                            content: response.message || 'Failed to delete location.',
+                                            type: 'red'
+                                        });
+                                    }
+                                },
+                                error: function () {
                                     $.alert({
-                                        title: 'Deleted',
-                                        content: 'Location deleted successfully!',
-                                        type: 'green'
-                                    });
-                                } else {
-                                    $.alert({
-                                        title: 'Error',
-                                        content: response.message || 'Failed to delete location.',
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                        content: 'An error occurred while deleting.',
                                         type: 'red'
                                     });
                                 }
-                            },
-                            error: function () {
-                                $.alert({
-                                    title: 'Error',
-                                    content: 'An error occurred while deleting.',
-                                    type: 'red'
-                                });
-                            }
-                        });
+                            });
+                        }
+                    },
+                    cancel: function () {
+                        // user canceled
                     }
-                },
-                cancel: function () {
-                    // user canceled
                 }
-            }
-        });
+            });
+        }
     });
 
     //Save locations' FaceId, DocumentIds, ...
     $(document).on("click", ".save-location-btn", function (e) {
         e.preventDefault();
 
-        var locationId = $(this).data("locationid");
-        var $card = $(this).closest(".card"); // scope to this location card
+        var $btn = $(this);
+        var locationId = $btn.data("locationid");
+        var $card = $btn.closest(".card"); // scope to this location card
+
+        // Disable button and show spinner
+        $btn.prop("disabled", true)
+            .html('<i class="fas fa-sync fa-spin"></i> Saving...');
+
+        // ✅ Get Location Name
+        var locationName = $card.find("input.form-control.title-name").val()
+            || $card.find("input[asp-for$='LocationName']").val()
+            || $card.find("input[id^='location_']").val();
 
         // Collect AgentId
         var agentId = null;
@@ -361,7 +394,7 @@ $(document).ready(function () {
             });
         });
 
-        // Collect selected MediaReports (assuming also `doc_` prefix, adjust if needed)
+        // Collect selected MediaReports
         var mediaReports = [];
         $card.find("input[id^='media_']").each(function () {
             mediaReports.push({
@@ -374,7 +407,11 @@ $(document).ready(function () {
             url: '/ReportTemplate/SaveLocation',
             type: 'POST',
             contentType: 'application/json',
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="icheckifyAntiforgery"]').val()
+            },
             data: JSON.stringify({
+                LocationName: locationName,
                 AgentId: agentId,
                 LocationId: locationId,
                 FaceIds: faceIds,
@@ -384,24 +421,107 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.success) {
                     $.alert({
-                        title: "Success",
-                        content: "Location saved successfully!",
+                        title: '<span class="i-green"><i class="fas fa-check-circle"></i></span> Success',
+                        content: response.message || "Location saved successfully!",
                         type: "green"
                     });
                 } else {
                     $.alert({
-                        title: "Error",
+                        title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
                         content: response.message || "Failed to save location.",
                         type: "red"
                     });
                 }
             },
-            error: function () {
+            error: function (xhr) {
+                console.error(xhr.responseText);
                 $.alert({
-                    title: "Error",
+                    title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
                     content: "An error occurred while saving.",
                     type: "red"
                 });
+            },
+            complete: function () {
+                // ✅ Re-enable button and restore text
+                $btn.prop("disabled", false)
+                    .html('<i class="fas fa-edit me-1"></i> Save');
+            }
+        });
+    });
+
+
+    //Clone location
+    $(document).on("click", ".clone-location-btn", function (e) {
+        e.preventDefault();
+
+        var $btn = $(this);
+        var locationId = $btn.data("locationid");
+        var reportTemplateId = $btn.data("reporttemplateid");
+
+        if (!locationId || !reportTemplateId) {
+            $.alert({
+                title: "Error",
+                content: "Missing location or template ID.",
+                type: "red"
+            });
+            return;
+        }
+
+        $.confirm({
+            title: ' Clone Location',
+            content: 'Are you sure you want to clone this location?',
+            icon: 'fas fa-copy',
+            type: 'dark',
+            buttons: {
+                Yes: {
+                    text: 'Yes, Clone',
+                    btnClass: 'btn-dark',
+                    action: function () {
+                        // show spinner
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Clone.');
+
+                        $.ajax({
+                            url: '/ReportTemplate/CloneLocation',
+                            type: 'POST',
+                            data: {
+                                locationId: locationId,
+                                reportTemplateId: reportTemplateId,
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    $.alert({
+                                        title: "Cloned",
+                                        content: "Location cloned successfully! Reloading...",
+                                        type: "green",
+                                        buttons: {
+                                            OK: function () {
+                                                location.reload(); // reload page after confirmation
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    $.alert({
+                                        title: "Failed",
+                                        content: response.message || "Unable to clone location.",
+                                        type: "red"
+                                    });
+                                }
+                            },
+                            error: function (xhr) {
+                                $.alert({
+                                    title: "Error",
+                                    content: "Server error while cloning location.",
+                                    type: "red"
+                                });
+                            },
+                            complete: function () {
+                                $btn.prop("disabled", false).html('<i class="fas fa-clone"></i> Clone');
+                            }
+                        });
+                    },
+                },
+                Cancel: function () { }
             }
         });
     });
@@ -412,9 +532,9 @@ $(document).ready(function () {
         var id = $(this).data('id');
         $.confirm({
             title: 'Confirm Activation',
+            icon: 'fas fa-flash',
         content: 'Are you sure you want to activate this report?',
         type: 'green',
-        typeAnimated: true,
         buttons: {
             confirm: {
             text: 'Yes, Activate',
@@ -430,18 +550,22 @@ $(document).ready(function () {
                     success: function (response) {
                         if (response.success) {
                             $.alert({
-                                title: 'Success!',
+                                title: '<span class="i-green"> <i class="fas fas fa-flash"></i> </span> Activated!',
                                 content: response.message,
                                 type: 'green',
                                 buttons: {
-                                    OK: function () {
-                                        location.href = "/ReportTemplate/Profile";
+                                    OK: {
+                                        btnClass: 'btn-green',
+                                        icon: 'fa-flash',
+                                        action: function () {
+                                            location.href = "/ReportTemplate/Profile";
+                                        }
                                     }
                                 }
                             });
                         } else {
                             $.alert({
-                                title: 'Error!',
+                                title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                 content: response.message,
                                 type: 'red'
                             });
@@ -449,17 +573,17 @@ $(document).ready(function () {
                     },
                     error: function () {
                         $.alert({
-                            title: 'Error!',
+                            title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                             content: 'Something went wrong while activating the report.',
                             type: 'red'
                         });
                     }
                 });
-                        }
+                    }
                 },
             cancel: {
                 text: 'Cancel',
-                btnClass: 'btn-secondary'
+                        btnClass: 'btn-default'
                 }
             }
         });
@@ -473,12 +597,13 @@ $(document).ready(function () {
             $.confirm({
                 title: 'Confirm Clone',
                 content: 'Do you want to clone this template?',
-                type: 'blue',
+                icon: 'fas fa-copy',
+                type: 'dark',
                 typeAnimated: true,
                 buttons: {
                     confirm: {
                         text: 'Yes, Clone',
-                        btnClass: 'btn-blue',
+                        btnClass: 'btn-dark',
                         action: function () {
                             hasClone = false;
                             $("body").addClass("submit-progress-bg");
@@ -491,21 +616,27 @@ $(document).ready(function () {
                     },
                     cancel: {
                         text: 'Cancel',
-                        btnClass: 'btn-gray'
+                        btnClass: 'btn-default'
                     }
                 }
             });
         }
-        
     });
 
+    //edit template
     $(document).on('click', '.edit-template', function (e) {
         $("body").addClass("submit-progress-bg");
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         disableAllInteractiveElements();
+        var $btn = $(this);
+        $btn.prop('disabled', true);         // disable button
+        $btn.addClass('disabled');           // add visual Bootstrap disabled style
+        $btn.html('<i class="fas fa-sync fa-spin"></i> Edit'); // show spinner feedback
     });
+
+    //delete template
     $(document).on('click', '.delete-template', function () {
         var id = $(this).data("id");
         var row = $(this).closest("tr");
@@ -514,7 +645,6 @@ $(document).ready(function () {
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete this template?',
             type: 'red',
-            typeAnimated: true,
             buttons: {
                 confirm: {
                     text: 'Yes, Delete',
@@ -530,16 +660,21 @@ $(document).ready(function () {
                             success: function (response) {
                                 if (response.success) {
                                     $.alert({
-                                        title: 'Deleted!',
+                                        title: '<span class="i-orangered"> <i class="fas fa-trash"></i> </span> Deleted!',
                                         content: response.message,
-                                        type: 'green'
+                                        type: 'red',
+                                        buttons: {
+                                            OK: {
+                                                btnClass: 'btn-red',
+                                            }
+                                        }
                                     });
                                     row.fadeOut(500, function () {
                                         $(this).remove();
                                     });
                                 } else {
                                     $.alert({
-                                        title: 'Error!',
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                         content: response.message,
                                         type: 'red'
                                     });
@@ -547,7 +682,7 @@ $(document).ready(function () {
                             },
                             error: function () {
                                 $.alert({
-                                    title: 'Error!',
+                                    title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                     content: 'Something went wrong. Please try again.',
                                     type: 'red'
                                 });
@@ -557,7 +692,7 @@ $(document).ready(function () {
                 },
                 cancel: {
                     text: 'Cancel',
-                    btnClass: 'btn-secondary'
+                        btnClass: 'btn-default'
                 }
             }
         });

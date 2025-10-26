@@ -1,6 +1,10 @@
 ﻿@model ReportTemplate
 <div class="row">
+    <form id="antiForgeryForm">
+        @Html.AntiForgeryToken()
+    </form>
     <div class="col-12 text-center">
+        <input type="hidden" id="locationCount" value="@Model.LocationReport.Count" />
         <label for="Name">
             <small> Template Name </small> :
             <span class="btn-outline-success">@Model.Name</span>
@@ -172,8 +176,8 @@
                                                             </div>
                                                         }
                                                     </div>
-                                                    <div class="col-md-1">
-                                                        <button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="@question.Id">
+                                                    <div class="mt-2">
+                                                        <button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="@question.Id" data-locationid="@location.Id">
                                                             <i class="fas fa-trash me-1"></i><small> Delete </small>
                                                         </button>
                                                     </div>
