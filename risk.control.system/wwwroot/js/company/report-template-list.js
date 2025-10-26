@@ -353,8 +353,18 @@ $(document).ready(function () {
     $(document).on("click", ".save-location-btn", function (e) {
         e.preventDefault();
 
-        var locationId = $(this).data("locationid");
-        var $card = $(this).closest(".card"); // scope to this location card
+        var $btn = $(this);
+        var locationId = $btn.data("locationid");
+        var $card = $btn.closest(".card"); // scope to this location card
+
+        // Disable button and show spinner
+        $btn.prop("disabled", true)
+            .html('<i class="fas fa-sync fa-spin"></i> Saving...');
+
+        // ✅ Get Location Name
+        var locationName = $card.find("input.form-control.title-name").val()
+            || $card.find("input[asp-for$='LocationName']").val()
+            || $card.find("input[id^='location_']").val();
 
         // Collect AgentId
         var agentId = null;
@@ -384,7 +394,7 @@ $(document).ready(function () {
             });
         });
 
-        // Collect selected MediaReports (assuming also `doc_` prefix, adjust if needed)
+        // Collect selected MediaReports
         var mediaReports = [];
         $card.find("input[id^='media_']").each(function () {
             mediaReports.push({
@@ -401,7 +411,7 @@ $(document).ready(function () {
                 'X-CSRF-TOKEN': $('input[name="icheckifyAntiforgery"]').val()
             },
             data: JSON.stringify({
-                
+                LocationName: locationName,
                 AgentId: agentId,
                 LocationId: locationId,
                 FaceIds: faceIds,
@@ -411,26 +421,108 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.success) {
                     $.alert({
-                        title: '<span class="i-green"><i class="fas fa-edit"></i> </span> Success',
-                        content: "Location saved successfully!",
+                        title: '<span class="i-green"><i class="fas fa-check-circle"></i></span> Success',
+                        content: response.message || "Location saved successfully!",
                         type: "green"
                     });
                 } else {
                     $.alert({
-                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                        title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
                         content: response.message || "Failed to save location.",
                         type: "red"
                     });
                 }
             },
             error: function (xhr) {
-            console.error(xhr.responseText);
+                console.error(xhr.responseText);
+                $.alert({
+                    title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
+                    content: "An error occurred while saving.",
+                    type: "red"
+                });
+            },
+            complete: function () {
+                // ✅ Re-enable button and restore text
+                $btn.prop("disabled", false)
+                    .html('<i class="fas fa-edit me-1"></i> Save');
+            }
+        });
+    });
+
+
+    //Clone location
+    $(document).on("click", ".clone-location-btn", function (e) {
+        e.preventDefault();
+
+        var $btn = $(this);
+        var locationId = $btn.data("locationid");
+        var reportTemplateId = $btn.data("reporttemplateid");
+
+        if (!locationId || !reportTemplateId) {
             $.alert({
-                title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
-                content: "An error occurred while saving.",
+                title: "Error",
+                content: "Missing location or template ID.",
                 type: "red"
             });
+            return;
         }
+
+        $.confirm({
+            title: ' Clone Location',
+            content: 'Are you sure you want to clone this location?',
+            icon: 'fas fa-copy',
+            type: 'dark',
+            buttons: {
+                Yes: {
+                    text: 'Yes, Clone',
+                    btnClass: 'btn-dark',
+                    action: function () {
+                        // show spinner
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Clone.');
+
+                        $.ajax({
+                            url: '/ReportTemplate/CloneLocation',
+                            type: 'POST',
+                            data: {
+                                locationId: locationId,
+                                reportTemplateId: reportTemplateId,
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    $.alert({
+                                        title: "Cloned",
+                                        content: "Location cloned successfully! Reloading...",
+                                        type: "green",
+                                        buttons: {
+                                            OK: function () {
+                                                location.reload(); // reload page after confirmation
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    $.alert({
+                                        title: "Failed",
+                                        content: response.message || "Unable to clone location.",
+                                        type: "red"
+                                    });
+                                }
+                            },
+                            error: function (xhr) {
+                                $.alert({
+                                    title: "Error",
+                                    content: "Server error while cloning location.",
+                                    type: "red"
+                                });
+                            },
+                            complete: function () {
+                                $btn.prop("disabled", false).html('<i class="fas fa-clone"></i> Clone');
+                            }
+                        });
+                    },
+                },
+                Cancel: function () { }
+            }
         });
     });
 
@@ -505,7 +597,7 @@ $(document).ready(function () {
             $.confirm({
                 title: 'Confirm Clone',
                 content: 'Do you want to clone this template?',
-                                        icon: 'fas fa-copy',
+                icon: 'fas fa-copy',
                 type: 'dark',
                 typeAnimated: true,
                 buttons: {

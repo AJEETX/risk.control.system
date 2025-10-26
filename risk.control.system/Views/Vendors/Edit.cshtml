@@ -9,7 +9,6 @@
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title"><i class="fas fa-building"></i> @Applicationsettings.EDIT  Agency</h3>
             </div>
-
             <div class="card-body">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input id="vendorId" type="hidden" name="vendorId" asp-for="VendorId" />
@@ -20,7 +19,6 @@
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
                 <div class="row">
-
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="input-group-label"> Domain:</label>
@@ -34,7 +32,6 @@
                     </div>
                     @if(Model.SelectedByCompany)
                     {
-                        
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="input-group-label"> App Url: </label>
@@ -50,8 +47,7 @@
                     }
                     else
                     {
-                <input type="hidden" asp-for="MobileAppUrl" />
-                    
+                    <input type="hidden" asp-for="MobileAppUrl" />
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="input-group-label"> Activated Date: </label>
@@ -66,10 +62,7 @@
                     </div>
                     }
                 </div>
-                    
                 <partial name="Vendor/_Edit" model="Model" />
-
-                
             </div>
             <div class="card-footer">
             <div class="row">

@@ -916,6 +916,8 @@ namespace risk.control.system.Controllers
                 vendor.AgreementDate = DateTime.Now;
                 vendor.ActivatedDate = DateTime.Now;
                 vendor.DomainName = domainData;
+                vendor.BankName = vendor.BankName.ToUpper();
+                vendor.IFSCCode = vendor.IFSCCode.ToUpper();
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = currentUserEmail;
                 vendor.CreatedUser = currentUserEmail;
@@ -927,13 +929,13 @@ namespace risk.control.system.Controllers
 
                 var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
 
-                var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
-                var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
-                var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                vendor.AddressLatitude = companyCoordinates.Latitude;
-                vendor.AddressLongitude = companyCoordinates.Longitude;
-                vendor.AddressMapLocation = url;
+                //var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+                //var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+                //var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
+                //var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                //vendor.AddressLatitude = companyCoordinates.Latitude;
+                //vendor.AddressLongitude = companyCoordinates.Longitude;
+                //vendor.AddressMapLocation = url;
                 _context.Add(vendor);
 
                 var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
@@ -1050,6 +1052,8 @@ namespace risk.control.system.Controllers
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                 vendor.PhoneNumber = vendor.PhoneNumber.TrimStart('0');
+                vendor.BankName = vendor.BankName.ToUpper();
+                vendor.IFSCCode = vendor.IFSCCode.ToUpper();
 
                 vendor.PinCodeId = vendor.SelectedPincodeId;
                 vendor.DistrictId = vendor.SelectedDistrictId;
@@ -1057,13 +1061,13 @@ namespace risk.control.system.Controllers
                 vendor.CountryId = vendor.SelectedCountryId;
                 var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
 
-                var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
-                var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
-                var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                vendor.AddressLatitude = companyCoordinates.Latitude;
-                vendor.AddressLongitude = companyCoordinates.Longitude;
-                vendor.AddressMapLocation = url;
+                //var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+                //var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+                //var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
+                //var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                //vendor.AddressLatitude = companyCoordinates.Latitude;
+                //vendor.AddressLongitude = companyCoordinates.Longitude;
+                //vendor.AddressMapLocation = url;
 
                 _context.Vendor.Update(vendor);
 

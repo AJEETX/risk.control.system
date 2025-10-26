@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -12,7 +13,6 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("General Setup")]
@@ -22,12 +22,14 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext context;
         private readonly ICloneReportService cloneService;
         private readonly INotyfService notifyService;
+        private readonly ILogger<ReportTemplateController> logger;
 
-        public ReportTemplateController(ApplicationDbContext context, ICloneReportService cloneService, INotyfService notifyService)
+        public ReportTemplateController(ApplicationDbContext context, ICloneReportService cloneService, INotyfService notifyService, ILogger<ReportTemplateController> logger)
         {
             this.context = context;
             this.cloneService = cloneService;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
         public IActionResult Index()
         {
@@ -92,6 +94,7 @@ namespace risk.control.system.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex.StackTrace);
                 notifyService.Error($"Issue cloning Report!!!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -118,6 +121,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 return Json(new { success = false, message = "Report activation failed! Try again" });
             }
@@ -154,6 +158,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 return Json(new { success = false, message = "Exception to delete Template" });
             }
@@ -345,126 +350,252 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddQuestion(long locationId, string? optionsInput, bool isRequired, string newQuestionText, string newQuestionType)
         {
-            var location = context.LocationReport.Include(q => q.Questions).FirstOrDefault(q => q.Id == locationId);
-            if (location == null)
+            try
             {
-                return Json(new { success = false, message = "location not found." });
+
+                var location = context.LocationReport.Include(q => q.Questions).FirstOrDefault(q => q.Id == locationId);
+                if (location == null)
+                {
+                    return Json(new { success = false, message = "Location not found." });
+                }
+                var question = new Question
+                {
+                    QuestionText = newQuestionText,
+                    QuestionType = newQuestionType,
+                    Options = optionsInput,
+                    IsRequired = isRequired
+                };
+                location.Questions.Add(question);
+
+                context.SaveChanges();
+
+                return Json(new { success = true, updatedQuestion = question });
+
             }
-            var question = new Question
+            catch (Exception ex)
             {
-                QuestionText = newQuestionText,
-                QuestionType = newQuestionType,
-                Options = optionsInput,
-                IsRequired = isRequired
-            };
-            location.Questions.Add(question);
-
-            context.SaveChanges();
-
-            return Json(new { success = true, updatedQuestion = question });
+                logger.LogError(ex.StackTrace);
+                return Json(new { success = false, message = "Add Question Error." });
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteQuestion(long id, long locationId)
         {
-            var question = context.Questions.FirstOrDefault(q => q.Id == id);
-            if (question == null)
+            try
             {
-                return Json(new { success = false, message = "Question not found." });
-            }
-            var location = context.LocationReport
-                .Include(l => l.Questions)
-                .FirstOrDefault(l => l.Id == locationId);
+                var question = context.Questions.FirstOrDefault(q => q.Id == id);
+                if (question == null)
+                {
+                    return Json(new { success = false, message = "Question not found." });
+                }
+                var location = context.LocationReport
+                    .Include(l => l.Questions)
+                    .FirstOrDefault(l => l.Id == locationId);
 
-            if (location.Questions.Count > 1)
+                if (location.Questions.Count > 1)
+                {
+                    context.Questions.Remove(question);
+                    context.SaveChanges();
+                    return Json(new { success = true, Id = id });
+                }
+                return Json(new { success = false, message = "Single Question not deleted." });
+
+            }
+            catch (Exception ex)
             {
-                context.Questions.Remove(question);
-                context.SaveChanges();
+                logger.LogError(ex.StackTrace);
+                return Json(new { success = false, message = "Error Question Delete." });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteLocation(long id, bool locationDeletable = true)
+        {
+            try
+            {
+                if (!locationDeletable)
+                {
+                    return Json(new { success = false, message = "Single Location not DELETED." });
+                }
+                var location = await context.LocationReport
+                    .Include(l => l.Questions)
+                    .Include(l => l.AgentIdReport)
+                    .Include(l => l.FaceIds)
+                    .Include(l => l.DocumentIds)
+                    .Include(l => l.MediaReports)
+                    .FirstOrDefaultAsync(l => l.Id == id);
+
+                if (location == null)
+                {
+                    return Json(new { success = false, message = "Location not found." });
+                }
+
+                context.Questions.RemoveRange(location.Questions);
+                context.AgentIdReport.Remove(location.AgentIdReport);
+                context.DigitalIdReport.RemoveRange(location.FaceIds);
+                context.DocumentIdReport.RemoveRange(location.DocumentIds);
+                context.MediaReport.RemoveRange(location.MediaReports);
+
+                context.LocationReport.Remove(location);
+                await context.SaveChangesAsync();
+
                 return Json(new { success = true, Id = id });
             }
-            return Json(new { success = false, message = "Single Question not deleted." });
+            catch (Exception ex)
+            {
+                logger.LogError(ex.StackTrace);
+                return Json(new { success = false, message = "Error Location Delete." });
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteLocation(long id, bool locationDeletable = true)
+        public async Task<IActionResult> SaveLocation([FromBody] SaveLocationDto model)
         {
-            if (!locationDeletable)
+            try
             {
-                return Json(new { success = false, message = "Single Location not DELETED." });
-            }
-            var location = context.LocationReport
-                .Include(l => l.Questions)
-                .Include(l => l.AgentIdReport)
-                .Include(l => l.FaceIds)
-                .Include(l => l.DocumentIds)
-                .Include(l => l.MediaReports)
-                .FirstOrDefault(l => l.Id == id);
+                var location = await context.LocationReport
+                    .Include(l => l.AgentIdReport)
+                    .Include(l => l.FaceIds)
+                    .Include(l => l.DocumentIds)
+                    .Include(l => l.MediaReports)
+                    .FirstOrDefaultAsync(l => l.Id == model.LocationId);
 
-            if (location == null)
+                if (location == null)
+                    return Json(new { success = false, message = "Location not found." });
+
+                location.LocationName = model.LocationName;
+
+                // Update AgentId
+                var agent = location.AgentIdReport;
+                if (agent != null)
+                    agent.Selected = model.AgentId.Selected;
+
+                // Update FaceIds
+                foreach (var f in model.FaceIds)
+                {
+                    var face = location.FaceIds.FirstOrDefault(x => x.Id == f.Id);
+                    if (face != null)
+                        face.Selected = f.Selected;
+                }
+
+                // Update DocumentIds
+                foreach (var d in model.DocumentIds)
+                {
+                    var doc = location.DocumentIds.FirstOrDefault(x => x.Id == d.Id);
+                    if (doc != null)
+                        doc.Selected = d.Selected;
+                }
+
+                // Update MediaReports
+                foreach (var m in model.MediaReports)
+                {
+                    var media = location.MediaReports.FirstOrDefault(x => x.Id == m.Id);
+                    if (media != null)
+                        media.Selected = m.Selected;
+                }
+
+                await context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Location saved successfully!" });
+            }
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Location not found." });
+                logger.LogError(ex.StackTrace);
+                return Json(new { success = false, message = "Error Location Save." });
             }
-
-            context.Questions.RemoveRange(location.Questions);
-            context.AgentIdReport.Remove(location.AgentIdReport);
-            context.DigitalIdReport.RemoveRange(location.FaceIds);
-            context.DocumentIdReport.RemoveRange(location.DocumentIds);
-            context.MediaReport.RemoveRange(location.MediaReports);
-
-            context.LocationReport.Remove(location);
-            context.SaveChanges();
-
-            return Json(new { success = true, Id = id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SaveLocation([FromBody] SaveLocationDto model)
+        public async Task<IActionResult> CloneLocation(long locationId, long reportTemplateId)
         {
-            var location = context.LocationReport
-                .Include(l => l.AgentIdReport)
-                .Include(l => l.FaceIds)
-                .Include(l => l.DocumentIds)
-                .Include(l => l.MediaReports)
-                .FirstOrDefault(l => l.Id == model.LocationId);
-
-            if (location == null)
-                return Json(new { success = false, message = "Location not found." });
-
-            // Update AgentId
-            var agent = location.AgentIdReport;
-            if (agent != null)
-                agent.Selected = model.AgentId.Selected;
-
-            // Update FaceIds
-            foreach (var f in model.FaceIds)
+            try
             {
-                var face = location.FaceIds.FirstOrDefault(x => x.Id == f.Id);
-                if (face != null)
-                    face.Selected = f.Selected;
-            }
+                var original = await context.LocationReport
+                    .Include(l => l.AgentIdReport)
+                    .Include(l => l.FaceIds)
+                    .Include(l => l.DocumentIds)
+                    .Include(l => l.MediaReports)
+                    .Include(l => l.Questions)
+                    .FirstOrDefaultAsync(l => l.Id == locationId);
 
-            // Update DocumentIds
-            foreach (var d in model.DocumentIds)
+                if (original == null)
+                    return Json(new { success = false, message = "Original location not found." });
+
+                var locationName = original.LocationName + " (Copy)";
+                var reportTemplate = await context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == reportTemplateId);
+
+                if (reportTemplate == null)
+                {
+                    return Json(new { success = false, message = "Report Template not found." });
+                }
+
+                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => l.LocationName.ToLower() == locationName.ToLower());
+
+                if (hasAnyLocationName)
+                {
+                    return Json(new { success = false, message = $"Location name {locationName} exists." });
+                }
+                // Create clone (deep copy)
+                var clone = new LocationReport
+                {
+                    LocationName = original.LocationName + " (Copy)",
+                    ReportTemplateId = reportTemplateId,
+                    Created = DateTime.Now,
+                    AgentIdReport = new AgentIdReport
+                    {
+                        Selected = original.AgentIdReport.Selected,
+                        IsRequired = original.AgentIdReport.IsRequired,
+                        ReportName = original.AgentIdReport.ReportName,                                          // You can set other properties of Agent here if needed
+                        ReportType = original.AgentIdReport.ReportType,  // Default agent
+                    },
+                    FaceIds = original.FaceIds.Select(f => new FaceIdReport
+                    {
+                        IsRequired = f.IsRequired,
+                        Selected = f.Selected,
+                        ReportName = f.ReportName,
+                        Has2Face = f.Has2Face,
+                        ReportType = f.ReportType
+                    }).ToList(),
+                    DocumentIds = original.DocumentIds.Select(d => new DocumentIdReport
+                    {
+                        IsRequired = d.IsRequired,
+                        Selected = d.Selected,
+                        HasBackImage = d.HasBackImage,
+                        ReportName = d.ReportName,
+                        ReportType = d.ReportType
+                    }).ToList(),
+                    MediaReports = original.MediaReports.Select(m => new MediaReport
+                    {
+                        IsRequired = m.IsRequired,
+                        Selected = m.Selected,
+                        ReportName = m.ReportName,
+                        MediaType = m.MediaType,
+                        MediaExtension = m.MediaExtension
+                    }).ToList(),
+                    Questions = original.Questions.Select(q => new Question
+                    {
+                        QuestionText = q.QuestionText,
+                        QuestionType = q.QuestionType,
+                        IsRequired = q.IsRequired
+                    }).ToList()
+                };
+
+                context.LocationReport.Add(clone);
+                await context.SaveChangesAsync();
+
+                // Render partial view for new location card
+                var html = await this.RenderViewAsync("_LocationCardPartial", clone, true);
+                return Json(new { success = true, html });
+            }
+            catch (Exception ex)
             {
-                var doc = location.DocumentIds.FirstOrDefault(x => x.Id == d.Id);
-                if (doc != null)
-                    doc.Selected = d.Selected;
+                return Json(new { success = false, message = ex.Message });
             }
-
-            // Update MediaReports
-            foreach (var m in model.MediaReports)
-            {
-                var media = location.MediaReports.FirstOrDefault(x => x.Id == m.Id);
-                if (media != null)
-                    media.Selected = m.Selected;
-            }
-
-            context.SaveChanges();
-
-            return Json(new { success = true });
         }
 
     }

@@ -13,7 +13,6 @@ namespace risk.control.system.Seeds
                 IsRequired = true
             };
 
-
             var question2 = new Question
             {
                 QuestionText = "Met Person Relation With LA",

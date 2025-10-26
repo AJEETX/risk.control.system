@@ -3030,7 +3030,6 @@ img.mobile-capture-map {
     border-radius:5px !important;
 }
 .report-template-table {
-    table-layout: fixed;
     width: 100%;
     border-collapse: collapse;
 }
@@ -3054,7 +3053,7 @@ img.mobile-capture-map {
     }
     /* Status */
     .report-template-table th:nth-child(3) {
-        width: 150px;
+        width: 100px;
     }
     /* Created */
     .report-template-table th:nth-child(4),
@@ -3062,7 +3061,7 @@ img.mobile-capture-map {
     .report-template-table th:nth-child(6),
     .report-template-table th:nth-child(7),
     .report-template-table th:nth-child(8) {
-        width: 30px;
+        width: 20px;
     }
     /* Count columns */
     .report-template-table th:nth-child(9) {
