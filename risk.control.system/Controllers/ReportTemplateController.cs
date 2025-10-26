@@ -165,159 +165,10 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetFaceIdDetails(long faceId)
-        {
-            var face = await context.DigitalIdReport
-                .Where(f => f.Id == faceId)
-                .Select(f => new
-                {
-                    f.Id,
-                    f.ReportName,
-                    ReportType = f.ReportType.ToString() // Convert the ReportType enum to string
-                })
-                .FirstOrDefaultAsync();
-
-            if (face == null)
-            {
-                return Json(new { success = false, message = "FaceId not found." });
-            }
-
-            return Json(new
-            {
-                success = true,
-                faceId = face
-            });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult AddFaceId(long locationId, string IdIName, DigitalIdReportType ReportType)
-        {
-            var location = context.LocationReport.Include(l => l.FaceIds).FirstOrDefault(l => l.Id == locationId);
-            var faceId = new FaceIdReport
-            {
-                IdName = IdIName,
-                ReportType = ReportType
-            };
-            location.FaceIds.Add(faceId);
-
-            context.LocationReport.Update(location);
-            context.SaveChanges();
-
-            return Json(new { locationId = locationId, newFaceId = faceId.Id });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateFaceId(long id, string newName, string newReportType)
-        {
-            // Find the FaceId in the database
-            var faceId = await context.DigitalIdReport.FindAsync(id);
-            if (faceId == null)
-            {
-                return NotFound();
-            }
-
-            // Update the properties
-            faceId.IdName = newName;
-            faceId.ReportType = Enum.TryParse(newReportType, out DigitalIdReportType reportType) ? reportType : faceId.ReportType;
-
-            // Save the changes
-            await context.SaveChangesAsync();
-
-            // Return the updated FaceId back to the client
-            return Json(new
-            {
-                success = true,
-                message = "FaceId updated successfully",
-                updatedFaceId = new
-                {
-                    Id = faceId.Id,
-                    Name = faceId.IdName,
-                    ReportType = faceId.ReportType.ToString()
-                }
-            });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetDocumentIdDetails(long docId)
-        {
-            var doc = await context.DocumentIdReport
-                .Where(d => d.Id == docId)
-                .Select(d => new
-                {
-                    d.Id,
-                    d.IdName,
-                    DocumentType = d.ReportType.ToString() // Convert the DocumentIdReportType enum to string
-                })
-                .FirstOrDefaultAsync();
-
-            if (doc == null)
-            {
-                return Json(new { success = false, message = "DocumentId not found." });
-            }
-
-            return Json(new
-            {
-                success = true,
-                documentId = doc
-            });
-        }
-
-        [HttpPost]
-        public IActionResult AddDocId(long locationId, string IdIName, DocumentIdReportType ReportType)
-        {
-            var location = context.LocationReport.Include(l => l.DocumentIds).FirstOrDefault(l => l.Id == locationId);
-            var faceId = new DocumentIdReport
-            {
-                IdName = IdIName,
-                ReportType = ReportType
-            };
-            location.DocumentIds.Add(faceId);
-
-            context.LocationReport.Update(location);
-            context.SaveChanges();
-
-            return Json(new { locationId = locationId, newFaceId = faceId.Id });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateDocumentId(long id, string newName, string newDocumentType)
-        {
-            // Find the DocumentId in the database
-            var documentId = await context.DocumentIdReport.FindAsync(id);
-            if (documentId == null)
-            {
-                return NotFound();
-            }
-
-            // Update the properties
-            documentId.IdName = newName;
-            documentId.ReportType = Enum.TryParse(newDocumentType, out DocumentIdReportType documentType) ? documentType : documentId.ReportType;
-
-            // Save the changes
-            await context.SaveChangesAsync();
-
-            // Return the updated DocumentId back to the client
-            return Json(new
-            {
-                success = true,
-                message = "DocumentId updated successfully",
-                updatedDocumentId = new
-                {
-                    Id = documentId.Id,
-                    Name = documentId.IdName,
-                    DocumentType = documentId.ReportType.ToString()
-                }
-            });
-        }
-
-        [HttpGet]
-        public IActionResult GetQuestionDetails(long questionId)
+        public async Task<IActionResult> GetQuestionDetails(long questionId)
         {
             // Retrieve the question from the database using the questionId
-            var question = context.Questions
-                .Where(q => q.Id == questionId)
-                .FirstOrDefault();
+            var question = await context.Questions.FirstOrDefaultAsync(q => q.Id == questionId);
 
             if (question == null)
             {
@@ -330,30 +181,12 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateQuestion(long id, long locationId, string optionsInput, bool isRequired, string newQuestionText, string newQuestionType)
-        {
-            var question = context.Questions.FirstOrDefault(q => q.Id == id);
-            if (question == null)
-            {
-                return Json(new { success = false, message = "Question not found." });
-            }
-
-            question.QuestionText = newQuestionText;
-            question.Options = optionsInput;
-
-            context.SaveChanges();
-
-            return Json(new { success = true, updatedQuestion = question });
-        }
-
-        [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddQuestion(long locationId, string? optionsInput, bool isRequired, string newQuestionText, string newQuestionType)
+        public async Task<IActionResult> AddQuestion(long locationId, string? optionsInput, bool isRequired, string newQuestionText, string newQuestionType)
         {
             try
             {
-
-                var location = context.LocationReport.Include(q => q.Questions).FirstOrDefault(q => q.Id == locationId);
+                var location = await context.LocationReport.Include(q => q.Questions).FirstOrDefaultAsync(q => q.Id == locationId);
                 if (location == null)
                 {
                     return Json(new { success = false, message = "Location not found." });
@@ -367,7 +200,7 @@ namespace risk.control.system.Controllers
                 };
                 location.Questions.Add(question);
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 return Json(new { success = true, updatedQuestion = question });
 
@@ -381,23 +214,23 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteQuestion(long id, long locationId)
+        public async Task<IActionResult> DeleteQuestion(long id, long locationId)
         {
             try
             {
-                var question = context.Questions.FirstOrDefault(q => q.Id == id);
+                var question = await context.Questions.FirstOrDefaultAsync(q => q.Id == id);
                 if (question == null)
                 {
                     return Json(new { success = false, message = "Question not found." });
                 }
-                var location = context.LocationReport
+                var location = await context.LocationReport
                     .Include(l => l.Questions)
-                    .FirstOrDefault(l => l.Id == locationId);
+                    .FirstOrDefaultAsync(l => l.Id == locationId);
 
                 if (location.Questions.Count > 1)
                 {
                     context.Questions.Remove(question);
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                     return Json(new { success = true, Id = id });
                 }
                 return Json(new { success = false, message = "Single Question not deleted." });
@@ -597,6 +430,5 @@ namespace risk.control.system.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-
     }
 }
