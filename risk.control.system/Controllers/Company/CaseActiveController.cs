@@ -21,7 +21,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
 {
-    [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}, {MANAGER.DISPLAY_NAME}")]
     [Breadcrumb(" Cases")]
     public class CaseActiveController : Controller
     {
