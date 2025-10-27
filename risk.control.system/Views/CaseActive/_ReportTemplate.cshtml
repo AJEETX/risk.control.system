@@ -27,12 +27,10 @@
                             <i class="fas fa-chevron-down"></i>
                         </button>
                     </div>
-
                 </div>
                 <div id="@collapseId" class="collapse">
                     <div class="card-body">
                         <div class="row g-3 align-items-start">
-
                             <!-- Agent ID -->
                             <div class="col-md-3 border rounded p-2">
                                 <h6 class="text-muted"><i class="far fa-user"></i> Agent ID</h6>
@@ -62,8 +60,6 @@
                                     </li>
                                 </ul>
                             </div>
-
-
                             <!-- Face IDs -->
                             <div class="col-md-3 border rounded p-2">
                                 <h6 class="text-muted"><i class="far fa-user"></i> Face IDs</h6>
@@ -95,7 +91,6 @@
                                     }
                                 </ul>
                             </div>
-
                             <!-- Document IDs -->
                             <div class="col-md-3 border rounded p-2">
                                 <h6 class="text-muted"><i class="far fa-file-alt"></i> Document IDs</h6>
@@ -127,7 +122,6 @@
                                     }
                                 </ul>
                             </div>
-
                             <!-- Media IDs -->
                             <div class="col-md-3 border rounded p-2">
                                 <h6 class="text-muted"><i class="far fa-file-alt"></i> Media</h6>
@@ -153,9 +147,8 @@
                                     }
                                 </ul>
                             </div>
-
                             <!-- Questions -->
-                            <div class="col-md-9 border rounded p-2">
+                            <div class="col-md-12 border rounded p-2">
                                 <h6 class="text-muted"><i class="fas fa-question-circle"></i> Questions</h6>
                                 <ul class="list-unstyled">
                                     @foreach (var question in location.Questions ?? new List<Question>())
@@ -163,7 +156,7 @@
                                         <li class="mb-2">
                                             <div class="border rounded p-2 bg-light">
                                                 <div class="row">
-                                                    <div class="col-md-11">
+                                                    <div class="col-md-12">
                                                         <span>@question.QuestionText</span>
                                                         @if (question.IsRequired)
                                                         {
@@ -181,34 +174,12 @@
                                                             </div>
                                                         }
                                                     </div>
-                                                    <div class="mt-2">
-                                                        <button disabled class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="@question.Id">
-                                                            <i class="fas fa-trash me-1"></i><small> Delete </small>
-                                                        </button>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </li>
                                     }
                                 </ul>
-                                <span class="mt-2">
-                                    <button disabled class="btn btn-sm btn-outline-success add-question-btn" data-locationid="@location.Id">
-                                        <i class="fas fa-question me-1"></i> Add Question
-                                    </button>
-                                </span>
                             </div>
-
-
-                            <!-- Delete Button -->
-                            <div class="col-md-2 text-end">
-                                <button disabled class="btn btn-sm btn-outline-success mt-4 save-location-btn" data-locationid="@location.Id">
-                                    <i class="fas fa-edit me-1"></i> Save
-                                </button>
-                                <button disabled class="btn btn-sm btn-outline-danger mt-4 delete-location-btn" data-locationid="@location.Id">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-
                         </div>
                     </div>
                 </div>
