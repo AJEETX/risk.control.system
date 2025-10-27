@@ -301,7 +301,7 @@ namespace risk.control.system.Controllers
 
                 var reportTemplate = await context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == model.TemplateId);
 
-                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => l.LocationName.Trim().ToLower() == model.LocationName.Trim().ToLower());
+                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => l.Id != model.LocationId && l.LocationName.Trim().ToLower() == model.LocationName.Trim().ToLower());
 
                 if (hasAnyLocationName)
                 {
@@ -374,7 +374,7 @@ namespace risk.control.system.Controllers
                     return Json(new { success = false, message = "Report Template not found." });
                 }
 
-                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => l.LocationName.Trim().ToLower() == locationName.Trim().ToLower());
+                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => original.Id != locationId && l.LocationName.Trim().ToLower() == locationName.Trim().ToLower());
 
                 if (hasAnyLocationName)
                 {
