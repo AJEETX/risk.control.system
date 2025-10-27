@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
 using risk.control.system.Helpers;
@@ -19,6 +21,7 @@ public interface IAgentIdService
 public class AgentIdService : IAgentIdService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IBackgroundJobClient backgroundJobClient;
     private readonly IPanCardService panCardService;
     private readonly IGoogleApi googleApi;
     private readonly IWebHostEnvironment webHostEnvironment;
@@ -30,6 +33,7 @@ public class AgentIdService : IAgentIdService
 
     //test PAN FNLPM8635N
     public AgentIdService(ApplicationDbContext context,
+        IBackgroundJobClient backgroundJobClient,
         IPanCardService panCardService,
         IGoogleApi googleApi,
         IWebHostEnvironment webHostEnvironment,
@@ -38,6 +42,7 @@ public class AgentIdService : IAgentIdService
         IFaceMatchService faceMatchService)
     {
         this._context = context;
+        this.backgroundJobClient = backgroundJobClient;
         this.panCardService = panCardService;
         this.googleApi = googleApi;
         this.webHostEnvironment = webHostEnvironment;
@@ -596,6 +601,8 @@ public class AgentIdService : IAgentIdService
             {
                 await data.Image.CopyToAsync(stream);
             }
+
+
             claim = await _context.Investigations
                  .Include(c => c.PolicyDetail)
                  .Include(c => c.CustomerDetail)
@@ -674,6 +681,8 @@ public class AgentIdService : IAgentIdService
             media.MediaType = isVideo ? MediaType.VIDEO : MediaType.AUDIO;
 
             await _context.SaveChangesAsync(null, false);
+
+            backgroundJobClient.Enqueue(() => httpClientService.TranscribeAsync(location.Id, data.ReportName, "media", fileName, filePath));
 
             return new AppiCheckifyResponse
             {
