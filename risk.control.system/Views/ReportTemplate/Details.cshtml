@@ -9,16 +9,22 @@
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <li>
-                            <i class='far fa-hand-point-right'></i> Clone Template <sub>details</sub>
+                            <i class='fas fa-copy'></i> Clone <sub>location</sub>
                         </li>
                         <li>
-                            <i class='far fa-thumbs-up'></i> Edit Report <sub>template</sub>
+                            <i class='fas fa-edit'></i>  Save<sub>location</sub>
                         </li>
                         <li>
-                            <i class='fa fa-hand-peace-o'></i> <b> Save</b> Report <sub>template</sub>
+                            <i class='fa fa-trash'></i> Delete <sub>location</sub>
                         </li>
                         <li>
-                            <i class='fa fa-flash'></i> <b> Activate</b> Report <sub>template</sub>
+                            <i class='fa fa-trash'></i> Delete <sub>question</sub>
+                        </li>
+                        <li>
+                            <i class='fas fa-question '></i> Add <sub>question</sub>
+                        </li>
+                        <li>
+                            <i class='fa fa-flash'></i>  Activate <sub>template</sub>
                         </li>
                     </span>
                 </span>
@@ -242,7 +248,7 @@
                                             <button class="btn btn-sm btn-outline-secondary mt-4 clone-location-btn" data-locationid="@location.Id" data-reporttemplateid="@Model.Id">
                                                 <i class="fas fa-copy me-1"></i> Clone
                                             </button>
-                                            <button class="btn btn-sm btn-outline-success mt-4 save-location-btn" data-locationid="@location.Id">
+                                            <button class="btn btn-sm btn-outline-success mt-4 save-location-btn" data-locationid="@location.Id" data-reporttemplateid="@Model.Id">
                                                 <i class="fas fa-edit me-1"></i> Save
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger mt-4 delete-location-btn" data-locationid="@location.Id">

@@ -75,7 +75,7 @@
 
                     // show jConfirm success dialog
                     $.confirm({
-                        title: 'Question added',
+                        title: '<span class="i-green"> <i class="fas fa-question"></i> </span> Question',
                         content: 'Question has been added successfully.',
                         type: 'green',
                         buttons: {
@@ -135,6 +135,14 @@
         var locationId = $(this).data("locationid");
         var $row = $(this).closest("li"); // question row
 
+        if (!questionId || !locationId) {
+            $.alert({
+                title: "Error",
+                content: "Missing question ID or location ID.",
+                type: "red"
+            });
+            return;
+        }
         $.confirm({
             title: 'Confirm Delete',
             icon: 'fas fa-trash',
@@ -207,6 +215,15 @@
             });
         } else {
             var locationId = $(this).data("locationid");
+
+            if (!locationId) {
+                $.alert({
+                    title: "Error",
+                    content: "Missing location ID.",
+                    type: "red"
+                });
+                return;
+            }
             var $card = $(this).closest(".col-12"); // outer card for that location
 
             $.confirm({
@@ -276,6 +293,7 @@
 
         var $btn = $(this);
         var locationId = $btn.data("locationid");
+        var templateId = $btn.data("reporttemplateid");
         var $card = $btn.closest(".card"); // scope to this location card
 
         // ✅ Get Location Name
@@ -283,6 +301,14 @@
             || $card.find("input[asp-for$='LocationName']").val()
             || $card.find("input[id^='location_']").val();
 
+        if (!locationName || !locationName.trim()) {
+            $.alert({
+                title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
+                content: "Location name is empty.",
+                type: "red"
+            });
+            return;
+        }
         // Collect AgentId
         var agentId = null;
         var $agentCheckbox = $card.find("input[id^='agent_']");
@@ -340,6 +366,7 @@
                                 'X-CSRF-TOKEN': $('input[name="icheckifyAntiforgery"]').val()
                             },
                             data: JSON.stringify({
+                                TemplateId: templateId,
                                 LocationName: locationName,
                                 AgentId: agentId,
                                 LocationId: locationId,
@@ -467,6 +494,14 @@
         var id = $(this).data('id');
         var $btn = $(this);
 
+        if (!id) {
+            $.alert({
+                title: "Error",
+                content: "Missing templateId ID.",
+                type: "red"
+            });
+            return;
+        }
         $.confirm({
             title: 'Confirm Activation',
             icon: 'fas fa-flash',
@@ -588,6 +623,14 @@
         var row = $(this).closest("tr");
         var $btn = $(this);
 
+        if (!id) {
+            $.alert({
+                title: "Error",
+                content: "Missing templateId ID.",
+                type: "red"
+            });
+            return;
+        }
         $.confirm({
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete this template?',

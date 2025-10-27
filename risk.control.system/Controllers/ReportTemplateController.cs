@@ -98,7 +98,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error($"Issue cloning Report!!!");
                 return RedirectToAction(nameof(Profile));
             }
-
         }
 
         [HttpPost]
@@ -300,7 +299,15 @@ namespace risk.control.system.Controllers
                 if (location == null)
                     return Json(new { success = false, message = "Location not found." });
 
-                location.LocationName = model.LocationName;
+                var reportTemplate = await context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == model.TemplateId);
+
+                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => l.LocationName.Trim().ToLower() == model.LocationName.Trim().ToLower());
+
+                if (hasAnyLocationName)
+                {
+                    return Json(new { success = false, message = $"Location name {model.LocationName} exists." });
+                }
+                location.LocationName = model.LocationName.Trim().ToUpper();
 
                 // Update AgentId
                 var agent = location.AgentIdReport;
@@ -367,7 +374,7 @@ namespace risk.control.system.Controllers
                     return Json(new { success = false, message = "Report Template not found." });
                 }
 
-                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => l.LocationName.ToLower() == locationName.ToLower());
+                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => l.LocationName.Trim().ToLower() == locationName.Trim().ToLower());
 
                 if (hasAnyLocationName)
                 {
