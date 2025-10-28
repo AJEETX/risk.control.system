@@ -682,7 +682,7 @@ public class AgentIdService : IAgentIdService
 
             await _context.SaveChangesAsync(null, false);
 
-            backgroundJobClient.Enqueue(() => httpClientService.TranscribeAsync(location.Id, data.ReportName, "media", fileName, filePath));
+            //backgroundJobClient.Enqueue(() => httpClientService.TranscribeAsync(location.Id, data.ReportName, "media", fileName, filePath));
 
             return new AppiCheckifyResponse
             {

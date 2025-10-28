@@ -84,8 +84,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index));
                 }
                 var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
-                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled
-                    )
+                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var report = model.InvestigationReport.ToString();
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation, report);

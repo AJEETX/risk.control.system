@@ -384,7 +384,7 @@ namespace risk.control.system.Services
             try
             {
                 await CreateBucketAsync(bucketName);
-                var regionResponse = await s3Client.GetBucketLocationAsync("media");
+                var regionResponse = await s3Client.GetBucketLocationAsync(bucketName);
 
                 var transferUtility = new TransferUtility(s3Client);
                 await transferUtility.UploadAsync(filePath, bucketName, fileName);
@@ -449,21 +449,15 @@ namespace risk.control.system.Services
                 Console.WriteLine($"Bucket '{bucketName}' already exists.");
                 return;
             }
-
-            // Create the bucket
             try
             {
-
                 var putBucketRequest = new PutBucketRequest
                 {
                     BucketName = bucketName,
                     UseClientRegion = true // Automatically uses the region of the client
                 };
-
                 var response = await s3Client.PutBucketAsync(putBucketRequest);
-
                 Console.WriteLine($"Bucket created with HTTP status code: {response.HttpStatusCode}");
-
             }
             catch (Exception ex)
             {
