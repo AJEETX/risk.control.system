@@ -510,6 +510,8 @@
             });
             return;
         }
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+
         $.confirm({
             title: 'Confirm Activation',
             icon: 'fas fa-flash',
@@ -520,6 +522,7 @@
                 text: 'Yes, Activate',
                 btnClass: 'btn-green',
                 action: function () {
+                        $spinner.removeClass("hidden");
                     $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Activate');
                     $.ajax({
                         url: '/ReportTemplate/Activate',
@@ -561,6 +564,7 @@
                         },
                         complete: function () {
                             // ✅ Re-enable button and restore text
+                                $spinner.addClass("hidden");
                             $btn.prop("disabled", false).html('<i class="fas fa-flash"></i> Activate');
                         }
                      });

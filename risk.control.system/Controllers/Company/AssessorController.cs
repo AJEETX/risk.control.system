@@ -216,10 +216,10 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
-                if (model != null && model.ReportAiSummary == null && model.ClaimsInvestigation.AiEnabled)
-                {
-                    model = await investigationService.GetClaimDetailsAiReportSummary(model);
-                }
+                //if (model != null && model.ReportAiSummary == null && model.ClaimsInvestigation.AiEnabled)
+                //{
+                //    model = await investigationService.GetClaimDetailsAiReportSummary(model);
+                //}
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }

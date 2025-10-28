@@ -656,8 +656,8 @@ namespace risk.control.system.Services
 
         public async Task<CaseTransactionModel> GetClaimDetailsAiReportSummary(CaseTransactionModel model)
         {
-            var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
-            model.ReportAiSummary = investigationSummary;
+            //var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+            //model.ReportAiSummary = investigationSummary;
             return model;
         }
         public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
