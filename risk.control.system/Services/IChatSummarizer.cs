@@ -9,6 +9,7 @@ public interface IChatSummarizer
 }
 public class OpenAISummarizer : IChatSummarizer
 {
+    private static string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={Environment.GetEnvironmentVariable("GEMINI_KEY")}";
     private readonly HttpClient _httpClient;
 
     public OpenAISummarizer()
@@ -20,12 +21,6 @@ public class OpenAISummarizer : IChatSummarizer
     {
         try
         {
-            var apiKey = Environment.GetEnvironmentVariable("GEMINI_KEY");
-            if (string.IsNullOrWhiteSpace(apiKey))
-                throw new Exception("API key not found in environment variable 'GEMINI_KEY'.");
-
-            var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}";
-
             var requestBody = new
             {
                 contents = new[]

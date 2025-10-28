@@ -75,7 +75,7 @@
 
                     // show jConfirm success dialog
                     $.confirm({
-                        title: 'Question added',
+                        title: '<span class="i-green"> <i class="fas fa-question"></i> </span> Question',
                         content: 'Question has been added successfully.',
                         type: 'green',
                         buttons: {
@@ -135,6 +135,16 @@
         var locationId = $(this).data("locationid");
         var $row = $(this).closest("li"); // question row
 
+        if (!questionId || !locationId) {
+            $.alert({
+                title: "Error",
+                content: "Missing question ID or location ID.",
+                type: "red"
+            });
+            return;
+        }
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+
         $.confirm({
             title: 'Confirm Delete',
             icon: 'fas fa-trash',
@@ -145,8 +155,8 @@
                     text: 'Yes, delete it',
                     btnClass: 'btn-red',
                     action: function () {
+                        $spinner.removeClass("hidden");
                         $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
-
                         $.ajax({
                             url: '/ReportTemplate/DeleteQuestion',
                             type: 'POST',
@@ -179,9 +189,9 @@
                                 });
                             },
                             complete: function () {
+                                $spinner.addClass("hidden");
                                 // ✅ Re-enable button and restore text
-                                $btn.prop("disabled", false)
-                                    .html('<i class="fas fa-trash"></i> Delete');
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
                             }
                         });
                     }
@@ -205,8 +215,20 @@
                 content: 'Single Location not DELETED.',
                 type: 'red'
             });
-        } else {
+        }
+        else {
+            var $spinner = $(".submit-progress"); // global spinner (you already have this)
+
             var locationId = $(this).data("locationid");
+
+            if (!locationId) {
+                $.alert({
+                    title: "Error",
+                    content: "Missing location ID.",
+                    type: "red"
+                });
+                return;
+            }
             var $card = $(this).closest(".col-12"); // outer card for that location
 
             $.confirm({
@@ -219,8 +241,8 @@
                         text: 'Yes, delete it',
                         btnClass: 'btn-red',
                         action: function () {
+                            $spinner.removeClass("hidden");
                             $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
-
                             $.ajax({
                                 url: '/ReportTemplate/DeleteLocation',
                                 type: 'POST',
@@ -255,9 +277,9 @@
                                     });
                                 },
                                 complete: function () {
+                                    $spinner.addClass("hidden");
                                     // ✅ Re-enable button and restore text
-                                    $btn.prop("disabled", false)
-                                        .html('<i class="fas fa-trash"></i> Delete');
+                                    $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
                                 }
                             });
                         }
@@ -276,13 +298,23 @@
 
         var $btn = $(this);
         var locationId = $btn.data("locationid");
+        var templateId = $btn.data("reporttemplateid");
         var $card = $btn.closest(".card"); // scope to this location card
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
 
         // ✅ Get Location Name
         var locationName = $card.find("input.form-control.title-name").val()
             || $card.find("input[asp-for$='LocationName']").val()
             || $card.find("input[id^='location_']").val();
 
+        if (!locationName || !locationName.trim()) {
+            $.alert({
+                title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
+                content: "Location name is empty.",
+                type: "red"
+            });
+            return;
+        }
         // Collect AgentId
         var agentId = null;
         var $agentCheckbox = $card.find("input[id^='agent_']");
@@ -330,6 +362,7 @@
                     text: 'Yes',
                     btnClass: 'btn-success',
                     action: function () {
+                        $spinner.removeClass("hidden");
                         // Disable button and show spinner
                         $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Save');
                         $.ajax({
@@ -340,6 +373,7 @@
                                 'X-CSRF-TOKEN': $('input[name="icheckifyAntiforgery"]').val()
                             },
                             data: JSON.stringify({
+                                TemplateId: templateId,
                                 LocationName: locationName,
                                 AgentId: agentId,
                                 LocationId: locationId,
@@ -352,7 +386,7 @@
                                     $.alert({
                                         title: '<span class="i-green"><i class="fas fa-check-circle"></i></span> Success',
                                         content: response.message || "Location saved successfully!",
-                                        type: "green"
+                                        type: "green",
                                     });
                                 } else {
                                     $.alert({
@@ -371,9 +405,9 @@
                                 });
                             },
                             complete: function () {
+                                $spinner.addClass("hidden");
                                 // ✅ Re-enable button and restore text
-                                $btn.prop("disabled", false)
-                                    .html('<i class="fas fa-edit me-1"></i> Save');
+                                $btn.prop("disabled", false).html('<i class="fas fa-edit me-1"></i> Save');
                             }
                         });
                     }
@@ -392,6 +426,7 @@
         var $btn = $(this);
         var locationId = $btn.data("locationid");
         var reportTemplateId = $btn.data("reporttemplateid");
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
 
         if (!locationId || !reportTemplateId) {
             $.alert({
@@ -412,9 +447,8 @@
                     text: 'Yes, Clone',
                     btnClass: 'btn-dark',
                     action: function () {
-                        // show spinner
+                        $spinner.removeClass("hidden");
                         $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Clone.');
-
                         $.ajax({
                             url: '/ReportTemplate/CloneLocation',
                             type: 'POST',
@@ -451,6 +485,7 @@
                                 });
                             },
                             complete: function () {
+                                $spinner.addClass("hidden");
                                 $btn.prop("disabled", false).html('<i class="fas fa-clone"></i> Clone');
                             }
                         });
@@ -467,6 +502,16 @@
         var id = $(this).data('id');
         var $btn = $(this);
 
+        if (!id) {
+            $.alert({
+                title: "Error",
+                content: "Missing templateId ID.",
+                type: "red"
+            });
+            return;
+        }
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+
         $.confirm({
             title: 'Confirm Activation',
             icon: 'fas fa-flash',
@@ -477,6 +522,7 @@
                 text: 'Yes, Activate',
                 btnClass: 'btn-green',
                 action: function () {
+                        $spinner.removeClass("hidden");
                     $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Activate');
                     $.ajax({
                         url: '/ReportTemplate/Activate',
@@ -518,6 +564,7 @@
                         },
                         complete: function () {
                             // ✅ Re-enable button and restore text
+                                $spinner.addClass("hidden");
                             $btn.prop("disabled", false).html('<i class="fas fa-flash"></i> Activate');
                         }
                      });
@@ -588,6 +635,15 @@
         var row = $(this).closest("tr");
         var $btn = $(this);
 
+        if (!id) {
+            $.alert({
+                title: "Error",
+                content: "Missing templateId ID.",
+                type: "red"
+            });
+            return;
+        }
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
         $.confirm({
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete this template?',
@@ -597,6 +653,7 @@
                     text: 'Yes, Delete',
                     btnClass: 'btn-red',
                     action: function () {
+                        $spinner.removeClass("hidden");
                         $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
                         $.ajax({
                             url: '/ReportTemplate/DeleteTemplate',
@@ -636,9 +693,9 @@
                                 });
                             },
                             complete: function () {
+                                $spinner.addClass("hidden");
                                 // ✅ Re-enable button and restore text
-                                $btn.prop("disabled", false)
-                                    .html('<i class="fas fa-trash"></i> Delete');
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
                             }
                         });
                     }

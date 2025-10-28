@@ -6,6 +6,8 @@ namespace risk.control.system.Models
     {
         public MediaType MediaType { get; set; } = MediaType.AUDIO;
         public string MediaExtension { get; set; } = "mp3";
+
+        public string Transcript { get; set; } = "None";
         // Foreign key to LocationTemplate
         public long? LocationReportId { get; set; }  // This is the FK property
         public LocationReport? LocationReport { get; set; }  // Navigation property

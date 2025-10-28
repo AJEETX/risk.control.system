@@ -80,6 +80,9 @@
             </div> <!-- class bb-blog-inner -->
         </article>
         <div class="card shadow-lg border-1 rounded-lg">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
             <button id="loadTemplate" class="btn btn-default" type="button" data-toggle="collapse" data-target="#reportTemplateContainer"
                     aria-expanded="false" aria-controls="reportTemplateContainer">
                 <i class="fas fa-file-alt"></i> Edit Report: 
@@ -94,9 +97,7 @@
         </div>
         <form id="radioButtons" method="post" asp-controller="InvestigationPost" asp-action="AllocateSingle2Vendor">
             <div class="card-body">
-                <div class="submit-progress hidden">
-                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                </div>
+                
                 <input type="hidden" id="caseId" name="caseId" value="@Model.ClaimsInvestigation.Id" />
                 <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">

@@ -2,6 +2,7 @@
 {
     public class SaveLocationDto
     {
+        public long TemplateId { get; set; }
         public long LocationId { get; set; }
         public string LocationName { get; set; } // ✅ added
         public ChildSelectionDto AgentId { get; set; }

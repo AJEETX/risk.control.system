@@ -84,8 +84,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index));
                 }
                 var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
-                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled
-                    )
+                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var report = model.InvestigationReport.ToString();
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation, report);
@@ -217,10 +216,10 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
-                if (model != null && model.ReportAiSummary == null && model.ClaimsInvestigation.AiEnabled)
-                {
-                    model = await investigationService.GetClaimDetailsAiReportSummary(model);
-                }
+                //if (model != null && model.ReportAiSummary == null && model.ClaimsInvestigation.AiEnabled)
+                //{
+                //    model = await investigationService.GetClaimDetailsAiReportSummary(model);
+                //}
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
