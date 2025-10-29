@@ -284,13 +284,13 @@
                 <a id="back" asp-action="Profile" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> <i class="far fa-file-powerpoint"></i> Back</a>
                     @if (Model.IsActive)
                     {
-                        <button disabled class="btn btn-success" data-toggle="tooltip" title="The template is active">
+                        <button disabled class="btn btn-outline-secondary" data-toggle="tooltip" title="The template is active">
                             <i class="fas fa-flash igreen"></i><bold> Active</bold>
                         </button>
                     }
                     else
                     {
-                        <button type="button" class="btn btn-outline-success activate-btn" data-id="@Model.Id">
+                        <button type="button" class="btn btn-success activation-btn" data-id="@Model.Id">
                             <i class="fas fa-flash"></i> Activate
                         </button>
                     }

@@ -26,29 +26,52 @@
                 </span>
             </h3>
         </div>
-        <div class="card-body">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        <div class="filter-refresh-container shadow-lg border-1 rounded-lg">
+            <div class="filter-group">
+                <label for="caseTypeFilter" class="filter-label">
+                    <i class="bi bi-funnel"></i> Case Type:
+                </label>
+                <select id="caseTypeFilter" class="form-select custom-select">
+                    <option value="">All</option>
+                    <option value="@InsuranceType.CLAIM">@CONSTANTS.CLAIM</option>
+                    <option value="@InsuranceType.UNDERWRITING">@CONSTANTS.UNDERWRITING</option>
+                </select>
             </div>
-            
+            <div class="shadow-lg border-1 rounded-lg">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <button id="refreshTable" class="btn btn-light refresh-button">
+                    <i id="refreshIcon" class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
                     <form id="antiForgeryForm">
                         @Html.AntiForgeryToken()
                     </form>
-                    <table id="reportTemplatesTable" class="table table-bordered table-striped w-100">
+                    <div class="responsive">
+                        <table id="reportTemplatesTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Insurance Type</th>
-                                <th>Status</th>
-                                <th>Created On</th>
-                                <th>Actions</th>
+                                <th data-toggle="tooltip" title=""></th>
+                                <th data-toggle="tooltip" title="Template name">Name</th>
+                                <th data-toggle="tooltip" title="Case type">Case type</th>
+                                <th data-toggle="tooltip" title="Active/Inactive">Status</th>
+                                <th data-toggle="tooltip" title="Created date">Created</th>
+                                <th data-toggle="tooltip" title="Locations"><i class="fas fa-location-arrow"></i>  </th>
+                                <th data-toggle="tooltip" title="Face IDs"><i class="fas fa-id-badge"></i> </th>
+                                <th data-toggle="tooltip" title="Documents"><i class="fas fa-file-alt"></i> </th>
+                                <th data-toggle="tooltip" title="Media Files"><i class="fas fa-film"></i> </th>
+                                <th data-toggle="tooltip" title="Questions"><i class="fas fa-question-circle"></i></th>
+                                <th data-toggle="tooltip" title="[Clone] [Edit] [Delete] [Activate]">Actions</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> GetReportTemplates()
+        public async Task<IActionResult> GetReportTemplates(string insuranceType)
         {
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
@@ -73,8 +73,24 @@ namespace risk.control.system.Controllers
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             var companyUser = context.ClientCompanyApplicationUser
                 .Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
-            var query = context.ReportTemplates.Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system").AsQueryable();
+            var query = context.ReportTemplates
+                    .Include(r => r.LocationReport)
+                        .ThenInclude(l => l.FaceIds)
+                    .Include(r => r.LocationReport)
+                        .ThenInclude(l => l.DocumentIds)
+                         .Include(r => r.LocationReport)
+                        .ThenInclude(l => l.MediaReports)
+                    .Include(r => r.LocationReport)
+                        .ThenInclude(l => l.Questions)
+                .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system").AsQueryable();
 
+            if (!string.IsNullOrEmpty(insuranceType))
+            {
+                if (Enum.TryParse<InsuranceType>(insuranceType, out var parsedType))
+                {
+                    query = query.Where(t => t.InsuranceType == parsedType);
+                }
+            }
             if (!string.IsNullOrWhiteSpace(searchValue))
             {
                 query = query.Where(t =>
@@ -83,6 +99,50 @@ namespace risk.control.system.Controllers
             }
 
             // Sorting
+            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortDirection))
+            {
+                switch (sortColumn)
+                {
+                    case "name":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.Name) : query.OrderByDescending(t => t.Name);
+                        break;
+                    case "insuranceType":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.InsuranceType) : query.OrderByDescending(t => t.InsuranceType);
+                        break;
+                    case "isActive":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.IsActive) : query.OrderByDescending(t => t.IsActive);
+                        break;
+                    case "createdOn":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.Created) : query.OrderByDescending(t => t.Created);
+                        break;
+                    case "locations":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.LocationReport.Count) : query.OrderByDescending(t => t.LocationReport.Count);
+                        break;
+                    case "faceCount":
+                        query = sortDirection == "asc"
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.FaceIds).Count(i => i.Selected))
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.FaceIds).Count(i => i.Selected));
+                        break;
+                    case "docCount":
+                        query = sortDirection == "asc"
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.DocumentIds).Count(i => i.Selected))
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.DocumentIds).Count(i => i.Selected));
+                        break;
+                    case "mediaCount":
+                        query = sortDirection == "asc"
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.MediaReports).Count(i => i.Selected))
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.MediaReports).Count(i => i.Selected));
+                        break;
+                    case "questionCount":
+                        query = sortDirection == "asc"
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.Questions).Count())
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.Questions).Count());
+                        break;
+                    default:
+                        query = query.OrderByDescending(t => t.Id);
+                        break;
+                }
+            }
 
             var recordsTotal = await query.CountAsync();
             var data = await query.Skip(skip).Take(pageSize)
@@ -92,7 +152,20 @@ namespace risk.control.system.Controllers
                     name = t.Name,
                     insuranceType = t.InsuranceType.GetEnumDisplayName(),
                     isActive = t.IsActive,
-                    createdOn = t.Created
+                    createdOn = t.Created,
+                    locations = t.LocationReport.Count,
+                    faceCount = t.LocationReport
+                        .SelectMany(l => l.FaceIds)
+                        .Count(i => i.Selected),
+                    docCount = t.LocationReport
+                        .SelectMany(l => l.DocumentIds)
+                        .Count(i => i.Selected),
+                    mediaCount = t.LocationReport
+                    .SelectMany(l => l.MediaReports)
+                    .Count(i => i.Selected),
+                    questionCount = t.LocationReport
+                    .SelectMany(l => l.Questions)
+                    .Count()
                 })
                 .ToListAsync();
 
