@@ -145,7 +145,7 @@ namespace risk.control.system.Controllers
 
                 template.IsDeleted = true;
                 context.ReportTemplates.Update(template);
-                var affected = await context.SaveChangesAsync() > 0;
+                var affected = await context.SaveChangesAsync(null, false) > 0;
                 if (affected)
                 {
                     return Json(new { success = true, message = "Template deleted successfully." });
@@ -199,7 +199,7 @@ namespace risk.control.system.Controllers
                 };
                 location.Questions.Add(question);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 return Json(new { success = true, updatedQuestion = question });
 
@@ -229,7 +229,7 @@ namespace risk.control.system.Controllers
                 if (location.Questions.Count > 1)
                 {
                     context.Questions.Remove(question);
-                    await context.SaveChangesAsync();
+                    await context.SaveChangesAsync(null, false);
                     return Json(new { success = true, Id = id });
                 }
                 return Json(new { success = false, message = "Single Question not deleted." });
@@ -272,7 +272,7 @@ namespace risk.control.system.Controllers
                 context.MediaReport.RemoveRange(location.MediaReports);
 
                 context.LocationReport.Remove(location);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 return Json(new { success = true, Id = id });
             }
@@ -338,7 +338,7 @@ namespace risk.control.system.Controllers
                         media.Selected = m.Selected;
                 }
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 return Json(new { success = true, message = "Location saved successfully!" });
             }
@@ -426,7 +426,7 @@ namespace risk.control.system.Controllers
                 };
 
                 context.LocationReport.Add(clone);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 // Render partial view for new location card
                 var html = await this.RenderViewAsync("_LocationCardPartial", clone, true);

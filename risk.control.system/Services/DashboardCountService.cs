@@ -99,7 +99,7 @@ namespace risk.control.system.Services
             var claimsCompleted = GetAgencyyCompleted(userEmail);
 
             var data = new DashboardData();
-            data.FirstBlockName = "Allocate(new)";
+            data.FirstBlockName = "Allocate/Enquiry";
             data.FirstBlockCount = claimsAllocate;
             data.FirstBlockUrl = "/VendorInvestigation/Allocate";
 

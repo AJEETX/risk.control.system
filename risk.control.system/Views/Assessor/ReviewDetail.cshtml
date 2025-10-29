@@ -33,9 +33,7 @@
                     </button>
                 </div>
             </div>
-
             <div class="card-body">
-
                 <div class="row">
                     <partial name="Investigation/_DeletePolicy" model="Model" />
                     <partial name="Investigation/_DeleteCustomer" model="Model" />
@@ -43,19 +41,20 @@
                 </div>
             </div>
         </div>
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
+        
         
         <partial name="Investigation/_AgencySubmittedReport" model="@Model" />
 
         <div class="card-footer">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
             <div class="row">
                 <div class="col-md-12">
 
                     <form id="create-form">
 
-                        <a id="active-list" asp-action="Review" class="btn btn-outline-secondary">
+                        <a id="back" asp-action="Review" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i>
                             <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
                         </a>
