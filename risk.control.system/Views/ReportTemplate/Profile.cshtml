@@ -1,5 +1,5 @@
 ﻿@using risk.control.system.Helpers
-@model List<ReportTemplate>
+@* @model List<ReportTemplate> *@
 
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
@@ -30,39 +30,25 @@
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            <div class="d-flex justify-content-center">
-                <ul class="nav nav-tabs mb-3" id="insuranceTypeTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="claim-tab" data-toggle="tab" data-type="CLAIM" type="button" role="tab">
-                            CLAIM
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="underwriting-tab" data-toggle="tab" data-type="UNDERWRITING" type="button" role="tab">
-                            UNDERWRITING
-                        </button>
-                    </li>
-                </ul>
-            </div>
-
+            
             <div class="row">
                 <div class="col-md-12">
                     <form id="antiForgeryForm">
                         @Html.AntiForgeryToken()
                     </form>
-                    @{
-                        var claimTemplates = Model.Where(t => t.InsuranceType == InsuranceType.CLAIM).ToList();
-                        var underwritingTemplates = Model.Where(t => t.InsuranceType == InsuranceType.UNDERWRITING).ToList();
-                    }
-
-                    <div class="tab-content" id="insuranceTypeTabContent">
-                        <div class="tab-pane fade show active" id="claim-content" role="tabpanel">
-                            @await Html.PartialAsync("_ReportTemplates", claimTemplates)
-                        </div>
-                        <div class="tab-pane fade" id="underwriting-content" role="tabpanel">
-                            @await Html.PartialAsync("_ReportTemplates", underwritingTemplates)
-                        </div>
-                    </div>
+                    <table id="reportTemplatesTable" class="table table-bordered table-striped w-100">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Insurance Type</th>
+                                <th>Status</th>
+                                <th>Created On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
