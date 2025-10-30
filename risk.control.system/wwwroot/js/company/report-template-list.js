@@ -715,7 +715,7 @@
                                 complete: function () {
                                     // ✅ Re-enable button and restore text
                                     $spinner.addClass("hidden");
-                                    $btn.prop("disabled", false).html('<i class="fas fa-flash"></i> Activate');
+                                    $btn.prop("disabled", false).html('<i class="fas fa-flash"></i> Clone');
                                 }
                             });
                         }
