@@ -34,8 +34,8 @@
                 render: function (data, type, row) {
                     return `
                                 <a id="edit${data}"class="btn btn-xs btn-warning" href="/Pincodes/Edit/${data}">
-                                    <i class="fas fa-pen"></i> Edit
-                                </a> &nbsp;
+                                    <i class="fas fa-map-pin"></i> Edit
+                                </a>
                                 <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
                                             <i class="fas fa-trash"></i> Delete
                                         </a>`;

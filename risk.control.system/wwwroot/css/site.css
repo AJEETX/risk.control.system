@@ -1318,15 +1318,15 @@ input[type="text"] #emailAddress {
 }
 
 a.btn {
-    min-width: 5rem;
+    min-width: 4rem;
 }
 
     a.btn.btn-xs {
-        min-width: 5rem;
+        min-width: 4rem;
     }
 
 button.btn {
-    min-width: 5rem;
+    min-width: 4rem;
 }
 
     button.btn.btn-sm {
