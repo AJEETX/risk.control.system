@@ -83,14 +83,31 @@
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            <button id="loadTemplate" class="btn btn-default" type="button" data-toggle="collapse" data-target="#reportTemplateContainer"
-                    aria-expanded="false" aria-controls="reportTemplateContainer">
-                <i class="fas fa-file-alt"></i> Edit Report: 
-            </button>
+
+            <div class="card-header bg-light">
+                <h3 class="card-title">
+                    <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Edit Report Template</span>
+                </h3>
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Edit Report Template">
+                        <i class='far fa-hand-point-right'></i>
+                    </span>
+
+                    <!-- ✅ Toggle button -->
+                    <button id="loadTemplate" type="button" class="btn btn-tool"
+                            data-toggle="collapse" data-target="#reportTemplateContainer"
+                            aria-expanded="false" aria-controls="reportTemplateContainer">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ✅ collapse target -->
             <div id="reportTemplateContainer" class="card-body collapse">
-                <!-- Report template will load here -->
+                <!-- Report template loads here -->
             </div>
         </div>
+
         <input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
         <div class="card shadow-lg border-1 rounded-lg">
             <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
