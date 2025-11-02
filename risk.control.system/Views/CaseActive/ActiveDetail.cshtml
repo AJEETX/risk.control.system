@@ -18,9 +18,7 @@
                                 @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber ?? "N/A"
                             </span>
                         </li>
-
                         <li><i class="fas fa-clock"></i> Timeline</li>
-
                         @if (Model.Withdrawable)
                         {
                             <li>
@@ -44,13 +42,11 @@
                 </span>
             </h3>
         </div>
-
         <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation?.Id" />
         <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
         <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail?.PolicyDetailId" />
     </div>
-
     <div class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-light text-white text-center">
             <h3 class="card-title">
@@ -58,14 +54,12 @@
                     <b>@Model.ClaimsInvestigation?.SubStatus</b>
                 </span>
                 <b><i class='far fa-hand-point-right'></i></b>
-
                 <span class="badge badge-info" data-toggle="tooltip"
                       title="Owner : @Model.ClaimsInvestigation.CaseOwner">
                     <b>
                         @Model.ClaimsInvestigation.CaseOwner
                     </b>
                 </span>
-
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
@@ -77,7 +71,6 @@
                 </span>
             </h3>
         </div>
-
         <div class="card-body">
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
@@ -99,15 +92,12 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="card-body" id="reportTemplateContainer">
                     <!-- Report template will load here -->
                 </div>
             </div>
-
         <input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
             <partial name="Investigation/_TimelineReport" model="@Model" />
-
             <div class="card-footer">
                 @if (Model.Withdrawable)
                 {
@@ -128,14 +118,12 @@
                 else
                 {
                     <p>The case cannot be withdrawn. See the <b>Timeline</b> section above <i class="far fa-hand-point-up"></i> for more info.</p>
-
                     <div class="row">
                         <div class="col-md-12">
                             <a id="back" asp-action="Active" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left"></i>
                                 <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
                             </a>
-
                             <span id="withdraw-information-popup" class="badge badge-light">
                                 <div class="btn btn-outline-danger">
                                     <span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Withdraw <span class="badge badge-danger">
@@ -143,7 +131,6 @@
                                     </span>
                                 </div>
                             </span>
-
                         </div>
                     </div>
                 }

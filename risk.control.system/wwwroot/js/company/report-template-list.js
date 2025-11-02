@@ -14,6 +14,9 @@
                 d.insuranceType = $('#caseTypeFilter').val(); // <--- sends filter value
             }
         },
+        columnDefs: [
+            { targets: 1, width: '25%' } // 1 = 'name' column
+        ],
         columns: [
             { data: 'id', "bVisible": false },
             { data: 'name' },
@@ -29,7 +32,17 @@
             {
                 data: 'createdOn',
                 render: function (data) {
-                    return new Date(data).toLocaleDateString();
+                    if (!data) return '';
+                    let date = new Date(data);
+                    return date.toLocaleString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
                 }
             },
             { data: 'locations' },

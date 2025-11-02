@@ -369,7 +369,7 @@ function showdetails(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Details");
+    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
     disableAllInteractiveElements();
 
     var article = document.getElementById("article");

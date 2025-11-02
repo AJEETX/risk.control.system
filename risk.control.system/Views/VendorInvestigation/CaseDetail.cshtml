@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Details";
-
 }
 <section class="content">
     <div id="article" class="shadow-lg border-1 rounded-lg">
@@ -48,14 +47,12 @@
     }
     <div class="card shadow-lg border-1 rounded-lg">
     <div class="card-body">
-
         <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
         <partial name="_PolicyDetailsWithdraw" model="@data" />
 
         <div class="card-footer">
-
             <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="CaseVendorPost">
                 <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
                 <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
@@ -69,8 +66,6 @@
         </div>
     </div>
     </div>
-
-    
 </section>
 
 
@@ -78,10 +73,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/common/case-details.js">
-
-    </script>
-    <script src="~/js/supervisor/claims-details.js">
-
-    </script>
+    <script src="~/js/common/case-details.js"></script>
+    <script src="~/js/supervisor/claims-details.js"></script>
 }

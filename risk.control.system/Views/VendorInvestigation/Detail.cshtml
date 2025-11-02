@@ -62,21 +62,24 @@
                     {
                         <button id="withdraw-case" disabled class="btn btn-danger" title="Can't  be withdrawn"><i class="fas fa-undo"></i> Withdraw</button>
                     } *@
-                    <button id="withdraw-case" disabled class="btn btn-danger" title="Can't  be withdrawn"><i class="fas fa-undo"></i> Withdraw</button>
-
+                    
+                    <span id="decline-information-popup" class="badge badge-light">
+                        <div class="btn btn-outline-danger">
+                            <span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Decline <span class="badge badge-danger">
+                                <i class="fas fa-info"></i>
+                            </span>
+                        </div>
+                    </span>
                 </div>
             </div>
         </form>
     </div>
 </section>
 
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/common/case-details.js">
-    </script>
-    <script src="~/js/supervisor/claims-details.js">
-    </script>
+    <script src="~/js/common/case-details.js"></script>
+    <script src="~/js/supervisor/claims-details.js"></script>
 }
