@@ -652,7 +652,7 @@
                         complete: function () {
                             // ✅ Re-enable button and restore text
                                 $spinner.addClass("hidden");
-                            //$btn.prop("disabled", false).html('<i class="fas fa-flash"></i> Activate');
+                            $btn.prop("disabled", false).html('<i class="fas fa-flash"></i> Activate');
                         }
                      });
                     }
@@ -728,7 +728,7 @@
                                 complete: function () {
                                     // ✅ Re-enable button and restore text
                                     $spinner.addClass("hidden");
-                                    $btn.prop("disabled", false).html('<i class="fas fa-flash"></i> Clone');
+                                    $btn.prop("disabled", false).html('<i class="fas fa-copy"></i> Clone');
                                 }
                             });
                         }
@@ -831,6 +831,92 @@
                 cancel: {
                     text: 'Cancel',
                         btnClass: 'btn-default'
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.activation-btn', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var $btn = $(this);
+
+        if (!id) {
+            $.alert({
+                title: "Error",
+                content: "Missing templateId ID.",
+                type: "red"
+            });
+            return;
+        }
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+
+        $.confirm({
+            title: 'Confirm Activation',
+            icon: 'fas fa-flash',
+            content: 'Are you sure you want to activate this report?',
+            type: 'green',
+            buttons: {
+                confirm: {
+                    text: 'Yes, Activate',
+                    btnClass: 'btn-green',
+                    action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Activate');
+                        $.ajax({
+                            url: '/ReportTemplate/Activate',
+                            type: 'POST',
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: id
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    $.alert({
+                                        title: '<span class="i-green"> <i class="fas fas fa-flash"></i> </span> Activated!',
+                                        content: response.message,
+                                        type: 'green',
+                                        buttons: {
+                                            OK: {
+                                                btnClass: 'btn-green',
+                                                icon: 'fa-flash',
+                                                action: function () {
+                                                    
+                                                }
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    $.alert({
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                        content: response.message,
+                                        type: 'red'
+                                    });
+                                }
+                            },
+                            error: function () {
+                                $.alert({
+                                    title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                    content: 'Something went wrong while activating the report.',
+                                    type: 'red'
+                                });
+                            },
+                            complete: function () {
+                                // ✅ Re-enable button and restore text
+                                $spinner.addClass("hidden");
+                                $btn
+                                    .removeClass('btn-success activation-btn')
+                                    .addClass('btn-outline-success')
+                                    .prop('disabled', true)
+                                    .attr('title', 'The template is active')
+                                    .html('<i class="fas fa-flash igreen"></i> <b>Active</b>');
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Cancel',
+                    btnClass: 'btn-default'
                 }
             }
         });
