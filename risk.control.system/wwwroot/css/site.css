@@ -1331,6 +1331,7 @@ button.btn {
 
     button.btn.btn-sm {
         min-width: 3rem;
+        margin-right: 5px;
     }
 
 a.btn.btn-sm {
@@ -1347,6 +1348,7 @@ button.btn.btn-tool {
 
 a#back {
     min-width: 5rem;
+    margin-right: 5px;
 }
 
 a#back-button {

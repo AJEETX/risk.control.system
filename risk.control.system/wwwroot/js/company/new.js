@@ -7,7 +7,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add ");
+        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
 
         // Disable all buttons, submit inputs, and anchors
         $('button, input[type="submit"], a').prop('disabled', true);

@@ -138,15 +138,15 @@
                             <div class="d-flex justify-content-center align-items-center">
                                 <span class="detail-wizard"> <i class="far fa-hand-point-up"></i>  Complete  details to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
                             </div>
-                            <div>
-                                <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <a id="back" asp-action="New" class="btn btn-outline-secondary btn-sm"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
                                 @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                                 {
-                                    <button disabled class="btn btn-warning disabled">
+                                    <button disabled class="btn btn-warning disabled btn-sm">
                                         <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
                                     </button>
                                 }
-                                <button disabled class="btn btn-info disabled">
+                                <button disabled class="btn btn-info disabled btn-sm">
                                     <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b>Assign</b><sub>manual</sub>
                                 </button>
                             </div>
@@ -156,17 +156,17 @@
                             <div class="d-flex justify-content-center align-items-center">
                                 <span class="detail-wizard-complete"> <i class="far fa-thumbs-up"></i> Detail completed. <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
                             </div>
-                            <div>
-                                <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <a id="back" asp-action="New" class="btn btn-outline-secondary btn-sm"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
                                 @if (customerExist && beneficiaryExist && Model.CaseIsValidToAssign)
                                 {
                                     @if (Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                                     {
-                                        <button type="submit" id="assign-list" class="btn btn-warning">
+                                        <button type="submit" id="assign-list" class="btn btn-warning btn-sm">
                                             <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign</b><sub>auto</sub>
                                         </button>
                                     }
-                                    <a id="assign-manual" href="/Investigation/EmpanelledVendors?Id=@Model.ClaimsInvestigation.Id&fromEditPage=true" class="btn btn-info">
+                                    <a id="assign-manual" href="/Investigation/EmpanelledVendors?Id=@Model.ClaimsInvestigation.Id&fromEditPage=true" class="btn btn-info btn-sm">
                                         <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign</b><sub>manual</sub>
                                     </a>
                                 }
@@ -174,11 +174,11 @@
                                 {
                                     @if (Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                                     {
-                                        <button disabled class="btn btn-warning disabled">
+                                        <button disabled class="btn btn-warning disabled btn-sm">
                                             <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
                                         </button>
                                     }
-                                    <button disabled class="btn btn-info disabled">
+                                    <button disabled class="btn btn-info disabled btn-sm">
                                         <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b>Assign</b><sub>manual</sub>
                                     </button>
                                 }
