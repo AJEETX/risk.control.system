@@ -1,5 +1,92 @@
 ﻿$(document).ready(function () {
-    
+
+    var table =$('#reportTemplatesTable').DataTable({
+        processing: true,
+        serverSide: true,
+        language: {
+            loadingRecords: '&nbsp;',
+            processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
+        },
+        ajax: {
+            url: '/ReportTemplate/GetReportTemplates',
+            type: 'POST',
+            data: function (d) {
+                d.insuranceType = $('#caseTypeFilter').val(); // <--- sends filter value
+            }
+        },
+        columnDefs: [
+            { targets: 1, width: '25%' } // 1 = 'name' column
+        ],
+        columns: [
+            { data: 'id', "bVisible": false },
+            { data: 'name' },
+            { data: 'insuranceType' },
+            {
+                data: 'isActive',
+                render: function (data) {
+                    return data
+                        ? '<span class="badge bg-success"><i class="fas fa-check-circle"></i>  Active</span>'
+                        : '<span class="badge bg-secondary"><i class="fas fa-times-circle"></i> Inactive</span>';
+                }
+            },
+            {
+                data: 'createdOn',
+                render: function (data) {
+                    if (!data) return '';
+                    let date = new Date(data);
+                    return date.toLocaleString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+                }
+            },
+            { data: 'locations' },
+            { data: 'faceCount' },
+            { data: 'docCount' },
+            { data: 'mediaCount' },
+            { data: 'questionCount' },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row) {
+                    // Button HTML setup
+                    let activateBtn = row.isActive
+                        ? `<button class="btn btn-xs btn-outline-success" disabled><i class="fas fa-flash"></i> Active</button>`
+                        : `<button class="btn btn-xs btn-success activate-btn" data-id="${row.id}" data-insurancetype="${row.insuranceType}"><i class="fas fa-flash"></i> Activate</button>`;
+
+                    let editBtn = `<button class="btn btn-xs btn-warning edit-template" data-id="${row.id}"><i class="fas fa-edit"></i> Edit</button>`;
+                    let cloneBtn = `<button class="btn btn-xs btn-secondary  clone-btn" data-id="${row.id}"><i class="fas fa-copy"></i> Clone</button>`;
+                    let deleteBtn = row.isActive ?
+                        `<button class="btn btn-xs btn-danger" disabled><i class="fas fa-trash"></i> Delete</button>` : `<button class="btn btn-xs btn-danger delete-template" data-id="${row.id}"><i class="fas fa-trash"></i> Delete</button>`;
+
+                    return `${activateBtn} ${cloneBtn} ${editBtn} ${deleteBtn}`;
+                }
+            }
+        ],
+        order: [[0, 'desc']]
+    });
+
+    $('#caseTypeFilter').on('change', function () {
+        table.ajax.reload(); // Reload the table when the filter is changed
+    });
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false); // false => Retains current page
+    });
+
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
     // Add Question button click event
     $(document).on('click', '.add-question-btn', function () {
         var locationId = $(this).data('locationid');
@@ -542,7 +629,7 @@
                                             btnClass: 'btn-green',
                                             icon: 'fa-flash',
                                             action: function () {
-                                                location.href = "/ReportTemplate/Profile";
+                                                $('#reportTemplatesTable').DataTable().ajax.reload();
                                             }
                                         }
                                     }
@@ -579,11 +666,13 @@
     });
 
     var hasClone = true;
-    $(document).on('click', '.clone-template', function (e) {
+    $(document).on('click', '.clone-btn', function (e) {
         e.preventDefault();
+        var id = $(this).data('id');
         var url = $(this).attr("href");
         if (hasClone) {
             var $btn = $(this);
+            var $spinner = $(".submit-progress"); // global spinner (you already have this)
 
             $.confirm({
                 title: 'Confirm Clone',
@@ -596,15 +685,52 @@
                         text: 'Yes, Clone',
                         btnClass: 'btn-dark',
                         action: function () {
-                            $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Clone.');
-
-                            hasClone = false;
-                            $("body").addClass("submit-progress-bg");
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            disableAllInteractiveElements();
-                            window.location.href = url; // proceed to clone
+                            $spinner.removeClass("hidden");
+                            $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Clone');
+                            $.ajax({
+                                url: '/ReportTemplate/CloneDetails',
+                                type: 'POST',
+                                data: {
+                                    icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                    templateId: id
+                                },
+                                success: function (response) {
+                                    if (response.success) {
+                                        $.alert({
+                                            title: '<span class="i-gray"> <i class="fas fa-copy"></i> </span> Cloned!',
+                                            content: response.message,
+                                            type: 'dark',
+                                            buttons: {
+                                                OK: {
+                                                    btnClass: 'btn-dark',
+                                                    icon: 'fa-copy',
+                                                    action: function () {
+                                                        $('#reportTemplatesTable').DataTable().ajax.reload();
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        $.alert({
+                                            title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                            content: response.message,
+                                            type: 'red'
+                                        });
+                                    }
+                                },
+                                error: function () {
+                                    $.alert({
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                        content: 'Something went wrong while cloning the report.',
+                                        type: 'red'
+                                    });
+                                },
+                                complete: function () {
+                                    // ✅ Re-enable button and restore text
+                                    $spinner.addClass("hidden");
+                                    $btn.prop("disabled", false).html('<i class="fas fa-copy"></i> Clone');
+                                }
+                            });
                         }
                     },
                     cancel: {
@@ -618,6 +744,7 @@
 
     //edit template
     $(document).on('click', '.edit-template', function (e) {
+        var id = $(this).data('id');
         $("body").addClass("submit-progress-bg");
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
@@ -627,6 +754,7 @@
         $btn.prop('disabled', true);         // disable button
         $btn.addClass('disabled');           // add visual Bootstrap disabled style
         $btn.html('<i class="fas fa-sync fa-spin"></i> Edit'); // show spinner feedback
+        location.href = "/ReportTemplate/Details/" + id;
     });
 
     //delete template
@@ -708,13 +836,89 @@
         });
     });
 
-    $('#claim-tab').click(function () {
-            $('#claim-content').addClass('show active');
-            $('#underwriting-content').removeClass('show active');
-        });
+    $(document).on('click', '.activation-btn', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var $btn = $(this);
 
-    $('#underwriting-tab').click(function () {
-        $('#underwriting-content').addClass('show active');
-        $('#claim-content').removeClass('show active');
+        if (!id) {
+            $.alert({
+                title: "Error",
+                content: "Missing templateId ID.",
+                type: "red"
+            });
+            return;
+        }
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+
+        $.confirm({
+            title: 'Confirm Activation',
+            icon: 'fas fa-flash',
+            content: 'Are you sure you want to activate this report?',
+            type: 'green',
+            buttons: {
+                confirm: {
+                    text: 'Yes, Activate',
+                    btnClass: 'btn-green',
+                    action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Activate');
+                        $.ajax({
+                            url: '/ReportTemplate/Activate',
+                            type: 'POST',
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: id
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    $.alert({
+                                        title: '<span class="i-green"> <i class="fas fas fa-flash"></i> </span> Activated!',
+                                        content: response.message,
+                                        type: 'green',
+                                        buttons: {
+                                            OK: {
+                                                btnClass: 'btn-green',
+                                                icon: 'fa-flash',
+                                                action: function () {
+                                                    
+                                                }
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    $.alert({
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                        content: response.message,
+                                        type: 'red'
+                                    });
+                                }
+                            },
+                            error: function () {
+                                $.alert({
+                                    title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                    content: 'Something went wrong while activating the report.',
+                                    type: 'red'
+                                });
+                            },
+                            complete: function () {
+                                // ✅ Re-enable button and restore text
+                                $spinner.addClass("hidden");
+                                $btn
+                                    .removeClass('btn-success activation-btn')
+                                    .addClass('btn-outline-success')
+                                    .prop('disabled', true)
+                                    .attr('title', 'The template is active')
+                                    .html('<i class="fas fa-flash igreen"></i> <b>Active</b>');
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Cancel',
+                    btnClass: 'btn-default'
+                }
+            }
+        });
     });
 });

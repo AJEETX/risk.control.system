@@ -1,5 +1,5 @@
 ﻿@using risk.control.system.Helpers
-@model List<ReportTemplate>
+@* @model List<ReportTemplate> *@
 
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
@@ -26,42 +26,51 @@
                 </span>
             </h3>
         </div>
+        <div class="filter-refresh-container shadow-lg border-1 rounded-lg">
+            <div class="filter-group">
+                <label for="caseTypeFilter" class="filter-label">
+                    <i class="bi bi-funnel"></i> Case Type:
+                </label>
+                <select id="caseTypeFilter" class="form-select custom-select">
+                    <option value="">All</option>
+                    <option value="@InsuranceType.CLAIM">@CONSTANTS.CLAIM</option>
+                    <option value="@InsuranceType.UNDERWRITING">@CONSTANTS.UNDERWRITING</option>
+                </select>
+            </div>
+            <div class="shadow-lg border-1 rounded-lg">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <button id="refreshTable" class="btn btn-light refresh-button">
+                    <i id="refreshIcon" class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+        </div>
         <div class="card-body">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-            <div class="d-flex justify-content-center">
-                <ul class="nav nav-tabs mb-3" id="insuranceTypeTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="claim-tab" data-toggle="tab" data-type="CLAIM" type="button" role="tab">
-                            CLAIM
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="underwriting-tab" data-toggle="tab" data-type="UNDERWRITING" type="button" role="tab">
-                            UNDERWRITING
-                        </button>
-                    </li>
-                </ul>
-            </div>
-
             <div class="row">
                 <div class="col-md-12">
                     <form id="antiForgeryForm">
                         @Html.AntiForgeryToken()
                     </form>
-                    @{
-                        var claimTemplates = Model.Where(t => t.InsuranceType == InsuranceType.CLAIM).ToList();
-                        var underwritingTemplates = Model.Where(t => t.InsuranceType == InsuranceType.UNDERWRITING).ToList();
-                    }
-
-                    <div class="tab-content" id="insuranceTypeTabContent">
-                        <div class="tab-pane fade show active" id="claim-content" role="tabpanel">
-                            @await Html.PartialAsync("_ReportTemplates", claimTemplates)
-                        </div>
-                        <div class="tab-pane fade" id="underwriting-content" role="tabpanel">
-                            @await Html.PartialAsync("_ReportTemplates", underwritingTemplates)
-                        </div>
+                    <div class="responsive">
+                        <table id="reportTemplatesTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th data-toggle="tooltip" title=""></th>
+                                <th data-toggle="tooltip" title="Template name">Name</th>
+                                <th data-toggle="tooltip" title="Case type">Case type</th>
+                                <th data-toggle="tooltip" title="Active/Inactive">Status</th>
+                                <th data-toggle="tooltip" title="Created date">Created</th>
+                                <th data-toggle="tooltip" title="Locations"><i class="fas fa-location-arrow"></i>  </th>
+                                <th data-toggle="tooltip" title="Face IDs"><i class="fas fa-id-badge"></i> </th>
+                                <th data-toggle="tooltip" title="Documents"><i class="fas fa-file-alt"></i> </th>
+                                <th data-toggle="tooltip" title="Media Files"><i class="fas fa-film"></i> </th>
+                                <th data-toggle="tooltip" title="Questions"><i class="fas fa-question-circle"></i></th>
+                                <th data-toggle="tooltip" title="[Clone] [Edit] [Delete] [Activate]">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                     </div>
                 </div>
             </div>

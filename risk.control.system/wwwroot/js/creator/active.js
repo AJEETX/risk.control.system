@@ -177,7 +177,6 @@
                     return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -251,25 +250,7 @@
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');
     });
-    // Show the full map on hover and hide it when the mouse leaves
-    //table
-    //    .on('mouseenter', '.map-thumbnail', function () {
-    //        const $this = $(this); // Cache the current element
-
-    //        // Set a timeout to show the full map after 1 second
-    //        hoverTimeout = setTimeout(function () {
-    //            $this.find('.full-map').show(); // Show full map
-    //        }, 1000); // Delay of 1 second
-    //    })
-    //    .on('mouseleave', '.map-thumbnail', function () {
-    //        const $this = $(this); // Cache the current element
-
-    //        // Clear the timeout to cancel showing the map
-    //        clearTimeout(hoverTimeout);
-
-    //        // Immediately hide the full map
-    //        $this.find('.full-map').hide();
-    //    });
+ 
     $(document).on('show.bs.modal', '#mapModal', function (event) {
         var trigger = $(event.relatedTarget); // The <img> clicked
         var imageUrl = trigger.data('img');

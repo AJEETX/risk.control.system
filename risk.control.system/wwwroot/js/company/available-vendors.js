@@ -47,7 +47,7 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<span><i class='fas fa-exclamation-triangle i-blue' data-toggle='tooltip' title='Incomplete/Inactive'></i></span>",
+                "sDefaultContent": "<span class='i-orangered'><i class='fas fa-exclamation-triangle' data-toggle='tooltip' title='Incomplete/Inactive'></i></span>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.canOnboard) {

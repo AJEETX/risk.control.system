@@ -82,7 +82,6 @@
                                 <a  id="edit${data}" class="btn btn-xs btn-warning" href="/State/Edit/${data}">
                                     <i class="fas fa-map-marker-alt"></i> Edit
                                 </a>
-                                &nbsp;
                                 <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
                                             <i class="fas fa-trash"></i> Delete
                                         </a>`;

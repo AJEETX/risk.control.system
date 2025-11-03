@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Agency
             }
 
         }
-        [Breadcrumb(" Allocate(new)")]
+        [Breadcrumb(" Allocate/Enquiry")]
         public ActionResult Allocate()
         {
             try

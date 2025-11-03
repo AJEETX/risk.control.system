@@ -133,7 +133,7 @@ $(document).ready(function () {
                 bSortable: false,
                 mRender: function (data, type, row) {
                     return `
-                        <a id="edit${row.id}" href="/Agency/EditService?id=${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;
+                        <a id="edit${row.id}" href="/Agency/EditService?id=${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>
                         <a id="delete${row.id}" href="/Agency/DeleteService?id=${row.id}" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>`;
                 }
             },

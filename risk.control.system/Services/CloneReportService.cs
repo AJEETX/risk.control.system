@@ -48,7 +48,7 @@ namespace risk.control.system.Services
             context.ReportTemplates.UpdateRange(sameTypeTemplates);
             context.ReportTemplates.Update(template);
 
-            var rowsAffected = await context.SaveChangesAsync();
+            var rowsAffected = await context.SaveChangesAsync(null, false);
             return rowsAffected > 0;
         }
 
@@ -127,7 +127,7 @@ namespace risk.control.system.Services
             };
 
             var addedTemplate = await context.ReportTemplates.AddAsync(clone);
-            var rowsAffected = await context.SaveChangesAsync();
+            var rowsAffected = await context.SaveChangesAsync(null, false);
             return addedTemplate.Entity;
         }
 

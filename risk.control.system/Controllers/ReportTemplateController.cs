@@ -37,25 +37,145 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Report Template", FromAction = "Index")]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
+            //var currentUserEmail = HttpContext.User?.Identity?.Name;
+            //var companyUser = context.ClientCompanyApplicationUser
+            //    .Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+
+            //var templates = await context.ReportTemplates
+            //    .Include(r => r.LocationReport)
+            //        .ThenInclude(l => l.FaceIds)
+            //    .Include(r => r.LocationReport)
+            //        .ThenInclude(l => l.DocumentIds)
+            //         .Include(r => r.LocationReport)
+            //        .ThenInclude(l => l.MediaReports)
+            //    .Include(r => r.LocationReport)
+            //        .ThenInclude(l => l.Questions)
+            //        .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system")
+            //    .ToListAsync();
+
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> GetReportTemplates(string insuranceType)
+        {
+            var draw = Request.Form["draw"].FirstOrDefault();
+            var start = Request.Form["start"].FirstOrDefault();
+            var length = Request.Form["length"].FirstOrDefault();
+            var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][data]"].FirstOrDefault();
+            var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var searchValue = Request.Form["search[value]"].FirstOrDefault();
+
+            int pageSize = length != null ? Convert.ToInt32(length) : 10;
+            int skip = start != null ? Convert.ToInt32(start) : 0;
+
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             var companyUser = context.ClientCompanyApplicationUser
                 .Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var query = context.ReportTemplates
+                    .Include(r => r.LocationReport)
+                        .ThenInclude(l => l.FaceIds)
+                    .Include(r => r.LocationReport)
+                        .ThenInclude(l => l.DocumentIds)
+                         .Include(r => r.LocationReport)
+                        .ThenInclude(l => l.MediaReports)
+                    .Include(r => r.LocationReport)
+                        .ThenInclude(l => l.Questions)
+                .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system").AsQueryable();
 
-            var templates = await context.ReportTemplates
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.DocumentIds)
-                     .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.Questions)
-                    .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system")
+            if (!string.IsNullOrEmpty(insuranceType))
+            {
+                if (Enum.TryParse<InsuranceType>(insuranceType, out var parsedType))
+                {
+                    query = query.Where(t => t.InsuranceType == parsedType);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(searchValue))
+            {
+                query = query.Where(t =>
+                    t.Name.Contains(searchValue) ||
+                    t.InsuranceType.GetEnumDisplayName().Contains(searchValue));
+            }
+
+            // Sorting
+            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortDirection))
+            {
+                switch (sortColumn)
+                {
+                    case "name":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.Name) : query.OrderByDescending(t => t.Name);
+                        break;
+                    case "insuranceType":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.InsuranceType) : query.OrderByDescending(t => t.InsuranceType);
+                        break;
+                    case "isActive":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.IsActive) : query.OrderByDescending(t => t.IsActive);
+                        break;
+                    case "createdOn":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.Created) : query.OrderByDescending(t => t.Created);
+                        break;
+                    case "locations":
+                        query = sortDirection == "asc" ? query.OrderBy(t => t.LocationReport.Count) : query.OrderByDescending(t => t.LocationReport.Count);
+                        break;
+                    case "faceCount":
+                        query = sortDirection == "asc"
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.FaceIds).Count(i => i.Selected))
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.FaceIds).Count(i => i.Selected));
+                        break;
+                    case "docCount":
+                        query = sortDirection == "asc"
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.DocumentIds).Count(i => i.Selected))
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.DocumentIds).Count(i => i.Selected));
+                        break;
+                    case "mediaCount":
+                        query = sortDirection == "asc"
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.MediaReports).Count(i => i.Selected))
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.MediaReports).Count(i => i.Selected));
+                        break;
+                    case "questionCount":
+                        query = sortDirection == "asc"
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.Questions).Count())
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.Questions).Count());
+                        break;
+                    default:
+                        query = query.OrderByDescending(t => t.Id);
+                        break;
+                }
+            }
+
+            var recordsTotal = await query.CountAsync();
+            var data = await query.Skip(skip).Take(pageSize)
+                .Select(t => new
+                {
+                    id = t.Id,
+                    name = t.Name,
+                    insuranceType = t.InsuranceType.GetEnumDisplayName(),
+                    isActive = t.IsActive,
+                    createdOn = t.Created,
+                    locations = t.LocationReport.Count,
+                    faceCount = t.LocationReport
+                        .SelectMany(l => l.FaceIds)
+                        .Count(i => i.Selected),
+                    docCount = t.LocationReport
+                        .SelectMany(l => l.DocumentIds)
+                        .Count(i => i.Selected),
+                    mediaCount = t.LocationReport
+                    .SelectMany(l => l.MediaReports)
+                    .Count(i => i.Selected),
+                    questionCount = t.LocationReport
+                    .SelectMany(l => l.Questions)
+                    .Count()
+                })
                 .ToListAsync();
 
-            return View(templates);
+            return Json(new
+            {
+                draw = draw,
+                recordsFiltered = recordsTotal,
+                recordsTotal = recordsTotal,
+                data = data
+            });
         }
 
         [Breadcrumb(" Detail", FromAction = "Profile")]
@@ -81,15 +201,22 @@ namespace risk.control.system.Controllers
             return View(template);
         }
 
-        [Breadcrumb("Clone Detail", FromAction = "Profile")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CloneDetails(long templateId)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var newTemplate = await cloneService.CreateCloneReportTemplate(templateId, currentUserEmail);
-                notifyService.Success($"Report cloned successfully");
-                return View(newTemplate);
+                if (newTemplate != null)
+                {
+                    return Json(new { success = true, message = "Report cloned  successfully!" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Report clone failed!" });
+                }
             }
             catch (Exception ex)
             {
@@ -145,7 +272,7 @@ namespace risk.control.system.Controllers
 
                 template.IsDeleted = true;
                 context.ReportTemplates.Update(template);
-                var affected = await context.SaveChangesAsync() > 0;
+                var affected = await context.SaveChangesAsync(null, false) > 0;
                 if (affected)
                 {
                     return Json(new { success = true, message = "Template deleted successfully." });
@@ -199,7 +326,7 @@ namespace risk.control.system.Controllers
                 };
                 location.Questions.Add(question);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 return Json(new { success = true, updatedQuestion = question });
 
@@ -229,7 +356,7 @@ namespace risk.control.system.Controllers
                 if (location.Questions.Count > 1)
                 {
                     context.Questions.Remove(question);
-                    await context.SaveChangesAsync();
+                    await context.SaveChangesAsync(null, false);
                     return Json(new { success = true, Id = id });
                 }
                 return Json(new { success = false, message = "Single Question not deleted." });
@@ -272,7 +399,7 @@ namespace risk.control.system.Controllers
                 context.MediaReport.RemoveRange(location.MediaReports);
 
                 context.LocationReport.Remove(location);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 return Json(new { success = true, Id = id });
             }
@@ -338,7 +465,7 @@ namespace risk.control.system.Controllers
                         media.Selected = m.Selected;
                 }
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 return Json(new { success = true, message = "Location saved successfully!" });
             }
@@ -426,7 +553,7 @@ namespace risk.control.system.Controllers
                 };
 
                 context.LocationReport.Add(clone);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(null, false);
 
                 // Render partial view for new location card
                 var html = await this.RenderViewAsync("_LocationCardPartial", clone, true);

@@ -32,7 +32,7 @@ $(document).ready(function () {
                     return `
                                         <a id="edit${data}" class="btn btn-xs btn-warning" href="/District/Edit/${data}">
                                             <i class="fas fa-city"></i> Edit
-                                        </a> &nbsp;
+                                        </a> 
                                         <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
                                             <i class="fas fa-trash"></i> Delete
                                         </a>`;

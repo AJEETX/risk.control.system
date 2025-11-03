@@ -55,12 +55,11 @@
 			</div>
 		</div>
 		<partial name="_PolicyDetails" model="@Model" />
-
-
-		<partial name="_AgencyReport" model="@Model" />
 		<div class="submit-progress hidden">
 			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 		</div>
+		<partial name="_AgencyReport" model="@Model" />
+		
 		@if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest != null)
 		{
 			var data = new CaseTransactionModel

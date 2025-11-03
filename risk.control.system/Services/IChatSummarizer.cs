@@ -1,11 +1,9 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-using risk.control.system.Models;
-
 public interface IChatSummarizer
 {
-    Task<string> SummarizeDataAsync(InvestigationTask claimsInvestigation, string inputText = "Long text to summarize...");
+    Task<string> SummarizeDataAsync(string inputText = "Long text to summarize...");
 }
 public class OpenAISummarizer : IChatSummarizer
 {
@@ -17,7 +15,7 @@ public class OpenAISummarizer : IChatSummarizer
         _httpClient = new HttpClient();
     }
 
-    public async Task<string> SummarizeDataAsync(InvestigationTask claimsInvestigation, string inputText = "Long text to summarize...")
+    public async Task<string> SummarizeDataAsync(string inputText = "Long text to summarize...")
     {
         try
         {

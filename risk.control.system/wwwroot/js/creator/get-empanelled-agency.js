@@ -362,20 +362,34 @@
     $("#loadTemplate").on("click", function (e) {
         e.preventDefault();
 
-        let caseId = $("#caseIdHidden").val();
-        let container = $("#reportTemplateContainer");
-        //fas fa-sync fa-spin fa-4x fa-fw
-        container.html("<div class='text-center p-3'><i class='fas fa-sync fa-spin fa-2x'></i></div>");
+        const $btn = $(this);
+        const $icon = $btn.find("i");
+        const $container = $("#reportTemplateContainer");
+        const caseId = $("#caseIdHidden").val();
 
-        $.get("/Investigation/GetReportTemplate", { caseId: caseId })
-            .done(function (html) {
-                container.html(html);
-            })
-            .fail(function () {
-                container.html("<div class='alert alert-danger'>Failed to load report template.</div>");
-            });
+        // Toggle icon
+        if ($container.hasClass("show")) {
+            // Collapse
+            $icon.removeClass("fa-minus").addClass("fa-plus");
+        } else {
+            // Expand
+            $icon.removeClass("fa-plus").addClass("fa-minus");
+
+            // ✅ Only load if empty
+            if ($container.children().length === 0) {
+                $container.html("<div class='text-center p-3'><i class='fas fa-sync fa-spin fa-2x'></i></div>");
+
+                $.get("/Investigation/GetReportTemplate", { caseId: caseId })
+                    .done(function (html) {
+                        $container.html(html);
+                    })
+                    .fail(function () {
+                        $container.html("<div class='alert alert-danger'>Failed to load report template.</div>");
+                    });
+            }
+        }
     });
-    
+
 });
 function giveRating(img, image) {
     img.attr("src", "/Images/" + image).prevAll("img.rating").attr("src", "/Images/" + image);

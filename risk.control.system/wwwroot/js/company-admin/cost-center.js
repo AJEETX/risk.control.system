@@ -26,7 +26,6 @@
                         <a id="edit${data}" class="btn btn-xs btn-warning" href="/CostCentre/Edit/${data}">
                             <i class="fas fa-money-check-alt"></i> Edit
                         </a>
-                        &nbsp;
                         <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
                             <i class="fas fa-trash"></i> Delete
                         </button>`;

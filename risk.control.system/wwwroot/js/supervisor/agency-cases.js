@@ -219,7 +219,7 @@
                         buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
                     }
                     else {
-                        buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-search"></i> Details</a>'
+                        buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>'
                     }
                     return buttons;
                 }
@@ -369,7 +369,7 @@ function showdetails(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Details");
+    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
     disableAllInteractiveElements();
 
     var article = document.getElementById("article");

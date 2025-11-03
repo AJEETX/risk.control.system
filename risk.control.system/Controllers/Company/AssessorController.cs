@@ -87,7 +87,7 @@ namespace risk.control.system.Controllers.Company
                 if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var report = model.InvestigationReport.ToString();
-                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation, report);
+                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(report);
                     model.InvestigationReport.AiSummaryUpdated = DateTime.Now;
                     string jsonWrapped = JsonConvert.SerializeObject(new { report = investigationSummary }, Formatting.Indented);
 
@@ -254,11 +254,11 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
-                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
-                {
-                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
-                    model.ReportAiSummary = investigationSummary;
-                }
+                //if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
+                //{
+                //    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+                //    model.ReportAiSummary = investigationSummary;
+                //}
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
