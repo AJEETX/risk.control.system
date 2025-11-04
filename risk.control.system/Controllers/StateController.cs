@@ -183,6 +183,18 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(State state)
         {
+            // Uppercase normalization
+            state.Code = state.Code?.ToUpper();
+
+            // Check for duplicate code before saving
+            bool exists = await _context.State
+                .AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
+            if (exists)
+            {
+                ModelState.AddModelError("Code", "State Code already exists.");
+                notifyService.Error("State Code already exists!");
+                return View(state);
+            }
             state.Updated = DateTime.Now;
             state.CountryId = state.SelectedCountryId;
             state.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -232,7 +244,7 @@ namespace risk.control.system.Controllers
                     existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(existingState);
                     await _context.SaveChangesAsync();
-                    notifyService.Success("state edited successfully!");
+                    notifyService.Success("State edited successfully!");
                     return RedirectToAction(nameof(Profile));
                 }
                 catch (Exception ex)

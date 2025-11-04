@@ -12,6 +12,7 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <form id="edit-form" asp-action="Edit">
+                @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="BeneficiaryRelationId" />
                 <div class="form-group">
@@ -29,9 +30,9 @@
                     <span class="input-group-label"> Relation Code:</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Relation Code" maxlength="20">
+                        <input type="text" id="Code" asp-for="Code" class="form-control remarks title-name" required placeholder="Relation Code" maxlength="20">
                         <span asp-validation-for="Code" class="text-danger"></span>
                     </div>
                 </div>
@@ -48,7 +49,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/beneficiary.js">
-    </script>
+    <script src="~/js/company-admin/beneficiary.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 }

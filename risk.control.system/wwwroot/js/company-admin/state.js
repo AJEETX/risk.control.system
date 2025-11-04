@@ -206,6 +206,8 @@
     })
 
     $(document).on("click", ".delete-item", function () {
+        var $btn = $(this);
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
         var id = $(this).data("id");
         var row = $(this).closest("tr");
         var table = $('#customerTable').DataTable();
@@ -219,6 +221,8 @@
                     text: 'Yes, Delete',
                     btnClass: 'btn-red',
                     action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
                         $.ajax({
                             url: '/State/Delete',
                             type: 'POST',
@@ -246,7 +250,7 @@
                 },
                 cancel: {
                     text: 'Cancel',
-                    btnClass: 'btn-secondary'
+                    btnClass: 'btn-default'
                 }
             }
         });

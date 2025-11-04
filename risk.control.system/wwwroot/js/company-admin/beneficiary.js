@@ -1,6 +1,42 @@
 ﻿$(document).ready(function () {
     $('#Name').focus();
 
+    $("#Code").on("input", function () {
+        this.value = this.value.toUpperCase();
+    });
+    $("#Code").on("blur", function () {
+        var code = $(this).val().trim().toUpperCase();
+        if (!code) return;
+
+        var id = $('input[name="BeneficiaryRelationId"]').val() || null;
+        $.ajax({
+            url: '/BeneficiaryRelation/CheckDuplicateCode',
+            type: 'POST',
+            data: {
+                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                code: code,
+                id: id
+            },
+            success: function (exists) {
+                if (exists) {
+                    $.alert({
+                        title: '<i class="fas fa-exclamation-triangle text-danger"></i> Duplicate Code!',
+                        content: 'The Beneficiary Relation Code <b>' + code + '</b> already exists. Please choose another.',
+                        type: 'red',
+                    });
+                    $("#Code").val("").focus();
+                }
+            },
+            error: function () {
+                $.alert({
+                    title: 'Error',
+                    content: 'Beneficiary Relation Code already exist.',
+                    type: 'red',
+                });
+            }
+        });
+    });
+
     $('#customerTable').DataTable({
         ajax: {
             url: '/BeneficiaryRelation/GetBeneficiaryRelations',
@@ -19,6 +55,7 @@
             { data: 'name' },
             { data: 'code' },
             { data: 'updated' },
+            { data: 'updateBy' },
             {
                 data: 'beneficiaryRelationId',
                 render: function (data) {
@@ -129,6 +166,8 @@
     })
 
     $(document).on("click", ".delete-item", function () {
+        var $btn = $(this);
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
         var id = $(this).data("id");
         var row = $(this).closest("tr");
         var table = $('#customerTable').DataTable();
@@ -142,6 +181,8 @@
                     text: 'Yes, Delete',
                     btnClass: 'btn-red',
                     action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
                         $.ajax({
                             url: '/BeneficiaryRelation/Delete',
                             type: 'POST',
@@ -163,13 +204,18 @@
                             },
                             error: function (e) {
                                 $.alert('Error while deleting.');
+                            },
+                            complete: function () {
+                                $spinner.addClass("hidden");
+                                // ✅ Re-enable button and restore text
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
                             }
                         });
                     }
                 },
                 cancel: {
                     text: 'Cancel',
-                    btnClass: 'btn-secondary'
+                    btnClass: 'btn-default'
                 }
             }
         });

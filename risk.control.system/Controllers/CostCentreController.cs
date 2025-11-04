@@ -45,7 +45,8 @@ namespace risk.control.system.Controllers
                     c.CostCentreId,
                     c.Name,
                     c.Code,
-                    Updated = c.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")
+                    Updated = c.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm"),
+                    UpdateBy = c.UpdatedBy
                 }).ToList();
 
             return Json(new { data });
@@ -56,7 +57,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.CostCentre == null)
             {
-                notifyService.Error("Budget centre  Not found!");
+                notifyService.Error("Budget Centre Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -64,7 +65,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.CostCentreId == id);
             if (costCentre == null)
             {
-                notifyService.Error("Budget centre  Not found!");
+                notifyService.Error("Budget Centre Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -78,39 +79,59 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        // POST: CostCentre/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CostCentre costCentre)
         {
             if (costCentre is not null)
             {
+                // Uppercase normalization
+                costCentre.Code = costCentre.Code?.ToUpper();
+
+                // Check for duplicate code before saving
+                bool exists = await _context.CostCentre
+                    .AnyAsync(x => x.Code == costCentre.Code);
+                if (exists)
+                {
+                    ModelState.AddModelError("Code", "Budget Centre Code already exists.");
+                    notifyService.Error("Budget Centre Code already exists!");
+                    return View(costCentre);
+                }
                 costCentre.Updated = DateTime.Now;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(costCentre);
                 await _context.SaveChangesAsync();
-                notifyService.Success("cost centre created successfully!");
+                notifyService.Success("Budget Centre created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(costCentre);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> CheckDuplicateCode(string code, long? id)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return Json(false);
+
+            bool exists = await _context.CostCentre.AnyAsync(x => x.Code.ToUpper() == code.ToUpper() && (!id.HasValue || x.CostCentreId != id.Value));
+
+            return Json(exists);
+        }
         // GET: CostCentre/Edit/5
         [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id <= 0)
             {
-                notifyService.Error("Budget centre  Not found!");
+                notifyService.Error("Budget Centre Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
             var costCentre = await _context.CostCentre.FindAsync(id);
             if (costCentre == null)
             {
-                notifyService.Error("Budget centre  Not found!");
+                notifyService.Error("Budget Centre Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(costCentre);
@@ -125,22 +146,33 @@ namespace risk.control.system.Controllers
         {
             if (id != costCentre.CostCentreId)
             {
-                notifyService.Error("Budget centre  Not found!");
+                notifyService.Error("Budget Centre Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             try
             {
+                // Uppercase normalization
+                costCentre.Code = costCentre.Code?.ToUpper();
+
+                // Check for duplicate code before saving
+                bool exists = await _context.CostCentre.AnyAsync(x => x.Code == costCentre.Code && x.CostCentreId != id);
+                if (exists)
+                {
+                    ModelState.AddModelError("Code", "Budget Centre Code already exists.");
+                    notifyService.Error("Budget Centre Code already exists!");
+                    return View(costCentre);
+                }
                 costCentre.Updated = DateTime.Now;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(costCentre);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("Budget centre edited successfully!");
+                notifyService.Warning("Budget Centre edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error editing Budget centre !");
+                notifyService.Error("Error editing Budget Centre !");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -153,7 +185,7 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                return Json(new { success = false, message = "Budget centre Not found!" });
+                return Json(new { success = false, message = "Budget Centre Not found!" });
             }
             var costCentre = await _context.CostCentre.FindAsync(id);
             if (costCentre != null)
@@ -164,12 +196,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Budget centre deleted successfully!" });
-        }
-
-        private bool CostCentreExists(long id)
-        {
-            return (_context.CostCentre?.Any(e => e.CostCentreId == id)).GetValueOrDefault();
+            return Json(new { success = true, message = "Budget Centre deleted successfully!" });
         }
     }
 }

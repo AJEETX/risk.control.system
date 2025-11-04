@@ -45,7 +45,8 @@ namespace risk.control.system.Controllers
                     c.CaseEnablerId,
                     c.Name,
                     c.Code,
-                    Updated = c.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")
+                    Updated = c.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm"),
+                    UpdateBy = c.UpdatedBy
                 }).ToList();
 
             return Json(new { data });
@@ -82,14 +83,44 @@ namespace risk.control.system.Controllers
         {
             if (caseEnabler is not null)
             {
+                // Uppercase normalization
+                caseEnabler.Code = caseEnabler.Code?.ToUpper();
+
+                // Check for duplicate code before saving
+                bool exists = await _context.CaseEnabler
+                    .AnyAsync(x => x.Code == caseEnabler.Code);
+                if (exists)
+                {
+                    ModelState.AddModelError("Code", "Reason Code already exists.");
+                    notifyService.Error("Reason Code already exists!");
+                    return View(caseEnabler);
+                }
+
                 caseEnabler.Updated = DateTime.Now;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
+
                 _context.Add(caseEnabler);
                 await _context.SaveChangesAsync();
                 notifyService.Success("Reason created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(caseEnabler);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> CheckDuplicateCode(string code, long? id)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return Json(false);
+
+            code = code.ToUpper();
+
+            // ✅ Check if any other record (not this one) already has the same code
+            bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code.ToUpper() == code && (!id.HasValue || x.CaseEnablerId != id.Value));
+
+            return Json(exists);
         }
 
         [Breadcrumb("Edit ", FromAction = "Profile")]
@@ -121,6 +152,17 @@ namespace risk.control.system.Controllers
             }
             try
             {
+                // Uppercase normalization
+                caseEnabler.Code = caseEnabler.Code?.ToUpper();
+
+                // Check for duplicate code before saving
+                bool exists = await _context.CaseEnabler.AnyAsync(x => x.CaseEnablerId != id && x.Code == caseEnabler.Code);
+                if (exists)
+                {
+                    ModelState.AddModelError("Code", "Reason Code already exists.");
+                    notifyService.Error("Reason Code already exists!");
+                    return View(caseEnabler);
+                }
                 caseEnabler.Updated = DateTime.Now;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(caseEnabler);
