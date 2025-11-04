@@ -41,9 +41,9 @@
                                 <span class="input-group-label"> State Code:</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="State Code" maxlength="5">
+                                    <input type="text" id="Code" asp-for="Code" class="form-control remarks title-name" required placeholder="State Code" maxlength="5">
                                     <span asp-validation-for="Code" class="text-danger"></span>
                                 </div>
                             </div>
@@ -63,8 +63,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/state.js">
-    </script>
+    <script src="~/js/company-admin/state.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 }

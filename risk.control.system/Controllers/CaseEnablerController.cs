@@ -59,16 +59,22 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Reason Not found!");
                 return RedirectToAction(nameof(Profile));
             }
-
-            var caseEnabler = await _context.CaseEnabler
-                .FirstOrDefaultAsync(m => m.CaseEnablerId == id);
-            if (caseEnabler == null)
+            try
             {
-                notifyService.Error("Reason Not found!");
+                var caseEnabler = await _context.CaseEnabler.FirstOrDefaultAsync(m => m.CaseEnablerId == id);
+                if (caseEnabler == null)
+                {
+                    notifyService.Error("Reason Not found!");
+                    return RedirectToAction(nameof(Profile));
+                }
+                return View(caseEnabler);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error to get Reason !");
                 return RedirectToAction(nameof(Profile));
             }
-
-            return View(caseEnabler);
         }
 
         [Breadcrumb("Add  New", FromAction = "Profile")]
@@ -81,14 +87,15 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CaseEnabler caseEnabler)
         {
-            if (caseEnabler is not null)
+            if (caseEnabler is null || !ModelState.IsValid)
             {
-                // Uppercase normalization
+                notifyService.Error("Reason Empty!");
+                return RedirectToAction(nameof(Profile));
+            }
+            try
+            {
                 caseEnabler.Code = caseEnabler.Code?.ToUpper();
-
-                // Check for duplicate code before saving
-                bool exists = await _context.CaseEnabler
-                    .AnyAsync(x => x.Code == caseEnabler.Code);
+                bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code == caseEnabler.Code);
                 if (exists)
                 {
                     ModelState.AddModelError("Code", "Reason Code already exists.");
@@ -104,7 +111,12 @@ namespace risk.control.system.Controllers
                 notifyService.Success("Reason created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
-            return View(caseEnabler);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error to create Reason!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
 
 
@@ -126,28 +138,36 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id < 1 || _context.CaseEnabler == null)
+            if (id < 1)
             {
                 notifyService.Error("Reason Not found!");
                 return RedirectToAction(nameof(Profile));
             }
-
-            var caseEnabler = await _context.CaseEnabler.FindAsync(id);
-            if (caseEnabler == null)
+            try
             {
-                notifyService.Error("Reason Not found!");
+                var caseEnabler = await _context.CaseEnabler.FindAsync(id);
+                if (caseEnabler == null)
+                {
+                    notifyService.Error("Reason Not found!");
+                    return RedirectToAction(nameof(Profile));
+                }
+                return View(caseEnabler);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error in REASON!");
                 return RedirectToAction(nameof(Profile));
             }
-            return View(caseEnabler);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, CaseEnabler caseEnabler)
         {
-            if (id != caseEnabler.CaseEnablerId)
+            if (id != caseEnabler.CaseEnablerId || !ModelState.IsValid)
             {
-                notifyService.Error("Reason Not found!");
+                notifyService.Error("Reason Mismatch!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -186,16 +206,26 @@ namespace risk.control.system.Controllers
             {
                 return Json(new { success = false, message = "Reason Not found!" });
             }
-            var caseEnabler = await _context.CaseEnabler.FindAsync(id);
-            if (caseEnabler != null)
+            try
             {
+                var caseEnabler = await _context.CaseEnabler.FindAsync(id);
+                if (caseEnabler == null)
+                {
+                    return Json(new { success = false, message = "Reason Not found!" });
+                }
+
                 caseEnabler.Updated = DateTime.Now;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CaseEnabler.Remove(caseEnabler);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Reason deleted successfully!" });
             }
-
-            await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Reason deleted successfully!" });
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error deleting REASON!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
     }
 }

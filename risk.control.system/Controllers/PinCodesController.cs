@@ -187,15 +187,29 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PinCode pinCode)
         {
-            pinCode.Updated = DateTime.Now;
-            pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
-            pinCode.CountryId = pinCode.SelectedCountryId;
-            pinCode.StateId = pinCode.SelectedStateId;
-            pinCode.DistrictId = pinCode.SelectedDistrictId;
-            _context.Add(pinCode);
-            await _context.SaveChangesAsync();
-            notifyService.Success("Pincode created successfully!");
-            return RedirectToAction(nameof(Profile));
+            if (pinCode is null)
+            {
+                notifyService.Error("Pincode Empty!");
+                return RedirectToAction(nameof(Profile));
+            }
+            try
+            {
+                pinCode.Updated = DateTime.Now;
+                pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
+                pinCode.CountryId = pinCode.SelectedCountryId;
+                pinCode.StateId = pinCode.SelectedStateId;
+                pinCode.DistrictId = pinCode.SelectedDistrictId;
+                _context.Add(pinCode);
+                await _context.SaveChangesAsync();
+                notifyService.Success("Pincode created successfully!");
+                return RedirectToAction(nameof(Profile));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("Error to create Pincode!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
 
         // GET: PinCodes/Edit/5
@@ -227,6 +241,11 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (id != pinCode.StateId)
+                {
+                    notifyService.Error("Pincode Mismatch!");
+                    return RedirectToAction(nameof(Profile));
+                }
                 var existingPincode = await _context.PinCode.FindAsync(id);
                 existingPincode.Code = pinCode.Code;
                 existingPincode.Name = pinCode.Name;
@@ -238,36 +257,50 @@ namespace risk.control.system.Controllers
                 _context.Update(existingPincode);
                 if (await _context.SaveChangesAsync() > 0)
                 {
-                    notifyService.Success("pincode edited successfully!");
+                    notifyService.Success("Pincode edited successfully!");
+                    return RedirectToAction(nameof(Profile));
+                }
+                else
+                {
+                    notifyService.Error("An error occurred while updating the pincode!");
                     return RedirectToAction(nameof(Profile));
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+                notifyService.Error("An error occurred while updating the pincode!");
+                return RedirectToAction(nameof(Profile));
             }
-            notifyService.Error("An error occurred while updating the pincode!");
-            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (_context.PinCode == null)
+            if (id < 1)
             {
                 return Json(new { success = true, message = "Pincode not found!" });
             }
-            var pinCode = await _context.PinCode.FindAsync(id);
-            if (pinCode != null)
+            try
             {
+                var pinCode = await _context.PinCode.FindAsync(id);
+                if (pinCode == null)
+                {
+                    return Json(new { success = true, message = "Pincode not found!" });
+                }
                 pinCode.Updated = DateTime.Now;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.PinCode.Remove(pinCode);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Pincode deleted successfully!" });
             }
-
-            await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Pincode deleted successfully!" });
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("Error to delete District!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
     }
 }

@@ -372,7 +372,7 @@ $(document).ready(function () {
                 },
                 cancel: {
                     text: 'Cancel',
-                    btnClass: 'btn-secondary'
+                    btnClass: 'btn-default'
                 }
             }
         });

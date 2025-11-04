@@ -1,4 +1,4 @@
-$(document).ready(function () {
+﻿$(document).ready(function () {
     $('#customerTable').DataTable({
         processing: true,
         serverSide: true,
@@ -49,6 +49,10 @@ $(document).ready(function () {
         }
     });
 
+
+    $("#Code").on("input", function () {
+        this.value = this.value.toUpperCase();
+    });
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
@@ -246,6 +250,9 @@ $(document).ready(function () {
     });
 
     $(document).on("click", ".delete-item", function () {
+        var $btn = $(this);
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+
         var id = $(this).data("id");
         var row = $(this).closest("tr");
         var table = $('#customerTable').DataTable();
@@ -259,6 +266,9 @@ $(document).ready(function () {
                     text: 'Yes, Delete',
                     btnClass: 'btn-red',
                     action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
+
                         $.ajax({
                             url: '/District/Delete',
                             type: 'POST',
@@ -280,13 +290,18 @@ $(document).ready(function () {
                             },
                             error: function (e) {
                                 $.alert('Error while deleting.');
+                            },
+                            complete: function () {
+                                $spinner.addClass("hidden");
+                                // ✅ Re-enable button and restore text
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
                             }
                         });
                     }
                 },
                 cancel: {
                     text: 'Cancel',
-                    btnClass: 'btn-secondary'
+                    btnClass: 'btn-default'
                 }
             }
         });

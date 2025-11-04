@@ -153,8 +153,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Profile));
             }
 
-            var state = await _context.State.Include(s => s.Country)
-                .FirstOrDefaultAsync(m => m.StateId == id);
+            var state = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(m => m.StateId == id);
             if (state == null)
             {
                 notifyService.Error("State not found!");
@@ -183,32 +182,42 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(State state)
         {
-            // Uppercase normalization
-            state.Code = state.Code?.ToUpper();
-
-            // Check for duplicate code before saving
-            bool exists = await _context.State
-                .AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
-            if (exists)
+            if (state is null)
             {
-                ModelState.AddModelError("Code", "State Code already exists.");
-                notifyService.Error("State Code already exists!");
-                return View(state);
+                notifyService.Error("State Empty!");
+                return RedirectToAction(nameof(Profile));
             }
-            state.Updated = DateTime.Now;
-            state.CountryId = state.SelectedCountryId;
-            state.UpdatedBy = HttpContext.User?.Identity?.Name;
-            _context.Add(state);
-            await _context.SaveChangesAsync();
-            notifyService.Success("State created successfully!");
-            return RedirectToAction(nameof(Profile));
+            try
+            {
+                state.Code = state.Code?.ToUpper();
+                bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
+                if (exists)
+                {
+                    ModelState.AddModelError("Code", "State Code already exists.");
+                    notifyService.Error("State Code already exists!");
+                    return View(state);
+                }
+                state.Updated = DateTime.Now;
+                state.CountryId = state.SelectedCountryId;
+                state.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.Add(state);
+                await _context.SaveChangesAsync();
+                notifyService.Success("State created successfully!");
+                return RedirectToAction(nameof(Profile));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("Error to create State!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
 
         // GET: RiskCaseStatus/Edit/5
         [Breadcrumb("Edit State", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id < 1 || _context.State == null)
+            if (id < 1)
             {
                 notifyService.Error("State not found!");
                 return NotFound();
@@ -220,7 +229,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("State not found!");
                 return RedirectToAction(nameof(Profile));
             }
-            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", state.CountryId);
 
             return View(state);
         }
@@ -232,28 +240,37 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, State state)
         {
-            if (state is not null)
+            if (id != state.StateId)
             {
-                try
-                {
-                    var existingState = _context.State.Find(id);
-                    existingState.Code = state.Code;
-                    existingState.Name = state.Name;
-                    existingState.Updated = DateTime.Now;
-                    existingState.CountryId = state.SelectedCountryId;
-                    existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    _context.Update(existingState);
-                    await _context.SaveChangesAsync();
-                    notifyService.Success("State edited successfully!");
-                    return RedirectToAction(nameof(Profile));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
+                notifyService.Error("State Mismatch!");
+                return RedirectToAction(nameof(Profile));
             }
-            notifyService.Error("Error to edit state!");
-            return RedirectToAction(nameof(Profile));
+            try
+            {
+                bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId && x.StateId != id);
+                if (exists)
+                {
+                    ModelState.AddModelError("Code", "State Code already exists.");
+                    notifyService.Error("State Code already exists!");
+                    return View(state);
+                }
+                var existingState = _context.State.Find(id);
+                existingState.Code = state.Code;
+                existingState.Name = state.Name;
+                existingState.Updated = DateTime.Now;
+                existingState.CountryId = state.SelectedCountryId;
+                existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.Update(existingState);
+                await _context.SaveChangesAsync();
+                notifyService.Success("State edited successfully!");
+                return RedirectToAction(nameof(Profile));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("Error to edit State!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
 
         // POST: RiskCaseStatus/Delete/5
@@ -265,23 +282,30 @@ namespace risk.control.system.Controllers
             {
                 return Json(new { success = true, message = "State Not found!" });
             }
-            var state = await _context.State.FindAsync(id);
-            if (state == null)
+            try
             {
-                return Json(new { success = false, message = "State not found!" });
+                var state = await _context.State.FindAsync(id);
+                if (state == null)
+                {
+                    return Json(new { success = false, message = "State not found!" });
+                }
+                var hasDistrict = _context.District.Any(d => d.StateId == id);
+                if (hasDistrict)
+                {
+                    return Json(new { success = false, message = $"Cannot delete State {state.Name}. It has associated districts." });
+                }
+                state.Updated = DateTime.Now;
+                state.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.State.Remove(state);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "State deleted successfully!" });
             }
-            var hasDistrict = _context.District.Any(d => d.StateId == id);
-            if (hasDistrict)
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Cannot delete State {state.Name}. It has associated districts." });
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("Error to delete State!");
+                return RedirectToAction(nameof(Profile));
             }
-            state.Updated = DateTime.Now;
-            state.UpdatedBy = HttpContext.User?.Identity?.Name;
-            _context.State.Remove(state);
-
-            await _context.SaveChangesAsync();
-            notifyService.Success("State deleted successfully!");
-            return Json(new { success = true, message = "State deleted successfully!" });
         }
     }
 }

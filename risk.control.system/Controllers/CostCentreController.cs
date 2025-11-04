@@ -60,16 +60,23 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Budget Centre Not found!");
                 return RedirectToAction(nameof(Profile));
             }
-
-            var costCentre = await _context.CostCentre
-                .FirstOrDefaultAsync(m => m.CostCentreId == id);
-            if (costCentre == null)
+            try
             {
-                notifyService.Error("Budget Centre Not found!");
+                var costCentre = await _context.CostCentre.FirstOrDefaultAsync(m => m.CostCentreId == id);
+                if (costCentre == null)
+                {
+                    notifyService.Error("Budget Centre Not found!");
+                    return RedirectToAction(nameof(Profile));
+                }
+                return View(costCentre);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error to get Budget Centre !");
                 return RedirectToAction(nameof(Profile));
             }
-
-            return View(costCentre);
         }
 
         // GET: CostCentre/Create
@@ -83,9 +90,14 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CostCentre costCentre)
         {
-            if (costCentre is not null)
+            if (costCentre is null || !ModelState.IsValid)
             {
-                // Uppercase normalization
+                notifyService.Error("Budget Centre  Empty!");
+                return RedirectToAction(nameof(Profile));
+            }
+            try
+            {
+
                 costCentre.Code = costCentre.Code?.ToUpper();
 
                 // Check for duplicate code before saving
@@ -103,8 +115,13 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 notifyService.Success("Budget Centre created successfully!");
                 return RedirectToAction(nameof(Profile));
+
             }
-            return View(costCentre);
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         [HttpPost]
@@ -144,9 +161,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, [Bind("CostCentreId,Name,Code,Created,Updated,UpdatedBy")] CostCentre costCentre)
         {
-            if (id != costCentre.CostCentreId)
+            if (id != costCentre.CostCentreId || !ModelState.IsValid)
             {
-                notifyService.Error("Budget Centre Not found!");
+                notifyService.Error("Budget Centre Mismatch!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -187,16 +204,25 @@ namespace risk.control.system.Controllers
             {
                 return Json(new { success = false, message = "Budget Centre Not found!" });
             }
-            var costCentre = await _context.CostCentre.FindAsync(id);
-            if (costCentre != null)
+            try
             {
+                var costCentre = await _context.CostCentre.FindAsync(id);
+                if (costCentre == null)
+                {
+                    return Json(new { success = false, message = "Budget Centre Not found!" });
+                }
                 costCentre.Updated = DateTime.Now;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CostCentre.Remove(costCentre);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Budget Centre deleted successfully!" });
             }
-
-            await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Budget Centre deleted successfully!" });
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error deleting Budget Centre !");
+                return RedirectToAction(nameof(Profile));
+            }
         }
     }
 }

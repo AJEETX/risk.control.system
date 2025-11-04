@@ -178,35 +178,51 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(District district)
         {
-            if (district is null)
+            if (district is null || !ModelState.IsValid)
             {
-                notifyService.Error("District not found!");
+                notifyService.Error("District Empty!");
                 return RedirectToAction(nameof(Profile));
             }
-            district.Updated = DateTime.Now;
-            district.UpdatedBy = HttpContext.User?.Identity?.Name;
-            district.CountryId = district.SelectedCountryId;
-            district.StateId = district.SelectedStateId;
-            _context.Add(district);
-            await _context.SaveChangesAsync();
-            notifyService.Success("District created successfully!");
-            return RedirectToAction(nameof(Profile));
+            try
+            {
+                bool exists = await _context.District.AnyAsync(x => x.Code == district.Code && x.CountryId == district.SelectedCountryId && x.StateId == district.StateId);
+                if (exists)
+                {
+                    ModelState.AddModelError("Code", "Disitrict Code already exists.");
+                    notifyService.Error("Disitrict Code already exists!");
+                    return View(district);
+                }
+                district.Updated = DateTime.Now;
+                district.UpdatedBy = HttpContext.User?.Identity?.Name;
+                district.CountryId = district.SelectedCountryId;
+                district.StateId = district.SelectedStateId;
+                _context.District.Add(district);
+                await _context.SaveChangesAsync();
+                notifyService.Success("District created successfully!");
+                return RedirectToAction(nameof(Profile));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("Error to create District!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
 
         [Breadcrumb("Edit District", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id == 0 || _context.District == null)
+            if (id < 1)
             {
                 notifyService.Error("district not found!");
-                return NotFound();
+                return RedirectToAction(nameof(Profile));
             }
 
             var district = await _context.District.Include(d => d.Country).Include(d => d.State).FirstOrDefaultAsync(d => d.DistrictId == id);
             if (district == null)
             {
                 notifyService.Error("district not found!");
-                return NotFound();
+                return RedirectToAction(nameof(Profile));
             }
 
             return View(district);
@@ -218,6 +234,18 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (id != district.DistrictId)
+                {
+                    notifyService.Error("District Mismatch!");
+                    return RedirectToAction(nameof(Profile));
+                }
+                bool exists = await _context.District.AnyAsync(x => x.Code == district.Code && x.CountryId == district.SelectedCountryId && x.StateId == district.StateId && x.DistrictId != district.DistrictId);
+                if (exists)
+                {
+                    ModelState.AddModelError("Code", "Disitrict Code already exists.");
+                    notifyService.Error("Disitrict Code already exists!");
+                    return View(district);
+                }
                 var existingdistrict = await _context.District.FindAsync(id);
                 existingdistrict.Name = district.Name;
                 existingdistrict.Code = district.Code;
@@ -233,38 +261,46 @@ namespace risk.control.system.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+                notifyService.Error("Error to edit District!");
+                return RedirectToAction(nameof(Profile));
             }
-            notifyService.Error("An error occurred while updating the District!");
-            return RedirectToAction(nameof(Profile));
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (_context.District == null)
+            if (id < 1)
             {
                 return Json(new { success = false, message = "District Not found!" });
             }
-            var district = await _context.District.FindAsync(id);
-            if (district is null)
+            try
             {
-                return Json(new { success = false, message = "District Not found!" });
-            }
-            var hasPincode = _context.PinCode.Any(p => p.DistrictId == district.DistrictId);
-            if (hasPincode)
-            {
-                return Json(new { success = false, message = $"Cannot delete District {district.Name}. It has associated Pincodes" });
-            }
-            if (district != null)
-            {
+
+
+                var district = await _context.District.FindAsync(id);
+                if (district is null)
+                {
+                    return Json(new { success = false, message = "District Not found!" });
+                }
+                var hasPincode = _context.PinCode.Any(p => p.DistrictId == district.DistrictId);
+                if (hasPincode)
+                {
+                    return Json(new { success = false, message = $"Cannot delete District {district.Name}. It has associated Pincode(s)" });
+                }
+
                 district.Updated = DateTime.Now;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.District.Remove(district);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "District deleted successfully!" });
             }
-
-            await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "District deleted successfully!" });
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("Error to delete District!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
     }
 }

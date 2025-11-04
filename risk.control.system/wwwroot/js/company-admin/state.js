@@ -1,5 +1,10 @@
 ﻿$(document).ready(function () {
 
+
+    $("#Code").on("input", function () {
+        this.value = this.value.toUpperCase();
+    });
+
     var preloadedCountryId = $("#CountryId").val(); // Get the hidden field value
 
     if (preloadedCountryId) {
@@ -244,6 +249,11 @@
                             },
                             error: function (e) {
                                 $.alert('Error while deleting.');
+                            },
+                            complete: function () {
+                                $spinner.addClass("hidden");
+                                // ✅ Re-enable button and restore text
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
                             }
                         });
                     }

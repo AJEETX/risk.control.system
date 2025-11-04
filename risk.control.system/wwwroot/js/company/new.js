@@ -350,6 +350,8 @@
 
     $('#customerTableAuto tbody').on('click', '.btn-danger', function (e) {
         e.preventDefault();
+        var $btn = $(this);
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
 
         var id = $(this).attr('id').replace('details', '');
         var url = '/InvestigationPost/Delete/' + id; // Replace with your actual API URL
@@ -363,6 +365,9 @@
                     text: 'Yes, delete it',
                     btnClass: 'btn-red',
                     action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
+
                         $.ajax({
                             url: url,
                             type: 'POST',
@@ -388,12 +393,18 @@
                                     content: 'Failed to delete the case.',
                                     type: 'red'
                                 });
+                            },
+                            complete: function () {
+                                $spinner.addClass("hidden");
+                                // ✅ Re-enable button and restore text
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
                             }
                         });
                     }
                 },
                 cancel: function () {
-                    // No action on cancel
+                    text: 'Cancel',
+                    btnClass: 'btn-default'
                 }
             }
         });

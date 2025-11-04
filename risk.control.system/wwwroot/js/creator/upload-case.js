@@ -340,6 +340,7 @@
                 },
                 cancel: {
                     text: 'Cancel',
+                    btnClass: 'btn-default',
                     action: function () {
                         // Do nothing on cancel
                     }

@@ -58,19 +58,25 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.BeneficiaryRelation == null)
             {
-                notifyService.Error("Beneficiary relation Not found!");
+                notifyService.Error("Beneficiary Relation Not found!");
                 return RedirectToAction(nameof(Profile));
             }
-
-            var beneficiaryRelation = await _context.BeneficiaryRelation
-                .FirstOrDefaultAsync(m => m.BeneficiaryRelationId == id);
-            if (beneficiaryRelation == null)
+            try
             {
-                notifyService.Error("Beneficiary relation Not found!");
+                var beneficiaryRelation = await _context.BeneficiaryRelation.FirstOrDefaultAsync(m => m.BeneficiaryRelationId == id);
+                if (beneficiaryRelation == null)
+                {
+                    notifyService.Error("Beneficiary Relation Not found!");
+                    return RedirectToAction(nameof(Profile));
+                }
+                return View(beneficiaryRelation);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error to get Beneficiary Relation !");
                 return RedirectToAction(nameof(Profile));
             }
-
-            return View(beneficiaryRelation);
         }
 
         // GET: BeneficiaryRelation/Create
@@ -87,9 +93,14 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BeneficiaryRelation beneficiaryRelation)
         {
-            if (beneficiaryRelation is not null)
+            if (beneficiaryRelation is null || !ModelState.IsValid)
             {
-                // Uppercase normalization
+                notifyService.Error("Beneficiary Relation Empty!");
+                return RedirectToAction(nameof(Profile));
+            }
+            try
+            {
+
                 beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper();
 
                 // Check for duplicate code before saving
@@ -106,9 +117,15 @@ namespace risk.control.system.Controllers
                 _context.Add(beneficiaryRelation);
                 await _context.SaveChangesAsync();
                 notifyService.Success("Beneficiary Relation created successfully!");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Profile));
+
             }
-            return View(beneficiaryRelation);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error to create Beneficiary Relation !");
+                return RedirectToAction(nameof(Profile));
+            }
         }
 
         [HttpPost]
@@ -126,7 +143,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id < 1 || _context.BeneficiaryRelation == null)
+            if (id < 1)
             {
                 notifyService.Error("Beneficiary relation Not found!");
                 return RedirectToAction(nameof(Profile));
@@ -148,42 +165,36 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, BeneficiaryRelation beneficiaryRelation)
         {
-            if (id != beneficiaryRelation.BeneficiaryRelationId)
+            if (id != beneficiaryRelation.BeneficiaryRelationId || !ModelState.IsValid)
             {
-                notifyService.Error("Beneficiary Relation Not found!");
+                notifyService.Error("Beneficiary Relation Mismatch!");
                 return RedirectToAction(nameof(Profile));
             }
-
-            if (beneficiaryRelation is not null)
+            try
             {
-                try
-                {
-                    beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper();
+                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper();
 
-                    // Check for duplicate code before saving
-                    bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code == beneficiaryRelation.Code && x.BeneficiaryRelationId != id);
-                    if (exists)
-                    {
-                        ModelState.AddModelError("Code", "Beneficiary Relation Code already exists.");
-                        notifyService.Error("Beneficiary Relation Code already exists!");
-                        return View(beneficiaryRelation);
-                    }
-                    beneficiaryRelation.Updated = DateTime.Now;
-                    beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    _context.Update(beneficiaryRelation);
-                    await _context.SaveChangesAsync();
-                    notifyService.Warning("Beneficiary Relation edited successfully!");
-                    return RedirectToAction(nameof(Profile));
-                }
-                catch (Exception ex)
+                // Check for duplicate code before saving
+                bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code == beneficiaryRelation.Code && x.BeneficiaryRelationId != id);
+                if (exists)
                 {
-                    Console.WriteLine(ex.StackTrace);
-                    notifyService.Error("Error editing Beneficiary Relation!");
-                    return RedirectToAction(nameof(Profile));
+                    ModelState.AddModelError("Code", "Beneficiary Relation Code already exists.");
+                    notifyService.Error("Beneficiary Relation Code already exists!");
+                    return View(beneficiaryRelation);
                 }
-
+                beneficiaryRelation.Updated = DateTime.Now;
+                beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.Update(beneficiaryRelation);
+                await _context.SaveChangesAsync();
+                notifyService.Warning("Beneficiary Relation edited successfully!");
+                return RedirectToAction(nameof(Profile));
             }
-            return View(beneficiaryRelation);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error editing Beneficiary Relation!");
+                return RedirectToAction(nameof(Profile));
+            }
         }
 
         // POST: BeneficiaryRelation/Delete/5
@@ -195,16 +206,25 @@ namespace risk.control.system.Controllers
             {
                 return Json(new { success = false, message = "Beneficiary Relation Not found!" });
             }
-            var beneficiaryRelation = await _context.BeneficiaryRelation.FindAsync(id);
-            if (beneficiaryRelation != null)
+            try
             {
+                var beneficiaryRelation = await _context.BeneficiaryRelation.FindAsync(id);
+                if (beneficiaryRelation == null)
+                {
+                    return Json(new { success = false, message = "Beneficiary Relation Not found!" });
+                }
                 beneficiaryRelation.Updated = DateTime.Now;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.BeneficiaryRelation.Remove(beneficiaryRelation);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Beneficiary Relation deleted successfully!" });
             }
-
-            await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Beneficiary Relation deleted successfully!" });
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error deleting Beneficiary Relation !");
+                return RedirectToAction(nameof(Profile));
+            }
         }
     }
 }
