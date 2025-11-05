@@ -81,7 +81,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" id="Name" asp-for="Name" class="form-control remarks title-name" required placeholder="Pincode Name" maxlength="30">
+                        <input type="text" id="Name" asp-for="Name" class="form-control remarks title-name" required placeholder="Pincode Name" maxlength="50">
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" id="Code" asp-for="Code" class="form-control remarks title-name" required placeholder="Pincode Code" maxlength="6">
+                        <input type="text" id="Code" asp-for="Code" class="form-control remarks title-name" required placeholder="Pincode Code  (100001)" maxlength="6">
                         <span asp-validation-for="Code" class="text-danger"></span>
                     </div>
                 </div>

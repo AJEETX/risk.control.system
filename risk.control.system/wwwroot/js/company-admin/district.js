@@ -83,7 +83,7 @@
                             $('a').addClass('disabled-anchor').on('click', function (e) {
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
-                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add District");
+                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
 
                             $('#create-form').submit();
                             var createForm = document.getElementById("create-form");
@@ -135,7 +135,7 @@
                             $('a').addClass('disabled-anchor').on('click', function (e) {
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
-                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit District");
+                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
                             $('#edit-form').submit();
 
                             var createForm = document.getElementById("edit-form");
@@ -173,7 +173,7 @@
     // Function to fetch states based on countryId
     function fetchStates(countryId) {
         $.ajax({
-            url: '/GetStateName',  // Your controller route to fetch states
+            url: '/api/Company/GetStateName',  // Your controller route to fetch states
             type: 'GET',
             data: { countryId: countryId },
             success: function (data) {
@@ -238,7 +238,7 @@
             e.preventDefault(); // Prevent default action for anchor clicks
         });
 
-        $('a.create').html("<i class='fas fa-sync fa-spin'></i> Add District");
+        $('a.create').html("<i class='fas fa-sync fa-spin'></i> Add New");
 
         var article = document.getElementById("article");
         if (article) {

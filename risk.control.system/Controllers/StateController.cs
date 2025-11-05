@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Globalization;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -182,9 +183,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(State state)
         {
-            if (state is null || !ModelState.IsValid)
+            if (state is null)
             {
-                notifyService.Error("State Empty!");
+                notifyService.Error("Invalid State data!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -193,14 +194,15 @@ namespace risk.control.system.Controllers
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
                 if (exists)
                 {
-                    ModelState.AddModelError("Code", "State Code already exists.");
                     notifyService.Error("State Code already exists!");
-                    return View(state);
+                    return RedirectToAction(nameof(Profile));
                 }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                state.Name = textInfo.ToTitleCase(state.Name.ToLower());
                 state.Updated = DateTime.Now;
                 state.CountryId = state.SelectedCountryId;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.Add(state);
+                _context.State.Add(state);
                 await _context.SaveChangesAsync();
                 notifyService.Success("State created successfully!");
                 return RedirectToAction(nameof(Profile));
@@ -240,7 +242,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, State state)
         {
-            if (id < 1 || !ModelState.IsValid)
+            if (id < 1)
             {
                 notifyService.Error("State Null!");
                 return RedirectToAction(nameof(Profile));
@@ -250,13 +252,13 @@ namespace risk.control.system.Controllers
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId && x.StateId != id);
                 if (exists)
                 {
-                    ModelState.AddModelError("Code", "State Code already exists.");
                     notifyService.Error("State Code already exists!");
-                    return View(state);
+                    return RedirectToAction(nameof(Profile));
                 }
                 var existingState = _context.State.Find(id);
                 existingState.Code = state.Code;
-                existingState.Name = state.Name;
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                existingState.Name = textInfo.ToTitleCase(state.Name.ToLower());
                 existingState.Updated = DateTime.Now;
                 existingState.CountryId = state.SelectedCountryId;
                 existingState.UpdatedBy = HttpContext.User?.Identity?.Name;

@@ -116,19 +116,6 @@
     // Initialize autocomplete for Pincode
     pincodeAutocomplete();
 
-    //// Dynamically fetch State and District on Pincode change
-    //$("#PinCodeId").on("blur input, change", function () {
-    //    const selectedpinCodeId = $("#SelectedStateId").val();
-    //    pincodeAutocomplete();
-    //});
-
-    //$("#PinCodeId").on("autocompletechange", function (event, ui) {
-    //    if (!ui.item) {
-    //        // If no valid item is selected, clear the input
-    //        $(this).val("");
-    //        $("#SelectedPincodeId").val("");
-    //    }
-    //});
 });
 
 function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {

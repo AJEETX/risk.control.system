@@ -21,8 +21,8 @@ namespace risk.control.system.Seeds
                 s.StateName.ToLower() == "haryana"
                 ||
                 s.StateName.ToLower() == "delhi"
-                ||
-                s.StateCode.ToLower() == "up"
+                //||
+                //s.StateCode.ToLower() == "up"
                 ).Select(g => g.StateCode).Distinct()?.ToList();
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);

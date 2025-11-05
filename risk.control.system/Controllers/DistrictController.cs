@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Globalization;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -178,7 +179,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(District district)
         {
-            if (district is null || !ModelState.IsValid)
+            if (district is null)
             {
                 notifyService.Error("District Empty!");
                 return RedirectToAction(nameof(Profile));
@@ -188,10 +189,12 @@ namespace risk.control.system.Controllers
                 bool exists = await _context.District.AnyAsync(x => x.Code == district.Code && x.CountryId == district.SelectedCountryId && x.StateId == district.StateId);
                 if (exists)
                 {
-                    ModelState.AddModelError("Code", "Disitrict Code already exists.");
                     notifyService.Error("Disitrict Code already exists!");
-                    return View(district);
+                    return RedirectToAction(nameof(Profile));
                 }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                district.Name = textInfo.ToTitleCase(district.Name.ToLower());
+
                 district.Updated = DateTime.Now;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 district.CountryId = district.SelectedCountryId;
@@ -234,7 +237,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id < 1 || !ModelState.IsValid)
+                if (id < 1)
                 {
                     notifyService.Error("District Null!");
                     return RedirectToAction(nameof(Profile));
@@ -242,12 +245,12 @@ namespace risk.control.system.Controllers
                 bool exists = await _context.District.AnyAsync(x => x.Code == district.Code && x.CountryId == district.SelectedCountryId && x.StateId == district.StateId && x.DistrictId != district.DistrictId);
                 if (exists)
                 {
-                    ModelState.AddModelError("Code", "Disitrict Code already exists.");
                     notifyService.Error("Disitrict Code already exists!");
-                    return View(district);
+                    return RedirectToAction(nameof(Profile));
                 }
                 var existingdistrict = await _context.District.FindAsync(id);
-                existingdistrict.Name = district.Name;
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                existingdistrict.Name = textInfo.ToTitleCase(district.Name.ToLower());
                 existingdistrict.Code = district.Code;
                 existingdistrict.CountryId = district.SelectedCountryId;
                 existingdistrict.Updated = DateTime.Now;

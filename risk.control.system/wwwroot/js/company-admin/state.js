@@ -137,7 +137,7 @@
                             $('a').addClass('disabled-anchor').on('click', function (e) {
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
-                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add State");
+                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
 
                             $('#create-form').submit();
                             var createForm = document.getElementById("create-form");
@@ -189,7 +189,7 @@
                             $('a').addClass('disabled-anchor').on('click', function (e) {
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
-                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit State");
+                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
                             $('#edit-form').submit();
 
                             var createForm = document.getElementById("edit-form");

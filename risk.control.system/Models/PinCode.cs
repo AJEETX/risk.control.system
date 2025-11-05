@@ -30,12 +30,11 @@ namespace risk.control.system.Models
         [Display(Name = "State name")]
         public State? State { get; set; } = default!;
 
-        [Required]
         [Display(Name = "Country name")]
-        public long CountryId { get; set; } = default!;
+        public long? CountryId { get; set; } = default!;
 
         [Display(Name = "Country name")]
-        public Country Country { get; set; } = default!;
+        public Country? Country { get; set; } = default!;
 
         [NotMapped]
         public long SelectedPincodeId { get; set; }
