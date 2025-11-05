@@ -6,7 +6,7 @@
 <section class="content">
                 <div id="article" class="card shadow-lg border-1 rounded-lg">
                     <div class="card-header bg-secondary text-white text-center">
-                        <h3 class="card-title"><i class="fas fa-map-marker-alt"></i>  Edit State</h3>
+                        <h3 class="card-title"><i class="fas fa-map-marker-alt"></i>  Edit </h3>
                     </div>
                     <div class="card-body">
                         <form id="edit-form" asp-action="Edit">
@@ -14,7 +14,7 @@
                                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                             </div>
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input type="hidden" asp-for="StateId" />
+                                <input type="hidden" asp-for="StateId" value="@Model.StateId" />
                             <div class="form-group">
                                 <span class="input-group-label" for="CountryId"> Country:</span>
                                 <div class="input-group mb-3 autocomplete-wrapper">
@@ -53,7 +53,7 @@
                                     @Applicationsettings.CANCEL
                                 </a>
                                 <button id="edit" type="submit" class="btn btn-warning">
-                                    <i class="fas fa-map-marker-alt"></i>  Edit State
+                                    <i class="fas fa-map-marker-alt"></i>  Edit
                                 </button>
                             </div>
                         </form>

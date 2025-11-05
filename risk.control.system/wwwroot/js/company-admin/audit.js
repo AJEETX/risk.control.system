@@ -81,7 +81,7 @@
                 orderable: false,
                 searchable: false,
                 render: function (data) {
-                    return '<a id=details' + data + ' href="/Audit/Details?Id=' + data + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>'
+                    return '<a id=details' + data + ' href="/Audit/Details?Id=' + data + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>'
                 }
             }
         ],
@@ -112,7 +112,7 @@ function getaudit(id) {
         e.preventDefault(); // Prevent default action for anchor clicks
     });
 
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Details");
+    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
     var article = document.getElementById("datatable");
     if (article) {
         var nodes = article.getElementsByTagName('*');

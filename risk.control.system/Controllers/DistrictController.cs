@@ -160,7 +160,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District/Create
-        [Breadcrumb("Add District", FromAction = "Profile")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb("Edit District", FromAction = "Profile")]
+        [Breadcrumb("Edit", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)
@@ -234,9 +234,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id != district.DistrictId)
+                if (id < 1)
                 {
-                    notifyService.Error("District Mismatch!");
+                    notifyService.Error("District Null!");
                     return RedirectToAction(nameof(Profile));
                 }
                 bool exists = await _context.District.AnyAsync(x => x.Code == district.Code && x.CountryId == district.SelectedCountryId && x.StateId == district.StateId && x.DistrictId != district.DistrictId);

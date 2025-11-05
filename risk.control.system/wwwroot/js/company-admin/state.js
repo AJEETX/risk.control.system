@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
 
+    $('#Name').focus();
 
     $("#Code").on("input", function () {
         this.value = this.value.toUpperCase();
@@ -281,7 +282,7 @@ $('a.create').on('click', function () {
         e.preventDefault(); // Prevent default action for anchor clicks
     });
 
-    $('a.create').html("<i class='fas fa-sync fa-spin'></i> Add State");
+    $('a.create').html("<i class='fas fa-sync fa-spin'></i> Add New");
 
     var article = document.getElementById("article");
     if (article) {
@@ -291,10 +292,6 @@ $('a.create').on('click', function () {
         }
     }
 });
-var state = $('#Name');
-if (state) {
-    state.focus();
-}
 
 function showedit(id) {
     $("body").addClass("submit-progress-bg");

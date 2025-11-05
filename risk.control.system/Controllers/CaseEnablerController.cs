@@ -165,9 +165,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, CaseEnabler caseEnabler)
         {
-            if (id != caseEnabler.CaseEnablerId || !ModelState.IsValid)
+            if (id < 1 || !ModelState.IsValid)
             {
-                notifyService.Error("Reason Mismatch!");
+                notifyService.Error("Reason Null!");
                 return RedirectToAction(nameof(Profile));
             }
             try

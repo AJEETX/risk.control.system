@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Create
-        [Breadcrumb("Add Pincode", FromAction = "Profile")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -213,7 +213,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Edit/5
-        [Breadcrumb("Edit Pincode ", FromAction = "Profile")]
+        [Breadcrumb("Edit  ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id <= 0)
@@ -241,9 +241,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id != pinCode.StateId)
+                if (id < 1)
                 {
-                    notifyService.Error("Pincode Mismatch!");
+                    notifyService.Error("Pincode Null!");
                     return RedirectToAction(nameof(Profile));
                 }
                 var existingPincode = await _context.PinCode.FindAsync(id);

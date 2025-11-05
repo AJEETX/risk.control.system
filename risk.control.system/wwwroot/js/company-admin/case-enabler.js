@@ -1,6 +1,9 @@
 ﻿$(document).ready(function () {
     $('#Name').focus();
 
+    $("#Name").on("input", function () {
+        this.value = this.value.toUpperCase();
+    });
     $("#Code").on("input", function () {
         this.value = this.value.toUpperCase();
     });

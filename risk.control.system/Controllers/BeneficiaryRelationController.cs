@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
 
-        [Breadcrumb("Beneficairy Relation ")]
+        [Breadcrumb("Beneficiary Relation ")]
         public IActionResult Profile()
         {
             return View();
@@ -165,9 +165,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, BeneficiaryRelation beneficiaryRelation)
         {
-            if (id != beneficiaryRelation.BeneficiaryRelationId || !ModelState.IsValid)
+            if (id < 1 || !ModelState.IsValid)
             {
-                notifyService.Error("Beneficiary Relation Mismatch!");
+                notifyService.Error("Beneficiary Relation Null!");
                 return RedirectToAction(nameof(Profile));
             }
             try

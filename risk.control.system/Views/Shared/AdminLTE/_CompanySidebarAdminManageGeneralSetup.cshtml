@@ -4,8 +4,7 @@
     {
         <li class="nav-item">
             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") 
-                @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","") @Url.MakeActiveClass("Audit","")
-               @Url.MakeActiveClass("ReportTemplate", "")">
+                @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","")">
                 <i class="nav-icon fas fa-wrench"></i>
                 <p class="sidebar-menu-header-label">
                     @Applicationsettings.GENERAL_SETUP
@@ -13,14 +12,7 @@
                 </p>
             </a>
         </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="ReportTemplate" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplate", "")">
-                <i class="nav-icon far fa-file-powerpoint"></i>
-                <p>
-                    Report <sub class="igreen">template</sub>
-                </p>
-            </a>
-        </li>
+        
         // <li class="nav-item">
         //     <a is-active-page asp-controller="Country" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Country","")">
         //         <i class="nav-icon fas fa-map-marked-alt"></i>
@@ -50,15 +42,6 @@
                 <i class="nav-icon fas fa-map-pin"></i>
                 <p>
                     @Applicationsettings.PINCODE
-                </p>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a is-active-page asp-controller="Audit" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
-                <i class="nav-icon fa fa-align-center"></i>
-                <p>
-                    Audit <sub class="igreen">log</sub>
                 </p>
             </a>
         </li>

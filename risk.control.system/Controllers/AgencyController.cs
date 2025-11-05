@@ -1042,7 +1042,8 @@ namespace risk.control.system.Controllers
 
                 if (id <= 0)
                 {
-                    return Problem("Entity set 'ApplicationDbContext.VendorInvestigationServiceType'  is null.");
+                    notifyService.Custom($"Service Not Found.", 3, "red", "fas fa-truck");
+                    return RedirectToAction("Service", "Agency");
                 }
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
                 if (vendorInvestigationServiceType != null)
@@ -1062,7 +1063,7 @@ namespace risk.control.system.Controllers
                 logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
                 notifyService.Custom($"Error to delete service.", 3, "red", "fas fa-truck");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction("Service", "Agency");
             }
         }
 

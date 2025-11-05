@@ -117,10 +117,11 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Profile));
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("Error creating Budget Centre !");
+                return RedirectToAction(nameof(Profile));
             }
         }
 
@@ -161,9 +162,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, [Bind("CostCentreId,Name,Code,Created,Updated,UpdatedBy")] CostCentre costCentre)
         {
-            if (id != costCentre.CostCentreId || !ModelState.IsValid)
+            if (id < 1 || !ModelState.IsValid)
             {
-                notifyService.Error("Budget Centre Mismatch!");
+                notifyService.Error("Budget Centre Null!");
                 return RedirectToAction(nameof(Profile));
             }
             try

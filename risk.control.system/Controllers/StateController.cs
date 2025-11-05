@@ -163,7 +163,7 @@ namespace risk.control.system.Controllers
             return View(state);
         }
 
-        [Breadcrumb("Add State", FromAction = "Profile")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -214,7 +214,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Edit/5
-        [Breadcrumb("Edit State", FromAction = "Profile")]
+        [Breadcrumb("Edit", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)
@@ -240,9 +240,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, State state)
         {
-            if (id != state.StateId)
+            if (id < 1)
             {
-                notifyService.Error("State Mismatch!");
+                notifyService.Error("State Null!");
                 return RedirectToAction(nameof(Profile));
             }
             try

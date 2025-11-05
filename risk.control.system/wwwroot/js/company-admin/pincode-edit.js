@@ -221,7 +221,7 @@
             e.preventDefault(); // Prevent default action for anchor clicks
         });
 
-        $('a.create').html("<i class='fas fa-sync fa-spin'></i> Add Pincode");
+        $('a.create').html("<i class='fas fa-sync fa-spin'></i> Add New");
 
         var article = document.getElementById("article");
         if (article) {

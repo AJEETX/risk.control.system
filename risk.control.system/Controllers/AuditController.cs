@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Audit/Details/5
-        [Breadcrumb("Details ", FromAction = "Profile")]
+        [Breadcrumb("Detail ", FromAction = "Profile")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.AuditLogs == null)

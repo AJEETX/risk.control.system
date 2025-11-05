@@ -3,10 +3,8 @@
     if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
     {
         <li class="nav-item">
-            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","")
-                                @Url.MakeActiveClass("InvestigationCaseStatus","") @Url.MakeActiveClass("CaseEnabler","") @Url.MakeActiveClass("Costcentre","")
-                                                @Url.MakeActiveClass("InvestigationCaseOutcome","")
-                                                        @Url.MakeActiveClass("IpAddress","") 
+            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Audit", "")
+                       @Url.MakeActiveClass("ReportTemplate", "") @Url.MakeActiveClass("CaseEnabler", "") @Url.MakeActiveClass("Costcentre", "")
                                             @Url.MakeActiveClass("OccupationType","")
                                             @Url.MakeActiveClass("EducationType","")
                                             @Url.MakeActiveClass("AnnualIncome","")
@@ -61,7 +59,7 @@
         //     </a>
         // </li>
         // }
-
+        
         <li class="nav-item">
             <a is-active-page asp-controller="CaseEnabler" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler","")">
                 <i class="fas fa-puzzle-piece nav-icon"></i>
@@ -83,6 +81,22 @@
                 <i class="fas fa-user-tie nav-icon"></i>
                 <p>
                     @Applicationsettings.BENEFICIARY
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="ReportTemplate" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplate", "")">
+                <i class="nav-icon far fa-file-powerpoint"></i>
+                <p>
+                    Report <sub class="i-green">template</sub>
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Audit" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Audit", "")">
+                <i class="nav-icon fa fa-align-center"></i>
+                <p>
+                    Audit <sub class="i-grey">log</sub>
                 </p>
             </a>
         </li>
