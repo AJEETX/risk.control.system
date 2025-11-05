@@ -114,13 +114,10 @@
                                         <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
-                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone number only (1234567890)" />
+                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone number only (9876543210)" title="Please enter a 10-digit phone # without country-code"  data-toggle="tooltip"/>
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>
-
-                        
-
                         <div class="form-group">
                             <label class="input-group-label"> Role:</label>
                             <div class="input-group mb-3">
@@ -133,7 +130,6 @@
                                 <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
                             </div>
                         </div>
-                        
                     </div>
                     <div class="col-md-6">
                         <partial name="_Address" model="@Model" />

@@ -694,6 +694,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 #Email {
     color: blue;
+    padding-left:0;
 }
 
 /*#check-email {
@@ -2102,6 +2103,10 @@ select#PinCodeId {
 #emailAddress {
     border-color: #ccc;
     background-color: transparent;
+    padding-right:5px;
+}
+#domain{
+    padding-left:0;
 }
 /* Styles for the enabled state of the button */
 .enabled-btn {
