@@ -104,8 +104,7 @@ namespace risk.control.system.Controllers
                 beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper();
 
                 // Check for duplicate code before saving
-                bool exists = await _context.CostCentre
-                    .AnyAsync(x => x.Code == beneficiaryRelation.Code);
+                bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code == beneficiaryRelation.Code);
                 if (exists)
                 {
                     ModelState.AddModelError("Code", "Beneficiary Relation Code already exists.");

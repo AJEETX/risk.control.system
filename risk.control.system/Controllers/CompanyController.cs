@@ -1354,7 +1354,8 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
                 if (vendorInvestigationServiceType == null)
                 {
-                    return NotFound();
+                    notifyService.Error("OOPs !!!..Service Not Found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
@@ -1601,7 +1602,7 @@ namespace risk.control.system.Controllers
             if (user == null)
             {
                 notifyService.Error("user not found!");
-                return NotFound();
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             string selectedRole = string.Empty;
             //ViewBag.UserName = user.UserName;

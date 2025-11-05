@@ -88,7 +88,8 @@ namespace risk.control.system.Controllers
         {
             if (id == null || id <= 0)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..User Not Found");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var clientApplicationUser = await _context.ClientCompanyApplicationUser
@@ -100,7 +101,8 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (clientApplicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..User Not Found");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             return View(clientApplicationUser);
@@ -195,15 +197,15 @@ namespace risk.control.system.Controllers
         {
             if (userId == null || userId <= 0)
             {
-                notifyService.Error("company not found");
-                return NotFound();
+                notifyService.Error("Company not found");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var user = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(v => v.Id == userId);
             if (user == null)
             {
-                notifyService.Error("company not found");
-                return NotFound();
+                notifyService.Error("Company not found");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
@@ -302,7 +304,8 @@ namespace risk.control.system.Controllers
         {
             if (id == null || id <= 0)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..User Not Found");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var vendorApplicationUser = await _context.VendorApplicationUser
@@ -314,7 +317,8 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (vendorApplicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..User Not Found");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             return View(vendorApplicationUser);

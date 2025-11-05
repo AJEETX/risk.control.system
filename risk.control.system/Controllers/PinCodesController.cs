@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PinCode pinCode)
         {
-            if (pinCode is null)
+            if (pinCode is null || !ModelState.IsValid)
             {
                 notifyService.Error("Pincode Empty!");
                 return RedirectToAction(nameof(Profile));
@@ -241,7 +241,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id < 1)
+                if (id < 1 || !ModelState.IsValid)
                 {
                     notifyService.Error("Pincode Null!");
                     return RedirectToAction(nameof(Profile));
@@ -257,7 +257,7 @@ namespace risk.control.system.Controllers
                 _context.Update(existingPincode);
                 if (await _context.SaveChangesAsync() > 0)
                 {
-                    notifyService.Success("Pincode edited successfully!");
+                    notifyService.Warning("Pincode edited successfully!");
                     return RedirectToAction(nameof(Profile));
                 }
                 else

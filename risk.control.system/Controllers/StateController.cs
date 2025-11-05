@@ -182,7 +182,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(State state)
         {
-            if (state is null)
+            if (state is null || !ModelState.IsValid)
             {
                 notifyService.Error("State Empty!");
                 return RedirectToAction(nameof(Profile));
@@ -220,7 +220,7 @@ namespace risk.control.system.Controllers
             if (id < 1)
             {
                 notifyService.Error("State not found!");
-                return NotFound();
+                return RedirectToAction(nameof(Profile));
             }
 
             var state = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
@@ -240,7 +240,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, State state)
         {
-            if (id < 1)
+            if (id < 1 || !ModelState.IsValid)
             {
                 notifyService.Error("State Null!");
                 return RedirectToAction(nameof(Profile));
@@ -262,7 +262,7 @@ namespace risk.control.system.Controllers
                 existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(existingState);
                 await _context.SaveChangesAsync();
-                notifyService.Success("State edited successfully!");
+                notifyService.Warning("State edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)

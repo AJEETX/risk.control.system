@@ -49,7 +49,8 @@ namespace risk.control.system.Controllers
             {
                 if (id < 1)
                 {
-                    return NotFound();
+                    notifyService.Error("OOPs !!!..Not Found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
@@ -61,7 +62,8 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
                 if (vendorInvestigationServiceType == null)
                 {
-                    return NotFound();
+                    notifyService.Error("OOPs !!!..Service Not Found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 return View(vendorInvestigationServiceType);
@@ -326,7 +328,8 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
                 if (vendorInvestigationServiceType == null)
                 {
-                    return NotFound();
+                    notifyService.Error("OOPs !!!..Service Not Found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var agencysPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Available Agencies") { Parent = agencysPage };

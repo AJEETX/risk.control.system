@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -33,7 +34,5 @@ namespace risk.control.system.Services
             _context.Investigations.Update(claim);
             return await _context.SaveChangesAsync() > 0;
         }
-
-
     }
 }

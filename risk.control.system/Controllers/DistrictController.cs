@@ -234,7 +234,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id < 1)
+                if (id < 1 || !ModelState.IsValid)
                 {
                     notifyService.Error("District Null!");
                     return RedirectToAction(nameof(Profile));

@@ -92,14 +92,14 @@ namespace risk.control.system.Controllers
                 if (userId == null || _context.VendorApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                    return NotFound();
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var vendorApplicationUser = await _context.VendorApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                    return NotFound();
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var country = _context.Country.OrderBy(o => o.Name);

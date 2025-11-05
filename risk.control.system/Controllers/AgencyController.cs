@@ -723,7 +723,8 @@ namespace risk.control.system.Controllers
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..User Not Found");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             user.SecurityStamp = Guid.NewGuid().ToString();
             user.Updated = DateTime.Now;

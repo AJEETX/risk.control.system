@@ -403,8 +403,7 @@
                     }
                 },
                 cancel: function () {
-                    text: 'Cancel',
-                    btnClass: 'btn-default'
+                    // Do nothing
                 }
             }
         });
