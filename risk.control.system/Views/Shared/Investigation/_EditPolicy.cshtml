@@ -152,7 +152,7 @@
                     <label class="input-group-label"> Budget Centre:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="CostCentreId"><i class="nav-icon fas fa-money-check-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" asp-for="CostCentreId"><i class="nav-icon fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <select required asp-for="PolicyDetail.CostCentreId" class="form-control remarks" asp-items="@ViewBag.CostCentreId">
                             <option value="">--- SELECT ---</option>
@@ -162,7 +162,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="input-group-label"> Case Document:</label>
+                    <label class="input-group-label"> Document:</label>
                     <div class="input-group mb-3">
                         @if (Model?.PolicyDetail.DocumentPath is not null)
                         {

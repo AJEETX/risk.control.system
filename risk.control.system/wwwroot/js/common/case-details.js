@@ -145,7 +145,7 @@
                     self.setContentAppend('<b><i class="far fa-check-circle"></i> Cause of Incidence</b>:  ' + response.causeOfLoss);
                     self.setContentAppend('</p');
                     self.setContentAppend('<br><p class="fa-li">');
-                    self.setContentAppend('<b><i class="fas fa-money-check-alt"></i> Budget Centre</b>:  ' + response.costCentre);
+                    self.setContentAppend('<b><i class="fas fa-building"></i> Budget Centre</b>:  ' + response.costCentre);
                     self.setContentAppend('</p');
                     self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Policy Document</b>:');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.document + '" /> ');

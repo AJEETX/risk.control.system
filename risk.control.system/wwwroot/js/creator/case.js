@@ -74,7 +74,7 @@ $(document).ready(function () {
         handleFormSubmit(e, "create-form", askCreateConfirmation, {
             title: "Confirm Add Case",
             content: "Are you sure to add?",
-            icon: 'fas fa-user-plus',
+            icon: 'far fa-file-powerpoint',
             type: 'green',
             confirmText: "Add Case",
             confirmClass: 'btn-success',
@@ -87,7 +87,7 @@ $(document).ready(function () {
         handleFormSubmit(e, "edit-form", askEditConfirmation, {
             title: "Confirm Edit Case",
             content: "Are you sure to save?",
-            icon: 'fas fa-user-edit',
+            icon: 'far fa-file-powerpoint',
             type: 'orange',
             confirmText: "Save Case",
             confirmClass: 'btn-warning',

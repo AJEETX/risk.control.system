@@ -64,7 +64,7 @@
                 render: function (data) {
                     return `
                         <a id="edit${data}" class="btn btn-xs btn-warning" href="/CostCentre/Edit/${data}">
-                            <i class="fas fa-money-check-alt"></i> Edit
+                            <i class="fas fa-building"></i> Edit
                         </a>
                         <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
                             <i class="fas fa-trash"></i> Delete
@@ -90,7 +90,7 @@
                 title: "Confirm Add New",
                 content: "Are you sure to add?",
 
-                icon: 'fas fa-money-check-alt',
+                icon: 'fas fa-building',
                 type: 'green',
                 closeIcon: true,
                 buttons: {
@@ -132,7 +132,7 @@
             $.confirm({
                 title: "Confirm Edit",
                 content: "Are you sure to edit?",
-                icon: 'fas fa-money-check-alt',
+                icon: 'fas fa-building',
 
                 type: 'orange',
                 closeIcon: true,

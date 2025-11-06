@@ -25,7 +25,7 @@
                         <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
-                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone number only (e.g., 9876543210)" title="Please enter a 10-digit phone # without country-code" data-toggle="tooltip" />
+                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone # only (e.g., 9876543210)" title="Please enter a 10-digit phone # without country-code" data-toggle="tooltip" />
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
         </div>
@@ -52,6 +52,16 @@
         </div>
 
         <div class="form-group">
+            <label class="input-group-label"> IFSC Code: </label>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="10" />
+                <span asp-validation-for="IFSCCode" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
             <label class="input-group-label"> Bank Account #: </label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -62,16 +72,6 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label class="input-group-label"> IFSC Code: </label>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-                <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="Bank IFSC Code" maxlength="10" />
-                <span asp-validation-for="IFSCCode" class="text-danger"></span>
-            </div>
-        </div>
         @if (Model.SelectedByCompany)
         {
             <input asp-for="CanChangePassword" id="CanChangePassword" type="hidden" />
@@ -115,7 +115,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" type="text" placeholder="Enter Street Address" required maxlength="70" />
+                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" type="text" placeholder="Street Address..." required maxlength="70" />
                 <span asp-validation-for="Addressline" class="text-danger"></span>
             </div>
         </div>

@@ -257,7 +257,7 @@ namespace risk.control.system.Controllers
                 _context.Update(existingPincode);
                 if (await _context.SaveChangesAsync() > 0)
                 {
-                    notifyService.Warning("Pincode edited successfully!");
+                    notifyService.Custom($"Pincode edited successfully!", 3, "orange", "far fa-edit");
                     return RedirectToAction(nameof(Profile));
                 }
                 else

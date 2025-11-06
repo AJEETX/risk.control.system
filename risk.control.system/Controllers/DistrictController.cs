@@ -258,7 +258,7 @@ namespace risk.control.system.Controllers
                 existingdistrict.StateId = district.SelectedStateId;
                 _context.Update(existingdistrict);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("District edited successfully!");
+                notifyService.Custom($"District edited successfully!", 3, "orange", "far fa-edit");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)

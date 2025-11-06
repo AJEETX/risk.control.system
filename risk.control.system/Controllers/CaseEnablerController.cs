@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(caseEnabler);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("Reason edited successfully!");
+                notifyService.Custom($"Reason edited successfully!", 3, "orange", "fas fa-puzzle-piece");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)

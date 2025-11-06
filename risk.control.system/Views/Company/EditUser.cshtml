@@ -89,7 +89,7 @@
                                         <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
-                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone number only (e.g., 9876543210)" title="Please enter a 10-digit phone # without country-code" data-toggle="tooltip" />
+                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone # only (e.g., 9876543210)" title="Please enter a 10-digit phone # without country-code" data-toggle="tooltip" />
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -128,7 +128,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" required placeholder="Enter Street Address" maxlength="70" />
+                                <input type="text" asp-for="Addressline" class="form-control remarks" required placeholder="Street Address..." maxlength="70" />
                             </div>
                         </div>
                         <div class="form-group">

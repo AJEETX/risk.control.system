@@ -264,7 +264,7 @@ namespace risk.control.system.Controllers
                 existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(existingState);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("State edited successfully!");
+                notifyService.Custom($"State edited successfully!", 3, "orange", "far fa-edit");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
