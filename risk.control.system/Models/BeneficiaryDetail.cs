@@ -20,7 +20,7 @@ namespace risk.control.system.Models
 
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Phone")]
-        public string ContactNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         [Display(Name = "Annual Income")]
         public Income? Income { get; set; }
@@ -92,7 +92,7 @@ namespace risk.control.system.Models
            $"- City: {District}\n" +
            $"- State: {State}\n" +
            $"- Country: {Country}\n" +
-           $"- Contact number: {ContactNumber}\n" +
+           $"- Contact number: {PhoneNumber}\n" +
            $"- Income: {Income}";
         }
     }

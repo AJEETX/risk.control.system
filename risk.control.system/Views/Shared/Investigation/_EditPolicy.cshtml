@@ -103,7 +103,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="SumAssuredValue"><i class="fa fa-money"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="SumAssuredValue" required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Assured Amount (@ViewBag.Currency)" min="1000" maxlength="10" autocomplete="off" />
+                        <input id="SumAssuredValue" required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Assured Amount (@ViewBag.Currency) of minimum 100"
+                               min="100" maxlength="10" autocomplete="off" title="Assured Amount (@ViewBag.Currency) of minimum 100" data-toggle="tooltip"/>
                         <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                     </div>
                 </div>

@@ -112,6 +112,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<IPhoneService, PhoneService>();
 builder.Services.AddScoped<IMediaDataService, MediaDataService>();
 builder.Services.AddScoped<ITinyUrlService, TinyUrlService>();
 builder.Services.AddScoped<IPdfGenerateQuestionLocationService, PdfGenerateQuestionLocationService>();

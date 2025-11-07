@@ -24,6 +24,7 @@ namespace risk.control.system.Controllers.Mobile
         private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly ITokenService tokenService;
         private readonly UserManager<Models.ApplicationUser> _userManager;
+        private readonly IPhoneService phoneService;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
@@ -34,6 +35,7 @@ namespace risk.control.system.Controllers.Mobile
         private readonly ApplicationDbContext _context;
         private readonly string baseUrl;
         public SecureController(UserManager<Models.ApplicationUser> userManager,
+            IPhoneService phoneService,
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             INotificationService service,
@@ -47,6 +49,7 @@ namespace risk.control.system.Controllers.Mobile
         {
             this.pdfGenerativeService = pdfGenerativeService;
             _userManager = userManager ?? throw new ArgumentNullException();
+            this.phoneService = phoneService;
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.httpContextAccessor = httpContextAccessor;
             this.service = service;
@@ -235,6 +238,14 @@ namespace risk.control.system.Controllers.Mobile
                              $"Thanks\n{baseUrl}";
             var response = await SmsService.SendSmsAsync(countryCode, mobile, msg);
             return Ok(new { message = response });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("validate-phone-number")]
+        public async Task<IActionResult> ValidatePhoneNumber(string phoneNumber = "+61432854196", string country = "AU")
+        {
+            var result = await phoneService.ValidateAsync(phoneNumber, country);
+            return Ok(result);
         }
 
         //[AllowAnonymous]

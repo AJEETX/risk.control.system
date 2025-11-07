@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -25,17 +26,26 @@ namespace risk.control.system.Controllers.Company
     {
         private readonly ILogger<InvestigationController> logger;
         private readonly ApplicationDbContext context;
+        private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService service;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
+        private readonly IPhoneService phoneService;
 
-        public InvestigationController(ILogger<InvestigationController> logger, ApplicationDbContext context, INotyfService notifyService, IInvestigationService service, IEmpanelledAgencyService empanelledAgencyService)
+        public InvestigationController(ILogger<InvestigationController> logger,
+            ApplicationDbContext context,
+            IFeatureManager featureManager,
+            INotyfService notifyService, IInvestigationService service,
+            IEmpanelledAgencyService empanelledAgencyService,
+            IPhoneService phoneService)
         {
             this.logger = logger;
             this.context = context;
+            this.featureManager = featureManager;
             this.notifyService = notifyService;
             this.service = service;
             this.empanelledAgencyService = empanelledAgencyService;
+            this.phoneService = phoneService;
         }
         public IActionResult Index()
         {
@@ -236,7 +246,7 @@ namespace risk.control.system.Controllers.Company
                     {
                         InvestigationTaskId = id,
                         Addressline = random.Next(100, 999) + " GOOD STREET",
-                        ContactNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                        PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                         Education = Education.PROFESSIONAL,
                         Income = Income.UPPER_INCOME,
@@ -268,6 +278,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(CreatePolicy));
             }
         }
+
         [Breadcrumb(title: " Edit Customer", FromAction = "Details")]
         public async Task<IActionResult> EditCustomer(long id)
         {
@@ -357,7 +368,7 @@ namespace risk.control.system.Controllers.Company
                         SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault(),
                         PinCodeId = pinCode.PinCodeId,
                         SelectedPincodeId = pinCode.PinCodeId,
-                        ContactNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                        PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                     };
                     return View(model);
                 }
@@ -377,9 +388,9 @@ namespace risk.control.system.Controllers.Company
 
         }
         [Breadcrumb("Edit Beneficiary", FromAction = "Details")]
-        public IActionResult EditBeneficiary(long? id)
+        public IActionResult EditBeneficiary(long id)
         {
-            if (id == null || id < 1)
+            if (id < 1)
             {
                 notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                 return RedirectToAction(nameof(CreatePolicy));
@@ -537,6 +548,38 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ValidatePhone(string phone, int countryCode)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return Json(new { valid = false, message = "Phone number is required." });
+            if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+            {
+                var country = await context.Country.FirstOrDefaultAsync(c => c.ISDCode == countryCode);
+
+                var phoneInfo = await phoneService.ValidateAsync(country.ISDCode.ToString() + phone);
+
+                if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() || phoneInfo.NumberType.ToLower() != "mobile")
+                {
+                    return Json(new
+                    {
+                        valid = false,
+                        message = "Invalid phone number."
+                    });
+                }
+                return Json(new
+                {
+                    valid = true,
+                    message = "Valid phone number"
+                });
+            }
+            return Json(new
+            {
+                valid = true,
+                message = "Valid phone number"
+            });
         }
     }
 }

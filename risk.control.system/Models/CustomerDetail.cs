@@ -25,7 +25,7 @@ namespace risk.control.system.Models
         [Required]
         [Display(Name = "Contact number")]
         [DataType(DataType.PhoneNumber)]
-        public string ContactNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         [Required]
         [Display(Name = "Address line")]
@@ -108,7 +108,7 @@ namespace risk.control.system.Models
            $"- City: {District}\n" +
            $"- State: {State}\n" +
            $"- Country: {Country}\n" +
-           $"- Contact Number: {ContactNumber}\n" +
+           $"- Contact Number: {PhoneNumber}\n" +
            $"- Income: {Income.GetEnumDisplayName()}\n" +
            $"- Occupation: {Occupation.GetEnumDisplayName()}\n" +
            $"- Education: {Education.GetEnumDisplayName()}\n";

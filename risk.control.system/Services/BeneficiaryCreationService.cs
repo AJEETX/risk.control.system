@@ -158,7 +158,7 @@ namespace risk.control.system.Services
                     BeneficiaryRelationId = relation.BeneficiaryRelationId,
                     DateOfBirth = DateTime.ParseExact(uploadCase.BeneficiaryDob, "dd-MM-yyyy", CultureInfo.InvariantCulture),
                     Income = (Income)Enum.Parse(typeof(Income), uploadCase.BeneficiaryIncome),
-                    ContactNumber = uploadCase.BeneficiaryContact,
+                    PhoneNumber = uploadCase.BeneficiaryContact,
                     Addressline = uploadCase.BeneficiaryAddressLine,
                     PinCodeId = pinCode?.PinCodeId,
                     DistrictId = pinCode?.DistrictId,

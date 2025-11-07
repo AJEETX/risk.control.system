@@ -20,7 +20,7 @@
         var age = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
         currentBAgeinYrs =$"{(int)(age/ 365 )} years";
         country = @Model.Location?.Country?.Name;
-        phone = +@Model.Location?.Country.ISDCode +" (0) "+ @Model.Location?.ContactNumber;
+        phone = +@Model.Location?.Country.ISDCode +" (0) "+ @Model.Location?.PhoneNumber;
         imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
         map = string.Format(Model.Location.BeneficiaryLocationMap, "200", "200");
     }
@@ -121,7 +121,7 @@
         <div class="card-footer">
             <div class="text-right">
 
-                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.ContactNumber))
+                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.PhoneNumber))
                     {
                         <button id="beneficiary-comments" class="btn btn-sm bg-teal">
                             <i class="fas fa-comments"></i>
@@ -133,7 +133,7 @@
                             <i class="fas fa-comments"></i>
                         </button>
                     }
-                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.ContactNumber))
+                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.PhoneNumber))
                     {
                         <button id="beneficiary-detail" class="btn btn-sm btn-success">
                             <i class="fas fa-user-tie"></i> ...

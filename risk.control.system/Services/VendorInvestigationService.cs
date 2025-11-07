@@ -112,10 +112,10 @@ namespace risk.control.system.Services
             {
                 canDownload = tracker.DownloadCount <= 3;
             }
-            var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claim.CustomerDetail.ContactNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
-            claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+            var maskedCustomerContact = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
 
             var model = new CaseTransactionModel
             {
@@ -169,10 +169,10 @@ namespace risk.control.system.Services
 
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
-            var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claim.CustomerDetail.ContactNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
-            claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+            var maskedCustomerContact = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
 
             var timeTaken = DateTime.Now - lastHistory.StatusChangedAt;
             var model = new CaseTransactionModel
@@ -271,13 +271,13 @@ namespace risk.control.system.Services
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.ContactNumber.ToLower().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.Addressline.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.ContactNumber.ToLower().Contains(search));
+                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))
@@ -502,13 +502,13 @@ namespace risk.control.system.Services
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.ContactNumber.ToLower().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.Addressline.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.ContactNumber.ToLower().Contains(search));
+                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))
@@ -750,11 +750,11 @@ namespace risk.control.system.Services
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claimsAllocate2Agent.BeneficiaryDetail.BeneficiaryDetailId);
 
-            var maskedCustomerContact = new string('*', claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4) + claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Substring(claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claimsAllocate2Agent.CustomerDetail.ContactNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', beneficiaryDetail.ContactNumber.ToString().Length - 4) + beneficiaryDetail.ContactNumber.ToString().Substring(beneficiaryDetail.ContactNumber.ToString().Length - 4);
-            claimsAllocate2Agent.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
-            beneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+            var maskedCustomerContact = new string('*', claimsAllocate2Agent.CustomerDetail.PhoneNumber.ToString().Length - 4) + claimsAllocate2Agent.CustomerDetail.PhoneNumber.ToString().Substring(claimsAllocate2Agent.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            claimsAllocate2Agent.CustomerDetail.PhoneNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', beneficiaryDetail.PhoneNumber.ToString().Length - 4) + beneficiaryDetail.PhoneNumber.ToString().Substring(beneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            claimsAllocate2Agent.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
+            beneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
 
             var model = new CaseInvestigationVendorAgentModel
             {

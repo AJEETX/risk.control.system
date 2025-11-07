@@ -652,28 +652,30 @@ namespace risk.control.system.Controllers
                             }
                         }
                     }
-
-                    if (editby == "company")
-                    {
-                        return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
-                    }
-                    else if (editby == "empanelled")
-                    {
-                        return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = applicationUser.VendorId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(AgencyController.Users), "Agency");
-                    }
+                }
+                else
+                {
+                    notifyService.Error("OOPS !!!..Error Editing User, Contact Admin");
                 }
             }
             catch (Exception ex)
             {
                 logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPS !!!..Error Editing User, Contact Admin");
             }
-            notifyService.Error("OOPS !!!..Contact Admin");
-            return RedirectToAction(nameof(Index), "Dashboard");
+            if (editby == "company")
+            {
+                return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
+            }
+            else if (editby == "empanelled")
+            {
+                return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = applicationUser.VendorId });
+            }
+            else
+            {
+                return RedirectToAction(nameof(AgencyController.Users), "Agency");
+            }
         }
 
         [Breadcrumb(title: " Delete", FromAction = "Users")]

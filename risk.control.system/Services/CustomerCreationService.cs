@@ -202,7 +202,7 @@ namespace risk.control.system.Services
                     CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), uploadCase.CustomerType),
                     Gender = (Gender)Enum.Parse(typeof(Gender), uploadCase.Gender),
                     DateOfBirth = DateTime.ParseExact(uploadCase.CustomerDob, "dd-MM-yyyy", CultureInfo.InvariantCulture),
-                    ContactNumber = (uploadCase.CustomerContact),
+                    PhoneNumber = (uploadCase.CustomerContact),
                     Education = (Education)Enum.Parse(typeof(Education), uploadCase.Education),
                     Occupation = (Occupation)Enum.Parse(typeof(Occupation), uploadCase.Occupation),
                     Income = (Income)Enum.Parse(typeof(Income), uploadCase.Income),

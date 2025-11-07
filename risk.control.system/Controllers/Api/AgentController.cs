@@ -548,7 +548,7 @@ namespace risk.control.system.Controllers.Api
                             Photo = beneficiaryPhoto,
                             Relation = beneficiary.BeneficiaryRelation.Name,
                             Income = beneficiary.Income.GetEnumDisplayName(),
-                            Phone = beneficiary.ContactNumber,
+                            Phone = beneficiary.PhoneNumber,
                             DateOfBirth = beneficiary.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
                             Address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code
                         },
@@ -558,7 +558,7 @@ namespace risk.control.system.Controllers.Api
                             Occupation = claim.CustomerDetail.Occupation.GetEnumDisplayName(),
                             Photo = customerPhoto,
                             Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
-                            Phone = claim.CustomerDetail.ContactNumber,
+                            Phone = claim.CustomerDetail.PhoneNumber,
                             DateOfBirth = claim.CustomerDetail.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
                             Address = claim.CustomerDetail.Addressline + " " + claim.CustomerDetail.District.Name + " " + claim.CustomerDetail.State.Name + " " + claim.CustomerDetail.Country.Name + " " + claim.CustomerDetail.PinCode.Code
                         },

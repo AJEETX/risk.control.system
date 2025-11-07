@@ -449,7 +449,7 @@ a.table-link {
 }
 
 .card {
-    box-shadow: rgba(0, 0, 0, 0.12) 4px 4px 32x 1px;
+    box-shadow: rgba(0, 0, 0, 0.12) 4px 4px 32px 1px;
     border: 1px solid #ccc;
 }
 
@@ -694,7 +694,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 #Email {
     color: blue;
-    padding-left:0;
+    padding-left:5px;
 }
 
 /*#check-email {
@@ -3120,4 +3120,9 @@ img.mobile-capture-map {
 
 .report-template-table td .btn {
     margin: 2px;
+}
+.phone-icon {
+    position: absolute;
+    right: 10px;
+    top: 8px;
 }

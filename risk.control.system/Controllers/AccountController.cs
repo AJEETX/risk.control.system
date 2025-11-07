@@ -242,12 +242,15 @@ namespace risk.control.system.Controllers
                     var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
                     bool vendorIsActive = false;
                     bool companyIsActive = false;
+                    string loggingUsername = "Admin";
                     if (companyUser != null)
                     {
                         companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
+                        loggingUsername = companyUser.FirstName;
                     }
                     else if (vendorUser != null)
                     {
+                        loggingUsername = vendorUser.FirstName;
                         vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
                         if (agent_login != "agent_login")
                         {
@@ -281,7 +284,7 @@ namespace risk.control.system.Controllers
                         {
                             return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
                         }
-                        notifyService.Success("Login successful");
+                        notifyService.Success($"Welcome <b>{loggingUsername}</b>, Login successful");
                         if (Url.IsLocalUrl(model.ReturnUrl))
                             return Redirect(model.ReturnUrl);
 

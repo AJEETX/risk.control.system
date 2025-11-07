@@ -243,7 +243,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
 
-                customerDetail.ContactNumber = customerDetail.ContactNumber.TrimStart('0');
+                customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
@@ -315,7 +315,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
-                customerDetail.ContactNumber = customerDetail.ContactNumber.TrimStart('0');
+                customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
 
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
@@ -384,7 +384,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.IsReady2Assign = true;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
-                beneficiary.ContactNumber = beneficiary.ContactNumber.TrimStart('0');
+                beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
@@ -453,7 +453,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
                 claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
                 claimsInvestigation.IsReady2Assign = true;
-                beneficiary.ContactNumber = beneficiary.ContactNumber.TrimStart('0');
+                beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
@@ -525,13 +525,13 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (claim.CustomerDetail != null)
             {
-                var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-                claim.CustomerDetail.ContactNumber = maskedCustomerContact;
+                var maskedCustomerContact = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
+                claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
             }
             if (claim.BeneficiaryDetail != null)
             {
-                var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
-                claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+                var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+                claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
             var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
@@ -595,13 +595,13 @@ namespace risk.control.system.Services
 
             if (claim.CustomerDetail != null)
             {
-                var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-                claim.CustomerDetail.ContactNumber = maskedCustomerContact;
+                var maskedCustomerContact = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
+                claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
             }
             if (claim.BeneficiaryDetail != null)
             {
-                var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
-                claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+                var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+                claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
             var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
@@ -694,10 +694,10 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claim.CustomerDetail.ContactNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
-            claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+            var maskedCustomerContact = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
@@ -796,10 +796,10 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            var maskedCustomerContact = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claim.CustomerDetail.ContactNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
-            claim.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+            var maskedCustomerContact = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
             var timeTaken = DateTime.Now - claim.Created;
@@ -925,13 +925,13 @@ namespace risk.control.system.Services
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.ContactNumber.ToLower().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.Addressline.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.ContactNumber.ToLower().Contains(search));
+                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))
@@ -1166,13 +1166,13 @@ namespace risk.control.system.Services
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.ContactNumber.ToLower().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.Addressline.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.ContactNumber.ToLower().Contains(search));
+                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))
@@ -1356,13 +1356,13 @@ namespace risk.control.system.Services
                     a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.ContactNumber.ToLower().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.Addressline.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.ContactNumber.ToLower().Contains(search));
+                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))

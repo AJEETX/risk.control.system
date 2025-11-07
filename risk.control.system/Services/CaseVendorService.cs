@@ -63,12 +63,12 @@ namespace risk.control.system.Services
             {
                 return null;
             }
-            var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claim.CustomerDetail.ContactNumber = customerContactMasked;
+            var customerContactMasked = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            claim.CustomerDetail.PhoneNumber = customerContactMasked;
 
-            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
 
-            claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+            claim.BeneficiaryDetail.PhoneNumber = beneficairyContactMasked;
 
             claim.InvestigationReport.AgentEmail = userEmail;
 
@@ -232,14 +232,14 @@ namespace risk.control.system.Services
                 .Include(c => c.State)
                 .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claim.BeneficiaryDetail.BeneficiaryDetailId);
 
-            var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
-            claim.CustomerDetail.ContactNumber = customerContactMasked;
+            var customerContactMasked = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            claim.CustomerDetail.PhoneNumber = customerContactMasked;
 
-            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
 
-            claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+            claim.BeneficiaryDetail.PhoneNumber = beneficairyContactMasked;
 
-            beneficiaryDetails.ContactNumber = beneficairyContactMasked;
+            beneficiaryDetails.PhoneNumber = beneficairyContactMasked;
 
             var caseReportTemplate = await _context.ReportTemplates
                 .Include(r => r.LocationReport)

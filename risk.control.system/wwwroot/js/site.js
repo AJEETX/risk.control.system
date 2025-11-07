@@ -69,6 +69,27 @@ function checkFormCompletion(formSelector, create = false) {
             return false; // Exit loop early if a required field is empty
         }
 
+        //Check email address
+        const emailAddress = document.getElementById("emailAddress");
+        if (emailAddress) {
+            const emailData = emailAddress.value;
+            if (!emailData) {
+                isFormComplete = false;
+                return false; // Exit loop early if a required field is empty
+            }
+            const resultSpan = document.querySelector('#result span');
+            if (!resultSpan.classList.contains('available')) {
+                isFormComplete = false;
+                return false; // Exit loop early if a required field is empty
+            } 
+        }
+
+        //Check phone number
+        const phone = $('#PhoneNumber');
+        if (phone && phone.hasClass("is-invalid")) {
+            isFormComplete = false;
+            return false; // Exit loop early if a required field is empty
+        }
         // Validate file input type in create mode
         if (fieldType === 'file' && create) {
             const allowedExtensions = ['jpg', 'png', 'jpeg']; // Define your allowed extensions here
@@ -83,7 +104,6 @@ function checkFormCompletion(formSelector, create = false) {
     if ($('#PinCodeId').length > 0 && ($('#PinCodeId').val() || []).length === 0) {
         isFormComplete = false;
     }
-
     // Enable or disable the submit button
     $(formSelector).find('button[type="submit"]').prop('disabled', !isFormComplete);
 }
@@ -363,14 +383,14 @@ function clearAllNotifications() {
 }
 
 $(document).ready(function () {
-    $("#PhoneNumber, #ContactNumber").on("keydown", function (e) {
+    $("#PhoneNumber").on("keydown", function (e) {
         // Prevent first character being 0 (also covers numpad 0)
         if (this.selectionStart === 0 && (e.key === "0" || e.code === "Numpad0")) {
             e.preventDefault();
         }
     });
 
-    $("#PhoneNumber, #ContactNumber").on("paste", function (e) {
+    $("#PhoneNumber").on("paste", function (e) {
         let pasteData = (e.originalEvent || e).clipboardData.getData('text');
 
         // If the pasted text starts with 0, block it or fix it
@@ -389,7 +409,7 @@ $(document).ready(function () {
     });
 
     // Prevent typing first character as 0
-    $("#PhoneNumber, #ContactNumber").on("input", function () {
+    $("#PhoneNumber").on("input", function () {
         let val = $(this).val();
         if (val.length === 1 && val === "0") {
             $(this).val(""); // clear the input

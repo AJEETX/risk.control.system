@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -23,11 +24,15 @@ namespace risk.control.system.Controllers.Api.Company
     {
         private readonly ApplicationDbContext _context;
         private readonly IUserService userService;
+        private readonly IFeatureManager featureManager;
+        private readonly IPhoneService phoneService;
 
-        public CompanyController(ApplicationDbContext context, IUserService userService)
+        public CompanyController(ApplicationDbContext context, IUserService userService, IFeatureManager featureManager, IPhoneService phoneService)
         {
             _context = context;
             this.userService = userService;
+            this.featureManager = featureManager;
+            this.phoneService = phoneService;
         }
 
         [HttpGet("AllCompanies")]
@@ -885,6 +890,38 @@ namespace risk.control.system.Controllers.Api.Company
                     })?
                     .ToList();
             return Ok(countries);
+        }
+
+        [HttpGet("ValidatePhone")]
+        public async Task<IActionResult> ValidatePhone(string phone, int countryCode)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return Ok(new { valid = false, message = "Phone number is required." });
+            if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+            {
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode == countryCode);
+
+                var phoneInfo = await phoneService.ValidateAsync(country.ISDCode.ToString() + phone);
+
+                if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() || phoneInfo.NumberType.ToLower() != "mobile")
+                {
+                    return Ok(new
+                    {
+                        valid = false,
+                        message = "Invalid phone number."
+                    });
+                }
+                return Ok(new
+                {
+                    valid = true,
+                    message = "Valid phone number"
+                });
+            }
+            return Ok(new
+            {
+                valid = true,
+                message = "Valid phone number"
+            });
         }
     }
 }

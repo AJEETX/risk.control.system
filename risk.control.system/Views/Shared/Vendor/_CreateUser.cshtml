@@ -45,6 +45,7 @@
         </div>*@
         
         <div class="form-group">
+            <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
             <label class="input-group-label"> Phone #:</label>
             <div class="input-group">
                 <div class="input-group-prepend">
@@ -55,7 +56,15 @@
                         <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
-                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Phone # only (9876543210)" title="Please enter a 10-digit phone # without country-code"  data-toggle="tooltip"/>
+                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (9876543210)" title="Please enter a 10-digit mobile # without country-code"  data-toggle="tooltip"/>
+                <span id="phone-spinner" class="text-secondary phone-icon d-none">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                                <span id="phone-valid" class="text-success phone-icon d-none">
+                                </span>
+                                <span id="phone-invalid" class="text-danger phone-icon d-none">
+                                    <i class="fas fa-times-circle"></i>
+                                </span>
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
         </div>

@@ -343,14 +343,7 @@ namespace risk.control.system.Controllers
                         {
                             notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-lock");
                             await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
-                            if (txn == "agency")
-                            {
-                                return RedirectToAction(nameof(AgencyController.Users), "Agency");
-                            }
-                            else
-                            {
-                                return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
-                            }
+
                         }
                     }
                     else
@@ -380,35 +373,31 @@ namespace risk.control.system.Controllers
                                 notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-check");
                             }
                         }
-
-                        if (txn == "agency")
-                        {
-                            return RedirectToAction(nameof(AgencyController.Users), "Agency");
-                        }
-                        else if (txn == "company")
-                        {
-                            return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = vendorId });
-                        }
-                        else
-                        {
-                            return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
-                        }
                     }
                 }
                 else
                 {
-                    foreach (IdentityError error in result.Errors)
-                        ModelState.AddModelError("", error.Description);
+                    notifyService.Error("OOPS !!!..Error Creating User, Contact Admin");
                 }
-                notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
-                return View(user);
+
             }
             catch (Exception ex)
             {
                 logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.ToString());
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                notifyService.Error("OOPS !!!..Error Creating User, Contact Admin");
+            }
+            if (txn == "agency")
+            {
+                return RedirectToAction(nameof(AgencyController.Users), "Agency");
+            }
+            else if (txn == "company")
+            {
+                return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = vendorId });
+            }
+            else
+            {
+                return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
             }
         }
 

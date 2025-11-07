@@ -615,3 +615,86 @@ function clearPinCodeField() {
         pincodeDropdown.innerHTML = '';
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const phoneInput = document.getElementById("PhoneNumber");
+    const validIcon = document.getElementById("phone-valid");
+    const invalidIcon = document.getElementById("phone-invalid");
+    const spinnerIcon = document.getElementById("phone-spinner");
+
+    let typingTimer;
+    const typingDelay = 800; // milliseconds delay after typing stops
+
+    ["input","blur"].forEach(evt => {
+        phoneInput.addEventListener(evt, () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(validatePhone, evt === "blur" ? 0 : typingDelay);
+        });
+    });
+
+    async function validatePhone() {
+        const phone = phoneInput.value.trim();
+        const countryCode = document.getElementById("Isd").value.trim();
+        if (phone.length == 0) {
+            toggleSubmitButton(false);
+            return;
+        }
+        showSpinner();
+        try {
+            const response = await fetch(`/api/Company/ValidatePhone?phone=${encodeURIComponent(phone)}&countryCode=${countryCode}`);
+            const data = await response.json();
+
+            if (data.valid) {
+                phoneInput.title = "✅ Valid phone number";;
+                validIcon.classList.remove("d-none");
+                invalidIcon.classList.add("d-none");
+                phoneInput.classList.remove("is-invalid");
+                phoneInput.classList.add("is-valid");
+                toggleSubmitButton(true);
+            } else {
+                phoneInput.title = "❌ Invalid phone number";
+                invalidIcon.classList.remove("d-none");
+                validIcon.classList.add("d-none");
+                phoneInput.classList.remove("is-valid");
+                phoneInput.classList.add("is-invalid");
+                toggleSubmitButton(false);
+            }
+        } catch (err) {
+            console.error("Phone validation failed:", err);
+            invalidIcon.classList.remove("d-none");
+            validIcon.classList.add("d-none");
+            phoneInput.classList.remove("is-valid");
+            phoneInput.classList.add("is-invalid");
+            phoneInput.title = "❌ Phone # validation error";
+            toggleSubmitButton(false);
+        } finally {
+            hideSpinner();
+        }
+    }
+    function showSpinner() {
+        spinnerIcon.classList.remove("d-none");
+        validIcon.classList.add("d-none");
+        invalidIcon.classList.add("d-none");
+        phoneInput.classList.remove("is-valid", "is-invalid");
+    }
+    function hideSpinner() {
+        spinnerIcon.classList.add("d-none");
+    }
+
+    validatePhone();
+});
+
+function toggleSubmitButton(isValid) {
+    const form = document.getElementById("create-form") || document.getElementById("edit-form");
+    const submitButton = document.getElementById("create") || document.getElementById("edit");
+    const inputs = form.querySelectorAll(".remarks[required], .remarks[aria-required='true']");
+    let allValid = [...inputs].every(i => i.value.trim() && !i.classList.contains("is-invalid"));
+    const emailAddress = document.getElementById("emailAddress");
+    if (emailAddress) {
+        const emailData = emailAddress.value;
+        if (!emailData) {
+            allValid = false;
+        }
+    }
+    submitButton.disabled = !allValid;
+}

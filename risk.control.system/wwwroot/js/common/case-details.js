@@ -195,7 +195,7 @@
                     self.setContentAppend('<br><b><i class="fa fa-money"></i> Annual Income</b> : ' + response.income);
                     self.setContentAppend('<br><b><i class="fas fa-user-graduate"></i> Education</b> : ' + response.education);
                     self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b> : ' + response.address);
-                    self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b> : ' + response.contactNumber);
+                    self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b> : ' + response.phoneNumber);
                     self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Customer Image</b>:');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.customer + '" />');
                     self.setTitle('Customer details');
@@ -235,7 +235,7 @@
                     self.setContentAppend('<b><i class="fas fa-user-tie"></i> Beneficiary Name</b>: ' + response.beneficiaryName);
                     self.setContentAppend('</header>');
                     self.setContentAppend('<br><b><i class="fas fa-user-tag"></i>  Relation</b> : ' + response.beneficiaryRelation);
-                    self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b>: ' + response.contactNumber);
+                    self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b>: ' + response.phoneNumber);
                     self.setContentAppend('<br><b><i class="fa fa-money"></i> Annual Income</b>: ' + response.income);
                     self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b>: ' + response.address);
                     self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Beneficiary Image</b>:');

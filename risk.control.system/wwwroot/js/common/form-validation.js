@@ -1,23 +1,21 @@
 ﻿
 $(document).ready(function () {
 
-    //$('input[type="text"]').on("cut copy paste", function (e) {
-    //    e.preventDefault();
-    //});
+    $('#PhoneNumber, #PinCodeId').on("cut copy paste", function (e) {
+        e.preventDefault();
+    });
 
     // Call validateInput with selectors and patterns
     validateInput('#emailAddress', /[^a-z]/g); // Allow only alphabet characters (no spaces)
     validateInput('#ContractNumber, #IFSCCode, #Code', /[^a-zA-Z0-9]/g); // Allow only alphanumeric characters (no spaces)
-    validateInput('#CauseOfLoss, #Description, #Addressline, #Comments', /[^a-zA-Z0-9 ]/g); // Allow alphanumeric and spaces
+    validateInput('#CauseOfLoss, #Description, #Addressline, #Comments', /[^a-zA-Z0-9 .,-]/g); // Allow alphanumeric, spaces, comma, dot, dash
     validateInput('#CustomerName, #BeneficiaryName, #StateId, #DistrictId, #FirstName, #LastName, #Name, #Branch, #BankName', /[^a-zA-Z ]/g); // Allow alphabets and spaces
-    validateInput('#ContactNumber, #PhoneNumber, #BankAccountNumber, #ISDCode,#mobile', /[^0-9]/g); // Allow numeric only no spaces
+    validateInput('#PhoneNumber, #BankAccountNumber, #ISDCode,#mobile', /[^0-9]/g); // Allow numeric only no spaces
 
     // Allow only numbers and a single dot
-    // Allow only numbers and a single dot for SumAssuredValue and ContactNumber
     validateInput('#SumAssuredValue, #Price', /[^0-9.]/g, function(value) {
         return value.replace(/(\..*)\./g, '$1'); // Prevent multiple dots
     });
-
    
     // Example usage: Validate file input for allowed types (.jpg, .png, .pdf)
     validateFileInput('#createImageInput', ['jpg', 'png', 'jpeg']); // Adjust the selector and extensions as per your needs
@@ -35,7 +33,6 @@ $(document).ready(function () {
     // Initially check the form when the page loads
     checkFormCompletion('#create-form', true);
     checkFormCompletion('#edit-form');
-
 
     const $emailInput = $("#emailAddress");
 
@@ -62,21 +59,14 @@ $(document).ready(function () {
         checkDomain();
     });
 
-
 });
 function CheckIfEmailValid() {
     var name = $('#emailAddress').val();
     if (name && name.length > 4) {
         $('#check-email').prop('disabled', false);
-        //$("#check-email").css('color', 'white');
-        //$("#check-email").css('background-color', '#004788');
-        //$("#check-email").css('cursor', 'default');
     }
     else {
         $('#check-email').css('disabled', true);
-        //$("#check-email").css('color', '#ccc');
-        //$("#check-email").css('background-color', 'grey');
-        //$("#check-email").css('cursor', 'not-allowed');
     }
 }
 

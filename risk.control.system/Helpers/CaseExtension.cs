@@ -49,8 +49,8 @@ namespace risk.control.system.Helpers
                !string.IsNullOrWhiteSpace(customerDetail.Name) &&
                 customerDetail.DateOfBirth != null &&
                 policyDetail.ContractIssueDate > (customerDetail.DateOfBirth.GetValueOrDefault()) &&
-               !string.IsNullOrWhiteSpace(customerDetail.ContactNumber) &&
-                customerDetail.ContactNumber.Length >= 9 &&
+               !string.IsNullOrWhiteSpace(customerDetail.PhoneNumber) &&
+                customerDetail.PhoneNumber.Length >= 9 &&
                 customerDetail.PinCodeId > 0 &&
                 customerDetail.DistrictId > 0 &&
                 customerDetail.StateId > 0 &&
@@ -64,8 +64,8 @@ namespace risk.control.system.Helpers
                !string.IsNullOrWhiteSpace(customerDetail.Name) &&
                 customerDetail.DateOfBirth != null &&
                 policyDetail.ContractIssueDate > (customerDetail.DateOfBirth.GetValueOrDefault()) &&
-               !string.IsNullOrWhiteSpace(customerDetail.ContactNumber) &&
-                customerDetail.ContactNumber.Length >= 9 &&
+               !string.IsNullOrWhiteSpace(customerDetail.PhoneNumber) &&
+                customerDetail.PhoneNumber.Length >= 9 &&
                 customerDetail.PinCodeId > 0 &&
                 customerDetail.DistrictId > 0 &&
                 customerDetail.StateId > 0 &&
@@ -78,8 +78,8 @@ namespace risk.control.system.Helpers
                !string.IsNullOrWhiteSpace(customerDetail.Name) &&
                 customerDetail.DateOfBirth != null &&
                 policyDetail.ContractIssueDate > (customerDetail.DateOfBirth.GetValueOrDefault()) &&
-               !string.IsNullOrWhiteSpace(customerDetail.ContactNumber) &&
-                customerDetail.ContactNumber.Length >= 9 &&
+               !string.IsNullOrWhiteSpace(customerDetail.PhoneNumber) &&
+                customerDetail.PhoneNumber.Length >= 9 &&
                 customerDetail.SelectedPincodeId > 0 &&
                 customerDetail.SelectedDistrictId > 0 &&
                 customerDetail.SelectedCountryId > 0 &&
@@ -93,8 +93,8 @@ namespace risk.control.system.Helpers
                 !string.IsNullOrWhiteSpace(beneficiaryDetail.Name) &&
                 beneficiaryDetail.DateOfBirth != null &&
                 policyDetail.ContractIssueDate > (beneficiaryDetail.DateOfBirth.GetValueOrDefault()) &&
-                !string.IsNullOrWhiteSpace(beneficiaryDetail.ContactNumber) &&
-                beneficiaryDetail.ContactNumber.Length >= 9 &&
+                !string.IsNullOrWhiteSpace(beneficiaryDetail.PhoneNumber) &&
+                beneficiaryDetail.PhoneNumber.Length >= 9 &&
                 beneficiaryDetail.PinCodeId > 0 &&
                 beneficiaryDetail.DistrictId > 0 &&
                 beneficiaryDetail.StateId > 0 &&
@@ -108,8 +108,8 @@ namespace risk.control.system.Helpers
                 !string.IsNullOrWhiteSpace(beneficiaryDetail.Name) &&
                 beneficiaryDetail.DateOfBirth != null &&
                 policyDetail.ContractIssueDate > (beneficiaryDetail.DateOfBirth.GetValueOrDefault()) &&
-                !string.IsNullOrWhiteSpace(beneficiaryDetail.ContactNumber) &&
-                beneficiaryDetail.ContactNumber.Length >= 9 &&
+                !string.IsNullOrWhiteSpace(beneficiaryDetail.PhoneNumber) &&
+                beneficiaryDetail.PhoneNumber.Length >= 9 &&
                 beneficiaryDetail.PinCodeId > 0 &&
                 beneficiaryDetail.DistrictId > 0 &&
                 beneficiaryDetail.StateId > 0 &&

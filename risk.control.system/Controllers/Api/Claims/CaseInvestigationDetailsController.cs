@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
             if (isAgencyUser)
             {
-                customer.ContactNumber = new string('*', customer.ContactNumber.Length - 4) + customer.ContactNumber.Substring(customer.ContactNumber.Length - 4);
+                customer.PhoneNumber = new string('*', customer.PhoneNumber.Length - 4) + customer.PhoneNumber.Substring(customer.PhoneNumber.Length - 4);
             }
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 {
                     Customer = customer?.ImagePath != null ? customer.ImagePath : "/img/user.png",
                     CustomerName = customer.Name,
-                    ContactNumber = new string('*', customer.ContactNumber.ToString().Length - 4) + customer.ContactNumber.ToString().Substring(customer.ContactNumber.ToString().Length - 4),
+                    PhoneNumber = new string('*', customer.PhoneNumber.ToString().Length - 4) + customer.PhoneNumber.ToString().Substring(customer.PhoneNumber.ToString().Length - 4),
                     Address = customer.Addressline + "  " + customer.District.Name + "  " + customer.State.Name + "  " + customer.Country.Name + "  " + customer.PinCode.Code,
                     Occupation = customer.Occupation.GetEnumDisplayName(),
                     Income = customer.Income.GetEnumDisplayName(),
@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 Income = beneficiary.Income.GetEnumDisplayName(),
                 BeneficiaryRelation = beneficiary.BeneficiaryRelation.Name,
                 Address = beneficiary.Addressline + "  " + beneficiary.District.Name + "  " + beneficiary.State.Name + "  " + beneficiary.Country.Name + "  " + beneficiary.PinCode.Code,
-                ContactNumber = new string('*', beneficiary.ContactNumber.Length - 4) + beneficiary.ContactNumber.Substring(beneficiary.ContactNumber.Length - 4)
+                PhoneNumber = new string('*', beneficiary.PhoneNumber.Length - 4) + beneficiary.PhoneNumber.Substring(beneficiary.PhoneNumber.Length - 4)
             }
             );
         }

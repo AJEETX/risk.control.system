@@ -481,7 +481,7 @@ namespace risk.control.system.Services
                .ThenInclude(c => c.Country)
             .FirstOrDefaultAsync(c => c.Id == claimId);
 
-            var mobile = claim.CustomerDetail.ContactNumber.ToString();
+            var mobile = claim.CustomerDetail.PhoneNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
             var isdCode = claim.CustomerDetail.Country.ISDCode;
             var isInsurerUser = user is ClientCompanyApplicationUser;
@@ -596,7 +596,7 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PolicyDetail)
                .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
 
-            var mobile = beneficiary.ContactNumber.ToString();
+            var mobile = beneficiary.PhoneNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
             var isdCode = beneficiary.Country.ISDCode;
 
