@@ -15,13 +15,16 @@ namespace risk.control.system.Services
 
         // Ideally move these to configuration or secrets manager
         private const string ApiHost = "phonenumbervalidatefree.p.rapidapi.com";
-        private const string ApiKey = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
+        private static string ApiKey = Environment.GetEnvironmentVariable("PHONE_API");
         private const string BaseUrl = $"https://{ApiHost}/ts_PhoneNumberValidateTest.jsp";
 
         public async Task<PhoneNumberInfo?> ValidateAsync(string phoneNumber, string? country = null)
         {
             if (string.IsNullOrWhiteSpace(phoneNumber))
                 throw new ArgumentException("Phone number must not be empty.", nameof(phoneNumber));
+
+            if (string.IsNullOrWhiteSpace(ApiKey))
+                throw new ArgumentException("ApiKey must not be empty.", nameof(ApiKey));
 
             // Sanitize phone number
             var encodedNumber = Uri.EscapeDataString($"+{phoneNumber}");
