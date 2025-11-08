@@ -364,9 +364,11 @@ function populatePincodeDetails(selectedItem) {
     $("#PinCodeId").val(selectedItem.label);
     $("#SelectedPincodeId").val(selectedItem.value);
     $("#StateId").removeClass("invalid");
+    $("#StateId").addClass("valid-border");
     $("#StateId").val(selectedItem.stateName);
     $("#SelectedStateId").val(selectedItem.stateId);
     $("#DistrictId").removeClass("invalid");
+    $("#DistrictId").addClass("valid-border");
     $("#DistrictId").val(selectedItem.districtName);
     $("#SelectedDistrictId").val(selectedItem.districtId);
     $("#PinCodeId").removeClass("invalid");
@@ -581,6 +583,7 @@ function fetchAndSetFieldValue(url, data, fieldSelector, fieldName, callback = n
             hideLoader(`${fieldSelector}-loading`);
             if (response && response[fieldName]) {
                 $(fieldSelector).val(response[fieldName]);
+                $(fieldSelector).addClass('valid-border');
             }
             if (callback) callback(response);
         },

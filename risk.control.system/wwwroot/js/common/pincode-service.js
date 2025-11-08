@@ -223,6 +223,7 @@ function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) 
             if (response && response[responseKey]) {
                 $inputField.val(response[responseKey]);
                 $inputField.removeClass('invalid');
+                $inputField.addClass('valid-border');
                 // Fade in the input field
                 //$inputField.hide().fadeIn(1000); // Adjust duration as needed
                 if (callback) callback();
@@ -331,6 +332,7 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                     console.error("Error fetching autocomplete data:", error);
                     console.log("Response Text:", xhr.responseText); // Log the server error
                     $(fieldSelector).addClass('invalid');
+                    $(fieldSelector).removeClass('valid-border');
                     const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
                     if (hiddenFieldSelector) {
                         $(hiddenFieldSelector).val('');
@@ -349,6 +351,7 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
             if (ui.item.label == 'Error fetching data' || ui.item.label == "No results found") {
                 $(fieldSelector).val('');
                 $(fieldSelector).addClass('invalid');
+                $(fieldSelector).removeClass('valid-border');
                 const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
                 if (hiddenFieldSelector) {
                     $(hiddenFieldSelector).val('');
@@ -358,6 +361,7 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 // Set the input field to the "label" value when navigating with arrow keys
                 $(fieldSelector).val(ui.item.label);
                 $(fieldSelector).removeClass('invalid');
+                $(fieldSelector).addClass('valid-border');
                 const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
                 if (hiddenFieldSelector) {
                     $(hiddenFieldSelector).val(ui.item.id);
@@ -391,6 +395,7 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
 
                     // Remove the error class in case the field was previously marked invalid
                     $(fieldSelector).removeClass('invalid');
+                    $(fieldSelector).addClass('valid-border');
                 }
             }
             return false;

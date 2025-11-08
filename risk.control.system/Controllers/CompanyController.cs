@@ -233,7 +233,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(CompanyProfile));
             }
-            notifyService.Custom($"Company {clientCompany.Email} edited successfully.", 3, "orange", "fas fa-building");
+            notifyService.Custom($"Company <b>{clientCompany.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
             return RedirectToAction(nameof(CompanyController.CompanyProfile), "Company");
         }
 
@@ -351,7 +351,7 @@ namespace risk.control.system.Controllers
                     var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                     roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
                     var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                    notifyService.Custom($"User {user.Email} created successfully.", 3, "green", "fas fa-user-plus");
+                    notifyService.Custom($"User <b>{user.Email}</b> created successfully.", 3, "green", "fas fa-user-plus");
                     string message = "User created . \nEmail : " + user.Email + "\n" + baseUrl;
                     await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, message);
                     return RedirectToAction(nameof(CompanyController.Users), "Company");
@@ -498,7 +498,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                notifyService.Custom($"User {createdUser.Email} edited.", 3, "orange", "fas fa-user-lock");
+                                notifyService.Custom($"User <b>{createdUser.Email}</b> edited successfully.", 3, "orange", "fas fa-user-lock");
                                 string message = "User edited. \nEmail : " + createdUser.Email + "\n" + baseUrl;
                                 await smsService.DoSendSmsAsync(country.Code, country.ISDCode + createdUser.PhoneNumber, message);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
@@ -512,7 +512,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                notifyService.Custom($"User {createdUser.Email} edited.", 3, "orange", "fas fa-user-check");
+                                notifyService.Custom($"User <b>{createdUser.Email}</b> edited successfully.", 3, "orange", "fas fa-user-check");
                                 await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User edited . \nEmail : " + user.Email + "\n" + baseUrl);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
@@ -588,7 +588,7 @@ namespace risk.control.system.Controllers
                 model.Deleted = true;
                 _context.ClientCompanyApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"User {model.Email} deleted", 3, "orange", "fas fa-user-minus");
+                notifyService.Custom($"User <b>{model.Email}</b> deleted successfully", 3, "orange", "fas fa-user-minus");
                 return RedirectToAction(nameof(CompanyController.Users), "Company");
             }
             catch (Exception ex)
@@ -782,7 +782,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            notifyService.Custom($"Agency edited successfully.", 3, "orange", "fas fa-building");
+            notifyService.Custom($"Agency <b>{vendor.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
             return RedirectToAction(nameof(AgencyDetail), "Company", new { id = vendorId });
         }
 
@@ -950,7 +950,7 @@ namespace risk.control.system.Controllers
                         {
                             await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + baseUrl);
                         }
-                        notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+                        notifyService.Custom($"User <b>{user.Email}</b> created successfully.", 3, "green", "fas fa-user-plus");
                     }
                     return RedirectToAction(nameof(AgencyDetail), "Company", new { id = user.VendorId });
                 }
@@ -1078,7 +1078,7 @@ namespace risk.control.system.Controllers
                 model.Deleted = true;
                 _context.VendorApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"User {model.Email} deleted", 3, "orange", "fas fa-user-minus");
+                notifyService.Custom($"User <b>{model.Email}</b> deleted successfully", 3, "orange", "fas fa-user-minus");
                 return RedirectToAction(nameof(AgencyUsers), "Company", new { id = vendorId });
             }
             catch (Exception ex)
@@ -1502,7 +1502,7 @@ namespace risk.control.system.Controllers
                 company.UpdatedBy = currentUserEmail;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
-                notifyService.Custom($"Agency(s) de-panelled.", 3, "orange", "far fa-thumbs-down");
+                notifyService.Custom($"Agency(s) de-panelled. successfully", 3, "orange", "far fa-thumbs-down");
                 return RedirectToAction("EmpanelledVendors", "Vendors");
             }
             catch (Exception ex)

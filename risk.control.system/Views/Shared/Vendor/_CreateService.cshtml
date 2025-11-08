@@ -54,6 +54,7 @@
                     </span>
                 </div>
                 <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Search state ..." asp-for="StateId" required value="" />
+
                 <span asp-validation-for="StateId" class="text-danger"></span>
                 <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                 <div id="state-loading" class="loading-spinner">

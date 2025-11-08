@@ -172,10 +172,10 @@ namespace risk.control.system.Controllers
                 var edited = await agencyService.EditAgency(vendor, vendorDocument, currentUserEmail, portal_base_url);
                 if (!edited)
                 {
-                    notifyService.Custom($"Agency {vendor.Email} not edited.", 3, "red", "fas fa-building");
+                    notifyService.Custom($"Agency <b>{vendor.Email}</b> not edited.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(AgencyController.Profile), "Agency");
                 }
-                notifyService.Custom($"Agency {vendor.Email} edited successfully.", 3, "orange", "fas fa-building");
+                notifyService.Custom($"Agency <b>{vendor.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }
             catch (Exception ex)
@@ -370,7 +370,7 @@ namespace risk.control.system.Controllers
                             else
                             {
                                 await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "User created. \nEmail : " + user.Email + "\n" + portal_base_url);
-                                notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-check");
+                                notifyService.Custom($"User <b> {user.Email}</b> created.", 3, "green", "fas fa-user-check");
                             }
                         }
                     }
@@ -533,7 +533,7 @@ namespace risk.control.system.Controllers
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
                             await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "User edited. \nEmail : " + user.Email + "\n" + portal_base_url);
-                            notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-lock");
+                            notifyService.Custom($"User <b>{user.Email}</b> edited successfully.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
@@ -561,7 +561,7 @@ namespace risk.control.system.Controllers
                             else
                             {
                                 await smsService.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "User edited and unlocked. \nEmail : " + user.Email + "\n" + portal_base_url);
-                                notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-check");
+                                notifyService.Custom($"User <b>{user.Email}</b> edited successfully.", 3, "orange", "fas fa-user-check");
                             }
                         }
                     }
@@ -641,7 +641,7 @@ namespace risk.control.system.Controllers
                 model.Deleted = true;
                 _context.VendorApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"User {model.Email} deleted", 3, "red", "fas fa-user-minus");
+                notifyService.Custom($"User <b> {model.Email}</b> deleted successfully", 3, "red", "fas fa-user-minus");
                 return RedirectToAction(nameof(AgencyController.Users), "Agency");
             }
             catch (Exception ex)

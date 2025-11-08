@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers
                 company.UpdatedBy = currentUserEmail;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
-                notifyService.Custom($"Agency(s) de-panelled.", 3, "orange", "far fa-thumbs-down");
+                notifyService.Custom($"Agency(s) De-panelled successfully.", 3, "orange", "far fa-thumbs-down");
                 return RedirectToAction("EmpanelledVendors", "Vendors");
             }
             catch (Exception ex)
@@ -177,7 +177,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
 
-                notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
+                notifyService.Custom($"Agency(s) empanelled successfully", 3, "green", "fas fa-thumbs-up");
                 return RedirectToAction("AvailableVendors", "Vendors");
             }
             catch (Exception ex)
@@ -437,7 +437,7 @@ namespace risk.control.system.Controllers
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
                             await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
-                            notifyService.Custom($"User created.", 3, "orange", "fas fa-user-lock");
+                            notifyService.Custom($"User <b>{user.Email}<b> created successfully", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
@@ -466,7 +466,7 @@ namespace risk.control.system.Controllers
                         {
                             await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
                         }
-                        notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+                        notifyService.Custom($"User <b>{user.Email}<b> created successfully.", 3, "green", "fas fa-user-plus");
                     }
                     return RedirectToAction(nameof(Users), "Vendors", new { id = user.VendorId });
                 }
@@ -621,7 +621,7 @@ namespace risk.control.system.Controllers
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
                             await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
-                            notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                            notifyService.Custom($"User <b>{user.Email}<b> edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
@@ -648,7 +648,7 @@ namespace risk.control.system.Controllers
                             else
                             {
                                 await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited.\n Email : " + user.Email + "\n" + portal_base_url);
-                                notifyService.Custom($"User edited.", 3, "orange", "fas fa-user-check");
+                                notifyService.Custom($"User <b>{user.Email}<b> edited successfully.", 3, "orange", "fas fa-user-check");
                             }
                         }
                     }
@@ -749,7 +749,7 @@ namespace risk.control.system.Controllers
                 model.Deleted = true;
                 _context.VendorApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"User {model.Email} deleted", 3, "red", "fas fa-user-minus");
+                notifyService.Custom($"User <b>{model.Email}</b> Deleted successfully", 3, "red", "fas fa-user-minus");
                 return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
             }
             catch (Exception ex)
@@ -959,7 +959,7 @@ namespace risk.control.system.Controllers
                     await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
                 }
 
-                notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
+                notifyService.Custom($"Agency <b>{vendor.Email}</b>  created successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(CompanyController.AvailableVendors), "Vendors");
             }
             catch (Exception ex)
@@ -1084,7 +1084,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            notifyService.Custom($"Agency edited successfully.", 3, "orange", "fas fa-building");
+            notifyService.Custom($"Agency <b>{vendor.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
             return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = vendorId });
         }
 
@@ -1175,7 +1175,7 @@ namespace risk.control.system.Controllers
                 vendor.Deleted = true;
                 _context.Vendor.Update(vendor);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"Agency {vendor.Email} deleted successfully.", 3, "red", "fas fa-building");
+                notifyService.Custom($"Agency <b>{vendor.Email}</b> deleted successfully.", 3, "red", "fas fa-building");
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 return RedirectToAction(nameof(AvailableVendors), "Vendors");
             }

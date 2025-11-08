@@ -26,7 +26,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="email"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input readonly asp-for="Email" class="form-control readonly-input" />
+                                <input readonly asp-for="Email" class="form-control readonly-input valid-border" />
                             </div>
                         </div>
                     </div>
@@ -53,9 +53,9 @@
                             <label class="input-group-label"> Activated Date: </label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="ActivatedDate"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input readonly type="date" asp-for="ActivatedDate" class="form-control remarks" required placeholder="Agreement Date">
+                                    <input readonly type="date" id="ActivatedDate" asp-for="ActivatedDate" class="form-control remarks valid-border" required placeholder="Agreement Date">
                                 <span asp-validation-for="ActivatedDate" class="text-danger"></span>
                             </div>
                         </div>

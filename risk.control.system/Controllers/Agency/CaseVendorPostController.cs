@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers.Agency
 
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, baseUrl));
 
-                notifyService.Custom($"Case #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b>#{claim.PolicyDetail.ContractNumber}</b> Tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
             }
@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers.Agency
 
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId, baseUrl));
 
-                notifyService.Custom($"Case #{contract} report submitted", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b> #{contract}</b> report submitted", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(AgentController.Index), "Agent");
             }
@@ -199,11 +199,11 @@ namespace risk.control.system.Controllers.Agency
                     backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, baseUrl));
                     //await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
 
-                    notifyService.Custom($"Case #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case <b> #{success.PolicyDetail.ContractNumber}</b>  Report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }
                 else
                 {
-                    notifyService.Custom($"Case #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case <b> #{success.PolicyDetail.ContractNumber}</b>  Report sent to review", 3, "orange", "far fa-file-powerpoint");
                 }
                 return RedirectToAction(nameof(VendorInvestigationController.ClaimReport), "VendorInvestigation");
             }
@@ -244,7 +244,7 @@ namespace risk.control.system.Controllers.Agency
 
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId, baseUrl));
 
-                notifyService.Custom($"Case #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b> #{policyNumber}</b> Declined successfully", 3, "red", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
             }
@@ -285,7 +285,7 @@ namespace risk.control.system.Controllers.Agency
 
                 var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlFromAgent(userEmail, claimId, agency.VendorId, baseUrl));
 
-                notifyService.Custom($"Case #{policyNumber} withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b> #{policyNumber}</b> Withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
             }

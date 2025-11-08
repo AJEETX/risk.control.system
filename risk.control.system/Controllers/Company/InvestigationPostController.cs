@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 else
                 {
-                    notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
+                    notifyService.Custom($"Policy <b>#{claim.PolicyDetail.ContractNumber}</b> created successfully", 3, "green", "far fa-file-powerpoint");
                 }
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = claim.Id });
             }
@@ -246,7 +246,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Error editing policy");
                     return RedirectToAction(nameof(InvestigationController.EditPolicy), "Investigation", new { id = id });
                 }
-                notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
+                notifyService.Custom($"Policy <b>#{claim.PolicyDetail.ContractNumber}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = claim.Id });
             }
             catch (Exception ex)
@@ -313,7 +313,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
 
                 }
-                notifyService.Custom($"Customer {customerDetail.Name} added successfully", 3, "green", "fas fa-user-plus");
+                notifyService.Custom($"Customer <b>{customerDetail.Name}</b> added successfully", 3, "green", "fas fa-user-plus");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = customerDetail.InvestigationTaskId });
             }
             catch (Exception ex)
@@ -345,18 +345,6 @@ namespace risk.control.system.Controllers.Company
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
-                {
-                    notifyService.Warning("No Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = investigationTaskId });
-                }
-                var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
-                if (file == null)
-                {
-                    notifyService.Warning("Invalid Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.EditCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
-                }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 {
                     var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == customerDetail.SelectedCountryId);
@@ -371,13 +359,24 @@ namespace risk.control.system.Controllers.Company
                         return RedirectToAction(nameof(InvestigationController.EditCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
                     }
                 }
-                var company = await service.EditCustomer(currentUserEmail, customerDetail, file);
+                IFormFile profileFile = null;
+                var files = Request.Form?.Files;
+                if (files != null && files.Count > 0)
+                {
+                    var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
+                    if (file != null)
+                    {
+                        profileFile = file;
+                    }
+                }
+
+                var company = await service.EditCustomer(currentUserEmail, customerDetail, profileFile);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
                     return RedirectToAction(nameof(InvestigationController.EditCustomer), "Investigation", new { id = investigationTaskId });
                 }
-                notifyService.Custom($"Customer {customerDetail.Name} edited successfully", 3, "orange", "fas fa-user-plus");
+                notifyService.Custom($"Customer <b>{customerDetail.Name}</b> edited successfully", 3, "orange", "fas fa-user-plus");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = customerDetail.InvestigationTaskId });
             }
             catch (Exception ex)
@@ -445,7 +444,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Warning("Error creating Beneficiary !!! ");
                     return RedirectToAction(nameof(InvestigationController.CreateBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
                 }
-                notifyService.Custom($"Beneficiary {beneficiary.Name} added successfully", 3, "green", "fas fa-user-tie");
+                notifyService.Custom($"Beneficiary <b>{beneficiary.Name}</b> added successfully", 3, "green", "fas fa-user-tie");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
             }
             catch (Exception ex)
@@ -479,19 +478,6 @@ namespace risk.control.system.Controllers.Company
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
-                {
-                    notifyService.Warning("No Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.EditBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                }
-                var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
-                if (file == null)
-                {
-                    notifyService.Warning("Invalid Image Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.EditBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                }
                 // ✅ PHONE VALIDATION USING RAPIDAPI
                 if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 {
@@ -508,6 +494,18 @@ namespace risk.control.system.Controllers.Company
                         return RedirectToAction(nameof(InvestigationController.EditBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
                     }
                 }
+
+                IFormFile profileFile = null;
+                var files = Request.Form?.Files;
+
+                if (files != null && files.Count > 0)
+                {
+                    var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
+                    if (file != null)
+                    {
+                        profileFile = file;
+                    }
+                }
                 var company = await service.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
                 if (company == null)
                 {
@@ -516,7 +514,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 if (company != null)
                 {
-                    notifyService.Custom($"Beneficiary {beneficiary.Name} edited successfully", 3, "orange", "fas fa-user-tie");
+                    notifyService.Custom($"Beneficiary <b>{beneficiary.Name}</b> edited successfully", 3, "orange", "fas fa-user-tie");
                 }
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
             }
@@ -633,7 +631,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 var jobId = backgroundJobClient.Enqueue(() => processCaseService.BackgroundAutoAllocation(distinctClaims, currentUserEmail, baseUrl));
                 progressService.AddAssignmentJob(jobId, currentUserEmail);
-                notifyService.Custom($"Assignment of {distinctClaims.Count} Case(s) started", 3, "orange", "far fa-file-powerpoint");
+                notifyService.Custom($"Assignment of <b> {distinctClaims.Count}</b> Case(s) started", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CaseActiveController.Active), "CaseActive", new { jobId });
             }
             catch (Exception ex)
@@ -710,7 +708,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(InvestigationController.New), "Investigation");
                 }
-                notifyService.Custom($"Case #:{allocatedCaseNumber} Assigned", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b>#:{allocatedCaseNumber}</b> Assigned", 3, "green", "far fa-file-powerpoint");
             }
             catch (Exception ex)
             {
@@ -745,7 +743,7 @@ namespace risk.control.system.Controllers.Company
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
                 //await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
 
-                notifyService.Custom($"Case #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
 
@@ -786,15 +784,15 @@ namespace risk.control.system.Controllers.Company
 
                 if (reportUpdateStatus == AssessorRemarkType.OK)
                 {
-                    notifyService.Custom($"Case #{contract} Approved", 3, "green", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
                 }
                 else if (reportUpdateStatus == AssessorRemarkType.REJECT)
                 {
-                    notifyService.Custom($"Case #{contract} Rejected", 3, "red", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
                 }
                 else
                 {
-                    notifyService.Custom($"Case #{contract} Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
                 }
 
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
@@ -837,7 +835,7 @@ namespace risk.control.system.Controllers.Company
 
                     backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId, baseUrl));
 
-                    notifyService.Success("Query Sent to Agency");
+                    notifyService.Success("Enquiry Sent to Agency");
                     return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
                 }
                 notifyService.Error("OOPs !!!..Error sending query");

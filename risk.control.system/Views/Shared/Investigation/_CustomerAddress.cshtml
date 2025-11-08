@@ -11,8 +11,7 @@
                 <i class="fa fa-asterisk asterik-style"></i>
             </span>
         </div>
-        <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown"
-               data-placeholder="pincode" placeholder="Type pincode or name" asp-for="PinCodeId"
+        <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode or name" asp-for="PinCodeId"
                required value="" autocomplete="off" />
         <span asp-validation-for="PinCodeId" class="text-danger"></span>
         <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
@@ -51,7 +50,7 @@
                 <img src="@img" class="flag-icon" data-toggle="tooltip" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
             </span>
         </div>
-        <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" data-toggle="tooltip" title="Auto-selected based on Pincode"  placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
+        <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" data-toggle="tooltip" title="Auto-selected based on Pincode" placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
         <span asp-validation-for="StateId" class="text-danger"></span>
         <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
         <div id="state-loading" class="loading-spinner">

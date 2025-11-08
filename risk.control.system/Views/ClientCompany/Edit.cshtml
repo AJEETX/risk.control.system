@@ -51,9 +51,9 @@
                                         <label class="input-group-label"> Name: </label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="FirstName"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Name" class="form-control title-name remarks" required placeholder="Company Name" maxlength="20" />
+                                            <input type="text" id="Name" asp-for="Name" class="form-control title-name remarks" required placeholder="Company Name" maxlength="20" />
                                             <span asp-validation-for="Name" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -84,9 +84,9 @@
                                         <label class="input-group-label"> Branch Name: </label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Branch"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Branch" class="form-control  title-name remarks" required placeholder="Branch Name" maxlength="30" />
+                                            <input type="text" id="Branch" asp-for="Branch" class="form-control  title-name remarks" required placeholder="Branch Name" maxlength="30" />
                                             <span asp-validation-for="Branch" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -95,9 +95,9 @@
                                         <label class="input-group-label"> Bank Name: </label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="BankName"> <i class="fas fa-landmark"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"> <i class="fas fa-landmark"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="BankName" class="form-control title-name remarks" required placeholder="Bank Name" maxlength="20" />
+                                            <input type="text" id="BankName" asp-for="BankName" class="form-control title-name remarks" required placeholder="Bank Name" maxlength="20" />
                                             <span asp-validation-for="BankName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -106,9 +106,9 @@
                                         <label class="input-group-label"> IFSC Code: </label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="IFSCCode"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="20" />
+                                            <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="20" />
                                             <span asp-validation-for="IFSCCode" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -117,9 +117,9 @@
                                         <label class="input-group-label"> Bank Account #: </label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="BankAccountNumber"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20" />
+                                            <input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20" />
                                             <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -129,9 +129,9 @@
                                         <label class="input-group-label"> Agreement Date: </label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="AgreementDate"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input readonly type="text" asp-for="AgreementDate" class="form-control remarks" required placeholder="Agreement Date" />
+                                            <input readonly type="text" id="AgreementDate" asp-for="AgreementDate" class="form-control remarks" required placeholder="Agreement Date" />
                                             <span asp-validation-for="AgreementDate" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -216,9 +216,9 @@
                                         <label class="input-group-label"> Address:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" />
+                                            <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -227,14 +227,15 @@
                                         <div class="input-group mb-3">
                                             @if (Model?.DocumentImage is not null)
                                             {
-                                                <img id="companyImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                                <img id="companyImage" class="form-Image valid-border" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                                <input asp-for="DocumentImage" type="file" class="form-control remarks valid-border" id="documentImageInput" />
                                             }
                                             else
                                             {
-                                                <img id="companyImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                <img id="companyImage" class="form-Image invalid-border" src="@Applicationsettings.NO_IMAGE">
+                                                <input asp-for="DocumentImage" type="file" class="form-control remarks invalid-border" id="documentImageInput" />
                                             }
                                             <i class="fa fa-asterisk asterik-style"></i>
-                                            <input asp-for="DocumentImage" type="file" class="form-control remarks" id="documentImageInput" />
                                         </div>
                                     </div>
                                     @* <div class="form-group">
@@ -314,9 +315,9 @@
                                                 <span class="input-group-label"> Pan API:</span>
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="PanIdfyUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        <span class="input-group-text"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                     </div>
-                                                    <input type="text" asp-for="PanIdfyUrl" class="form-control remarks" placeholder="pan verify url" />
+                                                    <input type="text" id="PanIdfyUrl" asp-for="PanIdfyUrl" class="form-control remarks" placeholder="pan verify url" />
                                                     <span asp-validation-for="PanIdfyUrl" class="text-danger"></span>
                                                 </div>
                                             </div>
@@ -324,9 +325,9 @@
                                                 <span class="input-group-label"> PAN API Key:</span>
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="RapidAPIKey"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        <span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                     </div>
-                                                    <input type="text" asp-for="PanAPIKey" class="form-control remarks" placeholder="pan verify url" />
+                                                    <input type="text" id="PanAPIKey" asp-for="PanAPIKey" class="form-control remarks" placeholder="pan verify url" />
                                                     <span asp-validation-for="PanAPIKey" class="text-danger"></span>
                                                 </div>
                                             </div>
@@ -334,9 +335,9 @@
                                                 <span class="input-group-label"> PAN API Host:</span>
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="RapidAPITaskId"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        <span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                     </div>
-                                                    <input type="text" asp-for="PanAPIHost" class="form-control remarks" placeholder="pan verify url" />
+                                                    <input type="text" id="PanAPIHost" asp-for="PanAPIHost" class="form-control remarks" placeholder="pan verify url" />
                                                     <span asp-validation-for="PanAPIHost" class="text-danger"></span>
                                                 </div>
                                             </div>
@@ -346,11 +347,11 @@
                                                         <span class="input-group-label"> Verify Pan:</span>
                                                         <div class="input-group mb-3">
                                                             <div class="input-group-prepend">
-                                                                <span class="input-group-text" id="pan-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                             </div>
 
                                                             <span class="checkbox">
-                                                                <input asp-for="VerifyPan" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                                <input id="VerifyPan" asp-for="VerifyPan" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                                             </span>
                                                         </div>
                                                     </div>
@@ -361,11 +362,11 @@
                                                         <span class="input-group-label"> Enable Media:</span>
                                                         <div class="input-group mb-3">
                                                             <div class="input-group-prepend">
-                                                                <span class="input-group-text" id="media-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                             </div>
 
                                                             <span class="checkbox">
-                                                                <input asp-for="EnableMedia" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                                <input id="EnableMedia" asp-for="EnableMedia" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                                             </span>
                                                         </div>
                                                     </div>
@@ -381,9 +382,9 @@
                                                 <span class="input-group-label"> Passport API:</span>
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="PassportIdfyUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        <span class="input-group-text"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                     </div>
-                                                    <input type="text" asp-for="PassportApiUrl" class="form-control remarks" placeholder="passport verify url" />
+                                                    <input type="text" id="PassportApiUrl" asp-for="PassportApiUrl" class="form-control remarks" placeholder="passport verify url" />
                                                     <span asp-validation-for="PassportApiUrl" class="text-danger"></span>
                                                 </div>
                                             </div>
@@ -391,9 +392,9 @@
                                                 <span class="input-group-label"> Passport API Key:</span>
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="PassportAPIKey"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        <span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                     </div>
-                                                    <input type="text" asp-for="PassportApiKey" class="form-control remarks" placeholder="pan verify url" />
+                                                    <input type="text" id="PassportAPIKey" asp-for="PassportApiKey" class="form-control remarks" placeholder="pan verify url" />
                                                     <span asp-validation-for="PassportApiKey" class="text-danger"></span>
                                                 </div>
                                             </div>
@@ -414,11 +415,11 @@
                                                         <span class="input-group-label"> Verify Passport:</span>
                                                         <div class="input-group mb-3">
                                                             <div class="input-group-prepend">
-                                                                <span class="input-group-text" id="passport-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                             </div>
 
                                                             <span class="checkbox">
-                                                                <input asp-for="VerifyPassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                                <input id="VerifyPassport" asp-for="VerifyPassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                                             </span>
                                                         </div>
                                                     </div>
@@ -428,19 +429,17 @@
                                                         <span class="input-group-label"> Enable Passport:</span>
                                                         <div class="input-group mb-3">
                                                             <div class="input-group-prepend">
-                                                                <span class="input-group-text" id="enable-passport"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                             </div>
 
                                                             <span class="checkbox">
-                                                                <input asp-for="EnablePassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                                <input id="EnablePassport" asp-for="EnablePassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -450,11 +449,11 @@
                                         <span class="input-group-label">Auto Allocation:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="auto-allocation"><i class="fas fa-file-export"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-file-export"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
 
                                             <span class="checkbox">
-                                                <input asp-for="AutoAllocation" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                <input id="AutoAllocation" asp-for="AutoAllocation" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                             </span>
                                         </div>
                                     </div>
@@ -462,28 +461,26 @@
                                         <span class="input-group-label"> Profile edit:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="CanChangePassword"><i class="fas fa-portrait"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-portrait"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
 
                                             <span class="checkbox">
-                                                <input asp-for="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                <input id="CanChangePassword" asp-for="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
 
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-
-                                   
                                     <div class="form-group">
                                         <span class="input-group-label">BulkUpload:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="bulk-upload"><i class="fa fa-upload"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fa fa-upload"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
 
                                             <span class="checkbox">
-                                                <input asp-for="BulkUpload" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                <input id="BulkUpload" asp-for="BulkUpload" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                             </span>
                                         </div>
                                     </div>
@@ -541,11 +538,11 @@
                                         <span class="input-group-label"> Enable AI:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="ai-enabled"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
 
                                             <span class="checkbox">
-                                                <input asp-for="AiEnabled" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                <input id="AiEnabled" asp-for="AiEnabled" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                             </span>
                                         </div>
                                     </div>
@@ -557,9 +554,9 @@
                                         <span class="input-group-label"> Creator SLA (day(s):</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="CreatorSla"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="CreatorSla" class="form-control remarks" placeholder="Creator sla (day(s)" />
+                                            <input type="text" id="CreatorSla" asp-for="CreatorSla" class="form-control remarks" placeholder="Creator sla (day(s)" />
                                             <span asp-validation-for="CreatorSla" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -571,9 +568,9 @@
                                         <span class="input-group-label"> Assessor SLA (day(s):</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="AssessorSla"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="AssessorSla" class="form-control remarks" placeholder="Assessor Sla (day(s)" />
+                                            <input type="text" id="AssessorSla" asp-for="AssessorSla" class="form-control remarks" placeholder="Assessor Sla (day(s)" />
                                             <span asp-validation-for="AssessorSla" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -584,9 +581,9 @@
                                         <span class="input-group-label"> Supervisor SLA (day(s)):</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="SupervisorSla"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="SupervisorSla" class="form-control remarks" placeholder="Supervisor Sla (day(s)" />
+                                            <input type="text" id="SupervisorSla" asp-for="SupervisorSla" class="form-control remarks" placeholder="Supervisor Sla (day(s)" />
                                             <span asp-validation-for="SupervisorSla" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -596,9 +593,9 @@
                                         <span class="input-group-label"> Agent SLA (day(s):</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="AgentSla"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="AgentSla" class="form-control remarks" placeholder="Agent Sla (day(s)" />
+                                            <input type="text" id="AgentSla" asp-for="AgentSla" class="form-control remarks" placeholder="Agent Sla (day(s)" />
                                             <span asp-validation-for="AgentSla" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -611,11 +608,11 @@
                                         <span class="input-group-label"> Enable Agent Answer update(Supervisor):</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="UpdateAgentAnswer"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
 
                                             <span class="checkbox">
-                                                <input asp-for="UpdateAgentAnswer" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                <input id="UpdateAgentAnswer" asp-for="UpdateAgentAnswer" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                             </span>
                                         </div>
                                     </div>
@@ -625,11 +622,11 @@
                                         <span class="input-group-label"> Set Prefilled data:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="HasSampleData"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
 
                                             <span class="checkbox">
-                                                <input asp-for="HasSampleData" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                <input id="HasSampleData" asp-for="HasSampleData" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                             </span>
                                         </div>
                                     </div>

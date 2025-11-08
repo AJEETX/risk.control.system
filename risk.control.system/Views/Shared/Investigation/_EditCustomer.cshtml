@@ -173,19 +173,17 @@
                         {
                             <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.ImagePath" data-toggle="tooltip" title="Upload Customer Photo" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Upload Customer Photo" />
+                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Upload Customer Photo" />
                         }
                         else
                         {
                             <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required />
+                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input  invalid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required />
                         }
                         <span asp-validation-for="ImagePath" class="text-danger"></span>
-
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -201,7 +199,6 @@
             <button id="edit" type="submit" class="btn btn-warning">
                 <i class="fas fa-user-plus"></i> Save  Customer
             </button>
-
         </div>
     </div>
 </div>

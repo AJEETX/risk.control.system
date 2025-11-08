@@ -17,7 +17,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="email"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input readonly asp-for="Email" class="form-control readonly-input" />
+                <input readonly asp-for="Email" class="form-control readonly-input valid-border" />
             </div>
         </div>
         <div class="form-group">
@@ -26,14 +26,18 @@
                 @if (Model?.ProfilePicture is not null)
                 {
                     <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="Profile Image" />
+                    <i class="fa fa-asterisk asterik-style"></i>
+                    <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required />
+                    <span asp-validation-for="ProfilePicture" class="text-danger"></span>
                 }
                 else
                 {
                     <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
+                    <i class="fa fa-asterisk asterik-style"></i>
+                    <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input invalid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required />
+                    <span asp-validation-for="ProfilePicture" class="text-danger"></span>
                 }
-                <i class="fa fa-asterisk asterik-style"></i>
-                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required/>
-                <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                
             </div>
         </div>
         <div class="form-group">

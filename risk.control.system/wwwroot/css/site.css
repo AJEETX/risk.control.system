@@ -734,6 +734,20 @@ input.remarks[required].input-validation-error {
 select.remarks[required]:valid {
     border-right: 3px solid green;
 }
+
+.valid-border {
+    border-right: 3px solid green !important;
+}
+
+.invalid-border {
+    border-right: 3px solid red !important;
+}
+
+/* optional: apply only on the right side */
+.valid-border-right {
+    border-right: 3px solid green !important;
+}
+
 ::-webkit-input-placeholder {
     text-transform: none;
 }

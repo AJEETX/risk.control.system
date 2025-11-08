@@ -114,19 +114,18 @@
                         {
                             <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.ImagePath" data-toggle="tooltip" title="Upload Beneficiary Photo" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Upload Beneficiary Photo" />
+                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Upload Beneficiary Photo" />
                         }
                         else
                         {
                             <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Beneficiary Photo" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Beneficiary Photo" required />
+                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input invalid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Beneficiary Photo" required />
                         }
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
     <div class="card-footer">
         <div class="text-right">
