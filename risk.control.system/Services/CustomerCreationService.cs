@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -17,18 +18,24 @@ namespace risk.control.system.Services
     public class CustomerCreationService : ICustomerCreationService
     {
         private readonly ApplicationDbContext context;
+        private readonly IFeatureManager featureManager;
+        private readonly IPhoneService phoneService;
         private readonly ICustomApiCLient customApiCLient;
         private readonly ICaseImageCreationService caseImageCreationService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger<CustomerCreationService> logger;
 
         public CustomerCreationService(ApplicationDbContext context,
+            IFeatureManager featureManager,
+            IPhoneService phoneService,
             ICustomApiCLient customApiCLient,
             ICaseImageCreationService caseImageCreationService,
             IWebHostEnvironment webHostEnvironment,
             ILogger<CustomerCreationService> logger)
         {
             this.context = context;
+            this.featureManager = featureManager;
+            this.phoneService = phoneService;
             this.customApiCLient = customApiCLient;
             this.caseImageCreationService = caseImageCreationService;
             this.webHostEnvironment = webHostEnvironment;
@@ -53,14 +60,14 @@ namespace risk.control.system.Services
                     errorCustomer.Add($"[{nameof(uploadCase.CustomerName)}=null/empty]");
                 }
 
-                if (!string.IsNullOrWhiteSpace(uploadCase.CustomerType) && Enum.TryParse(typeof(CustomerType), uploadCase.CustomerType, out var customerTypeEnum))
-                {
-                    uploadCase.CustomerType = customerTypeEnum.ToString();
-                }
-                else
-                {
-                    uploadCase.CustomerType = CustomerType.UNKNOWN.ToString();
-                }
+                //if (!string.IsNullOrWhiteSpace(uploadCase.CustomerType) && Enum.TryParse(typeof(CustomerType), uploadCase.CustomerType, out var customerTypeEnum))
+                //{
+                //    uploadCase.CustomerType = customerTypeEnum.ToString();
+                //}
+                //else
+                //{
+                //    uploadCase.CustomerType = CustomerType.UNKNOWN.ToString();
+                //}
 
                 if (!string.IsNullOrWhiteSpace(uploadCase.Gender) && Enum.TryParse<Gender>(uploadCase.Gender, true, out var gender))
                 {
@@ -107,6 +114,21 @@ namespace risk.control.system.Services
                         errorCustomer.Add($"[Customer Pincode=`{uploadCase.CustomerPincode}` And/Or District=`{uploadCase.CustomerDistrictName}` not found]");
                     }
                 }
+                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                {
+                    var phoneInfo = await phoneService.ValidateAsync(pinCode.Country.ISDCode.ToString() + uploadCase.CustomerContact);
+                    if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != pinCode.Country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLower() != pinCode.Country.Code.ToLower() ||
+                        phoneInfo.NumberType.ToLower() != "mobile")
+                    {
+                        errors.Add(new UploadError
+                        {
+                            UploadData = $"[Customer Phone number {uploadCase.CustomerContact} Invalid]",
+                            Error = $"[Phone number {uploadCase.CustomerContact} Invalid]"
+                        });
+                        errorCustomer.Add($"[[Customer Phone number {uploadCase.CustomerContact} Invalid]");
+                    }
+                }
+
                 var extension = Path.GetExtension(CUSTOMER_IMAGE).ToLower();
                 var fileName = Guid.NewGuid().ToString() + extension;
                 var imagesWithData = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), CUSTOMER_IMAGE);
@@ -199,7 +221,7 @@ namespace risk.control.system.Services
                 var customerDetail = new CustomerDetail
                 {
                     Name = uploadCase.CustomerName,
-                    CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), uploadCase.CustomerType),
+                    //CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), uploadCase.CustomerType),
                     Gender = (Gender)Enum.Parse(typeof(Gender), uploadCase.Gender),
                     DateOfBirth = DateTime.ParseExact(uploadCase.CustomerDob, "dd-MM-yyyy", CultureInfo.InvariantCulture),
                     PhoneNumber = (uploadCase.CustomerContact),

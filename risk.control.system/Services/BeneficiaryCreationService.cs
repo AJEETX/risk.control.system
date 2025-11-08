@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -19,17 +20,23 @@ namespace risk.control.system.Services
 
         private readonly ApplicationDbContext context;
         private readonly ICustomApiCLient customApiCLient;
+        private readonly IFeatureManager featureManager;
+        private readonly IPhoneService phoneService;
         private readonly ICaseImageCreationService caseImageCreationService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger<BeneficiaryCreationService> logger;
 
         public BeneficiaryCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient,
+            IFeatureManager featureManager,
+            IPhoneService phoneService,
             ICaseImageCreationService caseImageCreationService,
             IWebHostEnvironment webHostEnvironment,
             ILogger<BeneficiaryCreationService> logger)
         {
             this.context = context;
             this.customApiCLient = customApiCLient;
+            this.featureManager = featureManager;
+            this.phoneService = phoneService;
             this.caseImageCreationService = caseImageCreationService;
             this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
@@ -87,6 +94,20 @@ namespace risk.control.system.Services
                     }
                 }
 
+                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                {
+                    var phoneInfo = await phoneService.ValidateAsync(pinCode.Country.ISDCode.ToString() + uploadCase.CustomerContact);
+                    if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != pinCode.Country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLower() != pinCode.Country.Code.ToLower() ||
+                        phoneInfo.NumberType.ToLower() != "mobile")
+                    {
+                        errors.Add(new UploadError
+                        {
+                            UploadData = $"[Beneficiary Phone number {uploadCase.BeneficiaryContact} Invalid]",
+                            Error = $"[Phone number {uploadCase.BeneficiaryContact} Invalid]"
+                        });
+                        errorBeneficiary.Add($"[[Beneficiary Phone number {uploadCase.BeneficiaryContact} Invalid]");
+                    }
+                }
                 var relation = string.IsNullOrWhiteSpace(uploadCase.Relation)
                     ? context.BeneficiaryRelation.FirstOrDefault()  // Get first record from the table
                     : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower()) // Get matching record

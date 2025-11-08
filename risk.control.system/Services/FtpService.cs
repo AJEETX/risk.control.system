@@ -289,7 +289,7 @@ namespace risk.control.system.Services
 
             if (pipeCount < 27)
             {
-                errors.Add("The file is not pipe-delimited.");
+                errors.Add("The file is has less than expected columns.");
                 return (validRecords, errors);
             }
             using var reader = new StreamReader(csvEntry.Open());
