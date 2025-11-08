@@ -74,9 +74,9 @@
                             <label class="input-group-label"> First Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="FirstName" class="form-control title-name remarks" value="" required placeholder="First Name" maxlength="20" autocomplete=off>
+                                <input type="text" id="FirstName" asp-for="FirstName" class="form-control title-name remarks" value="" required placeholder="First Name" minlength="3" maxlength="20" autocomplete=off>
                                 <span asp-validation-for="FirstName" class="text-danger"></span>
                             </div>
                         </div>
@@ -85,9 +85,9 @@
                             <label class="input-group-label"> Last Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="LastName" class="form-control title-name remarks" value="" required placeholder="Last Name" maxlength="20" autocomplete="off">
+                                <input type="text" id="LastName" asp-for="LastName" class="form-control title-name remarks" value="" required placeholder="Last Name" maxlength="20" autocomplete="off">
                                 <span asp-validation-for="LastName" class="text-danger"></span>
                             </div>
                         </div>
@@ -122,7 +122,6 @@
                                 <span id="phone-valid" class="text-success phone-icon d-none">
                                 </span>
                                 <span id="phone-invalid" class="text-danger phone-icon d-none">
-                                    <i class="fas fa-times-circle"></i>
                                 </span>
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
@@ -147,9 +146,9 @@
                             <label class="input-group-label"> Address:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" autocomplete="off" />
+                                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" autocomplete="off" />
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>
@@ -157,9 +156,9 @@
                             <label class="input-group-label"> Note:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Comments"> <i class="fa fa-asterisk asterik-style-none"></i><i class="fas fa-comment"></i> </span>
+                                    <span class="input-group-text"> <i class="fa fa-asterisk asterik-style-none"></i><i class="fas fa-comment"></i> </span>
                                 </div>
-                                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Notes (optional)" maxlength="70" autocomplete="off" />
+                                <input type="text" id="Comments" asp-for="Comments" class="form-control remarks" placeholder="Notes (optional)" maxlength="70" autocomplete="off" />
                             </div>
                         </div>
 

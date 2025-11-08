@@ -212,7 +212,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" />
+                                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" required/>
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>
@@ -228,7 +228,7 @@
                                     <img id="companyImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                 }
                                 <i class="fa fa-asterisk asterik-style"></i>
-                                <input asp-for="DocumentImage" type="file" class="form-control remarks" id="documentImageInput" />
+                                <input asp-for="DocumentImage" type="file" class="form-control remarks" id="documentImageInput" required />
                             </div>
                         </div>
 @* 

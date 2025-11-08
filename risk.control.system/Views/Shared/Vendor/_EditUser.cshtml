@@ -32,7 +32,7 @@
                     <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
                 }
                 <i class="fa fa-asterisk asterik-style"></i>
-                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" />
+                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required/>
                 <span asp-validation-for="ProfilePicture" class="text-danger"></span>
             </div>
         </div>
@@ -40,9 +40,9 @@
             <label class="input-group-label"> First Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20" />
+                <input type="text" id="FirstName" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
         </div>
@@ -51,9 +51,9 @@
             <label class="input-group-label"> Last Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
+                <input type="text" id="LastName" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
         </div>
@@ -126,9 +126,9 @@
             <label class="input-group-label"> Address:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" />
+                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" />
                 <span asp-validation-for="Addressline" class="text-danger"></span>
             </div>
         </div>
@@ -136,9 +136,9 @@
             <label class="input-group-label"> Note:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
+                    <span class="input-group-text"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
                 </div>
-                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="70" />
+                <input type="text" id="Comments" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="70" />
             </div>
         </div>
         @if (Model.UserRole == AgencyRole.AGENCY_ADMIN)

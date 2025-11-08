@@ -719,7 +719,21 @@ input[type="radio"]:checked {
 input.title-name {
     text-transform: capitalize;
 }
-
+input.remarks[required]:valid {
+    border-right: 3px solid green;
+}
+input.remarks[required].valid {
+    border-right: 3px solid green;
+}
+input.remarks[required].is-invalid {
+    border-right: 3px solid red !important;
+}
+input.remarks[required].input-validation-error {
+    border-right: 3px solid red !important;
+}
+select.remarks[required]:valid {
+    border-right: 3px solid green;
+}
 ::-webkit-input-placeholder {
     text-transform: none;
 }
@@ -2158,8 +2172,7 @@ select#PinCodeId {
 
 /* Optional: You can add some styling to the file input for better appearance */
 .document-image-input {
-    background-color: #f8f9fa;
-    border-radius: 5px;
+    border-radius: 0 !important;
 }
 /* Blurred Background Overlay */
 .blur-overlay {

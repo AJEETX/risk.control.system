@@ -15,9 +15,9 @@
             <label class="input-group-label"> First Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" value="" maxlength="20" />
+                <input type="text" id="FirstName" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" value="" maxlength="20" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
         </div>
@@ -26,9 +26,9 @@
             <label class="input-group-label"> Last Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" value="" maxlength="20" />
+                <input type="text" id="LastName"asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" value="" maxlength="20" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
         </div>
@@ -123,9 +123,9 @@
             <label class="input-group-label"> Address:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="Addressline"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." value="" maxlength="70" required />
+                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." value="" maxlength="70" required />
                 <span asp-validation-for="Addressline" class="text-danger"></span>
             </div>
         </div>
