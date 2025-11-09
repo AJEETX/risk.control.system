@@ -549,37 +549,5 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-
-        [HttpGet]
-        public async Task<IActionResult> ValidatePhone(string phone, int countryCode)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-                return Json(new { valid = false, message = "Phone number is required." });
-            if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-            {
-                var country = await context.Country.FirstOrDefaultAsync(c => c.ISDCode == countryCode);
-
-                var phoneInfo = await phoneService.ValidateAsync(country.ISDCode.ToString() + phone);
-
-                if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() || phoneInfo.NumberType.ToLower() != "mobile")
-                {
-                    return Json(new
-                    {
-                        valid = false,
-                        message = "Invalid phone number."
-                    });
-                }
-                return Json(new
-                {
-                    valid = true,
-                    message = "Valid phone number"
-                });
-            }
-            return Json(new
-            {
-                valid = true,
-                message = "Valid phone number"
-            });
-        }
     }
 }

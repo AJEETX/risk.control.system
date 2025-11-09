@@ -1,8 +1,8 @@
-﻿//var apiKey = 'AIzaSyCYPyGotbPJAcE9Ap_ATSKkKOrXCQC4ops';
-$(function () {
-    $.get('/api/Agency/GetCompanyAgencyUser', function (data) {
+﻿$(function () {
+    const countryCode = $('#CountryCode').val();
+    const isdCode = $('#Isd').val();
+    displayBankCodeLabels(countryCode, isdCode);
 
-    });
     $('#edit-company.btn.btn-warning').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -103,7 +103,6 @@ $(function () {
         }
     });
 
-
     $('.btn.btn-danger').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -129,7 +128,6 @@ $(function () {
             }
         }
     });
-
 
     $("#agency-rating").each(function () {
         var av = $(this).find("span.avr").text();
@@ -190,5 +188,18 @@ function showdetails() {
         }
     }
 }
-//GetLoc();
+
+function displayBankCodeLabels(countryCode, isdCode) {
+    countryCode = (countryCode || '').toUpperCase().trim();
+    isdCode = (isdCode || '').trim();
+
+    const isIndia = (countryCode === 'IN' || isdCode === '91');
+    const isAustralia = (countryCode === 'AU' || isdCode === '61');
+
+    if (isAustralia) {
+        $('.info-box-text:contains("IFSC Code")').text('BSB Code');
+    } else if (!isIndia) {
+        $('.info-box-text:contains("IFSC Code")').text('Bank Code');
+    }
+}
 

@@ -1,4 +1,128 @@
 ﻿$(document).ready(function () {
+
+    // reusable validator function
+    function validateBankCode() {
+        var countryCode = ($('#CountryCode').val() || '').toUpperCase().trim();
+        var isdCode = ($('#Isd').val() || '').trim();
+        const $ifscLabel = $('label[for="IFSCCode"], .input-group-label:contains("IFSC Code")');
+        var $ifscInput = $('#IFSCCode');
+        if (!$ifscInput.length) return;
+
+        var code = ($ifscInput.val() || '').toUpperCase().trim();
+        $ifscInput.val(code);
+
+        // Reset UI
+        $('#ifsc-valid-icon').hide();
+        $('#ifsc-spinner').addClass('d-none');
+        $('#BankName').val('').removeClass('invalid-border valid-border').removeAttr('title');
+        $ifscInput.removeClass('is-valid is-invalid').removeAttr('title');
+
+        // Detect India vs Australia
+        var isIndia = (countryCode === 'IN' || isdCode === '91');
+        var isAustralia = (countryCode === 'AU' || isdCode === '61');
+
+        if (isIndia) {
+            // ------------------------ 🇮🇳 IFSC CHECK ------------------------
+            var ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+
+            if (code.length === 11 && ifscRegex.test(code)) {
+                $('#ifsc-spinner').removeClass('d-none');
+
+                $.ajax({
+                    url: 'https://ifsc.razorpay.com/' + encodeURIComponent(code),
+                    method: 'GET',
+                    success: function (data) {
+                        $('#ifsc-spinner').addClass('d-none');
+
+                        if (data && data.BANK) {
+                            $('#BankName')
+                                .val(data.BANK)
+                                .addClass('valid-border')
+                                .removeClass('invalid-border')
+                                .attr('title', '🏦 ' + data.BANK + ', ' + data.BRANCH + ', ' + data.ADDRESS);
+
+                            $('#ifsc-valid-icon').show();
+                            $ifscInput.addClass('is-valid').attr('title', '✅ Valid IFSC (' + data.BANK + ')');
+                        } else {
+                            setInvalid('❌ Invalid IFSC Code');
+                        }
+                    },
+                    error: function () {
+                        setInvalid('❌ Unable to verify IFSC (API error)');
+                    }
+                });
+            } else {
+                setInvalid('❌ IFSC must be 11 characters and match format (e.g., SBIN0000001)');
+            }
+        }
+        else if (isAustralia) {
+            $ifscLabel.text('BSB Code:');
+            $ifscInput
+                .attr('placeholder', 'Enter 6-digit BSB code')
+                .attr('maxlength', '6')
+                .attr('title', 'Enter valid BSB code');
+            // ------------------------ 🇦🇺 BSB CHECK ------------------------
+            var bsbRegex = /^\d{6}$/;
+            if (bsbRegex.test(code)) {
+                $('#ifsc-spinner').removeClass('d-none');
+
+                $.ajax({
+                    url: '/api/company/bsb?code=' + encodeURIComponent(code),
+                    method: 'GET',
+                    success: function (data) {
+                        $('#ifsc-spinner').addClass('d-none');
+
+                        if (data && data.bank) {
+                            $('#BankName')
+                                .val(data.bank)
+                                .addClass('valid-border')
+                                .removeClass('invalid-border')
+                                .attr('title', '🏦 ' + data.bank + ', ' + data.branch + ', ' + data.address);
+
+                            $('#ifsc-valid-icon').show();
+                            $ifscInput.addClass('is-valid').attr('title', '✅ Valid BSB (' + data.bank + ')');
+                        } else {
+                            setInvalid('❌ Invalid BSB Code');
+                        }
+                    },
+                    error: function (er) {
+                        console.log(er);
+                        setInvalid('❌ Unable to verify BSB (API error)');
+                    }
+                });
+            } else {
+                setInvalid('❌ BSB must be exactly 6 digits');
+            }
+        }
+        else {
+            // ------------------------ 🌍 Other countries ------------------------
+            setInvalid('❌ Bank code validation available only for India (IFSC) and Australia (BSB)');
+        }
+
+        function setInvalid(msg) {
+            $('#ifsc-spinner').addClass('d-none');
+            $ifscInput.addClass('is-invalid').attr('title', msg);
+            $('#BankName')
+                .val('')
+                .addClass('invalid-border')
+                .removeClass('valid-border')
+                .attr('title', msg);
+        }
+    }
+
+    // Attach blur handler
+    $(document).on('blur', '#IFSCCode', function () {
+        validateBankCode();
+    });
+
+    // Run once on page load if editing
+    $(window).on('load', function () {
+        var existing = ($('#IFSCCode').val() || '').trim();
+        if (existing.length > 0) {
+            validateBankCode();
+        }
+    });
+
     const fields = ['#CountryId', '#StateId', '#DistrictId', '#PinCodeId'];
     // Disable PinCodeId by default
     $("#StateId").prop("disabled", true).val("");
@@ -12,7 +136,7 @@
         });
     });
 
-    $('input.auto-dropdown').on('focus', function () {
+    $('input.auto-dropdown, #IFSCCode').on('focus', function () {
         $(this).select();
     });
 
@@ -648,18 +772,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         showSpinner();
         try {
-            const response = await fetch(`/api/Company/ValidatePhone?phone=${encodeURIComponent(phone)}&countryCode=${countryCode}`);
+            const response = await fetch(`/api/Company/IsValidMobileNumber?phone=${encodeURIComponent(phone)}&countryCode=${countryCode}`);
             const data = await response.json();
 
             if (data.valid) {
-                phoneInput.title = "✅ Valid phone number";;
+                phoneInput.title = "✅ Valid mobile number";;
                 validIcon.classList.remove("d-none");
                 invalidIcon.classList.add("d-none");
                 phoneInput.classList.remove("is-invalid");
                 phoneInput.classList.add("is-valid");
                 toggleSubmitButton(true);
             } else {
-                phoneInput.title = "❌ Invalid phone number";
+                phoneInput.title = "❌ Invalid mobile number";
                 invalidIcon.classList.remove("d-none");
                 validIcon.classList.add("d-none");
                 phoneInput.classList.remove("is-valid");
@@ -667,12 +791,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 toggleSubmitButton(false);
             }
         } catch (err) {
-            console.error("Phone validation failed:", err);
+            console.error("Mobile validation failed:", err);
             invalidIcon.classList.remove("d-none");
             validIcon.classList.add("d-none");
             phoneInput.classList.remove("is-valid");
             phoneInput.classList.add("is-invalid");
-            phoneInput.title = "❌ Phone # validation error";
+            phoneInput.title = "❌ Mobile # validation error";
             toggleSubmitButton(false);
         } finally {
             hideSpinner();

@@ -3153,6 +3153,27 @@ img.mobile-capture-map {
     right: 10px;
     top: 8px;
 }
-#PhoneNumber {
+#PhoneNumber, #IFSCCode {
     cursor: pointer; /* Pointer cursor for better UX */
+}
+/* Hide tick by default */
+.ifsc-valid-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: green;
+    display: none;
+}
+
+/* Validation styles */
+.is-valid {
+    border-color: #28a745 !important;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.text-orange {
+    color: red !important;
 }

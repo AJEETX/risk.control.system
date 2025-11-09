@@ -1,6 +1,16 @@
 ﻿$(document).ready(function () {
 
-    
+    const countryCode = $('#CountryCode').val();
+    const isdCode = $('#Isd').val();
+
+    const isIndia = (countryCode === 'IN' || isdCode === '91');
+    const isAustralia = (countryCode === 'AU' || isdCode === '61');
+
+    if (isAustralia) {
+        $('.info-box-text:contains("IFSC Code")').text('BSB Code');
+    } else if (!isIndia) {
+        $('.info-box-text:contains("IFSC Code")').text('Bank Code');
+    }
 
     // Initialize existing rating display
     refillRating($('#agency-rating'));

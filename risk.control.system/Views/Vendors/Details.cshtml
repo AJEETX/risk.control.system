@@ -7,6 +7,8 @@
 <section class="content">
     <input type="hidden" id="UserCount" value="@Model.SelectedCountryId" />
     <input type="hidden" id="ServiceCount" value="@Model.VendorInvestigationServiceTypes.Count" />
+    <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+    <input type="hidden" id="CountryCode" value="@Model?.Country.Code" />
     <div class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title"><i class="fas fa-building"></i>  Agency Profile</h3>
@@ -70,14 +72,14 @@
                         <div class="col-md-12">
                             @if (Model.SelectedByCompany)
                             {
-                                <a id="back" asp-controller="Vendors" asp-action="Agencies" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                <a id="back" asp-controller="Vendors" asp-action="Agencies" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                             }
                             else
                             {
-                                <a id="back" asp-controller="Vendors" asp-action="AvailableVendors" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                <a id="back" asp-controller="Vendors" asp-action="AvailableVendors" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                             }
-                            <a asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-success" data-toggle="tooltip" title="User count = @Model.SelectedCountryId"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
-                            <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-danger" data-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
+                            <a asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success" data-toggle="tooltip" title="User count = @Model.SelectedCountryId"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
+                            <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
 
                         </div>
                     </div>

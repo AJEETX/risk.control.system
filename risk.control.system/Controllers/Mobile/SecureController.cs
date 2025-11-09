@@ -241,13 +241,20 @@ namespace risk.control.system.Controllers.Mobile
         }
 
         [AllowAnonymous]
-        [HttpGet("validate-phone-number")]
-        public async Task<IActionResult> ValidatePhoneNumber(string phoneNumber = "+61432854196", string country = "AU")
+        [HttpGet("validate-mobile-number")]
+        public async Task<IActionResult> ValidatePhoneNumber(string phoneNumber = "+61432854196")
         {
-            var result = await phoneService.ValidateAsync(phoneNumber, country);
+            var result = await phoneService.ValidateAsync(phoneNumber);
             return Ok(result);
         }
 
+        [AllowAnonymous]
+        [HttpGet("is-mobile-number")]
+        public IActionResult IsValidMobileNumber(string phoneNumber = "+61432854196", string country = "61")
+        {
+            var result = phoneService.IsValidMobileNumber(phoneNumber, country);
+            return Ok(result);
+        }
         //[AllowAnonymous]
         //[HttpGet("pdf")]
         //public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")

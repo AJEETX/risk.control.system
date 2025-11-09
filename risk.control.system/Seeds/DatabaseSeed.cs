@@ -43,6 +43,8 @@ namespace risk.control.system.Seeds
 
             //PermissionModuleSeed.SeedClaim(context);
 
+            await BsbSeed.LoadBsbData(context);
+
             await ClientCompanySetupSeed.Seed(context);
 
             await StartCountryWiseSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor);

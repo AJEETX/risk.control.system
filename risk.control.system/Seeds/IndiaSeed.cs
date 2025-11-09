@@ -18,18 +18,38 @@ namespace risk.control.system.Seeds
             var india = countries.FirstOrDefault(c => c.Code.ToLower() == COUNTRY_CODE.ToLower());
             var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
             var indianStates = indiaPincodes.Where(s =>
-                s.StateName.ToLower() == "haryana"
-                ||
-                s.StateName.ToLower() == "delhi"
-                ||
+                s.StateName.ToLower() == "haryana" ||
+                s.StateName.ToLower() == "delhi" ||
                 s.StateCode.ToLower() == "up"
                 ).Select(g => g.StateCode).Distinct()?.ToList();
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
             await context.SaveChangesAsync(null, false);
 
-            var proper = new SeedInput { COUNTRY = COUNTRY_CODE, DOMAIN = "proper.com", PHOTO = "/img/proper.png", NAME = "Proper", ADDRESSLINE = "12 MG Road", BRANCH = "Main Office", BANK = "SBI", PINCODE = PINCODE };
-            var honest = new SeedInput { COUNTRY = COUNTRY_CODE, DOMAIN = "honest.com", PHOTO = "/img/honest.png", NAME = "Honest", ADDRESSLINE = "67 Mehrauli Road", BRANCH = "Gurgaon", BANK = "ICICI", PINCODE = PINCODE };
+            var proper = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                DOMAIN = "proper.com",
+                PHOTO = "/img/proper.png",
+                NAME = "Proper",
+                ADDRESSLINE = "12 MG Road",
+                BRANCH = "Main Office",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PINCODE = PINCODE
+            };
+            var honest = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                DOMAIN = "honest.com",
+                PHOTO = "/img/honest.png",
+                NAME = "Honest",
+                ADDRESSLINE = "67 Mehrauli Road",
+                BRANCH = "Gurgaon",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PINCODE = PINCODE
+            };
             var agencies = new List<SeedInput> { proper, honest };
             var vendors = new List<Vendor> { };
 
@@ -39,7 +59,18 @@ namespace risk.control.system.Seeds
                 vendors.Add(vendor);
             }
 
-            var insurer = new SeedInput { COUNTRY = COUNTRY_CODE, DOMAIN = "can-hsbc.com", NAME = "Can-Hsbc", PHOTO = "/img/insurer.jpg", ADDRESSLINE = "139 Sector 44", BRANCH = "Head Office", BANK = "HDFC", PINCODE = PINCODE };
+            var insurer = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                DOMAIN = "can-hsbc.com",
+                NAME = "Can-Hsbc",
+                PHOTO = "/img/insurer.jpg",
+                ADDRESSLINE = "139 Sector 44",
+                BRANCH = "Head Office",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PINCODE = PINCODE
+            };
             var companies = new List<SeedInput> { insurer };
             foreach (var company in companies)
             {

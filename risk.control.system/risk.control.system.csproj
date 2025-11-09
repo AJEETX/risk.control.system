@@ -64,6 +64,12 @@
     <None Update="au_postcodes.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="BSB.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="BSB2Name.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="countries.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

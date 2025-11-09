@@ -4,6 +4,8 @@
     ViewData["Title"] = "Manage Company";
 }
 <section class="content">
+    <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+    <input type="hidden" id="CountryCode" value="@Model?.Country.Code" />
         <div id="article" class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
 

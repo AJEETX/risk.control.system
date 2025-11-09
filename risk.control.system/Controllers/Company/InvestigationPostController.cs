@@ -295,11 +295,10 @@ namespace risk.control.system.Controllers.Company
                 {
                     var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == customerDetail.SelectedCountryId);
                     var countryCode = country?.ISDCode.ToString();
-                    var phoneInfo = await phoneService.ValidateAsync(countryCode + customerDetail.PhoneNumber);
-                    if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != countryCode || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() ||
-                        phoneInfo.NumberType.ToLower() != "mobile")
+                    var isMobile = phoneService.IsValidMobileNumber(customerDetail.PhoneNumber, countryCode);
+                    if (!isMobile)
                     {
-                        notifyService.Error("Invalid phone number. Please check and try again.");
+                        notifyService.Error("Invalid mobile number. Please check and try again.");
                         var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                         ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                         return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
@@ -349,11 +348,10 @@ namespace risk.control.system.Controllers.Company
                 {
                     var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == customerDetail.SelectedCountryId);
                     var countryCode = country?.ISDCode.ToString();
-                    var phoneInfo = await phoneService.ValidateAsync(countryCode + customerDetail.PhoneNumber);
-                    if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != countryCode || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() ||
-                        phoneInfo.NumberType.ToLower() != "mobile")
+                    var isMobile = phoneService.IsValidMobileNumber(customerDetail.PhoneNumber, countryCode);
+                    if (!isMobile)
                     {
-                        notifyService.Error("Invalid phone number. Please check and try again.");
+                        notifyService.Error("Invalid mobile number. Please check and try again.");
                         var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                         ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                         return RedirectToAction(nameof(InvestigationController.EditCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
@@ -425,10 +423,8 @@ namespace risk.control.system.Controllers.Company
                 {
                     var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == beneficiary.SelectedCountryId);
                     var countryCode = country?.ISDCode.ToString();
-                    var phoneInfo = await phoneService.ValidateAsync(countryCode + beneficiary.PhoneNumber);
-
-                    if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != countryCode || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() ||
-                        phoneInfo.NumberType.ToLower() != "mobile")
+                    var isMobile = phoneService.IsValidMobileNumber(beneficiary.PhoneNumber, countryCode);
+                    if (!isMobile)
                     {
                         notifyService.Error("Invalid phone number. Please check and try again.");
                         var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
@@ -483,12 +479,10 @@ namespace risk.control.system.Controllers.Company
                 {
                     var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == beneficiary.SelectedCountryId);
                     var countryCode = country?.ISDCode.ToString();
-                    var phoneInfo = await phoneService.ValidateAsync(countryCode + beneficiary.PhoneNumber);
-
-                    if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != countryCode || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() ||
-                        phoneInfo.NumberType.ToLower() != "mobile")
+                    var isMobile = phoneService.IsValidMobileNumber(beneficiary.PhoneNumber, countryCode);
+                    if (!isMobile)
                     {
-                        notifyService.Error("Invalid phone number. Please check and try again.");
+                        notifyService.Error("Invalid mobile number. Please check and try again.");
                         var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                         ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                         return RedirectToAction(nameof(InvestigationController.EditBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });

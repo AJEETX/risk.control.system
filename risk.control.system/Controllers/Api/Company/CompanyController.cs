@@ -896,7 +896,7 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> ValidatePhone(string phone, int countryCode)
         {
             if (string.IsNullOrWhiteSpace(phone))
-                return Ok(new { valid = false, message = "Phone number is required." });
+                return Ok(new { valid = false, message = "Mobile number is required." });
             if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
             {
                 var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode == countryCode);
@@ -908,20 +908,50 @@ namespace risk.control.system.Controllers.Api.Company
                     return Ok(new
                     {
                         valid = false,
-                        message = "Invalid phone number."
+                        message = "Invalid mobile number."
                     });
                 }
                 return Ok(new
                 {
                     valid = true,
-                    message = "Valid phone number"
+                    message = "Valid mobile number"
                 });
             }
             return Ok(new
             {
                 valid = true,
-                message = "Valid phone number"
+                message = "Valid mobile number"
             });
+        }
+        [HttpGet("IsValidMobileNumber")]
+        public async Task<IActionResult> IsValidMobileNumber(string phone, int countryCode)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return Ok(new { valid = false, message = "Mobile number is required." });
+            var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode == countryCode);
+
+            var isMobile = phoneService.IsValidMobileNumber(phone, country.ISDCode.ToString());
+
+            if (!isMobile)
+            {
+                return Ok(new
+                {
+                    valid = false,
+                    message = "Invalid mobile number."
+                });
+            }
+            return Ok(new
+            {
+                valid = true,
+                message = "Valid mobile number"
+            });
+        }
+
+        [HttpGet("bsb")]
+        public async Task<IActionResult> GetBSBDetails(string code)
+        {
+            var bsbDetail = _context.BsbInfo.FirstOrDefault(b => b.BSB == code);
+            return Ok(bsbDetail);
         }
     }
 }

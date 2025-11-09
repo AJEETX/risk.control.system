@@ -116,16 +116,15 @@ namespace risk.control.system.Services
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 {
-                    var phoneInfo = await phoneService.ValidateAsync(pinCode.Country.ISDCode.ToString() + uploadCase.CustomerContact);
-                    if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != pinCode.Country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLower() != pinCode.Country.Code.ToLower() ||
-                        phoneInfo.NumberType.ToLower() != "mobile")
+                    var isMobile = phoneService.IsValidMobileNumber(uploadCase.CustomerContact, pinCode.Country.ISDCode.ToString());
+                    if (!isMobile)
                     {
                         errors.Add(new UploadError
                         {
-                            UploadData = $"[Customer Phone number {uploadCase.CustomerContact} Invalid]",
-                            Error = $"[Phone number {uploadCase.CustomerContact} Invalid]"
+                            UploadData = $"[Customer Mobile number {uploadCase.CustomerContact} Invalid]",
+                            Error = $"[Mobile number {uploadCase.CustomerContact} Invalid]"
                         });
-                        errorCustomer.Add($"[Customer Phone number {uploadCase.CustomerContact} Invalid]");
+                        errorCustomer.Add($"[Customer Mobile number {uploadCase.CustomerContact} Invalid]");
                     }
                 }
 

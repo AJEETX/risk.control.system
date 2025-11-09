@@ -5,6 +5,8 @@
 }
 
 <section class="content">
+    <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+    <input type="hidden" id="CountryCode" value="@Model?.Country.Code" />
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title"><i class="fas fa-building"></i>  Agency Profile</h3>
@@ -159,5 +161,4 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/common/companies.js"></script>
-
 }
