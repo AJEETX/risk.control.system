@@ -326,7 +326,8 @@
     $('#radioButtons').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault(); $.confirm({
-                title: "Confirm Assign", content: "Are you sure ?",
+                title: "Confirm Assign <sub>manual</sub>",
+                content: "Are you sure ?",
                 icon: 'fas fa-external-link-alt',
                 type: 'blue',
                 closeIcon: true, buttons: {

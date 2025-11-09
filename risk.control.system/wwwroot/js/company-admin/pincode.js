@@ -625,6 +625,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const invalidIcon = document.getElementById("phone-invalid");
     const spinnerIcon = document.getElementById("phone-spinner");
 
+    phoneInput.addEventListener('focus', function () {
+        this.select();
+    });
+
     let typingTimer;
     const typingDelay = 800; // milliseconds delay after typing stops
 

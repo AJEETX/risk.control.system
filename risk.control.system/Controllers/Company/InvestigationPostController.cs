@@ -673,7 +673,7 @@ namespace risk.control.system.Controllers.Company
 
                 var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendorAndManager(currentUserEmail, policy, caseId, selectedcase, baseUrl));
 
-                notifyService.Custom($"Case #{policy} {status} to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(CaseActiveController.Active), "CaseActive");
             }
@@ -708,7 +708,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(InvestigationController.New), "Investigation");
                 }
-                notifyService.Custom($"Case <b>#:{allocatedCaseNumber}</b> Assigned", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b>#:{allocatedCaseNumber}</b> Assigned<sub>auto</b>", 3, "green", "far fa-file-powerpoint");
             }
             catch (Exception ex)
             {

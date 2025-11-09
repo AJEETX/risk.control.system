@@ -3153,3 +3153,6 @@ img.mobile-capture-map {
     right: 10px;
     top: 8px;
 }
+#PhoneNumber {
+    cursor: pointer; /* Pointer cursor for better UX */
+}

@@ -125,7 +125,7 @@ namespace risk.control.system.Services
                             UploadData = $"[Customer Phone number {uploadCase.CustomerContact} Invalid]",
                             Error = $"[Phone number {uploadCase.CustomerContact} Invalid]"
                         });
-                        errorCustomer.Add($"[[Customer Phone number {uploadCase.CustomerContact} Invalid]");
+                        errorCustomer.Add($"[Customer Phone number {uploadCase.CustomerContact} Invalid]");
                     }
                 }
 

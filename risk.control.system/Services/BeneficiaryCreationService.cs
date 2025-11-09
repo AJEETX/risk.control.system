@@ -105,7 +105,7 @@ namespace risk.control.system.Services
                             UploadData = $"[Beneficiary Phone number {uploadCase.BeneficiaryContact} Invalid]",
                             Error = $"[Phone number {uploadCase.BeneficiaryContact} Invalid]"
                         });
-                        errorBeneficiary.Add($"[[Beneficiary Phone number {uploadCase.BeneficiaryContact} Invalid]");
+                        errorBeneficiary.Add($"[Beneficiary Phone number {uploadCase.BeneficiaryContact} Invalid]");
                     }
                 }
                 var relation = string.IsNullOrWhiteSpace(uploadCase.Relation)

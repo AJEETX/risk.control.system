@@ -108,7 +108,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="20">
+                                <input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20">
                                 <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -161,14 +161,14 @@
                             <label class="input-group-label" for="DistrictId">District:</label>
                             <div class="input-group mb-3 autocomplete-wrapper">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" for="DistrictId" data-toggle="tooltip" title="Auto-selected based on Pincode">
+                                    <span class="input-group-text" for="DistrictId" data-toggle="tooltip">
                                         <i class="fas fa-city"></i>
                                         <i class="fa fa-asterisk asterik-style-disabled"></i>
                                     </span>
                                 </div>
                                 <input readonly type="text" id="DistrictId" class="form-control remarks valid-border" data-placeholder="district" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
                                 <span asp-validation-for="DistrictId" class="text-danger"></span>
-                                <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
+                                <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" title="Auto-selected based on Pincode" />
                                 <div id="district-loading" class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </div>
@@ -178,11 +178,11 @@
                             <label class="input-group-label" for="StateId"> State:</label>
                             <div class="input-group mb-3 autocomplete-wrapper">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" for="StateId" data-toggle="tooltip" title="Auto-selected based on Pincode"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style-disabled"></i></span>
+                                    <span class="input-group-text" for="StateId" data-toggle="tooltip"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style-disabled"></i></span>
                                 </div>
                                 <input readonly type="text" id="StateId" class="form-control remarks valid-border" data-placeholder="state" placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
                                 <span asp-validation-for="StateId" class="text-danger"></span>
-                                <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
+                                <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" title="Auto-selected based on Pincode" />
                                 <div id="state-loading" class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </div>

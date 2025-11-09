@@ -460,8 +460,8 @@
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
-                title: "ASSIGN !",
-                content: "Please select Case<span class='badge badge-light'>(s)</span> to Assign",
+                title: "ASSIGN <sub>auto</sub> !",
+                content: "Please select Case(s) to Assign <sub>auto</sub>",
                 icon: 'fas fa-random fa-sync',
                 type: 'red',
                 closeIcon: true,
