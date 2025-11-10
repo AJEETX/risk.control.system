@@ -1,6 +1,7 @@
 ﻿@model risk.control.system.Models.CustomerDetail
 <div class="form-group">
     <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+    <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
     <label class="input-group-label"> Phone #:</label>
     <div class="input-group">
         <!-- Display Country Code -->

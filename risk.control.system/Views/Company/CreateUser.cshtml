@@ -49,7 +49,7 @@
 
         <form id="create-form" asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
             <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
-
+            <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">

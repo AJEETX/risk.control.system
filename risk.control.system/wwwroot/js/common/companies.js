@@ -1,5 +1,5 @@
 ﻿$(function () {
-    const countryCode = $('#CountryCode').val();
+    const countryCode = $('#countryCode').val();
     const isdCode = $('#Isd').val();
     displayBankCodeLabels(countryCode, isdCode);
 
@@ -27,6 +27,7 @@
             }
         }
     });
+
     $('#edit-profile.btn.btn-warning').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

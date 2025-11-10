@@ -765,25 +765,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function validatePhone() {
         const phone = phoneInput.value.trim();
-        const countryCode = document.getElementById("Isd").value.trim();
+        const isd = document.getElementById("Isd").value.trim();
         if (phone.length == 0) {
             toggleSubmitButton(false);
             return;
         }
         showSpinner();
         try {
-            const response = await fetch(`/api/Company/IsValidMobileNumber?phone=${encodeURIComponent(phone)}&countryCode=${countryCode}`);
+            const response = await fetch(`/api/Company/IsValidMobileNumber?phone=${encodeURIComponent(phone)}&countryCode=${isd}`);
             const data = await response.json();
+            var countryCode = ($('#countryCode').val() || '').toUpperCase().trim();
 
             if (data.valid) {
-                phoneInput.title = "✅ Valid mobile number";;
+                phoneInput.title = `✅ Valid ${countryCode} mobile number`;
                 validIcon.classList.remove("d-none");
                 invalidIcon.classList.add("d-none");
                 phoneInput.classList.remove("is-invalid");
                 phoneInput.classList.add("is-valid");
                 toggleSubmitButton(true);
             } else {
-                phoneInput.title = "❌ Invalid mobile number";
+                phoneInput.title = `❌ Invalid ${countryCode} mobile number`;
                 invalidIcon.classList.remove("d-none");
                 validIcon.classList.add("d-none");
                 phoneInput.classList.remove("is-valid");
