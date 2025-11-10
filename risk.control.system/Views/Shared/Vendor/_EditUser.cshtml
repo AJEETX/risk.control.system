@@ -29,14 +29,16 @@
                 {
                     <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="Profile Image" />
                     <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required />
+                    <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" 
+                    data-preview-id="createProfileImage" data-toggle="tooltip" title="User Photo" />
                     <span asp-validation-for="ProfilePicture" class="text-danger"></span>
                 }
                 else
                 {
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
+                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="User Photo" />
                     <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input invalid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required />
+                    <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input invalid-border" type="file" id="createImageInput" 
+                        data-preview-id="createProfileImage" data-toggle="tooltip" title="User Photo" required />
                     <span asp-validation-for="ProfilePicture" class="text-danger"></span>
                 }
                 
