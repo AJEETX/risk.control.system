@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    var countryCode = ($('#CountryCode').val() || '').toUpperCase().trim();
+    var countryCode = ($('#countryCode').val() || '').toUpperCase().trim();
     var isdCode = ($('#Isd').val() || '').trim();
 
     // Detect India vs Australia
@@ -72,16 +72,17 @@
                     method: 'GET',
                     success: function (data) {
                         $('#ifsc-spinner').addClass('d-none');
-
+                        var bankData = '🏦 ' + data.bank + ', ' + data.address + ', ' + data.city + ', ' + data.state + ', ' + data.postcode;
+                        var branchData = '🏦 Branch: ' + data.branch + ', ' + data.address + ', ' + data.city + ', ' + data.state + ', ' + data.postcode;
                         if (data && data.bank) {
                             $('#BankName')
                                 .val(data.bank)
                                 .addClass('valid-border')
                                 .removeClass('invalid-border')
-                                .attr('title', '🏦 ' + data.bank + ', ' + data.branch + ', ' + data.address);
+                                .attr('title', bankData);
 
                             $('#ifsc-valid-icon').show();
-                            $ifscInput.addClass('is-valid').attr('title', '✅ Valid BSB (' + data.bank + ')');
+                            $ifscInput.addClass('is-valid').attr('title', '✅ Valid BSB');
                         } else {
                             setInvalid('❌ Invalid BSB Code');
                         }
@@ -241,7 +242,6 @@
         validateDistrictSelection(districtValue, stateId, countryId);
     });
 
-
     // Initialize country autocomplete
     countryAutocomplete();
 
@@ -253,7 +253,6 @@
 
     // Initialize autocomplete for Pincode
     pincodeAutocomplete();
-
 });
 
 function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
@@ -351,6 +350,7 @@ function countryAutocomplete() {
         validateCountrySelection($(this).val(), $("#SelectedCountryId").val());
     });
 }
+
 function fetchCountrySuggestions(term, responseCallback) {
     $.ajax({
         url: "/api/Company/GetCountrySuggestions", // API endpoint for country suggestions
@@ -420,6 +420,7 @@ function validateCountrySelection(inputValue, countryId) {
         }
     });
 }
+
 function pincodeAutocomplete() {
     const pinCodeField = "#PinCodeId";
     const selectedPinCodeField = "#SelectedPincodeId";
@@ -634,7 +635,6 @@ function clearPincodeFields() {
     $("#SelectedDistrictId").val("");
 }
 
-
 function stateAutocomplete() {
     $("#StateId").autocomplete({
         source: function (request, response) {
@@ -762,6 +762,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const validIcon = document.getElementById("phone-valid");
     const invalidIcon = document.getElementById("phone-invalid");
     const spinnerIcon = document.getElementById("phone-spinner");
+    var countryCode = ($('#countryCode').val() || '').toUpperCase().trim();
 
     phoneInput.addEventListener('focus', function () {
         this.select();
@@ -790,14 +791,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
 
             if (data.valid) {
-                phoneInput.title = `✅ Valid ${countryCode} mobile number`;
+                phoneInput.title = `✅ Valid ${countryCode} (📱) mobile #`;
                 validIcon.classList.remove("d-none");
                 invalidIcon.classList.add("d-none");
                 phoneInput.classList.remove("is-invalid");
                 phoneInput.classList.add("is-valid");
                 toggleSubmitButton(true);
             } else {
-                phoneInput.title = `❌ Invalid ${countryCode} mobile number`;
+                phoneInput.title = `❌ Invalid ${countryCode} (📱) mobile #`;
                 invalidIcon.classList.remove("d-none");
                 validIcon.classList.add("d-none");
                 phoneInput.classList.remove("is-valid");
@@ -805,7 +806,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 toggleSubmitButton(false);
             }
         } catch (err) {
-            console.error("Mobile validation failed:", err);
+            console.error(" (📱) Mobile # validation failed:", err);
             invalidIcon.classList.remove("d-none");
             validIcon.classList.add("d-none");
             phoneInput.classList.remove("is-valid");

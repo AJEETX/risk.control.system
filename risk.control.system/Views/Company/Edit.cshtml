@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
-
 }
 
 <section class="content">
@@ -20,6 +19,7 @@
                 <input type="hidden" asp-for="AddressLatitude" value="@Model.AddressLatitude" />
                 <input type="hidden" asp-for="AddressLongitude" value="@Model.AddressLongitude" />
                 <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+                <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="row">
                     <div class="col-sm-6">
@@ -33,7 +33,6 @@
                                 <input readonly asp-for="Email" class="form-control remarks valid-border" />
                             </div>
                         </div>
-
                         
                         <div class="form-group">
                             <label class="input-group-label"> Name: </label>

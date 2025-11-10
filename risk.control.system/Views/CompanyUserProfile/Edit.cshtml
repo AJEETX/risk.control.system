@@ -21,7 +21,8 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <input type="hidden" asp-for="Id" />
                         <input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompany.ClientCompanyId" />
-
+                        <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+                        <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
                         <!-- Profile Image Section -->
                         <div class="form-group text-center">
                             <div class="profile-img-container">
@@ -148,9 +149,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/company-user-profile.js">
-
-    </script>
+    <script src="~/js/company-admin/company-user-profile.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
 }

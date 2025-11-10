@@ -1091,17 +1091,5 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-
-        [Breadcrumb("Agent Load", FromAction = "Users")]
-        public IActionResult AgentLoad()
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (currentUserEmail == null)
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            return View();
-        }
     }
 }

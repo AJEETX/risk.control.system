@@ -6,6 +6,8 @@
 
 <section class="content">
     <form id="edit-form" asp-action="Edit" method="post" enctype="multipart/form-data">
+        <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+        <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title">
@@ -36,8 +38,6 @@
                             <label for="ProfileImage" class="control-label">Profile Photo <i class="fa fa-asterisk asterik-style"></i></label>
                             <input asp-for="ProfileImage" class="form-control document-image-input" type="file" id="editImageInput" data-preview-id="editProfileImage" />
                         </div>
-
-                        
 
                         <!-- Name Sections (First & Last) -->
                         <div class="form-group">
