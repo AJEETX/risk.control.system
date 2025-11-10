@@ -3,7 +3,7 @@
     <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
     <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
 
-    <label class="input-group-label"> Phone #:</label>
+    <label class="input-group-label"> Mobile #:</label>
     <div class="input-group">
         <!-- Display Country Code -->
 
@@ -15,7 +15,7 @@
                 <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
             </span>
         </div>
-        <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" autocomplete="off" placeholder="Mobile # only (e.g., 9876543210)" title="Please enter a 10-digit mobile # without country-code" data-toggle="tooltip" />
+        <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" autocomplete="off" placeholder="Enter mobile # without country-code" title="Enter mobile # without country-code" data-toggle="tooltip" />
         <span id="phone-spinner" class="text-secondary phone-icon d-none">
             <i class="fas fa-spinner fa-spin"></i>
         </span>

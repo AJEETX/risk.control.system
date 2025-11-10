@@ -1,11 +1,16 @@
 ﻿$(document).ready(function () {
+    var countryCode = ($('#CountryCode').val() || '').toUpperCase().trim();
+    var isdCode = ($('#Isd').val() || '').trim();
 
-    // reusable validator function
+    // Detect India vs Australia
+    var isIndia = (countryCode === 'IN' || isdCode === '91');
+    var isAustralia = (countryCode === 'AU' || isdCode === '61');
+
+    const $ifscLabel = $('label[for="IFSCCode"], .input-group-label:contains("IFSC Code")');
+    var $ifscInput = $('#IFSCCode');
+
     function validateBankCode() {
-        var countryCode = ($('#CountryCode').val() || '').toUpperCase().trim();
-        var isdCode = ($('#Isd').val() || '').trim();
-        const $ifscLabel = $('label[for="IFSCCode"], .input-group-label:contains("IFSC Code")');
-        var $ifscInput = $('#IFSCCode');
+        
         if (!$ifscInput.length) return;
 
         var code = ($ifscInput.val() || '').toUpperCase().trim();
@@ -16,10 +21,6 @@
         $('#ifsc-spinner').addClass('d-none');
         $('#BankName').val('').removeClass('invalid-border valid-border').removeAttr('title');
         $ifscInput.removeClass('is-valid is-invalid').removeAttr('title');
-
-        // Detect India vs Australia
-        var isIndia = (countryCode === 'IN' || isdCode === '91');
-        var isAustralia = (countryCode === 'AU' || isdCode === '61');
 
         if (isIndia) {
             // ------------------------ 🇮🇳 IFSC CHECK ------------------------
@@ -110,6 +111,16 @@
         }
     }
 
+    function setLabels() {
+        if (isAustralia) {
+            $ifscLabel.text('BSB Code:');
+            $ifscInput
+                .attr('placeholder', 'Enter 6-digit BSB code')
+                .attr('maxlength', '6')
+                .attr('title', 'Enter valid BSB code');
+        }
+    }
+
     // Attach blur handler
     $(document).on('blur', '#IFSCCode', function () {
         validateBankCode();
@@ -120,6 +131,9 @@
         var existing = ($('#IFSCCode').val() || '').trim();
         if (existing.length > 0) {
             validateBankCode();
+        }
+        else {
+            setLabels();
         }
     });
 
@@ -774,7 +788,6 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             const response = await fetch(`/api/Company/IsValidMobileNumber?phone=${encodeURIComponent(phone)}&countryCode=${isd}`);
             const data = await response.json();
-            var countryCode = ($('#countryCode').val() || '').toUpperCase().trim();
 
             if (data.valid) {
                 phoneInput.title = `✅ Valid ${countryCode} mobile number`;
