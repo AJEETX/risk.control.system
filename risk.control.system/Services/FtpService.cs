@@ -287,7 +287,7 @@ namespace risk.control.system.Services
             }
             int pipeCount = firstLine.Count(c => c == '|');
 
-            if (pipeCount < 27)
+            if (pipeCount < 26)
             {
                 errors.Add("The file is has less than expected columns.");
                 return (validRecords, errors);
