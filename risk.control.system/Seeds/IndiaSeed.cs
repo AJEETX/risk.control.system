@@ -16,12 +16,14 @@ namespace risk.control.system.Seeds
             string COUNTRY_CODE = "IN";
             string PINCODE = "122003";
             var india = countries.FirstOrDefault(c => c.Code.ToLower() == COUNTRY_CODE.ToLower());
-            var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
-            var indianStates = indiaPincodes.Where(s =>
+            var indiaPincodes = await PinCodeStateSeed.CsvRead_IndiaAsync();
+            var indianStates = indiaPincodes
+                .Where(s =>
                 s.StateName.ToLower() == "haryana" ||
                 s.StateName.ToLower() == "delhi" ||
                 s.StateCode.ToLower() == "up"
-                ).Select(g => g.StateCode).Distinct()?.ToList();
+                )
+                .Select(g => g.StateCode).Distinct()?.ToList();
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
             await context.SaveChangesAsync(null, false);
@@ -77,7 +79,12 @@ namespace risk.control.system.Seeds
                 _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company);
             }
             await context.SaveChangesAsync(null, false);
-            return PINCODE;
+            var pincode = indiaPincodes.FirstOrDefault(p => p.Code == PINCODE);
+            if (pincode == null)
+            {
+                return indiaPincodes.FirstOrDefault().Code;
+            }
+            return pincode.Code;
         }
     }
 }

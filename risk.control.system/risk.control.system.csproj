@@ -76,7 +76,10 @@
     <None Update="currency.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="India_pincode.csv">
+    <None Update="india_pincode.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="india_pincode_full.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="lang-currency.csv">

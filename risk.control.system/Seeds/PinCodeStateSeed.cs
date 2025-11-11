@@ -1,23 +1,23 @@
-﻿using risk.control.system.Data;
+﻿using System.Text.RegularExpressions;
+
+using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using System.Text.RegularExpressions;
 
 namespace risk.control.system.Seeds
 {
     public static class PinCodeStateSeed
     {
+        private static Regex regex = new Regex("\\\"(.*?)\\\"");
+        private static readonly Regex officeSuffixRegex = new(@"[\s\(\[]*B[\.\s]*O[\)\]]*$", RegexOptions.IgnoreCase);
         private static string currenciesFilePath = @"lang-currency.csv";
         private static string currenciesNameFilePath = @"currency.csv";
         private static string countriesFilePath = @"countries.csv";
-        private static string us_stateWisePincodeFilePath = @"america_zipcode.csv";
         private static string au_stateWisePincodeFilePath = @"au_postcodes.csv";
-        private static string all_india_pincodes = @"india_pincode.csv";
+        private static string all_india_pincodes = @"india_pincode_full.csv";
         private static string NO_DATA = " NO - DATA ";
         private static List<Currency> currencies = new List<Currency>();
         private static List<Currency> currenciesName = new List<Currency>();
-
-        private static Regex regex = new Regex("\\\"(.*?)\\\"");
 
         public static async Task SeedPincode(ApplicationDbContext context, List<PinCodeState> pincodes, Country country)
         {
@@ -211,84 +211,59 @@ namespace risk.control.system.Seeds
             }
             return pincodes;
         }
-        public static async Task<List<PinCodeState>> CsvRead_Us()
+
+        public static async Task<List<PinCodeState>> CsvRead_IndiaAsync()
         {
-            var pincodes = new List<PinCodeState>();
-            string csvData = await File.ReadAllTextAsync(us_stateWisePincodeFilePath);
-
-            bool firstRow = true;
-            foreach (string row in csvData.Split('\n'))
+            try
             {
-                if (!string.IsNullOrEmpty(row))
-                {
-                    if (!string.IsNullOrEmpty(row))
-                    {
-                        if (firstRow)
-                        {
-                            firstRow = false;
-                        }
-                        else
-                        {
-                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                            var rowData = output.Split(',').ToList();
 
-                            var pincodeState = new PinCodeState
-                            {
-                                Code = rowData[3]?.Trim() ?? NO_DATA,
-                                Name = rowData[5]?.Trim() ?? NO_DATA,
-                                District = rowData[4]?.Trim() ?? NO_DATA,
-                                StateName = rowData[1]?.Trim() ?? NO_DATA,
-                                StateCode = rowData[2]?.Trim() ?? NO_DATA,
-                                Latitude = NO_DATA,
-                                Longitude = NO_DATA,
-                            };
-                            var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
-                            pincodes.Add(pincodeState);
-                        }
+                var pincodes = new List<PinCodeState>();
+
+                // Read all lines from file
+                var lines = await File.ReadAllLinesAsync(all_india_pincodes);
+
+                // Skip header row
+                foreach (var line in lines.Skip(1))
+                {
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    // Split by TAB instead of comma
+                    var parts = line.Split(',');
+
+                    if (parts.Length >= 4)
+                    {
+                        var officeName = officeSuffixRegex.Replace(parts[0].Trim(), "").Trim('"');
+
+                        var pincode = parts[1].Trim('"');
+                        var district = parts[2].Trim('"').ToUpperInvariant();
+                        var stateName = parts[3].Trim('"').ToUpperInvariant();
+                        var stateCode = GetInitials(stateName);
+
+                        pincodes.Add(new PinCodeState
+                        {
+                            Name = officeName.Replace("B.O", "").Replace("BO", "").Replace("SO", "").Replace("S.O", "").Replace("S.O.", ""),
+                            Code = pincode,
+                            District = district,
+                            StateName = stateName,
+                            StateCode = stateCode,
+                            Latitude = "N/A",
+                            Longitude = "N/A"
+                        });
                     }
                 }
+
+                return pincodes;
+
             }
-            return pincodes;
-        }
-
-        public static async Task<List<PinCodeState>> CsvRead_India()
-        {
-            var pincodes = new List<PinCodeState>();
-            string csvData = await File.ReadAllTextAsync(all_india_pincodes);
-
-            bool firstRow = true;
-            foreach (string row in csvData.Split('\n'))
+            catch (Exception ex)
             {
-                if (!string.IsNullOrEmpty(row))
-                {
-                    if (!string.IsNullOrEmpty(row))
-                    {
-                        if (firstRow)
-                        {
-                            firstRow = false;
-                        }
-                        else
-                        {
-                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                            var rowData = output.Split(',').ToList();
-                            var pincodeState = new PinCodeState
-                            {
-                                Name = rowData[1]?.Trim() ?? NO_DATA,
-                                Code = rowData[2]?.Trim() ?? NO_DATA,
-                                District = rowData[3]?.Trim() ?? NO_DATA,
-                                StateName = rowData[4]?.Trim() ?? NO_DATA,
-                                StateCode = GetInitials(rowData[4])?.Trim() ?? NO_DATA,
-                                Latitude = NO_DATA,
-                                Longitude = NO_DATA,
-                            };
-                            pincodes.Add(pincodeState);
-                        }
-                    }
-                }
+
+                throw ex;
             }
-            return pincodes;
         }
-        static string GetInitials(string input)
+
+        private static string GetInitials(string input)
         {
             // Trim any extra spaces and split the string into words by space
             string[] words = input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);

@@ -18,9 +18,10 @@ namespace risk.control.system.Seeds
             var au = countries.FirstOrDefault(c => c.Code.ToLower() == COUNTRY_CODE.ToLower());
             var auPincodes = await PinCodeStateSeed.CsvRead_Au(0);
             var auStates = auPincodes.Where(s =>
-                s.StateCode.ToLower() == "vic" ||
-                s.StateCode.ToLower() == "qld" ||
-                s.StateCode.ToLower() == "nsw"
+                s.StateCode.ToLower() == "vic"
+                //||
+                //s.StateCode.ToLower() == "qld" ||
+                //s.StateCode.ToLower() == "nsw"
                 ).Select(g => g.StateCode).Distinct()?.ToList();
             var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
             await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes, au);
@@ -33,8 +34,8 @@ namespace risk.control.system.Seeds
                 PHOTO = "/img/checker.png",
                 ADDRESSLINE = "57 Mahoneys Road",
                 BRANCH = "Forest Hill",
-                IFSC = "SBIN0001234",
-                BANK = "State Bank of India",
+                IFSC = "733112",
+                BANK = "Westpac Banking Corporation",
                 PINCODE = PINCODE
             };
             var verify = new SeedInput
@@ -45,8 +46,8 @@ namespace risk.control.system.Seeds
                 PHOTO = "/img/verify.png",
                 ADDRESSLINE = "67 Mahoneys Road",
                 BRANCH = "Forest Hill",
-                IFSC = "SBIN0001234",
-                BANK = "State Bank of India",
+                IFSC = "083251",
+                BANK = "National Australia Bank Limited",
                 PINCODE = PINCODE
             };
             var agencies = new List<SeedInput> { checker, verify };
@@ -64,8 +65,8 @@ namespace risk.control.system.Seeds
                 PHOTO = "/img/insurer.jpg",
                 ADDRESSLINE = "109 Mahoneys Road",
                 BRANCH = "Forest Hill",
-                IFSC = "SBIN0001234",
-                BANK = "State Bank of India",
+                IFSC = "083251",
+                BANK = "National Australia Bank Limited",
                 PINCODE = PINCODE
             };
             var companies = new List<SeedInput> { insurer };
