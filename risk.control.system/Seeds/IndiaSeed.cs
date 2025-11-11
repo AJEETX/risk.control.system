@@ -18,11 +18,11 @@ namespace risk.control.system.Seeds
             var india = countries.FirstOrDefault(c => c.Code.ToLower() == COUNTRY_CODE.ToLower());
             var indiaPincodes = await PinCodeStateSeed.CsvRead_IndiaAsync();
             var indianStates = indiaPincodes
-                .Where(s =>
-                s.StateName.ToLower() == "haryana" ||
-                s.StateName.ToLower() == "delhi" ||
-                s.StateCode.ToLower() == "up"
-                )
+                //.Where(s =>
+                //s.StateName.ToLower() == "haryana" ||
+                //s.StateName.ToLower() == "delhi" ||
+                //s.StateCode.ToLower() == "up"
+                //)
                 .Select(g => g.StateCode).Distinct()?.ToList();
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);

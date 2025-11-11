@@ -216,7 +216,6 @@ namespace risk.control.system.Seeds
         {
             try
             {
-
                 var pincodes = new List<PinCodeState>();
 
                 // Read all lines from file
@@ -229,15 +228,15 @@ namespace risk.control.system.Seeds
                         continue;
 
                     // Split by TAB instead of comma
-                    var parts = line.Split(',');
+                    var parts = line.Split(',').Select(p => p.Trim().Trim('"')).ToArray(); // remove spaces and quotes
 
                     if (parts.Length >= 4)
                     {
                         var officeName = officeSuffixRegex.Replace(parts[0].Trim(), "").Trim('"');
 
-                        var pincode = parts[1].Trim('"');
-                        var district = parts[2].Trim('"').ToUpperInvariant();
-                        var stateName = parts[3].Trim('"').ToUpperInvariant();
+                        var pincode = parts[1].Trim();
+                        var district = parts[2].Trim().ToUpperInvariant();
+                        var stateName = parts[3].Trim().ToUpperInvariant();
                         var stateCode = GetInitials(stateName);
 
                         pincodes.Add(new PinCodeState
