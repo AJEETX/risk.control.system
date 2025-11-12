@@ -96,7 +96,8 @@ namespace risk.control.system.Services
 
                 if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 {
-                    var isMobile = phoneService.IsValidMobileNumber(uploadCase.CustomerContact, pinCode.Country.ISDCode.ToString());
+                    var country = context.Country.FirstOrDefault(c => c.CountryId == companyUser.ClientCompany.CountryId);
+                    var isMobile = phoneService.IsValidMobileNumber(uploadCase.BeneficiaryContact, country.ISDCode.ToString());
                     if (!isMobile)
                     {
                         errors.Add(new UploadError
