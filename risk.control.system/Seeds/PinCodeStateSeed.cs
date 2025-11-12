@@ -15,6 +15,7 @@ namespace risk.control.system.Seeds
         private static string countriesFilePath = @"countries.csv";
         private static string au_stateWisePincodeFilePath = @"au_postcodes.csv";
         private static string all_india_pincodes = @"india_pincode_full.csv";
+        private static string indian_states = @"indian_states.csv";
         private static string NO_DATA = " NO - DATA ";
         private static List<Currency> currencies = new List<Currency>();
         private static List<Currency> currenciesName = new List<Currency>();
@@ -27,9 +28,7 @@ namespace risk.control.system.Seeds
             {
                 var dbState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country, Updated = DateTime.Now };
                 var stateAdded = await context.State.AddAsync(dbState);
-
                 var districts = state.GroupBy(g => g.District);
-
                 var pinCodeList = new List<PinCode> { };
                 foreach (var district in districts)
                 {
@@ -212,24 +211,42 @@ namespace risk.control.system.Seeds
             return pincodes;
         }
 
+        private static List<StateModel> LoadStates(string filePath)
+        {
+            var lines = File.ReadAllLines(filePath);
+            var states = new List<StateModel>();
+
+            // Skip header
+            foreach (var line in lines.Skip(1))
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
+                var parts = line.Split(',');
+
+                if (parts.Length >= 2)
+                {
+                    states.Add(new StateModel
+                    {
+                        StateName = parts[0].Trim(),
+                        StateCode = parts[1].Trim()
+                    });
+                }
+            }
+
+            return states;
+        }
         public static async Task<List<PinCodeState>> CsvRead_IndiaAsync()
         {
             try
             {
+                var states = LoadStates(indian_states);
                 var pincodes = new List<PinCodeState>();
-
-                // Read all lines from file
                 var lines = await File.ReadAllLinesAsync(all_india_pincodes);
-
-                // Skip header row
                 foreach (var line in lines.Skip(1))
                 {
                     if (string.IsNullOrWhiteSpace(line))
                         continue;
-
-                    // Split by TAB instead of comma
                     var parts = line.Split(',').Select(p => p.Trim().Trim('"')).ToArray(); // remove spaces and quotes
-
                     if (parts.Length >= 4)
                     {
                         var officeName = officeSuffixRegex.Replace(parts[0].Trim(), "").Trim('"');
@@ -237,15 +254,14 @@ namespace risk.control.system.Seeds
                         var pincode = parts[1].Trim();
                         var district = parts[2].Trim().ToUpperInvariant();
                         var stateName = parts[3].Trim().ToUpperInvariant();
-                        var stateCode = GetInitials(stateName);
-
+                        var stateCode = states.FirstOrDefault(s => s.StateName.ToLower() == stateName.ToLower())?.StateCode;
                         pincodes.Add(new PinCodeState
                         {
                             Name = officeName.Replace("B.O", "").Replace("BO", "").Replace("SO", "").Replace("S.O", "").Replace("S.O.", ""),
                             Code = pincode,
                             District = district,
                             StateName = stateName,
-                            StateCode = stateCode,
+                            StateCode = stateCode ?? parts[3].Trim().ToUpperInvariant(),
                             Latitude = "N/A",
                             Longitude = "N/A"
                         });
@@ -257,35 +273,13 @@ namespace risk.control.system.Seeds
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
-
-        private static string GetInitials(string input)
-        {
-            // Trim any extra spaces and split the string into words by space
-            string[] words = input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            string initials = string.Empty;
-
-            if (words.Length == 1)
-            {
-                // If only one word, take the first two letters (if available)
-                initials = words[0].Substring(0, Math.Min(2, words[0].Length)).ToUpper();
-            }
-            else if (words.Length == 2)
-            {
-                // If two words, take the first letter of each word
-                initials = words[0].Substring(0, 1).ToUpper() + words[1].Substring(0, 1).ToUpper();
-            }
-            else if (words.Length > 2)
-            {
-                // If more than two words, take the first letter of the first two words
-                initials = words[0].Substring(0, 1).ToUpper() + words[1].Substring(0, 1).ToUpper();
-            }
-
-            return initials;
-        }
+    }
+    public class StateModel
+    {
+        public string StateName { get; set; }
+        public string StateCode { get; set; }
     }
 }
