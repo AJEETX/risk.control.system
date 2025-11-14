@@ -124,8 +124,8 @@ $(document).ready(function () {
                     }
                 }
             },
-            { data: "state", mRender: (data, type, row) => `<span title="${row.state}" data-toggle="tooltip">${data}</span>` },
-            { data: "country", mRender: (data, type, row) => `<span title="${row.country}" data-toggle="tooltip"> <img alt="${data}" title="${data}" src="${row.flag}" class="flag-icon" />(${row.country})</span>` },
+            { data: "stateCode", mRender: (data, type, row) => `<span title="${row.state}" data-toggle="tooltip">${data}</span>` },
+            { data: "countryCode", mRender: (data, type, row) => `<span title="${row.country}" data-toggle="tooltip"> <img alt="${data}" title="${data}" src="${row.flag}" class="flag-icon" />(${data})</span>` },
             { data: "updatedBy", mRender: (data, type, row) => `<span title="${row.updatedBy}" data-toggle="tooltip">${data}</span>` },
             { data: "updated", mRender: (data, type, row) => `<span title="${row.updated}" data-toggle="tooltip">${data}</span>` },
             {

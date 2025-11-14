@@ -1620,6 +1620,7 @@ namespace risk.control.system.Services
             // Fetching all relevant substatuses in a single query for efficiency
             var subStatuses = new[]
                 {
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER,
@@ -1629,13 +1630,7 @@ namespace risk.control.system.Services
 
             var query = context.Investigations
                 .Where(a => !a.Deleted &&
-                    a.ClientCompanyId == companyUser.ClientCompanyId &&
-                    (
-                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
-                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
-                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY ||
-                        a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
-                ));
+                    a.ClientCompanyId == companyUser.ClientCompanyId && subStatuses.Contains(a.SubStatus));
 
             int totalRecords = query.Count(); // Get total count before pagination
             return totalRecords;

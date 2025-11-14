@@ -8,7 +8,9 @@
         public string ServiceType { get; set; }
         public string District { get; set; }
         public string Districts { get; set; }
+        public string StateCode { get; set; }
         public string State { get; set; }
+        public string CountryCode { get; set; }
         public string Country { get; set; }
         public string Flag { get; set; }
         public string RawPincodes { get; set; }

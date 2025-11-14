@@ -145,16 +145,16 @@ $(document).ready(function () {
                 }
             },
             {
-                data: "state",
-                render: (data, type, row) => `<span title="${row.state}" data-toggle="tooltip">${data}</span>`
+                "data": "stateCode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.state + '" data-toggle="tooltip">' + data + '</span>'
+                }
             },
             {
-                data: "country",
-                render: (data, type, row) => `
-                    <span title="${row.country}" data-toggle="tooltip">
-                        <img alt="${row.country}" title="${row.country}" src="${row.flag}" class="flag-icon" data-toggle="tooltip"/>
-                        ${row.country}
-                    </span>`
+                "data": "countryCode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
+                }
             },
             {
                 data: "updatedBy",
