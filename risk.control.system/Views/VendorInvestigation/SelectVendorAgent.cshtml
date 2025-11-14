@@ -12,16 +12,24 @@
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
+                        
                         <li>
-
                             <i class='far fa-hand-point-right'></i> Case:
                             <b>
                                 <i class="far fa-file-powerpoint"></i>
-                                @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
+                                @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber  ( <i class='fa fa-plus'></i> )
                             </b>
                         </li>
                         <li>
-                            <i class='far fa-hand-point-right'></i> Select <input type='radio' /> <strong>AGENT</strong>
+                            <i class='far fa-hand-point-right'></i>
+                            <button class='badge badge-default xs top-info'>
+                                <b>
+                                    <i class="fa fa-sync"></i> Refresh
+                                </b>
+                            </button>
+                        </li>
+                        <li>
+                            <i class='far fa-hand-point-left'></i> Select <input type='radio' /> <strong>AGENT</strong>
                         </li>
                         <li>
                             <i class='far fa-thumbs-up'></i>
@@ -88,6 +96,9 @@
         @{
             Model.ReSelect = false;
         }
+        <div class="card shadow-lg border-1 rounded-lg">
+            <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
+        </div>
         <partial name="_AgentList" model="@Model" />
 
     </div>

@@ -13,12 +13,17 @@
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <li>
-                            <i class='far fa-file-powerpoint'></i>
-                            Claim: <span class="badge badge-light">
-                                @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber ?? "N/A"
+                            <i class='far fa-hand-point-right'></i>
+                            Case: <span class="badge badge-light">
+                                <i class='far fa-file-powerpoint'></i> @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
                             </span>
                         </li>
-                        <li><i class="fas fa-clock"></i> Timeline</li>
+                        <li>
+                            <i class='far fa-hand-point-right'></i>  <b>
+                                <i class="far fa-file-powerpoint"></i> Report Template ( <i class='fa fa-plus'></i> )
+                            </b>
+                        </li>
+                        <li><i class="fas fa-clock"></i> Timeline  ( <i class='fa fa-plus'></i> )</li>
                         @if (Model.Withdrawable)
                         {
                             <li>

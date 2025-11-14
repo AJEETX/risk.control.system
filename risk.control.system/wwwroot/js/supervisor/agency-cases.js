@@ -265,7 +265,6 @@
         }
         table.ajax.reload(null, false);
         $("#allocatedcase").prop('disabled', true);
-        $("#investigatecase").prop('disabled', true);
     });
     $(document).on('show.bs.modal', '#mapModal', function (event) {
         var trigger = $(event.relatedTarget); // The <img> clicked
