@@ -23,16 +23,16 @@ namespace risk.control.system.test
 
             _process = Process.Start(startInfo)!;
 
-            WaitUntilReady();
+            await WaitUntilReady();
         }
-        private void WaitUntilReady()
+        private async Task WaitUntilReady()
         {
             using var client = new HttpClient();
             for (var i = 0; i < 30; i++)
             {
                 try
                 {
-                    var result = client.GetAsync(BaseUrl).Result;
+                    var result = await client.GetAsync(BaseUrl);
                     if (result.IsSuccessStatusCode) return;
                 }
                 catch { }
