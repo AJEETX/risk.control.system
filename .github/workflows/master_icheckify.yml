@@ -23,6 +23,19 @@ jobs:
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
+     
+      - name: Install Playwright Browsers
+        working-directory: ./risk.control.system.test
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright Tests
+        run: dotnet test ./risk.control.system.test/risk.control.system.test.csproj --logger "trx;LogFileName=test_results.trx"
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: '**/*.trx'
 
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"

@@ -20,8 +20,8 @@
             }
         </div>
         <a class="d-block">
-            @UserManager.GetUserAsync(User).Result?.FirstName
-            @if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
+            <span id="user-firstname"> @UserManager.GetUserAsync(User).Result?.FirstName</span>
+            <span id="user-role"> @if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
             {
                 roleCode = @Applicationsettings.COMPANY_ADMIN.CODE;
                 <span class="badge badge-warning">@roleCode</span>
@@ -42,6 +42,7 @@
                 roleCode = @Applicationsettings.MANAGER.CODE;
                 <span class="badge badge-secondary">@roleCode</span>
             }
+            </span>
         </a>
     </div>
 }
