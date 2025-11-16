@@ -1,0 +1,68 @@
+{
+  "profiles": {
+    "Development": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "Account/Login",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "TEST_BASE_URL": "https://localhost:5001",
+        "APP_URL": "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk",
+        "COUNTRY": "ALL", // IN, AU, ALL
+        "SAMPLE_MOBILE_AUSTRALIA": "432854196",
+        "SAMPLE_MOBILE_INDIA": "9958389949",
+        "ipinfo_key": "5f18b75535d278",
+        "FtpKey": "C0##ect10n",
+        "TINY_URL_KEY": "rJDOGt9Ax2MTyTsGpWEfoKEvcnkffHEavSYzS8NEEk9wUbynspy7GF9gIBFr",
+        "OPEN_API": "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",
+        "HUGING_FACE": "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",
+        "GEMINI_KEY": "AIzaSyADR6X03bAkrWU13ro7Tfd47yTcbo6_ipc",
+        "JWT_KEY": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        "SMS_Url": "http://192.168.1.25:8080/message",
+        "SMS_User": "sms",
+        "SMS_Pwd": "FpW2xAoO",
+        "SMS_Sim": "2",
+        "SMS_User_India": "QQCLNH",
+        "SMS_Pwd_India": "8x4g066anpeskn",
+        "SMS_Sim_India": "1",
+        "PHONE_API": "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a",
+        "aws_id": "AKIAZSZXJZI5RVEJIKOB",
+        "aws_secret": "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",
+        "GOOGLE_MAP_KEY": "AIzaSyCYPyGotbPJAcE9Ap_ATSKkKOrXCQC4ops",
+        "GOOGLE_APPLICATION_CREDENTIALS_JSON": "{\"type\":\"service_account\",\"project_id\":\"riskunit\",\"private_key_id\":\"94b45a81c2c16d2382bb61789112fdc16c5251a4\",\"private_key\":\"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC5hWJnN+J9YoZO\\nFhiUn7GOJsNpVcUmV8UFkJ6wieDa4xbrmtdrjL4G8YuFI48cz08f42TA05dfU3D1\\nBMQbrY7MfpvrMFRITOIOUh6kv5uVigFzPg7Pyu7a2gbxtEQBZY3QeQPe4bkDhygw\\n/1kQACA7g3VnyhO4Ig1Tcz9qPzY+XfYEmnf3T7W/LPsDvAmJJDt6heIAPGT6j3RN\\nPlWP6hc0XkZncVg8GprpSHIiQQsW+lIk394XjjT3K9GxvkUPQsgQL/PfGYCyADpq\\nugD58AvJrUQWMeR03vqHVrX4aUGgesAv/nuDczg5Nv8YKy8CcUZTA4s7eFVrib+T\\nyq0askD/AgMBAAECggEAAWZptkc/4c1z5cK0J12PvG9pCNNfEmqeHkcVoz0av8HO\\n+EdvIDtde4Aws63OkWPNDr3W5TLMXFso2UMY2VLRNVJh3Kb2yEDFDkhq8wrSO3AX\\nDc7xspMag+bgiuz/64uNbUPp8y1K+U6NOtaXpNPI1dePvjpzZr4kVarzsgPDNGN3\\nYu6CNyMgPtSQ0OBXA4Bg/463dOx1Wl3iRcyzoc8h3wSorcpT1ZDCLs54tWLbDyVn\\nKXFma1mTsAAlXOB/e0ighxSrSMF+9losj4W9oz850K6fTaEaTttet1dICuxm+MIs\\nx83tZbdiQiPty/cPtCaakRrLsQGUm2mA2vxnOiWBAQKBgQDt2fWesqN8ACBplatw\\nG7YNpkMejK4ebTe5aZeATVs92UjI8egJTz3/jav7i1nQFPFExLn9v6efqOH6kdYr\\nlvZJ3zOTT2H1LGYQrcbnV1ILXJ+XpGkPX4URhKWyU0mWUVCEL6Ocm7aGZO5ehJUF\\nWVIxIG95qhtD3WgTdQO0z5dHIQKBgQDHrTx3PTubHO87D4/jYKd98P5qNTgkbiWT\\nLi8kTo02FJTg+Z+1s4SCeHWCavtNvb0fEh2IQxCOnKaSVmC78hCMPA3rrcTIC0I7\\nKPUauhSaOHcBq3rbHX/ENZ5uolr/h5vYqhC28yeAnmOCPh7qnpOf3h7X9xeCHTw/\\nzaVMZWAkHwKBgCHkzF6IAEn8TqIdJOf92uyJA8mHrIxDbgxq4p7y5wyiOQABkNo6\\nw4/2JUrcKblAMr1k90gUlpNm4oTtYUKm6YPPXa8hQclJQWYhDVYMGHHsCgX29M2v\\nA+xiJaaKvdLA1aNwknUPr2vpWBp59C5l8xNzFs+UkPwTwe/73cJXTqxhAoGBAL7J\\nRLv90uUbmW2KKgasxHyudrjOTu1oHRjrCPoc4AorUjE/8hzwAQ2UwVqyk5mtUHXO\\nnk8jHT/WZ8XtKJKL8Mm9W+OzbhFhyI+0S7WU1LiiePsseL/CCOFWBiJZmK8NSJiV\\nrlDQNg9Lx3Kbnni4uf8HgdsCagDVpEqmWGmNd3YrAoGAFmjy+T8Xq3qQe++skjy2\\n4gZFidZ5JCzXnqSkPZ4PW64QP0w6QM68sF3heHxhklNPh9AjCgzkcmn71yD4S30d\\nyfr8hNulaZT2ob0zi/j2G1imOmc8x59XFhtSLl2CehisK4QHdbMhzbfunCIc7Zuj\\nE/lL55zTykBRq7so2lbDZeI=\\n-----END PRIVATE KEY-----\\n\",\"client_email\":\"service-account@riskunit.iam.gserviceaccount.com\",\"client_id\":\"107079579253592917399\",\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"token_uri\":\"https://oauth2.googleapis.com/token\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"client_x509_cert_url\":\"https://www.googleapis.com/robot/v1/metadata/x509/service-account%40riskunit.iam.gserviceaccount.com\",\"universe_domain\":\"googleapis.com\"}"
+      },
+      "applicationUrl": "https://localhost:5001"
+    },
+    "icheckify-demo": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "Account/Login",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "TEST_BASE_URL": "https://localhost:5001",
+        "APP_URL": "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk",
+        "COUNTRY": "AU", // IN, AU, ALL
+        "SAMPLE_MOBILE_AUSTRALIA": "432854196",
+        "SAMPLE_MOBILE_INDIA": "9958389949",
+        "FtpData": "C0##ect10n",
+        "ipinfo_key": "5f18b75535d278",
+        "TINY_URL_KEY": "Q0582ZwZRX6svYlThe5pinYQ09KiYOgzDbwkrqsgm0qo7vu8taJDjkg6uYvJ",
+        "OPEN_API": "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",
+        "HUGING_FACE": "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",
+        "JWT_KEY": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        "SMS_Url": "https://api.sms-gate.app/3rdparty/v1/message",
+        "SMS_User": "KHHPON",
+        "SMS_Pwd": "oo1s2wfxhbvbtv",
+        "SMS_Sim": "1",
+        "SMS_User_India": "QQCLNH",
+        "SMS_Pwd_India": "8x4g066anpeskn",
+        "SMS_Sim_India": "1",
+        "aws_id": "AKIAZSZXJZI5RVEJIKOB",
+        "aws_secret": "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",
+        "GOOGLE_MAP_KEY": "AIzaSyCYPyGotbPJAcE9Ap_ATSKkKOrXCQC4ops",
+        "GOOGLE_APPLICATION_CREDENTIALS_JSON": "{\"type\":\"service_account\",\"project_id\":\"riskunit\",\"private_key_id\":\"94b45a81c2c16d2382bb61789112fdc16c5251a4\",\"private_key\":\"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC5hWJnN+J9YoZO\\nFhiUn7GOJsNpVcUmV8UFkJ6wieDa4xbrmtdrjL4G8YuFI48cz08f42TA05dfU3D1\\nBMQbrY7MfpvrMFRITOIOUh6kv5uVigFzPg7Pyu7a2gbxtEQBZY3QeQPe4bkDhygw\\n/1kQACA7g3VnyhO4Ig1Tcz9qPzY+XfYEmnf3T7W/LPsDvAmJJDt6heIAPGT6j3RN\\nPlWP6hc0XkZncVg8GprpSHIiQQsW+lIk394XjjT3K9GxvkUPQsgQL/PfGYCyADpq\\nugD58AvJrUQWMeR03vqHVrX4aUGgesAv/nuDczg5Nv8YKy8CcUZTA4s7eFVrib+T\\nyq0askD/AgMBAAECggEAAWZptkc/4c1z5cK0J12PvG9pCNNfEmqeHkcVoz0av8HO\\n+EdvIDtde4Aws63OkWPNDr3W5TLMXFso2UMY2VLRNVJh3Kb2yEDFDkhq8wrSO3AX\\nDc7xspMag+bgiuz/64uNbUPp8y1K+U6NOtaXpNPI1dePvjpzZr4kVarzsgPDNGN3\\nYu6CNyMgPtSQ0OBXA4Bg/463dOx1Wl3iRcyzoc8h3wSorcpT1ZDCLs54tWLbDyVn\\nKXFma1mTsAAlXOB/e0ighxSrSMF+9losj4W9oz850K6fTaEaTttet1dICuxm+MIs\\nx83tZbdiQiPty/cPtCaakRrLsQGUm2mA2vxnOiWBAQKBgQDt2fWesqN8ACBplatw\\nG7YNpkMejK4ebTe5aZeATVs92UjI8egJTz3/jav7i1nQFPFExLn9v6efqOH6kdYr\\nlvZJ3zOTT2H1LGYQrcbnV1ILXJ+XpGkPX4URhKWyU0mWUVCEL6Ocm7aGZO5ehJUF\\nWVIxIG95qhtD3WgTdQO0z5dHIQKBgQDHrTx3PTubHO87D4/jYKd98P5qNTgkbiWT\\nLi8kTo02FJTg+Z+1s4SCeHWCavtNvb0fEh2IQxCOnKaSVmC78hCMPA3rrcTIC0I7\\nKPUauhSaOHcBq3rbHX/ENZ5uolr/h5vYqhC28yeAnmOCPh7qnpOf3h7X9xeCHTw/\\nzaVMZWAkHwKBgCHkzF6IAEn8TqIdJOf92uyJA8mHrIxDbgxq4p7y5wyiOQABkNo6\\nw4/2JUrcKblAMr1k90gUlpNm4oTtYUKm6YPPXa8hQclJQWYhDVYMGHHsCgX29M2v\\nA+xiJaaKvdLA1aNwknUPr2vpWBp59C5l8xNzFs+UkPwTwe/73cJXTqxhAoGBAL7J\\nRLv90uUbmW2KKgasxHyudrjOTu1oHRjrCPoc4AorUjE/8hzwAQ2UwVqyk5mtUHXO\\nnk8jHT/WZ8XtKJKL8Mm9W+OzbhFhyI+0S7WU1LiiePsseL/CCOFWBiJZmK8NSJiV\\nrlDQNg9Lx3Kbnni4uf8HgdsCagDVpEqmWGmNd3YrAoGAFmjy+T8Xq3qQe++skjy2\\n4gZFidZ5JCzXnqSkPZ4PW64QP0w6QM68sF3heHxhklNPh9AjCgzkcmn71yD4S30d\\nyfr8hNulaZT2ob0zi/j2G1imOmc8x59XFhtSLl2CehisK4QHdbMhzbfunCIc7Zuj\\nE/lL55zTykBRq7so2lbDZeI=\\n-----END PRIVATE KEY-----\\n\",\"client_email\":\"service-account@riskunit.iam.gserviceaccount.com\",\"client_id\":\"107079579253592917399\",\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"token_uri\":\"https://oauth2.googleapis.com/token\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"client_x509_cert_url\":\"https://www.googleapis.com/robot/v1/metadata/x509/service-account%40riskunit.iam.gserviceaccount.com\",\"universe_domain\":\"googleapis.com\"}"
+      },
+      "applicationUrl": "https://localhost:5001"
+    }
+  }
+}

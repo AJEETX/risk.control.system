@@ -33,8 +33,8 @@ namespace risk.control.system.Seeds
             {
                 UserName = adminEmailwithSuffix,
                 Email = adminEmailwithSuffix,
-                FirstName = MANAGER.FIRST_NAME,
-                LastName = MANAGER.LAST_NAME,
+                FirstName = COMPANY_ADMIN.FIRST_NAME,
+                LastName = COMPANY_ADMIN.LAST_NAME,
                 Active = true,
                 EmailConfirmed = true,
                 ClientCompany = clientCompany,

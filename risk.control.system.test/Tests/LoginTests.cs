@@ -2,42 +2,53 @@
 {
     public class LoginTests : PlaywrightTestBase
     {
-        [Test]
-        public async Task CanLogin_WithCompanyAdmin()
+        [TestCase("admin@insurer.com", "R1$kcontrol!", "Andy", "admin")]
+        [TestCase("manager@insurer.com", "R1$kcontrol!", "Manny", "manager")]
+        [TestCase("creator@insurer.com", "R1$kcontrol!", "Creaty", "creator")]
+        [TestCase("assessor@insurer.com", "R1$kcontrol!", "Assessy", "assessor")]
+        [TestCase("admin@honest.com", "R1$kcontrol!", "Mathew", "admin")]
+        [TestCase("supervisor@honest.com", "R1$kcontrol!", "Adam", "supervisor")]
+        public async Task Login_ShouldRedirectToHome_AndDisplayCorrectUserInfo(
+            string email,
+            string password,
+            string expectedName,
+            string expectedRole)
         {
-            await _page!.GotoAsync($"{BaseUrl}/Account/Login");
-            await _page.ClickAsync("#acceptCookies");
+            // Perform Login
+            await LoginAsync(email, password);
 
-            await _page.FillAsync("#email", "admin@insurer.com");
-            await _page.FillAsync("#Password", "R1$kcontrol!");
-            await _page.ClickAsync("button[type=submit]");
-
+            // Validate redirect
             await _page!.WaitForURLAsync($"{BaseUrl}/");
             Assert.That(_page.Url, Is.EqualTo($"{BaseUrl}/"));
 
+            // Read user name
             var username = await _page.Locator("#user-firstname").InnerTextAsync();
-            StringAssert.Contains("Samy", username);
-            var rolename = await _page.Locator("#user-role").InnerTextAsync();
-            StringAssert.Contains("admin", rolename);
+            StringAssert.Contains(expectedName, username);
+
+            // Read user role
+            var role = await _page.Locator("#user-role").InnerTextAsync();
+            StringAssert.Contains(expectedRole, role);
         }
 
-        [Test]
-        public async Task CanLogin_WithCompanyCreator()
+        /// <summary>
+        /// Performs login using the UI.
+        /// Keeps the test clean and reusable.
+        /// </summary>
+        private async Task LoginAsync(string email, string password)
         {
             await _page!.GotoAsync($"{BaseUrl}/Account/Login");
-            await _page.ClickAsync("#acceptCookies");
+            await _page.WaitForTimeoutAsync(1000);
 
-            await _page.FillAsync("#email", "creator@insurer.com");
-            await _page.FillAsync("#Password", "R1$kcontrol!");
+            // Optional cookie banner
+            if (await _page.Locator("#acceptCookies").IsVisibleAsync())
+                await _page.ClickAsync("#acceptCookies");
+            await _page.WaitForSelectorAsync("#email");
+
+            await _page.FillAsync("#email", email);
+            await _page.FillAsync("#Password", password);
+
             await _page.ClickAsync("button[type=submit]");
-
-            await _page!.WaitForURLAsync($"{BaseUrl}/");
-            Assert.That(_page.Url, Is.EqualTo($"{BaseUrl}/"));
-
-            var username = await _page.Locator("#user-firstname").InnerTextAsync();
-            StringAssert.Contains("Reita", username);
-            var rolename = await _page.Locator("#user-role").InnerTextAsync();
-            StringAssert.Contains("creator", rolename);
         }
     }
 }
+

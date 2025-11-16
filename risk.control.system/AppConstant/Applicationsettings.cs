@@ -269,7 +269,7 @@
             public const string CODE = "creator";
             public const string USERNAME = "creator@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Reita";
+            public const string FIRST_NAME = "Creaty";
             public const string LAST_NAME = "Cremorne";
             public const string PROFILE_IMAGE = "/img/creator.jpeg";
         }
@@ -291,7 +291,7 @@
             public const string CODE = "assessor";
             public const string USERNAME = "assessor@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Samy";
+            public const string FIRST_NAME = "Assessy";
             public const string LAST_NAME = "Patrick";
             public const string PROFILE_IMAGE = "/img/assessor.jpeg";
         }
@@ -302,7 +302,7 @@
             public const string CODE = "manager";
             public const string USERNAME = "manager@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Samy";
+            public const string FIRST_NAME = "Manny";
             public const string LAST_NAME = "Patrick";
             public const string PROFILE_IMAGE = "/img/assessor.jpeg";
         }

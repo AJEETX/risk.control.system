@@ -34,11 +34,14 @@
                     </div>
                 }
                 <a href="#" class="d-block">
-                    @UserManager.GetUserAsync(User).Result?.FirstName
-                    @if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
+                    <span id="user-firstname">
+                        @UserManager.GetUserAsync(User).Result?.FirstName </span>
+                    <span id="user-role">
+                     @if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
                     {
                         <span class="badge badge-danger">@Applicationsettings.PORTAL_ADMIN.CODE</span>
                     }
+                    </span>
                 </a>
             </div>
         }
