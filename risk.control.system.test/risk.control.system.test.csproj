@@ -11,10 +11,6 @@
 	<PropertyGroup>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="Properties\launchSettings.json" CopyToOutputDirectory="Always" />
-	</ItemGroup>
   <ItemGroup>
     <Content Include="upload\au.zip">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
