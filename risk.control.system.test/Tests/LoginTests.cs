@@ -6,8 +6,8 @@
         [TestCase("manager@insurer.com", "R1$kcontrol!", "Manny", "manager")]
         [TestCase("creator@insurer.com", "R1$kcontrol!", "Creaty", "creator")]
         [TestCase("assessor@insurer.com", "R1$kcontrol!", "Assessy", "assessor")]
-        [TestCase("admin@honest.com", "R1$kcontrol!", "Mathew", "admin")]
-        [TestCase("supervisor@honest.com", "R1$kcontrol!", "Adam", "supervisor")]
+        [TestCase("admin@verify.com", "R1$kcontrol!", "Mathew", "admin")]
+        [TestCase("supervisor@verify.com", "R1$kcontrol!", "Adam", "supervisor")]
         public async Task Login_ShouldRedirectToHome_AndDisplayCorrectUserInfo(
             string email,
             string password,
@@ -39,7 +39,6 @@
             await _page!.GotoAsync($"{BaseUrl}/Account/Login");
             await _page.WaitForTimeoutAsync(1000);
 
-            // Optional cookie banner
             if (await _page.Locator("#acceptCookies").IsVisibleAsync())
                 await _page.ClickAsync("#acceptCookies");
             await _page.WaitForSelectorAsync("#email");

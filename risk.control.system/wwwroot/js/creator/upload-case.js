@@ -460,7 +460,7 @@
                     buttons: {
                         confirm: {
                             text: isChecked ? "Assign Directly" : "File Upload",  // Dynamic button text
-                            btnClass: isChecked ? 'btn-danger' : 'btn-info',  // Customize button class
+                            btnClass: isChecked ? 'btn-danger assign-directly' : 'btn-info file-upload',  // Customize button class
                             action: function () {
                                 askFileUploadConfirmation = false;
 

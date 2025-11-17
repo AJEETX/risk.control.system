@@ -8,12 +8,9 @@ namespace risk.control.system.test
         private static Process? _process;
 
         public static string BaseUrl { get; private set; } = Environment.GetEnvironmentVariable("TEST_BASE_URL") ?? "https://localhost:5001";
-
-        private static string PublishFolder => Path.GetFullPath(Path.Combine(TestContext.CurrentContext.WorkDirectory, "../../../../risk.control.system/bin/Release/net8.0/publish"));
-
         private static string DllPath => Path.Combine(PublishFolder, "risk.control.system.dll");
-        private string ProjectPath =>
-            Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "../../../../../risk.control.system"));
+        private static string ProjectPath => Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "../../../../../risk.control.system"));
+        private static string PublishFolder => Path.Combine(ProjectPath, "risk.control.system", "bin", "Release", "net8.0", "publish");
 
         [OneTimeSetUp]
         public async Task StartServer()
@@ -29,6 +26,11 @@ namespace risk.control.system.test
             });
 
             publish.WaitForExit();
+            if (publish.ExitCode != 0)
+            {
+                throw new Exception("dotnet publish failed:\n" +
+                    publish.StandardError.ReadToEnd());
+            }
 
             if (!Directory.Exists(PublishFolder))
             {
@@ -83,10 +85,11 @@ namespace risk.control.system.test
         private async Task WaitUntilReady()
         {
             Console.WriteLine("Waiting for MVC to become ready: " + BaseUrl);
+            await Task.Delay(10000);
 
             using var client = new HttpClient();
 
-            for (var i = 0; i < 40; i++) // 40 seconds max
+            for (var i = 0; i < 50; i++) // 40 seconds max
             {
                 try
                 {
