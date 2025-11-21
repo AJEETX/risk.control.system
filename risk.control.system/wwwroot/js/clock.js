@@ -1,4 +1,4 @@
-var askConfirmation = true; // Prevent duplicate confirmation dialogs
+﻿var askConfirmation = true; // Prevent duplicate confirmation dialogs
 var logoutPath = "/Account/Logout";
 var defaultTimeoutSeconds = parseInt(document.getElementById('timeout')?.value || "900", 10); // Default 15 minutes
 var sessionTimer = localStorage.getItem("sessionTimer")
@@ -9,6 +9,7 @@ const refreshSessionPath = "/Account/KeepSessionAlive"; // Path to refresh sessi
 async function refreshSession() {
     const currentPageUrl = window.location.href;
     console.log(`Refreshing session on ${currentPageUrl}`);
+    var token = $('input[name="icheckifyAntiforgery"]').val();
 
     try {
         // Send a POST request to keep the session alive
@@ -16,6 +17,7 @@ async function refreshSession() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                'X-CSRF-TOKEN': token   // ✔ Correct header name
             },
             credentials: "include", // Include cookies in the request
             body: JSON.stringify({ currentPage: currentPageUrl }), // Include the current page URL

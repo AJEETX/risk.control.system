@@ -129,7 +129,9 @@ $(document).ready(function () {
             $.ajax({
                 url: "/api/MasterData/GetUserBySearch",
                 type: "GET",
-                data: { search: request.term },
+                data: {
+                    search: request.term
+                },
                 success: function (data) {
                     // Ensure data is in the format [{ label: "email", value: "email" }]
                     response($.map(data, function (item) {
@@ -171,7 +173,9 @@ $(document).ready(function () {
             $.ajax({
                 url: "/api/Company/GetCountryIsdCode", // API endpoint for country suggestions
                 type: "GET",
-                data: { term: request.term }, // Use the term entered by the user
+                data: {
+                    term: request.term
+                }, // Use the term entered by the user
                 success: function (data) {
                     console.log(data); // Check what the server is sending
                     // Ensure data is in the format [{ label: "CountryName", value: "CountryCode", countryId: "CountryId", flag: "FlagImage" }]

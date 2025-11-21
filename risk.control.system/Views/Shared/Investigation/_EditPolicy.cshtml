@@ -72,7 +72,7 @@
                     <label class="input-group-label"> Verification Type:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="InvestigationServiceTypeId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
+                            <span class="input-group-text" asp-for="InvestigationServiceTypeId"><i class="nav-icon fas fa-wrench"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                         </div>
                         <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
                             <option value="">--- SELECT ---</option>
@@ -97,7 +97,7 @@
                     <label class="input-group-label"> Assured Amount (@ViewBag.Currency):</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="SumAssuredValue"><i class="fa fa-money"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-money-bill-wave"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <input id="SumAssuredValue" required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Assured Amount (@ViewBag.Currency) of minimum 100"
                                min="100" maxlength="10" autocomplete="off" title="Assured Amount (@ViewBag.Currency) of minimum 100" data-toggle="tooltip"/>
