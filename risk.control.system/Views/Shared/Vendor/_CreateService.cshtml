@@ -21,7 +21,7 @@
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="InvestigationServiceTypeId">
-                        <i class="fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i>
+                        <i class="fas fa-wrench"></i> <i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
                 <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId"
@@ -36,7 +36,7 @@
             <label class="input-group-label"> Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency):</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" for="Price"> <i class="fa fa-money"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text" for="Price"> <i class="fas fa-money-bill-wave"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
                 <input id="Price" asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency)" value="" required maxlength="10" autocomplete="off" />
                 <span asp-validation-for="Price" class="text-danger"></span>
