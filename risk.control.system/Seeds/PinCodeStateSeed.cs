@@ -237,44 +237,36 @@ namespace risk.control.system.Seeds
         }
         public static async Task<List<PinCodeState>> CsvRead_IndiaAsync()
         {
-            try
+            var states = LoadStates(indian_states);
+            var pincodes = new List<PinCodeState>();
+            var lines = await File.ReadAllLinesAsync(all_india_pincodes);
+            foreach (var line in lines.Skip(1))
             {
-                var states = LoadStates(indian_states);
-                var pincodes = new List<PinCodeState>();
-                var lines = await File.ReadAllLinesAsync(all_india_pincodes);
-                foreach (var line in lines.Skip(1))
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+                var parts = line.Split(',').Select(p => p.Trim().Trim('"')).ToArray(); // remove spaces and quotes
+                if (parts.Length >= 4)
                 {
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-                    var parts = line.Split(',').Select(p => p.Trim().Trim('"')).ToArray(); // remove spaces and quotes
-                    if (parts.Length >= 4)
+                    var officeName = officeSuffixRegex.Replace(parts[0].Trim(), "").Trim('"');
+
+                    var pincode = parts[1].Trim();
+                    var district = parts[2].Trim().ToUpperInvariant();
+                    var stateName = parts[3].Trim().ToUpperInvariant();
+                    var stateCode = states.FirstOrDefault(s => s.StateName.ToLower() == stateName.ToLower())?.StateCode;
+                    pincodes.Add(new PinCodeState
                     {
-                        var officeName = officeSuffixRegex.Replace(parts[0].Trim(), "").Trim('"');
-
-                        var pincode = parts[1].Trim();
-                        var district = parts[2].Trim().ToUpperInvariant();
-                        var stateName = parts[3].Trim().ToUpperInvariant();
-                        var stateCode = states.FirstOrDefault(s => s.StateName.ToLower() == stateName.ToLower())?.StateCode;
-                        pincodes.Add(new PinCodeState
-                        {
-                            Name = officeName.Replace("B.O", "").Replace("BO", "").Replace("SO", "").Replace("S.O", "").Replace("S.O.", ""),
-                            Code = pincode,
-                            District = district,
-                            StateName = stateName,
-                            StateCode = stateCode ?? parts[3].Trim().ToUpperInvariant(),
-                            Latitude = "N/A",
-                            Longitude = "N/A"
-                        });
-                    }
+                        Name = officeName.Replace("B.O", "").Replace("BO", "").Replace("SO", "").Replace("S.O", "").Replace("S.O.", ""),
+                        Code = pincode,
+                        District = district,
+                        StateName = stateName,
+                        StateCode = stateCode ?? parts[3].Trim().ToUpperInvariant(),
+                        Latitude = "N/A",
+                        Longitude = "N/A"
+                    });
                 }
-
-                return pincodes;
-
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+
+            return pincodes;
         }
     }
     public class StateModel

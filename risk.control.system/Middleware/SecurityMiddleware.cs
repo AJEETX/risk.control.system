@@ -29,6 +29,13 @@ namespace risk.control.system.Middleware
 
         public async Task Invoke(HttpContext context)
         {
+            // Remove headers your app controls
+            context.Response.Headers.Remove("X-Powered-By");
+            context.Response.Headers.Remove("X-AspNet-Version");
+            context.Response.Headers.Remove("X-AspNetMvc-Version");
+            context.Response.Headers.Remove("X-AspNetCore-Version");
+            context.Response.Headers.Remove("X-Generator");
+            context.Response.Headers.Remove("Server");
             var nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
             context.Items["CSP-Nonce"] = nonce;
 
@@ -50,10 +57,10 @@ namespace risk.control.system.Middleware
                     "font-src  'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
                     "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
                     "frame-src 'none';" +
-                    "media-src 'self' data: blob: https:;" +
+                    "media-src 'self' data:;" +
                     "object-src 'none';" +
                     "form-action 'self';" +
-                    "frame-ancestors 'self' https://maps.googleapis.com;" +
+                    "frame-ancestors 'self';" +
                     "upgrade-insecure-requests;");
             }
             try
