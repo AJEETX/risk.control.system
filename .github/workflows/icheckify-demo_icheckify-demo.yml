@@ -1,19 +1,46 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - icheckify-demo
+﻿name: Build, Scan and Deploy ASP.Net Core app to Azure Web App - icheckify-demo
 
 on:
   push:
     branches:
       - icheckify-demo
+  pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
+  # ---------------------------------------------------
+  # 1️⃣ CodeQL Security Scan Job
+  # ---------------------------------------------------
+  codeql:
+    name: CodeQL Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: csharp
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  # ---------------------------------------------------
+  # 2️⃣ Build & Publish Job
+  # ---------------------------------------------------
   build:
     runs-on: windows-latest
+    needs: codeql
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +50,7 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Build with dotnet
+      - name: Build
         run: dotnet build --configuration Release
      
       - name: Install Playwright Browsers
@@ -39,31 +66,34 @@ jobs:
           name: playwright-test-results
           path: '**/*.trx'
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+      - name: Publish
+        run: dotnet publish -c Release -o "${{ env.DOTNET_ROOT }}/myapp"
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{ env.DOTNET_ROOT }}/myapp
 
+  # ---------------------------------------------------
+  # 3️⃣ Deploy to Azure Job
+  # ---------------------------------------------------
   deploy:
     runs-on: windows-latest
     needs: build
     environment:
-      name: 'Production'
+      name: Production
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -78,4 +108,3 @@ jobs:
           app-name: 'icheckify-demo'
           slot-name: 'Production'
           package: .
-          
