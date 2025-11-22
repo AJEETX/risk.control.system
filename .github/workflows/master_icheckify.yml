@@ -1,4 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+﻿# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: Build and deploy ASP.Net Core app to Azure Web App - icheckify
@@ -8,8 +8,32 @@ on:
     branches:
       - master
   workflow_dispatch:
+permissions:
+  contents: read
+  security-events: write
 
 jobs:
+  # ---------------------------------------------------
+  # 1️⃣ CodeQL Security Scan Job
+  # ---------------------------------------------------
+  codeql:
+    name: CodeQL Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: csharp
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
   build:
     runs-on: windows-latest
 
