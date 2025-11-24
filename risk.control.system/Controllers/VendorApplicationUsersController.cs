@@ -176,7 +176,7 @@ namespace risk.control.system.Controllers
                     user.ProfilePicture = dataStream.ToArray();
                     user.ProfilePictureExtension = fileExtension;
                 }
-                var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
+                var userFullEmail = user.Email.Trim().ToLowerInvariant() + "@" + emailSuffix;
                 user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                 //DEMO
                 user.Password = Applicationsettings.Password;

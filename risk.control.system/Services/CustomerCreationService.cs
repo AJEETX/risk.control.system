@@ -103,7 +103,7 @@ namespace risk.control.system.Services
                                            .Include(p => p.State)
                                            .Include(p => p.Country)
                                            .FirstOrDefault(p => p.Code == uploadCase.CustomerPincode &&
-                                           p.District.Name.ToLower().Contains(uploadCase.CustomerDistrictName.ToLower()));
+                                           p.District.Name.ToLowerInvariant().Contains(uploadCase.CustomerDistrictName.ToLowerInvariant()));
                     if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
                     {
                         errors.Add(new UploadError
@@ -129,9 +129,9 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var extension = Path.GetExtension(CUSTOMER_IMAGE).ToLower();
+                var extension = Path.GetExtension(CUSTOMER_IMAGE).ToLowerInvariant();
                 var fileName = Guid.NewGuid().ToString() + extension;
-                var imagesWithData = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), CUSTOMER_IMAGE);
+                var imagesWithData = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLowerInvariant(), CUSTOMER_IMAGE);
                 if (imagesWithData is null)
                 {
                     errors.Add(new UploadError

@@ -39,7 +39,7 @@
 									<input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
 									<input type="hidden" name="Questions[@i].QuestionType" value="@question.QuestionType" />
 									<input type="hidden" name="Questions[@i].Options" value="@question.Options" />
-									<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
+									<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLowerInvariant())" />
 								</div>
 								<div class="col-md-4 col-4">
 									@if (question.QuestionType == "text")

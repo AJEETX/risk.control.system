@@ -35,7 +35,7 @@ namespace risk.control.system.Services
                     string folderPath = entry.FullName.Replace("/", "\\");
 
                     // Check if the entry is inside the desired subfolder and is an image file
-                    if (folderPath.ToLower().Contains("\\" + subfolderName + "\\") && IsImageFile(entry.FullName))
+                    if (folderPath.ToLowerInvariant().Contains("\\" + subfolderName + "\\") && IsImageFile(entry.FullName))
                     {
                         // Extract image data
                         using (MemoryStream imageStream = new MemoryStream())
@@ -66,7 +66,7 @@ namespace risk.control.system.Services
         {
             // Check if the file is an image based on file extension
             string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp" };
-            string extension = Path.GetExtension(filePath)?.ToLower();
+            string extension = Path.GetExtension(filePath)?.ToLowerInvariant();
             return imageExtensions.Contains(extension);
         }
     }

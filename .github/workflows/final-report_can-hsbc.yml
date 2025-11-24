@@ -75,23 +75,6 @@ jobs:
           name: security-scan
           path: ./codeql-results
 
-      - name: Install SARIF Web Viewer
-        run: npm install -g @microsoft/sarif-web-component
-
-      - name: Generate HTML Report
-        run: |
-            mkdir sarif-html
-            sarif-web-component build \
-                --sarif-file ./codeql-results/codeql.sarif \
-                --output-folder sarif-html \
-                --title "CodeQL Security Report"
-
-      - name: Upload HTML report
-        uses: actions/upload-artifact@v4
-        with:
-            name: codeql-html-report
-            path: sarif-html
-
   build:
     runs-on: windows-latest
     permissions:

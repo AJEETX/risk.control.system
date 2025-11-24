@@ -69,7 +69,7 @@
                                 <div class="input-group-prepend">
                                     @* Display Country Code *@
                                     <span class="input-group-text country-code-text" data-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
-                                        <img src="@("/flags/" + @Model.Country.Code.ToLower() + ".png")" class="flag-icon" />
+                                        <img src="@("/flags/" + @Model.Country.Code.ToLowerInvariant() + ".png")" class="flag-icon" />
                                         +@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>

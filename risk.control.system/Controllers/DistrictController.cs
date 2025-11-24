@@ -78,7 +78,7 @@ namespace risk.control.system.Controllers
             };
 
             // Determine sort direction
-            bool isAscending = orderDirection?.ToLower() == "asc";
+            bool isAscending = orderDirection?.ToLowerInvariant() == "asc";
 
             // Dynamically apply sorting using reflection
             var parameter = Expression.Parameter(typeof(District), "p");
@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Profile));
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                district.Name = textInfo.ToTitleCase(district.Name.ToLower());
+                district.Name = textInfo.ToTitleCase(district.Name.ToLowerInvariant());
 
                 district.Updated = DateTime.Now;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -250,7 +250,7 @@ namespace risk.control.system.Controllers
                 }
                 var existingdistrict = await _context.District.FindAsync(id);
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                existingdistrict.Name = textInfo.ToTitleCase(district.Name.ToLower());
+                existingdistrict.Name = textInfo.ToTitleCase(district.Name.ToLowerInvariant());
                 existingdistrict.Code = district.Code;
                 existingdistrict.CountryId = district.SelectedCountryId;
                 existingdistrict.Updated = DateTime.Now;

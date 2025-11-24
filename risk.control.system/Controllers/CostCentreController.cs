@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers
             try
             {
 
-                costCentre.Code = costCentre.Code?.ToUpper();
+                costCentre.Code = costCentre.Code?.ToUpperInvariant();
 
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre
@@ -132,7 +132,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
 
-            bool exists = await _context.CostCentre.AnyAsync(x => x.Code.ToUpper() == code.ToUpper() && (!id.HasValue || x.CostCentreId != id.Value));
+            bool exists = await _context.CostCentre.AnyAsync(x => x.Code.ToUpperInvariant() == code.ToUpperInvariant() && (!id.HasValue || x.CostCentreId != id.Value));
 
             return Json(exists);
         }
@@ -170,7 +170,7 @@ namespace risk.control.system.Controllers
             try
             {
                 // Uppercase normalization
-                costCentre.Code = costCentre.Code?.ToUpper();
+                costCentre.Code = costCentre.Code?.ToUpperInvariant();
 
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre.AnyAsync(x => x.Code == costCentre.Code && x.CostCentreId != id);

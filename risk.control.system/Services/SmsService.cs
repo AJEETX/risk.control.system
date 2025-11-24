@@ -40,9 +40,9 @@ namespace risk.control.system.Services
                 //var localIps = GetActiveIPAddressesInNetwork();
                 var url = Environment.GetEnvironmentVariable("SMS_Url");
 
-                var username = countryCode.ToLower() == "au" ? Environment.GetEnvironmentVariable("SMS_User") : Environment.GetEnvironmentVariable("SMS_User_India");
-                var password = countryCode.ToLower() == "au" ? Environment.GetEnvironmentVariable("SMS_Pwd") : Environment.GetEnvironmentVariable("SMS_Pwd_India");
-                var sim = countryCode.ToLower() == "au" ? Environment.GetEnvironmentVariable("SMS_Sim") : Environment.GetEnvironmentVariable("SMS_Sim_India");
+                var username = countryCode.ToLowerInvariant() == "au" ? Environment.GetEnvironmentVariable("SMS_User") : Environment.GetEnvironmentVariable("SMS_User_India");
+                var password = countryCode.ToLowerInvariant() == "au" ? Environment.GetEnvironmentVariable("SMS_Pwd") : Environment.GetEnvironmentVariable("SMS_Pwd_India");
+                var sim = countryCode.ToLowerInvariant() == "au" ? Environment.GetEnvironmentVariable("SMS_Sim") : Environment.GetEnvironmentVariable("SMS_Sim_India");
                 var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
 

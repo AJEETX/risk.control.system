@@ -53,7 +53,7 @@ namespace risk.control.system.Controllers
             };
 
             // Determine sort direction
-            bool isAscending = orderDirection?.ToLower() == "asc";
+            bool isAscending = orderDirection?.ToLowerInvariant() == "asc";
             var query = _context.State
                 .Include(s => s.Country)
                 .AsQueryable();
@@ -190,7 +190,7 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                state.Code = state.Code?.ToUpper();
+                state.Code = state.Code?.ToUpperInvariant();
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
                 if (exists)
                 {
@@ -198,7 +198,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Profile));
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                state.Name = textInfo.ToTitleCase(state.Name.ToLower());
+                state.Name = textInfo.ToTitleCase(state.Name.ToLowerInvariant());
                 state.Updated = DateTime.Now;
                 state.CountryId = state.SelectedCountryId;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -258,7 +258,7 @@ namespace risk.control.system.Controllers
                 var existingState = _context.State.Find(id);
                 existingState.Code = state.Code;
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                existingState.Name = textInfo.ToTitleCase(state.Name.ToLower());
+                existingState.Name = textInfo.ToTitleCase(state.Name.ToLowerInvariant());
                 existingState.Updated = DateTime.Now;
                 existingState.CountryId = state.SelectedCountryId;
                 existingState.UpdatedBy = HttpContext.User?.Identity?.Name;

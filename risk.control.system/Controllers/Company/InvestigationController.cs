@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 var totalReadyToAssign = await service.GetAutoCount(currentUserEmail);
                 var hasClaim = totalReadyToAssign > 0;
-                var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
+                var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLowerInvariant();
                 userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
 
                 if (!userCanCreate)
@@ -152,7 +152,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["CostCentreId"] = new SelectList(context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
 
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var model = service.AddCasePolicy(currentUserEmail);
@@ -195,7 +195,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatePolicy));
                 }
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
 
                 ViewData["InvestigationServiceTypeId"] = new SelectList(context.InvestigationServiceType.Where(i =>
                         i.InsuranceType == claimsInvestigation.PolicyDetail.InsuranceType).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
@@ -237,7 +237,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["BreadcrumbNode"] = editPage;
 
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var pinCode = context.PinCode.Include(s => s.Country).OrderBy(s => s.Name).FirstOrDefault(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
@@ -246,7 +246,7 @@ namespace risk.control.system.Controllers.Company
                     {
                         InvestigationTaskId = id,
                         Addressline = random.Next(100, 999) + " GOOD STREET",
-                        PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                        PhoneNumber = pinCode.Country.Code.ToLowerInvariant() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                         Education = Education.PROFESSIONAL,
                         Income = Income.UPPER_INCOME,
@@ -304,7 +304,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatePolicy));
                 }
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
@@ -343,7 +343,7 @@ namespace risk.control.system.Controllers.Company
                 var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "Investigation", $"Add beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
@@ -368,7 +368,7 @@ namespace risk.control.system.Controllers.Company
                         SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault(),
                         PinCodeId = pinCode.PinCodeId,
                         SelectedPincodeId = pinCode.PinCodeId,
-                        PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                        PhoneNumber = pinCode.Country.Code.ToLowerInvariant() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                     };
                     return View(model);
                 }
@@ -407,7 +407,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["BeneficiaryRelationId"] = new SelectList(context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", beneficiary.BeneficiaryRelationId);
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
@@ -442,7 +442,7 @@ namespace risk.control.system.Controllers.Company
                 var model = await empanelledAgencyService.GetEmpanelledVendors(id);
                 model.FromEditPage = fromEditPage;
                 var currentUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
                 if (vendorId > 0)
                 {
                     model.VendorId = vendorId;
@@ -478,7 +478,7 @@ namespace risk.control.system.Controllers.Company
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
                 var model = await service.GetClaimDetails(currentUserEmail, id);
                 return View(model);
             }

@@ -24,9 +24,6 @@ namespace risk.control.system.Controllers.Api
     [Authorize(Roles = $"{AGENT.DISPLAY_NAME}")]
     public class AgentController : ControllerBase
     {
-        private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
-        private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
-        private static string PanTask_id = "pan-card-verification-at-lowest-price.p.rapidapi.com";
         private readonly ApplicationDbContext _context;
         private readonly ICloneReportService cloneReportService;
         private readonly IHttpClientService httpClientService;
@@ -40,7 +37,6 @@ namespace risk.control.system.Controllers.Api
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
         private readonly IMailService mailboxService;
-        private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         private static Random randomNumber = new Random();
         private string portal_base_url = string.Empty;
 
@@ -265,14 +261,14 @@ namespace risk.control.system.Controllers.Api
         //        {
         //            return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
         //        }
-        //        if (request.Type.ToUpper() != "PAN")
+        //        if (request.Type.ToUpperInvariant() != "PAN")
         //        {
         //            return BadRequest("incorrect document");
         //        }
         //        //VERIFY PAN
         //        var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
         //        var maskedImage = await httpClientService.GetMaskedImage(new MaskImage { Image = request.Image }, FaceMatchBaseUrl);
-        //        if (maskedImage == null || maskedImage.DocType.ToUpper() != "PAN")
+        //        if (maskedImage == null || maskedImage.DocType.ToUpperInvariant() != "PAN")
         //        {
         //            return BadRequest("document issue");
         //        }
@@ -700,7 +696,7 @@ namespace risk.control.system.Controllers.Api
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var extension = Path.GetExtension(data.Image.FileName).ToLower();
+                var extension = Path.GetExtension(data.Image.FileName).ToLowerInvariant();
 
                 var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
                 if (!supportedExtensions.Contains(extension))

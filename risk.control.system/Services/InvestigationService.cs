@@ -25,7 +25,6 @@ namespace risk.control.system.Services
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
-        Task<CaseTransactionModel> GetClaimDetailsAiReportSummary(CaseTransactionModel model);
         Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id);
         Task<CaseTransactionModel> GetPdfReport(long id);
     }
@@ -654,12 +653,6 @@ namespace risk.control.system.Services
             return model;
         }
 
-        public async Task<CaseTransactionModel> GetClaimDetailsAiReportSummary(CaseTransactionModel model)
-        {
-            //var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
-            //model.ReportAiSummary = investigationSummary;
-            return model;
-        }
         public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
         {
             var claim = await context.Investigations
@@ -917,21 +910,21 @@ namespace risk.control.system.Services
             // Search filtering
             if (!string.IsNullOrEmpty(search))
             {
-                search = search.ToLower();
+                search = search.ToLowerInvariant();
                 query = query.Where(a =>
-                    a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
-                    a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
-                    a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
-                    a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
+                    a.PolicyDetail.ContractNumber.ToLowerInvariant().Contains(search) ||
+                    a.PolicyDetail.CauseOfLoss.ToLowerInvariant().Contains(search) ||
+                    a.PolicyDetail.InvestigationServiceType.Name.ToLowerInvariant().Contains(search) ||
+                    a.PolicyDetail.InvestigationServiceType.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.DateOfBirth.ToString().ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Code.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.PhoneNumber.ToLowerInvariant().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))
@@ -948,7 +941,7 @@ namespace risk.control.system.Services
             {
                 Id = a.Id,
                 IsNew = a.IsNew,
-                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpperInvariant()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                 PolicyId = a.PolicyDetail.ContractNumber,
                 AssignedToAgency = a.IsNew,
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
@@ -959,7 +952,7 @@ namespace risk.control.system.Services
                 Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-light\">customer name</span>",
                 Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
                 IsUploaded = a.IsUploaded,
-                Origin = a.ORIGIN.GetEnumDisplayName().ToLower(),
+                Origin = a.ORIGIN.GetEnumDisplayName().ToLowerInvariant(),
                 SubStatus = a.SubStatus,
                 Ready2Assign = a.IsValidCaseData(),
                 Service = a.PolicyDetail.InvestigationServiceType.Name,
@@ -991,62 +984,62 @@ namespace risk.control.system.Services
                 switch (orderColumn)
                 {
                     case 1: // Sort by Policy Number
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.PolicyId)
                             : transformedData.OrderByDescending(a => a.PolicyId);
                         break;
 
                     case 2: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.Amount)
                             : transformedData.OrderByDescending(a => a.Amount);
                         break;
 
                     case 3: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.PincodeCode)
                             : transformedData.OrderByDescending(a => a.PincodeCode);
                         break;
 
                     case 6: // Sort by Customer Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.CustomerFullName)
                             : transformedData.OrderByDescending(a => a.CustomerFullName);
                         break;
 
                     case 8: // Sort by Beneficiary Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.BeneficiaryFullName)
                             : transformedData.OrderByDescending(a => a.BeneficiaryFullName);
                         break;
 
 
                     case 9: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.ServiceType)
                             : transformedData.OrderByDescending(a => a.ServiceType);
                         break;
 
                     case 10: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.Location)
                             : transformedData.OrderByDescending(a => a.Location);
                         break;
 
                     case 11: // Sort by Created Date
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
                             : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null));
                         break;
 
                     case 12: // Sort by TimeElapsed
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;
 
                     default: // Default Sorting (if needed)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;
@@ -1159,20 +1152,20 @@ namespace risk.control.system.Services
             // Search filtering
             if (!string.IsNullOrEmpty(search))
             {
-                search = search.ToLower();
+                search = search.ToLowerInvariant();
                 query = query.Where(a =>
-                    a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
-                     a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
-                    a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
+                    a.PolicyDetail.ContractNumber.ToLowerInvariant().Contains(search) ||
+                     a.PolicyDetail.CauseOfLoss.ToLowerInvariant().Contains(search) ||
+                    a.PolicyDetail.InvestigationServiceType.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.DateOfBirth.ToString().ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Code.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.PhoneNumber.ToLowerInvariant().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))
@@ -1191,7 +1184,7 @@ namespace risk.control.system.Services
                 CustomerFullName = a.CustomerDetail?.Name ?? "",
                 BeneficiaryFullName = a.BeneficiaryDetail?.Name ?? "",
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
+                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpperInvariant()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Agent = GetOwner(a),
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwnerImage(a))),
@@ -1225,56 +1218,56 @@ namespace risk.control.system.Services
                 switch (orderColumn)
                 {
                     case 0: // Sort by Policy Number
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.PolicyId)
                             : transformedData.OrderByDescending(a => a.PolicyId);
                         break;
 
                     case 1: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.Amount)
                             : transformedData.OrderByDescending(a => a.Amount);
                         break;
 
                     case 6: // Sort by Customer Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.CustomerFullName)
                             : transformedData.OrderByDescending(a => a.CustomerFullName);
                         break;
 
                     case 8: // Sort by Beneficiary Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.BeneficiaryFullName)
                             : transformedData.OrderByDescending(a => a.BeneficiaryFullName);
                         break;
 
 
                     case 9: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.ServiceType)
                             : transformedData.OrderByDescending(a => a.ServiceType);
                         break;
 
                     case 10: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.SubStatus)
                             : transformedData.OrderByDescending(a => a.SubStatus);
                         break;
 
                     case 11: // Sort by Created Date
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
                             : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null));
                         break;
 
                     case 13: // Sort by TimeElapsed
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;
 
                     default: // Default Sorting (if needed)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;
@@ -1349,20 +1342,20 @@ namespace risk.control.system.Services
             // Search filtering
             if (!string.IsNullOrEmpty(search))
             {
-                search = search.ToLower();
+                search = search.ToLowerInvariant();
                 query = query.Where(a =>
-                    a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
-                    a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
-                    a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
+                    a.PolicyDetail.ContractNumber.ToLowerInvariant().Contains(search) ||
+                    a.PolicyDetail.CauseOfLoss.ToLowerInvariant().Contains(search) ||
+                    a.PolicyDetail.InvestigationServiceType.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.DateOfBirth.ToString().ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Code.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.PhoneNumber.ToLowerInvariant().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))
@@ -1380,7 +1373,7 @@ namespace risk.control.system.Services
                 CustomerFullName = a.CustomerDetail?.Name ?? string.Empty,
                 BeneficiaryFullName = a.BeneficiaryDetail?.Name ?? string.Empty,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
+                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpperInvariant()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Agent = GetOwner(a),
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwnerImage(a))),
@@ -1423,62 +1416,62 @@ namespace risk.control.system.Services
                 switch (orderColumn)
                 {
                     case 1: // Sort by Policy Number
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.PolicyId)
                             : transformedData.OrderByDescending(a => a.PolicyId);
                         break;
 
                     case 2: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.Amount)
                             : transformedData.OrderByDescending(a => a.Amount);
                         break;
 
                     case 3: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.PincodeCode)
                             : transformedData.OrderByDescending(a => a.PincodeCode);
                         break;
 
                     case 6: // Sort by Customer Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.CustomerFullName)
                             : transformedData.OrderByDescending(a => a.CustomerFullName);
                         break;
 
                     case 8: // Sort by Beneficiary Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.BeneficiaryFullName)
                             : transformedData.OrderByDescending(a => a.BeneficiaryFullName);
                         break;
 
 
                     case 9: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.ServiceType)
                             : transformedData.OrderByDescending(a => a.ServiceType);
                         break;
 
                     case 10: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.Location)
                             : transformedData.OrderByDescending(a => a.Location);
                         break;
 
                     case 11: // Sort by Created Date
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
                             : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null));
                         break;
 
                     case 12: // Sort by TimeElapsed
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;
 
                     default: // Default Sorting (if needed)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;

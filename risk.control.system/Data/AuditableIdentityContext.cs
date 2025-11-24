@@ -31,8 +31,8 @@ namespace risk.control.system.Data
 
         private void OnBeforeSaveChanges(string userId)
         {
-            userId = httpContext?.HttpContext?.User?.Identity.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userId);
+            var userEmail = userId ?? httpContext?.HttpContext?.User?.Identity.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             ChangeTracker.DetectChanges();
             var auditEntries = new List<AuditEntry>();
             foreach (var entry in ChangeTracker.Entries())
@@ -41,7 +41,7 @@ namespace risk.control.system.Data
                     continue;
                 var auditEntry = new AuditEntry(entry);
                 auditEntry.TableName = entry.Entity.GetType().Name;
-                auditEntry.UserId = userId;
+                auditEntry.UserId = userEmail;
                 auditEntry.CompanyId = companyUser?.ClientCompanyId;
                 auditEntries.Add(auditEntry);
                 foreach (var property in entry.Properties)
@@ -73,6 +73,8 @@ namespace risk.control.system.Data
                                 auditEntry.OldValues[propertyName] = property.OriginalValue;
                                 auditEntry.NewValues[propertyName] = property.CurrentValue;
                             }
+                            break;
+                        default:
                             break;
                     }
                 }

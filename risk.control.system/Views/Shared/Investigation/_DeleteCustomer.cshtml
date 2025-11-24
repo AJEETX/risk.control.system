@@ -20,7 +20,7 @@
         customerExist = true;
         country = @Model.ClaimsInvestigation?.CustomerDetail?.Country?.Name;
         phone = +@Model.ClaimsInvestigation?.CustomerDetail?.Country?.ISDCode +"(0) "+ @Model.ClaimsInvestigation?.CustomerDetail?.PhoneNumber;
-        imgPath = "/flags/" + @Model.ClaimsInvestigation.CustomerDetail.Country.Code.ToLower() + ".png";
+        imgPath = "/flags/" + @Model.ClaimsInvestigation.CustomerDetail.Country.Code.ToLowerInvariant() + ".png";
         map = string.Format(@Model.ClaimsInvestigation?.CustomerDetail.CustomerLocationMap, "200", "200");
     }
 }

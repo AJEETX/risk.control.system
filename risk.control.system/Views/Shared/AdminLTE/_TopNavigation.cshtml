@@ -35,7 +35,7 @@
 
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 info-dropdown">
                 @{
-                    var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
+                    var img = "/flags/" + @Model.CountryCode.ToLowerInvariant() + ".png";
                 }
 
                 <!-- Country -->

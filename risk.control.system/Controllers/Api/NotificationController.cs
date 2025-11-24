@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers.Api
             string logo = "https://icheckify-demo.azurewebsites.net/img/iCheckifyLogo.png";
             string? attachments = $"<a href='{logo}'>team</a>";
             var finalMessage = $"{message}\n\n Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")}\n\n {logo}";
-            await smsService.DoSendSmsAsync(countryCode.ToLower(), "+" + mobile, finalMessage);
+            await smsService.DoSendSmsAsync(countryCode.ToLowerInvariant(), "+" + mobile, finalMessage);
             return Ok();
         }
 

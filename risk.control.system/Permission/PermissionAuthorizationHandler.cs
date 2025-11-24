@@ -19,7 +19,7 @@ namespace risk.control.system.Permission
                 return;
             }
             var permissionss = context.User.Claims.Where(x => x.Type == Applicationsettings.PERMISSION &&
-                                                            x.Value.ToLower() == requirement.Permission.ToLower() &&
+                                                            x.Value.ToLowerInvariant() == requirement.Permission.ToLowerInvariant() &&
                                                             x.Issuer == "LOCAL AUTHORITY");
             if (permissionss.Any())
             {

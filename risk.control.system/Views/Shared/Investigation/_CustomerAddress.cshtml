@@ -42,7 +42,7 @@
     <label class="input-group-label" for="StateId"> State:</label>
     <div class="input-group mb-3 autocomplete-wrapper">
         @{
-            var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+            var img = "/flags/" + @Model.Country.Code.ToLowerInvariant() + ".png";
         }
         <div class="input-group-prepend">
 

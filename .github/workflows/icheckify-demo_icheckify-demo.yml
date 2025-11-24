@@ -26,6 +26,17 @@ jobs:
       - name: Fortify Check Out Source Code
         uses: actions/checkout@v4
 
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release
+
       - name: Run Fortify Scan
         uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
         with:
