@@ -23,15 +23,35 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: csharp
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
+        with:
+            output: ./codeql-results
+
+      - name: Upload SARIF results
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-results
+          path: ./codeql-results
+
+      - name: Convert SARIF to HTML
+        uses: microsoft/sarif-tools@v2
+        with:
+          command: 'transform --output codeql-report.html codeql-results/*.sarif'
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-html-report
+          path: codeql-report.html
+  
 
   # ---------------------------------------------------
   # 2️⃣ Build & Publish Job
