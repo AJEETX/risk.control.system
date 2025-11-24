@@ -51,7 +51,7 @@ jobs:
           mkdir html
           for file in codeql-results/*.sarif; do
             echo "Converting $file"
-                sarif convert "$file" --format html --output html/codeql-report.html
+                sarif convert "$file" --output html/codeql-report.html
             done
 
       - name: Upload HTML report
