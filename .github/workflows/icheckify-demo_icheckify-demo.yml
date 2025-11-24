@@ -12,6 +12,27 @@ permissions:
   security-events: write
 
 jobs:
+
+  Fortify-AST-Scan:
+    # Use the appropriate runner for building your source code. Ensure dev tools required to build your code are present and configured appropriately (MSBuild, Python, etc).
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      # pull-requests: write     # Required if DO_PR_COMMENT is set to true
+
+    steps:
+      - name: Fortify Check Out Source Code
+        uses: actions/checkout@v4
+
+      - name: Run Fortify Scan
+        uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
+        with:
+          sast-scan: true          # Run a SAST scan; if not specified or set to false, no SAST scan will be run
+          debricked-sca-scan: true # For FoD, run an open-source scan as part of the SAST scan (ignored if SAST scan
+                                   # is disabled). For SSC, run a Debricked scan and import results into SSC.
+
   # ---------------------------------------------------
   # 1️⃣ CodeQL Security Scan Job
   # ---------------------------------------------------
@@ -20,7 +41,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: CodeQL Checkout
+        uses: actions/checkout@v4
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -34,30 +56,13 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
             output: ./codeql-results
-            category: "codeql-csharp-scan"
+            category: security-scan
 
       - name: Upload SARIF results
         uses: actions/upload-artifact@v4
         with:
-          name: codeql-results
+          name: security-scan
           path: ./codeql-results
-
-      - name: Install SARIF converter tool
-        run: dotnet tool install --global Sarif.Multitool
-
-      - name: Convert SARIF to HTML
-        run: |
-          mkdir output
-          for file in codeql-results/*.sarif; do
-            echo "Converting $file"
-                ~/.dotnet/tools/sarif transform "$file" "output/report.html"
-            done
-
-      - name: Upload HTML report
-        uses: actions/upload-artifact@v4
-        with:
-          name: codeql-html-report
-          path: output/report.html
 
   # ---------------------------------------------------
   # 2️⃣ Build & Publish Job
