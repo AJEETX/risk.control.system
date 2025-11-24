@@ -35,12 +35,12 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
             output: ./codeql-results
-            category: "codeql-csharp-scan"
+            category: security-scan
 
       - name: Upload SARIF results
         uses: actions/upload-artifact@v4
         with:
-          name: codeql-results
+          name: security-scan
           path: ./codeql-results
 
       - name: Install SARIF converter tool
@@ -48,17 +48,17 @@ jobs:
 
       - name: Convert SARIF to HTML
         run: |
-          mkdir output
+          mkdir html
           for file in codeql-results/*.sarif; do
             echo "Converting $file"
-                ~/.dotnet/tools/sarif transform "$file" "output/report.html"
+                sarif convert "$file" --format html --output html/codeql-report.html
             done
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: codeql-html-report
-          path: output/report.html
+          path: html/codeql-report.html
 
   build:
     runs-on: windows-latest
