@@ -27,6 +27,17 @@ jobs:
       - name: Fortify Check Out Source Code
         uses: actions/checkout@v4
 
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release
+
       - name: Run Fortify Scan
         uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
         with:
@@ -64,41 +75,22 @@ jobs:
           name: security-scan
           path: ./codeql-results
 
-  convert-sarif:
-      name: Convert SARIF to HTML
-      runs-on: ubuntu-latest
-      needs: codeql
+      - name: Install SARIF Web Viewer
+        run: npm install -g @microsoft/sarif-web-component
 
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
+      - name: Generate HTML Report
+        run: |
+            mkdir sarif-html
+            sarif-web-component build \
+                --sarif-file ./codeql-results/codeql.sarif \
+                --output-folder sarif-html \
+                --title "CodeQL Security Report"
 
-        - name: Download SARIF results
-          uses: actions/download-artifact@v4
-          with:
-            name: security-scan
-
-        - name: Install Node
-          uses: actions/setup-node@v4
-          with:
-            node-version: '20'
-
-        - name: Install SARIF HTML converter
-          run: npm install -g sarif-html
-
-        - name: Convert SARIF to HTML Report
-          run: |
-            mkdir html-report
-            for file in ./codeql-results/*.sarif; do
-              echo "Converting $file"
-              sarif-html generate "$file" "html-report/report.html"
-            done
-
-        - name: Upload HTML Report
-          uses: actions/upload-artifact@v4
-          with:
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
             name: codeql-html-report
-            path: html-report/report.html
+            path: sarif-html
 
   build:
     runs-on: windows-latest
