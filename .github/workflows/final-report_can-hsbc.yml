@@ -43,22 +43,21 @@ jobs:
           name: security-scan
           path: ./codeql-results
 
-      - name: Install SARIF converter tool
-        run: dotnet tool install --global Sarif.Multitool
+      - name: Install SARIF viewer tool
+        run: dotnet tool install --global Sarif.Viewer.Console
 
       - name: Convert SARIF to HTML
         run: |
-          mkdir html
-          for file in codeql-results/*.sarif; do
-            echo "Converting $file"
-                sarif convert "$file" --output html/codeql-report.html
-            done
+          mkdir output
+          sarif-viewer export \
+            --output-file output/report.html \
+            codeql-results/*.sarif
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: codeql-html-report
-          path: html/codeql-report.html
+          path: output/report.html
 
   build:
     runs-on: windows-latest
