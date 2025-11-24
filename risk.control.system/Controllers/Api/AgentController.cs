@@ -15,10 +15,13 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = $"{AGENT.DISPLAY_NAME}")]
     public class AgentController : ControllerBase
     {
         private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
@@ -76,7 +79,6 @@ namespace risk.control.system.Controllers.Api
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        [AllowAnonymous]
         [HttpPost("pin")]
         public async Task<IActionResult> GetAgentPin(string agentEmail)
         {
@@ -107,7 +109,6 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("ResetUid")]
         public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)
         {
@@ -133,11 +134,14 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("VerifyMobile")]
         public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
         {
-            if (request is null || string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
+            if (request is null)
+            {
+                return BadRequest("Request body cannot be null or empty.");
+            }
+            if (string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
             {
                 return BadRequest("Invalid request parameters.");
             }
@@ -191,15 +195,18 @@ namespace risk.control.system.Controllers.Api
             await smsService.DoSendSmsAsync(countryCode, mobile, message);
         }
 
-        [AllowAnonymous]
         [HttpPost("VerifyId")]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)
         {
             try
             {
-                if (request is null || string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
+                if (request is null)
                 {
-                    return BadRequest();
+                    return BadRequest("Request body cannot be null or empty.");
+                }
+                if (string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
+                {
+                    return BadRequest("Uid And/Or Image is empty/null");
                 }
                 var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
                 if (mobileUidExist == null)
@@ -216,24 +223,6 @@ namespace risk.control.system.Controllers.Api
                 }
 
                 var image = Convert.FromBase64String(request.Image);
-
-                //var savedImage = ImageCompression.ConverterSkia(image);
-                //string path = Path.Combine(webHostEnvironment.WebRootPath, "onboard");
-                //if (!Directory.Exists(path))
-                //{
-                //    Directory.CreateDirectory(path);
-                //}
-
-                //using MemoryStream stream = new MemoryStream(image);
-
-                //var filePath = Path.Combine(path, $"face{DateTime.Now.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
-                //CompressImage.CompressimageWindows(stream, filePath);
-
-                //var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                //var saveImageBase64Image2Verify = Convert.ToBase64String(savedImage);
-
-                //var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
 
                 var matched = await compareFaces.DoFaceMatch(mobileUidExist.ProfilePicture, image);
                 if (matched.Item1)
@@ -257,59 +246,62 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
-        [HttpPost("VerifyDocument")]
-        public async Task<IActionResult> VerifyDocument(VerifyDocumentRequest request)
-        {
-            try
-            {
-                if (request is null || string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
-                {
-                    return BadRequest();
-                }
-                var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
-                if (mobileUidExist == null)
-                {
-                    return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
-                }
-                if (!request.VerifyPan)
-                {
-                    return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
-                }
-                if (request.Type.ToUpper() != "PAN")
-                {
-                    return BadRequest("incorrect document");
-                }
-                //VERIFY PAN
-                var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
-                var maskedImage = await httpClientService.GetMaskedImage(new MaskImage { Image = request.Image }, FaceMatchBaseUrl);
-                if (maskedImage == null || maskedImage.DocType.ToUpper() != "PAN")
-                {
-                    return BadRequest("document issue");
-                }
+        //[AllowAnonymous]
+        //[HttpPost("VerifyDocument")]
+        //public async Task<IActionResult> VerifyDocument(VerifyDocumentRequest request)
+        //{
+        //    try
+        //    {
+        //        if (request is null || string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
+        //        {
+        //            return BadRequest();
+        //        }
+        //        var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
+        //        if (mobileUidExist == null)
+        //        {
+        //            return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
+        //        }
+        //        if (!request.VerifyPan)
+        //        {
+        //            return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+        //        }
+        //        if (request.Type.ToUpper() != "PAN")
+        //        {
+        //            return BadRequest("incorrect document");
+        //        }
+        //        //VERIFY PAN
+        //        var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
+        //        var maskedImage = await httpClientService.GetMaskedImage(new MaskImage { Image = request.Image }, FaceMatchBaseUrl);
+        //        if (maskedImage == null || maskedImage.DocType.ToUpper() != "PAN")
+        //        {
+        //            return BadRequest("document issue");
+        //        }
 
-                var body = await httpClientService.VerifyPanNew(maskedImage.DocumentId, PanIdfyUrl, RapidAPIKey, PanTask_id);
+        //        var body = await httpClientService.VerifyPanNew(maskedImage.DocumentId, PanIdfyUrl, RapidAPIKey, PanTask_id);
 
-                if (body != null && body.valid)
-                {
-                    return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
-                }
-                return BadRequest("document verify issue");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                return BadRequest("document verify issue");
-            }
-        }
+        //        if (body != null && body.valid)
+        //        {
+        //            return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+        //        }
+        //        return BadRequest("document verify issue");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.ToString());
+        //        return BadRequest("document verify issue");
+        //    }
+        //}
 
-        [AllowAnonymous]
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("agent")]
-        public async Task<IActionResult> GetAll(string email = "agent@verify.com")
+        public async Task<IActionResult> GetAll(string email)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest("Email is empty/null");
+                }
                 var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -398,12 +390,15 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("agent-map")]
-        public async Task<IActionResult> IndexMap(string email = "agent@verify.com")
+        public async Task<IActionResult> IndexMap(string email)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest("Email is empty/null");
+                }
                 var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -469,12 +464,15 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("get")]
-        public async Task<IActionResult> Get(long caseId, string email = "agent@verify.com")
+        public async Task<IActionResult> Get(long caseId, string email)
         {
             try
             {
+                if (caseId < 1 || string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest("Invalid caseId And/Or Email is empty/null");
+                }
                 var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -576,12 +574,16 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(500);
             }
         }
-        [AllowAnonymous]
+
         [HttpGet("get-template")]
-        public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email = "agent@verify.com")
+        public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email)
         {
             try
             {
+                if (caseId < 1 || string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest("Invalid caseId And/Or Email is empty/null");
+                }
                 var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -597,16 +599,21 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(500);
             }
         }
-        [AllowAnonymous]
+
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
             try
             {
-                if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                if (data == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Request body cannot be null or empty.");
                 }
+                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                {
+                    return BadRequest("All fields (Image, LatLong) are required and must be valid.");
+                }
+
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
@@ -641,16 +648,20 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
             try
             {
-                if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                if (data == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Request body cannot be null or empty.");
                 }
+                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                {
+                    return BadRequest("All fields (Image, LatLong) are required and must be valid.");
+                }
+
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
@@ -675,15 +686,18 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("media")]
         public async Task<IActionResult> Media(DocumentData data)
         {
             try
             {
-                if (data == null || data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                if (data == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Request body cannot be null or empty.");
+                }
+                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                {
+                    return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
                 var extension = Path.GetExtension(data.Image.FileName).ToLower();
@@ -716,7 +730,6 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("answers")]
         public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
         {
@@ -747,15 +760,18 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
         {
             try
             {
-                if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || data.CaseId < 1)
+                if (data == null)
                 {
-                    throw new ArgumentNullException("Argument(s) can't be null");
+                    return BadRequest("Request body cannot be null or empty.");
+                }
+                if (string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || data.CaseId < 1)
+                {
+                    return BadRequest("All fields (Email, Remarks, CaseId) are required and must be valid.");
                 }
                 var agent = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
