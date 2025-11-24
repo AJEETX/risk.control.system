@@ -78,19 +78,27 @@ jobs:
           with:
             name: security-scan
 
-        - name: Install SARIF Tool
-          run: pip install sarif-tools
+        - name: Install Node
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20'
 
-        - name: Convert SARIF to Markdown
+        - name: Install SARIF HTML converter
+          run: npm install -g sarif-html
+
+        - name: Convert SARIF to HTML Report
           run: |
-            mkdir report
-            sarif-tools markdown codeql-results/*.sarif > report/codeql-report.md
+            mkdir html-report
+            for file in ./codeql-results/*.sarif; do
+              echo "Converting $file"
+              sarif-html generate "$file" "html-report/report.html"
+            done
 
-        - name: Upload human-readable report
+        - name: Upload HTML Report
           uses: actions/upload-artifact@v4
           with:
             name: codeql-html-report
-            path: report/codeql-report.md
+            path: html-report/report.html
 
   build:
     runs-on: windows-latest
