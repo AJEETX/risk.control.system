@@ -51,7 +51,7 @@ jobs:
           mkdir output
           for file in codeql-results/*.sarif; do
             echo "Converting $file"
-                ~/.dotnet/tools/sarif multitool transform "$file" "output/report.html"
+                ~/.dotnet/tools/sarif transform "$file" "output/report.html"
             done
 
       - name: Upload HTML report

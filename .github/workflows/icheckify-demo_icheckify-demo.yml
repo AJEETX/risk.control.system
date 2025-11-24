@@ -42,17 +42,22 @@ jobs:
           name: codeql-results
           path: ./codeql-results
 
+      - name: Install SARIF converter tool
+        run: dotnet tool install --global Sarif.Multitool
+
       - name: Convert SARIF to HTML
-        uses: microsoft/sarif-tools@v2
-        with:
-          command: 'transform --output codeql-report.html codeql-results/*.sarif'
+        run: |
+          mkdir output
+          for file in codeql-results/*.sarif; do
+            echo "Converting $file"
+                ~/.dotnet/tools/sarif transform "$file" "output/report.html"
+            done
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: codeql-html-report
-          path: codeql-report.html
-  
+          path: output/report.html
 
   # ---------------------------------------------------
   # 2️⃣ Build & Publish Job
