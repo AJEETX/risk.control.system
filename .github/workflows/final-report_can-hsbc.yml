@@ -43,17 +43,19 @@ jobs:
           name: security-scan
           path: ./codeql-results
 
-      - name: Install SARIF to HTML converter
-        run: npm install -g sarif-to-html
+      - name: Install SARIF Multitool
+        run: npm install -g @microsoft/sarif-multitool
 
       - name: Convert SARIF to HTML
-        run: sarif-to-html codeql-results/*.sarif > codeql-report.html
+        run: |
+            mkdir report
+            sarif-multitool export-html "codeql-results/*.sarif" -o report/
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: codeql-html-report
-          path: codeql-report.html
+          path: report
 
   build:
     runs-on: windows-latest
