@@ -568,20 +568,20 @@ namespace risk.control.system.Services
         //    var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED))?.ToList();
 
         //    var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+        //                i => i.Name.ToUpperInvariant() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
         //    var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+        //                i => i.Name.ToUpperInvariant() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
         //    var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+        //                i => i.Name.ToUpperInvariant() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
         //    var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+        //                i => i.Name.ToUpperInvariant() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
         //    var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+        //                i => i.Name.ToUpperInvariant() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
         //    var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-        //                i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+        //                i => i.Name.ToUpperInvariant() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
 
         //    var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
         //        i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);

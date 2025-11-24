@@ -42,8 +42,8 @@
                         CountryCode = company.Country.Code,
                         Country = $"{company.Country.Name} ({company.Country.Code})",
                         IsdCode = $"(+{company.Country.ISDCode})",
-                        CurrencyCode = $" {company.Country.CurrencyCode} ({Extensions.GetCultureByCountry(company.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
-                        CurrencyName = $" {company.Country.CurrencyName} ({Extensions.GetCultureByCountry(company.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+                        CurrencyCode = $" {company.Country.CurrencyCode} ({Extensions.GetCultureByCountry(company.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol})",
+                        CurrencyName = $" {company.Country.CurrencyName} ({Extensions.GetCultureByCountry(company.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol})",
                         Language = company.Country.Language
                     };
                     <partial name="AdminLTE/_CompanyTopNavigation" model="@navigationModel" />
@@ -62,8 +62,8 @@
                         CountryCode = vendor.Country.Code,
                         Country = $"{vendor.Country.Name} ({vendor.Country.Code})",
                         IsdCode = $"(+{vendor.Country.ISDCode})",
-                        CurrencyCode = $" {vendor.Country.CurrencyCode}({Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
-                        CurrencyName = $" {vendor.Country.CurrencyName} ({Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+                        CurrencyCode = $" {vendor.Country.CurrencyCode}({Extensions.GetCultureByCountry(vendor.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol})",
+                        CurrencyName = $" {vendor.Country.CurrencyName} ({Extensions.GetCultureByCountry(vendor.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol})",
                         Language = vendor.Country.Language
                     };
                     <partial name="AdminLTE/_AgencyTopNavigation" model="@navigationModel" />
@@ -81,8 +81,8 @@
                         CountryCode = admin.Country.Code,
                         Country = $"{admin.Country.Name} ({admin.Country.Code})",
                         IsdCode = $"(+{admin.Country.ISDCode})",
-                        CurrencyCode = $"{admin.Country.CurrencyCode} ({Extensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
-                        CurrencyName = $"{admin.Country.CurrencyName} ({Extensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+                        CurrencyCode = $"{admin.Country.CurrencyCode} ({Extensions.GetCultureByCountry(admin.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol})",
+                        CurrencyName = $"{admin.Country.CurrencyName} ({Extensions.GetCultureByCountry(admin.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol})",
                         Language = admin.Country.Language
                     };
                     <partial name="AdminLTE/_TopNavigation" model="@navigationModel" />

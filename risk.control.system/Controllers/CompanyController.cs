@@ -306,7 +306,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
+                var userFullEmail = user.Email.Trim().ToLowerInvariant() + "@" + emailSuffix;
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
                     string newFileName = Guid.NewGuid().ToString();
@@ -879,7 +879,7 @@ namespace risk.control.system.Controllers
                     user.ProfilePicture = dataStream.ToArray();
                     user.ProfilePictureExtension = fileExtension;
                 }
-                var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
+                var userFullEmail = user.Email.Trim().ToLowerInvariant() + "@" + emailSuffix;
                 //DEMO
                 user.Password = Applicationsettings.Password;
                 user.Email = userFullEmail;
@@ -1117,7 +1117,7 @@ namespace risk.control.system.Controllers
             {
                 var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
-                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
@@ -1235,7 +1235,7 @@ namespace risk.control.system.Controllers
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
@@ -1344,7 +1344,7 @@ namespace risk.control.system.Controllers
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.State)

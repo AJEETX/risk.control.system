@@ -1,19 +1,88 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - icheckify-demo
+﻿name: Build, Scan and Deploy ASP.Net Core app to Azure Web App - icheckify-demo
 
 on:
   push:
     branches:
       - icheckify-demo
+  pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
+
+  Fortify-AST-Scan:
+    # Use the appropriate runner for building your source code. Ensure dev tools required to build your code are present and configured appropriately (MSBuild, Python, etc).
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      # pull-requests: write     # Required if DO_PR_COMMENT is set to true
+
+    steps:
+      - name: Fortify Check Out Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release
+
+      - name: Run Fortify Scan
+        uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
+        with:
+          sast-scan: true          # Run a SAST scan; if not specified or set to false, no SAST scan will be run
+          debricked-sca-scan: true # For FoD, run an open-source scan as part of the SAST scan (ignored if SAST scan
+                                   # is disabled). For SSC, run a Debricked scan and import results into SSC.
+
+  # ---------------------------------------------------
+  # 1️⃣ CodeQL Security Scan Job
+  # ---------------------------------------------------
+  codeql:
+    name: CodeQL Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: CodeQL Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+            output: ./codeql-results
+            category: security-scan
+
+      - name: Upload SARIF results
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan
+          path: ./codeql-results
+
+  # ---------------------------------------------------
+  # 2️⃣ Build & Publish Job
+  # ---------------------------------------------------
   build:
     runs-on: windows-latest
+    needs: codeql
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +92,7 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Build with dotnet
+      - name: Build
         run: dotnet build --configuration Release
      
       - name: Install Playwright Browsers
@@ -39,31 +108,34 @@ jobs:
           name: playwright-test-results
           path: '**/*.trx'
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+      - name: Publish
+        run: dotnet publish -c Release -o "${{ env.DOTNET_ROOT }}/myapp"
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{ env.DOTNET_ROOT }}/myapp
 
+  # ---------------------------------------------------
+  # 3️⃣ Deploy to Azure Job
+  # ---------------------------------------------------
   deploy:
     runs-on: windows-latest
     needs: build
     environment:
-      name: 'Production'
+      name: Production
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -78,4 +150,3 @@ jobs:
           app-name: 'icheckify-demo'
           slot-name: 'Production'
           package: .
-          

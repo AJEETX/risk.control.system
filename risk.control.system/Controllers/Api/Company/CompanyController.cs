@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.Api.Company
                     District = u.District.Name,
                     State = u.State.Code,
                     Country = u.Country.Code,
-                    Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
+                    Flag = "/flags/" + u.Country.Code.ToLowerInvariant() + ".png",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     Active = u.Status.GetEnumDisplayName(),
                     UpdatedBy = u.UpdatedBy,
@@ -158,7 +158,7 @@ namespace risk.control.system.Controllers.Api.Company
                     State = u.State.Name,
                     CountryCode = u.Country.Code,
                     Country = u.Country.Name,
-                    Flag = $"/flags/{u.Country.Code.ToLower()}.png",
+                    Flag = $"/flags/{u.Country.Code.ToLowerInvariant()}.png",
                     Updated = u.Updated?.ToString("dd-MM-yyyy") ?? u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
@@ -242,7 +242,7 @@ namespace risk.control.system.Controllers.Api.Company
                     District = u.District.Name,
                     State = u.State.Code,
                     Country = u.Country.Code,
-                    Flag = $"/flags/{u.Country.Code.ToLower()}.png",
+                    Flag = $"/flags/{u.Country.Code.ToLowerInvariant()}.png",
                     Updated = u.Updated?.ToString("dd-MM-yyyy") ?? u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
@@ -342,7 +342,7 @@ namespace risk.control.system.Controllers.Api.Company
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Code,
-                    Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
+                    Flag = "/flags/" + u.Country.Code.ToLowerInvariant() + ".png",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     CanOnboard = u.Status == VendorStatus.ACTIVE &&
@@ -399,10 +399,10 @@ namespace risk.control.system.Controllers.Api.Company
                     State = service.State.Name,
                     CountryCode = service.Country.Code,
                     Country = service.Country.Name,
-                    Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
+                    Flag = "/flags/" + service.Country.Code.ToLowerInvariant() + ".png",
                     Pincodes = pincodes,
                     RawPincodes = rawPincodes,
-                    Rate = string.Format(Extensions.GetCultureByCountry(service.Country.Code.ToUpper()), "{0:c}", service.Price),
+                    Rate = string.Format(Extensions.GetCultureByCountry(service.Country.Code.ToUpperInvariant()), "{0:c}", service.Price),
                     UpdatedBy = service.UpdatedBy,
                     Updated = service.Updated.HasValue ? service.Updated.Value.ToString("dd-MM-yyyy") : service.Created.ToString("dd-MM-yyyy"),
                     IsUpdated = service.IsUpdated,
@@ -455,7 +455,7 @@ namespace risk.control.system.Controllers.Api.Company
                  .Take(10)
                  .Select(x => new { StateId = x.StateId, StateName = x.Name })?.ToList());
 
-            var states = _context.State.Where(x => x.CountryId == countryId && x.Name.ToLower().Contains(term.ToLower()))
+            var states = _context.State.Where(x => x.CountryId == countryId && x.Name.ToLowerInvariant().Contains(term.ToLowerInvariant()))
                     .OrderBy(x => x.Name)
                  .Take(10)
                     .Select(c => new
@@ -483,7 +483,7 @@ namespace risk.control.system.Controllers.Api.Company
                     })
                     .ToList()
                 : _context.District
-                    .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
+                    .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLowerInvariant().Contains(term.ToLowerInvariant()))
                     .OrderBy(x => x.Name)
                     .Take(10)
                     .Select(x => new
@@ -545,13 +545,13 @@ namespace risk.control.system.Controllers.Api.Company
             // Apply name filter (case-insensitive)
             if (!string.IsNullOrEmpty(nameFilter))
             {
-                pincodesQuery = pincodesQuery.Where(x => x.Name.ToLower().Contains(nameFilter.ToLower()));
+                pincodesQuery = pincodesQuery.Where(x => x.Name.ToLowerInvariant().Contains(nameFilter.ToLowerInvariant()));
             }
 
             // Apply pincode filter (case-insensitive)
             if (!string.IsNullOrEmpty(pincodeFilter))
             {
-                pincodesQuery = pincodesQuery.Where(x => x.Code.ToLower().Contains(pincodeFilter.ToLower()));
+                pincodesQuery = pincodesQuery.Where(x => x.Code.ToLowerInvariant().Contains(pincodeFilter.ToLowerInvariant()));
             }
 
             // Get the filtered and sorted results
@@ -600,13 +600,13 @@ namespace risk.control.system.Controllers.Api.Company
             // Apply name filter (case-insensitive)
             if (!string.IsNullOrEmpty(nameFilter))
             {
-                pincodesQuery = pincodesQuery.Where(x => x.Name.ToLower().Contains(nameFilter.ToLower()));
+                pincodesQuery = pincodesQuery.Where(x => x.Name.ToLowerInvariant().Contains(nameFilter.ToLowerInvariant()));
             }
 
             // Apply pincode filter (case-insensitive)
             if (!string.IsNullOrEmpty(pincodeFilter))
             {
-                pincodesQuery = pincodesQuery.Where(x => x.Code.ToLower().Contains(pincodeFilter.ToLower()));
+                pincodesQuery = pincodesQuery.Where(x => x.Code.ToLowerInvariant().Contains(pincodeFilter.ToLowerInvariant()));
             }
 
             // Get the filtered and sorted results
@@ -798,8 +798,8 @@ namespace risk.control.system.Controllers.Api.Company
                 // Search pincodes that match either name or pincode
                 pincodesQuery = _context.PinCode
                     .Where(x => x.CountryId == countryId &&
-                    (x.Name.ToLower().Contains(nameFilter.ToLower()) ||
-                    x.Code.ToLower().Contains(nameFilter.ToLower()))
+                    (x.Name.ToLowerInvariant().Contains(nameFilter.ToLowerInvariant()) ||
+                    x.Code.ToLowerInvariant().Contains(nameFilter.ToLowerInvariant()))
                     );
             }
             else
@@ -807,7 +807,7 @@ namespace risk.control.system.Controllers.Api.Company
                 // Search pincodes that match either name or pincode
                 pincodesQuery = _context.PinCode
                     .Where(x => x.CountryId == countryId &&
-                    x.Code.ToLower().Contains(pincodeFilter.ToLower())
+                    x.Code.ToLowerInvariant().Contains(pincodeFilter.ToLowerInvariant())
                     );
             }
 
@@ -875,7 +875,7 @@ namespace risk.control.system.Controllers.Api.Company
                  .Select(c => new
                  {
                      IsdCode = $"+{c.ISDCode.ToString()}",
-                     Flag = "/flags/" + c.Code.ToLower() + ".png",
+                     Flag = "/flags/" + c.Code.ToLowerInvariant() + ".png",
                      CountryId = $"{c.Code.ToString()}",
                      Label = $"+{c.ISDCode.ToString()} {c.Name}"
                  })?
@@ -888,7 +888,7 @@ namespace risk.control.system.Controllers.Api.Company
                     .Select(c => new
                     {
                         IsdCode = $"+{c.ISDCode.ToString()}",
-                        Flag = "/flags/" + c.Code.ToLower() + ".png",
+                        Flag = "/flags/" + c.Code.ToLowerInvariant() + ".png",
                         CountryId = $"{c.Code.ToString()}",
                         Label = $"+{c.ISDCode.ToString()} {c.Name}"
                     })?
@@ -907,7 +907,7 @@ namespace risk.control.system.Controllers.Api.Company
 
                 var phoneInfo = await phoneService.ValidateAsync(country.ISDCode.ToString() + phone);
 
-                if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() || phoneInfo.NumberType.ToLower() != "mobile")
+                if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLowerInvariant() != country.Code.ToLowerInvariant() || phoneInfo.NumberType.ToLowerInvariant() != "mobile")
                 {
                     return Ok(new
                     {
@@ -952,7 +952,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("bsb")]
-        public async Task<IActionResult> GetBSBDetails(string code)
+        public IActionResult GetBSBDetails(string code)
         {
             var bsbDetail = _context.BsbInfo.FirstOrDefault(b => b.BSB == code);
             return Ok(bsbDetail);

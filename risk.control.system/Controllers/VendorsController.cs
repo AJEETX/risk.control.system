@@ -395,7 +395,7 @@ namespace risk.control.system.Controllers
                     user.ProfilePicture = dataStream.ToArray();
                     user.ProfilePictureExtension = fileExtension;
                 }
-                var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
+                var userFullEmail = user.Email.Trim().ToLowerInvariant() + "@" + emailSuffix;
                 //DEMO
                 user.Password = Applicationsettings.Password;
                 user.Email = userFullEmail;
@@ -892,7 +892,7 @@ namespace risk.control.system.Controllers
 
                 Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
-                vendor.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
+                vendor.Email = mailAddress.ToLowerInvariant() + domainData.GetEnumDisplayName();
 
                 IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                 if (vendorDocument is not null)
@@ -918,8 +918,8 @@ namespace risk.control.system.Controllers
                 vendor.AgreementDate = DateTime.Now;
                 vendor.ActivatedDate = DateTime.Now;
                 vendor.DomainName = domainData;
-                vendor.BankName = vendor.BankName.ToUpper();
-                vendor.IFSCCode = vendor.IFSCCode.ToUpper();
+                vendor.BankName = vendor.BankName.ToUpperInvariant();
+                vendor.IFSCCode = vendor.IFSCCode.ToUpperInvariant();
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = currentUserEmail;
                 vendor.CreatedUser = currentUserEmail;
@@ -989,7 +989,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var isSuperAdmin = await _context.ApplicationUser.AnyAsync(u => u.Email.ToLower() == currentUserEmail.ToLower() && u.IsSuperAdmin);
+                var isSuperAdmin = await _context.ApplicationUser.AnyAsync(u => u.Email.ToLowerInvariant() == currentUserEmail.ToLowerInvariant() && u.IsSuperAdmin);
                 vendor.SelectedByCompany = isSuperAdmin;
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
                 var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
@@ -1054,8 +1054,8 @@ namespace risk.control.system.Controllers
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                 vendor.PhoneNumber = vendor.PhoneNumber.TrimStart('0');
-                vendor.BankName = vendor.BankName.ToUpper();
-                vendor.IFSCCode = vendor.IFSCCode.ToUpper();
+                vendor.BankName = vendor.BankName.ToUpperInvariant();
+                vendor.IFSCCode = vendor.IFSCCode.ToUpperInvariant();
 
                 vendor.PinCodeId = vendor.SelectedPincodeId;
                 vendor.DistrictId = vendor.SelectedDistrictId;

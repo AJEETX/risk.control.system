@@ -42,7 +42,7 @@ namespace risk.control.system.Seeds
                 IsVendorAdmin = false,
                 IsClientManager = true,
                 Addressline = "139 Sector 44",
-                PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                PhoneNumber = pinCode.Country.Code.ToLowerInvariant() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 PinCode = pinCode,
                 Country = pinCode.Country,
                 CountryId = pinCode.CountryId,

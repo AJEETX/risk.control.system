@@ -264,25 +264,25 @@ namespace risk.control.system.Services
             // Search filtering
             if (!string.IsNullOrEmpty(search))
             {
-                search = search.ToLower();
+                search = search.ToLowerInvariant();
                 query = query.Where(a =>
-                    a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
-                    a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
-                    a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
+                    a.PolicyDetail.ContractNumber.ToLowerInvariant().Contains(search) ||
+                    a.PolicyDetail.CauseOfLoss.ToLowerInvariant().Contains(search) ||
+                    a.PolicyDetail.InvestigationServiceType.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.DateOfBirth.ToString().ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Code.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.PhoneNumber.ToLowerInvariant().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))
             {
-                query = query.Where(c => c.PolicyDetail.InsuranceType.GetEnumDisplayName().ToLower() == caseType.ToLower());  // Assuming CaseType is the field in your data model
+                query = query.Where(c => c.PolicyDetail.InsuranceType.GetEnumDisplayName().ToLowerInvariant() == caseType.ToLowerInvariant());  // Assuming CaseType is the field in your data model
             }
             var data = query.AsEnumerable();
             int recordsFiltered = query.Count();
@@ -293,7 +293,7 @@ namespace risk.control.system.Services
             {
                 Id = a.Id,
                 IsNew = a.IsNew,
-                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpperInvariant()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                 PolicyId = a.PolicyDetail.ContractNumber,
                 AssignedToAgency = a.AssignedToAgency,
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
@@ -304,7 +304,7 @@ namespace risk.control.system.Services
                 Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-light\">customer name</span>",
                 Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
                 IsUploaded = a.IsUploaded,
-                Origin = a.ORIGIN.GetEnumDisplayName().ToLower(),
+                Origin = a.ORIGIN.GetEnumDisplayName().ToLowerInvariant(),
                 SubStatus = a.SubStatus,
                 Ready2Assign = a.IsReady2Assign,
                 Service = a.PolicyDetail.InvestigationServiceType.Name,
@@ -329,62 +329,62 @@ namespace risk.control.system.Services
                 switch (orderColumn)
                 {
                     case 1: // Sort by Policy Number
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.PolicyId)
                             : transformedData.OrderByDescending(a => a.PolicyId);
                         break;
 
                     case 2: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.Amount)
                             : transformedData.OrderByDescending(a => a.Amount);
                         break;
 
                     case 3: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.PincodeCode)
                             : transformedData.OrderByDescending(a => a.PincodeCode);
                         break;
 
                     case 6: // Sort by Customer Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.CustomerFullName)
                             : transformedData.OrderByDescending(a => a.CustomerFullName);
                         break;
 
                     case 8: // Sort by Beneficiary Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.BeneficiaryFullName)
                             : transformedData.OrderByDescending(a => a.BeneficiaryFullName);
                         break;
 
 
                     case 9: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.ServiceType)
                             : transformedData.OrderByDescending(a => a.ServiceType);
                         break;
 
                     case 10: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.Location)
                             : transformedData.OrderByDescending(a => a.Location);
                         break;
 
                     case 11: // Sort by Created Date
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
                             : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null));
                         break;
 
                     case 12: // Sort by TimeElapsed
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;
 
                     default: // Default Sorting (if needed)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;
@@ -495,25 +495,25 @@ namespace risk.control.system.Services
             // Search filtering
             if (!string.IsNullOrEmpty(search))
             {
-                search = search.ToLower();
+                search = search.ToLowerInvariant();
                 query = query.Where(a =>
-                    a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
-                     a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
-                    a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
-                    a.CustomerDetail.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
-                    a.BeneficiaryDetail.PhoneNumber.ToLower().Contains(search));
+                    a.PolicyDetail.ContractNumber.ToLowerInvariant().Contains(search) ||
+                     a.PolicyDetail.CauseOfLoss.ToLowerInvariant().Contains(search) ||
+                    a.PolicyDetail.InvestigationServiceType.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.DateOfBirth.ToString().ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PhoneNumber.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Code.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.PinCode.Name.ToLowerInvariant().Contains(search) ||
+                    a.CustomerDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Name.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.Addressline.ToLowerInvariant().Contains(search) ||
+                    a.BeneficiaryDetail.PhoneNumber.ToLowerInvariant().Contains(search));
             }
 
             if (!string.IsNullOrEmpty(caseType))
             {
-                query = query.Where(c => c.PolicyDetail.InsuranceType.GetEnumDisplayName().ToLower() == caseType.ToLower());  // Assuming CaseType is the field in your data model
+                query = query.Where(c => c.PolicyDetail.InsuranceType.GetEnumDisplayName().ToLowerInvariant() == caseType.ToLowerInvariant());  // Assuming CaseType is the field in your data model
             }
 
             var data = query.AsEnumerable();
@@ -526,7 +526,7 @@ namespace risk.control.system.Services
                 CustomerFullName = a.CustomerDetail?.Name ?? "",
                 BeneficiaryFullName = a.BeneficiaryDetail?.Name ?? "",
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
+                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpperInvariant()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Agent = a.Vendor.Email,
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwnerImage(a))),
@@ -559,56 +559,56 @@ namespace risk.control.system.Services
                 switch (orderColumn)
                 {
                     case 0: // Sort by Policy Number
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.PolicyId)
                             : transformedData.OrderByDescending(a => a.PolicyId);
                         break;
 
                     case 1: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.Amount)
                             : transformedData.OrderByDescending(a => a.Amount);
                         break;
 
                     case 6: // Sort by Customer Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.CustomerFullName)
                             : transformedData.OrderByDescending(a => a.CustomerFullName);
                         break;
 
                     case 8: // Sort by Beneficiary Full Name
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.BeneficiaryFullName)
                             : transformedData.OrderByDescending(a => a.BeneficiaryFullName);
                         break;
 
 
                     case 9: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.ServiceType)
                             : transformedData.OrderByDescending(a => a.ServiceType);
                         break;
 
                     case 10: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.SubStatus)
                             : transformedData.OrderByDescending(a => a.SubStatus);
                         break;
 
                     case 11: // Sort by Created Date
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
                             : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null));
                         break;
 
                     case 13: // Sort by TimeElapsed
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;
 
                     default: // Default Sorting (if needed)
-                        transformedData = orderDir.ToLower() == "asc"
+                        transformedData = orderDir.ToLowerInvariant() == "asc"
                             ? transformedData.OrderBy(a => a.TimeElapsed)
                             : transformedData.OrderByDescending(a => a.TimeElapsed);
                         break;
@@ -827,7 +827,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var agent = context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(a => a.Email.Trim().ToLower() == userEmail.ToLower());
+                var agent = context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(a => a.Email.Trim().ToLowerInvariant() == userEmail.ToLowerInvariant());
 
                 var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
 

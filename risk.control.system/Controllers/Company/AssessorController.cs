@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers.Company
 
                     model.ReportAiSummary = jsonWrapped;
                 }
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -122,7 +122,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index));
                 }
                 var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Assess(report)") { Parent = claimsPage, };
@@ -180,7 +180,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -220,7 +220,7 @@ namespace risk.control.system.Controllers.Company
                 //{
                 //    model = await investigationService.GetClaimDetailsAiReportSummary(model);
                 //}
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
@@ -259,7 +259,7 @@ namespace risk.control.system.Controllers.Company
                 //    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
                 //    model.ReportAiSummary = investigationSummary;
                 //}
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
@@ -289,7 +289,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("Approved", "Assessor", "Approved") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("ApprovedDetail", "Assessor", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
@@ -325,7 +325,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
 
                 return View(invoice);
             }

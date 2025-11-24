@@ -101,7 +101,7 @@ namespace risk.control.system.Controllers
             try
             {
 
-                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper();
+                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpperInvariant();
 
                 // Check for duplicate code before saving
                 bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code == beneficiaryRelation.Code);
@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
 
-            bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code.ToUpper() == code.ToUpper() && (!id.HasValue || x.BeneficiaryRelationId != id.Value));
+            bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code.ToUpperInvariant() == code.ToUpperInvariant() && (!id.HasValue || x.BeneficiaryRelationId != id.Value));
 
             return Json(exists);
         }
@@ -171,7 +171,7 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper();
+                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpperInvariant();
 
                 // Check for duplicate code before saving
                 bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code == beneficiaryRelation.Code && x.BeneficiaryRelationId != id);

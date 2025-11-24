@@ -89,12 +89,12 @@ namespace risk.control.system.Services
                 var servicetype = string.IsNullOrWhiteSpace(uploadCase.ServiceType)
                     ? context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == caseType)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
                     : context.InvestigationServiceType
-                        .FirstOrDefault(b => b.Code.ToLower() == uploadCase.ServiceType.ToLower() && b.InsuranceType == caseType)  // Case 2: Try matching Code + LineOfBusinessId
+                        .FirstOrDefault(b => b.Code.ToLowerInvariant() == uploadCase.ServiceType.ToLowerInvariant() && b.InsuranceType == caseType)  // Case 2: Try matching Code + LineOfBusinessId
                       ?? context.InvestigationServiceType
                         .FirstOrDefault(b => b.InsuranceType == caseType);  // Case 3: If no match, retry ignoring LineOfBusinessId
 
-                var savedNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(model, uploadCase.CaseId?.ToLower(), POLICY_IMAGE);
-                var extension = Path.GetExtension(POLICY_IMAGE).ToLower();
+                var savedNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(model, uploadCase.CaseId?.ToLowerInvariant(), POLICY_IMAGE);
+                var extension = Path.GetExtension(POLICY_IMAGE).ToLowerInvariant();
                 var fileName = Guid.NewGuid().ToString() + extension;
                 if (savedNewImage == null)
                 {
@@ -195,7 +195,7 @@ namespace risk.control.system.Services
                 }
                 var caseEnabler = string.IsNullOrWhiteSpace(uploadCase.Reason) ?
                     context.CaseEnabler.FirstOrDefault() :
-                    context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Reason.Trim().ToLower())
+                    context.CaseEnabler.FirstOrDefault(c => c.Code.ToLowerInvariant() == uploadCase.Reason.Trim().ToLowerInvariant())
                     ?? context.CaseEnabler.FirstOrDefault();
 
 
@@ -213,7 +213,7 @@ namespace risk.control.system.Services
 
                 var department = string.IsNullOrWhiteSpace(uploadCase.Department) ?
                    context.CostCentre.FirstOrDefault() :
-                   context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
+                   context.CostCentre.FirstOrDefault(c => c.Code.ToLowerInvariant() == uploadCase.Department.Trim().ToLowerInvariant())
                    ?? context.CostCentre.FirstOrDefault();
 
                 string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", POLICY_IMAGE);

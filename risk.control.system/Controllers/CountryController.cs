@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers
             };
 
             // Determine sort direction
-            bool isAscending = orderDirection?.ToLower() == "asc";
+            bool isAscending = orderDirection?.ToLowerInvariant() == "asc";
 
             var query = _context.Country.AsQueryable();
 

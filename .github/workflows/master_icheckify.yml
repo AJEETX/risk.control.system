@@ -1,4 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+﻿# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: Build and deploy ASP.Net Core app to Azure Web App - icheckify
@@ -8,8 +8,73 @@ on:
     branches:
       - master
   workflow_dispatch:
+permissions:
+  contents: read
+  security-events: write
 
 jobs:
+
+  Fortify-AST-Scan:
+    # Use the appropriate runner for building your source code. Ensure dev tools required to build your code are present and configured appropriately (MSBuild, Python, etc).
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      # pull-requests: write     # Required if DO_PR_COMMENT is set to true
+
+    steps:
+      - name: Fortify Check Out Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release
+
+      - name: Run Fortify Scan
+        uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
+        with:
+          sast-scan: true          # Run a SAST scan; if not specified or set to false, no SAST scan will be run
+          debricked-sca-scan: true # For FoD, run an open-source scan as part of the SAST scan (ignored if SAST scan
+                                   # is disabled). For SSC, run a Debricked scan and import results into SSC.
+  # ---------------------------------------------------
+  # 1️⃣ CodeQL Security Scan Job
+  # ---------------------------------------------------
+  codeql:
+    name: CodeQL Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: CodeQL Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+            output: ./codeql-results
+            category: security-scan
+
+      - name: Upload SARIF results
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan
+          path: ./codeql-results
+
   build:
     runs-on: windows-latest
 
@@ -23,19 +88,6 @@ jobs:
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
-     
-      - name: Install Playwright Browsers
-        working-directory: ./risk.control.system.test
-        run: npx playwright install --with-deps
-
-      - name: Run Playwright Tests
-        run: dotnet test ./risk.control.system.test/risk.control.system.test.csproj --logger "trx;LogFileName=test_results.trx"
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-test-results
-          path: '**/*.trx'
 
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"

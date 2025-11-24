@@ -82,7 +82,7 @@ namespace risk.control.system.Services
                                                     .Include(p => p.State)
                                                     .Include(p => p.Country)
                                                     .FirstOrDefault(p => p.Code == uploadCase.BeneficiaryPincode &&
-                                                    p.District.Name.ToLower().Contains(uploadCase.BeneficiaryDistrictName.ToLower()));
+                                                    p.District.Name.ToLowerInvariant().Contains(uploadCase.BeneficiaryDistrictName.ToLowerInvariant()));
                     if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
                     {
                         errors.Add(new UploadError
@@ -110,12 +110,12 @@ namespace risk.control.system.Services
                 }
                 var relation = string.IsNullOrWhiteSpace(uploadCase.Relation)
                     ? context.BeneficiaryRelation.FirstOrDefault()  // Get first record from the table
-                    : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower()) // Get matching record
+                    : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLowerInvariant() == uploadCase.Relation.ToLowerInvariant()) // Get matching record
                     ?? context.BeneficiaryRelation.FirstOrDefault();
 
-                var extension = Path.GetExtension(BENEFICIARY_IMAGE).ToLower();
+                var extension = Path.GetExtension(BENEFICIARY_IMAGE).ToLowerInvariant();
                 var fileName = Guid.NewGuid().ToString() + extension;
-                var beneficiaryNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), BENEFICIARY_IMAGE);
+                var beneficiaryNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLowerInvariant(), BENEFICIARY_IMAGE);
                 if (beneficiaryNewImage == null)
                 {
                     errors.Add(new UploadError

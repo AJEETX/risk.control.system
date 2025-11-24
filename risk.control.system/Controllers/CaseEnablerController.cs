@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                caseEnabler.Code = caseEnabler.Code?.ToUpper();
+                caseEnabler.Code = caseEnabler.Code?.ToUpperInvariant();
                 bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code == caseEnabler.Code);
                 if (exists)
                 {
@@ -127,10 +127,10 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
 
-            code = code.ToUpper();
+            code = code.ToUpperInvariant();
 
             // ✅ Check if any other record (not this one) already has the same code
-            bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code.ToUpper() == code && (!id.HasValue || x.CaseEnablerId != id.Value));
+            bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code.ToUpperInvariant() == code && (!id.HasValue || x.CaseEnablerId != id.Value));
 
             return Json(exists);
         }
@@ -173,7 +173,7 @@ namespace risk.control.system.Controllers
             try
             {
                 // Uppercase normalization
-                caseEnabler.Code = caseEnabler.Code?.ToUpper();
+                caseEnabler.Code = caseEnabler.Code?.ToUpperInvariant();
 
                 // Check for duplicate code before saving
                 bool exists = await _context.CaseEnabler.AnyAsync(x => x.CaseEnablerId != id && x.Code == caseEnabler.Code);

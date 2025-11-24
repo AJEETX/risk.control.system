@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers
             }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
-            clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
+            clientCompany.Email = mailAddress.ToLowerInvariant() + domainData.GetEnumDisplayName();
             IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
             if (companyDocument is not null)
             {
@@ -277,7 +277,7 @@ namespace risk.control.system.Controllers
                 else
                 {
                     var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
-                    if (existingClientCompany.DocumentUrl != null || existingClientCompany.DocumentUrl != null)
+                    if (existingClientCompany.DocumentUrl != null)
                     {
                         clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                         clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;

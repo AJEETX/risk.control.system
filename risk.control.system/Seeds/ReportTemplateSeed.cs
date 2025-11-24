@@ -11,7 +11,7 @@ namespace risk.control.system.Seeds
         {
             var template = new ReportTemplate
             {
-                Name = InsuranceType.UNDERWRITING.GetEnumDisplayName().ToLower(),
+                Name = InsuranceType.UNDERWRITING.GetEnumDisplayName().ToLowerInvariant(),
                 InsuranceType = InsuranceType.UNDERWRITING,
                 ClientCompanyId = company.ClientCompanyId,
                 IsActive = true,
@@ -87,7 +87,7 @@ namespace risk.control.system.Seeds
         {
             var template = new ReportTemplate
             {
-                Name = InsuranceType.CLAIM.GetEnumDisplayName().ToLower(),
+                Name = InsuranceType.CLAIM.GetEnumDisplayName().ToLowerInvariant(),
                 InsuranceType = InsuranceType.CLAIM,
                 ClientCompanyId = company.ClientCompanyId,
                 IsActive = true,

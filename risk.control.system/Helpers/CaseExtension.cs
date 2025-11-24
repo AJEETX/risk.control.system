@@ -6,7 +6,7 @@ namespace risk.control.system.Helpers
     {
         public static bool IsValidPolicy(this PolicyDetail policyDetail)
         {
-            return policyDetail != null && policyDetail != null &&
+            return policyDetail != null &&
                !string.IsNullOrWhiteSpace(policyDetail.ContractNumber.Trim()) &&
                 policyDetail.InvestigationServiceTypeId > 0 &&
                !string.IsNullOrWhiteSpace(policyDetail.CauseOfLoss) &&
@@ -22,7 +22,7 @@ namespace risk.control.system.Helpers
 
         public static bool IsValidCaseDetail(this PolicyDetail policyDetail)
         {
-            return policyDetail != null && policyDetail != null &&
+            return policyDetail != null &&
                !string.IsNullOrWhiteSpace(policyDetail.ContractNumber.Trim()) &&
                 policyDetail.InsuranceType != null &&
                 policyDetail.InvestigationServiceTypeId > 0 &&

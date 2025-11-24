@@ -111,7 +111,7 @@
                     if (row.completed) {
                         return `
                         <span class="custom-message-badge i-blue" title="${data}" data-toggle="tooltip">
-                            ${data}
+                             ${data}
                         </span>`;
                     } else {
                         if (row.status == 'Error') {
@@ -133,14 +133,14 @@
                 "bSortable": false,
                 "render": function (data, type, row) {
                     var img = '';
-                    var title = row.directAssign ? "Direct Assign" : "Only Upload";
+                    var title = row.directAssign ? "Assigned" : "Uploaded";
                     if (row.hasError) {
                         img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn-xs btn-danger' title='Download Error file'><i class='fa fa-download'></i> Error File</a> &nbsp;`;
                     }
                     else if (!row.hasError && row.status == 'Completed') {
-                        img += `<span class='btn-xs i-green upload-success' title='${title} Success'><i class='fa fa-check'></i> Success </span>&nbsp;`;
+                        img += `<span class='btn-xs i-green upload-success' title='${title} Successfully' data-toggle='tooltip'><i class='fa fa-check'></i> Success </span>&nbsp;`;
                     } else {
-                        img += `<span class='upload-progress'><i class='fas fa-sync fa-spin i-grey'></i> </span>&nbsp;`;
+                        img += `<span class='upload-progress' title='Action in-progress'><i class='fas fa-sync fa-spin i-grey'></i> </span>&nbsp;`;
                     }
 
                     img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file"><i class="nav-icon fa fa-download"></i> Download</a> ';
