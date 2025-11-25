@@ -460,8 +460,8 @@
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
-                title: "ASSIGN <sub>auto</sub> !",
-                content: "Please select Case(s) to Assign <sub>auto</sub>",
+                title: "ASSIGN<sub>auto</sub> !",
+                content: "Please select Case(s) to Assign<sub>auto</sub>",
                 icon: 'fas fa-random fa-sync',
                 type: 'red',
                 closeIcon: true,
@@ -476,30 +476,30 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Assign",
-                content: "Are you sure to Assign ?",
+                title: "Confirm Assign<sub>auto</sub>",
+                content: "Are you sure to Assign<sub>auto</sub> ?",
                 icon: 'fas fa-random',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign ",
+                        text: "Assign <sub>auto</sub>",
                         btnClass: 'btn-warning',
                         action: function () {
-                            askConfirmation = true;
 
+                            askConfirmation = true;
                             $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
+
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                           
-                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
+
+                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin'></i> Assign<sub>auto</sub>");
 
                             disableAllInteractiveElements();
 
                             $('#checkboxes').submit();
+
                             var article = document.getElementById("article");
                             if (article) {
                                 var nodes = article.getElementsByTagName('*');
@@ -515,6 +515,7 @@
                     }
                 }
             });
+
         }
     });
 
