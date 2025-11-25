@@ -95,7 +95,7 @@
                 "data": "uploadedType",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var title = row.directAssign ? "Direct Assign" : "Only Upload";
+                    var title = row.directAssign ? "Assigned" : "Uploaded";
                     return `
                     <span class="custom-message-badge" title="${title}" data-toggle="tooltip">
                         ${data}
@@ -135,21 +135,17 @@
                     var img = '';
                     var title = row.directAssign ? "Assigned" : "Uploaded";
                     if (row.hasError) {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn-xs btn-danger' title='Download Error file'><i class='fa fa-download'></i> Error File</a> &nbsp;`;
+                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger' title='Download Error file' data-toggle='tooltip'><i class='fa fa-download'></i> Error File</a> &nbsp;`;
                     }
                     else if (!row.hasError && row.status == 'Completed') {
-                        img += `<span class='btn-xs i-green upload-success' title='${title} Successfully' data-toggle='tooltip'><i class='fa fa-check'></i> Success </span>&nbsp;`;
+                        img += `<span class='btn btn-xs i-green upload-success' title='${title} Successfully' data-toggle='tooltip'><i class='fa fa-check'></i> ${title} </span> &nbsp;`;
                     } else {
-                        img += `<span class='upload-progress' title='Action in-progress'><i class='fas fa-sync fa-spin i-grey'></i> </span>&nbsp;`;
+                        img += `<span class='upload-progress' title='Action in-progress' data-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </span> &nbsp;`;
                     }
 
-                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file"><i class="nav-icon fa fa-download"></i> Download</a> ';
-                    //if (row.isManager || row.status != 'Completed') {
-                    //    img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete row"><i class="fas fa-trash"></i> </button>';
-                    //} else {
-                    //    img += '<button class="btn-xs btn-danger disabled" disabled title="Can\'t Delete row"><i class="fas fa-trash"></i> </button>';
-                    //}
-                    img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete row"><i class="fas fa-trash"></i> Delete </button>';
+                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file" data-toggle="tooltip"><i class="nav-icon fa fa-download"></i> Download</a> ';
+
+                    img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete" data-toggle="tooltip"><i class="fas fa-trash"></i> Delete </button>';
                     return img;
                 }
             },

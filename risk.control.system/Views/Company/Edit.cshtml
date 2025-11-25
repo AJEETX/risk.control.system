@@ -59,7 +59,7 @@
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     @{
-                                        var imgPath = "/flags/" + @Model.Country.Code.ToLowerInvariant() + ".png";
+                                        var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                                     }
                                     <span class="input-group-text country-code-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
                                         <img src="@imgPath" class="flag-icon" data-toggle="tooltip" title="@Model.Country.Name" />  +@Model?.Country.ISDCode

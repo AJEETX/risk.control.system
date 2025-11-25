@@ -3031,7 +3031,8 @@ th.col-match {
     margin-left: 0.5rem; /* optional spacing */
 }
 .upload-success {
-    border: 3px solid forestgreen;
+    border: 2px solid forestgreen;
+    cursor:text;
 }
 .upload-progress{
     width:70px;

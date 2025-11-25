@@ -97,7 +97,7 @@ public class AgentIdService : IAgentIdService
 
             face = locationTemplate.AgentIdReport;
 
-            string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName.ToLowerInvariant());
+            string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName.ToLower());
             string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
             face.ImageExtension = onlyExtension;
 
@@ -269,7 +269,7 @@ public class AgentIdService : IAgentIdService
             string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
             face.ImageExtension = onlyExtension;
 
-            var extension = Path.GetExtension(data.Image.FileName).ToLowerInvariant();
+            var extension = Path.GetExtension(data.Image.FileName).ToLower();
             var fileName = Guid.NewGuid().ToString() + extension;
             var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "face");
 
@@ -449,7 +449,7 @@ public class AgentIdService : IAgentIdService
             string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
             doc.ImageExtension = onlyExtension;
 
-            var extension = Path.GetExtension(data.Image.FileName).ToLowerInvariant();
+            var extension = Path.GetExtension(data.Image.FileName).ToLower();
             var fileName = Guid.NewGuid().ToString() + extension;
             var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "document");
 
@@ -585,7 +585,7 @@ public class AgentIdService : IAgentIdService
             using var memoryStream = new MemoryStream();
             await data.Image.CopyToAsync(memoryStream);
             fileBytes = memoryStream.ToArray();
-            var extension = Path.GetExtension(data.Image.FileName).ToLowerInvariant();
+            var extension = Path.GetExtension(data.Image.FileName).ToLower();
             var fileName = Guid.NewGuid().ToString() + extension;
             var mediaPath = Path.Combine(webHostEnvironment.WebRootPath, "media");
 
@@ -673,7 +673,7 @@ public class AgentIdService : IAgentIdService
             media.LocationInfo = weatherCustomData;
             media.LongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             media.LongLatTime = DateTime.UtcNow;
-            var mimeType = data.Image.ContentType.ToLowerInvariant();
+            var mimeType = data.Image.ContentType.ToLower();
 
             string[] videoExtensions = { ".mp4", ".webm", ".avi", ".mov", ".mkv" };
             bool isVideo = mimeType.StartsWith("video/") || videoExtensions.Contains(extension);

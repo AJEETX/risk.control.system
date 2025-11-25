@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers
             };
 
             // Determine sort direction
-            bool isAscending = orderDirection?.ToLowerInvariant() == "asc";
+            bool isAscending = orderDirection?.ToLower() == "asc";
 
             // Dynamically apply sorting using reflection
             var parameter = Expression.Parameter(typeof(Audit), "p");

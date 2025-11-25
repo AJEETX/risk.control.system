@@ -54,7 +54,7 @@ namespace risk.control.system.Helpers
                 return "unknown";
 
             // Convert the first few bytes to a hexadecimal string
-            string fileHeader = BitConverter.ToString(fileBytes.Take(8).ToArray()).Replace("-", "").ToUpperInvariant();
+            string fileHeader = BitConverter.ToString(fileBytes.Take(8).ToArray()).Replace("-", "").ToUpper();
 
             // Match the header against the known signatures
             foreach (var signature in FileSignatures)

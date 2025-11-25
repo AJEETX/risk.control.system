@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureExtension = fileExtension;
             }
             user.EmailConfirmed = true;
-            user.Email = user.Email.Trim().ToLowerInvariant();
+            user.Email = user.Email.Trim().ToLower();
             user.UserName = user.Email;
             user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;

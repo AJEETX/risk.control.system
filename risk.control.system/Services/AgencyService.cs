@@ -59,8 +59,8 @@ namespace risk.control.system.Services
             vendor.DistrictId = vendor.SelectedDistrictId;
             vendor.StateId = vendor.SelectedStateId;
             vendor.CountryId = vendor.SelectedCountryId;
-            vendor.BankName = vendor.BankName.ToUpperInvariant();
-            vendor.IFSCCode = vendor.IFSCCode.ToUpperInvariant();
+            vendor.BankName = vendor.BankName.ToUpper();
+            vendor.IFSCCode = vendor.IFSCCode.ToUpper();
             var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
 
             //var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;

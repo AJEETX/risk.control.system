@@ -17,7 +17,7 @@
     
     var beneficiaryAddress = $"{Model.Location.Addressline} {Model.Location.District?.Name} {Model.Location.State?.Name} {Model.Location.Country?.Name} {Model.Location.PinCode?.Code}";
     var beneficiaryAgeInYears =$"{(int)(DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
-    var imgPath = "/flags/" + @Model.Location.Country.Code.ToLowerInvariant() + ".png";
+    var imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
     var map = string.Format(Model.Location?.BeneficiaryLocationMap, "200", "200");
 
 }

@@ -23,7 +23,7 @@
             </div>
         }
         <a  class="d-block">
-            @UserManager.GetUserAsync(User).Result?.FirstName.ToLowerInvariant()
+            @UserManager.GetUserAsync(User).Result?.FirstName.ToLower()
             @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
             {
                 roleCode = @Applicationsettings.AGENCY_ADMIN.CODE;

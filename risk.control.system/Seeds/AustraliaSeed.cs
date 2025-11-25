@@ -15,13 +15,13 @@ namespace risk.control.system.Seeds
         {
             string COUNTRY_CODE = "AU";
             string PINCODE = "3131";
-            var au = countries.FirstOrDefault(c => c.Code.ToLowerInvariant() == COUNTRY_CODE.ToLowerInvariant());
+            var au = countries.FirstOrDefault(c => c.Code == COUNTRY_CODE);
             var auPincodes = await PinCodeStateSeed.CsvRead_Au(0);
             var auStates = auPincodes.Where(s =>
-                s.StateCode.ToLowerInvariant() == "vic"
+                s.StateCode == "VIC"
                 //||
-                //s.StateCode.ToLowerInvariant() == "qld" ||
-                //s.StateCode.ToLowerInvariant() == "nsw"
+                //s.StateCode.ToLower() == "qld" ||
+                //s.StateCode.ToLower() == "nsw"
                 ).Select(g => g.StateCode).Distinct()?.ToList();
             var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
             await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes, au);

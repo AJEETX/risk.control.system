@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
 
@@ -205,7 +205,7 @@ namespace risk.control.system.Controllers
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
@@ -317,7 +317,7 @@ namespace risk.control.system.Controllers
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)

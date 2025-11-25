@@ -300,7 +300,7 @@ namespace risk.control.system.Controllers.Company
                     {
                         notifyService.Error("Invalid mobile number. Please check and try again.");
                         var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                         return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
                     }
                 }
@@ -353,7 +353,7 @@ namespace risk.control.system.Controllers.Company
                     {
                         notifyService.Error("Invalid mobile number. Please check and try again.");
                         var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                         return RedirectToAction(nameof(InvestigationController.EditCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
                     }
                 }
@@ -428,7 +428,7 @@ namespace risk.control.system.Controllers.Company
                     {
                         notifyService.Error("Invalid phone number. Please check and try again.");
                         var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                         return RedirectToAction(nameof(InvestigationController.CreateBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
                     }
@@ -484,7 +484,7 @@ namespace risk.control.system.Controllers.Company
                     {
                         notifyService.Error("Invalid mobile number. Please check and try again.");
                         var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                         return RedirectToAction(nameof(InvestigationController.EditBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
                     }
                 }

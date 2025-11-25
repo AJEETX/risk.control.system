@@ -130,7 +130,7 @@ namespace risk.control.system.Services
 
                 foreach (var claimsCase in claimsCases)
                 {
-                    if (claimsCase.TaskedAgentEmail?.Trim()?.ToLowerInvariant() == vendorNonAdminUser.Email.Trim().ToLowerInvariant())
+                    if (claimsCase.TaskedAgentEmail?.Trim()?.ToLower() == vendorNonAdminUser.Email.Trim().ToLower())
                     {
                         if (!vendorCaseCount.TryGetValue(vendorNonAdminUser.Email, out countOfCases))
                         {

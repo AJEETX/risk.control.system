@@ -21,7 +21,7 @@
         currentBAgeinYrs =$"{(int)(age/ 365 )} years";
         country = @Model.Location?.Country?.Name;
         phone = +@Model.Location?.Country.ISDCode +" (0) "+ @Model.Location?.PhoneNumber;
-        imgPath = "/flags/" + @Model.Location.Country.Code.ToLowerInvariant() + ".png";
+        imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
         map = string.Format(Model.Location.BeneficiaryLocationMap, "200", "200");
     }
     string benficiaryProgressClass = "progress-bar-lightgrey"; // Default class

@@ -591,9 +591,9 @@ namespace risk.control.system.Controllers
             }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
 
-            var newDomain = input.Trim().ToLowerInvariant() + domainData.GetEnumDisplayName();
+            var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
-            var userCount = await _userManager.Users.CountAsync(u => u.Email.Trim().ToLowerInvariant().Substring(u.Email.IndexOf("@") + 1) == newDomain);
+            var userCount = await _userManager.Users.CountAsync(u => u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain);
 
             return userCount == 0 ? 0 : 1;
 
@@ -608,10 +608,10 @@ namespace risk.control.system.Controllers
             }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
 
-            var newDomain = input.Trim().ToLowerInvariant() + domainData.GetEnumDisplayName();
+            var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
-            var agenccompanyCount = await _context.ClientCompany.CountAsync(u => u.Email.Trim().ToLowerInvariant() == newDomain);
-            var agencyCount = await _context.Vendor.CountAsync(u => u.Email.Trim().ToLowerInvariant() == newDomain);
+            var agenccompanyCount = await _context.ClientCompany.CountAsync(u => u.Email.Trim().ToLower() == newDomain);
+            var agencyCount = await _context.Vendor.CountAsync(u => u.Email.Trim().ToLower() == newDomain);
 
             return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
         }

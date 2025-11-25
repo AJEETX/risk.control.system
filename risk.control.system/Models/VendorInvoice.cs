@@ -9,7 +9,7 @@ namespace risk.control.system.Models
         {
             this.InvoiceNumber = DateTime.Now.Date.Year.ToString() +
                 DateTime.Now.Date.Month.ToString() +
-                DateTime.Now.Date.Day.ToString() + Guid.NewGuid().ToString().Substring(0, 4).ToUpperInvariant() + "INV";
+                DateTime.Now.Date.Day.ToString() + Guid.NewGuid().ToString().Substring(0, 4).ToUpper() + "INV";
             this.DueDate = DateTime.Now.Date.AddMonths(1);
             this.SubTotal = 0;
             this.TaxAmount = 0;

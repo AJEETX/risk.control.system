@@ -21,10 +21,10 @@ namespace risk.control.system.Seeds
 
             //CREATE VENDOR COMPANY
 
-            var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code.ToLowerInvariant() == input.COUNTRY.ToLowerInvariant() && s.Code == input.PINCODE);
+            var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
             var addressline = input.ADDRESSLINE;
 
-            var states = context.State.Include(s => s.Country).Where(s => s.Country.Code.ToLowerInvariant() == input.COUNTRY.ToLowerInvariant()).ToList();
+            var states = context.State.Include(s => s.Country).Where(s => s.Country.Code == input.COUNTRY).ToList();
 
             var address = addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
             var addressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);

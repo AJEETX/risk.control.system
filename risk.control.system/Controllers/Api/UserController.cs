@@ -120,7 +120,7 @@ namespace risk.control.system.Controllers.Api
                             District = user.District.Name,
                             State = user.State.Name,
                             Country = user.Country.Code,
-                            Flag = "/flags/" + user.Country.Code.ToLowerInvariant() + ".png",
+                            Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
                             Roles = string.Join(",", GetUserRoles(user).Result),
                             Pincode = user.PinCode.Code,
                             OnlineStatus = status,

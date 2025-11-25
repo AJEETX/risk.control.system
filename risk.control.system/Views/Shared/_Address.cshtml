@@ -44,7 +44,7 @@
     <div class="input-group mb-3 autocomplete-wrapper">
         <div class="input-group-prepend">
             @{
-                var img = "/flags/" + @Model.Country.Code.ToLowerInvariant() + ".png";
+                var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
             }
             <span class="input-group-text country-code-text" data-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
                 <img src="@img" class="flag-icon" data-toggle="tooltip" /> @Model?.Country.Code <i class="fa fa-asterisk asterik-style-info"></i>
