@@ -133,7 +133,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClientCompanyApplicationUser user, string emailSuffix)
         {
-            var userFullEmail = user.Email.Trim().ToLowerInvariant() + "@" + emailSuffix;
+            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
                 string newFileName = userFullEmail;

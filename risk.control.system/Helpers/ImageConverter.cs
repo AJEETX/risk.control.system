@@ -28,7 +28,7 @@ namespace risk.control.system.Helpers
 
                 using var outputStream = new MemoryStream();
 
-                //onlyExtension = onlyExtension?.Trim().ToLowerInvariant().Replace(".", "") ?? "png";
+                //onlyExtension = onlyExtension?.Trim().ToLower().Replace(".", "") ?? "png";
 
                 //if (onlyExtension == "jpg" || onlyExtension == "jpeg")
                 //{

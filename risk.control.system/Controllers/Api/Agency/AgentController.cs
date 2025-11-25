@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers.Api.Agency
                    {
                        Id = a.Id,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(Extensions.GetCultureByCountry(vendorUser.Country.Code.ToUpperInvariant()), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(Extensions.GetCultureByCountry(vendorUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                        Company = a.ClientCompany.Name,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers.Api.Agency
                    {
                        Id = a.Id,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(Extensions.GetCultureByCountry(agentUser.Country.Code.ToUpperInvariant()), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(Extensions.GetCultureByCountry(agentUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                        AssignedToAgency = a.AssignedToAgency,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),

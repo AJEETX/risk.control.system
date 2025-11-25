@@ -24,7 +24,7 @@
     string customerProgressbarMessage = customerExist ? "customer" : "add customer";
 
     string beneficiaryProgressbarMessage = beneficiaryExist ? "edit beneficiary" : "beneficiary";
-    var imgPath = "/flags/" + @customerDetail.Country.Code.ToLowerInvariant() + ".png";
+    var imgPath = "/flags/" + @customerDetail.Country.Code.ToLower() + ".png";
     var map = string.Format(@customerDetail?.CustomerLocationMap, "200", "200");
 }
 

@@ -1,13 +1,17 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Security.Claims;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
-using System.Security.Claims;
 
 namespace risk.control.system.Controllers
 {
@@ -175,13 +179,13 @@ namespace risk.control.system.Controllers
             return new JsonResult(monthlyExpense);
         }
 
-
         public JsonResult GetWeeklyPieUnderwriting()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var monthlyExpense = dashboardService.CalculateWeeklyCaseStatusPieUnderwritings(userEmail);
             return new JsonResult(monthlyExpense);
         }
+
         public JsonResult GetClaimChart()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -195,6 +199,5 @@ namespace risk.control.system.Controllers
             var monthlyExpense = dashboardService.CalculateTimespan(userEmail);
             return new JsonResult(monthlyExpense);
         }
-
     }
 }

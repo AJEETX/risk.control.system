@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers
             }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
-            clientCompany.Email = mailAddress.ToLowerInvariant() + domainData.GetEnumDisplayName();
+            clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
             IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
             if (companyDocument is not null)
             {

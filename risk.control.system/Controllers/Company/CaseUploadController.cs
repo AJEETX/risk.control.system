@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 var totalReadyToAssign = await service.GetAutoCount(currentUserEmail);
                 var hasClaim = totalReadyToAssign > 0;
-                var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLowerInvariant();
+                var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
                 var hasFileUploads = _context.FilesOnFileSystem.Any();
                 var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
                 userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;

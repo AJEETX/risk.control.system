@@ -148,7 +148,7 @@ namespace risk.control.system.Controllers
             if (Image == null || Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
             var currentUserEmail = HttpContext.User.Identity.Name;
-            var extension = Path.GetExtension(Image.FileName).ToLowerInvariant();
+            var extension = Path.GetExtension(Image.FileName).ToLower();
 
             var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
             if (!supportedExtensions.Contains(extension))

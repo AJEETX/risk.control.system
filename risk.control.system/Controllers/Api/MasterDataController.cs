@@ -100,13 +100,13 @@ namespace risk.control.system.Controllers.Api
                 .ToListAsync();
 
             IQueryable<ApplicationUser> query = context.ApplicationUser
-                .Where(a => !a.Deleted && a.Email.ToLowerInvariant() != PORTAL_ADMIN.EMAIL.ToLowerInvariant() &&
+                .Where(a => !a.Deleted && a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower() &&
                             !vendorAgentIds.Contains(a.Id));
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                string loweredSearch = search.Trim().ToLowerInvariant();
-                query = query.Where(a => a.Email.ToLowerInvariant().StartsWith(loweredSearch));
+                string loweredSearch = search.Trim().ToLower();
+                query = query.Where(a => a.Email.ToLower().StartsWith(loweredSearch));
             }
 
             var userEmails = await query
@@ -117,12 +117,5 @@ namespace risk.control.system.Controllers.Api
 
             return Ok(userEmails);
         }
-
-        //[HttpGet("GetIpAddress")]
-        //public async Task<IActionResult> GetIpAddress()
-        //{
-        //    var ipAddresses = await context.IpApiResponse.ToListAsync();
-        //    return Ok(ipAddresses);
-        //}
     }
 }

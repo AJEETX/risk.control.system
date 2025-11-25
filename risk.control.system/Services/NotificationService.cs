@@ -221,7 +221,7 @@ namespace risk.control.system.Services
         //        .ThenInclude(c => c.Country)
         //        .FirstOrDefault(c => c.ClaimsInvestigationId == message.ClaimId);
         //    var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
-        //               i => i.Name.ToUpperInvariant() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+        //               i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
         //    var beneficiary = context.BeneficiaryDetail.Include(c=>c.Country)
         //        .FirstOrDefault(c => c.ClaimsInvestigationId == message.ClaimId);
 
@@ -335,7 +335,7 @@ namespace risk.control.system.Services
         //        .ThenInclude(c => c.Country)
         //        .FirstOrDefault(c => c.ClaimsInvestigationId == id);
         //    var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
-        //               i => i.Name.ToUpperInvariant() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+        //               i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
         //    var beneficiary = context.BeneficiaryDetail.Include(b=>b.Country)
         //        .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
@@ -354,11 +354,11 @@ namespace risk.control.system.Services
         //        isdCode = beneficiary.Country.ISDCode;
         //    }
 
-        //    if (confirm.ToUpperInvariant() == "Y")
+        //    if (confirm.ToUpper() == "Y")
         //    {
         //        confirm = "YES";
         //    }
-        //    else if (confirm.ToUpperInvariant() == "N")
+        //    else if (confirm.ToUpper() == "N")
         //    {
         //        confirm = "NO";
         //    }
@@ -411,7 +411,7 @@ namespace risk.control.system.Services
         //        .ThenInclude(c => c.PinCode)
         //     .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == id);
         //    var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
-        //               i => i.Name.ToUpperInvariant() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+        //               i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
         //    var beneficiary = context.BeneficiaryDetail
         //        .Include(c => c.ClaimsInvestigation)
         //        .Include(c => c.PinCode)

@@ -300,7 +300,7 @@ namespace risk.control.system.Controllers
                     user.ProfileImage.CopyTo(dataStream);
                     user.ProfilePicture = dataStream.ToArray();
                 }
-                var userFullEmail = user.Email.Trim().ToLowerInvariant() + "@" + emailSuffix;
+                var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 //DEMO
                 user.Password = Applicationsettings.Password;
 
@@ -765,7 +765,7 @@ namespace risk.control.system.Controllers
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
-                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var model = new VendorInvestigationServiceType
                 {
@@ -890,7 +890,7 @@ namespace risk.control.system.Controllers
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = _context.VendorApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.Country)
                     .Include(v => v.District)
@@ -996,7 +996,7 @@ namespace risk.control.system.Controllers
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = _context.VendorApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpperInvariant()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)

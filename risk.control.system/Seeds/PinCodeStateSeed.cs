@@ -75,10 +75,10 @@ namespace risk.control.system.Seeds
                         {
                             var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
                             var rowData = output.Split(',').ToList();
-                            var countryCode = rowData[1].Trim().ToLowerInvariant();
-                            var currency = currencies.FirstOrDefault(c => c.CountryCode.Trim().ToLowerInvariant() == countryCode);
+                            var countryCode = rowData[1].Trim().ToLower();
+                            var currency = currencies.FirstOrDefault(c => c.CountryCode.Trim().ToLower() == countryCode);
 
-                            var currencyName = currenciesName.FirstOrDefault(c => c.CountryCode.Trim().ToLowerInvariant() == countryCode);
+                            var currencyName = currenciesName.FirstOrDefault(c => c.CountryCode.Trim().ToLower() == countryCode);
 
                             var country = new Country
                             {
@@ -87,7 +87,7 @@ namespace risk.control.system.Seeds
                                 ISDCode = int.Parse(rowData[2].Trim()),
                                 CurrencyCode = currency?.CurrencyCode ?? currencyName?.CurrencyCode,
                                 CurrencyName = currencyName?.CurrencyName,
-                                Language = currency?.Language.ToUpperInvariant(),
+                                Language = currency?.Language.ToUpper(),
                                 Updated = DateTime.Now,
                             };
 
@@ -250,16 +250,16 @@ namespace risk.control.system.Seeds
                     var officeName = officeSuffixRegex.Replace(parts[0].Trim(), "").Trim('"');
 
                     var pincode = parts[1].Trim();
-                    var district = parts[2].Trim().ToUpperInvariant();
-                    var stateName = parts[3].Trim().ToUpperInvariant();
-                    var stateCode = states.FirstOrDefault(s => s.StateName.ToLowerInvariant() == stateName.ToLowerInvariant())?.StateCode;
+                    var district = parts[2].Trim().ToUpper();
+                    var stateName = parts[3].Trim().ToUpper();
+                    var stateCode = states.FirstOrDefault(s => s.StateName.ToLower() == stateName.ToLower())?.StateCode;
                     pincodes.Add(new PinCodeState
                     {
                         Name = officeName.Replace("B.O", "").Replace("BO", "").Replace("SO", "").Replace("S.O", "").Replace("S.O.", ""),
                         Code = pincode,
                         District = district,
                         StateName = stateName,
-                        StateCode = stateCode ?? parts[3].Trim().ToUpperInvariant(),
+                        StateCode = stateCode ?? parts[3].Trim().ToUpper(),
                         Latitude = "N/A",
                         Longitude = "N/A"
                     });

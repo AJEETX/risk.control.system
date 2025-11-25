@@ -28,7 +28,7 @@ namespace risk.control.system.Services
 
                 var panNumber = allText.Substring(panTextPre + txt2Find.Length + 1, 10);
 
-                var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().ToUpperInvariant() == panNumber.Trim().ToUpperInvariant());
+                var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().ToUpper() == panNumber.Trim().ToUpper());
                 if (annotation is null)
                 {
                     return inputImage;
@@ -95,7 +95,7 @@ namespace risk.control.system.Services
                 };
 
 
-                var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().ToUpperInvariant() == passportNumber.Trim().ToUpperInvariant());
+                var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().ToUpper() == passportNumber.Trim().ToUpper());
 
                 var allVertices = annotation.BoundingPoly.Vertices;
 

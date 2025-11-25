@@ -261,14 +261,14 @@ namespace risk.control.system.Controllers.Api
         //        {
         //            return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
         //        }
-        //        if (request.Type.ToUpperInvariant() != "PAN")
+        //        if (request.Type.ToUpper() != "PAN")
         //        {
         //            return BadRequest("incorrect document");
         //        }
         //        //VERIFY PAN
         //        var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
         //        var maskedImage = await httpClientService.GetMaskedImage(new MaskImage { Image = request.Image }, FaceMatchBaseUrl);
-        //        if (maskedImage == null || maskedImage.DocType.ToUpperInvariant() != "PAN")
+        //        if (maskedImage == null || maskedImage.DocType.ToUpper() != "PAN")
         //        {
         //            return BadRequest("document issue");
         //        }
@@ -696,7 +696,7 @@ namespace risk.control.system.Controllers.Api
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var extension = Path.GetExtension(data.Image.FileName).ToLowerInvariant();
+                var extension = Path.GetExtension(data.Image.FileName).ToLower();
 
                 var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
                 if (!supportedExtensions.Contains(extension))
