@@ -129,6 +129,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
+    name: Deploy to Azure Web App
     runs-on: windows-latest
     needs: build
     environment:
