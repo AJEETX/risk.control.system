@@ -48,41 +48,21 @@ jobs:
       - name: Build solution
         run: dotnet build --configuration Release
 
-    # 5️⃣ Install Fortify CLI
-      - name: Install Fortify CLI
-        run: |
-            mkdir -p fortify
-            curl -L https://downloads.microfocus.com/fortify/fortify-sca-22.3.0-linux.tar.gz | tar xz -C ./fortify
+    # 5️⃣ Run Fortify SAST + OSS scan
+      - name: Run Fortify Scan
+        uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
+        with:
+          sast-scan: true
+          debricked-sca-scan: true
+        env:
+          SCA_OUTPUT_DIR: ./fortify-reports   # save scan results here
 
-    # 6️⃣ Clean previous Fortify build
-      - name: Clean Fortify Build
-        run: ./fortify/bin/sourceanalyzer -b mybuild -clean
-
-    # 7️⃣ Translate project into Fortify SCA
-      - name: Translate and Build
-        run: ./fortify/bin/sourceanalyzer -b mybuild dotnet build --configuration Release
-
-    # 8️⃣ Run Fortify Scan and generate FPR + JSON
-      - name: Scan with Fortify
-        run: |
-            mkdir -p ./fortify-reports
-            ./fortify/bin/sourceanalyzer -b mybuild -scan \
-              -f ./fortify-reports/fortify-scan.fpr \
-              -format json -output ./fortify-reports/fortify-scan.json
-
-    # 9️⃣ Upload FPR report
-      - name: Upload Fortify FPR
+    # 6️⃣ Upload scan artifacts
+      - name: Upload Fortify Reports
         uses: actions/upload-artifact@v4
         with:
-          name: fortify-fpr
-          path: ./fortify-reports/fortify-scan.fpr
-
-    # 🔟 Upload JSON report
-      - name: Upload Fortify JSON
-        uses: actions/upload-artifact@v4
-        with:
-          name: fortify-json
-          path: ./fortify-reports/fortify-scan.json
+          name: fortify-reports
+          path: ./fortify-reports
 
   # ---------------------------------------------------
   # 2. CodeQL Security Scan Job
