@@ -99,8 +99,8 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
             repo-token: ${{ secrets.GITHUB_TOKEN }}
-            base_ref: "main"
-            head_ref: ${{ github.ref_name }}
+            base-ref: "master"
+            head-ref: ${{ github.ref_name }}
   # ---------------------------------------------------
   # 4. Build & Publish Job
   # ---------------------------------------------------
