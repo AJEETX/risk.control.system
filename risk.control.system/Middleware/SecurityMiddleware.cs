@@ -51,7 +51,7 @@ namespace risk.control.system.Middleware
                 context.Response.Headers.Append("Content-Security-Policy",
                     "default-src 'self';" +
                     "connect-src 'self' wss: https://maps.googleapis.com https://ifsc.razorpay.com; " +
-                    "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
+                    "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
                     //$"script-src 'self' 'nonce-{nonce}' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
                     "style-src 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
                     "font-src  'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
