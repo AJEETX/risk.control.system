@@ -72,7 +72,7 @@ jobs:
           path: ./fortify-logs
 
   # ---------------------------------------------------
-  # 2. CodeQL Security Scan Job
+  # 2️⃣ CodeQL Security Scan Job
   # ---------------------------------------------------
   codeql:
     name: CodeQL Security Scan
@@ -109,7 +109,7 @@ jobs:
             echo "A full CodeQL analysis report is available in the uploaded artifact." >> $GITHUB_STEP_SUMMARY
 
 # ======================================================
-# 3. DEPENDENCY VULNERABILITY SCAN
+# 3️⃣ DEPENDENCY VULNERABILITY SCAN
 # ======================================================
   dependency-review:
     name: Dependency Review (NuGet Security)
@@ -131,8 +131,9 @@ jobs:
         run: |
             echo "## Dependency Review Completed" >> $GITHUB_STEP_SUMMARY
             echo "Review the 'Security' tab for details on vulnerable dependencies." >> $GITHUB_STEP_SUMMARY
+
   # ---------------------------------------------------
-  # 4. Build & Publish Job
+  # 4️⃣ Build & Publish Job
   # ---------------------------------------------------
   build:
     name: Build .Net Core Application
@@ -165,8 +166,9 @@ jobs:
         run: |
             echo "## Build Completed" >> $GITHUB_STEP_SUMMARY
             echo "The .NET application has been built and published successfully." >> $GITHUB_STEP_SUMMARY
+
   # ---------------------------------------------------
-  # 5. Deploy to Azure Job
+  # 5️⃣ Deploy to Azure Job
   # ---------------------------------------------------
   deploy:
     name: Deploy to Azure Web App
@@ -225,8 +227,9 @@ jobs:
         run: |
             echo "## App Service Warmup Completed" >> $GITHUB_STEP_SUMMARY
             echo "The Azure Web App is now responsive." >> $GITHUB_STEP_SUMMARY
+
   # ---------------------------------------------------
-  # 6. OWASP ZAP Baseline Scan Job
+  # 6️⃣ OWASP ZAP Baseline Scan Job
   # ---------------------------------------------------
   zap-scan:
     name: OWASP ZAP Baseline Scan

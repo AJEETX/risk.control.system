@@ -61,6 +61,8 @@ jobs:
       - name: Save Fortify logs
         run: |
             mkdir -p ./fortify-logs
+            echo "## Fortify Scan Completed" >> $GITHUB_STEP_SUMMARY
+            echo "A full scan log is available in the uploaded artifact." >> $GITHUB_STEP_SUMMARY
             echo "$FORTIFY_ACTION_OUTPUT" > ./fortify-logs/fortify-log.txt || true
 
     # 7️⃣ Upload scan artifacts
@@ -69,8 +71,9 @@ jobs:
         with:
           name: fortify-logs
           path: ./fortify-logs
+
   # ---------------------------------------------------
-  # 2. CodeQL Security Scan Job
+  # 2️⃣ CodeQL Security Scan Job
   # ---------------------------------------------------
   codeql:
     name: CodeQL Security Scan
@@ -101,8 +104,13 @@ jobs:
           name: security-scan
           path: ./codeql-results
 
+      - name: Add Summary Output
+        run: |
+            echo "## CodeQL Scan Completed" >> $GITHUB_STEP_SUMMARY
+            echo "A full CodeQL analysis report is available in the uploaded artifact." >> $GITHUB_STEP_SUMMARY
+
 # ======================================================
-# 3. DEPENDENCY VULNERABILITY SCAN
+# 3️⃣ DEPENDENCY VULNERABILITY SCAN
 # ======================================================
   dependency-review:
     name: Dependency Review (NuGet Security)
@@ -119,8 +127,14 @@ jobs:
             repo-token: ${{ secrets.GITHUB_TOKEN }}
             base-ref: "master"
             head-ref: ${{ github.ref_name }}
+
+      - name: Add Summary Output
+        run: |
+            echo "## Dependency Review Completed" >> $GITHUB_STEP_SUMMARY
+            echo "Review the 'Security' tab for details on vulnerable dependencies." >> $GITHUB_STEP_SUMMARY
+
   # ---------------------------------------------------
-  # 4. Build  .Net Core Application Job
+  # 4️⃣ Build  .Net Core Application Job
   # ---------------------------------------------------
   build:
     name: Build .Net Core Application
@@ -148,8 +162,14 @@ jobs:
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Add Summary Output
+        run: |
+            echo "## Build Completed" >> $GITHUB_STEP_SUMMARY
+            echo "The .NET application has been built and published successfully." >> $GITHUB_STEP_SUMMARY
+
  # ---------------------------------------------------
-  # 5. Deploy to Azure Job
+  # 5️⃣ Deploy to Azure Job
   # ---------------------------------------------------
   deploy:
     name: Deploy to Azure Web App
@@ -170,6 +190,11 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_243D92813C17446F8D6FDDFB931F0A80 }}
+ 
+      - name: Add Deployment Summary Output
+        run: |
+            echo "## Deployment Completed" >> $GITHUB_STEP_SUMMARY
+            echo "The application has been deployed to Azure Web App successfully." >> $GITHUB_STEP_SUMMARY
 
       - name: Wait for App Service warmup
         run: |
@@ -186,8 +211,14 @@ jobs:
             done
             echo "App did not become ready in time"
             exit 1
+
+      - name: Add Summary Output
+        run: |
+            echo "## App Service Warmup Completed" >> $GITHUB_STEP_SUMMARY
+            echo "The Azure Web App is now responsive." >> $GITHUB_STEP_SUMMARY
+
 # ---------------------------------------------------
-  # 6. OWASP ZAP Baseline Scan Job
+  # 6️⃣ OWASP ZAP Baseline Scan Job
   # ---------------------------------------------------
   zap-scan:
     name: OWASP ZAP Baseline Scan
@@ -216,3 +247,8 @@ jobs:
         with:
           name: owasp-zap-report
           path: zap_report.html  
+
+      - name: Add Summary Output
+        run: |
+            echo "## OWASP ZAP Scan Completed" >> $GITHUB_STEP_SUMMARY
+            echo "A full OWASP ZAP scan report is available in the uploaded artifact." >> $GITHUB_STEP_SUMMARY
