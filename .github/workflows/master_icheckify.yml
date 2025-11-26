@@ -48,6 +48,7 @@ jobs:
       - name: Build solution
         run: dotnet build --configuration Release
 
+
     # 5️⃣ Run Fortify SAST + OSS scan
       - name: Run Fortify Scan
         uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
@@ -55,14 +56,20 @@ jobs:
           sast-scan: true
           debricked-sca-scan: true
         env:
-          SCA_OUTPUT_DIR: ./fortify-reports   # save scan results here
+           FORTIFY_HOME: ./fortify
+      
+    # 6️⃣ Save Fortify logs
+      - name: Save Fortify logs
+        run: |
+            mkdir -p ./fortify-logs
+            echo "$FORTIFY_ACTION_OUTPUT" > ./fortify-logs/fortify-log.txt || true
 
-    # 6️⃣ Upload scan artifacts
-      - name: Upload Fortify Reports
+    # 7️⃣ Upload scan artifacts
+      - name: Upload Fortify logs artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fortify-reports
-          path: ./fortify-reports
+          name: fortify-logs
+          path: ./fortify-logs
 
   # ---------------------------------------------------
   # 2. CodeQL Security Scan Job

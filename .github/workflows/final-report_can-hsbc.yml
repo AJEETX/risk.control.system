@@ -57,11 +57,13 @@ jobs:
         env:
            FORTIFY_HOME: ./fortify
       
+    # 6️⃣ Save Fortify logs
       - name: Save Fortify logs
         run: |
             mkdir -p ./fortify-logs
             echo "$FORTIFY_ACTION_OUTPUT" > ./fortify-logs/fortify-log.txt || true
 
+    # 7️⃣ Upload scan artifacts
       - name: Upload Fortify logs artifact
         uses: actions/upload-artifact@v4
         with:
