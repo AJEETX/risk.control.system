@@ -21,6 +21,7 @@ jobs:
   # ---------------------------------------------------
   fortify:
     # Use the appropriate runner for building your source code. Ensure dev tools required to build your code are present and configured appropriately (MSBuild, Python, etc).
+    name: Fortify Security Scan
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -51,7 +52,7 @@ jobs:
                                    # is disabled). For SSC, run a Debricked scan and import results into SSC.
 
   # ---------------------------------------------------
-  # 1️⃣ CodeQL Security Scan Job
+  # 2. CodeQL Security Scan Job
   # ---------------------------------------------------
   codeql:
     name: CodeQL Security Scan
@@ -82,12 +83,27 @@ jobs:
           name: security-scan
           path: ./codeql-results
 
+# ======================================================
+# 3. DEPENDENCY VULNERABILITY SCAN
+# ======================================================
+  dependency-review:
+    name: Dependency Review (NuGet Security)
+    runs-on: ubuntu-latest
+    needs: codeql
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Review dependencies for security issues
+        uses: actions/dependency-review-action@v4
   # ---------------------------------------------------
-  # 2️⃣ Build & Publish Job
+  # 4. Build & Publish Job
   # ---------------------------------------------------
   build:
+    name: Build .Net Core Application
     runs-on: windows-latest
-    needs: codeql
+    needs: dependency-review
     permissions:
       contents: read
 
@@ -112,9 +128,10 @@ jobs:
           path: ${{ env.DOTNET_ROOT }}/myapp
 
   # ---------------------------------------------------
-  # 3️⃣ Deploy to Azure Job
+  # 5. Deploy to Azure Job
   # ---------------------------------------------------
   deploy:
+    name: Deploy to Azure Web App
     runs-on: windows-latest
     needs: build
     environment:
@@ -144,7 +161,9 @@ jobs:
           app-name: 'icheckify-demo'
           slot-name: 'Production'
           package: .
-
+ # ---------------------------------------------------
+  # 6. OWASP ZAP Baseline Scan Job
+  # ---------------------------------------------------
   zap-scan:
     name: OWASP ZAP Baseline Scan
     needs: deploy
@@ -159,6 +178,11 @@ jobs:
         with:
           target: "https://${{ env.APP_SERVICE_NAME }}.azurewebsites.net"
           cmd_options: "-a"  # enable passive scan + spidering
+          docker_name: ghcr.io/zaproxy/zaproxy:stable
+          issue_title: "ZAP Scan Baseline Report"
+          fail_action: false
+          allow_issue_writing: false   # <-- disable issue creation
+          artifact_name: zap_scan
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
