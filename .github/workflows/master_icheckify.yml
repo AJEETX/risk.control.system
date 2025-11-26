@@ -97,6 +97,10 @@ jobs:
 
       - name: Review dependencies for security issues
         uses: actions/dependency-review-action@v4
+        with:
+            repo-token: ${{ secrets.GITHUB_TOKEN }}
+            base_ref: "master"
+            head_ref: ${{ github.ref_name }}
   # ---------------------------------------------------
   # 4. Build  .Net Core Application Job
   # ---------------------------------------------------
