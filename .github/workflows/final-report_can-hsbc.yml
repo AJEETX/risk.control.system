@@ -13,7 +13,9 @@ permissions:
   security-events: write
 
 jobs:
-
+ # ---------------------------------------------------
+  # 1️⃣ Fortify Security Scan Job
+  # ---------------------------------------------------
   Fortify-AST-Scan:
     # Use the appropriate runner for building your source code. Ensure dev tools required to build your code are present and configured appropriately (MSBuild, Python, etc).
     runs-on: ubuntu-latest
@@ -74,7 +76,9 @@ jobs:
         with:
           name: security-scan
           path: ./codeql-results
-
+ # ---------------------------------------------------
+  # 1️⃣ Build Job
+  # ---------------------------------------------------
   build:
     runs-on: windows-latest
     permissions:
@@ -99,7 +103,9 @@ jobs:
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
-
+ # ---------------------------------------------------
+  # 1️⃣ Deploy Job
+  # ---------------------------------------------------
   deploy:
     runs-on: windows-latest
     needs: build
