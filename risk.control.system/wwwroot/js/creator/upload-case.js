@@ -448,14 +448,14 @@
 
                 // Customize the confirm dialog dynamically
                 $.confirm({
-                    title: isChecked ? "Confirm Direct Assign" : "Confirm File Upload",  // Dynamic title based on checkbox
-                    content: isChecked ? "Are you sure you want to Assign Directly?" : "Are you sure you want to Upload?",  // Dynamic content
+                    title: isChecked ? "Confirm Assign" : "Confirm Upload",  // Dynamic title based on checkbox
+                    content: isChecked ? "Are you sure you want to Assign?" : "Are you sure you want to Upload?",  // Dynamic content
                     icon: isChecked ? 'fas fa-random' : 'fas fa-upload',  // Dynamic icon based on checkbox
                     type: isChecked ? 'red' : 'blue',  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
                     closeIcon: true,
                     buttons: {
                         confirm: {
-                            text: isChecked ? "Assign Directly" : "File Upload",  // Dynamic button text
+                            text: isChecked ? " Assign " : " Upload ",  // Dynamic button text
                             btnClass: isChecked ? 'btn-danger' : 'btn-info',  // Customize button class
                             action: function () {
                                 askFileUploadConfirmation = false;
