@@ -30,41 +30,59 @@ jobs:
       # pull-requests: write     # Required if DO_PR_COMMENT is set to true
 
     steps:
+    # 1️⃣ Checkout source code
       - name: Fortify Check Out Source Code
         uses: actions/checkout@v4
 
+    # 2️⃣ Setup .NET 8
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
             dotnet-version: 8.0.x
 
+    # 3️⃣ Restore dependencies
       - name: Restore dependencies
         run: dotnet restore
 
+    # 4️⃣ Build solution
       - name: Build solution
         run: dotnet build --configuration Release
 
-      - name: Run Fortify Scan
-        uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
-        with:
-          sast-scan: true          # Run a SAST scan; if not specified or set to false, no SAST scan will be run
-          debricked-sca-scan: true # For FoD, run an open-source scan as part of the SAST scan (ignored if SAST scan
-                                   # is disabled). For SSC, run a Debricked scan and import results into SSC.
-          output-fpr: fortify-scan.fpr      # <-- save FPR report
-          output-json: fortify-scan.json    # <-- optional JSON output
+    # 5️⃣ Install Fortify CLI
+      - name: Install Fortify CLI
+        run: |
+            mkdir -p fortify
+            curl -L https://downloads.microfocus.com/fortify/fortify-sca-22.3.0-linux.tar.gz | tar xz -C ./fortify
 
-      - name: Upload Fortify FPR Report
+    # 6️⃣ Clean previous Fortify build
+      - name: Clean Fortify Build
+        run: ./fortify/bin/sourceanalyzer -b mybuild -clean
+
+    # 7️⃣ Translate project into Fortify SCA
+      - name: Translate and Build
+        run: ./fortify/bin/sourceanalyzer -b mybuild dotnet build --configuration Release
+
+    # 8️⃣ Run Fortify Scan and generate FPR + JSON
+      - name: Scan with Fortify
+        run: |
+            mkdir -p ./fortify-reports
+            ./fortify/bin/sourceanalyzer -b mybuild -scan \
+              -f ./fortify-reports/fortify-scan.fpr \
+              -format json -output ./fortify-reports/fortify-scan.json
+
+    # 9️⃣ Upload FPR report
+      - name: Upload Fortify FPR
         uses: actions/upload-artifact@v4
         with:
-            name: fortify-report
-            path: fortify-scan.fpr
+          name: fortify-fpr
+          path: ./fortify-reports/fortify-scan.fpr
 
-      - name: Upload Fortify JSON Report
-        if: always()
+    # 🔟 Upload JSON report
+      - name: Upload Fortify JSON
         uses: actions/upload-artifact@v4
         with:
-            name: fortify-json-report
-            path: fortify-scan.json
+          name: fortify-json
+          path: ./fortify-reports/fortify-scan.json
 
   # ---------------------------------------------------
   # 2. CodeQL Security Scan Job
