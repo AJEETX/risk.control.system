@@ -50,7 +50,21 @@ jobs:
           sast-scan: true          # Run a SAST scan; if not specified or set to false, no SAST scan will be run
           debricked-sca-scan: true # For FoD, run an open-source scan as part of the SAST scan (ignored if SAST scan
                                    # is disabled). For SSC, run a Debricked scan and import results into SSC.
+          output-fpr: fortify-scan.fpr      # <-- save FPR report
+          output-json: fortify-scan.json    # <-- optional JSON output
 
+      - name: Upload Fortify FPR Report
+        uses: actions/upload-artifact@v4
+        with:
+            name: fortify-report
+            path: fortify-scan.fpr
+
+      - name: Upload Fortify JSON Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+            name: fortify-json-report
+            path: fortify-scan.json
   # ---------------------------------------------------
   # 2. CodeQL Security Scan Job
   # ---------------------------------------------------
@@ -165,7 +179,23 @@ jobs:
           app-name: 'icheckify-demo'
           slot-name: 'Production'
           package: .
- # ---------------------------------------------------
+ 
+      - name: Wait for App Service warmup
+        run: |
+            echo "Waiting for App Service to be ready..."
+            URL="https://${{ env.APP_SERVICE_NAME }}.azurewebsites.net"
+            for i in {1..12}; do
+              STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" $URL || echo 000)
+              if [ "$STATUS" -eq 200 ]; then
+                echo "App is ready!"
+                exit 0
+              fi
+              echo "Attempt $i: App not ready (status $STATUS). Waiting 5s..."
+              sleep 5
+            done
+            echo "App did not become ready in time"
+            exit 1
+  # ---------------------------------------------------
   # 6. OWASP ZAP Baseline Scan Job
   # ---------------------------------------------------
   zap-scan:
@@ -187,6 +217,8 @@ jobs:
           fail_action: false
           allow_issue_writing: false   # <-- disable issue creation
           artifact_name: zap_scan
+          token: ${{ secrets.GITHUB_TOKEN }}
+          use_docker_internal_working_dir: true
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
