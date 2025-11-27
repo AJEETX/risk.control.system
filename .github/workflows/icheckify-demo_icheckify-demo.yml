@@ -53,18 +53,69 @@ jobs:
         with:
           sast-scan: true
           debricked-sca-scan: true
-        env:
-           FORTIFY_HOME: ./fortify
-      
-    # 6️⃣ Save Fortify logs
-      - name: Save Fortify logs
+    
+     # 6️⃣ Extract SAST + OSS results separately
+      - name: Parse SAST + OSS Results
+        id: parse
         run: |
-            mkdir -p ./fortify-logs
+            mkdir -p fortify-logs
+            echo "$FORTIFY_ACTION_OUTPUT" > fortify-logs/fortify-log.txt
+
+            LOG=fortify-logs/fortify-log.txt
+
+            # -------------------------
+            # 🔍 Parse SAST findings
+            # -------------------------
+
+            SAST_CRIT=$(grep -i "SAST" $LOG | grep -i "Critical" | wc -l || echo 0)
+            SAST_HIGH=$(grep -i "SAST" $LOG | grep -i "High" | wc -l || echo 0)
+            SAST_MED=$(grep -i "SAST" $LOG | grep -i "Medium" | wc -l || echo 0)
+            SAST_LOW=$(grep -i "SAST" $LOG | grep -i "Low" | wc -l || echo 0)
+
+            # -------------------------
+            # 🔍 Parse OSS dependencies findings (Debricked)
+            # -------------------------
+            OSS_CRIT=$(grep -i "Debricked" $LOG | grep -i "Critical" | wc -l || echo 0)
+            OSS_HIGH=$(grep -i "Debricked" $LOG | grep -i "High" | wc -l || echo 0)
+            OSS_MED=$(grep -i "Debricked" $LOG | grep -i "Medium" | wc -l || echo 0)
+            OSS_LOW=$(grep -i "Debricked" $LOG | grep -i "Low" | wc -l || echo 0)
+
+            echo "sast_critical=$SAST_CRIT" >> $GITHUB_OUTPUT
+            echo "sast_high=$SAST_HIGH" >> $GITHUB_OUTPUT
+            echo "sast_medium=$SAST_MED" >> $GITHUB_OUTPUT
+            echo "sast_low=$SAST_LOW" >> $GITHUB_OUTPUT
+
+            echo "oss_critical=$OSS_CRIT" >> $GITHUB_OUTPUT
+            echo "oss_high=$OSS_HIGH" >> $GITHUB_OUTPUT
+            echo "oss_medium=$OSS_MED" >> $GITHUB_OUTPUT
+            echo "oss_low=$OSS_LOW" >> $GITHUB_OUTPUT
+     
+    # 7️⃣ Add summary with two tables
+      - name: Add Summary Output
+        run: |
             echo "## ✔️ Fortify Scan Completed" >> $GITHUB_STEP_SUMMARY
-            echo "A full scan log is available as an artifact." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "[📄 **Download Fortify Logs Artifact**](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts)" >> $GITHUB_STEP_SUMMARY
-            echo "$FORTIFY_ACTION_OUTPUT" > ./fortify-logs/fortify-log.txt || true
+
+            echo "## 🔐 SAST Vulnerability Summary" >> $GITHUB_STEP_SUMMARY
+            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| 🛑 Critical | ${{ steps.parse.outputs.sast_critical }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔥 High     | ${{ steps.parse.outputs.sast_high }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| ⚠️ Medium   | ${{ steps.parse.outputs.sast_medium }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| ℹ️ Low      | ${{ steps.parse.outputs.sast_low }} |" >> $GITHUB_STEP_SUMMARY
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## 📦 OSS / Open Source Dependency Vulnerability Summary (Debricked)" >> $GITHUB_STEP_SUMMARY
+            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| 🛑 Critical | ${{ steps.parse.outputs.oss_critical }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔥 High     | ${{ steps.parse.outputs.oss_high }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| ⚠️ Medium   | ${{ steps.parse.outputs.oss_medium }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| ℹ️ Low      | ${{ steps.parse.outputs.oss_low }} |" >> $GITHUB_STEP_SUMMARY
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "[📄 **Download Full Fortify Logs**](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts)" >> $GITHUB_STEP_SUMMARY
+
 
     # 7️⃣ Upload scan artifacts
       - name: Upload Fortify logs artifact
@@ -107,8 +158,10 @@ jobs:
 
       - name: Add Summary Output
         run: |
-            echo "## CodeQL Scan Completed" >> $GITHUB_STEP_SUMMARY
+            echo "## ✔️ CodeQL Scan Completed" >> $GITHUB_STEP_SUMMARY
             echo "A full CodeQL analysis report is available in the uploaded artifact." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "[📄 **Download CodeQL SARIF Artifact**](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts)" >> $GITHUB_STEP_SUMMARY
 
 # ======================================================
 # 3️⃣ DEPENDENCY VULNERABILITY SCAN
