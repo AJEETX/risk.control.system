@@ -253,7 +253,42 @@ jobs:
               echo ""
             } >> $GITHUB_STEP_SUMMARY
   # ---------------------------------------------------
-  # 4️⃣ Build & Publish Job
+  # 4️⃣ Unified Security Summary Job
+  # ---------------------------------------------------  
+  unified-security-summary:
+    name: Unified Security Summary
+    runs-on: ubuntu-latest
+    needs: [fortify, codeql, dependency-review]
+    steps:
+      - name: Generate Enhanced Security Summary
+        run: |
+          echo "## 🛡️ Unified Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan | Status | Vulnerabilities | Artifact / Link |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|----------------|----------------|" >> $GITHUB_STEP_SUMMARY
+
+          # Fortify
+          FORTIFY_HIGH=${{ needs.fortify.outputs.high_vulns || 'N/A' }}
+          FORTIFY_MEDIUM=${{ needs.fortify.outputs.medium_vulns || 'N/A' }}
+          FORTIFY_LOW=${{ needs.fortify.outputs.low_vulns || 'N/A' }}
+          echo "| Fortify SAST + OSS | ✔️ Completed | 🔴 High: $FORTIFY_HIGH ⚠️ Medium: $FORTIFY_MEDIUM 🟢 Low: $FORTIFY_LOW | [Download Fortify Logs](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=fortify-logs) |" >> $GITHUB_STEP_SUMMARY
+
+          # CodeQL
+          CODEQL_HIGH=${{ needs.codeql.outputs.high_vulns || 'N/A' }}
+          CODEQL_MEDIUM=${{ needs.codeql.outputs.medium_vulns || 'N/A' }}
+          CODEQL_LOW=${{ needs.codeql.outputs.low_vulns || 'N/A' }}
+          echo "| CodeQL Analysis | ✔️ Completed | 🔴 High: $CODEQL_HIGH ⚠️ Medium: $CODEQL_MEDIUM 🟢 Low: $CODEQL_LOW | [Download CodeQL SARIF](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=security-scan) |" >> $GITHUB_STEP_SUMMARY
+
+          # Dependency Review
+          DEP_VULN_COUNT=${{ needs.dependency-review.outputs.vulnerabilities || 'N/A' }}
+          echo "| Dependency Review | ✔️ Completed | Vulnerable Dependencies: $DEP_VULN_COUNT | [View in Security Tab](https://github.com/${GITHUB_REPOSITORY}/security/dependabot) |" >> $GITHUB_STEP_SUMMARY
+
+          echo ""
+          echo "### ✅ Notes"
+          echo "- Click the artifact links to download full logs/reports."
+          echo "- Review CodeQL SARIF and Dependency Review alerts in GitHub Security tab for details."
+  # ---------------------------------------------------
+  # 5️⃣ Build & Publish Job
   # ---------------------------------------------------
   build:
     name: Build .Net Core Application
@@ -288,7 +323,7 @@ jobs:
             echo "The .NET application has been built and published successfully." >> $GITHUB_STEP_SUMMARY
 
   # ---------------------------------------------------
-  # 5️⃣ Deploy to Azure Job
+  # 6️⃣ Deploy to Azure Job
   # ---------------------------------------------------
   deploy:
     name: Deploy to Azure Web App
@@ -350,7 +385,7 @@ jobs:
             echo "The Azure Web App is now responsive." >> $GITHUB_STEP_SUMMARY
 
   # ---------------------------------------------------
-  # 6️⃣ OWASP ZAP Baseline Scan Job
+  # 7️⃣ OWASP ZAP Baseline Scan Job
   # ---------------------------------------------------
   zap-scan:
     name: OWASP ZAP Baseline Scan
