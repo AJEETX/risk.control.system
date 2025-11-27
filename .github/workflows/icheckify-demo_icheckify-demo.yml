@@ -156,12 +156,47 @@ jobs:
           name: security-scan
           path: ./codeql-results
 
+    # Extract Number of Alerts from SARIF
+      - name: Extract CodeQL Alert Counts
+        id: sarif-stats
+        run: |
+            sarif_file=$(find ./codeql-results -name "*.sarif" | head -n 1)
+
+            if [ -z "$sarif_file" ]; then
+              echo "No SARIF file found!"
+              echo "alerts=0" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+
+            alerts=$(jq '[.. | objects | select(.ruleId?)] | length' "$sarif_file")
+
+            echo "alerts=$alerts" >> $GITHUB_OUTPUT
+
+    # Summary Output with Table + Badges
       - name: Add Summary Output
         run: |
-            echo "## ✔️ CodeQL Scan Completed" >> $GITHUB_STEP_SUMMARY
-            echo "A full CodeQL analysis report is available in the uploaded artifact." >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "[📄 **Download CodeQL SARIF Artifact**](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts)" >> $GITHUB_STEP_SUMMARY
+            {
+              echo "## ✔️ CodeQL Security Scan Summary"
+              echo ""
+              echo "| Item | Details |"
+              echo "|------|---------|"
+              echo "| **Status** | Completed Successfully |"
+              echo "| **Language** | C# |"
+              echo "| **Total Alerts Found** | **${{ steps.sarif-stats.outputs.alerts }}** |"
+              echo "| **Results Format** | SARIF |"
+              echo "| **Report Artifact** | [Download SARIF Artifact](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts) |"
+              echo "| **Category** | security-scan |"
+              echo ""
+              echo "### 🏷️ Badges"
+              echo ""
+              echo "![Status](https://img.shields.io/badge/CodeQL-Completed-brightgreen)"
+              echo "![Alerts](https://img.shields.io/badge/Alerts-${{ steps.sarif-stats.outputs.alerts }}-orange)"
+              echo "![Language](https://img.shields.io/badge/Language-CSharp-blue)"
+              echo ""
+              echo "### 📌 Notes"
+              echo "- CodeQL used GitHub's default security queries."
+              echo "- SARIF file can be imported into Visual Studio Code or SARIF Explorer."
+            } >> $GITHUB_STEP_SUMMARY
 
 # ======================================================
 # 3️⃣ DEPENDENCY VULNERABILITY SCAN
