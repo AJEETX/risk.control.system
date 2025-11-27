@@ -208,6 +208,7 @@ jobs:
             echo "The application has been deployed to Azure Web App successfully." >> $GITHUB_STEP_SUMMARY
 
       - name: Wait for App Service warmup
+        shell: bash
         run: |
             echo "Waiting for App Service to be ready..."
             URL="https://${{ env.APP_SERVICE_NAME }}.azurewebsites.net"
