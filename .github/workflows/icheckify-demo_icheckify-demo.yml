@@ -286,7 +286,7 @@ jobs:
           echo "- Click the artifact links to download full logs/reports."
           echo "- Review CodeQL SARIF and Dependency Review alerts in GitHub Security tab for details."
   # ---------------------------------------------------
-  # 5️⃣ Build & Publish Job
+  # 5️⃣  Build  .Net Core Application Job
   # ---------------------------------------------------
   build:
     name: Build .Net Core Application
@@ -351,7 +351,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'icheckify-demo'
+          app-name: '${{ env.APP_SERVICE_NAME }}'
           slot-name: 'Production'
           package: .
  
