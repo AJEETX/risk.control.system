@@ -60,8 +60,10 @@ jobs:
       - name: Save Fortify logs
         run: |
             mkdir -p ./fortify-logs
-            echo "## Fortify Scan Completed" >> $GITHUB_STEP_SUMMARY
-            echo "A full scan log is available in the uploaded artifact." >> $GITHUB_STEP_SUMMARY
+            echo "## ✔️ Fortify Scan Completed" >> $GITHUB_STEP_SUMMARY
+            echo "A full scan log is available as an artifact." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "[📄 **Download Fortify Logs Artifact**](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts)" >> $GITHUB_STEP_SUMMARY
             echo "$FORTIFY_ACTION_OUTPUT" > ./fortify-logs/fortify-log.txt || true
 
     # 7️⃣ Upload scan artifacts
