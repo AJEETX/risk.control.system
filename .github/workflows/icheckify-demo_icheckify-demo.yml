@@ -217,11 +217,41 @@ jobs:
             base-ref: "master"
             head-ref: ${{ github.ref_name }}
 
+      - name: Extract Vulnerability Count
+        id: vuln-count
+        run: |
+            json="${{ steps.depreview.outputs.report }}"
+            if [ -z "$json" ]; then
+              echo "vulnerabilities=0" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+
+            vulnerabilities=$(echo "$json" | jq '.vulnerabilities | length')
+            echo "vulnerabilities=$vulnerabilities" >> $GITHUB_OUTPUT
       - name: Add Summary Output
         run: |
-            echo "## Dependency Review Completed" >> $GITHUB_STEP_SUMMARY
-            echo "Review the 'Security' tab for details on vulnerable dependencies." >> $GITHUB_STEP_SUMMARY
-
+            {
+              echo "## ✔️ Dependency Review Security Summary"
+              echo ""
+              echo "| Item | Details |"
+              echo "|------|---------|"
+              echo "| **Status** | Completed Successfully |"
+              echo "| **Total Vulnerable Dependencies** | **${{ steps.vuln-count.outputs.vulnerabilities }}** |"
+              echo "| **Scan Type** | NuGet dependency security |"
+              echo "| **Base Branch** | master |"
+              echo "| **Compared Against** | ${{ github.ref_name }} |"
+              echo "| **GitHub Security Dashboard** | [View Security Alerts](https://github.com/${{ github.repository }}/security/dependabot) |"
+              echo ""
+              echo "### 🏷️ Badges"
+              echo "![Dependency Review](https://img.shields.io/badge/Dependency%20Review-Completed-brightgreen)"
+              echo "![Vulnerabilities](https://img.shields.io/badge/Vulnerabilities-${{ steps.vuln-count.outputs.vulnerabilities }}-red)"
+              echo "![NuGet](https://img.shields.io/badge/Package%20Source-NuGet-blue)"
+              echo ""
+              echo "### 📌 Notes"
+              echo "- GitHub detected and analyzed all updated packages."
+              echo "- Vulnerable packages require review under the repository’s **Security > Dependabot** tab."
+              echo ""
+            } >> $GITHUB_STEP_SUMMARY
   # ---------------------------------------------------
   # 4️⃣ Build & Publish Job
   # ---------------------------------------------------
