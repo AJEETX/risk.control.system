@@ -421,17 +421,13 @@ jobs:
           issue_title: "ZAP Scan Baseline Report"
           fail_action: false
           allow_issue_writing: false   # <-- disable issue creation
-          artifact_name: "zap-scan-${{ github.run_id }}"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          artifact_name: " "
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-          name: "zap-report-${{ github.run_id }}"
-          path: |
-            report_json.json
-            report_md.md
-            report_html.html
+          name: "zap-report"
+          path:  report_html.html
 
       - name: Show ZAP Summary Output
         run: |
@@ -440,8 +436,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Artifacts Generated:**" >> $GITHUB_STEP_SUMMARY
           echo "- \`report_html.html\` (Full HTML Report)" >> $GITHUB_STEP_SUMMARY
-          echo "- \`report_md.md\` (Markdown Summary)" >> $GITHUB_STEP_SUMMARY
-          echo "- \`report_json.json\` (JSON Details)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Download the ZAP scan artifact from the workflow run page." >> $GITHUB_STEP_SUMMARY
   
