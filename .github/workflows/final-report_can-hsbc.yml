@@ -390,13 +390,17 @@ jobs:
   # ---------------------------------------------------
   zap-scan:
     name: OWASP ZAP Baseline Scan
-    needs: deploy
+    needs: warmup
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Fix permissions for ZAP working directory
+        run: |
+            sudo chmod -R 777 $GITHUB_WORKSPACE
+      
       - name: Run ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.10.0
         with:
@@ -408,15 +412,30 @@ jobs:
           allow_issue_writing: false   # <-- disable issue creation
           artifact_name: zap_scan
           token: ${{ secrets.GITHUB_TOKEN }}
-          use_docker_internal_working_dir: true
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
           name: owasp-zap-report
-          path: zap_report.html  
+          path: |
+            report_json.json
+            report_md.md
+            report_html.html
 
-      - name: Add Summary Output
+      - name: Show ZAP Summary in Job Summary
         run: |
-            echo "## OWASP ZAP Scan Completed" >> $GITHUB_STEP_SUMMARY
-            echo "A full OWASP ZAP scan report is available in the uploaded artifact." >> $GITHUB_STEP_SUMMARY
+          echo "## 🛡️ OWASP ZAP Baseline Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔎 Key Findings" >> $GITHUB_STEP_SUMMARY
+        
+          # extract Core ZAP results
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          grep -E "PASS|WARN|FAIL" report_md.md >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📄 Full HTML Report" >> $GITHUB_STEP_SUMMARY
+          echo "[Download Report](./artifacts/owasp-zap-reports/report_html.html)" >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "_Full ZAP reports (HTML/MD/JSON) attached as build artifacts._" >> $GITHUB_STEP_SUMMARY
