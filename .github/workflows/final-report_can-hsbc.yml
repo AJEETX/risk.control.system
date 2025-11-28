@@ -410,17 +410,13 @@ jobs:
           issue_title: "ZAP Scan Baseline Report"
           fail_action: false
           allow_issue_writing: false   # <-- disable issue creation
-          artifact_name: zap_scan
-          token: ${{ secrets.GITHUB_TOKEN }}
+          artifact_name: ""
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-          name: owasp-zap-report
-          path: |
-            report_json.json
-            report_md.md
-            report_html.html
+          name: zap-report
+          path: report_html.html
 
       - name: Show ZAP Summary in Job Summary
         run: |
