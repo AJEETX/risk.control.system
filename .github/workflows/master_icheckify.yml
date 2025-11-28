@@ -360,27 +360,40 @@ jobs:
             echo "## Deployment Completed" >> $GITHUB_STEP_SUMMARY
             echo "The application has been deployed to Azure Web App successfully." >> $GITHUB_STEP_SUMMARY
 
-      - name: Wait for App Service warmup
-        shell: bash
-        run: |
-            echo "Waiting for App Service to be ready..."
-            URL="https://${{ env.APP_SERVICE_NAME }}.azurewebsites.net"
-            for i in {1..30}; do
-              STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" $URL || echo 000)
-              if [ "$STATUS" -eq 200 ]; then
-                echo "App is ready!"
-                exit 0
-              fi
-              echo "Attempt $i: App not ready (status $STATUS). Waiting 60s..."
-              sleep 60
-            done
-            echo "App did not become ready in time"
-            exit 1
+  warmup:
+    name: Warm Up Azure Web App
+    runs-on: ubuntu-latest
+    needs: deploy
 
-      - name: Add Summary Output
-        run: |
-            echo "## App Service Warmup Completed" >> $GITHUB_STEP_SUMMARY
-            echo "The Azure Web App is now responsive." >> $GITHUB_STEP_SUMMARY
+    steps:
+    - name: Wait for App Service warmup
+      shell: bash
+      run: |
+        echo "🌐 Waiting for App Service to be ready..."
+        URL="https://${{ env.APP_SERVICE_NAME }}.azurewebsites.net/Account/Login"
+
+        for i in {1..20}; do
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL" || echo 000)
+
+          echo "Attempt $i → Status: $STATUS"
+
+          if [ "$STATUS" -eq 200 ] || [ "$STATUS" -eq 302 ]; then
+            echo "✅ App is ready!"
+            exit 0
+          fi
+
+          echo "⏳ Not ready, waiting 15s..."
+          sleep 15
+        done
+
+        echo "❌ App did NOT become ready in time."
+        exit 1
+
+    - name: Add Warm-up Summary Output
+      if: always()
+      run: |
+        echo "## App Service Warmup Completed" >> $GITHUB_STEP_SUMMARY
+        echo "The Azure Web App warm-up job has finished." >> $GITHUB_STEP_SUMMARY
             
  # ---------------------------------------------------
   # 6️⃣ OWASP ZAP Baseline Scan Job
