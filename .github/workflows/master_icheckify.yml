@@ -407,6 +407,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
+      - name: Fix permissions
+        run: sudo chmod -R 777 $GITHUB_WORKSPACE
+
       - name: Run ZAP Baseline (Direct Docker)
         run: |
           docker run --network=host \
@@ -422,13 +425,28 @@ jobs:
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-          name: zap-report
-          path: report_html.html
+          name: zap-reports
+          path: |
+              report_html.html
+              report_json.json
+              report_md.md
 
       - name: Show Summary
         run: |
           echo "## OWASP ZAP Scan Completed" >> $GITHUB_STEP_SUMMARY
-          echo "Warnings and Failures:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          grep -E 'WARN|FAIL' report_md.md >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f report_md.md ]; then
+            echo "### 🔍 Findings Summary" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep -E 'WARN|FAIL|ALERT' report_md.md || echo "No warnings or failures detected." >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ report_md.md not found." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifacts Generated:**" >> $GITHUB_STEP_SUMMARY
+          echo "- report_html.html" >> $GITHUB_STEP_SUMMARY
+          echo "- report_json.json" >> $GITHUB_STEP_SUMMARY
+          echo "- report_md.md" >> $GITHUB_STEP_SUMMARY
