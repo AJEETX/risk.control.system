@@ -1,6 +1,5 @@
 ﻿@{
     ViewData["Title"] = @Applicationsettings.SERVICE;
-    var data = @ViewBag.CompanyId;
 }
 
 <section class="content">
@@ -16,7 +15,7 @@
                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
                         <tr>
-                            <th><input type="checkbox" name="select_all" id="checkall" value="0" /></th>
+                            <th><input type="checkbox" name="select_all" id="checkall" value="0" title="select all to empanel" data-bs-toggle="tooltip" /></th>
                             <th>
                                 Id
                             </th>
@@ -63,7 +62,6 @@
             </div>
         </form>
     </div>
-
 </section>
 @section Scripts {
     <script src="~/js/company/available-vendors.js"></script>

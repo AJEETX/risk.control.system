@@ -10,6 +10,12 @@ var showOcrMap = false;
 const image = "/images/beachflag.png";
 const MaxSizeInBytes = 5242880; // 5MG for upload
 
+document.addEventListener("DOMContentLoaded", function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     var printButton = document.getElementById("printInvoiceButton");

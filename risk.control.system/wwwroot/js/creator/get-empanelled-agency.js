@@ -52,7 +52,7 @@
                 "sDefaultContent": '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '" data-toggle="tooltip" title="Select Agency" />';
+                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '" data-bs-toggle="tooltip" title="Select Agency" />';
                     return img;
                 }
             },
@@ -66,7 +66,10 @@
                     }
 
                     // Add the rate count badge
-                    img += ' <span title="(Total count of user rated) star ratings" class="badge badge-light" data-toggle="tooltip"> (' + row.rateCount + ')';
+                    img +=
+                        ' <span class="badge badge-light" ' +
+                        'data-bs-toggle="tooltip" data-bs-html="true" ' +
+                        'title="(Total users rated)<sup>star ratings</sup>"> (' + row.rateCount + ')</span>';
 
                     // Calculate and display the average rating if available
                     if (row.rateCount && row.rateCount > 0) {
@@ -75,7 +78,7 @@
                     }
                     img += '</span>';
                     // Add the result span
-                    img += '<br /> <span class="result"></span>';
+                    img += '<br /> <span class="result" data-toggle="tooltip"></span>';
 
                     // Return the domain with the appended rating images and information
                     return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>' + '<br /> ' + img;
@@ -87,7 +90,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
                 }
@@ -95,31 +98,31 @@
             {
                 "data": "name",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
                 }
             },
             {
                 "data": "address",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.address + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.address + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "district",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.district + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.district + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "state",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.state + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.state + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -133,7 +136,7 @@
                         ? 'SERVICE AVAILABLE.\n\n  Total number of current cases = ' + row.caseCount
                         : ' NO SERVICE AVAILABLE.\n\n Total number of current cases = ' + row.caseCount;
                     return `
-            <span data-toggle="tooltip" data-html="true" title="${tooltipText}">
+            <span data-bs-toggle="tooltip" title="${tooltipText}">
                 ${statusText}
                 <span>(${data})</span>
             </span>
@@ -170,7 +173,14 @@
                 getdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
         }
     });
     $('#refreshTable').click(function () {
@@ -285,11 +295,16 @@
         $(this).css('color', 'red');
         var url = "/Vendors/PostRating?rating=" + parseInt($(this).attr("id")) + "&mid=" + $(this).attr("vendorId");
         $.post(url, null, function (data) {
-            $(e.currentTarget).closest('tr').find('span.result').text(data).css({
+            var $rowResult = $(e.currentTarget).closest('tr').find('span.result');
+
+            // Set text
+            $rowResult.text(data).css({
                 'color': 'red',
                 'font-size': 'small'
             });
-            $("#result").text(data);
+
+            // Set title (Fix)
+            $rowResult.attr("title", data);
         });
     });
     if ($("input[type='radio'].selected-case:checked").length) {
@@ -326,13 +341,13 @@
     $('#radioButtons').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault(); $.confirm({
-                title: "Confirm Assign <sub>manual</sub>",
+                title: "Confirm Assign<sub>manual</sub>",
                 content: "Are you sure ?",
                 icon: 'fas fa-external-link-alt',
                 type: 'blue',
                 closeIcon: true, buttons: {
                     confirm: {
-                        text: "Assign <sub>manual</sub>",
+                        text: "Assign<sub>manual</sub>",
                         btnClass: 'btn-info', action: function () {
                             askConfirmation = false;
                             $("body").addClass("submit-progress-bg");

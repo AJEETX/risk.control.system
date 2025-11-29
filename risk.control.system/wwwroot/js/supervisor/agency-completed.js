@@ -40,13 +40,13 @@
                 "data": "policyNum",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.policyId + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "amount",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.amount + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -55,7 +55,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.company + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.company + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
                 }
@@ -66,7 +66,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
                 }
@@ -76,7 +76,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
@@ -87,7 +87,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
@@ -97,35 +97,39 @@
             {
                 "data": "name",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "serviceType",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.serviceType + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "service",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.service + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "location",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.location + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.location + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "created",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.created + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
-            
-            { "data": "timePending" },
+            {
+                "data": "timePending",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.timePending + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -148,7 +152,14 @@
                 getdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
         }
     });
     table.on('mouseenter', '.map-thumbnail', function () {

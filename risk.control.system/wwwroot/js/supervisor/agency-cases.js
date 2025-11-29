@@ -6,7 +6,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate <sub>new</sub>");
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate");
         disableAllInteractiveElements();
 
         $('#radioButtons').submit();
@@ -105,12 +105,12 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<i class='fas fa-question'  data-toggle='tooltip' title='Enquiry'></i> ",
+                "sDefaultContent": "<i class='fas fa-question'  data-bs-toggle='tooltip' title='Enquiry'></i> ",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (!row.isQueryCase) {
 
-                        var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Select Case to Allocate" />';
+                        var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Select Case to Allocate" />';
                         return img;
                     }
                 }
@@ -119,20 +119,20 @@
                 "data": "policyNum",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.policyId + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "amount",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.amount + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "company",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
 
                 }
             },
@@ -144,13 +144,13 @@
             <div class="map-thumbnail profile-image doc-profile-image">
                 <img src="${row.personMapAddressUrl}" 
                      class="thumbnail profile-image doc-profile-image preview-map-image" 
-                     data-toggle="modal" 
+                     data-bs-toggle="modal" 
                      data-target="#mapModal" 
                      data-img='${row.personMapAddressUrl}' 
                      data-title='${row.pincodeName}' />
             </div>`;
                     } else {
-                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
+                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
                     }
                 }
             },
@@ -159,7 +159,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '<img src="' + row.document + '" class="profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
@@ -170,7 +170,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '<img src="' + row.customer + '" class="table-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
@@ -179,37 +179,40 @@
             {
                 "data": "name",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "serviceType",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.serviceType + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "service",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.service + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             
             {
                 "data": "addressLocationInfo",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.addressLocationInfo + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.addressLocationInfo + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "created",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.created + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
-
-            { "data": "timePending" },
-            
+            {
+                "data": "timePending",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.timePending + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -252,6 +255,14 @@
                 showenquiry(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
         }
     });
 
@@ -275,24 +286,7 @@
         modal.find('#modalMapImage').attr('src', imageUrl);
         modal.find('.modal-title').text(title || 'Map Preview');
     });
-    //table.on('mouseenter', '.map-thumbnail', function () {
-    //        const $this = $(this); // Cache the current element
-
-    //        // Set a timeout to show the full map after 1 second
-    //        hoverTimeout = setTimeout(function () {
-    //            $this.find('.full-map').show(); // Show full map
-    //        }, 1000); // Delay of 1 second
-    //    })
-    //    .on('mouseleave', '.map-thumbnail', function () {
-    //        const $this = $(this); // Cache the current element
-
-    //        // Clear the timeout to cancel showing the map
-    //        clearTimeout(hoverTimeout);
-
-    //        // Immediately hide the full map
-    //        $this.find('.full-map').hide();
-    //    });
-
+   
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
     table.on('draw.dt', function () {

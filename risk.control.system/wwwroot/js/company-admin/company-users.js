@@ -62,22 +62,22 @@
                     var tooltip = row.onlineStatusName || 'User status unknown'; // Tooltip text for the status
 
                     // Render the online status icon
-                    var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
+                    var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-bs-toggle="tooltip"></i>`;
 
                     // Render the user profile image
                     var img;
                     if (row.active) {
-                        img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
+                        img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-bs-toggle="tooltip"/>';
                     } else {
-                        img = '<div class="image-container"><img alt="' + row.name + '" title="Inactive!!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-user-inactive" data-toggle="tooltip"/>';
+                        img = '<div class="image-container"><img alt="' + row.name + '" title="Inactive!!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-user-inactive" data-bs-toggle="tooltip"/>';
                     }
 
                     // Add login verification icon
                     var buttons = '<span class="user-verified">';
                     if (row.loginVerified) {
-                        buttons += '<i class="fa fa-check-circle text-light-green" title="User Login Verified" data-toggle="tooltip"></i>';  // Green for verified
+                        buttons += '<i class="fa fa-check-circle text-light-green" title="User Login Verified" data-bs-toggle="tooltip"></i>';  // Green for verified
                     } else {
-                        buttons += '<i class="fa fa-check-circle text-lightgray" title="User Login Not Verified" data-toggle="tooltip"></i>';  // Grey for unverified
+                        buttons += '<i class="fa fa-check-circle text-lightgray" title="User Login Not Verified" data-bs-toggle="tooltip"></i>';  // Grey for unverified
                     }
                     buttons += '</span>';
 
@@ -91,33 +91,33 @@
             {
                 "data": "email",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + row.rawEmail + '</span>'
+                    return '<span title="' + row.rawEmail + '" data-bs-toggle="tooltip">' + row.rawEmail + '</span>'
                 }
             },
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>'
                 }
             },
             {
                 "data": "addressline",
                 bSortable: false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.addressline + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.addressline + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "state",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.stateName + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.stateName + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "pincode",
                 bSortable: false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.pincodeName + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -127,9 +127,9 @@
                     var buttons = "";
                     buttons += '<span class="checkbox">';
                     if (row.active) {
-                        buttons += '<i class="fa fa-toggle-on" title="ACTIVE" data-toggle="tooltip"></i>';
+                        buttons += '<i class="fa fa-toggle-on" title="ACTIVE" data-bs-toggle="tooltip"></i>';
                     } else {
-                        buttons += '<i class="fa fa-toggle-off" title="IN-ACTIVE" data-toggle="tooltip"></i>';
+                        buttons += '<i class="fa fa-toggle-off" title="IN-ACTIVE" data-bs-toggle="tooltip"></i>';
                     }
                     buttons += '</span>';
                     return buttons;
@@ -138,19 +138,19 @@
             {
                 "data": "role",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "updated",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "updatedBy",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -196,6 +196,14 @@
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
             });
         }
         

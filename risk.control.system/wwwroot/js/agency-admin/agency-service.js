@@ -95,9 +95,9 @@ $(document).ready(function () {
         },
         columns: [
             { data: "id", name: "Id", bVisible: false },
-            { data: "caseType", mRender: (data, type, row) => `<span title="${row.caseType}" data-toggle="tooltip">${data}</span>` },
-            { data: "serviceType", mRender: (data, type, row) => `<span title="${row.serviceType}" data-toggle="tooltip">${data}</span>` },
-            { data: "rate", mRender: (data, type, row) => `<span title="${row.rate}" data-toggle="tooltip">${data}</span>` },
+            { data: "caseType", mRender: (data, type, row) => `<span title="${row.caseType}" data-bs-toggle="tooltip">${data}</span>` },
+            { data: "serviceType", mRender: (data, type, row) => `<span title="${row.serviceType}" data-bs-toggle="tooltip">${data}</span>` },
+            { data: "rate", mRender: (data, type, row) => `<span title="${row.rate}" data-bs-toggle="tooltip">${data}</span>` },
             {
                 data: "district",
                 mRender: (data, type, row) => {
@@ -124,10 +124,10 @@ $(document).ready(function () {
                     }
                 }
             },
-            { data: "stateCode", mRender: (data, type, row) => `<span title="${row.state}" data-toggle="tooltip">${data}</span>` },
-            { data: "countryCode", mRender: (data, type, row) => `<span title="${row.country}" data-toggle="tooltip"> <img alt="${data}" title="${data}" src="${row.flag}" class="flag-icon" />(${data})</span>` },
-            { data: "updatedBy", mRender: (data, type, row) => `<span title="${row.updatedBy}" data-toggle="tooltip">${data}</span>` },
-            { data: "updated", mRender: (data, type, row) => `<span title="${row.updated}" data-toggle="tooltip">${data}</span>` },
+            { data: "stateCode", mRender: (data, type, row) => `<span title="${row.state}" data-bs-toggle="tooltip">${data}</span>` },
+            { data: "countryCode", mRender: (data, type, row) => `<span title="${row.country}" data-bs-toggle="tooltip"> <img alt="${data}" title="${data}" src="${row.flag}" class="flag-icon" />(${data})</span>` },
+            { data: "updatedBy", mRender: (data, type, row) => `<span title="${row.updatedBy}" data-bs-toggle="tooltip">${data}</span>` },
+            { data: "updated", mRender: (data, type, row) => `<span title="${row.updated}" data-bs-toggle="tooltip">${data}</span>` },
             {
                 sDefaultContent: "",
                 bSortable: false,
@@ -139,7 +139,17 @@ $(document).ready(function () {
             },
             { data: "isUpdated", bVisible: false },
             { data: "lastModified", bVisible: false }
-        ]
+        ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
+        }
     });
 
     // Highlight rows based on `isUpdated` flag
@@ -171,6 +181,10 @@ $(document).ready(function () {
 
     // Initialize tooltips after each DataTable draw
     $('#customerTable').on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({ animated: 'fade', placement: 'bottom', html: true });
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'bottom',
+            html: true
+        });
     });
 });

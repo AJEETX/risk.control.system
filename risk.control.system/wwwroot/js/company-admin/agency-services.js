@@ -54,19 +54,19 @@ $(document).ready(function () {
             {
                 "data": "caseType",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.caseType + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.caseType + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "serviceType",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.serviceType + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "rate",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.rate + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.rate + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -84,25 +84,25 @@ $(document).ready(function () {
             {
                 "data": "stateCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.state + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.state + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "countryCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
+                    return '<span title="' + row.country + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>';
                 }
             },
             {
                 "data": "updatedBy",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.updatedBy + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.updatedBy + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "updated",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.updated + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.updated + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -137,6 +137,14 @@ $(document).ready(function () {
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
             });
         }
     });
