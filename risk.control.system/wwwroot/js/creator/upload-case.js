@@ -88,7 +88,7 @@
             {
                 "data": "timeTaken",
                 "mRender": function (data, type, row) {
-                    return '<i title='+ data +' data-bs-toggle="tooltip">' + data + '</i>';
+                    return '<i>' + data + '</i>';
                 }
             },
             {
@@ -318,6 +318,13 @@
                         $.ajax({
                             url: '/Uploads/DeleteLog/' + fileId,
                             type: 'POST',
+                            headers: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                            },
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: fileId
+                            },
                             success: function (response) {
                                 $.alert({
                                     title: 'File has been Deleted!',

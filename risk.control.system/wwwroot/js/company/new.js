@@ -571,6 +571,9 @@
             url: "/InvestigationPost/DeleteCases", // Update with your actual delete endpoint
             type: "POST",
             data: JSON.stringify({ claims: claims }),
+            headers: {
+                "X-CSRF-TOKEN": $('input[name="icheckifyAntiforgery"]').val(),
+            },
             contentType: "application/json",
             success: function (response) {
                 if (response.success) {
@@ -598,7 +601,7 @@
                     });
                 }
             },
-            error: function () {
+            error: function (err) {
                 $.alert({
                     title: "Error!",
                     content: "Something went wrong. Please try again.",

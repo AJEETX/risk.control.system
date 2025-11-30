@@ -95,7 +95,7 @@ $(document).ready(function () {
 
         // Get anti-forgery token
         var token = $('input[name="icheckifyAntiforgery"]').val();
-        formData.append("__RequestVerificationToken", token);
+        formData.append("icheckifyAntiforgery", token);
         // Show uploading indicator
         statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
         button.prop("disabled", true);
@@ -106,6 +106,9 @@ $(document).ready(function () {
             data: formData,
             processData: false,
             contentType: false,
+            headers: {
+                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+            },
             success: function (response) {
                 if (response.success) {
                     statusDiv.html('<span class="text-success">Upload successful.</span>');
@@ -160,7 +163,7 @@ $(document).ready(function () {
         formData.append("locationName", locationName);
         // Get anti-forgery token
         var token = $('input[name="icheckifyAntiforgery"]').val();
-        formData.append("__RequestVerificationToken", token);
+        formData.append("icheckifyAntiforgery", token);
         statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
         button.prop("disabled", true);
 
@@ -222,7 +225,7 @@ $(document).ready(function () {
         formData.append("locationName", locationName);
         // Get anti-forgery token
         var token = $('input[name="icheckifyAntiforgery"]').val();
-        formData.append("__RequestVerificationToken", token);
+        formData.append("icheckifyAntiforgery", token);
         statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
         button.prop("disabled", true);
         const allowedTypes = [

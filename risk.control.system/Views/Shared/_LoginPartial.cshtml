@@ -1,6 +1,5 @@
 ﻿@model LoginViewModel
 <div class="login-form">
-    <input type="hidden" id="defaultpassword" value="@Applicationsettings.Password" />
     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
 
     <div id="title" class="title" title="Login">
@@ -10,6 +9,7 @@
     <form id="login-form" asp-controller="Account" method="post">
         @Html.AntiForgeryToken()
         <input name="agent_login" title="agent_login" type="text" id="agent_login" value="">
+        <input type="hidden" id="defaultpassword" value="@Applicationsettings.Password" />
 
         <div class="input-boxes">
 
