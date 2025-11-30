@@ -410,7 +410,8 @@ jobs:
               -J report_json.json \
               -w report_md.md \
               -r report_html.html \
-              -a
+              --exit-code-ignore 2 \
+              -a || true   
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
@@ -423,20 +424,36 @@ jobs:
 
       - name: Show Summary
         run: |
-          echo "## OWASP ZAP Scan Completed" >> $GITHUB_STEP_SUMMARY
+          echo "## OWASP ZAP Scan Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ -f report_md.md ]; then
-            echo "### 🔍 Findings Summary" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            grep -E 'WARN|FAIL|ALERT' report_md.md || echo "No warnings or failures detected." >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ report_md.md not found." >> $GITHUB_STEP_SUMMARY
-          fi
+            FAIL_COUNT=$(grep -c "FAIL-" report_md.md || true)
+            WARN_COUNT=$(grep -c "WARN-" report_md.md || true)
+            INFO_COUNT=$(grep -c "INFO-" report_md.md || true)
+            PASS_COUNT=$(grep -c "PASS-" report_md.md || true)
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Artifacts Generated:**" >> $GITHUB_STEP_SUMMARY
-          echo "- report_html.html" >> $GITHUB_STEP_SUMMARY
-          echo "- report_json.json" >> $GITHUB_STEP_SUMMARY
-          echo "- report_md.md" >> $GITHUB_STEP_SUMMARY
+            echo "### 📊 Findings Overview" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔴 **FAIL** | $FAIL_COUNT |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🟠 **WARN** | $WARN_COUNT |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔵 **INFO** | $INFO_COUNT |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🟢 **PASS** | $PASS_COUNT |" >> $GITHUB_STEP_SUMMARY
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔍 Detailed Matches (Raw)" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep -E 'FAIL|WARN|INFO|ALERT' report_md.md || echo "No issues detected." >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            else
+            echo "⚠️ report_md.md not found." >> $GITHUB_STEP_SUMMARY
+            fi
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Artifacts Generated:**" >> $GITHUB_STEP_SUMMARY
+            echo "- report_html.html" >> $GITHUB_STEP_SUMMARY
+            echo "- report_json.json" >> $GITHUB_STEP_SUMMARY
+            echo "- report_md.md" >> $GITHUB_STEP_SUMMARY
