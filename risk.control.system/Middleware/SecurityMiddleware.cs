@@ -28,9 +28,17 @@ namespace risk.control.system.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate";
-            context.Response.Headers["Pragma"] = "no-cache";
-            context.Response.Headers["Expires"] = "0";
+            if (context.Request.Path.StartsWithSegments("/css") || context.Request.Path.StartsWithSegments("/js") || context.Request.Path.StartsWithSegments("/images"))
+            {
+                context.Response.Headers["Cache-Control"] = "public,max-age=2592000"; // 30 days
+            }
+            else
+            {
+                // Sensitive pages / API
+                context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate";
+                context.Response.Headers["Pragma"] = "no-cache";
+                context.Response.Headers["Expires"] = "0";
+            }
 
             // Remove identifying headers
             context.Response.Headers.Remove("X-Powered-By");
@@ -53,12 +61,14 @@ namespace risk.control.system.Middleware
 
             // Permissions Policy
             context.Response.Headers["Permissions-Policy"] = "geolocation=(self)";
-
+            var nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+            context.Items["CSP-Nonce"] = nonce;
             // ---- FIXED CSP (no wildcards, no trailing slashes) ----
             context.Response.Headers["Content-Security-Policy"] =
                 "default-src 'self';" +
                 "connect-src 'self' wss: https://maps.googleapis.com https://ifsc.razorpay.com;" +
-                "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
+                $"script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
+                //$"script-src 'self' 'nonce-{nonce}' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
                 "style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com;" +
                 "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com;" +
                 "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com;" +

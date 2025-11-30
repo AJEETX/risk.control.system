@@ -42,7 +42,12 @@ using SmartBreadcrumbs.Extensions;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddHsts(options =>
+{
+    options.MaxAge = TimeSpan.FromDays(365);       // 1 year
+    options.IncludeSubDomains = true;              // apply to all subdomains
+    options.Preload = true;                        // optional, for browser preload lists
+});
 var env = builder.Environment;
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
@@ -402,7 +407,16 @@ try
 
     await risk.control.system.Seeds.DatabaseSeed.SeedDatabase(app);
 
-    app.UseStaticFiles();
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = ctx =>
+        {
+            if (!ctx.Context.Request.Path.StartsWithSegments("/api"))
+            {
+                ctx.Context.Response.Headers["Cache-Control"] = "public,max-age=2592000"; // 30 days
+            }
+        }
+    });
 
     app.UseRouting();
     //app.UseRateLimiter();
@@ -424,6 +438,15 @@ try
 
     app.UseNotyf();
     app.UseFileServer();
+
+    app.Use(async (context, next) =>
+    {
+        if (context.Items.ContainsKey("CSP-Nonce"))
+        {
+            context.Items["CSP-Nonce"] = context.Items["CSP-Nonce"];
+        }
+        await next();
+    });
 
     app.MapControllerRoute(
         name: "default",
