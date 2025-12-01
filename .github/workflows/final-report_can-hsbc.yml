@@ -114,7 +114,7 @@ jobs:
             echo "| ℹ️ Low      | ${{ steps.parse.outputs.oss_low }} |" >> $GITHUB_STEP_SUMMARY
 
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "[📄 **Download Full Fortify Logs**](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts)" >> $GITHUB_STEP_SUMMARY
+            echo "[📄 **Download Full Fortify Logs**](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
 
 
     # 7️⃣ Upload scan artifacts
