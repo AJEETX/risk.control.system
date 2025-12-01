@@ -183,7 +183,7 @@ jobs:
               echo "| **Language** | C# |"
               echo "| **Total Alerts Found** | **${{ steps.sarif-stats.outputs.alerts }}** |"
               echo "| **Results Format** | SARIF |"
-              echo "| **Report Artifact** | [Download SARIF Artifact](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts) |"
+              echo "| **Report Artifact** | [View Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |"
               echo "| **Category** | security-scan |"
               echo ""
               echo "### 🏷️ Badges"
