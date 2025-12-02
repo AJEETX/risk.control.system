@@ -121,7 +121,7 @@
                         return '<i class="fas fa-exclamation-triangle" data-bs-toggle="tooltip" title="Incomplete"></i>';
                     }
                     else {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign/delete" />';
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign<sub>auto</sub>/delete" />';
                         return img;
                     }
                 }

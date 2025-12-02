@@ -95,15 +95,15 @@
                     <p class="text-muted text-sm">
                         @if (Model?.CaseLocation?.ImagePath is not null)
                         {
-                            <img id="bImage" class="img-fluid block-data" src="@Model?.CaseLocation?.ImagePath" data-toggle="tooltip" title="Beneficiary Photo">
+                            <img id="bImage" class="img-fluid block-data" src="@Model?.CaseLocation?.ImagePath" data-bs-toggle="tooltip" title="Beneficiary Photo" />
                         }
                         else
                         {
-                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Beneficiary Photo">
+                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Beneficiary Photo" />
                         }
                     </p>
                     <p class="text-muted text-sm">
-                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" data-toggle="tooltip" title="Display Beneficiary Address in map">
+                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" data-bs-toggle="tooltip" title="Display Beneficiary Address in map" />
                     </p>
 
                 </div>
@@ -112,11 +112,11 @@
 
         <div class="card-footer">
             <div class="text-right">
-                <a id="beneficiary-comments" class="btn btn-sm bg-teal" data-toggle="tooltip" title="Send SMS to Beneficiary">
+                <a id="beneficiary-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Beneficiary">
                     <i class="fas fa-comments"></i>
                 </a>
 
-                <a id="beneficiary-detail" class="btn btn-sm btn-success" data-toggle="tooltip" title="Show Beneficiary Details">
+                <a id="beneficiary-detail" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Show Beneficiary Details">
                     <i class="fas fa-user-tie"></i> ...
                 </a>
             </div>
