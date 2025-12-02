@@ -139,7 +139,7 @@
                 }
             },
             {
-                "sDefaultContent": "<i class='fa-map-marker' data-bs-toggle='tooltip' title='No address'></i>",
+                "sDefaultContent": "<i class='fa-map-marker' data-toggle='tooltip' title='No address'></i>",
                 "data": "pincode",
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
@@ -149,9 +149,9 @@
 
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
-                            <img src="${formattedUrl}" 
+                            <img src="${formattedUrl}"  title="${row.pincodeName}"
                                  class="thumbnail profile-image doc-profile-image preview-map-image" 
-                                 data-bs-toggle="modal" 
+                                 data-toggle="modal" 
                                  data-target="#mapModal" 
                                  data-img='${formattedUrl}' 
                                  data-title='${row.pincodeName}' />
@@ -163,12 +163,12 @@
                 }
             },
             {
-                "sDefaultContent": "<i class='fa-map-marker' data-bs-toggle='tooltip' title='No address'></i>",
+                "sDefaultContent": "<i class='fa-map-marker' data-bs-toggle='tooltip' title='No Document'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -183,8 +183,8 @@
                     }
                     else {
                         var img = '<div class="map-thumbnail table-profile-image">';
-                        img += '<img src="' + row.customer + '" class="full-map" title="' + row.customerFullName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                        img += '<img src="' + row.customer + '" class="table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.customer + '" class="full-map" title="' + row.customerFullName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.customer + '" class="table-profile-image" title="' + row.customerFullName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Thumbnail image with class 'thumbnail'
                         img += '</div>';
                         return img;
                     }
@@ -206,7 +206,7 @@
                     }
                     else {
                         var img = '<div class="map-thumbnail table-profile-image">';
-                        img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                         img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                         img += '</div>';
                         return img;
@@ -739,8 +739,6 @@
         modal.find('#modalMapImage').attr('src', imageUrl);
         modal.find('.modal-title').text(title || 'Map Preview');
     });
-
-    
 });
 
 function checkUploadJobStatus() {

@@ -117,9 +117,24 @@ $(document).ready(function () {
         var value = $(this).val();
 
         if (value != '') {
-            // Fetch investigation services via AJAX and populate the dropdown
-            $.get("/api/MasterData/GetInvestigationServicesByInsuranceType", { InsuranceType: value }, function (data) {
-                PopulateInvestigationServices("#InvestigationServiceTypeId", data);
+            var token = $('input[name="icheckifyAntiforgery"]').val();
+
+            $.ajax({
+                url: "/api/MasterData/GetInvestigationServicesByInsuranceType",
+                type: "GET",
+                data: {
+                    InsuranceType: value
+                },
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": token
+                },
+                success: function (data) {
+                    PopulateInvestigationServices("#InvestigationServiceTypeId", data);
+                },
+                error: function (xhr) {
+                    console.error("Error loading services:", xhr);
+                }
             });
         }
     });

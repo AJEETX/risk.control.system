@@ -79,7 +79,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
                 }

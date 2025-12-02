@@ -42,7 +42,7 @@ namespace risk.control.system.Seeds
 
             var question6 = new Question
             {
-                QuestionText = "History of medical investigation, surgery or\r\ntreatment in past or planned in near future (even\r\nif it was a minor or major))",
+                QuestionText = "History of medical investigation, surgery or\r\ntreatment in past or planned in near future (even\r\nif it was a minor or major)",
                 QuestionType = "text",
             };
             var question7 = new Question

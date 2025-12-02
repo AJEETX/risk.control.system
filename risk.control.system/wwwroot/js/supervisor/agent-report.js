@@ -91,7 +91,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" title="' + row.company + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.company + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
@@ -102,7 +102,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" title="' + row.pincodeName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
@@ -128,7 +128,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -140,7 +140,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
                     img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
