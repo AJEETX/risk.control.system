@@ -53,30 +53,30 @@
             <div class="col-sm-6">
 
                 <div class="form-group">
-                    <label class="input-group-label"> Customer Name:</label>
+                    <label class="input-group-label" for="Name"> Customer Name:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="CustomerName"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <input id="CustomerName" required asp-for="Name" class="form-control remarks title-name" type="text" placeholder="Customer Name" maxlength="30" autocomplete="off" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="input-group-label"> Date Of Birth:</label>
+                    <label class="input-group-label" for="DateOfBirth"> Date Of Birth:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="DateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <input required asp-for="DateOfBirth" id="DateOfBirth" class="form-control remarks" type="date" />
                         <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="input-group-label"> Gender:</label>
+                    <label class="input-group-label" for="Gender"> Gender:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="Gender"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <select required asp-for="Gender" class="form-control remarks" asp-items="Html.GetEnumSelectList<Gender>()">
                             <option value="">--- SELECT ---</option>
@@ -98,10 +98,10 @@
                 </div> *@
 
                 <div class="form-group">
-                    <label class="input-group-label">Annual Income (@ViewBag.Currency):</label>
+                    <label class="input-group-label" for="Income">Annual Income (@ViewBag.Currency):</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="CustomerIncome"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <select required asp-for="Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
                             <option value="">--- SELECT ---</option>
@@ -112,10 +112,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="input-group-label"> Occupation:</label>
+                    <label class="input-group-label" for="Occupation"> Occupation:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="CustomerOccupation"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <select required asp-for="Occupation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Occupation>()">
                             <option value="">--- SELECT ---</option>
@@ -125,10 +125,10 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="input-group-label"> Education:</label>
+                    <label class="input-group-label" for="Education"> Education:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="CustomerEducation"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <select required asp-for="Education" class="form-control remarks" asp-items="Html.GetEnumSelectList<Education>()">
                             <option value="">--- SELECT ---</option>
@@ -144,7 +144,7 @@
                 <partial name="Investigation/_CustomerAddress" model="@Model" />
 
                 <div class="form-group">
-                    <label class="input-group-label"> Address:</label>
+                    <label class="input-group-label" for="Addressline"> Address:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" ><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -167,19 +167,19 @@
                 </div> *@
 
                 <div class="form-group">
-                    <label class="input-group-label"> Customer Photo:</label>
+                    <label class="input-group-label" for="createImageInput"> Customer Photo:</label>
                     <div class="input-group mb-3">
                         @if (Model?.ImagePath is not null)
                         {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.ImagePath" data-toggle="tooltip" title="Upload Customer Photo" />
+                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.ImagePath" data-bs-toggle="tooltip" title="Customer Photo" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Upload Customer Photo" />
+                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-title-id="customer-document" data-bs-toggle="tooltip" title="Upload Customer Photo" />
                         }
                         else
                         {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
+                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="Customer Photo" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input  invalid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" required />
+                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input  invalid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-title-id="customer-document" data-bs-toggle="tooltip" title="Upload Customer Photo" required />
                         }
                         <span asp-validation-for="ImagePath" class="text-danger"></span>
                     </div>

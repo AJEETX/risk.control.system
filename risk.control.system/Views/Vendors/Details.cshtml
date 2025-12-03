@@ -22,8 +22,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-toggle="tooltip" title="Total Cases completed (@Model.SelectedDistrictId)">  Cases completed (@Model.SelectedDistrictId)</label>
-                                <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-toggle="tooltip" title="Current Cases (@Model.SelectedStateId)"> Current Cases (@Model.SelectedStateId)</label>
+                                <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-bs-toggle="tooltip" title="Total Cases completed (@Model.SelectedDistrictId)">  Cases completed (@Model.SelectedDistrictId)</label>
+                                <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-bs-toggle="tooltip" title="Current Cases (@Model.SelectedStateId)"> Current Cases (@Model.SelectedStateId)</label>
                             </div>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
 
                     <div class="profile-img-container">
                         <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))"
-                             class="shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
+                             class="shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                     </div>
                     <h5 class="mt-3">@Model.Email</h5>
                     <p class="text-muted"><a id="edit-profile" asp-controller="Vendors" asp-action="Edit" asp-route-id="@Model.VendorId" class="btn btn-warning"><i class='fas fa-building'></i> Profile</a></p>
@@ -78,8 +78,8 @@
                             {
                                 <a id="back" asp-controller="Vendors" asp-action="AvailableVendors" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                             }
-                            <a asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success" data-toggle="tooltip" title="User count = @Model.SelectedCountryId"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
-                            <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
+                            <a asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="User count = @Model.SelectedCountryId"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
+                            <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
 
                         </div>
                     </div>

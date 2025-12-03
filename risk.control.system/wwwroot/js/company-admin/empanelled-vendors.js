@@ -51,7 +51,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
+                    var img = '<input title="select to depanel" data-bs-toggle="tooltip" class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
                     return img;
                 }
             },
@@ -59,7 +59,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="profile-image doc-profile-image" data-bs-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -73,7 +73,10 @@
                     }
 
                     // Add the rate count badge
-                    img += ' <span title="(Total count of user rated) star ratings" class="badge badge-light" data-toggle="tooltip"> (' + row.rateCount + ')';
+                    img +=
+                        ' <span class="badge badge-light" ' +
+                        'data-bs-toggle="tooltip" data-bs-html="true" ' +
+                        'title="(Total users rated)<sup>star ratings</sup>"> (' + row.rateCount + ')</span>';
 
                     // Calculate and display the average rating if available
                     if (row.rateCount && row.rateCount > 0) {
@@ -85,62 +88,62 @@
                     img += '<br /> <span class="result"></span>';
 
                     // Return the domain with the appended rating images and information
-                    return '<span title="' + row.name + '" data-toggle="tooltip"><a id="edit' + row.id + '" href="/Company/AgencyDetail?Id=' + row.id + '"> ' + data +'</a></span>' + '<br /> ' + img;
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip"><a id="edit' + row.id + '" href="/Company/AgencyDetail?Id=' + row.id + '"> ' + data +'</a></span>' + '<br /> ' + img;
                 }
             },
             //{
             //    "data": "name",
             //    "mRender": function (data, type, row) {
-            //        return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+            //        return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>'
             //    }
             //},
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>'
                 }
             },
             {
                 "data": "address",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "district",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "stateCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.state + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.state + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "countryCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
+                    return '<span title="' + row.country + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>';
                 }
             },
             {
                 "data": "caseCount",
                 "mRender": function (data, type, row) {
-                    return '<span title="Total number of current cases = ' + row.caseCount + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="Total number of current cases = ' + row.caseCount + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "updated",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "updateBy",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.updateBy + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.updateBy + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -157,6 +160,14 @@
             if (rowCount > 0) {
                 $('#empanel-vendors').prop('disabled', false);
             }
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
         }
     });
 

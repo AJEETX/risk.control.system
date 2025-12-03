@@ -1,4 +1,4 @@
-$.validator.setDefaults({
+﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -126,9 +126,14 @@ $(document).ready(function () {
     $("#email, #resetemail").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
+            var token = $('input[name="icheckifyAntiforgery"]').val();
             $.ajax({
                 url: "/api/MasterData/GetUserBySearch",
                 type: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token   // ✔ Correct header name
+                },
                 data: {
                     search: request.term
                 },

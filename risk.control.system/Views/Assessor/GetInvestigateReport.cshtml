@@ -40,7 +40,7 @@
 								<i class='far fa-hand-point-right'></i> Complete <i class='fas fa-check-circle'></i> remark
 							</li>
 							<li>
-								<i class='far fa-hand-point-right'></i> Select Submit type <input type="radio">
+								<i class='far fa-hand-point-right'></i> Select Submit type <input name="submittype" type="radio">
 							</li>
 							<li>
 								<i class='far fa-hand-point-right'></i> <button class='btn btn-warning btn-xs'><i class="fa fa-edit"></i>  ENQUIRE</b> </button>
@@ -267,7 +267,7 @@
 													<div class="input-group-prepend">
 														<span class="input-group-text" asp-for="ClaimsInvestigation.InvestigationReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
 													</div>
-													<textarea data-toggle="tooltip" title="Enter remarks" required maxlength="1000" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" placeholder="enter remarks to submit"></textarea>
+													<textarea data-bs-toggle="tooltip" title="Enter remarks" required maxlength="1000" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" placeholder="enter remarks to submit"></textarea>
 
 													<span asp-validation-for="ClaimsInvestigation.InvestigationReport.SupervisorRemarks" class="text-danger"></span>
 												</div>

@@ -13,15 +13,29 @@ $(document).ready(function () {
 
     $("#InsuranceType").on("change", function () {
         var value = $(this).val();
+        var token = $('input[name="icheckifyAntiforgery"]').val();
 
         if (value === '') {
             // Clear and reset InvestigationServiceTypeId dropdown
             $('#InvestigationServiceTypeId').empty();
             $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
         } else {
-            // Fetch investigation services via AJAX and populate the dropdown
-            $.get("/api/MasterData/GetInvestigationServicesByInsuranceType", { InsuranceType: value }, function (data) {
-                PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
+            $.ajax({
+                url: "/api/MasterData/GetInvestigationServicesByInsuranceType",
+                type: "GET",
+                data: {
+                    InsuranceType: value
+                },
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": token
+                },
+                success: function (data) {
+                    PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
+                },
+                error: function (xhr) {
+                    console.error("Error loading services:", xhr);
+                }
             });
         }
     });

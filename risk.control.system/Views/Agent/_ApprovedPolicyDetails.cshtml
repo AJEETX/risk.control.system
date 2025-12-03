@@ -25,7 +25,7 @@
             </span>
         </h3>
         <div class="card-tools">
-            <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.InvestigationReport.AgentEmail" class="badge badge-light">
+            <span data-bs-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.InvestigationReport.AgentEmail" class="badge badge-light">
                 <i class='far fa-hand-point-right'></i>
             </span>
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -108,11 +108,11 @@
                                 <p class="text-muted text-sm">
                                     @if (Model.ClaimsInvestigation.CaseNotes.Count > 0)
                                     {
-                                        <img id="notesDetail" class="img-fluid form-Image" src="@Applicationsettings.POLICY_BLANK_IMAGE" data-toggle="tooltip" title="Display notes">
+                                        <img id="notesDetail" class="img-fluid form-Image" src="@Applicationsettings.POLICY_BLANK_IMAGE" data-bs-toggle="tooltip" title="Display notes">
                                     }
                                     else
                                     {
-                                        <img id="notesDetail-disabled" class="img-fluid form-Image" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No notes">
+                                        <img id="notesDetail-disabled" class="img-fluid form-Image" src="@Applicationsettings.NO_POLICY_IMAGE" data-bs-toggle="tooltip" title="No notes">
                                     }
                                 </p>
                             </div>
@@ -335,7 +335,7 @@
             </span>
         </h3>
         <div class="card-tools">
-            <span data-toggle="tooltip" title="Agent report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): @Model.ClaimsInvestigation.InvestigationReport.AgentEmail" class="badge badge-light">
+            <span data-bs-toggle="tooltip" title="Agent report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): @Model.ClaimsInvestigation.InvestigationReport.AgentEmail" class="badge badge-light">
                 <i class='far fa-hand-point-right'></i>
             </span>
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -376,7 +376,7 @@
                                     </span>
                                 </h3>
                                 <div class="card-tools">
-                                    <span data-toggle="tooltip" title="Agent report time" class="badge badge-light">
+                                    <span data-bs-toggle="tooltip" title="Agent report time" class="badge badge-light">
                                         <i class="nav-icon fas fa-clock"></i>
                                         @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                     </span>
@@ -456,7 +456,7 @@
                                 </span>
                             </h3>
                             <div class="card-tools">
-                                <span data-toggle="tooltip" title=" Supervisor :  @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorEmail" class="badge badge-light">
+                                <span data-bs-toggle="tooltip" title=" Supervisor :  @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorEmail" class="badge badge-light">
                                     <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                 </span>
                             </div>
@@ -568,7 +568,7 @@
                         </span>
                     </h3>
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Assessor: : @Model.ClaimsInvestigation.InvestigationReport.AssessorEmail" class="badge badge-light">
+                        <span data-bs-toggle="tooltip" title="Assessor: : @Model.ClaimsInvestigation.InvestigationReport.AssessorEmail" class="badge badge-light">
                             @if (@Model.ClaimsInvestigation.InvestigationReport?.AssessorRemarksUpdated != null)
                             {
                                 <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")

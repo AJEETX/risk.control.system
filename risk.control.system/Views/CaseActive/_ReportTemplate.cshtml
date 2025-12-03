@@ -17,7 +17,7 @@
                         <i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
                         @if (location.IsRequired)
                         {
-                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                         }
                     </h5>
                     <div class="card-tools">
@@ -52,7 +52,7 @@
                                                     @location.AgentIdReport.ReportName
                                                     @if (location.AgentIdReport.IsRequired)
                                                     {
-                                                        <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                        <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                     }
                                                 </label>
                                             </div>
@@ -82,7 +82,7 @@
                                                         @face.ReportName
                                                         @if (face.IsRequired)
                                                         {
-                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                         }
                                                     </label>
                                                 </div>
@@ -113,7 +113,7 @@
                                                         @doc.ReportName
                                                         @if (doc.IsRequired)
                                                         {
-                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                         }
                                                     </label>
                                                 </div>
@@ -138,7 +138,7 @@
                                                         @doc.ReportName
                                                         @if (doc.IsRequired)
                                                         {
-                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                         }
                                                     </label>
                                                 </div>
@@ -160,7 +160,7 @@
                                                         <span>@question.QuestionText</span>
                                                         @if (question.IsRequired)
                                                         {
-                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                         }
                                                         <small class="text-muted">[@question.QuestionType]</small>
                                                         @if (question.QuestionType != "Text" && !string.IsNullOrEmpty(question.Options))

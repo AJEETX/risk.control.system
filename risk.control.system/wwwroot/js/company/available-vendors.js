@@ -47,11 +47,11 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<span class='i-orangered'><i class='fas fa-exclamation-triangle' data-toggle='tooltip' title='Incomplete/Inactive'></i></span>",
+                "sDefaultContent": "<span class='i-orangered'><i class='fas fa-exclamation-triangle' data-bs-toggle='tooltip' title='Incomplete/Inactive'></i></span>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.canOnboard) {
-                        var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '" data-toggle="tooltip" title="Select Agency to empanel" />';
+                        var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '" data-bs-toggle="tooltip" title="Select Agency to empanel" />';
                         return img;
                     }
                 }
@@ -63,63 +63,63 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="profile-image doc-profile-image" data-bs-toggle="tooltip"/>';
                     return img;
                 }
             },
             {
                 "data": "domain",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.vendorName + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.vendorName + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             //{
             //    "data": "name",
             //    "mRender": function (data, type, row) {
-            //        return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+            //        return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>'
             //    }
             //},
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>'
                 }
             },
             {
                 "data": "address",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.address + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.address + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "district",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "state",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "country",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
+                    return '<span title="' + row.country + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>';
                 }
             },
             {
                 "data": "updated",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "updateBy",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.updateBy + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.updateBy + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -128,12 +128,12 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn btn-xs btn-warning" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit </a>&nbsp;';
+                    buttons += '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit </a>&nbsp;';
                     if (data) {
-                        buttons += '<a id="delete' + row.id + '" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger" data-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i> Delete</a>'
+                        buttons += '<a id="delete' + row.id + '" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger" data-bs-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i> Delete</a>'
                     }
                     else {
-                        buttons += '<button disabled class="btn btn-xs btn-danger" data-toggle="tooltip" title="Delete Disabled"><i class="fas fa-trash"></i> Delete</a>';
+                        buttons += '<button disabled class="btn btn-xs btn-danger" data-bs-toggle="tooltip" title="Delete Disabled"><i class="fas fa-trash"></i> Delete</a>';
                     }
                     return buttons;
                 }
@@ -165,6 +165,14 @@
             if (rowCount > 0) {
                 $('#depanel-vendors').prop('disabled', false);
             }
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
         }
     });
 

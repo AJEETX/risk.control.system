@@ -91,6 +91,7 @@ namespace risk.control.system.Controllers
             }
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteLog(int id)
         {
             var file = _context.FilesOnFileSystem.FirstOrDefault(f => f.Id == id);
@@ -119,6 +120,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadFaceImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image, bool isAgent = false)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
@@ -131,6 +133,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
@@ -143,6 +146,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadMediaFile(long caseId, IFormFile Image, string latitude, string longitude, string reportName, string locationName)
         {
             if (Image == null || Image.Length == 0)

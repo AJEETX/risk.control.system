@@ -77,8 +77,8 @@
                 <span class="dropdown-header">
                     Notifications
                     <span class="notification-actions">
-                        <i id="notification-refresh" class="fas fa-sync" title="Refresh" data-toggle="tooltip"></i>
-                        <i id="clearNotifications" class="fa fa-trash" title="Clear All" data-toggle="tooltip"></i>
+                        <i id="notification-refresh" class="fas fa-sync" title="Refresh" data-bs-toggle="tooltip"></i>
+                        <i id="clearNotifications" class="fa fa-trash" title="Clear All" data-bs-toggle="tooltip"></i>
                     </span>
                 </span>
                 <div id="notificationList"></div>
@@ -95,7 +95,7 @@
                 <div class="text-center profile-section">
                     <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))"
                          class="rounded-circle shadow-sm border sidebar-profile"
-                         alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
+                         alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                     <p class="text-muted user-email">@Model.Email</p>
                 </div>
 

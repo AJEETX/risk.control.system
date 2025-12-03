@@ -25,14 +25,15 @@
                             <span asp-validation-for="ClientCompanyId" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> Email:
+                            <label class="input-group-label" for="Email">
+                                Email:
                                 @if(@Model.IsPasswordChangeRequired)
                                 {
-                                    <i class="fa fa-check-circle text-light-green" title="User Login verified" data-toggle="tooltip"></i>
+                                    <i class="fa fa-check-circle text-light-green" title="User Login verified" data-bs-toggle="tooltip"></i>
                                 }
                                 else
                                 {
-                                    <i class="fa fa-check-circle text-lightgray" title="User Login not verified" data-toggle="tooltip"></i>
+                                    <i class="fa fa-check-circle text-lightgray" title="User Login not verified" data-bs-toggle="tooltip"></i>
                                 }
                             </label>
                             <div class="input-group mb-3">
@@ -43,24 +44,24 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> Profile Photo:</label>
+                            <label class="input-group-label" for="createImageInput"> User Photo:</label>
                             <div class="input-group mb-3">
                                 @if (Model?.ProfilePicture is not null)
                                 {
-                                    <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="Profile Image" />
+                                    <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="User Photo" data-bs-toggle="tooltip" title="User Photo" />
                                 }
                                 else
                                 {
-                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="User Photo" />
+                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No User Photo" />
                                 }
                                 <i class="fa fa-asterisk asterik-style"></i>
-                                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" 
-                                data-preview-id="createProfileImage" data-toggle="tooltip" title="User Photo" />
+                                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-title-id="user-document"
+                                       data-preview-id="createProfileImage" data-bs-toggle="tooltip" title="Upload User Photo" />
                                 <span asp-validation-for="ProfilePicture" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> First Name:</label>
+                            <label class="input-group-label" for="FirstName"> First Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -70,7 +71,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> Last Name:</label>
+                            <label class="input-group-label" for="LastName"> Last Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -80,18 +81,18 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> Mobile #:</label>
+                            <label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
                             <div class="input-group">
 
                                 <div class="input-group-prepend">
                                     @{
                                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                                     }
-                                    <span class="input-group-text country-code-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                                        <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
-                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" title="Enter mobile # without country-code" data-toggle="tooltip" />
+                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
                                 <span id="phone-spinner" class="text-secondary phone-icon d-none">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </span>
@@ -104,10 +105,10 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> Role:</label>
+                            <label class="input-group-label" for="UserRole"> Role:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
                                 @if (Model.UserRole == CompanyRole.COMPANY_ADMIN)
                                 {
@@ -130,7 +131,7 @@
                         <partial name="_Address" model="@Model" />
 
                         <div class="form-group">
-                            <label class="input-group-label"> Address:</label>
+                            <label class="input-group-label" for="Addressline"> Address:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
@@ -139,7 +140,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> Note:</label>
+                            <label class="input-group-label" for="Comments"> Note:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
@@ -154,7 +155,7 @@
                         else
                         {
                             <div class="form-group">
-                                <label class="input-group-label"> Status:</label>
+                                <label class="input-group-label" for="Active"> Status:</label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>

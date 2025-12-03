@@ -107,15 +107,15 @@ $(document).ready(function () {
             { data: "id", visible: false },
             {
                 data: "caseType",
-                render: (data, type, row) => `<span title="${row.caseType}" data-toggle="tooltip">${data}</span>`
+                render: (data, type, row) => `<span title="${row.caseType}" data-bs-toggle="tooltip">${data}</span>`
             },
             {
                 data: "serviceType",
-                render: (data, type, row) => `<span title="${row.serviceType}" data-toggle="tooltip">${data}</span>`
+                render: (data, type, row) => `<span title="${row.serviceType}" data-bs-toggle="tooltip">${data}</span>`
             },
             {
                 data: "rate",
-                render: (data, type, row) => `<span title="${row.rate}" data-toggle="tooltip">${data}</span>`
+                render: (data, type, row) => `<span title="${row.rate}" data-bs-toggle="tooltip">${data}</span>`
             },
             {
                 data: "district",
@@ -147,22 +147,22 @@ $(document).ready(function () {
             {
                 "data": "stateCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.state + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.state + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "countryCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
+                    return '<span title="' + row.country + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>';
                 }
             },
             {
                 data: "updatedBy",
-                render: (data, type, row) => `<span title="${row.updatedBy}" data-toggle="tooltip">${data}</span>`
+                render: (data, type, row) => `<span title="${row.updatedBy}" data-bs-toggle="tooltip">${data}</span>`
             },
             {
                 data: "updated",
-                render: (data, type, row) => `<span title="${row.updated}" data-toggle="tooltip">${data}</span>`
+                render: (data, type, row) => `<span title="${row.updated}" data-bs-toggle="tooltip">${data}</span>`
             },
             {
                 defaultContent: '',
@@ -179,6 +179,14 @@ $(document).ready(function () {
             { data: "lastModified", visible: false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
             $('[data-toggle="tooltip"]').tooltip({
                 animated: 'fade',
                 placement: 'bottom',

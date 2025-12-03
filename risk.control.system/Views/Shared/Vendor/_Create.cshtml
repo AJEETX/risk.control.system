@@ -6,14 +6,13 @@
     <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
     <div class="row">
         <div class="col-sm-6">
-
             <div class="form-group">
-                <label class="input-group-label"> Agency Name: </label>
+                <label class="input-group-label" for="Name"> Agency Name: </label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text" asp-for="Name"><i class="fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
-                    <input type="text" id="Name" asp-for="Name" class="form-control remarks title-name" required placeholder="Agency Name" maxlength="30" />
+                    <input type="text" id="Name" asp-for="Name" class="form-control remarks title-name" required placeholder="Agency Name" maxlength="30" autocomplete="off"/>
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>
@@ -30,18 +29,18 @@
             </div> *@
 
             <div class="form-group">
-                <label class="input-group-label"> Mobile #:</label>
+                <label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
                 <div class="input-group">
 
                     <div class="input-group-prepend">
                         @{
                             var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                         }
-                        <span class="input-group-text country-code-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                            <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                        <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+                            <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                         </span>
                     </div>
-                    <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" title="Enter mobile # without country-code" data-toggle="tooltip" />
+                    <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
                     <span id="phone-spinner" class="text-secondary phone-icon d-none">
                         <i class="fas fa-spinner fa-spin"></i>
                     </span>
@@ -67,7 +66,7 @@
  *@
 
             <div class="form-group">
-                <label class="input-group-label"> IFSC Code: </label>
+                <label class="input-group-label" for="IFSCCode"> IFSC Code: </label>
                 <div class="input-group mb-3 position-relative">
                     <div class="input-group-prepend">
                         <span class="input-group-text">
@@ -75,7 +74,7 @@
                             <i class="fa fa-asterisk asterik-style"></i>
                         </span>
                     </div>
-                    <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="11" title="Enter valid IFSC code" data-toggle="tooltip"/>
+                    <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="11" data-bs-toggle="tooltip" />
                     <span id="ifsc-spinner" class="text-secondary phone-icon d-none">
                         <i class="fas fa-spinner fa-spin"></i>
                     </span>
@@ -86,7 +85,7 @@
             </div>
 
             <div class="form-group">
-                <label class="input-group-label"> Bank Name: </label>
+                <label class="input-group-label" for="BankName"> Bank Name: </label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">
@@ -94,13 +93,13 @@
                             <i class="fa fa-asterisk asterik-style"></i>
                         </span>
                     </div>
-                    <input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="..." maxlength="50" readonly tabindex="-1" title="Auto-selected" data-toggle="tooltip"/>
+                    <input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="..." maxlength="50" readonly tabindex="-1" title="Auto-selected" data-bs-toggle="tooltip"/>
                     <span asp-validation-for="BankName" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="input-group-label"> Bank Account #: </label>
+                <label class="input-group-label" for="BankAccountNumber"> Bank Account #: </label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -150,7 +149,7 @@
             <partial name="Vendor/_AgencyAddress" model="@Model" />
             
             <div class="form-group">
-                <label class="input-group-label"> Address: </label>
+                <label class="input-group-label" for="Addressline"> Address: </label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -170,12 +169,12 @@
                 </div>
             </div> *@
             <div class="form-group">
-                <label class="input-group-label"> Document:</label>
+                <label class="input-group-label" for="createImageInput"> Document:</label>
                 <div class="input-group mb-3">
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Document" />
+                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-bs-toggle="tooltip" title="No Agency Document" />
                     <i class="fa fa-asterisk asterik-style"></i>
                     <input accept=".jpg,.jpeg,.png" asp-for="DocumentImage" type="file"
-                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Document"
+                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-bs-toggle="tooltip" title="Upload Agency Document" data-title-id="agency-document"
                            data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
                     <span asp-validation-for="DocumentImage" class="text-danger"></span>
                 </div>

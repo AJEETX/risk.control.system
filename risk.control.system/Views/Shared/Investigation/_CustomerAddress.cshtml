@@ -30,7 +30,7 @@
                 <i class="fa fa-asterisk asterik-style-disabled"></i>
             </span>
         </div>
-        <input readonly type="text" id="DistrictId" class="form-control remarks" data-placeholder="district" data-toggle="tooltip" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
+        <input readonly type="text" id="DistrictId" class="form-control remarks" data-placeholder="district" data-bs-toggle="tooltip" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
         <span asp-validation-for="DistrictId" class="text-danger"></span>
         <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" title="Auto-selected based on Pincode" />
         <div id="district-loading" class="loading-spinner">
@@ -46,11 +46,11 @@
         }
         <div class="input-group-prepend">
 
-            <span class="input-group-text country-code-text" data-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
-                <img src="@img" class="flag-icon" data-toggle="tooltip" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
+            <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
+                <img src="@img" class="flag-icon" data-bs-toggle="tooltip" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
             </span>
         </div>
-        <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" data-toggle="tooltip"  placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
+        <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip"  placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
         <span asp-validation-for="StateId" class="text-danger"></span>
         <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" title="Auto-selected based on Pincode" />
         <div id="state-loading" class="loading-spinner">

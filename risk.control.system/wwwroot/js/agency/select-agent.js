@@ -55,14 +55,14 @@
                 "sDefaultContent": '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '" data-toggle="tooltip" title="Select Agent" />';
+                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '" data-bs-toggle="tooltip" title="Select Agent" />';
                     return img;
                 }
             },
             {
                 "data": "email",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + row.rawEmail + '</span>';
+                    return '<span title="' + row.rawEmail + '" data-bs-toggle="tooltip">' + row.rawEmail + '</span>';
                 }
             },
             {
@@ -71,7 +71,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.photo + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.photo + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.photo + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
                 }
@@ -79,7 +79,7 @@
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.phone + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.phone + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -87,49 +87,49 @@
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
                         var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                        img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" data-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                        img += '<img src="' + row.personMapAddressUrl + '" class="full-driving-map" title="' + row.mapDetails + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.personMapAddressUrl + '" class="full-driving-map" title="' + row.mapDetails + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                         img += '</div>';
                         return img;
                     }
                     else {
 
-                        return '<img src="/img/no-user.png" class="profile-image doc-profile-image" title="No Photo" data-toggle="tooltip" />'
+                        return '<img src="/img/no-user.png" class="profile-image doc-profile-image" title="No Photo" data-bs-toggle="tooltip" />'
                     }
 
 
-                    return '<span title="' + row.personMapAddressUrl + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.personMapAddressUrl + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             
             {
                 "data": "distance",
                 "mRender": function (data, type, row) {
-                    return '<span class="distance" title="' + row.distance + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span class="distance" title="' + row.distance + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "duration",
                 "mRender": function (data, type, row) {
-                    return '<span class="duration" title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span class="duration" title="' + row.duration + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "addressline",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.addressline + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.addressline + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "pinCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.pinCode + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.pinCode + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "count",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.count + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.count + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -140,7 +140,17 @@
                 "data": "distanceInMetres",
                 "bVisible": false
             }
-        ]
+        ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
+        }
     });
 
     table.on('xhr.dt', function () {

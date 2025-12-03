@@ -19,8 +19,8 @@
         // Reset UI
         $('#ifsc-valid-icon').hide();
         $('#ifsc-spinner').addClass('d-none');
-        $('#BankName').val('').removeClass('invalid-border valid-border').removeAttr('title');
-        $ifscInput.removeClass('is-valid is-invalid').removeAttr('title');
+        $('#BankName').val('').removeClass('invalid-border valid-border').removeAttr('data-bs-original-title data-original-title title');
+        $ifscInput.removeClass('is-valid is-invalid').removeAttr('data-bs-original-title data-original-title title');
 
         if (isIndia) {
             // ------------------------ 🇮🇳 IFSC CHECK ------------------------
@@ -40,10 +40,13 @@
                                 .val(data.BANK)
                                 .addClass('valid-border')
                                 .removeClass('invalid-border')
-                                .attr('title', '🏦 ' + data.BANK + ', ' + data.BRANCH + ', ' + data.ADDRESS);
+                                .attr('data-original-title', '🏦 ' + data.BANK + ', ' + data.BRANCH + ', ' + data.ADDRESS)
+                                .attr('data-bs-original-title', '🏦 ' + data.BANK + ', ' + data.BRANCH + ', ' + data.ADDRESS);
 
                             $('#ifsc-valid-icon').show();
-                            $ifscInput.addClass('is-valid').attr('title', '✅ Valid IFSC (' + data.BANK + ')');
+                            $ifscInput.addClass('is-valid')
+                                .attr('data-original-title', '✅ Valid IFSC (' + data.BANK + ')')
+                                .attr('data-bs-original-title', '✅ Valid IFSC (' + data.BANK + ')');
                         } else {
                             setInvalid('❌ Invalid IFSC Code');
                         }
@@ -61,28 +64,33 @@
             $ifscInput
                 .attr('placeholder', 'Enter 6-digit BSB code')
                 .attr('maxlength', '6')
-                .attr('title', 'Enter valid BSB code');
+                .attr('data-original-title', 'Enter valid BSB code')
+                .attr('data-bs-original-title', 'Enter valid BSB code');
             // ------------------------ 🇦🇺 BSB CHECK ------------------------
             var bsbRegex = /^\d{6}$/;
             if (bsbRegex.test(code)) {
                 $('#ifsc-spinner').removeClass('d-none');
-
+                
                 $.ajax({
                     url: '/api/company/bsb?code=' + encodeURIComponent(code),
                     method: 'GET',
                     success: function (data) {
                         $('#ifsc-spinner').addClass('d-none');
+                        if (data && data.bank) {
+
                         var bankData = '🏦 ' + data.bank + ', ' + data.address + ', ' + data.city + ', ' + data.state + ', ' + data.postcode;
                         var branchData = '🏦 Branch: ' + data.branch + ', ' + data.address + ', ' + data.city + ', ' + data.state + ', ' + data.postcode;
-                        if (data && data.bank) {
                             $('#BankName')
                                 .val(data.bank)
                                 .addClass('valid-border')
                                 .removeClass('invalid-border')
-                                .attr('title', bankData);
+                                .attr('data-original-title', bankData)
+                                .attr('data-bs-original-title', bankData);
 
                             $('#ifsc-valid-icon').show();
-                            $ifscInput.addClass('is-valid').attr('title', '✅ Valid BSB');
+                            $ifscInput.addClass('is-valid')
+                                .attr('data-original-title', '✅ Valid BSB')
+                                .attr('data-bs-original-title', '✅ Valid BSB');
                         } else {
                             setInvalid('❌ Invalid BSB Code');
                         }
@@ -103,12 +111,13 @@
 
         function setInvalid(msg) {
             $('#ifsc-spinner').addClass('d-none');
-            $ifscInput.addClass('is-invalid').attr('title', msg);
+            $ifscInput.addClass('is-invalid').removeClass('valid-border').attr('data-bs-original-title', msg).attr('data-original-title', msg);
             $('#BankName')
                 .val('')
                 .addClass('invalid-border')
                 .removeClass('valid-border')
-                .attr('title', msg);
+                .attr('data-bs-original-title', msg)
+                .attr('data-original-title', msg);
         }
     }
 
@@ -254,7 +263,6 @@
     // Initialize autocomplete for Pincode
     pincodeAutocomplete();
 });
-
 function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
     showLoader("#pincode-loading");
 
@@ -350,7 +358,6 @@ function countryAutocomplete() {
         validateCountrySelection($(this).val(), $("#SelectedCountryId").val());
     });
 }
-
 function fetchCountrySuggestions(term, responseCallback) {
     $.ajax({
         url: "/api/Company/GetCountrySuggestions", // API endpoint for country suggestions
@@ -463,7 +470,6 @@ function pincodeAutocomplete() {
     });
 }
 
-// Fetch Pincode suggestions from the server
 function fetchPincodeSuggestions(term, countryId, responseCallback) {
     $.ajax({
         url: "/api/Company/GetPincodeSuggestions",
@@ -498,7 +504,6 @@ function fetchPincodeSuggestions(term, countryId, responseCallback) {
     });
 }
 
-// Populate fields based on the selected Pincode
 function populatePincodeDetails(selectedItem) {
     $("#PinCodeId").val(selectedItem.label);
     $("#SelectedPincodeId").val(selectedItem.value);
@@ -513,7 +518,6 @@ function populatePincodeDetails(selectedItem) {
     $("#PinCodeId").removeClass("invalid");
 }
 
-// Validate if the input matches any valid Pincode suggestion
 function validatePincodeSelection(inputValue, countryId) {
     if (!inputValue) {
         clearPincodeFields();
@@ -620,12 +624,10 @@ function clearDistrictFields() {
     $("#SelectedPincodeId").val("");
 }
 
-// Mark a field as invalid
 function markInvalidField(fieldSelector) {
     $(fieldSelector).addClass("invalid");
 }
 
-// Clear Pincode and dependent fields
 function clearPincodeFields() {
     $("#PinCodeId").val("");
     $("#SelectedPincodeId").val("");
@@ -709,7 +711,6 @@ function districtAutocomplete() {
     });
 }
 
-// Utility functions
 function fetchAndSetFieldValue(url, data, fieldSelector, fieldName, callback = null) {
     showLoader(`${fieldSelector}-loading`);
 
@@ -778,6 +779,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    function setTooltip(el, text) {
+        // Remove old cached tooltip
+        el.removeAttribute("data-bs-original-title");
+        el.removeAttribute("data-original-title");
+
+        // Set new title
+        el.setAttribute("data-bs-original-title", text);
+        el.setAttribute("data-original-title", text);
+    }
+
     async function validatePhone() {
         const phone = phoneInput.value.trim();
         const isd = document.getElementById("Isd").value.trim();
@@ -791,14 +802,17 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
 
             if (data.valid) {
-                phoneInput.title = `✅ Valid ${countryCode} (📱) mobile #`;
+                setTooltip(phoneInput, `✅ Valid ${countryCode} (📱) mobile #`);
+                //phoneInput.title = `✅ Valid ${countryCode} (📱) mobile #`;
                 validIcon.classList.remove("d-none");
                 invalidIcon.classList.add("d-none");
                 phoneInput.classList.remove("is-invalid");
                 phoneInput.classList.add("is-valid");
                 toggleSubmitButton(true);
             } else {
-                phoneInput.title = `❌ Invalid ${countryCode} (📱) mobile #`;
+                setTooltip(phoneInput, `❌ Invalid ${countryCode} (📱) mobile #`);
+
+                //phoneInput.title = `❌ Invalid ${countryCode} (📱) mobile #`;
                 invalidIcon.classList.remove("d-none");
                 validIcon.classList.add("d-none");
                 phoneInput.classList.remove("is-valid");
@@ -811,7 +825,9 @@ document.addEventListener("DOMContentLoaded", function () {
             validIcon.classList.add("d-none");
             phoneInput.classList.remove("is-valid");
             phoneInput.classList.add("is-invalid");
-            phoneInput.title = "❌ Mobile # validation error";
+            setTooltip(phoneInput, "❌ Mobile # validation error");
+
+            //phoneInput.title = "❌ Mobile # validation error";
             toggleSubmitButton(false);
         } finally {
             hideSpinner();

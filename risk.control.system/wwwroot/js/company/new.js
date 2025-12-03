@@ -114,14 +114,14 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='Incomplete'></i>",
+                "sDefaultContent": "<i class='far fa-edit' data-bs-toggle='tooltip' title='Incomplete'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (!row.ready2Assign) {
-                        return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Incomplete"></i>';
+                        return '<i class="fas fa-exclamation-triangle" data-bs-toggle="tooltip" title="Incomplete"></i>';
                     }
                     else {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Assign/delete" />';
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign<sub>auto</sub>/delete" />';
                         return img;
                     }
                 }
@@ -129,13 +129,13 @@
             {
                 "data": "policyNum",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.policyId + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "amount",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.amount + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -149,26 +149,27 @@
 
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
-                            <img src="${formattedUrl}" 
-                                 class="thumbnail profile-image doc-profile-image preview-map-image" 
-                                 data-toggle="modal" 
-                                 data-target="#mapModal" 
-                                 data-img='${formattedUrl}' 
+                            <img src="${formattedUrl}"
+                                 title="${row.pincodeName}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${formattedUrl}'
                                  data-title='${row.pincodeName}' />
                         </div>`;
                     }
                     else {
-                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
+                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
                     }
                 }
             },
             {
-                "sDefaultContent": "<i class='fa-map-marker' data-toggle='tooltip' title='No address'></i>",
+                "sDefaultContent": "<i class='fa-map-marker' data-bs-toggle='tooltip' title='No Document'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -178,13 +179,13 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.customerFullName == "?") {
-                        var img = '<img alt="' + row.customerFullName + '" title="' + row.customerFullName + '" src="' + row.customer + '" class="table-profile-image-no-user" data-toggle="tooltip"/>';
+                        var img = '<img alt="' + row.customerFullName + '" title="' + row.customerFullName + '" src="' + row.customer + '" class="table-profile-image-no-user" data-bs-toggle="tooltip"/>';
                         return img;
                     }
                     else {
                         var img = '<div class="map-thumbnail table-profile-image">';
-                        img += '<img src="' + row.customer + '" class="full-map" title="' + row.customerFullName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                        img += '<img src="' + row.customer + '" class="table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.customer + '" class="full-map" title="' + row.customerFullName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.customer + '" class="table-profile-image" title="' + row.customerFullName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Thumbnail image with class 'thumbnail'
                         img += '</div>';
                         return img;
                     }
@@ -193,7 +194,7 @@
             {
                 "data": "name",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.customerFullName + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.customerFullName + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -201,13 +202,13 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.beneficiaryFullName == "?") {
-                        var img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image-no-user" data-toggle="tooltip"/>';
+                        var img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image-no-user" data-bs-toggle="tooltip"/>';
                         return img;
                     }
                     else {
                         var img = '<div class="map-thumbnail table-profile-image">';
-                        img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                        img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryFullName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                         img += '</div>';
                         return img;
                     }
@@ -216,29 +217,32 @@
             {
                 "data": "beneficiaryName",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.beneficiaryFullName + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "serviceType",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.serviceType + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "location",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.location + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.location + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "created",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.created + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
-                "data": "timePending"
+                "data": "timePending",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.timePending + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
             },
             {
                 "sDefaultContent": "",
@@ -247,7 +251,7 @@
                     var buttons = "";
                     console.log(row.status);
                     if (row.ready2Assign) {
-                        buttons += '<a id="assign' + row.id + '" href="/Investigation/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
+                        buttons += '<a  id="assign' + row.id + '" href="/Investigation/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
                         buttons += '<i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
@@ -298,7 +302,14 @@
                 showedit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
-            //checkUploadJobStatus();
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
         }
     });
 
@@ -338,14 +349,6 @@
     });
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');
-    });
-   
-    table.on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({
-            animated: 'fade',
-            placement: 'top',
-            html: true
-        });
     });
 
     $('#customerTableAuto tbody').on('click', '.btn-danger', function (e) {
@@ -569,6 +572,9 @@
             url: "/InvestigationPost/DeleteCases", // Update with your actual delete endpoint
             type: "POST",
             data: JSON.stringify({ claims: claims }),
+            headers: {
+                "X-CSRF-TOKEN": $('input[name="icheckifyAntiforgery"]').val(),
+            },
             contentType: "application/json",
             success: function (response) {
                 if (response.success) {
@@ -596,7 +602,7 @@
                     });
                 }
             },
-            error: function () {
+            error: function (err) {
                 $.alert({
                     title: "Error!",
                     content: "Something went wrong. Please try again.",
@@ -725,17 +731,15 @@
 
     // Apply confirmation to both forms
     handleUploadConfirmation("#upload-claims", "#UploadFileButton");
-    $(document).on('show.bs.modal', '#mapModal', function (event) {
-        var trigger = $(event.relatedTarget); // The <img> clicked
-        var imageUrl = trigger.data('img');
-        var title = trigger.data('title');
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
 
-        var modal = $(this);
-        modal.find('#modalMapImage').attr('src', imageUrl);
-        modal.find('.modal-title').text(title || 'Map Preview');
+        const imageUrl = $(this).data("img");
+        const title = $(this).data("title");
+
+        $("#modalMapImage").attr("src", imageUrl);
+        $("#mapModalLabel").text(title || "Map Preview");
     });
-
-    
 });
 
 function checkUploadJobStatus() {

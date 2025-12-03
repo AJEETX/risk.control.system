@@ -67,7 +67,7 @@
                         </li>
                         <li class="small">
                             <span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>
-                            Country:<img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @Model.Location?.Country.Name
+                            Country:<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @Model.Location?.Country.Name
                         </li>
                         <li class="small">
                             <span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>
@@ -81,15 +81,15 @@
                     <p class="text-muted text-sm">
                         @if (Model?.Location?.ImagePath != null)
                         {
-                            <img id="bImage" class="img-fluid block-data" src="@Model.Location.ImagePath" data-toggle="tooltip" title="Beneficiary Photo" />
+                            <img id="bImage" class="img-fluid block-data" src="@Model.Location.ImagePath" data-bs-toggle="tooltip" title="@Model.Location?.Name Photo" />
                         }
                         else
                         {
-                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER"  title="No Beneficiary Photo" />
+                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" title="No Beneficiary Photo" data-bs-toggle="tooltip" />
                         }
                     </p>
                     <p class="text-muted text-sm">
-                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Beneficiary Address on Map" />
+                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Beneficiary Address on Map" data-bs-toggle="tooltip" />
                     </p>
                 </div>
             </div>

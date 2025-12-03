@@ -58,7 +58,7 @@
                         <li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i></span>Age: @currentAgeInYrs</li>
                         <li class="small"><span class="fa-li"><i class="fa fa-money"></i></span>Annual Income:(@ViewBag.Currency) @customerDetail?.Income.GetEnumDisplayName()</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span>Address: @address</li>
-                        <li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />@customerDetail.Country.Name</li>
+                        <li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />@customerDetail.Country.Name</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Mobile #: (+@customerDetail?.Country.ISDCode) @customerDetail?.PhoneNumber</li>
                     </ul>
                 </div>
@@ -67,15 +67,15 @@
                     <p class="text-muted text-sm">
                         @if (customerDetail?.ImagePath != null)
                         {
-                            <img id="profileImage" class="img-fluid block-data" src="@customerDetail.ImagePath" data-toggle="tooltip" title="Customer Photo">
+                            <img id="profileImage" class="img-fluid block-data" src="@customerDetail.ImagePath" data-bs-toggle="tooltip" title="@customerDetail?.Name Photo" />
                         }
                         else
                         {
-                            <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER"  title="No Customer Photo">
+                            <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" title="No Customer Photo" data-bs-toggle="tooltip" />
                         }
                     </p>
                     <p class="text-muted text-sm">
-                        <img id="customerGoogleMap" class="img-fluid block-data" src="@map"  title="Display Customer Address in map">
+                        <img id="customerGoogleMap" class="img-fluid block-data" src="@map" title="Display Customer Address in map" data-bs-toggle="tooltip" />
                     </p>
                 </div>
             </div>

@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers.Api.Agency
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
             {
                 var companyImage = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId)?.Email;
-                if (companyImage == null)
+                if (companyImage != null)
                 {
                     return companyImage;
                 }

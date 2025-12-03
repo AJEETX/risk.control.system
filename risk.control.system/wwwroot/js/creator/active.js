@@ -77,49 +77,53 @@
             {
                 "data": "policyNum",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.policyId + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "amount",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.amount + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "agent",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.agent + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.agent + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
-                ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+                ///<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
+                        const formattedUrl = row.personMapAddressUrl
+                            .replace("{0}", "500")
+                            .replace("{1}", "500");
+
                         return `
-            <div class="map-thumbnail profile-image doc-profile-image">
-                <img src="${row.personMapAddressUrl}" 
-                     class="thumbnail profile-image doc-profile-image preview-map-image" 
-                     data-toggle="modal" 
-                     data-target="#mapModal" 
-                     data-img='${row.personMapAddressUrl}' 
-                     data-title='${row.pincodeName}' />
-            </div>`;
+                        <div class="map-thumbnail profile-image doc-profile-image">
+                            <img src="${formattedUrl}"
+                                 title="${row.pincodeName}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${formattedUrl}'
+                                 data-title='${row.pincodeName}' />
+                        </div>`;
                     } else {
-                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
+                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
                     }
                 }
-
             },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image"  title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -129,8 +133,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.customerFullName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.customer + '" class="table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.customerFullName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.customer + '" class="table-profile-image" title="' + row.customerFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -138,7 +142,7 @@
             {
                 "data": "name",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -147,8 +151,8 @@
                 "mRender": function (data, type, row) {
 
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.beneficiaryPhoto + '" class=" table-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryFullName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.beneficiaryPhoto + '" class=" table-profile-image" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
                 }
@@ -156,25 +160,25 @@
             {
                 "data": "beneficiaryName",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.beneficiaryName + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.beneficiaryName + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "serviceType",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.serviceType + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "subStatus",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.subStatus + '" data-toggle="tooltip"><small>' + data + '</small></span>'
+                    return '<span title="' + row.subStatus + '" data-bs-toggle="tooltip"><small>' + data + '</small></span>'
                 }
             },
             {
                 "data": "created",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.created + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -184,9 +188,9 @@
                     var buttons = "";
                     buttons += '<span class="checkbox">';
                     if (row.autoAllocated) {
-                        buttons += '<i class="fas fa-cog fa-spin" title="AUTO ALLOCATION" data-toggle="tooltip"></i>';
+                        buttons += '<i class="fas fa-cog fa-spin" title="AUTO ALLOCATION" data-bs-toggle="tooltip"></i>';
                     } else {
-                        buttons += '<i class="fas fa-user-tag" title="MANUAL ALLOCATION" data-toggle="tooltip"></i>';
+                        buttons += '<i class="fas fa-user-tag" title="MANUAL ALLOCATION" data-bs-toggle="tooltip"></i>';
                     }
                     buttons += '</span>';
                     
@@ -194,7 +198,10 @@
                 }
             },
             {
-                "data": "timePending"
+                "data": "timePending",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.timePending + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
             },
             {
                 "sDefaultContent": "",
@@ -232,7 +239,14 @@
                 getdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-            
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
         }
     });
     // Case Type Filter
@@ -251,50 +265,20 @@
         $('#refreshIcon').removeClass('fa-spin');
     });
  
-    $(document).on('show.bs.modal', '#mapModal', function (event) {
-        var trigger = $(event.relatedTarget); // The <img> clicked
-        var imageUrl = trigger.data('img');
-        var title = trigger.data('title');
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
 
-        var modal = $(this);
-        modal.find('#modalMapImage').attr('src', imageUrl);
-        modal.find('.modal-title').text(title || 'Map Preview');
+        const imageUrl = $(this).data("img");
+        const title = $(this).data("title");
+
+        $("#modalMapImage").attr("src", imageUrl);
+        $("#mapModalLabel").text(title || "Map Preview");
     });
-    table.on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({
-            animated: 'fade',
-            placement: 'bottom',
-            html: true
-        });
-    });
+
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
 
 
-    function TrackProgress() {
-        let progressBar = document.getElementById("progressBar");
-                let progressContainer = document.getElementById("progressContainer");
-
-                // Remove 'hidden' class to show progress bar
-                progressContainer.classList.remove("hidden");
-
-                let interval = setInterval(() => {
-                    fetch(`/InvestigationPost/GetAssignmentProgress?jobId=${uploadId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            let progress = data.progress;
-                            progressBar.style.width = progress + "%";
-                            progressBar.innerText = progress + "%";
-
-                            if (progress >= 100) {
-                                clearInterval(interval);
-                                setTimeout(() => {
-                                    progressContainer.classList.add("hidden"); // Hide after 1 sec
-                                }, 1000);
-                            }
-                        });
-                }, 1000);
-    }
     if (jobId) {
         checkJobStatus(jobId);
     }

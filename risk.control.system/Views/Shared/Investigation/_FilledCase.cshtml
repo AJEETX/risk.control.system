@@ -76,11 +76,11 @@
                     <p class="text-muted text-sm">
                         @if (Model.ClaimsInvestigation?.PolicyDetail?.DocumentPath != null)
                         {
-                            <img id="documentImage" class="img-fluid" src="@Model.ClaimsInvestigation.PolicyDetail.DocumentPath" data-toggle="tooltip" title="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber Document">
+                            <img id="documentImage" class="img-fluid" src="@Model.ClaimsInvestigation.PolicyDetail.DocumentPath" data-bs-toggle="tooltip" title="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber Document">
                         }
                         else
                         {
-                            <img id="documentImage" alt="No Document" class="img-circle img-fluid form-Image" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Document" />
+                            <img id="documentImage" alt="No Document" class="img-circle img-fluid form-Image" src="@Applicationsettings.NO_POLICY_IMAGE" data-bs-toggle="tooltip" title="No Document" />
                         }
                     </p>
                 </div>

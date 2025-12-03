@@ -58,31 +58,31 @@
                 "data": "icon",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<i title="' + row.message + '" class="' + data + '" data-toggle="tooltip"></i>';
+                    return '<i class="' + data + '" data-bs-toggle="tooltip"></i>';
                 }
             },
             {
                 "data": "name",
                 "mRender": function (data, type, row) {
-                    return '<i title="' + data + '" data-toggle="tooltip">' + data + '</i>';
+                    return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
                 }
             },
             {
                 "data": "fileType",
                 "mRender": function (data, type, row) {
-                    return '<i title="' + data + '" data-toggle="tooltip">' + data + '</i>';
+                    return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
                 }
             },
             {
                 "data": "uploadedBy",
                 "mRender": function (data, type, row) {
-                    return '<i title="Uploaded By' + data + '" data-toggle="tooltip">' + data + '</i>';
+                    return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
                 }
             },
             {
                 "data": "createdOn",
                 "mRender": function (data, type, row) {
-                    return '<i title="Action time = ' + data + '" data-toggle="tooltip">' + data + '</i>';
+                    return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
                 }
             },
             {
@@ -97,7 +97,7 @@
                 "mRender": function (data, type, row) {
                     var title = row.directAssign ? "Assigned" : "Uploaded";
                     return `
-                    <span class="custom-message-badge" title="${title}" data-toggle="tooltip">
+                    <span class="custom-message-badge" title="${title}" data-bs-toggle="tooltip">
                         ${data}
                     </span>`;
                 }
@@ -135,17 +135,17 @@
                     var img = '';
                     var title = row.directAssign ? "Assigned" : "Uploaded";
                     if (row.hasError) {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger' title='Download Error file' data-toggle='tooltip'><i class='fa fa-download'></i> Error File</a> &nbsp;`;
+                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger' title='Download Error file' data-bs-toggle='tooltip'><i class='fa fa-download'></i> Error File</a> &nbsp;`;
                     }
                     else if (!row.hasError && row.status == 'Completed') {
-                        img += `<span class='btn btn-xs i-green upload-success' title='${title} Successfully' data-toggle='tooltip'><i class='fa fa-check'></i> ${title} </span> &nbsp;`;
+                        img += `<span class='btn btn-xs i-green upload-success' title='${title} Successfully' data-bs-toggle='tooltip'><i class='fa fa-check'></i> ${title} </span> &nbsp;`;
                     } else {
-                        img += `<span class='upload-progress' title='Action in-progress' data-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </span> &nbsp;`;
+                        img += `<span class='upload-progress' title='Action in-progress' data-bs-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </span> &nbsp;`;
                     }
 
-                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file" data-toggle="tooltip"><i class="nav-icon fa fa-download"></i> Download</a> ';
+                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file" data-bs-toggle="tooltip"><i class="nav-icon fa fa-download"></i> Download</a> ';
 
-                    img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete" data-toggle="tooltip"><i class="fas fa-trash"></i> Delete </button>';
+                    img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete" data-bs-toggle="tooltip"><i class="fas fa-trash"></i> Delete </button>';
                     return img;
                 }
             },
@@ -200,6 +200,16 @@
                 $row.removeClass('processing-row');
             }
         },  // ✅ Added missing comma before `initComplete`
+        "drawCallback": function (settings, start, end, max, total, pre) {
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
+        },
         initComplete: function () {
             var api = this.api();
 
@@ -242,7 +252,7 @@
 
                     var icon = updatedRowData.data.directAssign ? 'fas fa-random' : 'fas fa-upload';  // Dynamic icon based on checkbox
                     var popType = updatedRowData.data.directAssign ? 'red' : 'blue';  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
-                    var title = updatedRowData.data.directAssign ? "Direct Assign" : "Upload";
+                    var title = updatedRowData.data.directAssign ? "Assign" : "Upload";
                     var btnClass = updatedRowData.data.directAssign ? 'btn-danger' : 'btn-info';
                     if (updatedRowData.data.status === 'Error') {
                         console.log("Status is Completed, stopping polling and updating row.");
@@ -308,6 +318,13 @@
                         $.ajax({
                             url: '/Uploads/DeleteLog/' + fileId,
                             type: 'POST',
+                            headers: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                            },
+                            data: {
+                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                id: fileId
+                            },
                             success: function (response) {
                                 $.alert({
                                     title: 'File has been Deleted!',
@@ -359,9 +376,9 @@
         $('#UploadFileButton').toggleClass('btn-info btn-danger');
         // Toggle the button text (including HTML content)
         if (isChecked) {
-            $('#UploadFileButton').html('<i class="fas fa-random"></i> Assign Directly');
+            $('#UploadFileButton').html('<i class="fas fa-random"></i> Assign');
         } else {
-            $('#UploadFileButton').html('<i class="nav-icon fa fa-upload"></i> File Upload');
+            $('#UploadFileButton').html('<i class="nav-icon fa fa-upload"></i> Upload');
         }
     });
     $("#postedFile").on('change', function () {
@@ -440,12 +457,8 @@
         $(formId).on('submit', function (event) {
             if (askFileUploadConfirmation) {
                 event.preventDefault();
-
                 // Check the state of the checkbox
                 let isChecked = $(checkboxId).is(':checked');
-
-
-
                 // Customize the confirm dialog dynamically
                 $.confirm({
                     title: isChecked ? "Confirm Assign" : "Confirm Upload",  // Dynamic title based on checkbox

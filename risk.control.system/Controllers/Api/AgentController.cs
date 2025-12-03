@@ -15,13 +15,11 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = $"{AGENT.DISPLAY_NAME}")]
+
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -76,6 +74,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpPost("pin")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAgentPin(string agentEmail)
         {
             try
@@ -106,6 +105,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpPost("ResetUid")]
+        [AllowAnonymous]
         public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)
         {
             try
@@ -131,6 +131,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpPost("VerifyMobile")]
+        [AllowAnonymous]
         public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
         {
             if (request is null)
@@ -192,6 +193,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpPost("VerifyId")]
+        [AllowAnonymous]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)
         {
             try
@@ -289,6 +291,7 @@ namespace risk.control.system.Controllers.Api
         //}
 
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [AllowAnonymous]
         [HttpGet("agent")]
         public async Task<IActionResult> GetAll(string email)
         {
@@ -386,6 +389,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("agent-map")]
         public async Task<IActionResult> IndexMap(string email)
         {
@@ -460,6 +464,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("get")]
         public async Task<IActionResult> Get(long caseId, string email)
         {
@@ -571,6 +576,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("get-template")]
         public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email)
         {
@@ -596,6 +602,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
@@ -644,6 +651,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
@@ -682,6 +690,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("media")]
         public async Task<IActionResult> Media(DocumentData data)
         {
@@ -726,6 +735,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("answers")]
         public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
         {
@@ -756,6 +766,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
         {

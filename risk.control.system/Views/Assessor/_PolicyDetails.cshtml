@@ -77,7 +77,7 @@
                     </h3>
 
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Case # : @Model.ClaimsInvestigation.PolicyDetail.ContractNumber" class="badge badge-light">
+                        <span data-bs-toggle="tooltip" title="Case # : @Model.ClaimsInvestigation.PolicyDetail.ContractNumber" class="badge badge-light">
                             <i class='far fa-hand-point-right'></i>
                         </span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -180,22 +180,22 @@
                                             <p class="text-muted text-sm">
                                                 @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentPath is not null)
                                                 {
-                                                    <img id="documentImage" class="img-fluid" src="@Model?.ClaimsInvestigation?.PolicyDetail.DocumentPath" data-toggle="tooltip" title="@Model?.ClaimsInvestigation?.PolicyDetail.ContractNumber Document">
+                                                    <img id="documentImage" class="img-fluid" src="@Model?.ClaimsInvestigation?.PolicyDetail.DocumentPath" data-bs-toggle="tooltip" title="@Model?.ClaimsInvestigation?.PolicyDetail.ContractNumber Document">
                                                 }
                                                 else
                                                 {
                                                     <img id="documentImage" alt="user-avatar"
-                                                         class="img-fluid form-Image" src=@Applicationsettings.NO_POLICY_IMAGE data-toggle="tooltip" title="No Document">
+                                                         class="img-fluid form-Image" src=@Applicationsettings.NO_POLICY_IMAGE data-bs-toggle="tooltip" title="No Document">
                                                 }
                                             </p>
                                             <p class="text-muted text-sm">
                                                 @if (Model.ClaimsInvestigation.CaseNotes.Count > 0)
                                                 {
-                                                    <img id="notesDetail" class="img-fluid form-Image" src="@Applicationsettings.POLICY_BLANK_IMAGE" data-toggle="tooltip" title="Display notes">
+                                                    <img id="notesDetail" class="img-fluid form-Image" src="@Applicationsettings.POLICY_BLANK_IMAGE" data-bs-toggle="tooltip" title="Display notes">
                                                 }
                                                 else
                                                 {
-                                                    <img id="notesDetail-disabled" class="img-fluid form-Image" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No notes">
+                                                    <img id="notesDetail-disabled" class="img-fluid form-Image" src="@Applicationsettings.NO_POLICY_IMAGE" data-bs-toggle="tooltip" title="No notes">
                                                 }
                                             </p>
                                         </div>
@@ -203,10 +203,10 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="text-right">
-                                        <a id="policy-comments" class="btn btn-sm bg-teal" data-toggle="tooltip" title="Add Notes">
+                                        <a id="policy-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Add Notes">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a id="policy-detail" class="btn btn-sm btn-info" data-toggle="tooltip" title="Show  Policy Details">
+                                        <a id="policy-detail" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Show  Policy Details">
                                             <i class="far fa-file-powerpoint"></i> ...
                                         </a>
                                     </div>
@@ -300,26 +300,26 @@
                                             <p class="text-muted text-sm">
                                                 @if (Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath is not null)
                                                 {
-                                                    <img id="profileImage" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath" data-toggle="tooltip" title="Customer Photo">
+                                                    <img id="profileImage" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath" data-bs-toggle="tooltip" title="Customer Photo">
                                                 }
                                                 else
                                                 {
-                                                    <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Customer Photo">
+                                                    <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Customer Photo">
                                                 }
                                             </p>
                                             <p class="text-muted text-sm">
-                                                <img id="customerGoogleMap" class="img-fluid block-data" src="@map" data-toggle="tooltip" title="Display Customer Address in map">
+                                                <img id="customerGoogleMap" class="img-fluid block-data" src="@map" data-bs-toggle="tooltip" title="Display Customer Address in map">
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="card-footer">
                                     <div class="text-right">
-                                        <a id="customer-comments" class="btn btn-sm bg-teal" data-toggle="tooltip" title="Send SMS to Customer">
+                                        <a id="customer-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Customer">
                                             <i class="fas fa-comments"></i>
                                         </a>
 
-                                        <a id="customer-detail" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Show Customer Details">
+                                        <a id="customer-detail" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Show Customer Details">
                                             <i class="fa fa-user-plus"></i> ...
                                         </a>
                                     </div>
@@ -400,15 +400,15 @@
                                             <p class="text-muted text-sm">
                                                 @if (Model?.Location?.ImagePath is not null)
                                                 {
-                                                    <img id="bImage" class="img-fluid block-data" src="@Model?.Location?.ImagePath" data-toggle="tooltip" title="Beneficiary Photo">
+                                                    <img id="bImage" class="img-fluid block-data" src="@Model?.Location?.ImagePath" data-bs-toggle="tooltip" title="Beneficiary Photo">
                                                 }
                                                 else
                                                 {
-                                                    <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Beneficiary Photo">
+                                                    <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Beneficiary Photo">
                                                 }
                                             </p>
                                             <p class="text-muted text-sm">
-                                                <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@bmap" data-toggle="tooltip" title="Display Beneficiary Address in map">
+                                                <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@bmap" data-bs-toggle="tooltip" title="Display Beneficiary Address in map">
                                             </p>
 
                                         </div>
@@ -417,11 +417,11 @@
 
                                 <div class="card-footer">
                                     <div class="text-right">
-                                        <a id="beneficiary-comments" class="btn btn-sm bg-teal" data-toggle="tooltip" title="Send SMS to Beneficiary">
+                                        <a id="beneficiary-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Beneficiary">
                                             <i class="fas fa-comments"></i>
                                         </a>
 
-                                        <a id="beneficiary-detail" class="btn btn-sm btn-success" data-toggle="tooltip" title="Show Beneficiary Details">
+                                        <a id="beneficiary-detail" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Show Beneficiary Details">
                                             <i class="fas fa-user-tie"></i> ...
                                         </a>
                                     </div>

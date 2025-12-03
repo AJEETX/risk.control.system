@@ -173,7 +173,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         
-        $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<b> <sub>manual</sub></b>");
+        $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<b><sub>manual</sub></b>");
         disableAllInteractiveElements();
 
         var article = document.getElementById("article");

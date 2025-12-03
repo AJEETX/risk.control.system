@@ -81,7 +81,7 @@
                             Country: 
                             @if(!string.IsNullOrWhiteSpace(country))
                             {
-                                <img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @country
+                                <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @country
                             }
                         </li>
                         <li class="small">
@@ -100,17 +100,17 @@
                     <p class="text-muted text-sm">
                         @if (Model?.Location?.ImagePath is not null)
                         {
-                            <img id="bImage" class="img-fluid block-data" src="@Model?.Location?.ImagePath">
+                            <img id="bImage" class="img-fluid block-data" src="@Model?.Location?.ImagePath" title="@Model.Location?.Name Photo" data-bs-toggle="tooltip" />
                         }
                         else
                         {
-                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" title="Beneficiary Photo" data-bs-toggle="tooltip" />
                         }
                     </p>
                     <p class="text-muted text-sm">
                         @if (Model?.Location?.BeneficiaryLocationMap != null)
                         {
-                            <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map">
+                            <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Customer Address in map" data-bs-toggle="tooltip" />
                         }
                     </p>
 
@@ -123,7 +123,7 @@
 
                     @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.PhoneNumber))
                     {
-                        <button id="beneficiary-comments" class="btn btn-sm bg-teal">
+                    <button id="beneficiary-comments" class="btn btn-sm bg-teal" title="Send Sms to Beneficiary" data-bs-toggle="tooltip">
                             <i class="fas fa-comments"></i>
                         </button>
                     }
@@ -135,7 +135,7 @@
                     }
                     @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.PhoneNumber))
                     {
-                        <button id="beneficiary-detail" class="btn btn-sm btn-success">
+                    <button id="beneficiary-detail" class="btn btn-sm btn-success" title="Display Beneficiary Detail" data-bs-toggle="tooltip">
                             <i class="fas fa-user-tie"></i> ...
                         </button>
                     }

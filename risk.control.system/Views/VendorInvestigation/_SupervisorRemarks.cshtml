@@ -25,8 +25,8 @@
                 <div class="form-group">
                     <span class="input-group-label"> Additional Document:</span>
                     <div class="input-group mb-3">
-                        <img class="form-Image" id="policyImage" src=@Applicationsettings.NO_POLICY_IMAGE data-toggle="tooltip" title="No additional document">
-                        <input accept="image/*" asp-for="InvestigationReport.SupervisorAttachment" type="file" class="form-control remarks" id="documentImageInput" data-toggle="tooltip" title="Add additional document">
+                        <img class="form-Image" id="policyImage" src=@Applicationsettings.NO_POLICY_IMAGE data-bs-toggle="tooltip" title="No additional document">
+                        <input accept="image/*" asp-for="InvestigationReport.SupervisorAttachment" type="file" class="form-control remarks" id="documentImageInput" data-bs-toggle="tooltip" title="Add additional document">
                     </div>
                 </div>
 
@@ -36,7 +36,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="InvestigationReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <textarea required name="supervisorRemarks" id="supervisorRemarks" asp-for="InvestigationReport.SupervisorRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter Remarks" rows="2"></textarea>
+                        <textarea required name="supervisorRemarks" id="supervisorRemarks" asp-for="InvestigationReport.SupervisorRemarks" class="form-control remarks" data-bs-toggle="tooltip" title="Enter Remarks" rows="2"></textarea>
                         <span asp-validation-for="InvestigationReport.SupervisorRemarks" class="text-danger"></span>
                     </div>
                 </div>

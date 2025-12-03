@@ -560,6 +560,7 @@ namespace risk.control.system.Controllers.Company
 
         [HttpPost, ActionName("DeleteCases")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCases([FromBody] DeleteRequestModel request)
         {
             if (request.claims == null || request.claims.Count == 0)

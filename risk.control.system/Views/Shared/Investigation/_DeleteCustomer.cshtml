@@ -81,7 +81,7 @@
                             Country: 
                             @if(!string.IsNullOrWhiteSpace(country))
                             {
-                                <img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @country
+                                <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @country
                             }
                         </li>
                         <li class="small">
@@ -100,17 +100,17 @@
                     <p class="text-muted text-sm">
                         @if (Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath is not null)
                         {
-                            <img id="profileImage" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath">
+                            <img id="profileImage" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath" title="@Model.ClaimsInvestigation?.CustomerDetail?.Name Photo" data-bs-toggle="tooltip" />
                         }
                         else
                         {
-                            <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                            <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" title="Customer Photo" data-bs-toggle="tooltip" />
                         }
                     </p>
                     <p class="text-muted text-sm">
                         @if (@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap is not null)
                         {
-                            <img id="customerGoogleMap" class="img-fluid block-data" src="@map">
+                            <img id="customerGoogleMap" class="img-fluid block-data" src="@map" title="Display Customer Address in map" data-bs-toggle="tooltip" />
                         }
                     </p>
                 </div>
@@ -121,7 +121,7 @@
 
                     @if (Model.ClaimsInvestigation.CustomerDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.CustomerDetail.PhoneNumber))
                     {
-                        <button id="customer-comments" class="btn btn-sm bg-teal">
+                        <button id="customer-comments" class="btn btn-sm bg-teal" title="Send Sms to Customer" data-bs-toggle="tooltip">
                             <i class="fas fa-comments"></i>
                         </button>
                     }
@@ -133,7 +133,7 @@
                     }
                     @if (Model.ClaimsInvestigation.CustomerDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.CustomerDetail.PhoneNumber))
                     {
-                        <button id="customer-detail" class="btn btn-sm btn-warning">
+                    <button id="customer-detail" class="btn btn-sm btn-warning" title="Display Customer Detail" data-bs-toggle="tooltip">
                             <i class="fa fa-user-plus"></i> ...
                         </button>
                     }

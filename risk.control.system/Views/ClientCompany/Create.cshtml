@@ -82,7 +82,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g. 9876543210)" title="Please enter a 10-digit mobile # without country-code" data-toggle="tooltip" />
+                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g. 9876543210)" data-bs-toggle="tooltip" />
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -220,10 +220,10 @@
                         <div class="form-group">
                             <span class="input-group-label"> Document:</span>
                             <div class="input-group mb-3">
-                                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/img/no-image.png" data-toggle="tooltip" title="No Document" />
+                                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/img/no-image.png" data-bs-toggle="tooltip" title="No Document" />
                                 <i class="fa fa-asterisk asterik-style"></i>
                                 <input accept=".jpg,.jpeg,.png" asp-for="DocumentImage" type="file"
-                                       class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Document"
+                                       class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-bs-toggle="tooltip" title="Upload Document"
                                        data-default-image="/img/no-image.png" />
                                 <span asp-validation-for="DocumentImage" class="text-danger"></span>
                             </div>
