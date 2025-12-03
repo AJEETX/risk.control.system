@@ -186,16 +186,16 @@ namespace risk.control.system.Services
                 {
                     using var dataStream = new MemoryStream();
                     claimDocument.CopyTo(dataStream);
-                    claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
+                    existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
                     //existingPolicy.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(claimDocument.FileName);
                     var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "policy");
                     var filePath = Path.Combine(webHostEnvironment.WebRootPath, "policy", fileName);
                     await File.WriteAllBytesAsync(filePath, dataStream.ToArray());
-                    claimsInvestigation.PolicyDetail.DocumentPath = "/policy/" + fileName;
+                    existingPolicy.PolicyDetail.DocumentPath = "/policy/" + fileName;
                 }
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, existingPolicy.PolicyDetail.InsuranceType.Value);
                 existingPolicy.ReportTemplate = reportTemplate;
                 existingPolicy.ReportTemplateId = reportTemplate.Id;
                 context.Investigations.Update(existingPolicy);

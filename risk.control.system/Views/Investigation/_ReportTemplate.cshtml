@@ -5,10 +5,10 @@
     </form>
     <div class="col-12 text-center">
         <input type="hidden" id="locationCount" value="@Model.LocationReport.Count" />
-        <label for="Name">
+        <span for="Name">
             Template Name :
             <span class="badge badge-default">@Model.Name</span>
-        </label>
+        </span>
     </div>
     @foreach (var location in Model.LocationReport)
     {
@@ -19,18 +19,18 @@
                     <h5 class="card-title">
                                     <span class="form-group">
                                         <div class="input-group">
-                                            <span class="badge badge-light mt-2" title="Location Name" data-toggle="tooltip">
+                                            <span class="badge badge-light mt-2" title="Location Name" data-bs-toggle="tooltip">
                                                 <i class="fas fa-map-marker-alt me-2"></i>
                                     @if (location.IsRequired)
                                     {
-                                        <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                        <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                     }
                                     else
                                     {
                                         <i class="fa fa-asterisk asterik-style-none"></i>
                                     }
                                 </span>
-                                <input type="text" asp-for="@location.LocationName" title="Location Name" data-toggle="tooltip" class="form-control remarks title-name" required placeholder="Location Name" value="@location.LocationName" maxlength="50" />
+                                <input type="text" asp-for="@location.LocationName" title="Location Name" data-bs-toggle="tooltip" class="form-control remarks title-name" required placeholder="Location Name" value="@location.LocationName" maxlength="50" />
 
                                 <span asp-validation-for="@location.LocationName" class="text-danger"></span>
                             </div>
@@ -68,7 +68,7 @@
                                                     @location.AgentIdReport.ReportName
                                                     @if (location.AgentIdReport.IsRequired)
                                                     {
-                                                        <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                        <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                     }
                                                 </label>
                                             </div>
@@ -98,7 +98,7 @@
                                                         @face.ReportName
                                                         @if (face.IsRequired)
                                                         {
-                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                         }
                                                     </label>
                                                 </div>
@@ -129,7 +129,7 @@
                                                         @doc.ReportName
                                                         @if (doc.IsRequired)
                                                         {
-                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                         }
                                                     </label>
                                                 </div>
@@ -153,7 +153,7 @@
                                                         @doc.ReportName
                                                         @if (doc.IsRequired)
                                                         {
-                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                         }
                                                     </label>
                                                 </div>
@@ -175,7 +175,7 @@
                                                         <span>@question.QuestionText</span>
                                                         @if (question.IsRequired)
                                                         {
-                                                            <span class="required-asterisk" title="Required field" data-toggle="tooltip">*</span>
+                                                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
                                                         }
                                                         <small class="text-muted">[@question.QuestionType]</small>
                                                         @if (question.QuestionType != "Text" && !string.IsNullOrEmpty(question.Options))

@@ -3,7 +3,6 @@
     ViewData["Title"] = "File Upload";
     var uploadId = Context.Request.Query["uploadId"];
 }
-
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <input type="hidden" id="uploadId" value="@uploadId" />
@@ -16,8 +15,6 @@
         {
             <partial name="Creator/_UploadTitle" model="Model" />
         }
-
-
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
@@ -25,12 +22,9 @@
             <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
         </div>
         <div class="card-body">
-            
             @if (!Model.IsManager)
-
             {
                 <partial name="Investigation/_Upload" model="Model" />
-
             }
             <table id="customerTableAuto" class="table table-bordered table-hover dt-responsive nowrap w-100">
                 <thead>

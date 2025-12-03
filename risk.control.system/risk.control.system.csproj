@@ -94,6 +94,7 @@
     <Folder Include="Logs\" />
     <Folder Include="wwwroot\agent-face\" />
     <Folder Include="wwwroot\beneficiary\" />
+    <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\customer\" />
     <Folder Include="wwwroot\document\" />
     <Folder Include="wwwroot\face\" />

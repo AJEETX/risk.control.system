@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
-
 }
 
 <section class="content">
@@ -21,7 +20,7 @@
                             <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Company Detail</span></h3>
 
                             <div class="card-tools">
-                                <span data-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
+                                <span data-bs-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-plus"></i>
                                 </button>
@@ -74,7 +73,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Mobile # only (9876543210)" title="Please enter a 10-digit mobile # without country-code" data-toggle="tooltip" />
+                                            <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Mobile # only (9876543210)" data-bs-toggle="tooltip" />
                                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -198,12 +197,12 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="input-group-label" for="CountryId" data-toggle="tooltip" title="Registered Country"> Country:</label>
+                                        <label class="input-group-label" for="CountryId" data-bs-toggle="tooltip" title="Registered Country"> Country:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" for="CountryId" data-toggle="tooltip" title="Registered Country"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style-info"></i></span>
+                                                <span class="input-group-text" for="CountryId" data-bs-toggle="tooltip" title="Registered Country"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style-info"></i></span>
                                             </div>
-                                            <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-toggle="tooltip" title="Registered Country" value="" tabindex="-1" />
+                                            <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-bs-toggle="tooltip" title="Registered Country" value="" tabindex="-1" />
                                             <span asp-validation-for="CountryId" class="text-danger"></span>
                                             <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                             <div id="country-loading" class="loading-spinner">
@@ -275,7 +274,7 @@
                             <h3 class="card-title"><i class="fas fa-sitemap"></i> <span class="badge badge-light"> Config Detail</span></h3>
 
                             <div class="card-tools">
-                                <span data-toggle="tooltip" title="Company Api Detail" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
+                                <span data-bs-toggle="tooltip" title="Company Api Detail" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-minus"></i>
                                 </button>

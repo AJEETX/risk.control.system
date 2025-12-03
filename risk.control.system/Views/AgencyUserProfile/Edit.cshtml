@@ -41,7 +41,7 @@
 
                         <!-- Name Sections (First & Last) -->
                         <div class="form-group">
-                            <label for="FirstName" class="input-group-label">First Name:</label>
+                            <label for="FirstName" class="input-group-label" for="FirstName">First Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
@@ -52,7 +52,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="FirstName" class="input-group-label">Last Name:</label>
+                            <label for="FirstName" class="input-group-label" for="LastName">Last Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
@@ -67,12 +67,12 @@
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     @* Display Country Code *@
-                                    <span class="input-group-text country-code-text" data-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
+                                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
                                         <img src="@("/flags/" + @Model.Country.Code.ToLower() + ".png")" class="flag-icon" />
                                         +@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
-                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" autocomplete="off" placeholder="Enter mobile # without country-code" title="Enter mobile # without country-code" data-toggle="tooltip" />
+                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" autocomplete="off" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                     <div class="col-md-6">
                         <!-- Email Section -->
                         <div class="form-group">
-                            <label for="Email" class="input-group-label">Email Address:</label>
+                            <label for="Email" class="input-group-label" for="Email">Email Address:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-at"></i><i class="fa fa-asterisk asterik-style"></i></span>
@@ -92,7 +92,7 @@
 
                         <!-- Role Section -->
                         <div class="form-group">
-                            <label for="UserRole" class="input-group-label">Role:</label>
+                            <label for="UserRole" class="input-group-label" for="UserRole">Role:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
@@ -103,7 +103,7 @@
                         <partial name="_Address" model="@Model" />
 
                         <div class="form-group">
-                            <label class="input-group-label"> Address:</label>
+                            <label class="input-group-label" for="Addressline"> Address:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>

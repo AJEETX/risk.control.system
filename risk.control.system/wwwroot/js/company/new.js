@@ -149,11 +149,12 @@
 
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
-                            <img src="${formattedUrl}"  title="${row.pincodeName}"
-                                 class="thumbnail profile-image doc-profile-image preview-map-image" 
-                                 data-toggle="modal" 
-                                 data-target="#mapModal" 
-                                 data-img='${formattedUrl}' 
+                            <img src="${formattedUrl}"
+                                 title="${row.pincodeName}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${formattedUrl}'
                                  data-title='${row.pincodeName}' />
                         </div>`;
                     }
@@ -730,14 +731,14 @@
 
     // Apply confirmation to both forms
     handleUploadConfirmation("#upload-claims", "#UploadFileButton");
-    $(document).on('show.bs.modal', '#mapModal', function (event) {
-        var trigger = $(event.relatedTarget); // The <img> clicked
-        var imageUrl = trigger.data('img');
-        var title = trigger.data('title');
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
 
-        var modal = $(this);
-        modal.find('#modalMapImage').attr('src', imageUrl);
-        modal.find('.modal-title').text(title || 'Map Preview');
+        const imageUrl = $(this).data("img");
+        const title = $(this).data("title");
+
+        $("#modalMapImage").attr("src", imageUrl);
+        $("#mapModalLabel").text(title || "Map Preview");
     });
 });
 

@@ -140,15 +140,20 @@
                 "data": "pincode",
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
+                        const formattedUrl = row.personMapAddressUrl
+                            .replace("{0}", "500")
+                            .replace("{1}", "500");
+
                         return `
-            <div class="map-thumbnail profile-image doc-profile-image">
-                <img src="${row.personMapAddressUrl}" title='${row.pincodeName}' 
-                     class="thumbnail profile-image doc-profile-image preview-map-image" 
-                     data-toggle="modal" 
-                     data-target="#mapModal" 
-                     data-img='${row.personMapAddressUrl}' 
-                     data-title='${row.pincodeName}' />
-            </div>`;
+                        <div class="map-thumbnail profile-image doc-profile-image">
+                            <img src="${formattedUrl}"
+                                 title="${row.pincodeName}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${formattedUrl}'
+                                 data-title='${row.pincodeName}' />
+                        </div>`;
                     } else {
                         return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
                     }
@@ -277,14 +282,14 @@
         table.ajax.reload(null, false);
         $("#allocatedcase").prop('disabled', true);
     });
-    $(document).on('show.bs.modal', '#mapModal', function (event) {
-        var trigger = $(event.relatedTarget); // The <img> clicked
-        var imageUrl = trigger.data('img');
-        var title = trigger.data('title');
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
 
-        var modal = $(this);
-        modal.find('#modalMapImage').attr('src', imageUrl);
-        modal.find('.modal-title').text(title || 'Map Preview');
+        const imageUrl = $(this).data("img");
+        const title = $(this).data("title");
+
+        $("#modalMapImage").attr("src", imageUrl);
+        $("#mapModalLabel").text(title || "Map Preview");
     });
    
     $('#customerTable tbody').hide();

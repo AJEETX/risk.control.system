@@ -52,7 +52,7 @@
 											<img class="action-image" src="~/headers/customer.gif" />Agent ID
 										</th>
 										<th class="col-face-photo">
-											<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-toggle="tooltip"></i> Photo
+											<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-bs-toggle="tooltip"></i> Photo
 										</th>
 											<th class="col-pin-img" title="Indicative Map Route">
 												<img class="action-image" src="~/headers/pincode.gif" /> Indicative Map
@@ -143,16 +143,16 @@
 											{
 												@if (agent.ImageValid.HasValue && agent.ImageValid.Value)
 												{
-													<i class="fa fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
+													<i class="fa fa-check-circle text-success" title="Matched" data-bs-toggle="tooltip"></i>
 												}
 												else
 												{
-													<i class="fa fa-times-circle text-danger" title="Not matched" data-toggle="tooltip"></i>
+													<i class="fa fa-times-circle text-danger" title="Not matched" data-bs-toggle="tooltip"></i>
 												}
 											}
 											else
 											{
-												<i class="fa fa-times-circle text-muted" title="Not validated" data-toggle="tooltip"></i>
+												<i class="fa fa-times-circle text-muted" title="Not validated" data-bs-toggle="tooltip"></i>
 											}
 										</td>
 									</tr>

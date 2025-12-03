@@ -22,7 +22,7 @@
             </span>
         </h3>
         <div class="card-tools">
-            <span data-toggle="tooltip" title="Agent report time" class="badge badge-light"> <i class="nav-icon fas fa-clock"></i> @questionTime </span>
+            <span data-bs-toggle="tooltip" title="Agent report time" class="badge badge-light"> <i class="nav-icon fas fa-clock"></i> @questionTime </span>
             
         </div>
     </div>
@@ -46,7 +46,7 @@
 
                     @if (Model.ClaimsInvestigation.UpdateAgentAnswer && Model.ClaimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
                     {
-                        <textarea name="remarks" id="remarks" asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks" rows="2"></textarea>
+                        <textarea name="remarks" id="remarks" asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-bs-toggle="tooltip" title="Edit Agent Remarks" rows="2"></textarea>
                         <span asp-validation-for="InvestigationReport.AgentRemarks" class="text-danger"></span>
                     }
                     else

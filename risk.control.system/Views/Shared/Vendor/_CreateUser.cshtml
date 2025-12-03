@@ -7,15 +7,15 @@
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
-            <label class="input-group-label"> Photo:</label>
+            <label class="input-group-label" for="createImageInput"> User Photo:</label>
             <div class="input-group mb-3">
-                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Upload Photo" />
+                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No User Photo" />
                 <i class="fa fa-asterisk asterik-style"></i>
-                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Photo" />
+                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-title-id="user-document" required data-bs-toggle="tooltip" title="Upload User Photo" />
             </div>
         </div>
         <div class="form-group">
-            <label class="input-group-label"> First Name:</label>
+            <label class="input-group-label" for="FirstName"> First Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -26,7 +26,7 @@
         </div>
 
         <div class="form-group">
-            <label class="input-group-label"> Last Name:</label>
+            <label class="input-group-label" for="LastName"> Last Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -48,17 +48,17 @@
         </div>*@
         
         <div class="form-group">
-            <label class="input-group-label"> Mobile #:</label>
+            <label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
             <div class="input-group">
                 <div class="input-group-prepend">
                     @{
                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                     }
-                    <span class="input-group-text country-code-text" data-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
-                        <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
+                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
+                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  +@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
-                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" title="Enter mobile # without country-code"  data-toggle="tooltip"/>
+                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
                 <span id="phone-spinner" class="text-secondary phone-icon d-none">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </span>
@@ -73,10 +73,10 @@
         @if(Model.UserRole == null)
         {
             <div class="form-group">
-                <label class="input-group-label"> Role:</label>
+                <label class="input-group-label" for="UserRole"> Role:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" asp-for="UserRole"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <span class="input-group-text" ><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
                     @{
                         // Get the enum values except the one you want to exclude
@@ -97,10 +97,10 @@
         else
         {
             <div class="form-group">
-                <label class="input-group-label"> Role:</label>
+                <label class="input-group-label" for="UserRole"> Role:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" asp-for="UserRole"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
                     <select asp-for="@Model.UserRole" class="form-control remarks">
                         <option value="@Model.UserRole">@Model.UserRole</option>
@@ -122,7 +122,7 @@
     <div class="col-md-6">
         <partial name="_Address" model="@Model" />
         <div class="form-group">
-            <label class="input-group-label"> Address:</label>
+            <label class="input-group-label" for="Addressline"> Address:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -134,7 +134,7 @@
         @if(Model.Active)
         {
             <div class="form-group">
-                <label class="input-group-label"> Status:</label>
+                <label class="input-group-label" for="Active"> Status:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -151,7 +151,7 @@
         else
         {
             <div class="form-group">
-                <label class="input-group-label"> Status:</label>
+                <label class="input-group-label" for="Active"> Status:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>

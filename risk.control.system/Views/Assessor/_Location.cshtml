@@ -44,7 +44,7 @@
 									<thead class="thead-light">
 										<tr>
 											<th class="col-face-photo"> 
-												<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-toggle="tooltip"></i> Agent Photo
+												<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-bs-toggle="tooltip"></i> Agent Photo
 											</th>
 											<th class="col-pin-img" title="Indicative Address Info"><img class="action-image" src="~/headers/pincode.gif" /> Indicative Address Info</th>
 											<th class="col-weather" title="Location info"><img class="action-image" src="~/headers/information.gif" />Location info</th>
@@ -113,16 +113,16 @@
 												{
 													@if (agent.ImageValid.HasValue && agent.ImageValid.Value)
 													{
-														<i class="fa fa-check-circle text-success" title="Matched" data-toggle="tooltip"></i>
+														<i class="fa fa-check-circle text-success" title="Matched" data-bs-toggle="tooltip"></i>
 													}
 													else
 													{
-														<i class="fa fa-times-circle text-danger" title="Not matched" data-toggle="tooltip"></i>
+														<i class="fa fa-times-circle text-danger" title="Not matched" data-bs-toggle="tooltip"></i>
 													}
 												}
 												else
 												{
-													<i class="fa fa-times-circle text-muted" title="Not validated" data-toggle="tooltip"></i>
+													<i class="fa fa-times-circle text-muted" title="Not validated" data-bs-toggle="tooltip"></i>
 												}
 												<div>
 												@agent.Similarity

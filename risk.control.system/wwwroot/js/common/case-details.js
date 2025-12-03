@@ -147,7 +147,7 @@
                     self.setContentAppend('<br><p class="fa-li">');
                     self.setContentAppend('<b><i class="fas fa-building"></i> Budget Centre</b>:  ' + response.costCentre);
                     self.setContentAppend('</p');
-                    self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Policy Document</b>:');
+                    self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Case Document</b>:');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.document + '" /> ');
                     self.setContentAppend('</p');
                     self.setContentAppend('</div>');

@@ -252,7 +252,7 @@
 
                     var icon = updatedRowData.data.directAssign ? 'fas fa-random' : 'fas fa-upload';  // Dynamic icon based on checkbox
                     var popType = updatedRowData.data.directAssign ? 'red' : 'blue';  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
-                    var title = updatedRowData.data.directAssign ? "Direct Assign" : "Upload";
+                    var title = updatedRowData.data.directAssign ? "Assign" : "Upload";
                     var btnClass = updatedRowData.data.directAssign ? 'btn-danger' : 'btn-info';
                     if (updatedRowData.data.status === 'Error') {
                         console.log("Status is Completed, stopping polling and updating row.");
@@ -376,9 +376,9 @@
         $('#UploadFileButton').toggleClass('btn-info btn-danger');
         // Toggle the button text (including HTML content)
         if (isChecked) {
-            $('#UploadFileButton').html('<i class="fas fa-random"></i> Assign Directly');
+            $('#UploadFileButton').html('<i class="fas fa-random"></i> Assign');
         } else {
-            $('#UploadFileButton').html('<i class="nav-icon fa fa-upload"></i> File Upload');
+            $('#UploadFileButton').html('<i class="nav-icon fa fa-upload"></i> Upload');
         }
     });
     $("#postedFile").on('change', function () {
@@ -457,12 +457,8 @@
         $(formId).on('submit', function (event) {
             if (askFileUploadConfirmation) {
                 event.preventDefault();
-
                 // Check the state of the checkbox
                 let isChecked = $(checkboxId).is(':checked');
-
-
-
                 // Customize the confirm dialog dynamically
                 $.confirm({
                     title: isChecked ? "Confirm Assign" : "Confirm Upload",  // Dynamic title based on checkbox

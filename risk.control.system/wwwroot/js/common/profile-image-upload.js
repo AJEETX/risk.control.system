@@ -42,6 +42,7 @@
         const inputElement = $(this);
         const previewElement = $(`#${inputElement.data('preview-id')}`); // Dynamically find preview element
         const defaultImageUrl = inputElement.data('default-image'); // Get the default image URL from the data attribute
+        const previewElementTitle = inputElement.data('title-id'); // Dynamically find preview element
 
         const files = inputElement[0].files;
 
@@ -84,7 +85,27 @@
             const fileReader = new FileReader();
             fileReader.onload = function (e) {
                 if (previewElement) {
+
                     previewElement.attr('src', e.target.result); // Set the preview image source
+                    if (previewElementTitle === 'case-document') {
+                        previewElement.attr('data-bs-original-title', 'Case Document'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Case Document'); // Set the preview image source
+                    } else if (previewElementTitle === 'customer-document') {
+                        previewElement.attr('data-bs-original-title', 'Customer Photo'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Customer Photo'); // Set the preview image source
+                    } else if (previewElementTitle === 'beneficiary-document') {
+                        previewElement.attr('data-bs-original-title', 'Beneficiary Photo'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Beneficiary Photo'); // Set the preview image source
+                    } else if (previewElementTitle === 'user-document') {
+                        previewElement.attr('data-bs-original-title', 'User Photo'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'User Photo'); // Set the preview image source
+                    } else if (previewElementTitle === 'agency-document') {
+                        previewElement.attr('data-bs-original-title', 'Agency Document'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Agency Document'); // Set the preview image source
+                    } else if (previewElementTitle === 'company-document') {
+                        previewElement.attr('data-bs-original-title', 'Company Document'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Company Document'); // Set the preview image source
+                    }
                 }
             };
             fileReader.readAsDataURL(file);

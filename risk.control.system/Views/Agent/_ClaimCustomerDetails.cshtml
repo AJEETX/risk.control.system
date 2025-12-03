@@ -88,15 +88,15 @@
                         <p class="text-muted text-sm">
                             @if (Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath is not null)
                             {
-                                <img id="profileImage" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath" data-toggle="tooltip" title="Customer Photo">
+                                <img id="profileImage" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath" data-bs-toggle="tooltip" title="Customer Photo">
                             }
                             else
                             {
-                                <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Customer Photo">
+                                <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Customer Photo">
                             }
                         </p>
                         <p class="text-muted text-sm">
-                            <img id="customerGoogleMap" class="img-fluid block-data" src="@map" data-toggle="tooltip" title="Display Customer Address in map">
+                            <img id="customerGoogleMap" class="img-fluid block-data" src="@map" data-bs-toggle="tooltip" title="Display Customer Address in map">
                         </p>
 
                     </div>
@@ -104,11 +104,11 @@
             </div>
             <div class="card-footer">
                 <div class="text-right">
-                    <a id="customer-comments" class="btn btn-sm bg-teal" data-toggle="tooltip" title="Send SMS to Customer">
+                    <a id="customer-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Customer">
                         <i class="fas fa-comments"></i>
                     </a>
 
-                    <a id="customer-detail" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Show Customer Details">
+                    <a id="customer-detail" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Show Customer Details">
                         <i class="fa fa-user-plus"></i> ...
                     </a>
                 </div>

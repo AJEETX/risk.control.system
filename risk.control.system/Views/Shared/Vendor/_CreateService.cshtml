@@ -5,7 +5,7 @@
     <div class="col-md-6">
 
         <div class="form-group">
-            <label class="input-group-label"> Case Type:</label>
+            <label class="input-group-label" for="InsuranceType"> Case Type:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" asp-for="InsuranceType"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
@@ -17,10 +17,10 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="input-group-label">Verification Type:</label>
+            <label class="input-group-label" for="InvestigationServiceTypeId">Verification Type:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" for="InvestigationServiceTypeId">
+                    <span class="input-group-text" >
                         <i class="fas fa-wrench"></i> <i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
@@ -33,7 +33,7 @@
         </div>
 
         <div class="form-group">
-            <label class="input-group-label"> Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency):</label>
+            <label class="input-group-label" for="Price"> Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency):</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="Price"> <i class="fas fa-money-bill-wave"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -49,8 +49,8 @@
                     @{
                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                     }
-                    <span class="input-group-text country-code-text" data-toggle="tooltip" title="Registered Country : @Model?.Country.Name">
-                        <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  @Model?.Country.Code
+                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country : @Model?.Country.Name">
+                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  @Model?.Country.Code
                     </span>
                 </div>
                 <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Search state ..." asp-for="StateId" required value="" />
