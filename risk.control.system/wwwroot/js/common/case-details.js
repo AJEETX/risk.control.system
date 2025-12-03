@@ -27,7 +27,6 @@
                     data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Customer Address Location</b>');
                     self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
-                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><img class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
                     self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');

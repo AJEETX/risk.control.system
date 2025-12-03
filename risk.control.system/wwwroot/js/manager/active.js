@@ -97,11 +97,11 @@ $(document).ready(function () {
                         return `
             <div class="map-thumbnail profile-image doc-profile-image">
                 <img src="${row.personMapAddressUrl}"  title="${row.pincodeName}"
-                     class="thumbnail profile-image doc-profile-image preview-map-image" 
-                     data-toggle="modal" 
-                     data-target="#mapModal" 
+                     class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal" 
+                     data-bs-toggle="tooltip"
+                     data-bs-placement="top"
                      data-img='${row.personMapAddressUrl}' 
-                     data-title='${row.pincodeName}' />
+                     data-title='Addresss: ${row.pincodeName}' />
             </div>`;
                     } else {
                         return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
@@ -114,8 +114,7 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Case Document: ' + row.policyId + '" data-img="' + row.document + '" src="' + row.document + '" class="thumbnail profile-image doc-profile-image open-map-modal" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -125,8 +124,7 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.customerFullName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.customer + '" class="table-profile-image" title="' + row.customerFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Customer: ' + row.customerFullName + '" data-img="' + row.customer + '" src="' + row.customer + '" class="thumbnail table-profile-image open-map-modal" title="' + row.customerFullName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -142,8 +140,7 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img data-title="Beneficiary: ' + row.beneficiaryFullName + '" data-img="' + row.beneficiaryPhoto + '" src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image open-map-modal" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -249,14 +246,15 @@ $(document).ready(function () {
         }
         table.ajax.reload(null, false); // false => Retains current page
     });
-    $(document).on('show.bs.modal', '#mapModal', function (event) {
-        var trigger = $(event.relatedTarget); // The <img> clicked
-        var imageUrl = trigger.data('img');
-        var title = trigger.data('title');
 
-        var modal = $(this);
-        modal.find('#modalMapImage').attr('src', imageUrl);
-        modal.find('.modal-title').text(title || 'Map Preview');
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
+
+        const imageUrl = $(this).data("img");
+        const title = $(this).data("title");
+
+        $("#modalMapImage").attr("src", imageUrl);
+        $("#mapModalLabel").text(title || "Map Preview");
     });
 
     $('#customerTable tbody').hide();
