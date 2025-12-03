@@ -394,7 +394,6 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("agent-map")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> IndexMap(string email)
