@@ -172,13 +172,13 @@ namespace risk.control.system.Controllers.Company
 
                     return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
                 }
-                var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
-                {
-                    notifyService.Warning("No Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-                var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
+                //var files = Request.Form?.Files;
+                //if (files == null || files.Count == 0)
+                //{
+                //    notifyService.Warning("No Image Uploaded Error !!! ");
+                //    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
+                //}
+                var file = model.PolicyDetail?.Document;
                 if (file == null)
                 {
                     notifyService.Warning("Invalid Image Uploaded Error !!! ");
@@ -229,15 +229,10 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 IFormFile documentFile = null;
-                var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
+                var file = model.PolicyDetail?.Document;
+                if (file != null)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
-                    if (file != null)
-                    {
-                        documentFile = file;
-                    }
+                    documentFile = file;
                 }
 
                 var claim = await service.EditPolicy(currentUserEmail, model, documentFile);
@@ -278,13 +273,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
                 }
 
-                var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
-                {
-                    notifyService.Warning("No Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
-                }
-                var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
+                var file = customerDetail?.ProfileImage;
                 if (file == null)
                 {
                     notifyService.Warning("Invalid Image Uploaded Error !!! ");
@@ -358,16 +347,11 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
                 IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-                if (files != null && files.Count > 0)
+                var file = customerDetail?.ProfileImage;
+                if (file != null)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
+                    profileFile = file;
                 }
-
                 var company = await service.EditCustomer(currentUserEmail, customerDetail, profileFile);
                 if (company == null)
                 {
@@ -405,14 +389,14 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
-                {
-                    notifyService.Warning("No Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                }
+                //var files = Request.Form?.Files;
+                //if (files == null || files.Count == 0)
+                //{
+                //    notifyService.Warning("No Image Uploaded Error !!! ");
+                //    return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
+                //}
 
-                var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
+                var file = beneficiary?.ProfileImage;
                 if (file == null)
                 {
                     notifyService.Warning("Invalid Image Error !!! ");
@@ -490,15 +474,10 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
+                var file = beneficiary?.ProfileImage;
+                if (file != null)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
+                    profileFile = file;
                 }
                 var company = await service.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
                 if (company == null)

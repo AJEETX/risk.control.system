@@ -178,7 +178,7 @@
                         var $colLeft = $("<div>").addClass("col-md-11");
 
                         // Question text
-                        var $spanText = $("<span>").text(q.questionText); // SAFE
+                        var $spanText = $("<span>").text(safeText(q.questionText)); // SAFE
                         $colLeft.append($spanText);
 
                         // Required asterisk
@@ -187,15 +187,15 @@
                                 .addClass("required-asterisk")
                                 .attr("title", "Required field")
                                 .text("*");
-                            $colLeft.append(" ").append($required);
+                            $colLeft.append(document.createTextNode(" ")).append($required);
                         }
 
                         // Question type
                         if (q.questionType) {
                             var $smallType = $("<small>")
                                 .addClass("text-muted")
-                                .text("[" + q.questionType + "]");
-                            $colLeft.append(" ").append($smallType);
+                                .text("[" + safeText(q.questionType) + "]");
+                            $colLeft.append(document.createTextNode(" ")).append($smallType);
                         }
 
                         // Options (for non-text questions)
@@ -204,7 +204,7 @@
                             var opts = q.options.split(",").map(function (o) {
                                 return $("<span>")
                                     .addClass("badge bg-light text-dark border me-1")
-                                    .text(o.trim());
+                                    .text(safeText(o.trim()));
                             });
                             opts.forEach(function ($opt) { $optionsDiv.append($opt); });
                             $colLeft.append($optionsDiv);
@@ -955,3 +955,7 @@
         });
     });
 });
+
+function safeText(v) {
+    return $('<div>').text(v || "").text();
+}

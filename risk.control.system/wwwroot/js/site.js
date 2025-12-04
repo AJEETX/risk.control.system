@@ -204,23 +204,9 @@ function error(err) {
 
 async function fetchIpInfo() {
     try {
-        //if (!latlong) throw new Error("Latitude and longitude are not available");
-
-        //const url = `/api/Notification/GetClientIp?url=${encodeURIComponent(window.location.pathname)}&latlong=${encodeURIComponent(latlong)}`;
         const parser = new UAParser();
         const browserInfo = parser.getResult();
-
-        //const response = await fetch(url);
-        //if (!response.ok) {
-        //    console.error(`IP fetch failed with status: ${response.status}`);
-        //    displayUnavailableInfo();
-        //    return;
-        //}
-
-        //const data = await response.json();
         updateInfoDisplay({
-            //ipAddress: data.ipAddress || 'Not available',
-            //city: data.district || 'Not available',
             browser: `${browserInfo.browser.name?.toLowerCase()} ${browserInfo.browser.major}` || 'Not available',
             device: getDeviceType() || 'Not available',
             os: `${browserInfo.os.name?.toLowerCase()} ${browserInfo.os.version}` || 'Not available',
@@ -233,8 +219,6 @@ async function fetchIpInfo() {
 
 function updateInfoDisplay(info) {
     const fields = {
-        //ipAddress: '#ipAddress .info-data',
-        //city: '#city .info-data',
         browser: '#browser .info-data',
         device: '#device .info-data',
         os: '#os .info-data',
@@ -248,8 +232,6 @@ function updateInfoDisplay(info) {
 
 function displayUnavailableInfo() {
     updateInfoDisplay({
-        //ipAddress: 'Not available',
-        //city: 'Not available',
         browser: 'Not available',
         device: 'Not available',
         os: 'Not available',
@@ -310,54 +292,68 @@ function markNotificationAsRead(notificationId) {
 }
 function loadNotifications(keepOpen = false) {
     $.get('/api/Notification/GetNotifications', function (response) {
-        $("#notificationList").html("");
+        var $list = $("#notificationList");
+        $list.empty();
+
         var totalCount = response.total;
-        if (response.maxCountReached) {
-            var maxText = `${response.maxCount}+`;
-            $("#notificationCount").text(maxText);
-        }
-        else {
-            $("#notificationCount").text(totalCount);
-        }
+        $("#notificationCount").text(response.maxCountReached ? `${response.maxCount}+` : totalCount);
 
         if (response.data.length > 0) {
             response.data.forEach(function (item) {
-                $("#notificationList").append(
-                    `<a href="#" class="notification-item" data-id="${item.id}">
-                        <!-- First Row: Icon, Message, Status -->
-                        <div class="notification-content">
-                            <i class="${item.symbol}"></i> 
-                            <span class="notification-message text-muted text-xs">${item.message}</span>
-                            <span class="badge badge-light text-muted text-xs">${item.status}</span>
-                            <div class=".notification-action-content">
-                                <div class="float-right">
-                                    <span class="notification-time text-muted text-xs">
-                                        <i class="far fa-clock"></i> ${item.createdAt}
-                                    </span>
-                                    <span class="delete-notification" data-id="${item.id}">
-                                        <i class="fas fa-trash"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Second Row: User, Time, Delete Icon -->
-                        
-                    </a>`
-                );
+                // Create the main <a> element
+                var $a = $("<a>")
+                    .addClass("notification-item")
+                    .attr("href", "#")
+                    .attr("data-id", item.id);
+
+                // Icon
+                var $icon = $("<i>").addClass(item.symbol || "");
+
+                // Message
+                var $message = $("<span>")
+                    .addClass("notification-message text-muted text-xs")
+                    .text(item.message);
+
+                // Status
+                var $status = $("<span>")
+                    .addClass("badge badge-light text-muted text-xs")
+                    .text(item.status);
+
+                // Created at
+                var $time = $("<span>")
+                    .addClass("notification-time text-muted text-xs")
+                    .html(`<i class="far fa-clock"></i> ${$("<div>").text(item.createdAt).html()}`);
+
+                // Delete icon
+                var $delete = $("<span>")
+                    .addClass("delete-notification")
+                    .attr("data-id", item.id)
+                    .append($("<i>").addClass("fas fa-trash"));
+
+                // Assemble content
+                var $content = $("<div>").addClass("notification-content")
+                    .append($icon)
+                    .append($message)
+                    .append($status)
+                    .append(
+                        $("<div>").addClass("notification-action-content float-right")
+                            .append($time)
+                            .append($delete)
+                    );
+
+                $a.append($content);
+                $list.append($a);
             });
 
-            // Enable the "Clear All" icon
             $("#clearNotifications").removeClass("clear-disabled");
-
         } else {
-            $("#notificationList").append("<div class='text-center text-muted'>No notifications</div>");
-
-            // Disable the "Clear All" icon when no notifications exist
+            $list.append($("<div>").addClass("text-center text-muted").text("No notifications"));
             $("#clearNotifications").addClass("clear-disabled");
         }
-        // Click event to mark as read
-        $(".delete-notification").on("click", function (e) {
-            e.stopPropagation(); // Prevent closing the dropdown
+
+        // Delete click event
+        $(".delete-notification").off("click").on("click", function (e) {
+            e.stopPropagation();
             $("#notificationDropdown").addClass("show");
             $("#notificationToggle").attr("aria-expanded", "true");
             $(this).addClass("fa-spin");

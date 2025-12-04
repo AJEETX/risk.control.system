@@ -168,7 +168,6 @@ builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
 builder.Services.AddScoped<IGoogleApi, GoogleApi>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
 builder.Services.AddScoped<IChatSummarizer, OpenAISummarizer>();
-builder.Services.AddScoped<ISqliteSchemaService, SqliteSchemaService>();
 
 builder.Services.AddScoped<IHttpClientService, HttpClientService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

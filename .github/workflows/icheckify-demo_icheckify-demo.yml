@@ -197,9 +197,9 @@ jobs:
               echo "- SARIF file can be imported into Visual Studio Code or SARIF Explorer."
             } >> $GITHUB_STEP_SUMMARY
 
-# ======================================================
+  # ---------------------------------------------------
 # 3️⃣ DEPENDENCY VULNERABILITY SCAN
-# ======================================================
+  # ---------------------------------------------------
   dependency-review:
     name: Dependency Review (NuGet Security)
     runs-on: ubuntu-latest
@@ -250,6 +250,7 @@ jobs:
               echo "- Vulnerable packages require review under the repository’s **Security > Dependabot** tab."
               echo ""
             } >> $GITHUB_STEP_SUMMARY
+
   # ---------------------------------------------------
   # 4️⃣ Unified Security Summary Job
   # ---------------------------------------------------  
@@ -360,6 +361,9 @@ jobs:
             echo "## Deployment Completed" >> $GITHUB_STEP_SUMMARY
             echo "The application has been deployed to Azure Web App successfully." >> $GITHUB_STEP_SUMMARY
 
+  # ---------------------------------------------------
+  # 7️⃣ Warmup Job
+  # ---------------------------------------------------
   warmup:
     name: Warm Up Azure Web App
     runs-on: ubuntu-latest
