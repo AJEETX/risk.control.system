@@ -45,7 +45,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="input-group-label" for="Name"> Beneficiary Name:</label>
+                    <label class="input-group-label" for="BeneficiaryName"> Beneficiary Name:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -71,7 +71,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="BeneficiaryRelationId" class="form-control remarks" asp-items="ViewBag.BeneficiaryRelationId">
+                        <select id="BeneficiaryRelationId" required asp-for="BeneficiaryRelationId" class="form-control remarks" asp-items="ViewBag.BeneficiaryRelationId">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="BeneficiaryRelationId" class="text-danger"></span>
@@ -84,7 +84,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                        <select id="Income" required asp-for="Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Income" class="text-danger"></span>

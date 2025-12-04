@@ -17,7 +17,7 @@
             url: '/CostCentre/CheckDuplicateCode',
             type: 'POST',
             data: {
-                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                 code: code,
                 id: id
             },
@@ -190,7 +190,7 @@
                             url: '/CostCentre/Delete',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {

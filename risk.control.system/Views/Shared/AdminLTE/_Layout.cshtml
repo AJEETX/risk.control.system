@@ -3,6 +3,7 @@
 @inject ApplicationDbContext _context
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IHttpContextAccessor HttpContextAccessor
+
 <!DOCTYPE html>
 <html>
 
@@ -18,6 +19,7 @@
 </head>
 
 <body class="hold-transition sidebar-mini">
+    @Html.AntiForgeryToken() <!-- Add this line -->
     @{
         var timeout = Context.Items["timeout"];
         var userEmail = User?.Identity?.Name;

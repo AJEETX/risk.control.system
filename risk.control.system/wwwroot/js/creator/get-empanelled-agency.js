@@ -397,7 +397,8 @@
 
                 $.get("/Investigation/GetReportTemplate", { caseId: caseId })
                     .done(function (html) {
-                        $container.html(html);
+                        const safe = DOMPurify.sanitize(html, { RETURN_TRUSTED_TYPE: false });
+                        $container.html(safe);
                     })
                     .fail(function () {
                         $container.html("<div class='alert alert-danger'>Failed to load report template.</div>");

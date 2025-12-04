@@ -133,24 +133,30 @@ const chatGPTMessage = document.getElementById('password-advise');
 
 if (chatGPTMessage) {
     var userEmail = document.getElementById('Email').value;
-    const eventSource = new EventSource(`/Account/StreamTypingUpdates?email=${userEmail}`);
+    const eventSource = new EventSource(`/Account/StreamTypingUpdates?email=${encodeURIComponent(userEmail)}`);
 
     eventSource.addEventListener('message', (event) => {
+
+        // 🔐 Origin check — prevent DOM-based injection
+        if (event.origin !== window.location.origin) {
+            console.warn("⚠️ Blocked message from unknown origin:", event.origin);
+            return;
+        }
+
         if (event.data === "done") {
             eventSource.close();
         }
         else if (event.data.startsWith("PASSWORD_UPDATE|")) {
-            // Extract the JSON data after the separator
             const jsonData = event.data.replace("PASSWORD_UPDATE|", "");
             const passwordModel = JSON.parse(jsonData);
 
-            // Populate UI with user details first
             document.getElementById('displayedEmail').textContent = passwordModel.email;
             document.getElementById('CurrentPassword').value = passwordModel.currentPassword;
-            document.getElementById('profilePicture').src = `data:image/*;base64,${passwordModel.profilePicture}`;
+            document.getElementById('profilePicture').src =
+                `data:image/*;base64,${passwordModel.profilePicture}`;
         }
         else {
-            // Queue messages for typing effect
+            // Queue other streaming messages
             messageQueue.push(event.data);
             processNextMessage();
         }

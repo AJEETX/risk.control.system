@@ -66,7 +66,7 @@ namespace risk.control.system.Middleware
             // ---- FIXED CSP (no wildcards, no trailing slashes) ----
             context.Response.Headers["Content-Security-Policy"] =
                 "default-src 'self';" +
-                "connect-src 'self' wss: https://maps.googleapis.com https://ifsc.razorpay.com;" +
+                "connect-src 'self' https://maps.googleapis.com https://ifsc.razorpay.com;" +
                 $"script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
                 //$"script-src 'self' 'nonce-{nonce}' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
                 "style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com;" +

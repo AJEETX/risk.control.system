@@ -17,8 +17,26 @@
                 faceMapUrl.classList.add('hidden');
             }
             if (faceMsg) {
-                faceMsg.innerHTML = `<p>Distance: <em> ... </em>, Duration <em>...}</em>.</p>`;
-                faceMsg.classList.add('hidden');
+                faceMsg.classList.remove('hidden');
+                faceMsg.innerHTML = ""; // clear existing children safely
+
+                const p = document.createElement("p");
+                p.classList.add("agent-block");
+
+                const text1 = document.createTextNode(`Distance from ${data.address} Address: `);
+                const dist = document.createElement("em");
+                dist.textContent = data.distance;
+
+                const text2 = document.createTextNode(", Duration: ");
+                const dur = document.createElement("em");
+                dur.textContent = data.duration;
+
+                p.appendChild(text1);
+                p.appendChild(dist);
+                p.appendChild(text2);
+                p.appendChild(dur);
+
+                faceMsg.appendChild(p);
             }
             if (liveMap) liveMap.classList.add('hidden');
             if (spinner) spinner.classList.remove('hidden');

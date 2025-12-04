@@ -63,9 +63,7 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.ActiveLiClasses = "breadcrumb-item active";
 });
 // Set up logging
-var logDirectory = Path.Combine(builder.Environment.ContentRootPath, "Logs");
-Directory.CreateDirectory(logDirectory);
-LogCleanup.DeleteOldLogFiles(logDirectory, maxAgeInDays: 7);
+var logDirectory = LogSetup.CreateLogging(builder.Environment.ContentRootPath);
 
 builder.Logging.ClearProviders();
 builder.Logging.SetMinimumLevel(LogLevel.Error); // Optional global filter
@@ -335,7 +333,7 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require secure cookies (only over HTTPS)
     options.Cookie.SameSite = SameSiteMode.Strict; // Apply a strict SameSite policy
     options.HeaderName = "X-CSRF-TOKEN"; // Set a custom header name
-    options.FormFieldName = "icheckifyAntiforgery"; // Set a custom form field name
+    options.FormFieldName = "__RequestVerificationToken"; // Set a custom form field name
     options.SuppressXFrameOptionsHeader = false; // Enable the X-Frame-Options header
 });
 

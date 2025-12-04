@@ -246,7 +246,6 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    console.log(row.status);
                     if (row.ready2Assign) {
                         buttons += '<a  id="assign' + row.id + '" href="/Investigation/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
                         buttons += '<i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
@@ -372,7 +371,7 @@
                             url: url,
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {
@@ -570,7 +569,7 @@
             type: "POST",
             data: JSON.stringify({ claims: claims }),
             headers: {
-                "X-CSRF-TOKEN": $('input[name="icheckifyAntiforgery"]').val(),
+                "X-CSRF-TOKEN": $('input[name="__RequestVerificationToken"]').val(),
             },
             contentType: "application/json",
             success: function (response) {

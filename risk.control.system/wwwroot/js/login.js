@@ -126,7 +126,7 @@ $(document).ready(function () {
     $("#email, #resetemail").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
-            var token = $('input[name="icheckifyAntiforgery"]').val();
+            var token = $('input[name="__RequestVerificationToken"]').val();
             $.ajax({
                 url: "/api/MasterData/GetUserBySearch",
                 type: "GET",

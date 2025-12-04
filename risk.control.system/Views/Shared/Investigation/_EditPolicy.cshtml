@@ -86,7 +86,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="nav-icon fas fa-puzzle-piece"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="PolicyDetail.CaseEnablerId" class="form-control remarks" asp-items="ViewBag.CaseEnablerId">
+                        <select id="CaseEnablerId" required asp-for="PolicyDetail.CaseEnablerId" class="form-control remarks" asp-items="ViewBag.CaseEnablerId">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
@@ -117,11 +117,11 @@
                         <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
                     </div>
                 </div>
-                <label class="input-group-label"> Incident Date:</label>
+                <label class="input-group-label" for="DateOfIncident"> Incident Date:</label>
                 <div class="form-group">
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="DateOfIncident"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <input required asp-for="PolicyDetail.DateOfIncident" id="DateOfIncident" class="form-control remarks" type="date" />
                         <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
@@ -145,7 +145,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="nav-icon fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="PolicyDetail.CostCentreId" class="form-control remarks" asp-items="@ViewBag.CostCentreId">
+                        <select id="CostCentreId" required asp-for="PolicyDetail.CostCentreId" class="form-control remarks" asp-items="@ViewBag.CostCentreId">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="PolicyDetail.CostCentreId" class="text-danger"></span>

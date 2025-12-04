@@ -117,7 +117,7 @@ $(document).ready(function () {
         var value = $(this).val();
 
         if (value != '') {
-            var token = $('input[name="icheckifyAntiforgery"]').val();
+            var token = $('input[name="__RequestVerificationToken"]').val();
 
             $.ajax({
                 url: "/api/MasterData/GetInvestigationServicesByInsuranceType",

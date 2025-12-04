@@ -319,10 +319,10 @@
                             url: '/Uploads/DeleteLog/' + fileId,
                             type: 'POST',
                             headers: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                             },
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: fileId
                             },
                             success: function (response) {

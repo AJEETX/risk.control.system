@@ -22,6 +22,7 @@ namespace risk.control.system.Controllers.Api
             this.smsService = smsService;
         }
         [HttpPost("ClearAll")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ClearAllNotifications()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -30,12 +31,14 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpPost("MarkAsRead")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkAsRead(NotificationRequest request)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             await service.MarkAsRead(request.Id, userEmail);
             return Ok();
         }
+
         [HttpGet("GetNotifications")]
         public async Task<ActionResult> GetNotifications()
         {
@@ -110,15 +113,15 @@ namespace risk.control.system.Controllers.Api
         //    return Redirect("/page/confirm.html");
         //}
 
-        [HttpPost("sms")]
-        public async Task<IActionResult> SendSingleSMS(string countryCode = "au", string mobile = "61432854196", string message = "SMS fom iCheckify team")
-        {
-            string logo = "https://icheckify-demo.azurewebsites.net/img/iCheckifyLogo.png";
-            string? attachments = $"<a href='{logo}'>team</a>";
-            var finalMessage = $"{message}\n\n Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")}\n\n {logo}";
-            await smsService.DoSendSmsAsync(countryCode.ToLower(), "+" + mobile, finalMessage);
-            return Ok();
-        }
+        //[HttpPost("sms")]
+        //public async Task<IActionResult> SendSingleSMS(string countryCode = "au", string mobile = "61432854196", string message = "SMS fom iCheckify team")
+        //{
+        //    string logo = "https://icheckify-demo.azurewebsites.net/img/iCheckifyLogo.png";
+        //    string? attachments = $"<a href='{logo}'>team</a>";
+        //    var finalMessage = $"{message}\n\n Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")}\n\n {logo}";
+        //    await smsService.DoSendSmsAsync(countryCode.ToLower(), "+" + mobile, finalMessage);
+        //    return Ok();
+        //}
 
         private static string GetTimeAgo(DateTime createdAt)
         {

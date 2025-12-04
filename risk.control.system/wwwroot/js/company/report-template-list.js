@@ -93,6 +93,8 @@
 
         // Reset form and set location
         $('#questionAddForm')[0].reset();
+        $('#optionsInput').prop('required', false); // prevent validation error
+
         $('#addQuestionModal').find('input[name="LocationId"]').val(locationId);
 
         // Handle options visibility based on the selected type (default state)
@@ -111,25 +113,18 @@
             .modal('show'); // show after binding
     });
 
-    // helper to escape text (avoid XSS when injecting server text)
-    function escapeHtml(text) {
-        if (!text) return "";
-        return text
-            .toString()
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
     // toggle options container when type changes (optional)
     $(document).on('change', '#QuestionType', function () {
         const t = $(this).val();
+        const $optionsContainer = $('#optionsContainer');
+        const $optionsInput = $('#optionsInput');
+
         if (t === 'dropdown' || t === 'radiobutton' || t === 'checkbox') {
-            $('#optionsContainer').removeClass('d-none').show();
+            $optionsContainer.removeClass('d-none').show();
+            $optionsInput.prop('required', true); // enable required
         } else {
-            $('#optionsContainer').addClass('d-none').hide();
+            $optionsContainer.addClass('d-none').hide();
+            $optionsInput.prop('required', false); // disable required
         }
     });
 
@@ -148,7 +143,7 @@
             url: '/ReportTemplate/AddQuestion',
             method: 'POST',
             data: {
-                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                 locationId: locationId,
                 optionsInput: optionsInput,
                 newQuestionText: newQuestionText,
@@ -169,38 +164,75 @@
                             ok: function () { /* do nothing */ }
                         }
                     });
-
-                    // optionally append/prepend the new question to UI so user sees it immediately
                     var q = response.updatedQuestion;
                     if (q && locationId) {
-                        var requiredHtml = q.isRequired ? ' <span class="required-asterisk" title="Required field">*</span>' : '';
-                        var optionsHtml = '';
-                        if (q.questionType && q.questionType.toLowerCase() !== 'text' && q.options) {
-                            var opts = (q.options || '').split(',').map(function (o) { return '<span class="badge bg-light text-dark border me-1">' + escapeHtml(o.trim()) + '</span>'; }).join(' ');
-                            optionsHtml = '<div class="mt-4">' + opts + '</div>';
-                        }
-                        var newHtml = '<li class="mb-2">' +
-                            '<div class="border rounded p-2 bg-light">' +
-                            '<div class="row">' +
-                            '<div class="col-md-11">' +
-                            '<span>' + escapeHtml(q.questionText) + '</span>' + requiredHtml +
-                            ' <small class="text-muted">[' + escapeHtml(q.questionType) + ']</small>' +
-                            optionsHtml +
-                            '</div>' +
-                            '<div class="mt-2">' +
-                            '<button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="' + q.id + '" data-locationid="' + locationId + '">' +
-                            '<i class="fas fa-trash me-1"></i><small> Delete </small>' +
-                            '</button>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</li>';
 
-                        // find the add button for this location and insert into its question list
+                        // Create <li>
+                        var $li = $("<li>").addClass("mb-2");
+
+                        // Outer container div
+                        var $container = $("<div>").addClass("border rounded p-2 bg-light");
+                        var $row = $("<div>").addClass("row");
+
+                        // Left column
+                        var $colLeft = $("<div>").addClass("col-md-11");
+
+                        // Question text
+                        var $spanText = $("<span>").text(q.questionText); // SAFE
+                        $colLeft.append($spanText);
+
+                        // Required asterisk
+                        if (q.isRequired) {
+                            var $required = $("<span>")
+                                .addClass("required-asterisk")
+                                .attr("title", "Required field")
+                                .text("*");
+                            $colLeft.append(" ").append($required);
+                        }
+
+                        // Question type
+                        if (q.questionType) {
+                            var $smallType = $("<small>")
+                                .addClass("text-muted")
+                                .text("[" + q.questionType + "]");
+                            $colLeft.append(" ").append($smallType);
+                        }
+
+                        // Options (for non-text questions)
+                        if (q.questionType && q.questionType.toLowerCase() !== "text" && q.options) {
+                            var $optionsDiv = $("<div>").addClass("mt-4");
+                            var opts = q.options.split(",").map(function (o) {
+                                return $("<span>")
+                                    .addClass("badge bg-light text-dark border me-1")
+                                    .text(o.trim());
+                            });
+                            opts.forEach(function ($opt) { $optionsDiv.append($opt); });
+                            $colLeft.append($optionsDiv);
+                        }
+
+                        // Right column: Delete button
+                        var $colRight = $("<div>").addClass("mt-2");
+                        var $deleteBtn = $("<button>")
+                            .addClass("btn btn-sm btn-outline-danger delete-question-btn")
+                            .attr("data-questionid", q.id)
+                            .attr("data-locationid", locationId);
+
+                        var $icon = $("<i>").addClass("fas fa-trash me-1");
+                        var $small = $("<small>").text(" Delete ");
+
+                        $deleteBtn.append($icon).append($small);
+                        $colRight.append($deleteBtn);
+
+                        // Assemble row
+                        $row.append($colLeft).append($colRight);
+                        $container.append($row);
+                        $li.append($container);
+
+                        // Append safely to list
                         var $addBtn = $('button.add-question-btn[data-locationid="' + locationId + '"]');
                         var $list = $addBtn.closest('.col-md-9').find('ul.list-unstyled').first();
                         if ($list.length) {
-                            $list.append(newHtml);
+                            $list.append($li);
                         }
                     }
                 } else {
@@ -248,7 +280,7 @@
                             url: '/ReportTemplate/DeleteQuestion',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: questionId,
                                 locationId: locationId
                             },
@@ -334,7 +366,7 @@
                                 url: '/ReportTemplate/DeleteLocation',
                                 type: 'POST',
                                 data: {
-                                    icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                     id: locationId,
                                     locationDeletable: $('#locationCount').val() > 1
                                 },
@@ -457,7 +489,7 @@
                             type: 'POST',
                             contentType: 'application/json',
                             headers: {
-                                'X-CSRF-TOKEN': $('input[name="icheckifyAntiforgery"]').val()
+                                'X-CSRF-TOKEN': $('input[name="__RequestVerificationToken"]').val()
                             },
                             data: JSON.stringify({
                                 TemplateId: templateId,
@@ -542,7 +574,7 @@
                             data: {
                                 locationId: locationId,
                                 reportTemplateId: reportTemplateId,
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                             },
                             success: function (response) {
                                 if (response.success) {
@@ -615,7 +647,7 @@
                         url: '/ReportTemplate/Activate',
                         type: 'POST',
                         data: {
-                            icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                             id: id
                         },
                         success: function (response) {
@@ -691,7 +723,7 @@
                                 url: '/ReportTemplate/CloneDetails',
                                 type: 'POST',
                                 data: {
-                                    icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                     templateId: id
                                 },
                                 success: function (response) {
@@ -787,7 +819,7 @@
                             url: '/ReportTemplate/DeleteTemplate',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {
@@ -836,6 +868,7 @@
         });
     });
 
+    //activate
     $(document).on('click', '.activation-btn', function (e) {
         e.preventDefault();
         var id = $(this).data('id');
@@ -867,7 +900,7 @@
                             url: '/ReportTemplate/Activate',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {

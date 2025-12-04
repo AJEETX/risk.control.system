@@ -13,7 +13,7 @@ $(document).ready(function () {
 
     $("#InsuranceType").on("change", function () {
         var value = $(this).val();
-        var token = $('input[name="icheckifyAntiforgery"]').val();
+        var token = $('input[name="__RequestVerificationToken"]').val();
 
         if (value === '') {
             // Clear and reset InvestigationServiceTypeId dropdown
@@ -196,16 +196,22 @@ function loadDistrictData(countryId, stateId) {
             const $districtSelect = $("#SelectedDistrictIds");
             $districtSelect.empty();
 
-            if (response && response.length > 0) {
+            if (Array.isArray(response) && response.length > 0) {
+
                 response.forEach(d => {
-                    $districtSelect.append(`<option value="${d.districtId}">${d.districtName}</option>`);
+                    const opt = $("<option>")
+                        .val(d.districtId)
+                        .text(d.districtName);
+                    $districtSelect.append(opt);
                 });
 
-                // Optional: Pre-select if there are existing values
                 const preselected = $("#SelectedDistrictIds").data("selected")?.toString().split(",") || [];
                 $districtSelect.val(preselected);
+
             } else {
-                $districtSelect.append(`<option disabled>No districts found</option>`);
+                $districtSelect.append(
+                    $("<option>").prop("disabled", true).text("No districts found")
+                );
             }
         },
         error: function () {

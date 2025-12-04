@@ -10,7 +10,8 @@
 
         $.get("/CaseActive/GetReportTemplate", { caseId: caseId })
             .done(function (html) {
-                container.html(html);
+                const safe = DOMPurify.sanitize(html, { RETURN_TRUSTED_TYPE: false });
+                container.html(safe);
                 container.data("loaded", true);
             })
             .fail(function () {

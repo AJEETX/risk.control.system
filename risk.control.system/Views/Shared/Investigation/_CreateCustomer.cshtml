@@ -79,7 +79,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Gender" class="form-control remarks" asp-items="Html.GetEnumSelectList<Gender>()">
+                        <select id="Gender" required asp-for="Gender" class="form-control remarks" asp-items="Html.GetEnumSelectList<Gender>()">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Gender" class="text-danger"></span>
@@ -104,7 +104,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                        <select id="Income" required asp-for="Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Income" class="text-danger"></span>
@@ -118,7 +118,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Occupation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Occupation>()">
+                        <select id="Occupation" required asp-for="Occupation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Occupation>()">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Occupation" class="text-danger"></span>
@@ -131,7 +131,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Education" class="form-control remarks" asp-items="Html.GetEnumSelectList<Education>()">
+                        <select id="Education" required asp-for="Education" class="form-control remarks" asp-items="Html.GetEnumSelectList<Education>()">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Education" class="text-danger"></span>

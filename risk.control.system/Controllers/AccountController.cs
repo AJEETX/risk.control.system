@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers
         }
 
         [Authorize]
-        [IgnoreAntiforgeryToken]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> KeepSessionAlive([FromBody] KeepSessionRequest request)
         {
             try
@@ -118,6 +118,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> KeepAlive()
         {
             var userId = _userManager.GetUserId(User);
@@ -540,6 +541,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
