@@ -2,6 +2,7 @@
 
 using Hangfire;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,8 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -291,8 +294,10 @@ namespace risk.control.system.Controllers.Api
         //}
 
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpGet("agent")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> GetAll(string email)
         {
             try
@@ -389,8 +394,8 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("agent-map")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> IndexMap(string email)
         {
             try
@@ -464,7 +469,8 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpGet("get")]
         public async Task<IActionResult> Get(long caseId, string email)
         {
@@ -576,7 +582,8 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpGet("get-template")]
         public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email)
         {
@@ -602,7 +609,8 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
@@ -651,7 +659,8 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
@@ -690,7 +699,8 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("media")]
         public async Task<IActionResult> Media(DocumentData data)
         {
@@ -735,7 +745,8 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("answers")]
         public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
         {
@@ -766,7 +777,8 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
         {
