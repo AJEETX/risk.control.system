@@ -138,7 +138,7 @@ if (chatGPTMessage) {
     eventSource.addEventListener('message', (event) => {
 
         // 🔐 Origin check — prevent DOM-based injection
-        if (event.origin !== window.location.origin) {
+        if (event.origin !== window.location.origin || event.target.url !== window.location.origin + "/Account/StreamTypingUpdates") {
             console.warn("⚠️ Blocked message from unknown origin:", event.origin);
             return;
         }

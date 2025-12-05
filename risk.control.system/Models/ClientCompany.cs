@@ -45,6 +45,8 @@ namespace risk.control.system.Models
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
         [NotMapped]
+        public IFormFile? Document { get; set; }
+        [NotMapped]
         public long SelectedPincodeId { get; set; }
         [NotMapped]
         public long SelectedDistrictId { get; set; }

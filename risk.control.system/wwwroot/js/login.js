@@ -144,7 +144,8 @@ $(document).ready(function () {
                     }));
                     $("#loader").hide(); // Hide loader
                 },
-                error: function () {
+                error: function (err) {
+                    console.log(err);
                     response([]);
                     $("#loader").hide(); // Hide loader
                 }

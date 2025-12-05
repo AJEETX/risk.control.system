@@ -172,12 +172,6 @@ namespace risk.control.system.Controllers.Company
 
                     return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
                 }
-                //var files = Request.Form?.Files;
-                //if (files == null || files.Count == 0)
-                //{
-                //    notifyService.Warning("No Image Uploaded Error !!! ");
-                //    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                //}
                 var file = model.PolicyDetail?.Document;
                 if (file == null)
                 {
@@ -389,12 +383,6 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                //var files = Request.Form?.Files;
-                //if (files == null || files.Count == 0)
-                //{
-                //    notifyService.Warning("No Image Uploaded Error !!! ");
-                //    return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                //}
 
                 var file = beneficiary?.ProfileImage;
                 if (file == null)

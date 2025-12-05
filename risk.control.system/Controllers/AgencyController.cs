@@ -160,16 +160,10 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(Edit), "Agency");
                 }
-                if (vendor == null || vendor.VendorId == 0)
-                {
-                    notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(AgencyController.Profile), "Agency");
-                }
+
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
-
-                var edited = await agencyService.EditAgency(vendor, vendorDocument, currentUserEmail, portal_base_url);
+                var edited = await agencyService.EditAgency(vendor, vendor.Document, currentUserEmail, portal_base_url);
                 if (!edited)
                 {
                     notifyService.Custom($"Agency <b>{vendor.Email}</b> not edited.", 3, "red", "fas fa-building");
@@ -270,17 +264,6 @@ namespace risk.control.system.Controllers
 
             try
             {
-                IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-                if (files != null && files.Count > 0)
-                {
-                    var file = files.FirstOrDefault(f => f.FileName == user?.ProfileImage?.FileName && f.Name == user?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
-                }
-
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0 && !string.IsNullOrWhiteSpace(Path.GetFileName(user.ProfileImage.FileName)))
                 {
                     string newFileName = Guid.NewGuid().ToString();
@@ -454,21 +437,11 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(AgencyController.Users), "Agency");
                 }
-                IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-                if (files != null && files.Count > 0)
-                {
-                    var file = files.FirstOrDefault(f => f.FileName == applicationUser?.ProfileImage?.FileName && f.Name == applicationUser?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
-                }
 
-                if (profileFile != null && profileFile.Length > 0)
+                if (applicationUser?.ProfileImage != null && applicationUser?.ProfileImage.Length > 0)
                 {
                     string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(profileFile.FileName));
+                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser?.ProfileImage.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -476,7 +449,7 @@ namespace risk.control.system.Controllers
                         Directory.CreateDirectory(path);
                     }
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    profileFile.CopyTo(new FileStream(upload, FileMode.Create));
+                    applicationUser?.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfilePicture = dataStream.ToArray();
                     applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
@@ -651,102 +624,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-        }
-
-        [Breadcrumb("Edit Role", FromAction = "Users")]
-        public async Task<IActionResult> UserRoles(string userId)
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (currentUserEmail == null)
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            var userRoles = new List<VendorUserRoleViewModel>();
-            VendorApplicationUser user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                notifyService.Custom("OOPs !!!..User Not Found.", 3, "red", "fas fa-user-plus");
-                return RedirectToAction(nameof(AgencyController.Users), "Agency");
-            }
-            foreach (var role in roleManager.Roles.Where(r =>
-                r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()) ||
-                r.Name.Contains(AppRoles.SUPERVISOR.ToString()) ||
-                r.Name.Contains(AppRoles.AGENT.ToString())))
-            {
-                var userRoleViewModel = new VendorUserRoleViewModel
-                {
-                    RoleId = role.Id.ToString(),
-                    RoleName = role?.Name
-                };
-                if (await userManager.IsInRoleAsync(user, role?.Name))
-                {
-                    userRoleViewModel.Selected = true;
-                }
-                else
-                {
-                    userRoleViewModel.Selected = false;
-                }
-                userRoles.Add(userRoleViewModel);
-            }
-            var model = new VendorUserRolesViewModel
-            {
-                UserId = userId,
-                VendorId = user.VendorId.Value,
-                UserName = user.UserName,
-                VendorUserRoleViewModel = userRoles
-            };
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (currentUserEmail == null)
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                notifyService.Error("OOPs !!!..User Not Found");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.Now;
-            user.UpdatedBy = HttpContext.User?.Identity?.Name;
-            var roles = await userManager.GetRolesAsync(user);
-            var result = await userManager.RemoveFromRolesAsync(user, roles);
-            var newRoles = model.VendorUserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName);
-            result = await userManager.AddToRolesAsync(user, newRoles);
-
-            var currentUser = await userManager.GetUserAsync(HttpContext.User);
-            await signInManager.RefreshSignInAsync(currentUser);
-
-            var onboardAgent = newRoles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active;
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
-
-            string tinyUrl = await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
-
-            var message = $"Dear {user.FirstName}\n" +
-            $"Click on link below to install the mobile app\n\n" +
-            $"{tinyUrl}\n\n" +
-            $"Thanks\n\n" +
-            $"{portal_base_url}";
-            if (onboardAgent)
-            {
-                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, message);
-                notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
-            }
-            else
-            {
-                notifyService.Custom($"User {user.Email} role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
-            }
-            return RedirectToAction(nameof(AgencyController.Users), "Agency");
         }
 
         [Breadcrumb("Manage Service")]

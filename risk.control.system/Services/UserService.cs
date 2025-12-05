@@ -132,7 +132,7 @@ namespace risk.control.system.Services
                 var activeUser = new UserDetailResponse
                 {
                     Id = u.AgencyUser.Id,
-                    Photo = u.AgencyUser.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.AgencyUser.ProfilePicture)),
+                    Photo = u.AgencyUser.ProfilePictureUrl == null ? Applicationsettings.NO_USER : u.AgencyUser.ProfilePictureUrl,
                     Email = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT) ?
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a>" :
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
@@ -241,7 +241,7 @@ namespace risk.control.system.Services
                     user.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
+                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : user.ProfilePictureUrl,
                     Active = user.Active,
                     Addressline = user.Addressline + ", " + user.District.Name,
                     State = user.State.Code,
@@ -344,7 +344,7 @@ namespace risk.control.system.Services
                     Email = "<a href=/Company/EditUser?userId=" + user.Id + ">" + user.Email + "</a>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
+                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : user.ProfilePictureUrl,
                     Active = user.Active,
                     Addressline = user.Addressline + ", " + user.District.Name,
                     District = user.District.Name,
@@ -446,7 +446,7 @@ namespace risk.control.system.Services
                     Email = $"<a href='/CompanyUser/Edit?userId={user.Id}'>{user.Email}</a>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
+                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : user.ProfilePictureUrl,
                     Active = user.Active,
                     Addressline = user.Addressline + ", " + user.District.Name,
                     District = user.District.Name,
@@ -544,7 +544,7 @@ namespace risk.control.system.Services
                     Email = "<a href=/User/Edit?userId=" + user.Id + ">" + user.Email + "</a>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
+                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : user.ProfilePictureUrl,
                     Active = user.Active,
                     Addressline = user.Addressline,
                     District = user.District.Name,

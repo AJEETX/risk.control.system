@@ -783,12 +783,14 @@ document.addEventListener("DOMContentLoaded", function () {
         // Remove old cached tooltip
         el.removeAttribute("data-bs-original-title");
         el.removeAttribute("data-original-title");
+        el.removeAttribute('data-bs-original-title data-original-title title');
+        el.setAttribute("data-bs-original-title", '');
+        el.setAttribute("data-original-title", '');
 
         // Set new title
         el.setAttribute("data-bs-original-title", text);
         el.setAttribute("data-original-title", text);
     }
-
     async function validatePhone() {
         const phone = phoneInput.value.trim();
         const isd = document.getElementById("Isd").value.trim();
@@ -844,6 +846,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     validatePhone();
+
 });
 
 function toggleSubmitButton(isValid) {

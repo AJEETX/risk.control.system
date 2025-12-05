@@ -301,9 +301,9 @@
             public const string CODE = "manager";
             public const string USERNAME = "manager@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Samy";
-            public const string LAST_NAME = "Patrick";
-            public const string PROFILE_IMAGE = "/img/assessor.jpeg";
+            public const string FIRST_NAME = "Peter";
+            public const string LAST_NAME = "Mathew";
+            public const string PROFILE_IMAGE = "/img/assigner.jpeg";
         }
 
         public static class AGENCY_ADMIN

@@ -762,91 +762,6 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb(" Roles", FromAction = "EditUser")]
-        public async Task<IActionResult> UserRoles(string userId)
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var userRoles = new List<VendorUserRoleViewModel>();
-            //ViewBag.userId = userId;
-            VendorApplicationUser user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                notifyService.Error("User Not Found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            //ViewBag.UserName = user.UserName;
-            foreach (var role in roleManager.Roles.Where(r =>
-                r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()) ||
-                r.Name.Contains(AppRoles.SUPERVISOR.ToString()) ||
-                r.Name.Contains(AppRoles.AGENT.ToString())))
-            {
-                var userRoleViewModel = new VendorUserRoleViewModel
-                {
-                    RoleId = role.Id.ToString(),
-                    RoleName = role?.Name
-                };
-                if (await userManager.IsInRoleAsync(user, role?.Name))
-                {
-                    userRoleViewModel.Selected = true;
-                }
-                else
-                {
-                    userRoleViewModel.Selected = false;
-                }
-                userRoles.Add(userRoleViewModel);
-            }
-            var model = new VendorUserRolesViewModel
-            {
-                UserId = userId,
-                VendorId = user.VendorId.Value,
-                UserName = user.UserName,
-                VendorUserRoleViewModel = userRoles
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                notifyService.Error("OOPs !!!..User Not Found");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.Now;
-            user.UpdatedBy = HttpContext.User?.Identity?.Name;
-            var roles = await userManager.GetRolesAsync(user);
-            var result = await userManager.RemoveFromRolesAsync(user, roles);
-            var newRoles = model.VendorUserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName);
-
-            result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
-                Where(x => x.Selected).Select(y => y.RoleName));
-            var onboardAgent = newRoles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active;
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
-            string tinyUrl = await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
-
-            var message = $"Dear {user.FirstName}\n";
-            message += $"Please click on the link below to install the mobile\n";
-            message += $"{tinyUrl}\n";
-            message += $"{portal_base_url}";
-            if (onboardAgent)
-            {
-                notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
-            }
-            else
-            {
-                notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
-            }
-            return RedirectToAction("Users", "Vendors", new { id = model.VendorId });
-        }
-
         [Breadcrumb("Manage Service", FromAction = "Details")]
         public IActionResult Service(string id)
         {
@@ -894,11 +809,10 @@ namespace risk.control.system.Controllers
 
                 vendor.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
 
-                IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
-                if (vendorDocument is not null)
+                if (vendor.Document is not null)
                 {
                     string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
+                    string fileExtension = Path.GetExtension(Path.GetFileName(vendor.Document.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -906,11 +820,11 @@ namespace risk.control.system.Controllers
                         Directory.CreateDirectory(path);
                     }
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
+                    vendor.Document.CopyTo(new FileStream(upload, FileMode.Create));
                     vendor.DocumentUrl = "/agency/" + newFileName;
 
                     using var dataStream = new MemoryStream();
-                    vendorDocument.CopyTo(dataStream);
+                    vendor.Document.CopyTo(dataStream);
                     vendor.DocumentImage = dataStream.ToArray();
                     vendor.DocumentImageExtension = fileExtension;
                 }
@@ -949,7 +863,7 @@ namespace risk.control.system.Controllers
                     Company = companyUser.ClientCompany,
                     Symbol = "far fa-hand-point-right i-orangered",
                     Message = $"Agency {vendor.Email} created",
-                    Status = "Empanel",
+                    Status = "",
                     NotifierUserEmail = currentUserEmail
                 };
                 _context.Notifications.Add(notification);
@@ -1021,11 +935,10 @@ namespace risk.control.system.Controllers
 
             try
             {
-                IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
-                if (vendorDocument is not null)
+                if (vendor.Document is not null)
                 {
                     string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
+                    string fileExtension = Path.GetExtension(Path.GetFileName(vendor.Document.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -1035,9 +948,9 @@ namespace risk.control.system.Controllers
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
 
                     using var dataStream = new MemoryStream();
-                    vendorDocument.CopyTo(dataStream);
+                    vendor.Document.CopyTo(dataStream);
                     vendor.DocumentImage = dataStream.ToArray();
-                    vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
+                    vendor.Document.CopyTo(new FileStream(upload, FileMode.Create));
                     vendor.DocumentUrl = "/agency/" + newFileName;
                     vendor.DocumentImageExtension = fileExtension;
                 }

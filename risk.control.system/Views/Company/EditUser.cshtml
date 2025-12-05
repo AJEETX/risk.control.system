@@ -46,9 +46,9 @@
                         <div class="form-group">
                             <label class="input-group-label" for="createImageInput"> User Photo:</label>
                             <div class="input-group mb-3">
-                                @if (Model?.ProfilePicture is not null)
+                                @if (Model?.ProfilePictureUrl is not null)
                                 {
-                                    <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="User Photo" data-bs-toggle="tooltip" title="User Photo" />
+                                    <img id="createProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl" alt="User Photo" data-bs-toggle="tooltip" title="User Photo" />
                                 }
                                 else
                                 {

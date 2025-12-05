@@ -173,10 +173,10 @@
                 <div class="input-group mb-3">
                     <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-bs-toggle="tooltip" title="No Agency Document" />
                     <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="DocumentImage" type="file"
+                    <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
                            class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-bs-toggle="tooltip" title="Upload Agency Document" data-title-id="agency-document"
                            data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
-                    <span asp-validation-for="DocumentImage" class="text-danger"></span>
+                    <span asp-validation-for="Document" class="text-danger"></span>
                 </div>
             </div>
 @* 

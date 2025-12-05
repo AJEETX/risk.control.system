@@ -180,11 +180,10 @@ namespace risk.control.system.Controllers
 
                 var existCompany = _context.ClientCompany.Include(c => c.Country).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-                IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
-                if (companyDocument is not null)
+                if (clientCompany.Document is not null)
                 {
                     string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(companyDocument.FileName));
+                    string fileExtension = Path.GetExtension(Path.GetFileName(clientCompany.Document.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
                     if (!Directory.Exists(path))
@@ -192,10 +191,10 @@ namespace risk.control.system.Controllers
                         Directory.CreateDirectory(path);
                     }
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-                    companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
+                    clientCompany.Document.CopyTo(new FileStream(upload, FileMode.Create));
                     existCompany.DocumentUrl = "/company/" + newFileName;
                     using var dataStream = new MemoryStream();
-                    companyDocument.CopyTo(dataStream);
+                    clientCompany.Document.CopyTo(dataStream);
                     existCompany.DocumentImage = dataStream.ToArray();
                     existCompany.DocumentImageExtension = fileExtension;
                 }
@@ -721,11 +720,10 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
-                if (vendorDocument is not null)
+                if (vendor.Document is not null)
                 {
                     string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
+                    string fileExtension = Path.GetExtension(Path.GetFileName(vendor.Document.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -735,9 +733,9 @@ namespace risk.control.system.Controllers
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
 
                     using var dataStream = new MemoryStream();
-                    vendorDocument.CopyTo(dataStream);
+                    vendor.Document.CopyTo(dataStream);
                     vendor.DocumentImage = dataStream.ToArray();
-                    vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
+                    vendor.Document.CopyTo(new FileStream(upload, FileMode.Create));
                     vendor.DocumentUrl = "/agency/" + newFileName;
                     vendor.DocumentImageExtension = fileExtension;
                 }
@@ -1592,81 +1590,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-        }
-
-        [Breadcrumb("Edit Role", FromAction = "Users")]
-        public async Task<IActionResult> UserRoles(string userId)
-        {
-            var userRoles = new List<CompanyUserRoleViewModel>();
-            ClientCompanyApplicationUser user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                notifyService.Error("user not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            string selectedRole = string.Empty;
-            //ViewBag.UserName = user.UserName;
-            foreach (var role in roleManager.Roles.Where(r =>
-                r.Name.Contains(AppRoles.COMPANY_ADMIN.ToString()) ||
-                r.Name.Contains(AppRoles.CREATOR.ToString()) ||
-                r.Name.Contains(AppRoles.ASSESSOR.ToString())))
-            {
-                var userRoleViewModel = new CompanyUserRoleViewModel
-                {
-                    RoleId = role.Id.ToString(),
-                    RoleName = role?.Name
-                };
-                if (await userManager.IsInRoleAsync(user, role?.Name))
-                {
-                    userRoleViewModel.Selected = true;
-                    selectedRole = role.Name;
-                }
-                else
-                {
-                    userRoleViewModel.Selected = false;
-                }
-                userRoles.Add(userRoleViewModel);
-            }
-            var model = new CompanyUserRolesViewModel
-            {
-                UserId = userId,
-                CompanyId = user.ClientCompanyId.Value,
-                UserName = user.UserName,
-                CompanyUserRoleViewModel = userRoles,
-                UserRole = !string.IsNullOrWhiteSpace(selectedRole) ? (CompanyRole)Enum.Parse(typeof(CompanyRole), selectedRole, true) : null,
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(string userId, CompanyUserRolesViewModel model)
-        {
-            var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                notifyService.Error("user not found!");
-                return RedirectToAction(nameof(CompanyController.Users), "Company");
-            }
-            user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.Now;
-            user.UpdatedBy = HttpContext.User?.Identity?.Name;
-            var roles = await userManager.GetRolesAsync(user);
-            var result = await userManager.RemoveFromRolesAsync(user, roles);
-            result = await userManager.AddToRolesAsync(user, new List<string> { model.UserRole.ToString() });
-            var currentUser = await userManager.GetUserAsync(HttpContext.User);
-            await signInManager.RefreshSignInAsync(currentUser);
-            if (result.Succeeded)
-            {
-                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User role edited . \nEmail : " + user.Email + "\n" + baseUrl);
-
-                notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
-                return RedirectToAction(nameof(CompanyController.Users));
-            }
-            notifyService.Error("OOPS !!!..Contact Admin");
-            return RedirectToAction(nameof(Index), "Dashboard");
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Web;
+﻿using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -9,10 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -526,41 +523,6 @@ namespace risk.control.system.Controllers
                 model.Flag = $"/flags/{smsSent2User.Country.Code}.png";
                 model.ProfilePicture = smsSent2User.ProfilePicture;
                 model.Reset = true;
-            }
-
-            return View(model);
-        }
-        [HttpGet]
-        public IActionResult ResetPassword(string userId, string token)
-        {
-            if (userId == null || token == null)
-                return BadRequest("Invalid password reset token.");
-
-            var model = new ResetPasswordViewModel { UserId = userId, Token = token };
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
-            {
-                return RedirectToAction(nameof(ResetPasswordConfirmation));
-            }
-            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
-
-            var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.Password);
-            if (result.Succeeded)
-                return RedirectToAction(nameof(ResetPasswordConfirmation));
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
             }
 
             return View(model);
