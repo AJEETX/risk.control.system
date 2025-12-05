@@ -132,19 +132,29 @@
     $(document).on('submit', '#questionAddForm', function (e) {
         e.preventDefault();
 
-        var locationId = $('#questionAddForm input[name="LocationId"]').val();
-        var optionsInput = $('#optionsInput').val();
-        var newQuestionText = $('#QuestionText').val();
-        var newQuestionType = $('#QuestionType').val();
-        // <-- THIS IS THE FIX: check checked state
-        var isRequired = $('#isRequired').is(':checked'); // returns true/false
+        // read + normalize inputs
+        var locationIdRaw = $('#questionAddForm input[name="LocationId"]').val();
+        var locationId = sanitizeId(locationIdRaw);
+
+        var optionsInput = $('#optionsInput').val() || "";
+        var newQuestionText = $('#QuestionText').val() || "";
+        var newQuestionType = $('#QuestionType').val() || "";
+
+        // fix: explicit boolean read
+        var isRequired = !!$('#isRequired').is(':checked');
+
+        // optional: basic client-side validation
+        if (!newQuestionText.trim()) {
+            $.alert({ title: 'Validation', content: 'Question text cannot be empty.', type: 'orange' });
+            return;
+        }
 
         $.ajax({
             url: '/ReportTemplate/AddQuestion',
             method: 'POST',
             data: {
                 __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
-                locationId: locationId,
+                locationId: locationId,                 // sanitized
                 optionsInput: optionsInput,
                 newQuestionText: newQuestionText,
                 newQuestionType: newQuestionType,
@@ -152,87 +162,108 @@
             },
             success: function (response) {
                 if (response.success) {
-                    // close correct modal id
                     $('#addQuestionModal').modal('hide');
 
-                    // show jConfirm success dialog
                     $.confirm({
                         title: '<span class="i-green"> <i class="fas fa-question"></i> </span> Question',
                         content: 'Question has been added successfully.',
                         type: 'green',
-                        buttons: {
-                            ok: function () { /* do nothing */ }
-                        }
+                        buttons: { ok: function () { /* no-op */ } }
                     });
+
                     var q = response.updatedQuestion;
                     if (q && locationId) {
 
-                        // Create <li>
+                        // Sanitize remote question properties
+                        var qText = safeText(q.questionText);
+                        var qType = safeText(q.questionType);
+                        var qOptions = String(q.options || "");
+                        var qIsRequired = !!q.isRequired; // coerce
+                        var qId = sanitizeId(q.id);       // sanitize id before using as data attr
+
+                        // Create list item
                         var $li = $("<li>").addClass("mb-2");
 
-                        // Outer container div
                         var $container = $("<div>").addClass("border rounded p-2 bg-light");
                         var $row = $("<div>").addClass("row");
 
                         // Left column
                         var $colLeft = $("<div>").addClass("col-md-11");
 
-                        // Question text
-                        var $spanText = $("<span>").text(safeText(q.questionText)); // SAFE
+                        var $spanText = $("<span>").text(qText);
                         $colLeft.append($spanText);
 
                         // Required asterisk
-                        if (q.isRequired) {
+                        if (qIsRequired) {
                             var $required = $("<span>")
-                                .addClass("required-asterisk")
-                                .attr("title", "Required field")
-                                .text("*");
-                            $colLeft.append(document.createTextNode(" ")).append($required);
+                                .addClass("required-asterisk text-danger fw-bold")
+                                .text("*")
+                                .attr("data-bs-toggle", "tooltip")
+                                .attr("data-bs-placement", "top")
+                                .attr("title", "Required field");
+
+                            $colLeft.append(" ").append($required);
                         }
 
                         // Question type
-                        if (q.questionType) {
+                        if (qType) {
                             var $smallType = $("<small>")
                                 .addClass("text-muted")
-                                .text("[" + safeText(q.questionType) + "]");
+                                .text("[" + qType + "]");
                             $colLeft.append(document.createTextNode(" ")).append($smallType);
                         }
 
-                        // Options (for non-text questions)
-                        if (q.questionType && q.questionType.toLowerCase() !== "text" && q.options) {
+                        // Options (non-text questions)
+                        if (qType && qType.toLowerCase() !== "text" && qOptions) {
                             var $optionsDiv = $("<div>").addClass("mt-4");
-                            var opts = q.options.split(",").map(function (o) {
-                                return $("<span>")
+
+                            // Parse options, sanitize each option text
+                            var optionList = qOptions.split(",")
+                                .map(function (o) { return safeText(o.trim()); })
+                                .filter(function (o) { return o.length > 0; });
+
+                            optionList.forEach(function (optText) {
+                                var $opt = $("<span>")
                                     .addClass("badge bg-light text-dark border me-1")
-                                    .text(safeText(o.trim()));
+                                    .text(optText);
+                                $optionsDiv.append($opt);
                             });
-                            opts.forEach(function ($opt) { $optionsDiv.append($opt); });
+
                             $colLeft.append($optionsDiv);
                         }
 
                         // Right column: Delete button
-                        var $colRight = $("<div>").addClass("mt-2");
+                        var $colRight = $("<div>").addClass("mt-2 text-end"); // align right
+
                         var $deleteBtn = $("<button>")
                             .addClass("btn btn-sm btn-outline-danger delete-question-btn")
-                            .attr("data-questionid", q.id)
-                            .attr("data-locationid", locationId);
+                            .attr("data-questionid", qId)        // sanitized
+                            .attr("data-locationid", locationId); // sanitized
 
                         var $icon = $("<i>").addClass("fas fa-trash me-1");
-                        var $small = $("<small>").text(" Delete ");
+                        var $small = $("<small>").text(" Delete");
 
                         $deleteBtn.append($icon).append($small);
                         $colRight.append($deleteBtn);
 
-                        // Assemble row
+                        // assemble
                         $row.append($colLeft).append($colRight);
                         $container.append($row);
                         $li.append($container);
 
-                        // Append safely to list
-                        var $addBtn = $('button.add-question-btn[data-locationid="' + locationId + '"]');
+                        // find the target list safely (avoid interpolated selector)
+                        var $addBtns = $('button.add-question-btn[data-locationid]');
+                        var $addBtn = $addBtns.filter(function () {
+                            // compare the sanitized attribute value to sanitized locationId
+                            return String($(this).attr('data-locationid')) === String(locationId);
+                        }).first();
+
                         var $list = $addBtn.closest('.col-md-9').find('ul.list-unstyled').first();
-                        if ($list.length) {
+                        if ($list && $list.length) {
                             $list.append($li);
+                        } else {
+                            // fallback: append to a known container if selector fails
+                            $('#questionsFallbackList').append($li);
                         }
                     }
                 } else {
@@ -957,5 +988,12 @@
 });
 
 function safeText(v) {
+    // keep this as your current implementation: it encodes any HTML special chars
     return $('<div>').text(v || "").text();
+}
+
+function sanitizeId(v) {
+    if (v === null || v === undefined) return "";
+    // allow only alphanum, underscore, hyphen (adjust to your id format if needed)
+    return String(v).replace(/[^a-zA-Z0-9_\-]/g, "");
 }

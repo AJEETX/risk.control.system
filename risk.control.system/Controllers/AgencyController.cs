@@ -302,7 +302,7 @@ namespace risk.control.system.Controllers
                 }
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 //DEMO
-                user.Password = Applicationsettings.Password;
+                user.Password = Applicationsettings.TestingData;
 
                 user.PinCodeId = user.SelectedPincodeId;
                 user.DistrictId = user.SelectedDistrictId;

@@ -39,7 +39,7 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 ClientCompany = clientCompany,
                 PhoneNumberConfirmed = true,
-                Password = Password,
+                Password = TestingData,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 Addressline = "139 Sector 44",
@@ -61,7 +61,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(admin.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(admin, Password);
+                    await userManager.CreateAsync(admin, TestingData);
                     await userManager.AddToRoleAsync(admin, AppRoles.COMPANY_ADMIN.ToString());
                     //var clientAssignerRole = new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString());
                     //clientAssigner.ApplicationRoles.Add(clientAssignerRole);

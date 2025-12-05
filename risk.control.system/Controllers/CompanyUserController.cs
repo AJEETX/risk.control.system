@@ -154,7 +154,7 @@ namespace risk.control.system.Controllers
             }
             //DEMO
             user.Active = true;
-            user.Password = Applicationsettings.Password;
+            user.Password = Applicationsettings.TestingData;
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;

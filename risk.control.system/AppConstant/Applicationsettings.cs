@@ -3,8 +3,7 @@
     public static class Applicationsettings
     {
         public const double ACTIVE_USER_TIMESPAN = 10;
-        public const string Password = "R1$kcontrol!";
-        public const string TestPassword = "R1$kcontrol";
+        public const string TestingData = "R1$kcontrol!";
         public const string PERMISSION = "Permission";
         public static readonly string ADMIN_MOBILE = "404723089";
         //public static readonly string PORTAL_ADMIN_MOBILE = "432854196";

@@ -42,7 +42,7 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 Active = true,
                 PhoneNumberConfirmed = true,
-                Password = Password,
+                Password = TestingData,
                 Vendor = vendor,
                 PhoneNumber = Applicationsettings.USER_MOBILE,
                 IsSuperAdmin = false,
@@ -69,7 +69,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(vendorAgent.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(vendorAgent, Password);
+                    await userManager.CreateAsync(vendorAgent, TestingData);
                     await userManager.AddToRoleAsync(vendorAgent, AppRoles.AGENT.ToString());
                     //var vendorAgentRole = new ApplicationRole(AppRoles.AGENT.ToString(), AppRoles.AGENT.ToString());
                     //vendorAgent.ApplicationRoles.Add(vendorAgentRole);

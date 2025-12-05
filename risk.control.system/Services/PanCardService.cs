@@ -67,7 +67,7 @@ namespace risk.control.system.Services
                 #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
                 if (company.VerifyPan)
                 {
-                    var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId, company.PanIdfyUrl, company.PanAPIKey, company.PanAPIHost);
+                    var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId, company.PanIdfyUrl, company.PanAPIData, company.PanAPIHost);
                     if (panResponse != null && panResponse.valid)
                     {
                         var panMatch = panRegex.Match(maskedImage.DocumentId);

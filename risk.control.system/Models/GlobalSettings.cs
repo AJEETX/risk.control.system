@@ -44,7 +44,7 @@ namespace risk.control.system.Models
         public string WeatherUri { get; set; } = "https://api.open-meteo.com/v1/forecast";
 
         public string PanIdfyUrl { get; set; } = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
-        public string PanAPIKey { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
+        public string PanAPIData { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         public string PanAPIHost { get; set; } = "pan-card-verification-at-lowest-price.p.rapidapi.com";
 
         public string? PassportApiUrl { get; set; } = "https://document-ocr1.p.rapidapi.com/idr";

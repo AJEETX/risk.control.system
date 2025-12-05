@@ -35,7 +35,7 @@ namespace risk.control.system.Seeds
                 Email = PORTAL_ADMIN.EMAIL,
                 FirstName = PORTAL_ADMIN.FIRST_NAME,
                 LastName = PORTAL_ADMIN.LAST_NAME,
-                Password = Password,
+                Password = TestingData,
                 EmailConfirmed = true,
                 IsSuperAdmin = true,
                 Active = true,
@@ -60,7 +60,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(portalAdmin.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(portalAdmin, Password);
+                    await userManager.CreateAsync(portalAdmin, TestingData);
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.PORTAL_ADMIN.ToString());
 
                     //var portalAdminRole = new ApplicationRole(AppRoles.PORTALADMIN.ToString(), AppRoles.PORTALADMIN.ToString());

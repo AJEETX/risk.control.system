@@ -36,7 +36,7 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 Active = true,
                 PhoneNumberConfirmed = true,
-                Password = Password,
+                Password = TestingData,
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 Vendor = vendor,
                 IsSuperAdmin = false,
@@ -58,7 +58,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(vendorSupervisor.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(vendorSupervisor, Password);
+                    await userManager.CreateAsync(vendorSupervisor, TestingData);
                     await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.SUPERVISOR.ToString());
                     //var vendorSuperVisorRole = new ApplicationRole(AppRoles.SUPERVISOR.ToString(), AppRoles.Supervisor.ToString());
                     //vendorSupervisor.ApplicationRoles.Add(vendorSuperVisorRole);

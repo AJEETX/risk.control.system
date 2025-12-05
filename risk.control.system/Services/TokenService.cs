@@ -1,10 +1,12 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+using Microsoft.IdentityModel.Tokens;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace risk.control.system.Services
 {
@@ -26,7 +28,7 @@ namespace risk.control.system.Services
         public string GenerateJwtToken(AgentLoginModel model)
         {
             // Fetch the signing key from configuration
-            var key = config["Jwt:Key"];
+            var key = config["Jwt:Data"];
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 

@@ -82,15 +82,15 @@ builder.Logging.AddProvider(new CsvLoggerProvider(logDirectory, LogLevel.Error))
 //builder.Services.AddTransient<CaseApproved>();
 //builder.Services.AddTransient<CaseRejected>();
 
-builder.Services.AddCors(opt =>
-{
-    opt.AddDefaultPolicy(builder =>
-    {
-        builder.AllowAnyOrigin()
-        .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+//builder.Services.AddCors(opt =>
+//{
+//    opt.AddDefaultPolicy(builder =>
+//    {
+//        builder.AllowAnyOrigin()
+//        .AllowAnyHeader()
+//            .AllowAnyMethod();
+//    });
+//});
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {

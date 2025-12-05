@@ -291,52 +291,69 @@ function markNotificationAsRead(notificationId) {
     });
 }
 function loadNotifications(keepOpen = false) {
+
     $.get('/api/Notification/GetNotifications', function (response) {
-        var $list = $("#notificationList");
+
+        const $list = $("#notificationList");
         $list.empty();
 
-        var totalCount = response.total;
-        $("#notificationCount").text(response.maxCountReached ? `${response.maxCount}+` : totalCount);
+        // Safe count display
+        const totalCount = response.total;
+        $("#notificationCount").text(
+            response.maxCountReached ? `${response.maxCount}+` : totalCount
+        );
 
-        if (response.data.length > 0) {
+        if (Array.isArray(response.data) && response.data.length > 0) {
+
             response.data.forEach(function (item) {
-                // Create the main <a> element
-                var $a = $("<a>")
+
+                // ===== SANITIZE ALL REMOTE DATA (Very important) =====
+
+                const safeMessage = sanitizeText(item.message);
+                const safeStatus = sanitizeText(item.status);
+                const safeCreatedAt = sanitizeDate(item.createdAt);
+                const safeIconClass = sanitizeCssClass(item.symbol);
+
+                // ===== BUILD DOM SAFELY (No HTML strings) =====
+
+                const $a = $("<a>")
                     .addClass("notification-item")
                     .attr("href", "#")
                     .attr("data-id", item.id);
 
-                // Icon
-                var $icon = $("<i>").addClass(item.symbol || "");
+                const $icon = $("<i>").addClass(safeIconClass);
 
-                // Message
-                var $message = $("<span>")
+                const $message = $("<span>")
                     .addClass("notification-message text-muted text-xs")
-                    .text(item.message);
+                    .text(safeMessage);
 
-                // Status
-                var $status = $("<span>")
+                const $status = $("<span>")
                     .addClass("badge badge-light text-muted text-xs")
-                    .text(item.status);
+                    .text(safeStatus);
 
-                // Created at
-                var $time = $("<span>")
-                    .addClass("notification-time text-muted text-xs")
-                    .html(`<i class="far fa-clock"></i> ${$("<div>").text(item.createdAt).html()}`);
+                // Clock text + icon (no HTML strings)
+                const $time = $("<span>")
+                    .addClass("notification-time text-muted text-xs");
 
-                // Delete icon
-                var $delete = $("<span>")
+                const $clockIcon = $("<i>").addClass("far fa-clock");
+                const $created = $("<span>").text(" " + safeCreatedAt);
+                $time.append($clockIcon).append($created);
+
+                // Delete button
+                const $delete = $("<span>")
                     .addClass("delete-notification")
                     .attr("data-id", item.id)
                     .append($("<i>").addClass("fas fa-trash"));
 
-                // Assemble content
-                var $content = $("<div>").addClass("notification-content")
+                // Build content
+                const $content = $("<div>")
+                    .addClass("notification-content")
                     .append($icon)
                     .append($message)
                     .append($status)
                     .append(
-                        $("<div>").addClass("notification-action-content float-right")
+                        $("<div>")
+                            .addClass("notification-action-content float-right")
                             .append($time)
                             .append($delete)
                     );
@@ -346,21 +363,38 @@ function loadNotifications(keepOpen = false) {
             });
 
             $("#clearNotifications").removeClass("clear-disabled");
+
         } else {
-            $list.append($("<div>").addClass("text-center text-muted").text("No notifications"));
+
+            $list.append(
+                $("<div>")
+                    .addClass("text-center text-muted")
+                    .text("No notifications")
+            );
+
             $("#clearNotifications").addClass("clear-disabled");
         }
 
-        // Delete click event
+        // ===== DELETE HANDLER SAFE ATTACH =====
+
         $(".delete-notification").off("click").on("click", function (e) {
             e.stopPropagation();
+
+            const $this = $(this);
+
+            // Keep dropdown open
             $("#notificationDropdown").addClass("show");
             $("#notificationToggle").attr("aria-expanded", "true");
-            $(this).addClass("fa-spin");
-            var notificationId = $(this).data("id");
+
+            $this.addClass("fa-spin");
+
+            const notificationId = $this.data("id");
             markNotificationAsRead(notificationId);
-            setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+
+            setTimeout(() => $this.removeClass("fa-spin"), 1000);
         });
+
+        // ===== KEEP DROPDOWN OPEN IF NEEDED =====
 
         if (keepOpen) {
             $("#notificationDropdown").addClass("show");
@@ -368,6 +402,29 @@ function loadNotifications(keepOpen = false) {
         }
     });
 }
+
+/* ===============================
+   SANITIZATION HELPERS (SAFE)
+   =============================== */
+
+// Allow letters, numbers, spaces, punctuation
+function sanitizeText(str) {
+    if (!str) return "";
+    return String(str).replace(/[<>]/g, ""); // Remove tags entirely
+}
+
+// Allow only safe date characters
+function sanitizeDate(str) {
+    if (!str) return "";
+    return String(str).replace(/[^0-9A-Za-z:\-\/\s]/g, "");
+}
+
+// Allow only valid CSS class characters
+function sanitizeCssClass(str) {
+    if (!str) return "";
+    return String(str).replace(/[^a-zA-Z0-9\-\s]/g, "");
+}
+
 function clearAllNotifications() {
     var token = $('input[name="__RequestVerificationToken"]').val();
     $.ajax({
