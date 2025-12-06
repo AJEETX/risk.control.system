@@ -12,7 +12,7 @@ namespace risk.control.system.Services
         Task<ReportTemplate> GetReportTemplate(long caseId);
     }
 
-    public class EmpanelledAgencyService : IEmpanelledAgencyService
+    internal class EmpanelledAgencyService : IEmpanelledAgencyService
     {
         private readonly ApplicationDbContext _context;
 

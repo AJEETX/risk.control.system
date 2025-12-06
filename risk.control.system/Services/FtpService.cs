@@ -26,7 +26,7 @@ namespace risk.control.system.Services
 
     }
 
-    public class FtpService : IFtpService
+    internal class FtpService : IFtpService
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;

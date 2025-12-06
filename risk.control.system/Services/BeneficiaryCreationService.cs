@@ -15,7 +15,7 @@ namespace risk.control.system.Services
     {
         Task<(BeneficiaryDetail, List<UploadError>, List<string>)> AddBeneficiary(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data);
     }
-    public class BeneficiaryCreationService : IBeneficiaryCreationService
+    internal class BeneficiaryCreationService : IBeneficiaryCreationService
     {
 
         private readonly ApplicationDbContext context;

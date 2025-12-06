@@ -17,7 +17,7 @@ namespace risk.control.system.Services
 
     }
 
-    public class CaseVendorService : ICaseVendorService
+    internal class CaseVendorService : ICaseVendorService
     {
         private readonly ApplicationDbContext _context;
 

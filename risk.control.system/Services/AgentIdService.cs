@@ -18,7 +18,7 @@ public interface IAgentIdService
     Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions);
 }
 
-public class AgentIdService : IAgentIdService
+internal class AgentIdService : IAgentIdService
 {
     private readonly ApplicationDbContext _context;
     private readonly IBackgroundJobClient backgroundJobClient;

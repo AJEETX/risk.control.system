@@ -15,7 +15,7 @@ namespace risk.control.system.Services
         string GenerateJwtToken(AgentLoginModel model);
         Task<RefreshToken> GenerateRefreshTokenAsync(string userId);
     }
-    public class TokenService : ITokenService
+    internal class TokenService : ITokenService
     {
         private readonly IConfiguration config;
         private readonly ApplicationDbContext context;

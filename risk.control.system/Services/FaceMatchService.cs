@@ -6,7 +6,7 @@ namespace risk.control.system.Services
     {
         Task<(string, byte[], float)> GetFaceMatchAsync(byte[] registeredImage, byte[] faceImageBytes, string onlyExtension);
     }
-    public class FaceMatchService : IFaceMatchService
+    internal class FaceMatchService : IFaceMatchService
     {
         private readonly ICompareFaces compareFaces;
         private readonly ILogger<FaceMatchService> logger;

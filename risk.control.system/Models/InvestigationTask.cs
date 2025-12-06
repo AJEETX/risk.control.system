@@ -19,8 +19,8 @@ namespace risk.control.system.Models
         public PolicyDetail? PolicyDetail { get; set; }
         public CustomerDetail? CustomerDetail { get; set; }
         public BeneficiaryDetail? BeneficiaryDetail { get; set; }
-        public string Status { get; set; }
-        public string SubStatus { get; set; }
+        public string Status { get; set; } = "";
+        public string SubStatus { get; set; } = "";
         public string? CaseOwner { get; set; }
         public bool IsUploaded { get; set; } = false;
         public bool IsReady2Assign { get; set; } = false;

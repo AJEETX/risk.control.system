@@ -8,7 +8,7 @@ namespace risk.control.system.Services
     {
         Task SaveTranscript(long locationId, string reportName, string transcript);
     }
-    public class MediaDataService : IMediaDataService
+    internal class MediaDataService : IMediaDataService
     {
         private readonly ApplicationDbContext context;
 

@@ -1,4 +1,5 @@
 ﻿using Google.Cloud.Vision.V1;
+
 using SkiaSharp;
 
 namespace risk.control.system.Services
@@ -8,7 +9,7 @@ namespace risk.control.system.Services
         byte[] MaskPanTextInImage(byte[] inputImage, IReadOnlyList<EntityAnnotation> textAnnotations, string txt2Find);
         byte[] MaskPassportTextInImage(byte[] inputImage, IReadOnlyList<EntityAnnotation> textAnnotations, string passportNumber);
     }
-    public class GoogleMaskHelper : IGoogleMaskHelper
+    internal class GoogleMaskHelper : IGoogleMaskHelper
     {
         public byte[] MaskPanTextInImage(byte[] inputImage, IReadOnlyList<EntityAnnotation> textAnnotations, string txt2Find)
         {

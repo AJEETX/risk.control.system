@@ -18,7 +18,7 @@ namespace risk.control.system.Services
         Task<List<UserDetailResponse>> GetCompanyAgencyUsers(string userEmail, long id);
         Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail);
     }
-    public class UserService : IUserService
+    internal class UserService : IUserService
     {
         private readonly IConfiguration config;
         private readonly ApplicationDbContext context;

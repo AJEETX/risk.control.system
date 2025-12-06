@@ -9,7 +9,7 @@ namespace risk.control.system.Services
     {
         Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail, string portal_base_url);
     }
-    public class AgencyService : IAgencyService
+    internal class AgencyService : IAgencyService
     {
         private const string vendorMapSize = "800x800";
         private readonly IWebHostEnvironment webHostEnvironment;

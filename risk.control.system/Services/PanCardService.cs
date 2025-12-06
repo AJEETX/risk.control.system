@@ -12,7 +12,7 @@ namespace risk.control.system.Services
     {
         Task<DocumentIdReport> Process(byte[] IdImage, IReadOnlyList<EntityAnnotation> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension);
     }
-    public class PanCardService : IPanCardService
+    internal class PanCardService : IPanCardService
     {
         private static string panNumber2Find = "Permanent Account Number";
         private static string newPanNumber2Find = "Permanent Account Number Card";

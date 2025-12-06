@@ -15,9 +15,11 @@ namespace risk.control.system.Services
         Task<object> GetActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
         Task<object> GetManagerActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
         InvestigationCreateModel Create(string currentUserEmail);
-        InvestigationTask AddCasePolicy(string userEmail);
-        Task<InvestigationTask> CreatePolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument);
-        Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument);
+        CreateCaseViewModel AddCasePolicy(string userEmail);
+        Task<InvestigationTask> CreatePolicy(string userEmail, InvestigationTask claimsInvestigation);
+        Task<InvestigationTask> CreatePolicy(string userEmail, CreateCaseViewModel claimsInvestigation);
+        Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation);
+        Task<InvestigationTask> EditPolicy(string userEmail, EditPolicyDto dto);
         Task<ClientCompany> CreateCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument);
         Task<ClientCompany> EditCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument);
         Task<ClientCompany> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
@@ -28,9 +30,10 @@ namespace risk.control.system.Services
         Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id);
         Task<CaseTransactionModel> GetPdfReport(long id);
     }
-    public class InvestigationService : IInvestigationService
+    internal class InvestigationService : IInvestigationService
     {
         private readonly ApplicationDbContext context;
+        private readonly IFileStorageService fileStorageService;
         private readonly INumberSequenceService numberService;
         private readonly IChatSummarizer chatSummarizer;
         private readonly ICloneReportService cloneService;
@@ -39,6 +42,7 @@ namespace risk.control.system.Services
         private readonly ICustomApiCLient customApiCLient;
 
         public InvestigationService(ApplicationDbContext context,
+            IFileStorageService fileStorageService,
             INumberSequenceService numberService,
             IChatSummarizer chatSummarizer,
             ICloneReportService cloneService,
@@ -47,6 +51,7 @@ namespace risk.control.system.Services
             ICustomApiCLient customApiCLient)
         {
             this.context = context;
+            this.fileStorageService = fileStorageService;
             this.numberService = numberService;
             this.chatSummarizer = chatSummarizer;
             this.cloneService = cloneService;
@@ -88,49 +93,68 @@ namespace risk.control.system.Services
             };
             return model;
         }
-        public InvestigationTask AddCasePolicy(string userEmail)
+        public CreateCaseViewModel AddCasePolicy(string userEmail)
         {
             var contractNumber = numberService.GetNumberSequence("PX");
-            var model = new InvestigationTask
+            var policy = new PolicyDetail
             {
-                PolicyDetail = new PolicyDetail
-                {
-                    InsuranceType = InsuranceType.CLAIM,
-                    CaseEnablerId = context.CaseEnabler.FirstOrDefault().CaseEnablerId,
-                    CauseOfLoss = "LOST IN ACCIDENT",
-                    ContractIssueDate = DateTime.Now.AddDays(-10),
-                    CostCentreId = context.CostCentre.FirstOrDefault().CostCentreId,
-                    DateOfIncident = DateTime.Now.AddDays(-3),
-                    InvestigationServiceTypeId = context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == InsuranceType.CLAIM).InvestigationServiceTypeId,
-                    Comments = "SOMETHING FISHY",
-                    SumAssuredValue = new Random().Next(10000, 99999),
-                    ContractNumber = contractNumber
-                },
-                Status = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR
+                InsuranceType = InsuranceType.CLAIM,
+                CaseEnablerId = context.CaseEnabler.FirstOrDefault().CaseEnablerId,
+                CauseOfLoss = "LOST IN ACCIDENT",
+                ContractIssueDate = DateTime.Now.AddDays(-10),
+                CostCentreId = context.CostCentre.FirstOrDefault().CostCentreId,
+                DateOfIncident = DateTime.Now.AddDays(-3),
+                InvestigationServiceTypeId = context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == InsuranceType.CLAIM).InvestigationServiceTypeId,
+                Comments = "SOMETHING FISHY",
+                SumAssuredValue = new Random().Next(10000, 99999),
+                ContractNumber = contractNumber
             };
-            return model;
+            return new CreateCaseViewModel
+            {
+                PolicyDetail = new PolicyDetailDto
+                {
+                    InsuranceType = policy.InsuranceType,
+                    CaseEnablerId = policy.CaseEnablerId,
+                    CauseOfLoss = policy.CauseOfLoss,
+                    ContractIssueDate = policy.ContractIssueDate,
+                    CostCentreId = policy.CostCentreId,
+                    DateOfIncident = policy.DateOfIncident,
+                    InvestigationServiceTypeId = policy.InvestigationServiceTypeId,
+                    Comments = policy.Comments,
+                    SumAssuredValue = policy.SumAssuredValue,
+                    ContractNumber = policy.ContractNumber
+                }
+            };
+
+            //var model = new InvestigationTask
+            //{
+            //    PolicyDetail = new PolicyDetail
+            //    {
+            //        InsuranceType = InsuranceType.CLAIM,
+            //        CaseEnablerId = context.CaseEnabler.FirstOrDefault().CaseEnablerId,
+            //        CauseOfLoss = "LOST IN ACCIDENT",
+            //        ContractIssueDate = DateTime.Now.AddDays(-10),
+            //        CostCentreId = context.CostCentre.FirstOrDefault().CostCentreId,
+            //        DateOfIncident = DateTime.Now.AddDays(-3),
+            //        InvestigationServiceTypeId = context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == InsuranceType.CLAIM).InvestigationServiceTypeId,
+            //        Comments = "SOMETHING FISHY",
+            //        SumAssuredValue = new Random().Next(10000, 99999),
+            //        ContractNumber = contractNumber
+            //    },
+            //    Status = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR
+            //};
+            //return model;
         }
-        public async Task<InvestigationTask> CreatePolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument)
+        public async Task<InvestigationTask> CreatePolicy(string userEmail, InvestigationTask claimsInvestigation)
         {
             try
             {
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
-                if (claimDocument is not null)
-                {
-                    using var dataStream = new MemoryStream();
-                    claimDocument.CopyTo(dataStream);
-                    claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(claimDocument.FileName);
-                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "policy");
-                    if (!Directory.Exists(imagePath))
-                    {
-                        Directory.CreateDirectory(imagePath);
-                    }
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "policy", fileName);
-                    await File.WriteAllBytesAsync(filePath, dataStream.ToArray());
-                    claimsInvestigation.PolicyDetail.DocumentPath = "/policy/" + fileName;
-                }
+                var (fileName, relativePath) = await fileStorageService.SavePolicyDocumentAsync(claimsInvestigation.PolicyDetail.Document);
+
+                claimsInvestigation.PolicyDetail.DocumentPath = relativePath;
+                claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
 
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
 
@@ -161,7 +185,63 @@ namespace risk.control.system.Services
                 return null!;
             }
         }
-        public async Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation, IFormFile? claimDocument)
+        public async Task<InvestigationTask> CreatePolicy(string userEmail, CreateCaseViewModel model)
+        {
+            try
+            {
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+
+                var (fileName, relativePath) = await fileStorageService.SavePolicyDocumentAsync(model.Document);
+                var claimsInvestigation = new InvestigationTask
+                {
+                    PolicyDetail = new PolicyDetail
+                    {
+                        InsuranceType = model.PolicyDetail.InsuranceType,
+                        CaseEnablerId = model.PolicyDetail.CaseEnablerId,
+                        CauseOfLoss = model.PolicyDetail.CauseOfLoss,
+                        ContractIssueDate = model.PolicyDetail.ContractIssueDate,
+                        CostCentreId = model.PolicyDetail.CostCentreId,
+                        DateOfIncident = model.PolicyDetail.DateOfIncident,
+                        InvestigationServiceTypeId = model.PolicyDetail.InvestigationServiceTypeId,
+                        Comments = model.PolicyDetail.Comments,
+                        SumAssuredValue = model.PolicyDetail.SumAssuredValue,
+                        ContractNumber = model.PolicyDetail.ContractNumber
+                    }
+                };
+
+                claimsInvestigation.PolicyDetail.DocumentPath = relativePath;
+                claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
+
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
+
+                claimsInvestigation.IsNew = true;
+                claimsInvestigation.CreatedUser = userEmail;
+                claimsInvestigation.CaseOwner = userEmail;
+                claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
+                claimsInvestigation.UpdatedBy = userEmail;
+                claimsInvestigation.Status = CONSTANTS.CASE_STATUS.INITIATED;
+                claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR;
+                claimsInvestigation.CreatorSla = currentUser.ClientCompany.CreatorSla;
+                claimsInvestigation.ClientCompany = currentUser.ClientCompany;
+                claimsInvestigation.ClientCompanyId = currentUser.ClientCompanyId;
+                claimsInvestigation.ReportTemplate = reportTemplate;
+                claimsInvestigation.ReportTemplateId = reportTemplate.Id;
+                var aaddedClaimId = context.Investigations.Add(claimsInvestigation);
+                numberService.SaveNumberSequence("PX");
+                var saved = await context.SaveChangesAsync() > 0;
+
+                await timelineService.UpdateTaskStatus(claimsInvestigation.Id, userEmail);
+
+                return saved ? claimsInvestigation : null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return null!;
+            }
+        }
+        public async Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation)
         {
             try
             {
@@ -182,17 +262,58 @@ namespace risk.control.system.Services
                 existingPolicy.UpdatedBy = userEmail;
                 existingPolicy.ORIGIN = ORIGIN.USER;
                 existingPolicy.PolicyDetail.InsuranceType = claimsInvestigation.PolicyDetail.InsuranceType;
-                if (claimDocument is not null)
+                if (claimsInvestigation.PolicyDetail.Document is not null)
                 {
-                    using var dataStream = new MemoryStream();
-                    claimDocument.CopyTo(dataStream);
-                    existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(claimDocument.FileName);
-                    //existingPolicy.PolicyDetail.DocumentImage = CompressImage.ProcessCompress(dataStream.ToArray(), Path.GetExtension(claimDocument.FileName));
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(claimDocument.FileName);
-                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "policy");
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "policy", fileName);
-                    await File.WriteAllBytesAsync(filePath, dataStream.ToArray());
-                    existingPolicy.PolicyDetail.DocumentPath = "/policy/" + fileName;
+                    var (fileName, relativePath) = await fileStorageService.SavePolicyDocumentAsync(claimsInvestigation.PolicyDetail.Document);
+
+                    existingPolicy.PolicyDetail.DocumentPath = relativePath;
+                    existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
+                }
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, existingPolicy.PolicyDetail.InsuranceType.Value);
+                existingPolicy.ReportTemplate = reportTemplate;
+                existingPolicy.ReportTemplateId = reportTemplate.Id;
+                context.Investigations.Update(existingPolicy);
+
+                var saved = await context.SaveChangesAsync() > 0;
+
+                return saved ? existingPolicy : null;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return null!;
+            }
+        }
+        public async Task<InvestigationTask> EditPolicy(string userEmail, EditPolicyDto dto)
+        {
+            try
+            {
+                var existingPolicy = await context.Investigations
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.ClientCompany)
+                        .FirstOrDefaultAsync(c => c.Id == dto.Id);
+
+                existingPolicy.IsNew = true;
+                existingPolicy.PolicyDetail.ContractIssueDate = dto.PolicyDetail.ContractIssueDate;
+                existingPolicy.PolicyDetail.InvestigationServiceTypeId = dto.PolicyDetail.InvestigationServiceTypeId;
+                existingPolicy.PolicyDetail.CostCentreId = dto.PolicyDetail.CostCentreId;
+                existingPolicy.PolicyDetail.CaseEnablerId = dto.PolicyDetail.CaseEnablerId;
+                existingPolicy.PolicyDetail.DateOfIncident = dto.PolicyDetail.DateOfIncident;
+                existingPolicy.PolicyDetail.ContractNumber = dto.PolicyDetail.ContractNumber;
+                existingPolicy.PolicyDetail.SumAssuredValue = dto.PolicyDetail.SumAssuredValue;
+                existingPolicy.PolicyDetail.CauseOfLoss = dto.PolicyDetail.CauseOfLoss;
+                existingPolicy.Updated = DateTime.Now;
+                existingPolicy.UpdatedBy = userEmail;
+                existingPolicy.ORIGIN = ORIGIN.USER;
+                existingPolicy.PolicyDetail.InsuranceType = dto.PolicyDetail.InsuranceType;
+                if (dto.NewDocument is not null)
+                {
+                    var (fileName, relativePath) = await fileStorageService.SavePolicyDocumentAsync(dto.NewDocument);
+
+                    existingPolicy.PolicyDetail.DocumentPath = relativePath;
+                    existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
                 }
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, existingPolicy.PolicyDetail.InsuranceType.Value);
@@ -542,6 +663,8 @@ namespace risk.control.system.Services
               $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
+            //claim.PolicyDetail.DocumentPath = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
+            //        Path.Combine(webHostEnvironment.ContentRootPath, claim.PolicyDetail.DocumentPath))));
             var model = new CaseTransactionModel
             {
                 ClaimsInvestigation = claim,
@@ -947,7 +1070,10 @@ namespace risk.control.system.Services
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeCode = ClaimsInvestigationExtension.GetPincodeCode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                Document = a.PolicyDetail?.DocumentPath != null ? a.PolicyDetail?.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
+                Document = a.PolicyDetail?.DocumentPath != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, a.PolicyDetail.DocumentPath)))) :
+                Applicationsettings.NO_POLICY_IMAGE,
                 Customer = a.CustomerDetail?.ImagePath != null ? a.CustomerDetail?.ImagePath : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-light\">customer name</span>",
                 Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
@@ -971,11 +1097,6 @@ namespace risk.control.system.Services
                         a.CustomerDetail.CustomerLocationMap :
                         a.BeneficiaryDetail.BeneficiaryLocationMap :
                         Applicationsettings.NO_MAP
-                //PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
-                //        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING?
-                //        string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") :
-                //        string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400") : 
-                //        Applicationsettings.NO_MAP
             });
 
             // Apply Sorting AFTER Data Transformation

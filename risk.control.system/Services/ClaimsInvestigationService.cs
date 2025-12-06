@@ -10,7 +10,7 @@ namespace risk.control.system.Services
         Task<bool> SubmitNotes(string userEmail, long claimId, string notes);
     }
 
-    public class ClaimsInvestigationService : IClaimsInvestigationService
+    internal class ClaimsInvestigationService : IClaimsInvestigationService
     {
         private readonly ApplicationDbContext _context;
 

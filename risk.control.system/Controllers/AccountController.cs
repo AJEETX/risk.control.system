@@ -73,6 +73,10 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (ModelState.IsValid == false)
+                {
+                    return BadRequest(new { message = "Invalid request." });
+                }
                 if (User is null || User.Identity is null)
                 {
                     return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
@@ -118,6 +122,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> KeepAlive()
         {
+            if (ModelState.IsValid == false)
+            {
+                return BadRequest(new { message = "Invalid request." });
+            }
             var userId = _userManager.GetUserId(User);
             if (userId != null)
             {

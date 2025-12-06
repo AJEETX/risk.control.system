@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.InvestigationTask
+﻿@model risk.control.system.Models.ViewModel.EditPolicyDto
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <input type="hidden" asp-for="Id" />
@@ -155,21 +155,21 @@
                 <div class="form-group">
                     <label class="input-group-label" for="createImageInput"> Document:</label>
                     <div class="input-group mb-3">
-                        @if (Model?.PolicyDetail.DocumentPath is not null)
+                        @if (Model?.ExistingDocumentPath is not null)
                         {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.PolicyDetail.DocumentPath" data-bs-toggle="tooltip" title="Case Document" />
+                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/Investigation/GetPolicyDocument/@Model.Id" data-bs-toggle="tooltip" title="Case Document" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="PolicyDetail.Document" type="file" class="form-control remarks document-image-input valid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document"
+                            <input accept=".jpg,.jpeg,.png" asp-for="NewDocument" type="file" class="form-control remarks document-image-input valid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document"
                                    data-bs-toggle="tooltip" title="Upload Case Document" data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
                         }
                         else
                         {
                             <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src=@Applicationsettings.NO_POLICY_IMAGE data-bs-toggle="tooltip" title="No Case Document" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="PolicyDetail.Document" type="file" class="form-control remarks document-image-input invalid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document" required 
+                            <input accept=".jpg,.jpeg,.png" asp-for="NewDocument" type="file" class="form-control remarks document-image-input invalid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document" required 
                             data-bs-toggle="tooltip" title="Upload Case Document" data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
                         }
-                        <span asp-validation-for="PolicyDetail.DocumentPath" class="text-danger"></span>
+                        <span asp-validation-for="NewDocument" class="text-danger"></span>
                     </div>
                 </div>
             </div>

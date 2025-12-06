@@ -9,7 +9,7 @@ namespace risk.control.system.Services
     {
         Task<VendorInvoice> GetInvoice(long id);
     }
-    public class InvoiceService : IInvoiceService
+    internal class InvoiceService : IInvoiceService
     {
         private readonly ApplicationDbContext context;
 

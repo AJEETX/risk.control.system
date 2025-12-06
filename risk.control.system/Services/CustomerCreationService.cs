@@ -15,7 +15,7 @@ namespace risk.control.system.Services
     {
         Task<(CustomerDetail, List<UploadError>, List<string>)> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data);
     }
-    public class CustomerCreationService : ICustomerCreationService
+    internal class CustomerCreationService : ICustomerCreationService
     {
         private readonly ApplicationDbContext context;
         private readonly IFeatureManager featureManager;
