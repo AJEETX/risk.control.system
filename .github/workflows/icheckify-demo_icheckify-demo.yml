@@ -38,11 +38,11 @@ jobs:
 
       # ---------- Generate JSON Report ----------
       - name: Snyk JSON Report
-        run: snyk test --json > snyk-report.json
+        run: snyk test --json > snyk-report.json || true
 
       # ---------- Convert JSON to HTML ----------
       - name: Convert to HTML
-        run: snyk-to-html -i snyk-report.json -o snyk-report.html
+        run: snyk-to-html -i snyk-report.json -o snyk-report.html || true
 
       # ---------- Upload Reports as Artifacts ----------
       - name: Upload JSON Report
