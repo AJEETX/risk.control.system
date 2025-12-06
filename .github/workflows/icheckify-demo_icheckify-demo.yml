@@ -57,9 +57,6 @@ jobs:
           name: snyk-html-report
           path: snyk-report.html
 
-      # ---------- Monitor (Dashboard Report) ----------
-      - name: Snyk Monitor (Dashboard)
-        run: snyk monitor
   # ---------------------------------------------------
   # 1️⃣ Fortify Scan Job
   # ---------------------------------------------------
