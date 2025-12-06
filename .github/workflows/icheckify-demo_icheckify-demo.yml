@@ -41,7 +41,7 @@ jobs:
 
       # ---------- Generate JSON Report ----------
       - name: Snyk JSON Report
-        run: snyk test --file=./risk.control.system/risk.control.system.csproj --json > snyk-report.json || true
+        run: snyk test --file=./risk.control.system.sln --json > snyk-report.json || true
 
       # ---------- Convert JSON to HTML ----------
       - name: Convert to HTML
