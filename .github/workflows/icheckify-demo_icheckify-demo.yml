@@ -36,9 +36,12 @@ jobs:
       - name: Authenticate Snyk
         run: snyk auth ${{ secrets.SNYK_TOKEN }}
 
+      - name: List .csproj files
+        run: find . -name "*.csproj"
+
       # ---------- Generate JSON Report ----------
       - name: Snyk JSON Report
-        run: snyk test --json > snyk-report.json || true
+        run: snyk test $(find . -name "*.csproj" | head -n 1) --json > snyk-report.json || true
 
       # ---------- Convert JSON to HTML ----------
       - name: Convert to HTML
