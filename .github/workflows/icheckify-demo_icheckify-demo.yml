@@ -36,14 +36,29 @@ jobs:
       - name: Authenticate Snyk
         run: snyk auth ${{ secrets.SNYK_TOKEN }}
 
-      - name: List .csproj files
-        run: find . -name "*.csproj"
+      - name: Detect .sln or .csproj
+        id: detect
+        run: |
+          SOLUTION_FILE=$(find . -name "*.sln" | head -n 1)
+          if [ -n "$SOLUTION_FILE" ]; then
+            echo "Detected solution file: $SOLUTION_FILE"
+            echo "FILE=$SOLUTION_FILE" >> $GITHUB_ENV
+          else
+            PROJECT_FILE=$(find . -name "*.csproj" | head -n 1)
+            if [ -n "$PROJECT_FILE" ]; then
+              echo "Detected project file: $PROJECT_FILE"
+              echo "FILE=$PROJECT_FILE" >> $GITHUB_ENV
+            else
+              echo "Error: No .sln or .csproj with dependencies found."
+              exit 1
+            fi
+          fi
 
-      # ---------- Generate JSON Report ----------
+      # 6️⃣ Run Snyk test (generate JSON)
       - name: Snyk JSON Report
-        run: snyk test --file=./risk.control.system.sln --json > snyk-report.json || true
+        run: snyk test --file=$FILE --json > snyk-report.json || true
 
-      # ---------- Convert JSON to HTML ----------
+      # 7️⃣ Convert JSON → HTML
       - name: Convert to HTML
         run: snyk-to-html -i snyk-report.json -o snyk-report.html || true
 
