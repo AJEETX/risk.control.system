@@ -17,6 +17,39 @@ env:
 
 jobs:
 
+  codacy-security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Java (Codacy CLI requires Java)
+      uses: actions/setup-java@v4
+      with:
+        distribution: "temurin"
+        java-version: "17"
+
+    - name: Download Codacy Analysis CLI
+      run: |
+        wget https://github.com/codacy/codacy-analysis-cli/releases/latest/download/codacy-analysis-cli.jar
+
+    - name: Run Codacy security analysis
+      env:
+        CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+      run: |
+        java -jar codacy-analysis-cli.jar analyze \
+          --tool-analysis \
+          --allow-network \
+          --verbose \
+          --output .codacy-analysis-output.json
+
+    - name: Upload Codacy report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: codacy-analysis-report
+        path: .codacy-analysis-output.json
+
   snyk-scan:
     runs-on: ubuntu-latest
 

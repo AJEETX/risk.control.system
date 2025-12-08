@@ -1,5 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +9,12 @@ using risk.control.system.Models;
 
 using SmartBreadcrumbs.Attributes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("Roles")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
     public class RolesController : Controller
     {
         private readonly RoleManager<ApplicationRole> _roleManager;
