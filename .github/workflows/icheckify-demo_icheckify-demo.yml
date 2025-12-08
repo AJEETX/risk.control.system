@@ -26,7 +26,16 @@ jobs:
 
     - name: Install Codacy CLI v2
       run: |
-          curl -fsSL https://cli.codacy.com/install.sh | sh
+          LATEST=$(curl -s https://api.github.com/repos/codacy/codacy-cli-v2/releases/latest \
+            | grep browser_download_url \
+            | grep linux \
+            | cut -d '"' -f 4)
+
+          echo "Downloading: $LATEST"
+          wget "$LATEST" -O codacy-cli
+
+          chmod +x codacy-cli
+          sudo mv codacy-cli /usr/local/bin/codacy
 
     - name: Run Codacy security analysis
       env:
@@ -38,11 +47,12 @@ jobs:
             --verbose \
             --output results.sarif
 
-    - name: Upload security report
+    - name: Upload SARIF report
       uses: actions/upload-artifact@v4
       with:
           name: codacy-security-report
           path: results.sarif
+
 
   snyk-scan:
     runs-on: ubuntu-latest
