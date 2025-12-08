@@ -34,18 +34,17 @@ jobs:
       run: |
         LATEST=$(curl -s https://api.github.com/repos/codacy/codacy-analysis-cli/releases/latest \
           | grep browser_download_url \
-          | grep -E "\.(zip|tar\.gz|jar)" \
-          | head -1 \
+          | grep .zip \
           | cut -d '"' -f 4)
 
         echo "Downloading: $LATEST"
         wget "$LATEST"
+        unzip codacy-analysis-cli-*.zip
 
-        if [[ $LATEST == *.zip ]]; then
-          unzip *.zip
-        elif [[ $LATEST == *.tar.gz ]]; then
-          tar -xzf *.tar.gz
-        fi
+        # Locate and copy jar
+        JAR_PATH=$(find . -name "codacy-analysis-cli.jar" | head -1)
+        echo "JAR located at: $JAR_PATH"
+        cp "$JAR_PATH" codacy-analysis-cli.jar
 
     - name: Run Codacy security analysis
       env:
