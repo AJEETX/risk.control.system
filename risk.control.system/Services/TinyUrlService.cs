@@ -6,7 +6,7 @@ namespace risk.control.system.Services
     {
         Task<string> ShortenUrlAsync(string longUrl);
     }
-    public class TinyUrlService : ITinyUrlService
+    internal class TinyUrlService : ITinyUrlService
     {
         private readonly HttpClient _httpClient;
 

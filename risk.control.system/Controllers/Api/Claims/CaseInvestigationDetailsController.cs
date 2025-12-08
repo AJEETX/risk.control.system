@@ -39,6 +39,7 @@ namespace risk.control.system.Controllers.Api.Claims
             this.httpClientService = httpClientService;
         }
 
+        
         [HttpGet("GetPolicyDetail")]
         public async Task<IActionResult> GetPolicyDetail(long id)
         {

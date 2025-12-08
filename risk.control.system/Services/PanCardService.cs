@@ -12,7 +12,7 @@ namespace risk.control.system.Services
     {
         Task<DocumentIdReport> Process(byte[] IdImage, IReadOnlyList<EntityAnnotation> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension);
     }
-    public class PanCardService : IPanCardService
+    internal class PanCardService : IPanCardService
     {
         private static string panNumber2Find = "Permanent Account Number";
         private static string newPanNumber2Find = "Permanent Account Number Card";
@@ -32,7 +32,7 @@ namespace risk.control.system.Services
             string panNumber = string.Empty;
             string docyTypePan = string.Empty;
             byte[]? ocrImaged = null;
-            var filePath = Path.ChangeExtension(webHostEnvironment.WebRootPath, doc.FilePath);
+            var filePath = Path.Combine(webHostEnvironment.ContentRootPath, doc.FilePath);
 
             var allPanText = imageReadOnly.FirstOrDefault().Description;
             var panTextPre = allPanText.IndexOf(panNumber2Find);

@@ -10,7 +10,8 @@ namespace risk.control.system.Seeds
     {
         static string randomPinCode = string.Empty;
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, UserManager<VendorApplicationUser> vendorUserManager,
-            UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiCLient customApiCLient, IHttpContextAccessor httpAccessor)
+            UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiCLient customApiCLient, IHttpContextAccessor httpAccessor,
+            IFileStorageService fileStorageService)
         {
             var globalSetting = new GlobalSettings
             {
@@ -25,16 +26,16 @@ namespace risk.control.system.Seeds
             var country = Environment.GetEnvironmentVariable("COUNTRY");
             if (country == "IN")
             {
-                randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+                randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes, fileStorageService);
             }
             else if (country == "AU")
             {
-                randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+                randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes, fileStorageService);
             }
             else
             {
-                randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
-                randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes);
+                randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes, fileStorageService);
+                randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes, fileStorageService);
             }
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode);

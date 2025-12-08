@@ -46,12 +46,10 @@
                 </button>
             </div>
         </div>
-        <div class="card-body">
-            
-            <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
+        <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
+            <div class="card-body">
                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
-                        <tr>
                         <tr>
                             <th data-toggle="tooltip" title="Select Case to Assess"><img class="action-image" src="~/headers/arrow-down.gif" /></th>
                             <th data-toggle="tooltip" title="Case Number" alt="Case Number"><img class="action-image" src="~/headers/policy-num.gif" /></th>
@@ -78,24 +76,21 @@
                         </tr>
                     </thead>
                 </table>
+        </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-
-                            <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                                <span class="badge badge-danger"> <i class="fas fa-glasses" aria-hidden="true"></i> </span>
-                                Assess <sub>report</sub>
-                            </button>
-                        </div>
+                        <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+                            <span class="badge badge-danger"> <i class="fas fa-glasses" aria-hidden="true"></i> </span>
+                            Assess <sub>report</sub>
+                        </button>
                     </div>
                 </div>
-            </form>
-            <div id="maps" class="col-md-12">
-                <div id="map"></div>
             </div>
-        </div>
+
+        </form>
     </div>
 </section>
 

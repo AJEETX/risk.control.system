@@ -9,7 +9,7 @@ namespace risk.control.system.Services
     {
         Task UpdateTaskStatus(long taskId, string updatedBy, string subStatus = "");
     }
-    public class TimelineService : ITimelineService
+    internal class TimelineService : ITimelineService
     {
         private readonly ApplicationDbContext context;
 

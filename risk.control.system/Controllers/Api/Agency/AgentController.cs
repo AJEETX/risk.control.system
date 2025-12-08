@@ -18,10 +18,12 @@ namespace risk.control.system.Controllers.Api.Agency
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public AgentController(ApplicationDbContext context)
+        public AgentController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet("GetNew")]
@@ -48,8 +50,11 @@ namespace risk.control.system.Controllers.Api.Agency
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                        AssignedToAgency = a.AssignedToAgency,
-                       Document = a.PolicyDetail.DocumentPath != null ? (a.PolicyDetail.DocumentPath) : Applicationsettings.NO_POLICY_IMAGE,
-                       Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
+                       Document = a.PolicyDetail.DocumentPath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, a.PolicyDetail.DocumentPath)))) : Applicationsettings.NO_POLICY_IMAGE,
+                       Customer =
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail))))),
                        Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
                        Policy = a.PolicyDetail.InsuranceType.GetEnumDisplayName(),
                        Status = a.SubStatus,
@@ -59,9 +64,8 @@ namespace risk.control.system.Controllers.Api.Agency
                        Created = a.Created.ToString("dd-MM-yyyy"),
                        timePending = a.GetAgentTimePending(),
                        PolicyNum = a.GetPolicyNumForAgency(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR),
-                       BeneficiaryPhoto = a.BeneficiaryDetail.ImagePath != null ?
-                                       a.BeneficiaryDetail.ImagePath :
-                                      Applicationsettings.NO_USER,
+                       BeneficiaryPhoto = a.BeneficiaryDetail.ImagePath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, a.BeneficiaryDetail?.ImagePath)))) : Applicationsettings.NO_USER,
                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,

@@ -15,7 +15,7 @@ namespace risk.control.system.Services
         Task<VendorApplicationUser> GetPin(string agentEmail, string portal_base_url);
     }
 
-    public class AgentService : IAgentService
+    internal class AgentService : IAgentService
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor httpContextAccessor;

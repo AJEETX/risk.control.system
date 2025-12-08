@@ -6,7 +6,7 @@ namespace risk.control.system.Services
     {
         Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath);
     }
-    public class GoogleApi : IGoogleApi
+    internal class GoogleApi : IGoogleApi
     {
         private readonly IWebHostEnvironment webHostEnvironment;
 

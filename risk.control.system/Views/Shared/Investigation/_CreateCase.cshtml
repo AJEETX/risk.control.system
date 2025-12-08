@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.InvestigationTask
+﻿@model risk.control.system.Models.ViewModel.CreateCaseViewModel
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <div id="article" class="card shadow-lg border-1 rounded-lg">
     <div class="card-header bg-secondary text-white text-center">
@@ -156,7 +156,7 @@
                     <div class="input-group mb-3">
                         <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-bs-toggle="tooltip" title="No Case Document" />
                         <i class="fa fa-asterisk asterik-style"></i>
-                        <input accept=".jpg,.jpeg,.png" asp-for="PolicyDetail.Document" type="file" class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required
+                        <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file" class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required
                                data-bs-toggle="tooltip" title="Upload Case Document" data-title-id="case-document" data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
                     </div>
                 </div>

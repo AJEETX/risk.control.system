@@ -238,7 +238,7 @@
                             <div class="input-group mb-3">
                                 @if (Model?.DocumentUrl is not null)
                                 {
-                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model.DocumentUrl" title="Company Document" data-bs-toggle="tooltip" />
+                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/Document/GetCompanyDocument/@Model.ClientCompanyId" title="Company Document" data-bs-toggle="tooltip" />
                                 }
                                 else
                                 {

@@ -11,7 +11,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task<string> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, UserManager<VendorApplicationUser> vendorUserManager,
             UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiCLient customApiCLient, IHttpContextAccessor httpAccessor,
-            List<Country> countries, List<InvestigationServiceType> servicesTypes)
+            List<Country> countries, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
             string COUNTRY_CODE = "IN";
             string PINCODE = "122003";
@@ -40,7 +40,8 @@ namespace risk.control.system.Seeds
                 BRANCH = "Main Office",
                 IFSC = "SBIN0001234",
                 BANK = "State Bank of India",
-                PINCODE = PINCODE
+                PINCODE = PINCODE,
+                PHONE = "9876543210"
             };
             var honest = new SeedInput
             {
@@ -52,14 +53,15 @@ namespace risk.control.system.Seeds
                 BRANCH = "Gurgaon",
                 IFSC = "SBIN0001234",
                 BANK = "State Bank of India",
-                PINCODE = PINCODE
+                PINCODE = PINCODE,
+                PHONE = "9876543210"
             };
             var agencies = new List<SeedInput> { proper, honest };
             var vendors = new List<Vendor> { };
 
             foreach (var agency in agencies)
             {
-                var vendor = await AgencySeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes);
+                var vendor = await AgencySeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes, fileStorageService);
                 vendors.Add(vendor);
             }
 
@@ -73,12 +75,13 @@ namespace risk.control.system.Seeds
                 BRANCH = "Head Office",
                 IFSC = "SBIN0001234",
                 BANK = "State Bank of India",
-                PINCODE = PINCODE
+                PINCODE = PINCODE,
+                PHONE = "9876543210"
             };
             var companies = new List<SeedInput> { insurer };
             foreach (var company in companies)
             {
-                _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company);
+                _ = await Insurer.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company, fileStorageService);
             }
             await context.SaveChangesAsync(null, false);
             var pincode = indiaPincodes.FirstOrDefault(p => p.Code == PINCODE);

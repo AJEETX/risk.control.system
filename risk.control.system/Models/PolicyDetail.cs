@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using risk.control.system.Helpers;
-
 namespace risk.control.system.Models
 {
     public class PolicyDetail : BaseEntity
@@ -12,46 +10,56 @@ namespace risk.control.system.Models
         public long PolicyDetailId { get; set; }
 
         [Display(Name = "Investigation type")]
-        public long? InvestigationServiceTypeId { get; set; } = default!;
+        [Required]
+        public long InvestigationServiceTypeId { get; set; } = default!;
 
         [Display(Name = "Investigation type")]
         public InvestigationServiceType? InvestigationServiceType { get; set; } = default!;
 
         [Display(Name = "Case number")]
+        [Required]
+        [StringLength(20)]
         public string ContractNumber { get; set; } = default!;
 
         [Display(Name = "Case issue date")]
         [DataType(DataType.Date)]
+        [Required]
         public DateTime ContractIssueDate { get; set; }
 
-        [Display(Name = "Claim type")]
-        public ClaimType? ClaimType { get; set; } = Models.ClaimType.DEATH;
         public InsuranceType? InsuranceType { get; set; } = Models.InsuranceType.CLAIM;
 
         [Display(Name = "Date of incident")]
         [DataType(DataType.Date)]
+        [Required]
         public DateTime DateOfIncident { get; set; }
 
         [Display(Name = "Cause of loss")]
+        [Required]
+        [StringLength(70)]
         public string CauseOfLoss { get; set; }
 
         [Display(Name = "Sum assured value")]
         [Column(TypeName = "decimal(15,2)")]
+        [Range(100, 9999999999)]
         public decimal SumAssuredValue { get; set; }
 
         [Display(Name = "Budget centre")]
-        public long? CostCentreId { get; set; }
+        [Required]
+        public long CostCentreId { get; set; }
 
         [Display(Name = "Budget centre")]
         public CostCentre? CostCentre { get; set; }
 
-        public long? CaseEnablerId { get; set; }
+        [Required]
+        public long CaseEnablerId { get; set; }
 
         [Display(Name = "Reason To Verify")]
         public CaseEnabler? CaseEnabler { get; set; }
 
         [Display(Name = "Case Document")]
         [NotMapped]
+        [Required]
+        [FileExtensions(Extensions = "jpg,jpeg,png")]
         public IFormFile? Document { get; set; }
 
         [Display(Name = "Case Document")]
@@ -60,6 +68,7 @@ namespace risk.control.system.Models
         public byte[]? DocumentImage { get; set; } = default!;
 
         [Display(Name = "Case remarks")]
+        [StringLength(500)]
         public string? Comments { get; set; }
 
         public override string ToString()
@@ -68,7 +77,6 @@ namespace risk.control.system.Models
            $"- Contract Number: {ContractNumber}\n" +
            $"- Investigation Service Type: {InvestigationServiceType}\n" +
            $"- Case Issue Date: ${ContractIssueDate}\n" +
-           $"- Claim Type: {ClaimType.GetEnumDisplayName()}\n" +
            $"- Date Of Incident: {DateOfIncident}\n" +
            $"- Cause Of Loss: {CauseOfLoss}\n" +
            $"- Sum Assured Value: {SumAssuredValue}\n" +

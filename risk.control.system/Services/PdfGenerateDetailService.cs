@@ -15,7 +15,7 @@ namespace risk.control.system.Services
         Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary
              , ReportTemplate investigationReport);
     }
-    public class PdfGenerateDetailService : IPdfGenerateDetailService
+    internal class PdfGenerateDetailService : IPdfGenerateDetailService
     {
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);

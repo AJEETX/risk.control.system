@@ -8,7 +8,7 @@ namespace risk.control.system.Services
         string GetNumberSequence(string module);
         void SaveNumberSequence(string module);
     }
-    public class NumberSequenceService : INumberSequenceService
+    internal class NumberSequenceService : INumberSequenceService
     {
         private readonly ApplicationDbContext context;
 

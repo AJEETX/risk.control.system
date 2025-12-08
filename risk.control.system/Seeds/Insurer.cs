@@ -9,11 +9,11 @@ using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
 {
-    public class InsurerAllianz
+    public class Insurer
     {
         private const string companyMapSize = "800x800";
         public static async Task<ClientCompany> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
-                    ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, SeedInput input)
+                    ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, SeedInput input, IFileStorageService fileStorageService)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
@@ -35,6 +35,8 @@ namespace risk.control.system.Seeds
             {
                 insurerImage = File.ReadAllBytes(noCompanyImagePath);
             }
+            var extension = Path.GetExtension(insurerImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(insurerImage, extension, input.DOMAIN);
             vendors = vendors.Where(v => v.CountryId == companyPinCode.CountryId).ToList();
 
             var insurer = new ClientCompany
@@ -55,9 +57,9 @@ namespace risk.control.system.Seeds
                 PinCodeId = companyPinCode.PinCodeId,
                 //Description = "CORPORATE OFFICE ",
                 Email = input.DOMAIN,
-                DocumentUrl = input.PHOTO,
+                DocumentUrl = relativePath,
                 DocumentImage = insurerImage,
-                PhoneNumber = "9988004739",
+                PhoneNumber = input.PHONE,
                 ExpiryDate = DateTime.Now.AddDays(5),
                 EmpanelledVendors = vendors,
                 Status = CompanyStatus.ACTIVE,
@@ -88,7 +90,7 @@ namespace risk.control.system.Seeds
 
             await context.SaveChangesAsync(null, false);
 
-            var creator = await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, insurerCompany.Entity);
+            var creator = await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, insurerCompany.Entity, fileStorageService);
 
             var claimTemplate = ReportTemplateSeed.CLAIM(context, insurer);
             var underwriting = ReportTemplateSeed.UNDERWRITING(context, insurer);

@@ -14,7 +14,7 @@ namespace risk.control.system.Services
         Task DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false);
     }
 
-    public class SmsService : ISmsService
+    internal class SmsService : ISmsService
     {
         private static HttpClient client = new HttpClient();
         private readonly IFeatureManager featureManager;

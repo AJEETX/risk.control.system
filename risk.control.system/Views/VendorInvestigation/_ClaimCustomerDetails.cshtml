@@ -105,7 +105,7 @@
                     <p class="text-muted text-sm">
                         @if (Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath is not null)
                         {
-                            <img id="profileImage" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath" data-bs-toggle="tooltip" title="Customer Photo" />
+                            <img id="profileImage" class="img-fluid block-data" src="/Document/GetCustomerDocument/@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" data-bs-toggle="tooltip" title="Customer Photo" />
                         }
                         else
                         {

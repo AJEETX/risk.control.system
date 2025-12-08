@@ -18,9 +18,10 @@ public interface IAgentIdService
     Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions);
 }
 
-public class AgentIdService : IAgentIdService
+internal class AgentIdService : IAgentIdService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IFileStorageService fileStorageService;
     private readonly IBackgroundJobClient backgroundJobClient;
     private readonly IPanCardService panCardService;
     private readonly IGoogleApi googleApi;
@@ -33,6 +34,7 @@ public class AgentIdService : IAgentIdService
 
     //test PAN FNLPM8635N
     public AgentIdService(ApplicationDbContext context,
+        IFileStorageService fileStorageService,
         IBackgroundJobClient backgroundJobClient,
         IPanCardService panCardService,
         IGoogleApi googleApi,
@@ -42,6 +44,7 @@ public class AgentIdService : IAgentIdService
         IFaceMatchService faceMatchService)
     {
         this._context = context;
+        this.fileStorageService = fileStorageService;
         this.backgroundJobClient = backgroundJobClient;
         this.panCardService = panCardService;
         this.googleApi = googleApi;
@@ -56,7 +59,7 @@ public class AgentIdService : IAgentIdService
         InvestigationTask claim = null;
         AgentIdReport face = null;
         LocationReport location = null;
-        string filePath = string.Empty;
+        byte[] faceBytes;
         try
         {
             claim = await _context.Investigations
@@ -96,27 +99,26 @@ public class AgentIdService : IAgentIdService
                 .FirstOrDefault(l => l.Id == location.Id);
 
             face = locationTemplate.AgentIdReport;
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
+            face.FilePath = relativePath;
+            face.ImageExtension = Path.GetExtension(fileName);
+            //string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName.ToLower());
+            //string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
+            //face.ImageExtension = onlyExtension;
 
-            string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName.ToLower());
-            string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
-            face.ImageExtension = onlyExtension;
+            //var fileName = Guid.NewGuid().ToString() + Path.GetExtension(data.Image.FileName);
+            //var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "agent-face");
 
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(data.Image.FileName);
-            var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "agent-face");
+            //if (!Directory.Exists(imagePath))
+            //{
+            //    Directory.CreateDirectory(imagePath);
+            //}
 
-            if (!Directory.Exists(imagePath))
-            {
-                Directory.CreateDirectory(imagePath);
-            }
-
-            filePath = Path.Combine(webHostEnvironment.WebRootPath, "agent-face", fileName);
-            byte[] faceBytes;
+            //filePath = Path.Combine(webHostEnvironment.WebRootPath, "agent-face", fileName);
             using (var dataStream = new MemoryStream())
             {
                 data.Image.CopyTo(dataStream);
                 faceBytes = dataStream.ToArray();
-                await File.WriteAllBytesAsync(filePath, faceBytes);
-                face.FilePath = "/agent-face/" + fileName;
             }
             locationTemplate.Updated = DateTime.Now;
             locationTemplate.AgentEmail = agent.Email;
@@ -150,7 +152,7 @@ public class AgentIdService : IAgentIdService
 
             #region FACE IMAGE PROCESSING
 
-            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, onlyExtension);
+            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, face.ImageExtension);
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             var addressTask = httpClientService.GetRawAddress(latitude, longitude);
             #endregion FACE IMAGE PROCESSING
@@ -177,7 +179,7 @@ public class AgentIdService : IAgentIdService
             face.LocationInfo = weatherCustomData;
             var (confidence, compressImage, similarity) = await faceMatchTask;
 
-            await File.WriteAllBytesAsync(filePath, compressImage);
+            await File.WriteAllBytesAsync(face.FilePath, compressImage);
             face.DigitalIdImageMatchConfidence = confidence;
             face.Similarity = similarity;
             face.ImageValid = similarity > 70;
@@ -189,7 +191,7 @@ public class AgentIdService : IAgentIdService
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
                 Image = compressImage,
-                LocationImage = filePath,
+                LocationImage = face.FilePath,
                 LocationLongLat = face.LongLat,
                 LocationTime = face?.LongLatTime,
                 FacePercent = face?.DigitalIdImageMatchConfidence
@@ -208,8 +210,8 @@ public class AgentIdService : IAgentIdService
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-                Image = await File.ReadAllBytesAsync(filePath),
-                LocationImage = (filePath),
+                Image = await File.ReadAllBytesAsync(face.FilePath),
+                LocationImage = (face.FilePath),
                 LocationLongLat = face?.LongLat,
                 LocationTime = face?.LongLatTime,
                 FacePercent = face?.DigitalIdImageMatchConfidence
@@ -222,7 +224,6 @@ public class AgentIdService : IAgentIdService
         InvestigationTask claim = null;
         FaceIdReport face = null;
         LocationReport location = null;
-        string filePath = string.Empty;
         try
         {
             claim = await _context.Investigations
@@ -264,28 +265,12 @@ public class AgentIdService : IAgentIdService
             face = locationTemplate.FaceIds.FirstOrDefault(c => c.ReportName == data.ReportName);
 
             var hasCustomerVerification = face.ReportName == DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName();
-            string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName);
-            string imageFileName = Path.GetFileNameWithoutExtension(imageFileNameWithExtension);
-            string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
-            face.ImageExtension = onlyExtension;
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
+            face.FilePath = relativePath;
+            face.ImageExtension = Path.GetExtension(fileName);
 
-            var extension = Path.GetExtension(data.Image.FileName).ToLower();
-            var fileName = Guid.NewGuid().ToString() + extension;
-            var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "face");
-
-            // Ensure directory exists
-            if (!Directory.Exists(imagePath))
-            {
-                Directory.CreateDirectory(imagePath);
-            }
-
-            // Full file path
-            filePath = Path.Combine(webHostEnvironment.WebRootPath, "face", fileName);
             using var stream = new MemoryStream();
             await data.Image.CopyToAsync(stream);
-            await File.WriteAllBytesAsync(filePath, stream.ToArray());
-
-            face.FilePath = "/face/" + fileName;
             var faceBytes = stream.ToArray();
 
             locationTemplate.AgentEmail = agent.Email;
@@ -306,13 +291,13 @@ public class AgentIdService : IAgentIdService
             if (!hasCustomerVerification)
             {
                 var beneficiaryFilePath = claim.BeneficiaryDetail.ImagePath.Substring(1);
-                var image = Path.Combine(webHostEnvironment.WebRootPath, beneficiaryFilePath);
+                var image = Path.Combine(webHostEnvironment.ContentRootPath, claim.BeneficiaryDetail.ImagePath);
                 registeredImage = await File.ReadAllBytesAsync(image);
             }
             else
             {
                 var customerFilePath = claim.CustomerDetail.ImagePath.Substring(1);
-                var image = Path.Combine(webHostEnvironment.WebRootPath, customerFilePath);
+                var image = Path.Combine(webHostEnvironment.ContentRootPath, claim.CustomerDetail.ImagePath);
                 registeredImage = await File.ReadAllBytesAsync(image);
             }
 
@@ -333,7 +318,7 @@ public class AgentIdService : IAgentIdService
 
             #region FACE IMAGE PROCESSING
 
-            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, onlyExtension);
+            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, face.ImageExtension);
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             var addressTask = httpClientService.GetRawAddress(latitude, longitude);
             #endregion FACE IMAGE PROCESSING
@@ -363,7 +348,7 @@ public class AgentIdService : IAgentIdService
 
             var (confidence, compressImage, similarity) = await faceMatchTask;
 
-            await File.WriteAllBytesAsync(filePath, compressImage);
+            await File.WriteAllBytesAsync(face.FilePath, compressImage);
             //face.IdImage = compressImage;
             face.MatchConfidence = confidence;
             face.Similarity = similarity;
@@ -375,8 +360,8 @@ public class AgentIdService : IAgentIdService
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-                Image = await File.ReadAllBytesAsync(filePath),
-                LocationImage = (filePath),
+                Image = await File.ReadAllBytesAsync(face.FilePath),
+                LocationImage = (face.FilePath),
                 LocationLongLat = face.LongLat,
                 LocationTime = face?.LongLatTime,
                 FacePercent = face?.MatchConfidence
@@ -396,8 +381,8 @@ public class AgentIdService : IAgentIdService
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-                Image = await File.ReadAllBytesAsync(filePath),
-                LocationImage = (filePath),
+                Image = await File.ReadAllBytesAsync(face.FilePath),
+                LocationImage = (face.FilePath),
                 LocationLongLat = face?.LongLat,
                 LocationTime = face?.LongLatTime,
                 FacePercent = face?.MatchConfidence
@@ -410,7 +395,6 @@ public class AgentIdService : IAgentIdService
         InvestigationTask claim = null;
         DocumentIdReport doc = null;
         Task<string> addressTask = null;
-        string filePath = string.Empty;
         try
         {
             claim = await _context.Investigations
@@ -444,29 +428,14 @@ public class AgentIdService : IAgentIdService
                 .FirstOrDefault(l => l.Id == location.Id);
 
             doc = locationTemplate.DocumentIds.FirstOrDefault(c => c.ReportName == data.ReportName);
-            string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName);
-            string imageFileName = Path.GetFileNameWithoutExtension(imageFileNameWithExtension);
-            string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
-            doc.ImageExtension = onlyExtension;
-
-            var extension = Path.GetExtension(data.Image.FileName).ToLower();
-            var fileName = Guid.NewGuid().ToString() + extension;
-            var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "document");
-
-            // Ensure directory exists
-            if (!Directory.Exists(imagePath))
-            {
-                Directory.CreateDirectory(imagePath);
-            }
-
-            // Full file path
-            filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", fileName);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
+            doc.FilePath = relativePath;
+            doc.ImageExtension = Path.GetExtension(fileName);
 
             using var stream = new MemoryStream();
             await data.Image.CopyToAsync(stream);
             byte[] docImage = stream.ToArray();
-            await File.WriteAllBytesAsync(filePath, docImage);
-            doc.FilePath = "/document/" + fileName;
+
 
             locationTemplate.ValidationExecuted = true;
             locationTemplate.Updated = DateTime.Now;
@@ -493,7 +462,7 @@ public class AgentIdService : IAgentIdService
             }
             var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
-            var googleDetecTask = googleApi.DetectTextAsync(filePath);
+            var googleDetecTask = googleApi.DetectTextAsync(doc.FilePath);
 
             addressTask = httpClientService.GetRawAddress(latitude, longitude);
 
@@ -513,11 +482,11 @@ public class AgentIdService : IAgentIdService
                 //PAN
                 if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
                 {
-                    doc = await panCardService.Process(docImage, imageReadOnly, company, doc, onlyExtension);
+                    doc = await panCardService.Process(docImage, imageReadOnly, company, doc, doc.ImageExtension);
                 }
                 else
                 {
-                    await File.WriteAllBytesAsync(filePath, CompressImage.ProcessCompress(docImage, onlyExtension));
+                    await File.WriteAllBytesAsync(doc.FilePath, CompressImage.ProcessCompress(docImage, doc.ImageExtension));
                     //doc.IdImage = CompressImage.ProcessCompress(doc.IdImage, onlyExtension);
                     doc.ImageValid = true;
                     doc.LongLatTime = DateTime.Now;
@@ -527,7 +496,7 @@ public class AgentIdService : IAgentIdService
             }
             else
             {
-                await File.WriteAllBytesAsync(filePath, CompressImage.ProcessCompress(docImage, onlyExtension));
+                await File.WriteAllBytesAsync(doc.FilePath, CompressImage.ProcessCompress(docImage, doc.ImageExtension));
                 //doc.IdImage = CompressImage.ProcessCompress(doc.IdImage, onlyExtension);
                 doc.ImageValid = false;
                 doc.LongLatTime = DateTime.Now;
@@ -545,7 +514,7 @@ public class AgentIdService : IAgentIdService
             {
                 BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
                 Image = docImage,
-                OcrImage = (filePath),
+                OcrImage = (doc.FilePath),
                 OcrLongLat = doc?.LongLat,
                 OcrTime = doc?.LongLatTime,
                 Valid = doc?.ImageValid
@@ -565,8 +534,8 @@ public class AgentIdService : IAgentIdService
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
-                Image = await File.ReadAllBytesAsync(filePath),
-                LocationImage = (filePath),
+                Image = await File.ReadAllBytesAsync(doc.FilePath),
+                LocationImage = (doc.FilePath),
                 LocationLongLat = doc?.LongLat,
                 LocationTime = doc?.LongLatTime,
                 Valid = doc?.ImageValid
@@ -582,27 +551,6 @@ public class AgentIdService : IAgentIdService
         byte[] fileBytes = null; ;
         try
         {
-            using var memoryStream = new MemoryStream();
-            await data.Image.CopyToAsync(memoryStream);
-            fileBytes = memoryStream.ToArray();
-            var extension = Path.GetExtension(data.Image.FileName).ToLower();
-            var fileName = Guid.NewGuid().ToString() + extension;
-            var mediaPath = Path.Combine(webHostEnvironment.WebRootPath, "media");
-
-            // Ensure directory exists
-            if (!Directory.Exists(mediaPath))
-            {
-                Directory.CreateDirectory(mediaPath);
-            }
-
-            // Full file path
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "media", fileName);
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await data.Image.CopyToAsync(stream);
-            }
-
-
             claim = await _context.Investigations
                  .Include(c => c.PolicyDetail)
                  .Include(c => c.CustomerDetail)
@@ -620,6 +568,13 @@ public class AgentIdService : IAgentIdService
 
             // Save to DB
             media = locationTemplate.MediaReports.FirstOrDefault(c => c.ReportName == data.ReportName);
+
+            using var memoryStream = new MemoryStream();
+            await data.Image.CopyToAsync(memoryStream);
+            fileBytes = memoryStream.ToArray();
+            var (fileName, relativePath) = await fileStorageService.SaveMediaAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
+            media.FilePath = relativePath;
+            media.ImageExtension = Path.GetExtension(fileName);
 
             var longLat = data.LocationLatLong.IndexOf("/");
             var latitude = data.LocationLatLong.Substring(0, longLat)?.Trim();
@@ -657,7 +612,6 @@ public class AgentIdService : IAgentIdService
             media.Distance = distance;
             media.DistanceInMetres = distanceInMetres;
             media.DurationInSeconds = durationInSecs;
-            media.FilePath = "/media/" + fileName;
 
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
                 $"\r\n" +
@@ -665,8 +619,8 @@ public class AgentIdService : IAgentIdService
                 $"\r\n" +
                 $"\r\nElevation(sea level):{weatherData.elevation} metres";
 
-            media.ImageExtension = extension;
-            media.MediaExtension = extension.TrimStart('.');
+            media.ImageExtension = media.ImageExtension;
+            media.MediaExtension = media.ImageExtension.TrimStart('.');
             media.ValidationExecuted = true;
             media.ImageValid = true;
             media.LocationAddress = $"{address}";
@@ -676,7 +630,7 @@ public class AgentIdService : IAgentIdService
             var mimeType = data.Image.ContentType.ToLower();
 
             string[] videoExtensions = { ".mp4", ".webm", ".avi", ".mov", ".mkv" };
-            bool isVideo = mimeType.StartsWith("video/") || videoExtensions.Contains(extension);
+            bool isVideo = mimeType.StartsWith("video/") || videoExtensions.Contains(media.ImageExtension);
 
             media.MediaType = isVideo ? MediaType.VIDEO : MediaType.AUDIO;
 

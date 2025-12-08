@@ -29,10 +29,9 @@ namespace risk.control.system.Services
         Task<AudioTranscript> TranscribeAsync(long locationId, string reportName, string bucketName, string fileName, string filePath);
     }
 
-    public class HttpClientService : IHttpClientService
+    internal class HttpClientService : IHttpClientService
     {
         private static HttpClient httpClient = new HttpClient();
-        private static string PinCodeBaseUrl = "https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode";
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IAmazonTranscribeService _amazonTranscribeService;
         private readonly IAmazonS3 s3Client;

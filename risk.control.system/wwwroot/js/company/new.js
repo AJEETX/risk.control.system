@@ -144,8 +144,8 @@
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
                         const formattedUrl = row.personMapAddressUrl
-                            .replace("{0}", "500")
-                            .replace("{1}", "500");
+                            .replace("{0}", "400")
+                            .replace("{1}", "400");
 
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">

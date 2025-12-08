@@ -114,6 +114,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddScoped<ISanitizerService, SanitizerService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
 builder.Services.AddScoped<IPhoneService, PhoneService>();
 builder.Services.AddScoped<IMediaDataService, MediaDataService>();

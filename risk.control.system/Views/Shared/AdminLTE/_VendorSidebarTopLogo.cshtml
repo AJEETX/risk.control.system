@@ -8,12 +8,14 @@
 @if (SignInManager.IsSignedIn(User))
 {
     var roleCode = string.Empty;
+    var user = UserManager.GetUserAsync(User).Result;
+
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
 
-        @if (UserManager.GetUserAsync(User).Result?.ProfilePicture != null)
+        @if (user != null)
         {
             <div class="image">
-                <img class="elevation-2 sidebar-profile img-circle" src="data:image/*;base64,@(Convert.ToBase64String(@UserManager.GetUserAsync(User).Result.ProfilePicture))">
+                <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetAgencyUserDocument/@user.Id" alt="user image">
             </div>
         }
         else

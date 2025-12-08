@@ -17,7 +17,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             UserManager<VendorApplicationUser> userManager,
-            Vendor vendor, ICustomApiCLient customApiCLient)
+            Vendor vendor, ICustomApiCLient customApiCLient, IFileStorageService fileStorageService)
         {
             noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
@@ -34,6 +34,9 @@ namespace risk.control.system.Seeds
             {
                 adminImage = File.ReadAllBytes(noUserImagePath);
             }
+            var extension = Path.GetExtension(adminImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, vendor.Email);
+
             var vendorAdmin = new VendorApplicationUser()
             {
                 UserName = adminEmailwithSuffix,
@@ -54,7 +57,7 @@ namespace risk.control.system.Seeds
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = AGENCY_ADMIN.PROFILE_IMAGE,
+                ProfilePictureUrl = relativePath,
                 ProfilePicture = adminImage,
                 Role = AppRoles.AGENCY_ADMIN,
                 UserRole = AgencyRole.AGENCY_ADMIN,
@@ -81,11 +84,12 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Supervisor
-            await SupervisorSeed.Seed(context, SUPERVISOR.CODE, webHostEnvironment, userManager, vendor, pinCode, SUPERVISOR.PROFILE_IMAGE, SUPERVISOR.FIRST_NAME, SUPERVISOR.LAST_NAME);
+            await SupervisorSeed.Seed(context, SUPERVISOR.CODE, webHostEnvironment, userManager, vendor, pinCode, SUPERVISOR.PROFILE_IMAGE, SUPERVISOR.FIRST_NAME, SUPERVISOR.LAST_NAME, fileStorageService);
 
             //Seed Vendor Agent
             string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
-            await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME, "2 Jawahar Nagar");
+            await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME,
+                fileStorageService, "2 Jawahar Nagar");
 
             //if (!System.Diagnostics.Debugger.IsAttached)
             //{

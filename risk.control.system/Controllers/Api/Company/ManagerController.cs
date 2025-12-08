@@ -22,12 +22,15 @@ namespace risk.control.system.Controllers.Api.Company
     public class ManagerController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IInvestigationService service;
 
         public ManagerController(ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
             IInvestigationService service)
         {
             _context = context;
+            this.webHostEnvironment = webHostEnvironment;
             this.service = service;
         }
 
@@ -103,11 +106,13 @@ namespace risk.control.system.Controllers.Api.Company
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 Document = a.PolicyDetail?.DocumentPath != null ?
-                    a.PolicyDetail?.DocumentPath :
-                    Applicationsettings.NO_POLICY_IMAGE,
-                Customer = a.CustomerDetail?.ImagePath != null ?
-                    a.CustomerDetail?.ImagePath :
-                    Applicationsettings.NO_USER,
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, a.PolicyDetail.DocumentPath)))) :
+                Applicationsettings.NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ImagePath != null
+                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, a.CustomerDetail?.ImagePath))))
+                        : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ??
                     "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /></span>",
                 Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
@@ -118,9 +123,8 @@ namespace risk.control.system.Controllers.Api.Company
                 Created = a.Created.ToString("dd-MM-yyyy"),
                 timePending = GetManagerTimeCompleted(a),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ?
-                    a.BeneficiaryDetail.ImagePath :
-                    Applicationsettings.NO_USER,
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, a.BeneficiaryDetail?.ImagePath)))) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i></span>" :
                     a.BeneficiaryDetail.Name,
@@ -228,11 +232,13 @@ namespace risk.control.system.Controllers.Api.Company
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 Document = a.PolicyDetail?.DocumentPath != null ?
-                    a.PolicyDetail.DocumentPath :
-                    Applicationsettings.NO_POLICY_IMAGE,
-                Customer = a.CustomerDetail?.ImagePath != null ?
-                    a.CustomerDetail?.ImagePath :
-                    Applicationsettings.NO_USER,
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, a.PolicyDetail.DocumentPath)))) :
+                Applicationsettings.NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ImagePath != null
+                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, a.CustomerDetail?.ImagePath))))
+                        : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ??
                     "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /></span>",
                 Policy = $"<span class='badge badge-light'>{a.PolicyDetail?.InsuranceType.GetEnumDisplayName()}</span>",
@@ -243,9 +249,8 @@ namespace risk.control.system.Controllers.Api.Company
                 Created = a.Created.ToString("dd-MM-yyyy"),
                 timePending = GetManagerTimeCompleted(a),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ?
-                    a.BeneficiaryDetail?.ImagePath :
-                    Applicationsettings.NO_USER,
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, a.BeneficiaryDetail?.ImagePath)))) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" :
                     a.BeneficiaryDetail.Name,

@@ -36,7 +36,7 @@ namespace risk.control.system.Services
         Task NotifyFileUploadAutoAssign(string senderUserEmail, FileOnFileSystemModel file, string url);
     }
 
-    public class MailService : IMailService
+    internal class MailService : IMailService
     {
         private readonly ApplicationDbContext _context;
         private readonly ISmsService smsService;

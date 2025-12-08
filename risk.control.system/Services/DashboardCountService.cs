@@ -18,7 +18,7 @@ namespace risk.control.system.Services
         DashboardData GetSuperAdminCount(string userEmail, string role);
     }
 
-    public class DashboardCountService : IDashboardCountService
+    internal class DashboardCountService : IDashboardCountService
     {
         private readonly ApplicationDbContext _context;
 

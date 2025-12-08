@@ -50,10 +50,8 @@
             </div>
             <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
         </div>
-        <div class="card-body">
-            
-            <form id="radioButtons" asp-action="SelectVendorAgent" method="get">
-
+        <form id="radioButtons" asp-action="SelectVendorAgent" method="get">
+            <div class="card-body">
                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
                         <tr>
@@ -76,25 +74,21 @@
                         </tr>
                     </thead>
                 </table>
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+        </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
-                            <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                                <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i> </span>
-                                Allocate
-                            </button>
+                        <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i> </span>
+                            Allocate
+                        </button>
 
-                        </div>
                     </div>
                 </div>
-            </form>
-            <div id="maps" class="col-md-12">
-                <div id="map"></div>
-
             </div>
-        </div>
+        </form>
     </div>
 </section>
 <partial name="_DisplayPopUp" />

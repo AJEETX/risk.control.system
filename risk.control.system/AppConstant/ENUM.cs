@@ -170,49 +170,6 @@ namespace risk.control.system.Models
         [Description("Non-High Net Worth Individual")]
         NONHNI,
     }
-    public enum DwellType
-    {
-        [Display(Name = "Mortgaged")]
-        [Description("Property is owned with an active mortgage")]
-        MORTGAGED = 0,
-
-        [Display(Name = "Owned")]
-        [Description("Property is fully owned without any mortgage")]
-        OWNED = 1,
-
-        [Display(Name = "Rented")]
-        [Description("Property is rented")]
-        RENTED = 2,
-
-        [Display(Name = "Shared")]
-        [Description("Property is shared with others, such as roommates or family")]
-        SHARED = 3
-    }
-
-    public enum YESNO
-    {
-        [Display(Name = "YES")]
-        [Description("Affirmative response")]
-        YES = 0,
-
-        [Display(Name = "NO")]
-        [Description("Negative response")]
-        NO = 1
-    }
-    public enum DURATION
-    {
-        [Display(Name = "No Time")]
-        [Description("No specific duration assigned")]
-        ZERO = 0,
-
-        [Display(Name = "Less than 6 Months")]
-        [Description("The duration is less than 6 months")]
-        LESS_THAN_6_MONTHS = 1,
-
-        [Display(Name = "More than 6 Months")]
-        [Description("The duration exceeds 6 months")]
-        MORE_THAN_6_MONTHS = 2
-    }
     public enum SupervisorRemarkType
     {
         OK,
