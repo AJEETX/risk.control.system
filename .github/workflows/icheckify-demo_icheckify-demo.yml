@@ -26,21 +26,32 @@ jobs:
 
     - name: Install Codacy CLI v2
       run: |
-          LATEST=$(curl -s https://api.github.com/repos/codacy/codacy-cli-v2/releases/latest \
-            | grep browser_download_url \
-            | grep linux_amd64 \
-            | cut -d '"' -f 4)
+          # Get latest Linux AMD64 tar.gz
+            LATEST=$(curl -s https://api.github.com/repos/codacy/codacy-cli-v2/releases/latest \
+              | grep browser_download_url \
+              | grep linux_amd64 \
+              | cut -d '"' -f 4)
 
-          echo "Downloading: $LATEST"
+            echo "Downloading: $LATEST"
+            wget "$LATEST" -O codacy-cli.tar.gz
 
-          wget "$LATEST" -O codacy-cli.tar.gz
-          tar -xzf codacy-cli.tar.gz
-          
-          BINARY=$(find . -type f -name "codacy" | head -1)
-          echo "Found binary: $BINARY"
+            # Extract tar.gz
+            mkdir codacy-cli-temp
+            tar -xzf codacy-cli.tar.gz -C codacy-cli-temp
 
-          chmod +x "$BINARY"
-          sudo mv "$BINARY" /usr/local/bin/codacy
+            # Find the binary inside extracted folder
+            BINARY=$(find codacy-cli-temp -type f -name "codacy" | head -1)
+
+            if [ -z "$BINARY" ]; then
+              echo "❌ Could not find codacy binary!"
+              exit 1
+            fi
+
+            echo "Found binary: $BINARY"
+
+            # Make executable and move to /usr/local/bin
+            chmod +x "$BINARY"
+            sudo mv "$BINARY" /usr/local/bin/codacy
 
     - name: Run Codacy analysis
       env:
