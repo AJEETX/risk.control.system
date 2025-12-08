@@ -27,7 +27,7 @@ namespace risk.control.system.Seeds
                 managerImage = File.ReadAllBytes(noUserImagePath);
             }
             var extension = Path.GetExtension(managerImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(managerImage, extension, clientCompany.Email);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(managerImage, extension, clientCompany.Email, "user");
             var manager = new ClientCompanyApplicationUser()
             {
                 UserName = managorEmailwithSuffix,

@@ -144,7 +144,7 @@
                                     <p class="text-muted text-sm">
                                         @if (Model?.DocumentUrl is not null)
                                         {
-                                            <img id="documentImage" class="img-fluid" src="@Model?.DocumentUrl">
+                                            <img id="documentImage" class="img-fluid" src="/Document/GetCompanyDocument/@Model.ClientCompanyId">
                                         }
                                         else
                                         {

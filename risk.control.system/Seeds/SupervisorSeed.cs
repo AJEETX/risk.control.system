@@ -29,7 +29,7 @@ namespace risk.control.system.Seeds
                 supervisorImage = File.ReadAllBytes(noUserImagePath);
             }
             var extension = Path.GetExtension(supervisorImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(supervisorImage, extension, vendor.Email);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(supervisorImage, extension, vendor.Email, "user");
             var vendorSupervisor = new VendorApplicationUser()
             {
                 UserName = supervisorEmailwithSuffix,

@@ -269,7 +269,7 @@ namespace risk.control.system.Controllers
             {
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0 && !string.IsNullOrWhiteSpace(Path.GetFileName(user.ProfileImage.FileName)))
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
 
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
@@ -436,7 +436,7 @@ namespace risk.control.system.Controllers
                 if (applicationUser?.ProfileImage != null && applicationUser?.ProfileImage.Length > 0)
                 {
                     var domain = user.Email.Split('@').Last();
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, domain);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, domain, "user");
 
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);

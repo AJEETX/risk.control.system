@@ -23,7 +23,7 @@ namespace risk.control.system.Seeds
 
             var adminImage = File.ReadAllBytes(adminImagePath);
             var extension = Path.GetExtension(adminImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, companyDomain);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, companyDomain, "user");
             var admin = new ClientCompanyApplicationUser()
             {
                 UserName = adminEmailwithSuffix,

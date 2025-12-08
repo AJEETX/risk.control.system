@@ -35,7 +35,7 @@ namespace risk.control.system.Seeds
                 adminImage = File.ReadAllBytes(noUserImagePath);
             }
             var extension = Path.GetExtension(adminImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, vendor.Email);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, vendor.Email, "user");
 
             var vendorAdmin = new VendorApplicationUser()
             {

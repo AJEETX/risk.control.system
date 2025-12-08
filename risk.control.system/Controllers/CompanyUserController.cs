@@ -26,6 +26,7 @@ namespace risk.control.system.Controllers
     {
         public List<UsersViewModel> UserList;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
+        private readonly IFileStorageService fileStorageService;
         private readonly IPasswordHasher<ClientCompanyApplicationUser> passwordHasher;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
@@ -38,6 +39,7 @@ namespace risk.control.system.Controllers
         private string portal_base_url = string.Empty;
 
         public CompanyUserController(UserManager<ClientCompanyApplicationUser> userManager,
+            IFileStorageService fileStorageService,
             IPasswordHasher<ClientCompanyApplicationUser> passwordHasher,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
@@ -49,6 +51,7 @@ namespace risk.control.system.Controllers
             ApplicationDbContext context)
         {
             this.userManager = userManager;
+            this.fileStorageService = fileStorageService;
             this.passwordHasher = passwordHasher;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
@@ -78,7 +81,6 @@ namespace risk.control.system.Controllers
             var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage };
             ViewData["BreadcrumbNode"] = editPage;
-
 
             return View(model);
         }
@@ -133,24 +135,21 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClientCompanyApplicationUser user, string emailSuffix)
         {
+            if (string.IsNullOrWhiteSpace(emailSuffix))
+            {
+                notifyService.Error("Email suffix is required!");
+                return View(user);
+            }
             var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                string newFileName = userFullEmail;
-                string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
-                newFileName += fileExtension;
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-                user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
+                user.ProfilePictureUrl = relativePath;
+                user.ProfilePictureExtension = Path.GetExtension(fileName);
+
                 using var dataStream = new MemoryStream();
                 user.ProfileImage.CopyTo(dataStream);
                 user.ProfilePicture = dataStream.ToArray();
-                user.ProfilePictureUrl = "/company/" + newFileName;
-                user.ProfilePictureExtension = fileExtension;
             }
             //DEMO
             user.Active = true;
@@ -189,7 +188,6 @@ namespace risk.control.system.Controllers
             notifyService.Error($"Err User create.", 3);
             return View(user);
         }
-
 
         // GET: ClientCompanyApplicationUser/Edit/5
         [Breadcrumb("Edit ")]
@@ -230,21 +228,14 @@ namespace risk.control.system.Controllers
                 var user = await userManager.FindByIdAsync(id.ToString());
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    string newFileName = user.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                    var domain = applicationUser.Email.Split('@')[1];
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, domain, "user");
+                    applicationUser.ProfilePictureUrl = relativePath;
+                    applicationUser.ProfilePictureExtension = Path.GetExtension(fileName);
+
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
-                    applicationUser.ProfilePictureUrl = "/company/" + newFileName;
-                    applicationUser.ProfilePictureExtension = fileExtension;
                 }
 
                 if (user != null)
@@ -296,7 +287,6 @@ namespace risk.control.system.Controllers
             notifyService.Error("OOPS !!!..Contact Admin");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
-
 
         // GET: VendorApplicationUsers/Delete/5
         [Breadcrumb("Delete")]

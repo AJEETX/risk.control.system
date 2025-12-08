@@ -24,6 +24,7 @@ namespace risk.control.system.Controllers
     {
         private const string vendorMapSize = "800x800";
         private readonly ApplicationDbContext _context;
+        private readonly IFileStorageService fileStorageService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
@@ -33,6 +34,7 @@ namespace risk.control.system.Controllers
 
         public ClientCompanyController(
             ApplicationDbContext context,
+            IFileStorageService fileStorageService,
             IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
@@ -41,6 +43,7 @@ namespace risk.control.system.Controllers
             UserManager<ClientCompanyApplicationUser> userManager)
         {
             _context = context;
+            this.fileStorageService = fileStorageService;
             this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
@@ -73,25 +76,15 @@ namespace risk.control.system.Controllers
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
             clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
-            IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
-            if (companyDocument is not null)
+            if (clientCompany.Document is not null)
             {
-                string newFileName = clientCompany.Email;
-                string fileExtension = Path.GetExtension(Path.GetFileName(companyDocument.FileName));
-                newFileName += fileExtension;
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-                companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                clientCompany.DocumentUrl = "/company/" + newFileName;
+                var (fileName, relativePath) = await fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
+                clientCompany.DocumentUrl = relativePath;
+                clientCompany.DocumentImageExtension = Path.GetExtension(fileName);
 
                 using var dataStream = new MemoryStream();
-                companyDocument.CopyTo(dataStream);
+                clientCompany.Document.CopyTo(dataStream);
                 clientCompany.DocumentImage = dataStream.ToArray();
-                clientCompany.DocumentImageExtension = fileExtension;
             }
 
             var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == clientCompany.SelectedPincodeId);
@@ -254,25 +247,15 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
-                if (companyDocument is not null)
+                if (clientCompany.Document is not null)
                 {
-                    string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(companyDocument.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
+                    clientCompany.DocumentUrl = relativePath;
+                    clientCompany.DocumentImageExtension = Path.GetExtension(fileName);
 
                     using var dataStream = new MemoryStream();
-                    companyDocument.CopyTo(dataStream);
+                    clientCompany.Document.CopyTo(dataStream);
                     clientCompany.DocumentImage = dataStream.ToArray();
-                    companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                    clientCompany.DocumentUrl = "/company/" + newFileName;
-                    clientCompany.DocumentImageExtension = fileExtension;
                 }
                 else
                 {

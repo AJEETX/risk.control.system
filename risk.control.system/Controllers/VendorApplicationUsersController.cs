@@ -25,6 +25,7 @@ namespace risk.control.system.Controllers
     public class VendorApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileStorageService fileStorageService;
         private readonly ILogger<VendorApplicationUsersController> logger;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
@@ -37,6 +38,7 @@ namespace risk.control.system.Controllers
         private string portal_base_url = string.Empty;
 
         public VendorApplicationUsersController(ApplicationDbContext context,
+            IFileStorageService fileStorageService,
             ILogger<VendorApplicationUsersController> logger,
             UserManager<VendorApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
@@ -48,6 +50,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this.fileStorageService = fileStorageService;
             this.logger = logger;
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -159,22 +162,13 @@ namespace risk.control.system.Controllers
                 }
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
-                    string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    user.ProfilePictureUrl = "/agency/" + newFileName;
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
+                    user.ProfilePictureUrl = relativePath;
+                    user.ProfilePictureExtension = Path.GetExtension(fileName);
 
                     using var dataStream = new MemoryStream();
                     user.ProfileImage.CopyTo(dataStream);
                     user.ProfilePicture = dataStream.ToArray();
-                    user.ProfilePictureExtension = fileExtension;
                 }
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 user.PhoneNumber = user.PhoneNumber.TrimStart('0');
@@ -278,26 +272,18 @@ namespace risk.control.system.Controllers
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    string newFileName = user.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
+                    var domain = user.Email.Split('@')[1];
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, domain, "user");
+                    user.ProfilePictureUrl = relativePath;
+                    user.ProfilePictureExtension = Path.GetExtension(fileName);
+
                     using var dataStream = new MemoryStream();
-                    applicationUser.ProfileImage.CopyTo(dataStream);
-                    applicationUser.ProfilePicture = dataStream.ToArray();
-                    applicationUser.ProfilePictureExtension = fileExtension;
+                    user.ProfileImage.CopyTo(dataStream);
+                    user.ProfilePicture = dataStream.ToArray();
                 }
 
                 if (user != null)
                 {
-                    user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                     user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                     user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
                     user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;

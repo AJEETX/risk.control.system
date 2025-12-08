@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
                     var domain = applicationUser.Email.Split('@')[1];
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(applicationUser.ProfileImage, domain);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(applicationUser.ProfileImage, domain, "user");
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
@@ -229,7 +229,6 @@ namespace risk.control.system.Controllers
         {
             try
             {
-
                 if (ModelState.IsValid)
                 {
                     var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
@@ -244,7 +243,6 @@ namespace risk.control.system.Controllers
 
                     if (user == null)
                     {
-
                         notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }

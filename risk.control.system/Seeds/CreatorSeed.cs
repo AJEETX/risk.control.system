@@ -28,7 +28,7 @@ namespace risk.control.system.Seeds
                 creatorImage = File.ReadAllBytes(noUserImagePath);
             }
             var extension = Path.GetExtension(creatorImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(creatorImage, extension, clientCompany.Email);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(creatorImage, extension, clientCompany.Email, "user");
             var clientCreator = new ClientCompanyApplicationUser()
             {
                 UserName = creatorEmailwithSuffix,

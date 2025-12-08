@@ -381,7 +381,7 @@ namespace risk.control.system.Controllers
 
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
 
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
@@ -546,7 +546,7 @@ namespace risk.control.system.Controllers
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
                     var domain = applicationUser.Email.Split('@')[1];
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(applicationUser.ProfileImage, domain);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(applicationUser.ProfileImage, domain, "user");
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
@@ -917,8 +917,7 @@ namespace risk.control.system.Controllers
             {
                 if (vendor.Document is not null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(vendor.Document, vendor.Email);
-
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(vendor.Document, vendor.Email, "user");
                     using var dataStream = new MemoryStream();
                     vendor.Document.CopyTo(dataStream);
                     vendor.DocumentImage = dataStream.ToArray();

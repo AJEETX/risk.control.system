@@ -27,7 +27,7 @@ namespace risk.control.system.Seeds
                 assessorImage = File.ReadAllBytes(noUserImagePath);
             }
             var extension = Path.GetExtension(assessorImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(assessorImage, extension, clientCompany.Email);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(assessorImage, extension, clientCompany.Email,"user");
             var clientAssessor = new ClientCompanyApplicationUser()
             {
                 UserName = assessorEmailwithSuffix,
