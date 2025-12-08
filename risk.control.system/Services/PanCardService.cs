@@ -32,7 +32,7 @@ namespace risk.control.system.Services
             string panNumber = string.Empty;
             string docyTypePan = string.Empty;
             byte[]? ocrImaged = null;
-            var filePath = Path.ChangeExtension(webHostEnvironment.WebRootPath, doc.FilePath);
+            var filePath = Path.Combine(webHostEnvironment.ContentRootPath, doc.FilePath);
 
             var allPanText = imageReadOnly.FirstOrDefault().Description;
             var panTextPre = allPanText.IndexOf(panNumber2Find);

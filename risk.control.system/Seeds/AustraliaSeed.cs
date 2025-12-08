@@ -11,7 +11,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task<string> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, UserManager<VendorApplicationUser> vendorUserManager,
             UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiCLient customApiCLient, IHttpContextAccessor httpAccessor,
-            List<Country> countries, List<InvestigationServiceType> servicesTypes)
+            List<Country> countries, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
             string COUNTRY_CODE = "AU";
             string PINCODE = "3131";
@@ -36,7 +36,8 @@ namespace risk.control.system.Seeds
                 BRANCH = "Forest Hill",
                 IFSC = "733112",
                 BANK = "Westpac Banking Corporation",
-                PINCODE = PINCODE
+                PINCODE = PINCODE,
+                PHONE = "432123456"
             };
             var verify = new SeedInput
             {
@@ -48,13 +49,14 @@ namespace risk.control.system.Seeds
                 BRANCH = "Forest Hill",
                 IFSC = "083251",
                 BANK = "National Australia Bank Limited",
-                PINCODE = PINCODE
+                PINCODE = PINCODE,
+                PHONE = "432123456"
             };
             var agencies = new List<SeedInput> { checker, verify };
             var vendors = new List<Vendor> { };
             foreach (var agency in agencies)
             {
-                var vendor = await AgencySeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes);
+                var vendor = await AgencySeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes, fileStorageService);
                 vendors.Add(vendor);
             }
             var insurer = new SeedInput
@@ -65,14 +67,15 @@ namespace risk.control.system.Seeds
                 PHOTO = "/img/insurer.jpg",
                 ADDRESSLINE = "109 Mahoneys Road",
                 BRANCH = "Forest Hill",
-                IFSC = "083251",
-                BANK = "National Australia Bank Limited",
-                PINCODE = PINCODE
+                IFSC = "733127",
+                BANK = "Westpac Banking Corporation",
+                PINCODE = PINCODE,
+                PHONE = "432123456"
             };
             var companies = new List<SeedInput> { insurer };
             foreach (var company in companies)
             {
-                _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company);
+                _ = await Insurer.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company, fileStorageService);
             }
             await context.SaveChangesAsync(null, false);
             return PINCODE;

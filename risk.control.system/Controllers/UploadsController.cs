@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,29 +47,42 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
-                if (file == null)
+                var file = await _context.FilesOnFileSystem
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (file == null || string.IsNullOrWhiteSpace(file.FilePath))
                 {
                     notifyService.Error("OOPs !!!.. Download error");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                string zipPath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", file.Name);
-                var fileBytes = System.IO.File.ReadAllBytes(zipPath);
-                return File(fileBytes, "application/zip", Path.GetFileName(zipPath));
+
+                string fullPath = Path.Combine(webHostEnvironment.ContentRootPath, file.FilePath);
+
+                if (!System.IO.File.Exists(fullPath))
+                {
+                    notifyService.Error("File not found on server");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+
+                string fileName = Path.GetFileName(fullPath);
+
+                return File(stream, "application/zip", fileName);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error downloading ZIP");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
         public async Task<IActionResult> DownloadErrorLog(long id)
         {
             try
             {
-                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+                var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(x => x.Id == id);
                 if (file == null)
                 {
                     notifyService.Error("OOPs !!!.. Download error");

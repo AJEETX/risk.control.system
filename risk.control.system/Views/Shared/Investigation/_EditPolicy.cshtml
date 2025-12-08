@@ -157,7 +157,7 @@
                     <div class="input-group mb-3">
                         @if (Model?.ExistingDocumentPath is not null)
                         {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/Investigation/GetPolicyDocument/@Model.Id" data-bs-toggle="tooltip" title="Case Document" />
+                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/Document/GetPolicyDocument/@Model.Id" data-bs-toggle="tooltip" title="Case Document" />
                             <i class="fa fa-asterisk asterik-style"></i>
                             <input accept=".jpg,.jpeg,.png" asp-for="NewDocument" type="file" class="form-control remarks document-image-input valid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document"
                                    data-bs-toggle="tooltip" title="Upload Case Document" data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />

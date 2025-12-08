@@ -67,7 +67,7 @@
                     <p class="text-muted text-sm">
                         @if (customerDetail?.ImagePath != null)
                         {
-                            <img id="profileImage" class="img-fluid block-data" src="@customerDetail.ImagePath" data-bs-toggle="tooltip" title="@customerDetail?.Name Photo" />
+                            <img id="profileImage" class="img-fluid block-data" src="/Document/GetCustomerDocument/@customerDetail.CustomerDetailId" data-bs-toggle="tooltip" title="@customerDetail?.Name Photo" />
                         }
                         else
                         {

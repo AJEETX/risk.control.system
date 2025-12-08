@@ -23,13 +23,15 @@ namespace risk.control.system.Controllers.Api.Company
     public class CompanyController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IUserService userService;
         private readonly IFeatureManager featureManager;
         private readonly IPhoneService phoneService;
 
-        public CompanyController(ApplicationDbContext context, IUserService userService, IFeatureManager featureManager, IPhoneService phoneService)
+        public CompanyController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IUserService userService, IFeatureManager featureManager, IPhoneService phoneService)
         {
             _context = context;
+            this.webHostEnvironment = webHostEnvironment;
             this.userService = userService;
             this.featureManager = featureManager;
             this.phoneService = phoneService;
@@ -50,7 +52,8 @@ namespace risk.control.system.Controllers.Api.Company
                 new
                 {
                     Id = u.ClientCompanyId,
-                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
+                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, u.DocumentUrl)))),
                     Domain = $"<a href='/ClientCompany/Details?Id={u.ClientCompanyId}'>" + u.Email + "</a>",
                     Name = u.Name,
                     //Code = u.Code,
@@ -145,7 +148,8 @@ namespace risk.control.system.Controllers.Api.Company
                 .Select(u => new
                 {
                     Id = u.VendorId,
-                    Document = u.DocumentUrl != null ? u.DocumentUrl : Applicationsettings.NO_IMAGE,
+                    Document = u.DocumentUrl != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, u.DocumentUrl)))) : Applicationsettings.NO_IMAGE,
                     Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ?
                         $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>" :
                         u.Email,
@@ -233,7 +237,8 @@ namespace risk.control.system.Controllers.Api.Company
                 .Select(u => new
                 {
                     Id = u.VendorId,
-                    Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
+                    Document = u.DocumentUrl != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, u.DocumentUrl)))) : Applicationsettings.NO_IMAGE,
                     Domain = u.Email,
                     Name = u.Name,
                     Code = u.Code,
@@ -333,7 +338,8 @@ namespace risk.control.system.Controllers.Api.Company
                 new
                 {
                     Id = u.VendorId,
-                    Document = u.DocumentUrl != null ? u.DocumentUrl : Applicationsettings.NO_IMAGE,
+                    Document = u.DocumentUrl != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, u.DocumentUrl)))) : Applicationsettings.NO_IMAGE,
                     Domain = u.Email,
                     Name = u.Name,
                     Code = u.Code,

@@ -211,7 +211,7 @@ namespace risk.control.system.Services
                 }
                 else
                 {
-                    var (fileName, relativePath) = await fileStorageService.SavePolicyDocumentAsync(savedNewImage, extension);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(savedNewImage, extension, "Case", uploadCase.CaseId);
                     filePath = relativePath;
                 }
                 var policyDetail = new PolicyDetail

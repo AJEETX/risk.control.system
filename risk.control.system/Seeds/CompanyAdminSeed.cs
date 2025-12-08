@@ -3,6 +3,7 @@
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -13,22 +14,16 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             UserManager<ClientCompanyApplicationUser> userManager,
-            ClientCompany clientCompany, string companyDomain, PinCode pinCode)
+            ClientCompany clientCompany, string companyDomain, PinCode pinCode, IFileStorageService fileStorageService)
         {
             //Seed client creator
-            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
-
             string adminEmailwithSuffix = Applicationsettings.COMPANY_ADMIN.CODE + "@" + companyDomain;
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE));
 
             var adminImage = File.ReadAllBytes(adminImagePath);
-
-            if (adminImage == null)
-            {
-                adminImage = File.ReadAllBytes(noUserImagePath);
-            }
-
+            var extension = Path.GetExtension(adminImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, companyDomain);
             var admin = new ClientCompanyApplicationUser()
             {
                 UserName = adminEmailwithSuffix,
@@ -50,7 +45,7 @@ namespace risk.control.system.Seeds
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = COMPANY_ADMIN.PROFILE_IMAGE,
+                ProfilePictureUrl = relativePath,
                 ProfilePicture = adminImage,
                 Role = AppRoles.COMPANY_ADMIN,
                 UserRole = CompanyRole.COMPANY_ADMIN,

@@ -37,7 +37,7 @@
 						@if (doc.ValidationExecuted)
 						{
 							<img id="doc-img-@doc.Id"
-								 src="@(doc?.FilePath)"
+									 src="/Document/GetOcrDocument/@doc.Id"
 								 class="thumbnail-image thumbnail profile-image doc-profile-image preview-image"
 								 title="Click to view document" />
 						}
@@ -89,7 +89,7 @@
 
 					</td>
 					<td>
-						<input type="file" class="form-control form-control-sm doc-upload" data-docid="@doc.Id" />
+							<input type="file" class="form-control remarks form-control-sm doc-upload" data-docid="@doc.Id" />
 						<button class="btn btn-sm btn-primary mt-1 upload-doc-btn"
 								data-docid="@doc.Id"
 								data-locationid="@location.Id"

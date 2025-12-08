@@ -70,7 +70,7 @@
                     <p class="text-muted text-sm">
                         @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentPath is not null)
                         {
-                            <img id="documentImage" class="img-fluid" src="@Model?.ClaimsInvestigation?.PolicyDetail.DocumentPath" data-bs-toggle="tooltip" title="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber Document" />
+                            <img id="documentImage" class="img-fluid" src="/Document/GetPolicyDocument/@Model.ClaimsInvestigation.Id" data-bs-toggle="tooltip" title="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber Document" />
                         }
                         else
                         {

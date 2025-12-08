@@ -175,7 +175,7 @@
             <div class="input-group mb-3">
                 @if (Model?.DocumentUrl is not null)
                 {
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.DocumentUrl" data-bs-toggle="tooltip" title="Agency Document" />
+                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/Document/GetAgencyDocument/@Model?.VendorId" data-bs-toggle="tooltip" title="Agency Document" />
                     <i class="fa fa-asterisk asterik-style"></i>
                     <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
                            class="form-control remarks document-image-input valid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="agency-document" data-bs-toggle="tooltip" title="Upload Agency Document" data-default-image="@Applicationsettings.NO_IMAGE" />

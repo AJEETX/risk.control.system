@@ -19,9 +19,10 @@
         <!-- Sidebar user (optional) -->
         @if (SignInManager.IsSignedIn(User))
         {
+            var user = UserManager.GetUserAsync(User).Result;
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
 
-                @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
+                @if (user?.ProfilePictureUrl != null)
                 {
                     <div class="image">
                         <img class="elevation-2 sidebar-profile" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">

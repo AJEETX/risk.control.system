@@ -21,6 +21,7 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext context;
         private readonly ICustomApiCLient customApiCLient;
         private readonly IFeatureManager featureManager;
+        private readonly IFileStorageService fileStorageService;
         private readonly IPhoneService phoneService;
         private readonly ICaseImageCreationService caseImageCreationService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -28,6 +29,7 @@ namespace risk.control.system.Services
 
         public BeneficiaryCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient,
             IFeatureManager featureManager,
+            IFileStorageService fileStorageService,
             IPhoneService phoneService,
             ICaseImageCreationService caseImageCreationService,
             IWebHostEnvironment webHostEnvironment,
@@ -36,6 +38,7 @@ namespace risk.control.system.Services
             this.context = context;
             this.customApiCLient = customApiCLient;
             this.featureManager = featureManager;
+            this.fileStorageService = fileStorageService;
             this.phoneService = phoneService;
             this.caseImageCreationService = caseImageCreationService;
             this.webHostEnvironment = webHostEnvironment;
@@ -113,28 +116,7 @@ namespace risk.control.system.Services
                     : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower()) // Get matching record
                     ?? context.BeneficiaryRelation.FirstOrDefault();
 
-                var extension = Path.GetExtension(BENEFICIARY_IMAGE).ToLower();
-                var fileName = Guid.NewGuid().ToString() + extension;
-                var beneficiaryNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), BENEFICIARY_IMAGE);
-                if (beneficiaryNewImage == null)
-                {
-                    errors.Add(new UploadError
-                    {
-                        UploadData = "[Beneficiary image : null/empty]",
-                        Error = "null/empty"
-                    });
-                    errorBeneficiary.Add($"[Beneficiary image=`{BENEFICIARY_IMAGE}` null/not found]");
-                }
-                else
-                {
-                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary");
-                    if (!Directory.Exists(imagePath))
-                    {
-                        Directory.CreateDirectory(imagePath);
-                    }
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary", fileName);
-                    await File.WriteAllBytesAsync(filePath, beneficiaryNewImage);
-                }
+
                 if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryIncome) && Enum.TryParse<Income>(uploadCase.BeneficiaryIncome, true, out var incomeEnum))
                 {
                     uploadCase.BeneficiaryIncome = incomeEnum.ToString();
@@ -171,8 +153,24 @@ namespace risk.control.system.Services
                     });
                     errorBeneficiary.Add("[Beneficiary addressline=null/empty]");
                 }
+                var extension = Path.GetExtension(BENEFICIARY_IMAGE).ToLower();
+                string filePath = string.Empty;
+                var beneficiaryNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), BENEFICIARY_IMAGE);
+                if (beneficiaryNewImage == null)
+                {
+                    errors.Add(new UploadError
+                    {
+                        UploadData = "[Beneficiary image : null/empty]",
+                        Error = "null/empty"
+                    });
+                    errorBeneficiary.Add($"[Beneficiary image=`{BENEFICIARY_IMAGE}` null/not found]");
+                }
+                else
+                {
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiaryNewImage, extension, "Case", uploadCase.CaseId);
+                    filePath = relativePath;
+                }
 
-                string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", BENEFICIARY_IMAGE);
                 var beneficairy = new BeneficiaryDetail
                 {
                     Name = uploadCase.BeneficiaryName,
@@ -186,8 +184,8 @@ namespace risk.control.system.Services
                     StateId = pinCode?.StateId,
                     CountryId = pinCode?.CountryId,
                     //ProfilePicture = beneficiaryNewImage,
-                    ImagePath = "/beneficiary/" + fileName,
-                    ProfilePictureExtension = Path.GetExtension(BENEFICIARY_IMAGE),
+                    ImagePath = filePath,
+                    ProfilePictureExtension = extension,
                     Updated = DateTime.Now,
                     UpdatedBy = companyUser.Email
                 };

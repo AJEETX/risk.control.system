@@ -32,7 +32,6 @@ namespace risk.control.system.Services
     internal class HttpClientService : IHttpClientService
     {
         private static HttpClient httpClient = new HttpClient();
-        private static string PinCodeBaseUrl = "https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode";
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IAmazonTranscribeService _amazonTranscribeService;
         private readonly IAmazonS3 s3Client;

@@ -19,6 +19,7 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext context;
         private readonly IFeatureManager featureManager;
+        private readonly IFileStorageService fileStorageService;
         private readonly IPhoneService phoneService;
         private readonly ICustomApiCLient customApiCLient;
         private readonly ICaseImageCreationService caseImageCreationService;
@@ -27,6 +28,7 @@ namespace risk.control.system.Services
 
         public CustomerCreationService(ApplicationDbContext context,
             IFeatureManager featureManager,
+            IFileStorageService fileStorageService,
             IPhoneService phoneService,
             ICustomApiCLient customApiCLient,
             ICaseImageCreationService caseImageCreationService,
@@ -35,6 +37,7 @@ namespace risk.control.system.Services
         {
             this.context = context;
             this.featureManager = featureManager;
+            this.fileStorageService = fileStorageService;
             this.phoneService = phoneService;
             this.customApiCLient = customApiCLient;
             this.caseImageCreationService = caseImageCreationService;
@@ -129,28 +132,6 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var extension = Path.GetExtension(CUSTOMER_IMAGE).ToLower();
-                var fileName = Guid.NewGuid().ToString() + extension;
-                var imagesWithData = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), CUSTOMER_IMAGE);
-                if (imagesWithData is null)
-                {
-                    errors.Add(new UploadError
-                    {
-                        UploadData = $"[Customer image : Image {CUSTOMER_IMAGE} null/not found]",
-                        Error = $"Image {CUSTOMER_IMAGE} null/not found"
-                    });
-                    errorCustomer.Add($"[Customer Image=`{CUSTOMER_IMAGE}` null/not found]");
-                }
-                else
-                {
-                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "customer");
-                    if (!Directory.Exists(imagePath))
-                    {
-                        Directory.CreateDirectory(imagePath);
-                    }
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "customer", fileName);
-                    await File.WriteAllBytesAsync(filePath, imagesWithData);
-                }
                 if (string.IsNullOrWhiteSpace(uploadCase.CustomerAddressLine))
                 {
                     errors.Add(new UploadError
@@ -216,8 +197,23 @@ namespace risk.control.system.Services
                     errorCustomer.Add($"[Customer Date of Birth=`{uploadCase.CustomerDob}` null/invalid]");
                 }
 
-                string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", CUSTOMER_IMAGE);
-
+                var extension = Path.GetExtension(CUSTOMER_IMAGE).ToLower();
+                string filePath = string.Empty;
+                var imagesWithData = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), CUSTOMER_IMAGE);
+                if (imagesWithData is null)
+                {
+                    errors.Add(new UploadError
+                    {
+                        UploadData = $"[Customer image : Image {CUSTOMER_IMAGE} null/not found]",
+                        Error = $"Image {CUSTOMER_IMAGE} null/not found"
+                    });
+                    errorCustomer.Add($"[Customer Image=`{CUSTOMER_IMAGE}` null/not found]");
+                }
+                else
+                {
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(imagesWithData, extension, "Case", uploadCase.CaseId);
+                    filePath = relativePath;
+                }
                 var customerDetail = new CustomerDetail
                 {
                     Name = uploadCase.CustomerName,
@@ -235,8 +231,8 @@ namespace risk.control.system.Services
                     DistrictId = pinCode?.DistrictId,
                     //Description = rowData[20]?.Trim(),
                     //ProfilePicture = imagesWithData,
-                    ImagePath = "/customer/" + fileName,
-                    ProfilePictureExtension = Path.GetExtension(CUSTOMER_IMAGE),
+                    ImagePath = filePath,
+                    ProfilePictureExtension = extension,
                     UpdatedBy = companyUser.Email,
                     Updated = DateTime.Now
                 };

@@ -708,33 +708,5 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-
-        public IActionResult GetPolicyDocument(long id)
-        {
-            var task = context.Investigations
-                .Include(x => x.PolicyDetail)
-                .FirstOrDefault(x => x.Id == id);
-
-            if (task?.PolicyDetail?.DocumentPath == null)
-                return NotFound();
-
-            var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, task.PolicyDetail.DocumentPath);
-
-            if (!System.IO.File.Exists(fullPath))
-                return NotFound();
-
-            var ext = Path.GetExtension(fullPath).ToLowerInvariant();
-            var contentType = ext switch
-            {
-                ".jpg" => "image/jpeg",
-                ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                _ => "application/octet-stream"
-            };
-
-            var fileBytes = System.IO.File.ReadAllBytes(fullPath);
-
-            return File(fileBytes, contentType);
-        }
     }
 }

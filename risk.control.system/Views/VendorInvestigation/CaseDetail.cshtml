@@ -51,7 +51,7 @@
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
         <partial name="_PolicyDetailsWithdraw" model="@data" />
-
+    </div>
         <div class="card-footer">
             <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="CaseVendorPost">
                 <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
@@ -64,7 +64,6 @@
                 </div>
             </form>
         </div>
-    </div>
     </div>
 </section>
 

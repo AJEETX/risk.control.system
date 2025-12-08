@@ -24,6 +24,7 @@ namespace risk.control.system.Controllers
         public List<UsersViewModel> UserList;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ApplicationDbContext _context;
+        private readonly IFileStorageService fileStorageService;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly INotificationService service;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -35,6 +36,7 @@ namespace risk.control.system.Controllers
         private string portal_base_url = string.Empty;
 
         public AgencyUserProfileController(ApplicationDbContext context,
+            IFileStorageService fileStorageService,
             UserManager<VendorApplicationUser> userManager,
             INotificationService service,
              IHttpContextAccessor httpContextAccessor,
@@ -46,6 +48,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this.fileStorageService = fileStorageService;
             this.signInManager = signInManager;
             this.userManager = userManager;
             this.service = service;
@@ -137,21 +140,14 @@ namespace risk.control.system.Controllers
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
+                    var domain = applicationUser.Email.Split('@')[1];
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(applicationUser.ProfileImage, domain);
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
-                    applicationUser.ProfilePictureExtension = fileExtension;
+
+                    applicationUser.ProfilePictureUrl = relativePath;
+                    applicationUser.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
 
                 if (user != null)

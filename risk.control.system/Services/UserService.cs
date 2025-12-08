@@ -22,16 +22,18 @@ namespace risk.control.system.Services
     {
         private readonly IConfiguration config;
         private readonly ApplicationDbContext context;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
         private readonly DateTime cutoffTime;
         private readonly IFeatureManager featureManager;
 
-        public UserService(IConfiguration config, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IDashboardService dashboardService, IFeatureManager featureManager)
+        public UserService(IConfiguration config, ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, IDashboardService dashboardService, IFeatureManager featureManager)
         {
             this.config = config;
             cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
             this.context = context;
+            this.webHostEnvironment = webHostEnvironment;
             this.userManager = userManager;
             this.dashboardService = dashboardService;
             this.featureManager = featureManager;
@@ -132,7 +134,8 @@ namespace risk.control.system.Services
                 var activeUser = new UserDetailResponse
                 {
                     Id = u.AgencyUser.Id,
-                    Photo = u.AgencyUser.ProfilePictureUrl == null ? Applicationsettings.NO_USER : u.AgencyUser.ProfilePictureUrl,
+                    Photo = u.AgencyUser.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, u.AgencyUser.ProfilePictureUrl)))),
                     Email = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT) ?
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a>" :
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
@@ -241,7 +244,8 @@ namespace risk.control.system.Services
                     user.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : user.ProfilePictureUrl,
+                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
                     Active = user.Active,
                     Addressline = user.Addressline + ", " + user.District.Name,
                     State = user.State.Code,
@@ -344,7 +348,8 @@ namespace risk.control.system.Services
                     Email = "<a href=/Company/EditUser?userId=" + user.Id + ">" + user.Email + "</a>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : user.ProfilePictureUrl,
+                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
                     Active = user.Active,
                     Addressline = user.Addressline + ", " + user.District.Name,
                     District = user.District.Name,
@@ -544,7 +549,8 @@ namespace risk.control.system.Services
                     Email = "<a href=/User/Edit?userId=" + user.Id + ">" + user.Email + "</a>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : user.ProfilePictureUrl,
+                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
                     Active = user.Active,
                     Addressline = user.Addressline,
                     District = user.District.Name,
@@ -568,8 +574,6 @@ namespace risk.control.system.Services
             await context.SaveChangesAsync(null, false);
             return activeUsersDetails;
         }
-
-
 
         private async Task<List<string>> GetUserRoles(ApplicationUser user)
         {

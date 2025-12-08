@@ -44,7 +44,7 @@
 						@if (face.ValidationExecuted)
 						{
 							<img id="face-img-@face.Id"
-								 src="@(face?.FilePath)"
+								 src="/Document/GetFaceDocument/@face.Id"
 								 class="mobile-capture-info preview-image"
 								 title="@face.ReportName" />
 						}

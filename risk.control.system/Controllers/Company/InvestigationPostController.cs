@@ -337,7 +337,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var company = await service.CreateCustomer(currentUserEmail, customerDetail, file);
+                var company = await service.CreateCustomer(currentUserEmail, customerDetail);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
@@ -389,13 +389,14 @@ namespace risk.control.system.Controllers.Company
                         return RedirectToAction(nameof(InvestigationController.EditCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
                     }
                 }
-                IFormFile profileFile = null;
+
                 var file = customerDetail?.ProfileImage;
-                if (file != null)
+                if (file == null)
                 {
-                    profileFile = file;
+                    notifyService.Warning("Invalid Image Uploaded Error !!! ");
+                    return RedirectToAction(nameof(InvestigationController.EditBeneficiary), "Investigation", new { id = customerDetail.InvestigationTaskId });
                 }
-                var company = await service.EditCustomer(currentUserEmail, customerDetail, profileFile);
+                var company = await service.EditCustomer(currentUserEmail, customerDetail);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
