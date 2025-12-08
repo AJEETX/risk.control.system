@@ -11,7 +11,7 @@ namespace risk.control.system.Services
         Task<string> GetAddressFromLatLong(double latitude, double longitude);
         Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong, string startLbl = "S", string endLbl = "E", string mapHeight = "300", string mapWidth = "200", string startColor = "red", string endColor = "green");
     }
-    public class CustomApiClient : ICustomApiCLient
+    internal class CustomApiClient : ICustomApiCLient
     {
         private static readonly string geocodeUrl = "https://maps.googleapis.com/maps/api/geocode/json";
         private readonly ILogger<CustomApiClient> logger;

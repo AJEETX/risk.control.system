@@ -30,7 +30,7 @@ namespace risk.control.system.Services
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<bool> SubmitNotes(string userEmail, long claimId, string notes);
     }
-    public class ProcessCaseService : IProcessCaseService
+    internal class ProcessCaseService : IProcessCaseService
     {
         private readonly ApplicationDbContext context;
         private readonly IPdfGenerativeService pdfGenerativeService;

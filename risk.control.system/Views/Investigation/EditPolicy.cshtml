@@ -1,10 +1,10 @@
-﻿@model risk.control.system.Models.InvestigationTask
+﻿@model risk.control.system.Models.ViewModel.EditPolicyDto
 
 @{
     ViewData["Title"] = "Edit";
 }
 <section class="content">
-    <form id="edit-form" method="post" asp-controller="InvestigationPost" asp-action="EditPolicy" enctype="multipart/form-data">
+    <form id="edit-form" method="post" asp-action="EditPolicy" enctype="multipart/form-data">
         <partial name="Investigation/_EditPolicy" model="Model" />
         
     </form>

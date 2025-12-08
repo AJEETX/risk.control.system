@@ -112,7 +112,7 @@
                     <div class="input-group mb-3">
                         @if (Model?.ImagePath is not null)
                         {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.ImagePath" data-bs-toggle="tooltip" title="Beneficiary Photo" />
+                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/Document/GetBeneficiaryDocument/@Model.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo" />
                             <i class="fa fa-asterisk asterik-style"></i>
                             <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-title-id="beneficiary-document" data-bs-toggle="tooltip" title="Upload Beneficiary Photo" />
                         }

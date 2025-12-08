@@ -7,7 +7,7 @@ namespace risk.control.system.Services
         Task<AppiCheckifyResponse> PostAgentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long faceId, string latitude, string longitude, bool isAgent, IFormFile Image);
         Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long docId, string latitude, string longitude, IFormFile Image);
     }
-    public class ClaimsAgentService : IClaimsAgentService
+    internal class ClaimsAgentService : IClaimsAgentService
     {
         private readonly IAgentIdService agentIdService;
 

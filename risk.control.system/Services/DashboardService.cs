@@ -26,7 +26,7 @@ namespace risk.control.system.Services
         TatResult CalculateTimespan(string userEmail);
     }
 
-    public class DashboardService : IDashboardService
+    internal class DashboardService : IDashboardService
     {
         private readonly ApplicationDbContext _context;
         private const string allocatedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;

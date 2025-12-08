@@ -11,7 +11,7 @@ namespace risk.control.system.Services
         bool IsValidMobileNumber(string phoneNumber, string countryCode = "91");
     }
 
-    public class PhoneService : IPhoneService
+    internal class PhoneService : IPhoneService
     {
         private static readonly Dictionary<string, string> CountryPatterns = new()
         {

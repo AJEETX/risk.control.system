@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Net;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +26,13 @@ namespace risk.control.system.Controllers.Company
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     public class InvestigationController : Controller
     {
+        private const long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
+
         private readonly ILogger<InvestigationController> logger;
         private readonly ApplicationDbContext context;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService service;
@@ -34,6 +41,7 @@ namespace risk.control.system.Controllers.Company
 
         public InvestigationController(ILogger<InvestigationController> logger,
             ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
             INotyfService notifyService, IInvestigationService service,
             IEmpanelledAgencyService empanelledAgencyService,
@@ -41,6 +49,7 @@ namespace risk.control.system.Controllers.Company
         {
             this.logger = logger;
             this.context = context;
+            this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
             this.notifyService = notifyService;
             this.service = service;
@@ -173,6 +182,114 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(CreatePolicy));
             }
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> CreatePolicy(CreateCaseViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors");
+                    return View(model);
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (model == null || model.PolicyDetail == null)
+                {
+                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
+
+                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
+                }
+                var file = model.Document;
+
+                if (file == null || file.Length == 0)
+                {
+                    notifyService.Error("Invalid Document");
+                    return View(model);
+                }
+                if (file.Length > MAX_FILE_SIZE)
+                {
+                    ModelState.AddModelError(nameof(model.Document), "File too large.");
+                    return View(model);
+                }
+
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!AllowedExt.Contains(ext))
+                {
+                    ModelState.AddModelError(nameof(model.Document), "Invalid file type.");
+                    return View(model);
+                }
+
+                if (!AllowedMime.Contains(file.ContentType))
+                {
+                    ModelState.AddModelError(nameof(model.Document), "Invalid file content type.");
+                    return View(model);
+                }
+
+                if (!ImageSignatureValidator.HasValidSignature(file))
+                {
+                    ModelState.AddModelError(nameof(model.Document), "Invalid file content.");
+                    return View(model);
+                }
+
+                // Business validation: dates
+                if (model.PolicyDetail.DateOfIncident > DateTime.UtcNow)
+                {
+                    ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident date cannot be in the future.");
+                    return View(model);
+                }
+                if (model.PolicyDetail.ContractIssueDate > DateTime.UtcNow)
+                {
+                    ModelState.AddModelError("PolicyDetail.ContractIssueDate", "Contract issue date cannot be in the future.");
+                    return View(model);
+                }
+                if (model.PolicyDetail.DateOfIncident < model.PolicyDetail.ContractIssueDate)
+                {
+                    ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident cannot be before issue date.");
+                    return View(model);
+                }
+
+                model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
+                model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
+                model.PolicyDetail.Comments = WebUtility.HtmlEncode(model.PolicyDetail.Comments);
+
+                // Validate file content-type
+                var allowedTypes = new[] { "image/jpeg", "image/png" };
+                if (!allowedTypes.Contains(file.ContentType))
+                {
+                    notifyService.Error("Invalid file format");
+                    return View(model);
+                }
+
+                // Validate file size (example 5 MB max)
+                if (file.Length > 5 * 1024 * 1024)
+                {
+                    notifyService.Error("File too large");
+                    return View(model);
+                }
+                var claim = await service.CreatePolicy(currentUserEmail, model);
+                if (claim == null)
+                {
+                    notifyService.Error("Error Creating Case detail");
+                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
+                }
+                else
+                {
+                    notifyService.Custom($"Policy <b>#{claim.PolicyDetail.ContractNumber}</b> created successfully", 3, "green", "far fa-file-powerpoint");
+                }
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = claim.Id });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.StackTrace);
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
         [Breadcrumb(title: " Edit Case", FromAction = "Details")]
         public async Task<IActionResult> EditPolicy(long id)
         {
@@ -194,6 +311,23 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("Case Not Found!!!");
                     return RedirectToAction(nameof(CreatePolicy));
                 }
+                var model = new EditPolicyDto
+                {
+                    Id = claimsInvestigation.Id,
+                    PolicyDetail = new PolicyDetailDto
+                    {
+                        CaseEnablerId = claimsInvestigation.PolicyDetail.CaseEnablerId,
+                        CauseOfLoss = claimsInvestigation.PolicyDetail.CauseOfLoss,
+                        Comments = claimsInvestigation.PolicyDetail.Comments,
+                        CostCentreId = claimsInvestigation.PolicyDetail.CostCentreId,
+                        ContractIssueDate = claimsInvestigation.PolicyDetail.ContractIssueDate,
+                        ContractNumber = claimsInvestigation.PolicyDetail.ContractNumber,
+                        DateOfIncident = claimsInvestigation.PolicyDetail.DateOfIncident,
+                        InvestigationServiceTypeId = claimsInvestigation.PolicyDetail.InvestigationServiceTypeId,
+                        SumAssuredValue = claimsInvestigation.PolicyDetail.SumAssuredValue,
+                    },
+                    ExistingDocumentPath = claimsInvestigation.PolicyDetail.DocumentPath
+                };
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
@@ -208,7 +342,7 @@ namespace risk.control.system.Controllers.Company
                 var editPage = new MvcBreadcrumbNode("EditPolicy", "Investigation", $"Edit Case") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
-                return View(claimsInvestigation);
+                return View(model);
             }
             catch (Exception ex)
             {
@@ -216,6 +350,31 @@ namespace risk.control.system.Controllers.Company
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!!..Try Again");
                 return RedirectToAction(nameof(CreatePolicy));
+            }
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> EditPolicy(EditPolicyDto dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return View(dto);
+
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                var savedTask = await service.EditPolicy(currentUserEmail, dto);
+                notifyService.Custom($"Policy <b>#{savedTask.PolicyDetail.ContractNumber}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = dto.Id });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.StackTrace);
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
         [Breadcrumb(title: " Add Customer", FromAction = "Details")]

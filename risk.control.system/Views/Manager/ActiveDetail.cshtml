@@ -85,17 +85,18 @@
 
             <input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
             <partial name="Investigation/_TimelineReport" model="@Model" />
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <a id="back" asp-controller="Manager" asp-action="Active" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i>
-                            <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
-                        </a>
-                    </div>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <a id="back" asp-controller="Manager" asp-action="Active" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
+                    </a>
                 </div>
             </div>
         </div>
+
     </div>
 </section>
 @section Scripts {

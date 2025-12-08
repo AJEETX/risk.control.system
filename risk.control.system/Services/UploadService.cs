@@ -7,7 +7,7 @@ namespace risk.control.system.Services
     {
         Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP);
     }
-    public class UploadService : IUploadService
+    internal class UploadService : IUploadService
     {
         private readonly IProgressService uploadProgressService;
         private readonly ICaseCreationService _caseCreationService;

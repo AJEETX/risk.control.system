@@ -1,10 +1,10 @@
-﻿@model risk.control.system.Models.InvestigationTask
+﻿@model risk.control.system.Models.ViewModel.CreateCaseViewModel
 @{
     ViewData["Title"] = @Applicationsettings.CREATE;
 }
 
 <section class="content">
-    <form id="create-form" asp-controller="InvestigationPost" asp-action="CreatePolicy" method="post" enctype="multipart/form-data">
+    <form id="create-form" asp-action="CreatePolicy" method="post" enctype="multipart/form-data">
         <partial name="Investigation/_CreateCase" model="Model" />
     </form>
 </section>

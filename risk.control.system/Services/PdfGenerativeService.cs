@@ -11,9 +11,8 @@ namespace risk.control.system.Services
     public interface IPdfGenerativeService
     {
         Task<string> Generate(long investigationTaskId, string userEmail = "assessor@insurer.com");
-        // Define methods for PDF generation here
     }
-    public class PdfGenerativeService : IPdfGenerativeService
+    internal class PdfGenerativeService : IPdfGenerativeService
     {
 
         private readonly ApplicationDbContext context;

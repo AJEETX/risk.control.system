@@ -13,7 +13,7 @@ namespace risk.control.system.Services
         Task<string> RenderViewToStringAsync(string viewName, object model);
     }
 
-    public class ViewRenderService : IViewRenderService
+    internal class ViewRenderService : IViewRenderService
     {
         private readonly IRazorViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;

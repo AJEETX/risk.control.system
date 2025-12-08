@@ -20,7 +20,7 @@ namespace risk.control.system.Services
         Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long claimsInvestigationId, string remarks);
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
     }
-    public class VendorInvestigationService : IVendorInvestigationService
+    internal class VendorInvestigationService : IVendorInvestigationService
     {
         private readonly ApplicationDbContext context;
         private readonly INumberSequenceService numberService;

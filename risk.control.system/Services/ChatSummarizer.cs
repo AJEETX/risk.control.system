@@ -5,7 +5,7 @@ public interface IChatSummarizer
 {
     Task<string> SummarizeDataAsync(string inputText = "Long text to summarize...");
 }
-public class OpenAISummarizer : IChatSummarizer
+internal class OpenAISummarizer : IChatSummarizer
 {
     private static string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={Environment.GetEnvironmentVariable("GEMINI_KEY")}";
     private readonly HttpClient _httpClient;

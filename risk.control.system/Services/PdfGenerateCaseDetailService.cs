@@ -1,8 +1,10 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Utils;
+
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 
@@ -13,7 +15,7 @@ namespace risk.control.system.Services
         SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
         SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
     }
-    public class PdfGenerateCaseDetailService : IPdfGenerateCaseDetailService
+    internal class PdfGenerateCaseDetailService : IPdfGenerateCaseDetailService
     {
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);

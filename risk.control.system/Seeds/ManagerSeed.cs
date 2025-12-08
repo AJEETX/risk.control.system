@@ -3,6 +3,7 @@
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -13,7 +14,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             UserManager<ClientCompanyApplicationUser> userManager,
-            ClientCompany clientCompany, PinCode pinCode, string managorEmailwithSuffix, string photo, string firstName, string lastName)
+            ClientCompany clientCompany, PinCode pinCode, string managorEmailwithSuffix, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
@@ -25,6 +26,8 @@ namespace risk.control.system.Seeds
             {
                 managerImage = File.ReadAllBytes(noUserImagePath);
             }
+            var extension = Path.GetExtension(managerImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(managerImage, extension, clientCompany.Email);
             var manager = new ClientCompanyApplicationUser()
             {
                 UserName = managorEmailwithSuffix,
@@ -46,7 +49,7 @@ namespace risk.control.system.Seeds
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = photo,
+                ProfilePictureUrl = relativePath,
                 ProfilePicture = managerImage,
                 Role = AppRoles.MANAGER,
                 UserRole = CompanyRole.MANAGER,

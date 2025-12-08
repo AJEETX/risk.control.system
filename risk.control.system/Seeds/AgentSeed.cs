@@ -15,17 +15,15 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, string agentEmailwithSuffix,
             IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient,
             UserManager<VendorApplicationUser> userManager,
-            Vendor vendor, string pinCode, string photo, string firstName, string lastName, string addressLine = "")
+            Vendor vendor, string pinCode, string photo, string firstName, string lastName, IFileStorageService fileStorageService, string addressLine = "")
         {
 
-            var noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             string agentImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
             var agentImage = File.ReadAllBytes(agentImagePath);
 
-            if (agentImage == null)
-            {
-                agentImage = File.ReadAllBytes(noUserImagePath);
-            }
+            var extension = Path.GetExtension(agentImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(agentImage, extension, vendor.Email);
+
             var pincode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.Code == pinCode);
             var address = addressLine + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
             var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
@@ -55,7 +53,7 @@ namespace risk.control.system.Seeds
                 DistrictId = pincode?.DistrictId ?? default!,
                 StateId = pincode?.StateId ?? default!,
                 PinCodeId = pincode?.PinCodeId ?? default!,
-                ProfilePictureUrl = photo,
+                ProfilePictureUrl = relativePath,
                 ProfilePicture = agentImage,
                 Role = AppRoles.AGENT,
                 UserRole = AgencyRole.AGENT,

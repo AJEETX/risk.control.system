@@ -7,7 +7,7 @@ public interface IGoogleService
 {
     Task<List<string>> GetAutocompleteSuggestions(string input, string types = "address");
 }
-public class GoogleService : IGoogleService
+internal class GoogleService : IGoogleService
 {
     private static HttpClient client = new HttpClient();
     public async Task<List<string>> GetAutocompleteSuggestions(string input, string types = "address")

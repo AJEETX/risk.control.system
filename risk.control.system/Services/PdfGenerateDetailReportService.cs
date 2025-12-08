@@ -11,7 +11,7 @@ namespace risk.control.system.Services
     {
         Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true);
     }
-    public class PdfGenerateDetailReportService : IPdfGenerateDetailReportService
+    internal class PdfGenerateDetailReportService : IPdfGenerateDetailReportService
     {
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);

@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Net;
+using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -164,6 +165,11 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors");
+                    return View(model);
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 if (model == null || model.PolicyDetail == null || !model.PolicyDetail.IsValidCaseDetail())
@@ -172,14 +178,33 @@ namespace risk.control.system.Controllers.Company
 
                     return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
                 }
-                var file = model.PolicyDetail?.Document;
-                if (file == null)
+                model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
+                model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
+                model.PolicyDetail.Comments = WebUtility.HtmlEncode(model.PolicyDetail.Comments);
+
+                var file = model.PolicyDetail.Document;
+
+                if (file == null || file.Length == 0)
                 {
-                    notifyService.Warning("Invalid Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
+                    notifyService.Error("Invalid Document");
+                    return View(model);
                 }
 
-                var claim = await service.CreatePolicy(currentUserEmail, model, file);
+                // Validate file content-type
+                var allowedTypes = new[] { "image/jpeg", "image/png" };
+                if (!allowedTypes.Contains(file.ContentType))
+                {
+                    notifyService.Error("Invalid file format");
+                    return View(model);
+                }
+
+                // Validate file size (example 5 MB max)
+                if (file.Length > 5 * 1024 * 1024)
+                {
+                    notifyService.Error("File too large");
+                    return View(model);
+                }
+                var claim = await service.CreatePolicy(currentUserEmail, model);
                 if (claim == null)
                 {
                     notifyService.Error("Error Creating Case detail");
@@ -213,23 +238,47 @@ namespace risk.control.system.Controllers.Company
 
                     return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
                 }
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors");
+                    return View(model);
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
                 if (model == null || model.PolicyDetail == null || !model.PolicyDetail.IsValidCaseDetail())
                 {
                     notifyService.Error("OOPs !!!..Incomplete/Invalid input");
 
-                    return RedirectToAction(nameof(InvestigationController.EditPolicy), "Investigation", new { id = id });
+                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
                 }
+                model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
+                model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
+                model.PolicyDetail.Comments = WebUtility.HtmlEncode(model.PolicyDetail.Comments);
 
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var file = model.PolicyDetail.Document;
 
-                IFormFile documentFile = null;
-                var file = model.PolicyDetail?.Document;
-                if (file != null)
+                if (file == null || file.Length == 0)
                 {
-                    documentFile = file;
+                    notifyService.Error("Invalid Document");
+                    return View(model);
                 }
 
-                var claim = await service.EditPolicy(currentUserEmail, model, documentFile);
+                // Validate file content-type
+                var allowedTypes = new[] { "image/jpeg", "image/png" };
+                if (!allowedTypes.Contains(file.ContentType))
+                {
+                    notifyService.Error("Invalid file format");
+                    return View(model);
+                }
+
+                // Validate file size (example 5 MB max)
+                if (file.Length > 5 * 1024 * 1024)
+                {
+                    notifyService.Error("File too large");
+                    return View(model);
+                }
+
+                var claim = await service.EditPolicy(currentUserEmail, model);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error editing policy");
@@ -288,7 +337,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var company = await service.CreateCustomer(currentUserEmail, customerDetail, file);
+                var company = await service.CreateCustomer(currentUserEmail, customerDetail);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
@@ -340,13 +389,14 @@ namespace risk.control.system.Controllers.Company
                         return RedirectToAction(nameof(InvestigationController.EditCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
                     }
                 }
-                IFormFile profileFile = null;
+
                 var file = customerDetail?.ProfileImage;
-                if (file != null)
+                if (file == null)
                 {
-                    profileFile = file;
+                    notifyService.Warning("Invalid Image Uploaded Error !!! ");
+                    return RedirectToAction(nameof(InvestigationController.EditBeneficiary), "Investigation", new { id = customerDetail.InvestigationTaskId });
                 }
-                var company = await service.EditCustomer(currentUserEmail, customerDetail, profileFile);
+                var company = await service.EditCustomer(currentUserEmail, customerDetail);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");

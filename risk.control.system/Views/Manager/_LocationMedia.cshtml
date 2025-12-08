@@ -43,14 +43,14 @@
 									@if (doc.MediaType == MediaType.VIDEO)
 									{
 										<video class="media-view" controls>
-											<source src="@doc.FilePath" type="video/@doc.MediaExtension">
+											<source src="/Document/GetMediaDocument/@doc.Id"  type="video/@doc.MediaExtension">
 											Your browser does not support the video tag.
 										</video>
 									}
 									else if (doc.MediaType == MediaType.AUDIO)
 									{
 										<audio controls>
-											<source src="@doc.FilePath" type="audio/@doc.MediaExtension" />
+											<source src="/Document/GetMediaDocument/@doc.Id" type="audio/@doc.MediaExtension" />
 										</audio>
 									}
 								</div>

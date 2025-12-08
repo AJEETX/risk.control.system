@@ -15,7 +15,7 @@
         private const double MinLon = 63.5;
         private const double MaxLon = 99.5;
 
-        public static string GetDigiPin(double lat, double lon)
+        internal static string GetDigiPin(double lat, double lon)
         {
             if (lat < MinLat || lat > MaxLat)
                 throw new ArgumentOutOfRangeException(nameof(lat), "Latitude out of range");

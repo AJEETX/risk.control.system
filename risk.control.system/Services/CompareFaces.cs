@@ -9,7 +9,7 @@ namespace risk.control.system.Services
     {
         Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> DoFaceMatch(byte[] data, byte[] tdata);
     }
-    public class CompareFaces : ICompareFaces
+    internal class CompareFaces : ICompareFaces
     {
         private readonly IAmazonRekognition rekognitionClient;
         private readonly IAmazonTextract textractClient;

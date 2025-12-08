@@ -6,7 +6,7 @@ namespace risk.control.system.Services
     {
         void CleanFailedJobs();
     }
-    public class HangfireJobService : IHangfireJobService
+    internal class HangfireJobService : IHangfireJobService
     {
         private readonly IBackgroundJobClient _backgroundJobClient;
 

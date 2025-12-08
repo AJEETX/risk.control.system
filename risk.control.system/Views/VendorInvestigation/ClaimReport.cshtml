@@ -32,9 +32,9 @@
             </div>
             <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
         </div>
-        <div class="card-body">
             
             <form id="checkboxes" asp-action="GetInvestigateReport" method="get">
+            <div class="card-body">
 
                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
@@ -62,25 +62,21 @@
 
                 </table>
 
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+        </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
-                            <button disabled id="allocatedcase" type="submit" class="btn btn-info">
-                                <span class="badge badge-info"> <i class="far fa-file-archive" aria-hidden="true"></i> </span>
-                                Submit <sub>report</sub>
-                            </button>
-                        </div>
+                        <button disabled id="allocatedcase" type="submit" class="btn btn-info">
+                            <span class="badge badge-info"> <i class="far fa-file-archive" aria-hidden="true"></i> </span>
+                            Submit <sub>report</sub>
+                        </button>
                     </div>
                 </div>
+            </div>
 
             </form>
-            <div id="maps" class="col-md-12">
-                <div id="map"></div>
-
-            </div>
-        </div>
     </div>
 </section>
 <partial name="_DisplayPopUp" />

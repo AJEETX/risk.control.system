@@ -14,11 +14,12 @@ namespace risk.control.system.Services
     {
         Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, byte[] model, ORIGIN fileOrFTP);
     }
-    public class CaseDetailCreationService : ICaseDetailCreationService
+    internal class CaseDetailCreationService : ICaseDetailCreationService
     {
 
         private readonly ApplicationDbContext context;
         private readonly ICloneReportService cloneService;
+        private readonly IFileStorageService fileStorageService;
         private readonly IBeneficiaryCreationService beneficiaryCreationService;
         private readonly ICustomerCreationService customerCreationService;
         private readonly ICaseImageCreationService caseImageCreationService;
@@ -27,6 +28,7 @@ namespace risk.control.system.Services
 
         public CaseDetailCreationService(ApplicationDbContext context,
             ICloneReportService cloneService,
+            IFileStorageService fileStorageService,
             IBeneficiaryCreationService beneficiaryCreationService,
             ICustomerCreationService customerCreationService,
             ICaseImageCreationService caseImageCreationService,
@@ -35,6 +37,7 @@ namespace risk.control.system.Services
         {
             this.context = context;
             this.cloneService = cloneService;
+            this.fileStorageService = fileStorageService;
             this.beneficiaryCreationService = beneficiaryCreationService;
             this.customerCreationService = customerCreationService;
             this.caseImageCreationService = caseImageCreationService;
@@ -93,25 +96,7 @@ namespace risk.control.system.Services
                       ?? context.InvestigationServiceType
                         .FirstOrDefault(b => b.InsuranceType == caseType);  // Case 3: If no match, retry ignoring LineOfBusinessId
 
-                var savedNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(model, uploadCase.CaseId?.ToLower(), POLICY_IMAGE);
-                var extension = Path.GetExtension(POLICY_IMAGE).ToLower();
-                var fileName = Guid.NewGuid().ToString() + extension;
-                if (savedNewImage == null)
-                {
-                    case_errors.Add(new UploadError { UploadData = "[Policy Image: null/not found]", Error = "null/not found" });
-                    caseErrors.Add($"[Policy Image=`{POLICY_IMAGE}`  null/not found]");
-                }
-                else
-                {
-                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "policy");
-                    if (!Directory.Exists(imagePath))
-                    {
-                        Directory.CreateDirectory(imagePath);
-                    }
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "policy", fileName);
-                    await File.WriteAllBytesAsync(filePath, savedNewImage);
 
-                }
                 if (!string.IsNullOrWhiteSpace(uploadCase.Amount) && decimal.TryParse(uploadCase.Amount, out var amount))
                 {
                     uploadCase.Amount = amount.ToString();
@@ -216,34 +201,36 @@ namespace risk.control.system.Services
                    context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
                    ?? context.CostCentre.FirstOrDefault();
 
-                string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", POLICY_IMAGE);
-
+                var savedNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(model, uploadCase.CaseId?.ToLower(), POLICY_IMAGE);
+                var extension = Path.GetExtension(POLICY_IMAGE).ToLower();
+                string filePath = string.Empty;
+                if (savedNewImage == null)
+                {
+                    case_errors.Add(new UploadError { UploadData = "[Policy Image: null/not found]", Error = "null/not found" });
+                    caseErrors.Add($"[Policy Image=`{POLICY_IMAGE}`  null/not found]");
+                }
+                else
+                {
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(savedNewImage, extension, "Case", uploadCase.CaseId);
+                    filePath = relativePath;
+                }
                 var policyDetail = new PolicyDetail
                 {
                     ContractNumber = uploadCase.CaseId,
                     SumAssuredValue = Convert.ToDecimal(uploadCase.Amount),
                     ContractIssueDate = DateTime.ParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
                     //ClaimType = (ClaimType.DEATH)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
-                    InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
+                    InvestigationServiceTypeId = servicetype.InvestigationServiceTypeId,
                     DateOfIncident = DateTime.ParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
                     CauseOfLoss = !string.IsNullOrWhiteSpace(uploadCase.Cause?.Trim()) ? uploadCase.Cause.Trim() : "UNKNOWN",
                     CaseEnablerId = caseEnabler.CaseEnablerId,
                     CostCentreId = department.CostCentreId,
                     InsuranceType = caseType,
-                    //DocumentImage = savedNewImage ?? File.ReadAllBytes(noImagePath),
-                    DocumentPath = "/policy/" + fileName,
-                    DocumentImageExtension = Path.GetExtension(POLICY_IMAGE),
+                    DocumentPath = filePath,
+                    DocumentImageExtension = extension,
                     Updated = DateTime.Now,
                     UpdatedBy = companyUser.Email
                 };
-                //if (!policyDetail.IsValidCaseDetail())
-                //{
-                //    return null;
-                //}
-                //if (customer is null || !policyDetail.IsValidCustomerForUpload(customer) || beneficiary is null || !policyDetail.IsValidBeneficiaryForUpload(beneficiary))
-                //{
-                //    return null;
-                //}
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(companyUser.ClientCompanyId.Value, caseType);
                 var claim = new InvestigationTask
                 {

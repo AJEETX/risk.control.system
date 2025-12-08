@@ -97,7 +97,7 @@
                                 <p class="text-muted text-sm">
                                     @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentPath is not null)
                                     {
-                                        <img id="documentImage" class="img-fluid" src="@Model?.ClaimsInvestigation?.PolicyDetail.DocumentPath" title="@Model.ClaimsInvestigation?.PolicyDetail.ContractNumber Document" data-bs-toggle="tooltip" />
+                                        <img id="documentImage" class="img-fluid" src="/Document/GetPolicyDocument/@Model?.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" title="@Model.ClaimsInvestigation?.PolicyDetail.ContractNumber Document" data-bs-toggle="tooltip" />
                                     }
                                     else
                                     {
@@ -205,7 +205,7 @@
                                         <p class="text-muted text-sm">
                                             @if (Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath is not null)
                                             {
-                                                <img id="profileImage" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath" data-bs-toggle="tooltip" title="Customer Photo" />
+                                                <img id="profileImage" class="img-fluid block-data" src="/Document/GetCustomerDocument/@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" data-bs-toggle="tooltip" title="Customer Photo" />
                                             }
                                             else
                                             {
@@ -291,7 +291,7 @@
                                         <p class="text-muted text-sm">
                                             @if (Model?.Location?.ImagePath is not null)
                                             {
-                                                <img id="bImage" class="img-fluid block-data" src="@Model?.Location?.ImagePath" data-bs-toggle="tooltip" title="Beneficiary Photo" />
+                                                <img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Location.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo" />
                                             }
                                             else
                                             {

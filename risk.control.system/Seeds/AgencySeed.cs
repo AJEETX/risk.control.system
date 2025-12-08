@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
     {
         private const string vendorMapSize = "800x800";
         public static async Task<Vendor> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
-                    ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input, List<InvestigationServiceType> servicesTypes)
+                    ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
@@ -38,7 +38,8 @@ namespace risk.control.system.Seeds
             {
                 checkerImage = File.ReadAllBytes(noCompanyImagePath);
             }
-
+            var extension = Path.GetExtension(checkerImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(checkerImage, extension, input.DOMAIN);
             var checker = new Vendor
             {
                 Name = input.NAME,
@@ -57,8 +58,8 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = input.DOMAIN,
-                PhoneNumber = "9888004739",
-                DocumentUrl = input.PHOTO,
+                PhoneNumber = input.PHONE,
+                DocumentUrl = relativePath,
                 DocumentImage = checkerImage,
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
@@ -94,7 +95,7 @@ namespace risk.control.system.Seeds
             checker.VendorInvestigationServiceTypes = agencyServices;
 
             await context.SaveChangesAsync(null, false);
-            await AgencyUserSeed.Seed(context, webHostEnvironment, vendorUserManager, checkerAgency.Entity, customApiCLient);
+            await AgencyUserSeed.Seed(context, webHostEnvironment, vendorUserManager, checkerAgency.Entity, customApiCLient, fileStorageService);
 
             return checkerAgency.Entity;
         }

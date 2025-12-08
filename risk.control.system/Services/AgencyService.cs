@@ -9,41 +9,35 @@ namespace risk.control.system.Services
     {
         Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail, string portal_base_url);
     }
-    public class AgencyService : IAgencyService
+    internal class AgencyService : IAgencyService
     {
         private const string vendorMapSize = "800x800";
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ICustomApiCLient customApiCLient;
         private readonly ApplicationDbContext context;
         private readonly ISmsService smsService;
+        private readonly IFileStorageService fileStorageService;
 
-        public AgencyService(IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient, ApplicationDbContext context, ISmsService SmsService)
+        public AgencyService(IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient, ApplicationDbContext context, ISmsService SmsService, IFileStorageService fileStorageService)
         {
             this.webHostEnvironment = webHostEnvironment;
             this.customApiCLient = customApiCLient;
             this.context = context;
             smsService = SmsService;
+            this.fileStorageService = fileStorageService;
         }
         public async Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail, string portal_base_url)
         {
             if (vendorDocument is not null)
             {
-                string newFileName = Guid.NewGuid().ToString();
-                string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
-                newFileName += fileExtension;
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
+                var (fileName, relativePath) = await fileStorageService.SaveAsync(vendor.Document, vendor.Email);
 
                 using var dataStream = new MemoryStream();
                 vendorDocument.CopyTo(dataStream);
-                vendor.DocumentImageExtension = fileExtension;
                 vendor.DocumentImage = dataStream.ToArray();
-                vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                vendor.DocumentUrl = "/agency/" + newFileName;
+
+                vendor.DocumentImageExtension = Path.GetExtension(fileName);
+                vendor.DocumentUrl = relativePath;
             }
             else
             {

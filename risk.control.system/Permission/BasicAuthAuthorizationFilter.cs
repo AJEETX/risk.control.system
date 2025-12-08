@@ -1,5 +1,6 @@
-﻿using Hangfire.Dashboard;
-using System.Text;
+﻿using System.Text;
+
+using Hangfire.Dashboard;
 
 namespace risk.control.system.Permission
 {
@@ -30,18 +31,7 @@ namespace risk.control.system.Permission
                 if (credentials.Length != 2)
                     return false;
 
-                string username = "admin", password = "admin";
-
-#if !DEBUG
-            username = Environment.GetEnvironmentVariable("SMS_User");
-            password = Environment.GetEnvironmentVariable("SMS_Pwd");
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                Console.WriteLine("Environment variables not set properly!");
-                return false;
-            }
-#endif
+                string username = Environment.GetEnvironmentVariable("SMS_User"), password = Environment.GetEnvironmentVariable("SMS_Pwd");
 
                 // Check if credentials match
                 return credentials[0] == username && credentials[1] == password;

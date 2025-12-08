@@ -10,7 +10,7 @@ namespace risk.control.system.Services
         Task<ApplicationUser> ForgotPassword(string useremail, string mobile, string countryCode);
     }
 
-    public class AccountService : IAccountService
+    internal class AccountService : IAccountService
     {
         private readonly ApplicationDbContext context;
         private readonly ISmsService smsService;

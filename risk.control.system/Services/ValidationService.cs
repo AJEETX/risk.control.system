@@ -13,7 +13,7 @@ namespace risk.control.system.Services
     {
         Task<bool> ValidateJwtToken(ApplicationDbContext context, HttpContext httpConext, string token);
     }
-    public class ValidationService : IValidationService
+    internal class ValidationService : IValidationService
     {
         private readonly IConfiguration config;
 

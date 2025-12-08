@@ -38,7 +38,7 @@
 						@if (face.ValidationExecuted)
 						{
 							<img id="face-img-@face.Id"
-								 src="@(face?.FilePath)"
+									 src="/Document/GetFaceDocument/@face.Id"
 									 class="thumbnail-image thumbnail profile-image doc-profile-image preview-image"
 								 title="Click to view face photo" />
 						}
