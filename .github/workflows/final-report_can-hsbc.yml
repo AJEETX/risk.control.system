@@ -32,7 +32,7 @@ jobs:
 
     - name: Download Codacy Analysis CLI
       run: |
-        wget https://github.com/codacy/codacy-analysis-cli/releases/latest/download/codacy-analysis-cli.jar
+        wget https://download.codacy.com/tools/codacy-analysis-cli/latest/codacy-analysis-cli.jar
 
     - name: Run Codacy security analysis
       env:
