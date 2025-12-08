@@ -28,16 +28,21 @@ jobs:
       run: |
           LATEST=$(curl -s https://api.github.com/repos/codacy/codacy-cli-v2/releases/latest \
             | grep browser_download_url \
-            | grep linux \
+            | grep linux_amd64 \
             | cut -d '"' -f 4)
 
           echo "Downloading: $LATEST"
-          wget "$LATEST" -O codacy-cli
 
-          chmod +x codacy-cli
-          sudo mv codacy-cli /usr/local/bin/codacy
+          wget "$LATEST" -O codacy-cli.tar.gz
+          tar -xzf codacy-cli.tar.gz
+          
+          BINARY=$(find . -type f -name "codacy" | head -1)
+          echo "Found binary: $BINARY"
 
-    - name: Run Codacy security analysis
+          chmod +x "$BINARY"
+          sudo mv "$BINARY" /usr/local/bin/codacy
+
+    - name: Run Codacy analysis
       env:
           CODACY_API_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
       run: |
@@ -52,7 +57,6 @@ jobs:
       with:
           name: codacy-security-report
           path: results.sarif
-
 
   snyk-scan:
     runs-on: ubuntu-latest
@@ -226,6 +230,7 @@ jobs:
   codeql:
     name: CodeQL Security Scan
     runs-on: ubuntu-latest
+    needs: [codacy-security-scan]
 
     steps:
       - name: CodeQL Checkout
@@ -353,7 +358,7 @@ jobs:
   unified-security-summary:
     name: Unified Security Summary
     runs-on: ubuntu-latest
-    needs: [fortify, codeql, dependency-review, codacy-security-scan]
+    needs: [fortify, codeql, dependency-review]
     steps:
       - name: Generate Enhanced Security Summary
         run: |
