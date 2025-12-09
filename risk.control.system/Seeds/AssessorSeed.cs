@@ -27,7 +27,7 @@ namespace risk.control.system.Seeds
                 assessorImage = File.ReadAllBytes(noUserImagePath);
             }
             var extension = Path.GetExtension(assessorImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(assessorImage, extension, clientCompany.Email,"user");
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(assessorImage, extension, clientCompany.Email, "user");
             var clientAssessor = new ClientCompanyApplicationUser()
             {
                 UserName = assessorEmailwithSuffix,
@@ -43,7 +43,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
                 IsClientManager = true,
-                Addressline = "139 Sector 44",
+                Addressline = clientCompany.Addressline,
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 PinCode = pinCode,
                 Country = pinCode.Country,

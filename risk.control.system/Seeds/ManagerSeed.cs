@@ -41,7 +41,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = true,
                 Active = true,
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
-                Addressline = "139 Sector 44",
+                Addressline = clientCompany.Addressline,
                 IsVendorAdmin = false,
                 ClientCompany = clientCompany,
                 Country = pinCode.Country,

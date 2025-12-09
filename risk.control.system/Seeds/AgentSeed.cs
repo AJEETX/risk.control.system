@@ -22,7 +22,7 @@ namespace risk.control.system.Seeds
             var agentImage = File.ReadAllBytes(agentImagePath);
 
             var extension = Path.GetExtension(agentImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(agentImage, extension, vendor.Email,"user");
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(agentImage, extension, vendor.Email, "user");
 
             var pincode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.Code == pinCode);
             var address = addressLine + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
@@ -46,7 +46,7 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
-                Addressline = addressLine,
+                Addressline = vendor.Addressline,
                 Country = pincode?.Country,
                 PinCode = pincode,
                 CountryId = pincode?.CountryId,

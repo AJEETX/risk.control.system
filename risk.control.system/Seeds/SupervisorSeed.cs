@@ -44,7 +44,7 @@ namespace risk.control.system.Seeds
                 Vendor = vendor,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
-                Addressline = "55 Donvale Road",
+                Addressline = vendor.Addressline,
                 IsVendorAdmin = false,
                 CountryId = pinCode.CountryId,
                 DistrictId = pinCode?.DistrictId ?? default!,

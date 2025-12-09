@@ -21,8 +21,7 @@ namespace risk.control.system.Seeds
 
             var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
 
-            var companyAddressline = input.ADDRESSLINE;
-            var companyAddress = companyAddressline + ", " + companyPinCode.District.Name + ", " + companyPinCode.State.Name + ", " + companyPinCode.Country.Code;
+            var companyAddress = input.ADDRESSLINE + ", " + companyPinCode.District.Name + ", " + companyPinCode.State.Name + ", " + companyPinCode.Country.Code;
             var companyAddressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
             var companyAddressCoordinatesLatLong = companyAddressCoordinates.Latitude + "," + companyAddressCoordinates.Longitude;
             var companyAddressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={companyAddressCoordinatesLatLong}&zoom=14&size={companyMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyAddressCoordinatesLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
@@ -42,7 +41,7 @@ namespace risk.control.system.Seeds
             var insurer = new ClientCompany
             {
                 Name = input.NAME,
-                Addressline = companyAddressline,
+                Addressline = input.ADDRESSLINE,
                 Branch = input.BRANCH,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,

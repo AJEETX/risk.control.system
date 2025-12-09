@@ -1,0 +1,22 @@
+﻿project:
+  allowNetwork: true
+
+engines:
+  pylint:
+    enabled: true
+  eslint:
+    enabled: true
+  stylelint:
+    enabled: true
+  bandit:
+    enabled: true
+  shellcheck:
+    enabled: true
+
+paths:
+  - .
+
+excludePaths:
+  - bin/
+  - obj/
+  - node_modules/

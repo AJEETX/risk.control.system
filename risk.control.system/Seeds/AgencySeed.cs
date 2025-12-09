@@ -22,28 +22,27 @@ namespace risk.control.system.Seeds
             //CREATE VENDOR COMPANY
 
             var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
-            var addressline = input.ADDRESSLINE;
 
             var states = context.State.Include(s => s.Country).Where(s => s.Country.Code == input.COUNTRY).ToList();
 
-            var address = addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+            var address = input.ADDRESSLINE + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
             var addressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
             var latLong = addressCoordinates.Latitude + "," + addressCoordinates.Longitude;
             var addressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
-            string checkerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
-            var checkerImage = File.ReadAllBytes(checkerImagePath);
+            string agencyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
+            var agencyImage = File.ReadAllBytes(agencyImagePath);
 
-            if (checkerImage == null)
+            if (agencyImage == null)
             {
-                checkerImage = File.ReadAllBytes(noCompanyImagePath);
+                agencyImage = File.ReadAllBytes(noCompanyImagePath);
             }
-            var extension = Path.GetExtension(checkerImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(checkerImage, extension, input.DOMAIN);
+            var extension = Path.GetExtension(agencyImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(agencyImage, extension, input.DOMAIN);
             var checker = new Vendor
             {
                 Name = input.NAME,
-                Addressline = addressline,
+                Addressline = input.ADDRESSLINE,
                 Branch = input.BRANCH,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
@@ -60,7 +59,7 @@ namespace risk.control.system.Seeds
                 Email = input.DOMAIN,
                 PhoneNumber = input.PHONE,
                 DocumentUrl = relativePath,
-                DocumentImage = checkerImage,
+                DocumentImage = agencyImage,
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
                 CanChangePassword = globalSettings.CanChangePassword,

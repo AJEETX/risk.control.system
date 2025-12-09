@@ -50,7 +50,7 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = true,
-                Addressline = "1 Gandhi Nagar",
+                Addressline = vendor.Addressline,
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 Vendor = vendor,
                 CountryId = countryId,
@@ -89,7 +89,7 @@ namespace risk.control.system.Seeds
             //Seed Vendor Agent
             string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
             await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME,
-                fileStorageService, "2 Jawahar Nagar");
+                fileStorageService);
 
             //if (!System.Diagnostics.Debugger.IsAttached)
             //{
