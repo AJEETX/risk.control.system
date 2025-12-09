@@ -91,7 +91,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select id="Income" required asp-for="Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                        <select id="Income" required asp-for="Income" class="form-control remarks" asp-items="@ViewBag.IncomeList">
                             <option value="">--- SELECT---</option>
                         </select>
                         <span asp-validation-for="Income" class="text-danger"></span>

@@ -20,6 +20,7 @@ namespace risk.control.system.Models
         [DataType(DataType.Date)]
         public DateTime? DateOfBirth { get; set; }
 
+        [Required]
         public Gender? Gender { get; set; }
 
         [Required]
@@ -32,28 +33,29 @@ namespace risk.control.system.Models
         public string Addressline { get; set; }
 
         [Display(Name = "PinCode")]
-        public long? PinCodeId { get; set; } = default!;
+        public long? PinCodeId { get; set; }
 
         [Display(Name = "PinCode")]
-        public PinCode? PinCode { get; set; } = default!;
+        public PinCode? PinCode { get; set; }
 
         [Display(Name = "State")]
-        public long? StateId { get; set; } = default!;
+        public long? StateId { get; set; }
 
         [Display(Name = "State")]
-        public State? State { get; set; } = default!;
+        public State? State { get; set; }
 
         [Display(Name = "Country")]
-        public long? CountryId { get; set; } = default!;
+        public long? CountryId { get; set; }
 
         [Display(Name = "Country")]
-        public Country? Country { get; set; } = default!;
+        public Country? Country { get; set; }
 
         [Display(Name = "District")]
-        public long? DistrictId { get; set; } = default!;
+        public long? DistrictId { get; set; }
 
         [Display(Name = "District")]
-        public District? District { get; set; } = default!;
+        public District? District { get; set; }
+        [Required]
         public long? InvestigationTaskId { get; set; }
         public InvestigationTask? InvestigationTask { get; set; }
         [NotMapped]

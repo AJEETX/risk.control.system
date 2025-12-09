@@ -159,17 +159,17 @@
                         {
                             <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/Document/GetPolicyDocument/@Model.Id" data-bs-toggle="tooltip" title="Case Document" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="NewDocument" type="file" class="form-control remarks document-image-input valid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document"
+                            <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file" class="form-control remarks document-image-input valid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document"
                                    data-bs-toggle="tooltip" title="Upload Case Document" data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
                         }
                         else
                         {
                             <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src=@Applicationsettings.NO_POLICY_IMAGE data-bs-toggle="tooltip" title="No Case Document" />
                             <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="NewDocument" type="file" class="form-control remarks document-image-input invalid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document" required 
+                            <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file" class="form-control remarks document-image-input invalid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document" required 
                             data-bs-toggle="tooltip" title="Upload Case Document" data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
                         }
-                        <span asp-validation-for="NewDocument" class="text-danger"></span>
+                        <span asp-validation-for="Document" class="text-danger"></span>
                     </div>
                 </div>
             </div>

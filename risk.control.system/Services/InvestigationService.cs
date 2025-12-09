@@ -22,8 +22,8 @@ namespace risk.control.system.Services
         Task<InvestigationTask> EditPolicy(string userEmail, EditPolicyDto dto);
         Task<ClientCompany> CreateCustomer(string userEmail, CustomerDetail customerDetail);
         Task<ClientCompany> EditCustomer(string userEmail, CustomerDetail customerDetail);
-        Task<ClientCompany> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
-        Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
+        Task<ClientCompany> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary);
+        Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary);
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
@@ -307,9 +307,9 @@ namespace risk.control.system.Services
                 existingPolicy.UpdatedBy = userEmail;
                 existingPolicy.ORIGIN = ORIGIN.USER;
                 existingPolicy.PolicyDetail.InsuranceType = dto.PolicyDetail.InsuranceType;
-                if (dto.NewDocument is not null)
+                if (dto.Document is not null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(dto.NewDocument, "Case", dto.PolicyDetail.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(dto.Document, "Case", dto.PolicyDetail.ContractNumber);
 
                     existingPolicy.PolicyDetail.DocumentPath = relativePath;
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
@@ -450,7 +450,7 @@ namespace risk.control.system.Services
                 return null;
             }
         }
-        public async Task<ClientCompany> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary, IFormFile? customerDocument)
+        public async Task<ClientCompany> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary)
         {
             try
             {
@@ -506,7 +506,7 @@ namespace risk.control.system.Services
                 return null;
             }
         }
-        public async Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument)
+        public async Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary)
         {
             try
             {
@@ -514,14 +514,11 @@ namespace risk.control.system.Services
                     .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
 
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                if (customerDocument is not null)
+                if (beneficiary?.ProfileImage != null)
                 {
-                    if (beneficiary?.ProfileImage != null)
-                    {
-                        var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage,"Case",claimsInvestigation.PolicyDetail.ContractNumber);
-                        beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
-                        beneficiary.ImagePath = relativePath;
-                    }
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
+                    beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
+                    beneficiary.ImagePath = relativePath;
                 }
                 else
                 {

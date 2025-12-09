@@ -19,7 +19,7 @@ namespace risk.control.system.Models.ViewModel
         public PolicyDetailDto PolicyDetail { get; set; }
 
         // Only used if user uploads a new file
-        public IFormFile? NewDocument { get; set; }
+        public IFormFile? Document { get; set; }
 
         // Display-only: existing path for showing the image
         public string? ExistingDocumentPath { get; set; }

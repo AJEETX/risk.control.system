@@ -16,7 +16,7 @@ namespace risk.control.system.Models
         public long BeneficiaryRelationId { get; set; }
 
         [Display(Name = "Relation")]
-        public BeneficiaryRelation BeneficiaryRelation { get; set; }
+        public BeneficiaryRelation? BeneficiaryRelation { get; set; }
 
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Phone")]

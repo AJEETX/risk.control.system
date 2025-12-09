@@ -13,6 +13,14 @@ document.addEventListener("DOMContentLoaded", function () {
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
+    const addressInput = document.getElementById("Addressline");
+    if (addressInput) {
+        addressInput.addEventListener("input", function () {
+            if (this.value.length > 0) {
+                this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+            }
+        });
+    }
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -265,7 +273,6 @@ function getMobileType() {
 }
 
 var moreInfo = "...";
-
 
 function markNotificationAsRead(notificationId) {
     var token = $('input[name="__RequestVerificationToken"]').val();
@@ -635,32 +642,6 @@ $(document).ready(function () {
         }
     });
 
-    // delete messages
-    $('#delete-messages').on('click', function () {
-        let ids = [];
-        let form = $('#listForm');
-        let checkboxArray = document.getElementsByName('ids');
-
-        // check if checkbox is checked
-        for (let i = 0; i < checkboxArray.length; i++) {
-            if (checkboxArray[i].checked)
-                ids.push(checkboxArray[i].value);
-        }
-
-        // submit form
-        if (ids.length > 0) {
-            if (confirm("Are you sure you want to delete this item(s)?")) {
-                form.submit();
-            }
-        }
-    });
-
-    $('#delete-message').on('click', function () {
-        $('#deleteForm').submit();
-    });
-
-    // Attach the call to toggleChecked to the
-    // click event of the global checkbox:
     $("#checkall").click(function () {
         var status = $("#checkall").prop('checked');
         $('#manage-vendors').prop('disabled', !status)
@@ -713,29 +694,6 @@ function checkIfAnyChecked(elements) {
     return hasAnyCheckboxChecked;
 }
 
-async function initPopMap(_position, title) {
-    const { Map } = await google.maps.importLibrary("maps");
-    // The location of Uluru
-    var position = { lat: -25.344, lng: 131.031 };
-    if (_position) {
-        position = _position;
-    }
-    var element = document.getElementById("pop-map");
-    // The map, centered at Uluru
-    mapz = new Map(element, {
-        scaleControl: true,
-        zoom: 14,
-        center: position,
-        mapId: "4504f8b37365c3d0",
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-    });
-
-    var marker = new google.maps.Marker({ position: position, map: mapz, title: title })
-}
-function enableSubmitButton(obj, showDefaultOption = true) {
-    var value = obj.value;
-    $('#create-pincode').prop('disabled', false);
-}
 function toggleChecked(status) {
     $("#checkboxes input").each(function () {
         // Set the checked status of each to match the

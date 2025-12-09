@@ -190,12 +190,6 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    notifyService.Error("Please correct the errors");
-                    return View(model);
-                }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 if (model == null || model.PolicyDetail == null)
                 {
@@ -203,52 +197,74 @@ namespace risk.control.system.Controllers.Company
 
                     return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
                 }
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+
                 var file = model.Document;
 
                 if (file == null || file.Length == 0)
                 {
-                    notifyService.Error("Invalid Document");
+                    notifyService.Error("Invalid Document Image ");
+                    LoadDropDowns(model.PolicyDetail);
                     return View(model);
                 }
                 if (file.Length > MAX_FILE_SIZE)
                 {
+                    notifyService.Error($"Document image Size exceeds the max size: 5MB");
                     ModelState.AddModelError(nameof(model.Document), "File too large.");
+                    LoadDropDowns(model.PolicyDetail);
                     return View(model);
                 }
 
                 var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
                 if (!AllowedExt.Contains(ext))
                 {
+                    notifyService.Error($"Invalid Document image type");
                     ModelState.AddModelError(nameof(model.Document), "Invalid file type.");
+                    LoadDropDowns(model.PolicyDetail);
                     return View(model);
                 }
 
                 if (!AllowedMime.Contains(file.ContentType))
                 {
-                    ModelState.AddModelError(nameof(model.Document), "Invalid file content type.");
+                    notifyService.Error($"Invalid Document Image content type");
+                    ModelState.AddModelError(nameof(model.Document), "Invalid Document Image  content type.");
+                    LoadDropDowns(model.PolicyDetail);
                     return View(model);
                 }
 
                 if (!ImageSignatureValidator.HasValidSignature(file))
                 {
+                    notifyService.Error($"Invalid or corrupted Document Image ");
                     ModelState.AddModelError(nameof(model.Document), "Invalid file content.");
+                    LoadDropDowns(model.PolicyDetail);
                     return View(model);
                 }
 
                 // Business validation: dates
                 if (model.PolicyDetail.DateOfIncident > DateTime.UtcNow)
                 {
+                    notifyService.Error($"Incident date cannot be in the future");
                     ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident date cannot be in the future.");
+                    LoadDropDowns(model.PolicyDetail);
                     return View(model);
                 }
                 if (model.PolicyDetail.ContractIssueDate > DateTime.UtcNow)
                 {
+                    notifyService.Error($"Issue date cannot be in the future");
                     ModelState.AddModelError("PolicyDetail.ContractIssueDate", "Contract issue date cannot be in the future.");
+                    LoadDropDowns(model.PolicyDetail);
                     return View(model);
                 }
                 if (model.PolicyDetail.DateOfIncident < model.PolicyDetail.ContractIssueDate)
                 {
+                    notifyService.Error($"Incident cannot be before Issue date");
                     ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident cannot be before issue date.");
+                    LoadDropDowns(model.PolicyDetail);
                     return View(model);
                 }
 
@@ -261,15 +277,13 @@ namespace risk.control.system.Controllers.Company
                 if (!allowedTypes.Contains(file.ContentType))
                 {
                     notifyService.Error("Invalid file format");
+                    ModelState.AddModelError(nameof(model.Document), "Invalid file content.");
+                    LoadDropDowns(model.PolicyDetail);
                     return View(model);
                 }
 
-                // Validate file size (example 5 MB max)
-                if (file.Length > 5 * 1024 * 1024)
-                {
-                    notifyService.Error("File too large");
-                    return View(model);
-                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
                 var claim = await service.CreatePolicy(currentUserEmail, model);
                 if (claim == null)
                 {
@@ -290,6 +304,35 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+        private void LoadDropDowns(PolicyDetailDto model)
+        {
+            ViewData["CaseEnablerId"] = new SelectList(
+                context.CaseEnabler.OrderBy(s => s.Code),
+                "CaseEnablerId",
+                "Name",
+                model.CaseEnablerId
+            );
+
+            ViewData["CostCentreId"] = new SelectList(
+                context.CostCentre.OrderBy(s => s.Code),
+                "CostCentreId",
+                "Name",
+                model.CostCentreId
+            );
+
+            if (model != null)
+            {
+                ViewData["InvestigationServiceTypeId"] = new SelectList(
+                    context.InvestigationServiceType
+                        .Where(i => i.InsuranceType == model.InsuranceType)
+                        .OrderBy(s => s.Code),
+                    "InvestigationServiceTypeId",
+                    "Name",
+                    model.InvestigationServiceTypeId
+                );
+            }
+        }
+
         [Breadcrumb(title: " Edit Case", FromAction = "Details")]
         public async Task<IActionResult> EditPolicy(long id)
         {
@@ -356,18 +399,99 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> EditPolicy(EditPolicyDto dto)
+        public async Task<IActionResult> EditPolicy(EditPolicyDto model)
         {
             try
             {
                 if (!ModelState.IsValid)
-                    return View(dto);
+                {
+                    notifyService.Error("Please correct the errors");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+
+                var file = model.Document;
+
+                if (file == null || file.Length == 0)
+                {
+                    notifyService.Error("Invalid Document");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+                if (file.Length > MAX_FILE_SIZE)
+                {
+                    notifyService.Error("Document File too large");
+                    ModelState.AddModelError(nameof(model.Document), "File too large.");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!AllowedExt.Contains(ext))
+                {
+                    notifyService.Error("Invalid Document type");
+                    ModelState.AddModelError(nameof(model.Document), "Invalid file type.");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+
+                if (!AllowedMime.Contains(file.ContentType))
+                {
+                    notifyService.Error("Invalid Document content type");
+                    ModelState.AddModelError(nameof(model.Document), "Invalid file content type.");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+
+                if (!ImageSignatureValidator.HasValidSignature(file))
+                {
+                    notifyService.Error("Invalid Document content");
+                    ModelState.AddModelError(nameof(model.Document), "Invalid file content.");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+
+                // Business validation: dates
+                if (model.PolicyDetail.DateOfIncident > DateTime.UtcNow)
+                {
+                    notifyService.Error("Incident date cannot be in the future");
+                    ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident date cannot be in the future.");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+                if (model.PolicyDetail.ContractIssueDate > DateTime.UtcNow)
+                {
+                    notifyService.Error("Issue date cannot be in the future");
+                    ModelState.AddModelError("PolicyDetail.ContractIssueDate", "Contract issue date cannot be in the future.");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+                if (model.PolicyDetail.DateOfIncident < model.PolicyDetail.ContractIssueDate)
+                {
+                    notifyService.Error("Incident cannot be before issue date");
+                    ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident cannot be before issue date.");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
+
+                model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
+                model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
+                model.PolicyDetail.Comments = WebUtility.HtmlEncode(model.PolicyDetail.Comments);
+
+                // Validate file content-type
+                var allowedTypes = new[] { "image/jpeg", "image/png" };
+                if (!allowedTypes.Contains(file.ContentType))
+                {
+                    notifyService.Error("Invalid file format");
+                    LoadDropDowns(model.PolicyDetail);
+                    return View(model);
+                }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var savedTask = await service.EditPolicy(currentUserEmail, dto);
+                var savedTask = await service.EditPolicy(currentUserEmail, model);
                 notifyService.Custom($"Policy <b>#{savedTask.PolicyDetail.ContractNumber}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = dto.Id });
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.Id });
             }
             catch (Exception ex)
             {
@@ -377,6 +501,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
         [Breadcrumb(title: " Add Customer", FromAction = "Details")]
         public async Task<IActionResult> CreateCustomer(long id)
         {
@@ -404,7 +529,7 @@ namespace risk.control.system.Controllers.Company
                     var customerDetail = new CustomerDetail
                     {
                         InvestigationTaskId = id,
-                        Addressline = random.Next(100, 999) + " GOOD STREET",
+                        Addressline = random.Next(10, 99) + " Main Road",
                         PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                         Education = Education.PROFESSIONAL,
@@ -424,9 +549,12 @@ namespace risk.control.system.Controllers.Company
                         SelectedPincodeId = pinCode.PinCodeId,
                         Gender = Gender.MALE,
                     };
+                    LoadDropDowns(customerDetail);
+
                     return View(customerDetail);
                 }
                 var blankCustomerDetail = new CustomerDetail { Country = currentUser.ClientCompany.Country, CountryId = currentUser.ClientCompany.CountryId, InvestigationTaskId = id };
+                LoadDropDowns(blankCustomerDetail);
                 return View(blankCustomerDetail);
             }
             catch (Exception ex)
@@ -436,6 +564,80 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPS!!!..Try Again");
                 return RedirectToAction(nameof(CreatePolicy));
             }
+        }
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> CreateCustomer(CustomerDetail customerDetail)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors and try again.");
+                    LoadDropDowns(customerDetail);
+                    return View(customerDetail);
+                }
+
+                // Validate image signature
+                if (!ImageSignatureValidator.HasValidSignature(customerDetail.ProfileImage))
+                {
+                    notifyService.Error("Invalid or corrupted image");
+                    ModelState.AddModelError(nameof(customerDetail.ProfileImage), "Invalid or corrupted image.");
+                    LoadDropDowns(customerDetail);
+                    return View(customerDetail);
+                }
+
+                // Validate phone number
+                var country = await context.Country.FindAsync(customerDetail.SelectedCountryId);
+                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                {
+                    if (!phoneService.IsValidMobileNumber(customerDetail.PhoneNumber, country.ISDCode.ToString()))
+                    {
+                        notifyService.Error("Invalid mobile number");
+                        ModelState.AddModelError(nameof(customerDetail.PhoneNumber), "Invalid mobile number.");
+                        LoadDropDowns(customerDetail);
+                        return View(customerDetail);
+                    }
+                }
+
+                // Save customer
+                var currentUserEmail = HttpContext.User.Identity.Name;
+                var result = await service.CreateCustomer(currentUserEmail, customerDetail);
+
+                if (result == null)
+                {
+                    notifyService.Error("Error creating customer.");
+                    LoadDropDowns(customerDetail);
+                    return View(customerDetail);
+                }
+                notifyService.Custom($"Customer <b>{customerDetail.Name}</b> added successfully", 3, "green", "fas fa-user-plus");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = customerDetail.InvestigationTaskId });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error creating customer");
+                notifyService.Error("Unexpected error. Please try again.");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = customerDetail.InvestigationTaskId });
+            }
+        }
+        private void LoadDropDowns(CustomerDetail model)
+        {
+            var pinCode = context.PinCode.Include(s => s.Country).OrderBy(s => s.Name).FirstOrDefault(s => (s.Country.CountryId == model.SelectedCountryId || s.Country.CountryId == model.CountryId));
+            model.Country = pinCode.Country;
+            model.CountryId = pinCode.CountryId;
+            model.SelectedCountryId = pinCode.CountryId.GetValueOrDefault();
+            model.StateId = pinCode.StateId;
+            model.SelectedStateId = pinCode.StateId.GetValueOrDefault();
+            model.DistrictId = pinCode.DistrictId;
+            model.SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault();
+            model.PinCodeId = pinCode.PinCodeId;
+            model.SelectedPincodeId = pinCode.PinCodeId;
+            // Enum dropdowns
+            ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender)).Cast<Gender>(), model.Gender);
+            ViewData["IncomeList"] = new SelectList(Enum.GetValues(typeof(Income)).Cast<Income>(), model.Income);
+            ViewData["EducationList"] = new SelectList(Enum.GetValues(typeof(Education)).Cast<Education>(), model.Education);
+            ViewData["OccupationList"] = new SelectList(Enum.GetValues(typeof(Occupation)).Cast<Occupation>(), model.Occupation);
         }
 
         [Breadcrumb(title: " Edit Customer", FromAction = "Details")]
@@ -470,6 +672,8 @@ namespace risk.control.system.Controllers.Company
                 var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("EditCustomer", "Investigation", $"Edit Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
+                LoadDropDowns(customer);
+
                 return View(customer);
             }
             catch (Exception ex)
@@ -480,6 +684,62 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<IActionResult> EditCustomer(long investigationTaskId, CustomerDetail customerDetail)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors and try again.");
+                    LoadDropDowns(customerDetail);
+                    return View(customerDetail);
+                }
+
+                // Validate image signature
+                if (!ImageSignatureValidator.HasValidSignature(customerDetail.ProfileImage))
+                {
+                    notifyService.Error("Invalid or corrupted image");
+                    ModelState.AddModelError(nameof(customerDetail.ProfileImage), "Invalid or corrupted image.");
+                    LoadDropDowns(customerDetail);
+                    return View(customerDetail);
+                }
+
+                // Validate phone number
+                var country = await context.Country.FindAsync(customerDetail.SelectedCountryId);
+                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                {
+                    if (!phoneService.IsValidMobileNumber(customerDetail.PhoneNumber, country.ISDCode.ToString()))
+                    {
+                        notifyService.Error("Invalid mobile number");
+                        ModelState.AddModelError(nameof(customerDetail.PhoneNumber), "Invalid mobile number.");
+                        LoadDropDowns(customerDetail);
+                        return View(customerDetail);
+                    }
+                }
+
+                var currentUserEmail = HttpContext.User.Identity.Name;
+
+                var company = await service.EditCustomer(currentUserEmail, customerDetail);
+                if (company == null)
+                {
+                    notifyService.Error("OOPs !!!..Error edting customer");
+                    LoadDropDowns(customerDetail);
+                    return View(customerDetail);
+                }
+                notifyService.Custom($"Customer <b>{customerDetail.Name}</b> edited successfully", 3, "orange", "fas fa-user-plus");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = customerDetail.InvestigationTaskId });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.StackTrace);
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Error edting customer");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = customerDetail.InvestigationTaskId });
+            }
         }
 
         [Breadcrumb("Add Beneficiary", FromAction = "Details")]
@@ -513,7 +773,7 @@ namespace risk.control.system.Controllers.Company
                     var model = new BeneficiaryDetail
                     {
                         InvestigationTaskId = id,
-                        Addressline = random.Next(100, 999) + " GREAT ROAD",
+                        Addressline = random.Next(10, 99) + " Main Road",
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
                         Income = Income.MEDIUM_INCOME,
                         Name = NameGenerator.GenerateName(),
@@ -529,11 +789,14 @@ namespace risk.control.system.Controllers.Company
                         SelectedPincodeId = pinCode.PinCodeId,
                         PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                     };
+                    LoadDropDowns(model);
+
                     return View(model);
                 }
                 else
                 {
                     var model = new BeneficiaryDetail { InvestigationTaskId = id, Country = currentUser.ClientCompany.Country, CountryId = currentUser.ClientCompany.CountryId };
+                    LoadDropDowns(model);
                     return View(model);
                 }
             }
@@ -545,6 +808,78 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateBeneficiary(long investigationTaskId, BeneficiaryDetail beneficiary)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors and try again.");
+                    LoadDropDowns(beneficiary);
+                    return View(beneficiary);
+                }
+
+                // Validate image signature
+                if (!ImageSignatureValidator.HasValidSignature(beneficiary.ProfileImage))
+                {
+                    notifyService.Error("Invalid or corrupted image");
+                    ModelState.AddModelError(nameof(beneficiary.ProfileImage), "Invalid or corrupted image.");
+                    LoadDropDowns(beneficiary);
+                    return View(beneficiary);
+                }
+
+                // Validate phone number
+                var country = await context.Country.FindAsync(beneficiary.SelectedCountryId);
+                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                {
+                    if (!phoneService.IsValidMobileNumber(beneficiary.PhoneNumber, country.ISDCode.ToString()))
+                    {
+                        notifyService.Error("Invalid mobile number");
+                        ModelState.AddModelError(nameof(beneficiary.PhoneNumber), "Invalid mobile number.");
+                        LoadDropDowns(beneficiary);
+                        return View(beneficiary);
+                    }
+                }
+                var currentUserEmail = HttpContext.User.Identity.Name;
+
+                var company = await service.CreateBeneficiary(currentUserEmail, investigationTaskId, beneficiary);
+                if (company == null)
+                {
+                    notifyService.Warning("Error creating Beneficiary !!! ");
+                    LoadDropDowns(beneficiary);
+                    return View(beneficiary);
+                }
+                notifyService.Custom($"Beneficiary <b>{beneficiary.Name}</b> added successfully", 3, "green", "fas fa-user-tie");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.StackTrace);
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Warning("Error creating Beneficiary !!! ");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
+            }
+        }
+
+        private void LoadDropDowns(BeneficiaryDetail model)
+        {
+            var pinCode = context.PinCode.Include(s => s.Country).OrderBy(s => s.Name).FirstOrDefault(s => (s.Country.CountryId == model.SelectedCountryId || s.Country.CountryId == model.CountryId));
+            model.Country = pinCode.Country;
+            model.CountryId = pinCode.CountryId;
+            model.SelectedCountryId = pinCode.CountryId.GetValueOrDefault();
+            model.StateId = pinCode.StateId;
+            model.SelectedStateId = pinCode.StateId.GetValueOrDefault();
+            model.DistrictId = pinCode.DistrictId;
+            model.SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault();
+            model.PinCodeId = pinCode.PinCodeId;
+            model.SelectedPincodeId = pinCode.PinCodeId;
+            // Enum dropdowns
+            ViewData["BeneficiaryRelationId"] = new SelectList(context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", model.BeneficiaryRelationId);
+            ViewData["IncomeList"] = new SelectList(Enum.GetValues(typeof(Income)).Cast<Income>(), model.Income);
         }
         [Breadcrumb("Edit Beneficiary", FromAction = "Details")]
         public IActionResult EditBeneficiary(long id)
@@ -573,6 +908,7 @@ namespace risk.control.system.Controllers.Company
                 var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "Investigation", $"Edit beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
+                LoadDropDowns(beneficiary);
 
                 return View(beneficiary);
             }
@@ -582,6 +918,63 @@ namespace risk.control.system.Controllers.Company
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> EditBeneficiary(long beneficiaryDetailId, BeneficiaryDetail beneficiary)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors and try again.");
+                    LoadDropDowns(beneficiary);
+                    return View(beneficiary);
+                }
+
+                // Validate image signature
+                if (!ImageSignatureValidator.HasValidSignature(beneficiary.ProfileImage))
+                {
+                    notifyService.Error("Invalid or corrupted image");
+                    ModelState.AddModelError(nameof(beneficiary.ProfileImage), "Invalid or corrupted image.");
+                    LoadDropDowns(beneficiary);
+                    return View(beneficiary);
+                }
+
+                // Validate phone number
+                var country = await context.Country.FindAsync(beneficiary.SelectedCountryId);
+                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                {
+                    if (!phoneService.IsValidMobileNumber(beneficiary.PhoneNumber, country.ISDCode.ToString()))
+                    {
+                        notifyService.Error("Invalid mobile number");
+                        ModelState.AddModelError(nameof(beneficiary.PhoneNumber), "Invalid mobile number.");
+                        LoadDropDowns(beneficiary);
+                        return View(beneficiary);
+                    }
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                var company = await service.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary);
+                if (company == null)
+                {
+                    notifyService.Error("OOPs !!!..Error editing beneficiary");
+                    LoadDropDowns(beneficiary);
+                    return View(beneficiary);
+
+                }
+                notifyService.Custom($"Beneficiary <b>{beneficiary.Name}</b> edited successfully", 3, "orange", "fas fa-user-tie");
+
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.StackTrace);
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Error editing beneficiary");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
             }
         }
 

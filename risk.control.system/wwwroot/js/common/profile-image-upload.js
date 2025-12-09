@@ -85,7 +85,7 @@
             const fileReader = new FileReader();
             fileReader.onload = function (e) {
                 if (previewElement) {
-
+                    inputElement.removeClass('invalid-border')
                     previewElement.attr('src', e.target.result); // Set the preview image source
                     if (previewElementTitle === 'case-document') {
                         previewElement.attr('data-bs-original-title', 'Case Document'); // Set the preview image source
