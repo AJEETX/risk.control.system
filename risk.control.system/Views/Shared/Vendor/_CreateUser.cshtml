@@ -6,21 +6,23 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div class="form-group">
-            <label class="input-group-label" for="createImageInput"> User Photo:</label>
-            <div class="input-group mb-3">
-                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No User Photo" />
-                <i class="fa fa-asterisk asterik-style"></i>
-                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-title-id="user-document" required data-bs-toggle="tooltip" title="Upload User Photo" />
+
+        <div class="form-group text-center">
+            <div class="profile-img-container">
+                <img id="document-Image" class="form-Image" src="@Applicationsettings.NO_USER" title="User Photo" alt="User Photo" data-bs-toggle="tooltip" />
             </div>
+            <label for="createImageInput" class="control-label">User Photo<i class="fa fa-asterisk asterik-style-logo"></i></label>
+            <input id="createImageInput" accept=".jpg,.jpeg,.png" required asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
+                <span asp-validation-for="ProfileImage" class="text-danger"></span>
         </div>
+
         <div class="form-group">
             <label class="input-group-label" for="FirstName"> First Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" id="FirstName" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" value="" maxlength="20" />
+                <input type="text" id="FirstName" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name"  maxlength="20" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
         </div>
@@ -31,7 +33,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" id="LastName"asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" value="" maxlength="20" />
+                <input type="text" id="LastName"asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
         </div>
@@ -42,7 +44,7 @@
         <div class="input-group-prepend">
         <span class="input-group-text" id="Password"> <i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
         </div>
-        <input type="password" asp-for="Password" class="form-control remarks" required placeholder="Password" value="" maxlength="20" autocomplete="new-password">
+        <input type="password" asp-for="Password" class="form-control remarks" required placeholder="Password"  maxlength="20" autocomplete="new-password">
         <span asp-validation-for="Password" class="text-danger"></span>
         </div>
         </div>*@
@@ -70,7 +72,19 @@
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
         </div>
-        @if(Model.UserRole == null)
+            @* <div class="form-group">
+            <span class="input-group-label"> Note:</span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style-none"></i></span>
+                </div>
+                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Notes (optional)"  maxlength="50" />
+            </div>
+        </div> *@
+        
+    </div>
+    <div class="col-md-6">
+         @if(Model.UserRole == null)
         {
             <div class="form-group">
                 <label class="input-group-label" for="UserRole"> Role:</label>
@@ -108,18 +122,7 @@
                 </div>
             </div>
         }
-        @* <div class="form-group">
-            <span class="input-group-label"> Note:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style-none"></i></span>
-                </div>
-                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Notes (optional)" value="" maxlength="50" />
-            </div>
-        </div> *@
-        
-    </div>
-    <div class="col-md-6">
+   
         <partial name="_Address" model="@Model" />
         <div class="form-group">
             <label class="input-group-label" for="Addressline"> Address:</label>
@@ -127,7 +130,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." value="" maxlength="70" required />
+                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..."  maxlength="70" required />
                 <span asp-validation-for="Addressline" class="text-danger"></span>
             </div>
         </div>

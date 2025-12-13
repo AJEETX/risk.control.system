@@ -1,12 +1,14 @@
-﻿using risk.control.system.Data;
+﻿using Microsoft.EntityFrameworkCore;
+
+using risk.control.system.Data;
 using risk.control.system.Models;
 
 namespace risk.control.system.Services
 {
     public interface INumberSequenceService
     {
-        string GetNumberSequence(string module);
-        void SaveNumberSequence(string module);
+        Task<string> GetNumberSequence(string module);
+        Task SaveNumberSequence(string module);
     }
     internal class NumberSequenceService : INumberSequenceService
     {
@@ -16,14 +18,14 @@ namespace risk.control.system.Services
         {
             this.context = context;
         }
-        public string GetNumberSequence(string module)
+        public async Task<string> GetNumberSequence(string module)
         {
             string result = "";
             try
             {
                 int counter = 0;
 
-                NumberSequence numberSequence = context.NumberSequence.Where(x => x.Module.Equals(module)).FirstOrDefault();
+                NumberSequence numberSequence = await context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
 
                 if (numberSequence is null)
                 {
@@ -51,9 +53,9 @@ namespace risk.control.system.Services
             return result;
         }
 
-        public void SaveNumberSequence(string module)
+        public async Task SaveNumberSequence(string module)
         {
-            NumberSequence numberSequence = context.NumberSequence.Where(x => x.Module.Equals(module)).FirstOrDefault();
+            NumberSequence numberSequence = await context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
             int counter = 0;
 
             if (numberSequence is null)

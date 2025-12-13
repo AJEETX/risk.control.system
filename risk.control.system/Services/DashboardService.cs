@@ -8,22 +8,22 @@ namespace risk.control.system.Services
 {
     public interface IDashboardService
     {
-        Dictionary<string, int> CalculateAgencyClaimStatus(string userEmail);
-        Dictionary<string, int> CalculateAgencyUnderwritingStatus(string userEmail);
+        Task<Dictionary<string, int>> CalculateAgencyClaimStatus(string userEmail);
+        Task<Dictionary<string, int>> CalculateAgencyUnderwritingStatus(string userEmail);
 
-        Dictionary<string, int> CalculateAgentCaseStatus(string userEmail);
+        Task<Dictionary<string, int>> CalculateAgentCaseStatus(string userEmail);
 
-        Dictionary<string, (int count1, int count2)> CalculateWeeklyCaseStatus(string userEmail);
+        Task<Dictionary<string, (int count1, int count2)>> CalculateWeeklyCaseStatus(string userEmail);
 
-        Dictionary<string, (int count1, int count2)> CalculateMonthlyCaseStatus(string userEmail);
+        Task<Dictionary<string, (int count1, int count2)>> CalculateMonthlyCaseStatus(string userEmail);
 
-        Dictionary<string, (int count1, int count2)> CalculateCaseChart(string userEmail);
+        Task<Dictionary<string, (int count1, int count2)>> CalculateCaseChart(string userEmail);
 
-        Dictionary<string, int> CalculateWeeklyCaseStatusPieClaims(string userEmail);
+        Task<Dictionary<string, int>> CalculateWeeklyCaseStatusPieClaims(string userEmail);
 
-        Dictionary<string, int> CalculateWeeklyCaseStatusPieUnderwritings(string userEmail);
+        Task<Dictionary<string, int>> CalculateWeeklyCaseStatusPieUnderwritings(string userEmail);
 
-        TatResult CalculateTimespan(string userEmail);
+        Task<TatResult> CalculateTimespan(string userEmail);
     }
 
     internal class DashboardService : IDashboardService
@@ -39,23 +39,22 @@ namespace risk.control.system.Services
             this._context = context;
         }
 
-        public Dictionary<string, int> CalculateAgencyClaimStatus(string userEmail)
+        public async Task<Dictionary<string, int>> CalculateAgencyClaimStatus(string userEmail)
         {
-            return CalculateAgencyCaseStatus(userEmail, InsuranceType.CLAIM);
+            return await CalculateAgencyCaseStatus(userEmail, InsuranceType.CLAIM);
         }
 
-        public Dictionary<string, int> CalculateAgencyUnderwritingStatus(string userEmail)
+        public async Task<Dictionary<string, int>> CalculateAgencyUnderwritingStatus(string userEmail)
         {
-            return CalculateAgencyCaseStatus(userEmail, InsuranceType.UNDERWRITING);
+            return await CalculateAgencyCaseStatus(userEmail, InsuranceType.UNDERWRITING);
         }
-        Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail, InsuranceType insuranceType)
+        private async Task<Dictionary<string, int>> CalculateAgencyCaseStatus(string userEmail, InsuranceType insuranceType)
         {
             var vendorCaseCount = new Dictionary<string, int>();
 
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            List<Vendor> existingVendors = _context.Vendor
-                .ToList();
+            List<Vendor> existingVendors = await _context.Vendor.ToListAsync();
 
             if (companyUser == null)
             {
@@ -102,13 +101,13 @@ namespace risk.control.system.Services
         }
 
 
-        public Dictionary<string, int> CalculateAgentCaseStatus(string userEmail)
+        public async Task<Dictionary<string, int>> CalculateAgentCaseStatus(string userEmail)
         {
             var vendorCaseCount = new Dictionary<string, int>();
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var existingVendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+            var existingVendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
 
             var claimsCases = _context.Investigations
                .Include(c => c.Vendor)
@@ -149,11 +148,11 @@ namespace risk.control.system.Services
             return vendorCaseCount;
         }
 
-        public Dictionary<string, (int count1, int count2)> CalculateCaseChart(string userEmail)
+        public async Task<Dictionary<string, (int count1, int count2)>> CalculateCaseChart(string userEmail)
         {
             Dictionary<string, (int count1, int count2)> dictMonthlySum = new Dictionary<string, (int count1, int count2)>();
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
             var startDate = new DateTime(DateTime.Now.Year, 1, 1);
             var months = Enumerable.Range(0, 11)
                                    .Select(startDate.AddMonths)
@@ -237,10 +236,10 @@ namespace risk.control.system.Services
             return dictMonthlySum;
         }
 
-        public Dictionary<string, (int count1, int count2)> CalculateMonthlyCaseStatus(string userEmail)
+        public async Task<Dictionary<string, (int count1, int count2)>> CalculateMonthlyCaseStatus(string userEmail)
         {
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             Dictionary<string, (int count1, int count2)> dictWeeklyCases = new Dictionary<string, (int count1, int count2)>();
             if (companyUser != null)
@@ -311,13 +310,13 @@ namespace risk.control.system.Services
             return dictWeeklyCases;
         }
 
-        public TatResult CalculateTimespan(string userEmail)
+        public async Task<TatResult> CalculateTimespan(string userEmail)
         {
             var dictWeeklyCases = new Dictionary<string, List<int>>();
             var result = new List<TatDetail>();
             int totalStatusChanged = 0;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
             if (companyUser != null)
             {
                 var tdetail = _context.Investigations
@@ -399,7 +398,7 @@ namespace risk.control.system.Services
             return new TatResult { Count = totalStatusChanged, TatDetails = result };
         }
 
-        public Dictionary<string, (int count1, int count2)> CalculateWeeklyCaseStatus(string userEmail)
+        public async Task<Dictionary<string, (int count1, int count2)>> CalculateWeeklyCaseStatus(string userEmail)
         {
             Dictionary<string, (int count1, int count2)> dictWeeklyCases = new Dictionary<string, (int, int)>();
 
@@ -407,8 +406,8 @@ namespace risk.control.system.Services
                     .Include(i => i.PolicyDetail)
                      .Where(d => d.Created > DateTime.Now.AddDays(-28) && !d.Deleted);
 
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser != null)
             {
@@ -476,15 +475,15 @@ namespace risk.control.system.Services
             return dictWeeklyCases;
         }
 
-        public Dictionary<string, int> CalculateWeeklyCaseStatusPieClaims(string userEmail)
+        public async Task<Dictionary<string, int>> CalculateWeeklyCaseStatusPieClaims(string userEmail)
         {
-            return CalculateWeeklyCaseStatusPie(userEmail, InsuranceType.CLAIM);
+            return await CalculateWeeklyCaseStatusPie(userEmail, InsuranceType.CLAIM);
         }
-        public Dictionary<string, int> CalculateWeeklyCaseStatusPieUnderwritings(string userEmail)
+        public async Task<Dictionary<string, int>> CalculateWeeklyCaseStatusPieUnderwritings(string userEmail)
         {
-            return CalculateWeeklyCaseStatusPie(userEmail, InsuranceType.UNDERWRITING);
+            return await CalculateWeeklyCaseStatusPie(userEmail, InsuranceType.UNDERWRITING);
         }
-        private Dictionary<string, int> CalculateWeeklyCaseStatusPie(string userEmail, InsuranceType insuranceType)
+        private async Task<Dictionary<string, int>> CalculateWeeklyCaseStatusPie(string userEmail, InsuranceType insuranceType)
         {
             Dictionary<string, int> dictWeeklyCases = new Dictionary<string, int>();
 
@@ -493,8 +492,8 @@ namespace risk.control.system.Services
                      .Where(d => d.Created > DateTime.Now.AddDays(-28) && !d.Deleted && d.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                      (d.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY && d.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY));
 
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser != null)
             {

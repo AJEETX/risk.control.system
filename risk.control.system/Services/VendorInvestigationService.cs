@@ -78,7 +78,7 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var companyUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
             var timeTaken = endTIme - claim.Created;
@@ -89,7 +89,7 @@ namespace risk.control.system.Services
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == claim.InvestigationReportId);
             var templates = await context.ReportTemplates
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
@@ -105,8 +105,8 @@ namespace risk.control.system.Services
 
             claim.InvestigationReport.ReportTemplate = templates;
 
-            var tracker = context.PdfDownloadTracker
-                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == currentUserEmail);
+            var tracker = await context.PdfDownloadTracker
+                          .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
             bool canDownload = true;
             if (tracker != null)
             {
@@ -769,14 +769,14 @@ namespace risk.control.system.Services
             try
             {
                 var assignedToAgent = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
-                var claim = context.Investigations
+                var claim = await context.Investigations
                     .Include(c => c.InvestigationReport)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
                     .Include(c => c.BeneficiaryDetail)
-                    .Where(c => c.Id == claimsInvestigationId).FirstOrDefault();
+                    .FirstOrDefaultAsync(c => c.Id == claimsInvestigationId);
 
-                var agentUser = context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
+                var agentUser = await context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == vendorAgentEmail);
 
                 string drivingDistance, drivingDuration, drivingMap;
                 float distanceInMeters;
@@ -819,7 +819,7 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
+                return null!;
             }
         }
 
@@ -827,7 +827,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var agent = context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(a => a.Email.Trim().ToLower() == userEmail.ToLower());
+                var agent = await context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email.Trim().ToLower() == userEmail.ToLower());
 
                 var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
 
@@ -856,7 +856,7 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
+                return (null!, string.Empty);
             }
         }
 

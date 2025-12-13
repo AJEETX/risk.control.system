@@ -17,11 +17,11 @@ namespace risk.control.system.Seeds
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
-            var globalSettings = context.GlobalSettings.FirstOrDefault();
+            var globalSettings = await context.GlobalSettings.FirstOrDefaultAsync();
 
             //CREATE VENDOR COMPANY
 
-            var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
+            var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefaultAsync(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
 
             var states = context.State.Include(s => s.Country).Where(s => s.Country.Code == input.COUNTRY).ToList();
 

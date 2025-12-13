@@ -17,9 +17,9 @@ namespace risk.control.system.Seeds
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
-            var globalSettings = context.GlobalSettings.FirstOrDefault();
+            var globalSettings = await context.GlobalSettings.FirstOrDefaultAsync();
 
-            var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
+            var companyPinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
 
             var companyAddress = input.ADDRESSLINE + ", " + companyPinCode.District.Name + ", " + companyPinCode.State.Name + ", " + companyPinCode.Country.Code;
             var companyAddressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);

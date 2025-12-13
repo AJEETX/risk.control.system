@@ -93,11 +93,5 @@
 
   <ItemGroup>
     <Folder Include="Logs\" />
-    <Folder Include="wwwroot\agency\" />
-    <Folder Include="wwwroot\agent-face\" />
-    <Folder Include="wwwroot\document\" />
-    <Folder Include="wwwroot\face\" />
-    <Folder Include="wwwroot\media\" />
-    <Folder Include="wwwroot\upload-file\" />
   </ItemGroup>
 </Project>

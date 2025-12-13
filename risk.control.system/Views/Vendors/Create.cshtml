@@ -39,8 +39,8 @@
             </div>
         </div>
         <form id="create-form" asp-action="Create" enctype="multipart/form-data" method="post" autocomplete="off">
-            <input type="hidden" asp-for="Email" id="mailAddress" name="mailAddress" required/>
-            <input type="hidden" asp-for="DomainName" id="domainAddress" name="domainAddress" required/>
+            <input type="hidden" asp-for="Email" id="mailAddress" />
+            <input type="hidden" asp-for="DomainName" id="domainAddress" name="domainAddress" />
             <partial name="Vendor/_Create" model="Model" />
 
             <div class="card-footer">
@@ -72,6 +72,6 @@
     }
     <script src="~/js/company-admin/create-agency.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
-    <script src="~/js/common/profile-image-upload.js"></script>
+    <script src="~/js/common/image-upload.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 }

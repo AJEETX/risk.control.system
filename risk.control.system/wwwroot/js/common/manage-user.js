@@ -183,15 +183,9 @@ function CheckIfEmailValid() {
     var name = $('#email').val();
     if (name && name.length > 4) {
         $('#check-email').prop('disabled', false);
-        //$("#check-email").css('color', 'white');
-        //$("#check-email").css('background-color', '#004788');
-        //$("#check-email").css('cursor', 'default');
     }
     else {
         $('#check-email').css('disabled', true);
-        //$("#check-email").css('color', '#ccc');
-        //$("#check-email").css('background-color', 'grey');
-        //$("#check-email").css('cursor', 'not-allowed');
     }
 }
 

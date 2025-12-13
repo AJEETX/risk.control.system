@@ -41,7 +41,6 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
         private readonly ISmsService smsService;
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IFeatureManager featureManager;
@@ -49,7 +48,6 @@ namespace risk.control.system.Services
         public MailService(ApplicationDbContext context,
             ISmsService SmsService,
             IHttpContextAccessor httpContextAccessor,
-            IWebHostEnvironment webHostEnvironment,
             UserManager<ClientCompanyApplicationUser> userManager,
             IFeatureManager featureManager,
             UserManager<VendorApplicationUser> userVendorManager)
@@ -57,7 +55,6 @@ namespace risk.control.system.Services
             this._context = context;
             smsService = SmsService;
             this.httpContextAccessor = httpContextAccessor;
-            this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
             this.userManager = userManager;
             this.userVendorManager = userVendorManager;
@@ -66,9 +63,9 @@ namespace risk.control.system.Services
         {
             try
             {
-                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
                 if (file.Completed.GetValueOrDefault())
                 {
@@ -120,7 +117,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
 
         }
@@ -128,9 +124,9 @@ namespace risk.control.system.Services
         {
             try
             {
-                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
                 if (file.Completed.GetValueOrDefault())
                 {
@@ -182,19 +178,17 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
-
         }
 
         public async Task NotifyClaimAllocationToVendorAndManager(string userEmail, string policy, long claimsInvestigationId, long vendorId, string url = "")
         {
             try
             {
-                var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
-                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == userEmail);
-                var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
-                var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+                var managerRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
+                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var supervisorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var agencyAdminRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
 
                 var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId);
 
@@ -213,13 +207,10 @@ namespace risk.control.system.Services
                         userEmailsToSend.Add(assignedUser);
                     }
                 }
-
-                //string claimsUrl = $"{AgencyBaseUrl + claimsInvestigationId}";
-
-                var claimsInvestigation = _context.Investigations
+                var claimsInvestigation = await _context.Investigations
                     .Include(i => i.Vendor)
                     .Include(i => i.PolicyDetail)
-                    .FirstOrDefault(v => v.Id == claimsInvestigationId);
+                    .FirstOrDefaultAsync(v => v.Id == claimsInvestigationId);
 
                 var notification = new StatusNotification
                 {
@@ -241,9 +232,9 @@ namespace risk.control.system.Services
                 };
                 _context.Notifications.Add(managerNotification);
 
-                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var clientCompanyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
                 foreach (var userEmailToSend in userEmailsToSend)
                 {
@@ -257,7 +248,6 @@ namespace risk.control.system.Services
                         message += $"{clientCompanyUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(userEmailToSend.Country.Code, userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
-                        //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
                     }
                     //SMS ::END
                 }
@@ -267,7 +257,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -275,8 +264,8 @@ namespace risk.control.system.Services
         {
             try
             {
-                var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
-                var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+                var supervisorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var agencyAdminRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
 
                 var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId);
 
@@ -296,12 +285,10 @@ namespace risk.control.system.Services
                     }
                 }
 
-                //string claimsUrl = $"{AgencyBaseUrl + claimsInvestigationId}";
-
-                var claimsInvestigation = _context.Investigations
+                var claimsInvestigation = await _context.Investigations
                     .Include(i => i.Vendor)
                     .Include(i => i.PolicyDetail)
-                    .FirstOrDefault(v => v.Id == claimsInvestigationId);
+                    .FirstOrDefaultAsync(v => v.Id == claimsInvestigationId);
 
                 var notification = new StatusNotification
                 {
@@ -312,14 +299,10 @@ namespace risk.control.system.Services
                     NotifierUserEmail = userEmail
                 };
                 _context.Notifications.Add(notification);
-                //claimsInvestigation.Notifications.Add(notification);
-                //StreamReader str = new StreamReader(FilePath);
-                //string MailText = str.ReadToEnd();
-                //str.Close();
 
-                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var clientCompanyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
                 foreach (var userEmailToSend in userEmailsToSend)
                 {
@@ -333,7 +316,6 @@ namespace risk.control.system.Services
                         message += $"{clientCompanyUser.Email},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(userEmailToSend.Country.Code, userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
-                        //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
                     }
                     //SMS ::END
                 }
@@ -343,7 +325,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -351,9 +332,9 @@ namespace risk.control.system.Services
         {
             try
             {
-                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
                 var claimsInvestigations = _context.Investigations
                     .Include(i => i.PolicyDetail)
@@ -372,7 +353,6 @@ namespace risk.control.system.Services
                     };
 
                     _context.Notifications.Add(notification);
-                    //claimsInvestigation.Notifications.Add(notification);
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
@@ -381,18 +361,14 @@ namespace risk.control.system.Services
                         message += $"Thanks \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(applicationUser.Country.Code, applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
-                        //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = applicationUser.Email, RecepicientPhone = applicationUser.PhoneNumber, Message = message });
                     }
                     //SMS ::END
                 }
-
-
                 var rows = await _context.SaveChangesAsync(null, false);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -401,9 +377,9 @@ namespace risk.control.system.Services
             try
             {
                 var assigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
-                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
                 var notification = new StatusNotification
                 {
@@ -431,7 +407,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -439,9 +414,9 @@ namespace risk.control.system.Services
         {
             try
             {
-                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
                 var notification = new StatusNotification
                 {
@@ -469,7 +444,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -477,16 +451,16 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claim = _context.Investigations
+                var claim = await _context.Investigations
                     .Include(i => i.PolicyDetail)
-                    .FirstOrDefault(v => v.Id == claimId);
+                    .FirstOrDefaultAsync(v => v.Id == claimId);
 
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claim.ClientCompanyId);
 
                 var companyUsers = _context.ClientCompanyApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
-                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
-                var vendorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var vendorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
 
                 List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
 
@@ -499,7 +473,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
+                var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == vendorId);
                 var vendorNotification = new StatusNotification
                 {
                     Role = vendorRole,
@@ -521,7 +495,6 @@ namespace risk.control.system.Services
                     NotifierUserEmail = claim.CreatedUser
                 };
                 _context.Notifications.Add(notification);
-                //claim.Notifications.Add(notification);
 
                 foreach (var user in users)
                 {
@@ -533,7 +506,6 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
-                        //claim.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
@@ -542,7 +514,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -550,15 +521,15 @@ namespace risk.control.system.Services
         {
             try
             {
-                var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+                var agentRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
-                var recepientUser = _context.VendorApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == agentEmail);
+                var recepientUser = await _context.VendorApplicationUser.Include(c => c.Country).FirstOrDefaultAsync(c => c.Email == agentEmail);
 
-                var claimsInvestigation = _context.Investigations
+                var claimsInvestigation = await _context.Investigations
                     .Include(i => i.Vendor)
                     .Include(i => i.PolicyDetail)
-                    .FirstOrDefault(v => v.Id == claimId);
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+                    .FirstOrDefaultAsync(v => v.Id == claimId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
                 var notification = new StatusNotification
                 {
@@ -570,7 +541,6 @@ namespace risk.control.system.Services
                     NotifierUserEmail = userEmail
                 };
                 _context.Notifications.Add(notification);
-                //claimsInvestigation.Notifications.Add(notification);
 
                 var rows = await _context.SaveChangesAsync(null, false);
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
@@ -581,29 +551,27 @@ namespace risk.control.system.Services
                     message += $"{userEmail},\n ";
                     message += $"{url}";
                     await smsService.DoSendSmsAsync(recepientUser.Country.Code, recepientUser.Country.ISDCode + recepientUser.PhoneNumber, message);
-                    //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = recepientUser.Email, RecepicientPhone = recepientUser.PhoneNumber, Message = message });
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
         public async Task NotifyClaimCreation(string userEmail, InvestigationTask claimsInvestigation, string url = "")
         {
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            var applicationUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             List<string> userEmailsToSend = new();
 
-            var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == applicationUser.Email);
+            var clientCompanyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == applicationUser.Email);
             if (clientCompanyUser == null)
             {
                 userEmailsToSend.Add(userEmail);
             }
             else
             {
-                var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
+                var managerRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
 
                 var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
@@ -621,9 +589,9 @@ namespace risk.control.system.Services
             {
                 var rows = await _context.SaveChangesAsync(null, false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                Console.WriteLine(ex.StackTrace);
             }
         }
 
@@ -631,19 +599,19 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claimsInvestigation = _context.Investigations
+                var claimsInvestigation = await _context.Investigations
                 .Include(i => i.PolicyDetail)
                 .Include(i => i.Vendor)
-                .FirstOrDefault(v => v.Id == claimId);
+                .FirstOrDefaultAsync(v => v.Id == claimId);
                 var companyUsers = _context.ClientCompanyApplicationUser
                                     .Include(u => u.ClientCompany)
                                     .Include(u => u.Country)
                                     .Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
-                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var managerRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
+                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
                 List<ApplicationUser> users = new List<ApplicationUser>();
                 foreach (var user in companyUsers)
@@ -654,7 +622,7 @@ namespace risk.control.system.Services
                         users.Add(user);
                     }
                 }
-                var vendorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+                var vendorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
                 var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsInvestigation.VendorId);
 
                 foreach (var agencyUser in vendorUsers)
@@ -698,7 +666,6 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
-                        //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
@@ -707,7 +674,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -715,13 +681,13 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claimsInvestigation = _context.Investigations
+                var claimsInvestigation = await _context.Investigations
                .Include(i => i.Vendor)
                .Include(i => i.PolicyDetail)
-               .FirstOrDefault(v => v.Id == claimId);
+               .FirstOrDefaultAsync(v => v.Id == claimId);
                 var companyUsers = _context.ClientCompanyApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
+                var assessorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
 
                 List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
                 foreach (var user in companyUsers)
@@ -733,7 +699,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
                 var notification = new StatusNotification
                 {
@@ -744,7 +710,6 @@ namespace risk.control.system.Services
                     NotifierUserEmail = senderUserEmail
                 };
                 _context.Notifications.Add(notification);
-                //claimsInvestigation.Notifications.Add(notification);
                 foreach (var user in users)
                 {
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
@@ -755,7 +720,6 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail},\n ";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
-                        //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
@@ -764,7 +728,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -772,10 +735,10 @@ namespace risk.control.system.Services
         {
             try
             {
-                var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
-                var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+                var supervisorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var agencyAdminRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == senderUserEmail);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == senderUserEmail);
 
                 var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorUser.VendorId);
 
@@ -795,11 +758,11 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var claimsInvestigation = _context.Investigations
+                var claimsInvestigation = await _context.Investigations
                     .Include(i => i.Vendor)
                     .Include(i => i.PolicyDetail)
-                    .FirstOrDefault(v => v.Id == claimId);
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+                    .FirstOrDefaultAsync(v => v.Id == claimId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
 
                 var notification = new StatusNotification
@@ -822,7 +785,6 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
-                        //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
@@ -831,7 +793,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -839,15 +800,13 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claimsInvestigation = _context.Investigations
+                var claimsInvestigation = await _context.Investigations
                .Include(i => i.Vendor)
                .Include(i => i.PolicyDetail)
-               .FirstOrDefault(v => v.Id == claimId);
+               .FirstOrDefaultAsync(v => v.Id == claimId);
 
-                //1. get vendor admin and supervisor email
-
-                var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
-                var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+                var supervisorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var agencyAdminRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
 
                 var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == claimsInvestigation.Vendor.VendorId);
 
@@ -867,11 +826,9 @@ namespace risk.control.system.Services
                     }
                 }
 
+                var clientCompanyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-
-                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == senderUserEmail);
-
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
                 var notification = new StatusNotification
                 {
@@ -895,7 +852,6 @@ namespace risk.control.system.Services
                         message += $"{clientCompanyUser.Email}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(userEmailToSend.Country.Code, userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
-                        //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
                     }
                     //SMS ::END
                 }
@@ -905,7 +861,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -913,12 +868,12 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claimsInvestigation = _context.Investigations
+                var claimsInvestigation = await _context.Investigations
                    .Include(i => i.PolicyDetail)
-                   .FirstOrDefault(v => v.Id == claimId);
+                   .FirstOrDefaultAsync(v => v.Id == claimId);
                 var companyUsers = _context.ClientCompanyApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
+                var assessorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
 
                 List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
                 foreach (var user in companyUsers)
@@ -930,8 +885,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
                 var notification = new StatusNotification
                 {
@@ -953,7 +907,6 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
-                        //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
@@ -962,7 +915,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
 
@@ -970,17 +922,17 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claim = _context.Investigations
+                var claim = await _context.Investigations
                     .Include(i => i.PolicyDetail)
-                    .FirstOrDefault(v => v.Id == claimId);
+                    .FirstOrDefaultAsync(v => v.Id == claimId);
 
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claim.ClientCompanyId);
 
                 var users = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId && u.UserRole == AgencyRole.AGENCY_ADMIN || u.UserRole == AgencyRole.SUPERVISOR);
 
-                var vendorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var vendorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
 
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
+                var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == vendorId);
                 var vendorNotification = new StatusNotification
                 {
                     Role = vendorRole,
@@ -1002,7 +954,6 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}, \n";
                         message += $"{url}";
                         await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
-                        //claim.SmsNotifications.Add(new SmsNotification { RecepicientEmail = user.Email, RecepicientPhone = user.PhoneNumber, Message = message });
                     }
                 }
 
@@ -1011,7 +962,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
             }
         }
     }

@@ -30,7 +30,7 @@ namespace risk.control.system.Services
         {
             //CHECK AND VALIDATE EMAIL PASSWORD
             var resetPhone = countryCode.TrimStart('+') + mobile.Trim().ToString();
-            var user = context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country.ISDCode.ToString(), u.PhoneNumber) == resetPhone);
+            var user = await context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country.ISDCode.ToString(), u.PhoneNumber) == resetPhone);
             if (user != null)
             {
                 var passwordString = $"Your password is: {user.Password}";

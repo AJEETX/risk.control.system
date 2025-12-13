@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers.Api.Agency
         public async Task<IActionResult> AllUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var vendorUsers = _context.VendorApplicationUser
                  .Include(u => u.Country)
@@ -171,9 +171,9 @@ namespace risk.control.system.Controllers.Api.Agency
         public async Task<IActionResult> AllServices()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var vendor = _context.Vendor
+            var vendor = await _context.Vendor
                 .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
                  .Include(i => i.VendorInvestigationServiceTypes)
@@ -185,7 +185,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(i => i.InvestigationServiceType)
                 .Include(i => i.State)
                 .Include(i => i.VendorInvestigationServiceTypes)
-                .FirstOrDefault(a => a.VendorId == vendorUser.VendorId && !a.Deleted);
+                .FirstOrDefaultAsync(a => a.VendorId == vendorUser.VendorId && !a.Deleted);
 
             var services = vendor.VendorInvestigationServiceTypes?
                 .OrderBy(s => s.InvestigationServiceType.Name);
@@ -272,7 +272,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenBy(u => u.LastName)
                 .ToListAsync();
 
-            var result = dashboardService.CalculateAgentCaseStatus(userEmail);  // Assume this is async
+            var result = await dashboardService.CalculateAgentCaseStatus(userEmail);  // Assume this is async
 
             var claim = await _context.Investigations
                 .Include(c => c.PolicyDetail)

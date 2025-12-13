@@ -214,18 +214,18 @@ namespace risk.control.system.Controllers.Api.Agency
             if (a.SubStatus == allocated2agent)
             {
                 ownerEmail = a.TaskedAgentEmail;
-                var agentProfile = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail)?.Email;
-                if (agentProfile != null)
+                var agencyUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail);
+                if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser.Email))
                 {
-                    return agentProfile;
+                    return agencyUser?.Email;
                 }
             }
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
             {
-                var companyImage = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId)?.Email;
-                if (companyImage != null)
+                var companyUser = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId);
+                if (companyUser != null && !string.IsNullOrWhiteSpace(companyUser.Email))
                 {
-                    return companyImage;
+                    return companyUser.Email;
                 }
             }
             return "noDataimage";
@@ -243,18 +243,18 @@ namespace risk.control.system.Controllers.Api.Agency
             if (a.SubStatus == allocated2agent)
             {
                 ownerEmail = a.TaskedAgentEmail;
-                var agentProfile = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail)?.ProfilePicture;
-                if (agentProfile != null)
+                var agencyUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail);
+                if (agencyUser != null && agencyUser?.ProfilePicture != null)
                 {
-                    return agentProfile;
+                    return agencyUser?.ProfilePicture;
                 }
             }
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
             {
-                var agentProfile = _context.ClientCompany.FirstOrDefault(u => u.ClientCompanyId == a.ClientCompanyId)?.DocumentImage;
-                if (agentProfile != null)
+                var companyUser = _context.ClientCompany.FirstOrDefault(u => u.ClientCompanyId == a.ClientCompanyId);
+                if (companyUser != null && companyUser?.DocumentImage != null)
                 {
-                    return agentProfile;
+                    return companyUser?.DocumentImage;
                 }
             }
             return noDataimage;

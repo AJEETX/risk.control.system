@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Uid And/Or Image is empty/null");
                 }
-                var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
+                var mobileUidExist = await _context.VendorApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
                 if (mobileUidExist == null)
                 {
                     return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
@@ -306,7 +306,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Email is empty/null");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -321,7 +321,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
                 if (vendorUser == null)
                 {
                     return Unauthorized("Invalid User !!!");
@@ -356,7 +356,7 @@ namespace risk.control.system.Controllers.Api
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                         claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentPath != null ?
-                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c.PolicyDetail.DocumentPath.Substring(1)))) :
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, c.PolicyDetail.DocumentPath))) :
                         Applicationsettings.NO_POLICY_IMAGE,
                         CustomerName = c.CustomerDetail.Name,
                         CustomerEmail = email,
@@ -365,7 +365,7 @@ namespace risk.control.system.Controllers.Api
                         c.CustomerDetail.Addressline,
                         c.CustomerDetail.PinCode.Code,
                         CustomerPhoto = c?.CustomerDetail.ImagePath != null ?
-                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c?.CustomerDetail.ImagePath.Substring(1)))) :
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, c?.CustomerDetail.ImagePath))) :
                         Applicationsettings.USER_PHOTO,
                         Country = c.CustomerDetail.Country.Name,
                         State = c.CustomerDetail.State.Name,
@@ -375,7 +375,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             c.BeneficiaryDetail.BeneficiaryDetailId,
                             Photo = c.BeneficiaryDetail?.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c.BeneficiaryDetail.ImagePath.Substring(1)))) :
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, c.BeneficiaryDetail.ImagePath))) :
                             Applicationsettings.USER_PHOTO,
                             c.BeneficiaryDetail.Country.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
@@ -404,7 +404,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Email is empty/null");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -417,7 +417,7 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
                 if (vendorUser == null)
                 {
                     return Unauthorized("Invalid User !!!");
@@ -480,7 +480,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Invalid caseId And/Or Email is empty/null");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -493,7 +493,7 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var claim = _context.Investigations
+                var claim = await _context.Investigations
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(c => c.CostCentre)
                     .Include(c => c.PolicyDetail)
@@ -506,31 +506,31 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
-                    .FirstOrDefault(c => c.Id == caseId);
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                var beneficiary = _context.BeneficiaryDetail
+                var beneficiary = await _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
                     .Include(c => c.PinCode)
                     .Include(c => c.District)
                     .Include(c => c.State)
                     .Include(c => c.Country)
-                    .FirstOrDefault(c => c.InvestigationTaskId == caseId);
+                    .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
 
                 object locations = null;
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
                 {
                     locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
                 }
-                var docPath = Path.Combine(webHostEnvironment.WebRootPath, claim.PolicyDetail.DocumentPath.Substring(1));
+                var docPath = Path.Combine(webHostEnvironment.ContentRootPath, claim.PolicyDetail.DocumentPath);
                 var docByte = System.IO.File.ReadAllBytes(docPath);
                 var docBase64 = Convert.ToBase64String(docByte);
                 var documentPhoto = claim.PolicyDetail.DocumentPath != null ? docBase64 : Applicationsettings.NO_POLICY_IMAGE;
                 var customerPhoto = claim.CustomerDetail.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, claim.CustomerDetail.ImagePath.Substring(1)))) : Applicationsettings.USER_PHOTO;
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, claim.CustomerDetail.ImagePath))) : Applicationsettings.USER_PHOTO;
                 var beneficiaryPhoto = beneficiary.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, beneficiary.ImagePath.Substring(1)))) : Applicationsettings.USER_PHOTO;
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, beneficiary.ImagePath))) : Applicationsettings.USER_PHOTO;
                 return Ok(
                     new
                     {
@@ -593,7 +593,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Invalid caseId And/Or Email is empty/null");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -625,7 +625,7 @@ namespace risk.control.system.Controllers.Api
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
                 {
@@ -675,7 +675,7 @@ namespace risk.control.system.Controllers.Api
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
                 {
@@ -721,7 +721,7 @@ namespace risk.control.system.Controllers.Api
                 if (!supportedExtensions.Contains(extension))
                     return BadRequest("Unsupported media format.");
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
                 {
@@ -792,7 +792,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("All fields (Email, Remarks, CaseId) are required and must be valid.");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {

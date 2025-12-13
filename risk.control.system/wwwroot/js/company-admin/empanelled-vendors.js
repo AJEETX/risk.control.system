@@ -189,13 +189,6 @@
             }
         });
     });
-    table.on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({
-            animated: 'fade',
-            placement: 'top',
-            html: true
-        });
-    });
     
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
@@ -268,12 +261,12 @@
                 content: "Are you sure?",
                 icon: 'fas fa-hand-pointer',
     
-                type: 'red',
+                type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
                         text: "Submit",
-                        btnClass: 'btn-danger',
+                        btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;
                             $("body").addClass("submit-progress-bg");

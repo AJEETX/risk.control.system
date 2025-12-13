@@ -3,6 +3,7 @@ using System.Security.Claims;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
@@ -51,7 +52,7 @@ namespace risk.control.system.Middleware
                     }
                     var user = context.User.Identity.Name;
                     var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
-                    var appUser = dbContext.ApplicationUser.FirstOrDefault(u => u.Email == user);
+                    var appUser = await dbContext.ApplicationUser.FirstOrDefaultAsync(u => u.Email == user);
                     var userRole = context.User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                     if (userRole == null)
                     {
@@ -71,8 +72,8 @@ namespace risk.control.system.Middleware
                                                 userRole.Value.Contains(AppRoles.AGENT.ToString());
                         if (isCompanyUser)
                         {
-                            var companyUser = dbContext.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
-                            var company = dbContext.ClientCompany.FirstOrDefault(c => companyUser.ClientCompanyId == c.ClientCompanyId);
+                            var companyUser = await dbContext.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == user);
+                            var company = await dbContext.ClientCompany.FirstOrDefaultAsync(c => companyUser.ClientCompanyId == c.ClientCompanyId);
 
                             if (company == null)
                             {

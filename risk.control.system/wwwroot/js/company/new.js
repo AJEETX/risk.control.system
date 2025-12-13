@@ -359,6 +359,7 @@
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete this case?',
             type: 'red',
+            icon: 'fas fa-trash',
             buttons: {
                 confirm: {
                     text: 'Yes, delete it',
@@ -379,7 +380,15 @@
                                 $.alert({
                                     title: 'Deleted!',
                                     content: response.message,
-                                    type: 'red'
+                                    closeIcon: true,
+                                    type: 'red',
+                                    icon: 'fas fa-trash',
+                                    buttons: {
+                                        ok: {
+                                            text: 'Close',
+                                            btnClass: 'btn-default',
+                                        }
+                                    }
                                 });
 
                                 // Reload the DataTable
@@ -532,6 +541,7 @@
                 content: "Please select Case(s) to delete.",
                 type: 'red',
                 closeIcon: true,
+                icon: 'fas fa-trash',
                 buttons: {
                     cancel: {
                         text: "OK",
@@ -577,6 +587,7 @@
                     $.alert({
                         title: "Deleted!",
                         content: "Selected case(s) have been deleted.",
+                        icon: 'fas fa-trash',
                         type: 'red',
                         buttons: {
                             ok: {

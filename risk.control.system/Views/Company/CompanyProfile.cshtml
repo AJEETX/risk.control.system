@@ -18,7 +18,9 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 text-center">
-                        <p class="info-box-number">Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</p>
+                    <div class="form-group text-center">
+                        <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-bs-toggle="tooltip" title="Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")"> Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</label>
+                    </div>
 
                         <div class="profile-img-container">
                             <img src="/Document/GetCompanyDocument/@Model.ClientCompanyId" class="shadow-lg border profile-img" alt="Company Profile" title="@Model.Email" data-bs-toggle="tooltip" />

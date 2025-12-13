@@ -48,8 +48,18 @@
         <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
-        <div class="row">
+        <div class="row top-margin-10">
             <div class="col-md-6">
+
+                <div class="form-group text-center">
+                    <div class="profile-img-container">
+                        <img id="document-Image" class="form-Image" src="@Applicationsettings.NO_USER" title="Beneficiary Photo" alt="Beneficiary Photo" data-bs-toggle="tooltip" />
+                    </div>
+                    <label for="createImageInput" class="control-label">Beneficiary Photo <i class="fa fa-asterisk asterik-style-logo"></i></label>
+                    <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" required class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="beneficiary-document" title="Upload Beneficiary Photo" data-bs-toggle="tooltip" />
+                    <span asp-validation-for="ProfileImage" class="text-danger"></span>
+                </div>
+
                 <div class="form-group">
                     <label class="input-group-label" for="BeneficiaryName"> Beneficiary Name:</label>
                     <div class="input-group mb-3">
@@ -71,6 +81,12 @@
                         <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                     </div>
                 </div>
+
+                <partial name="Investigation/_BeneficiaryPhoneNumber" model="@Model" />
+
+
+            </div>
+            <div class="col-md-6">
 
                 <div class="form-group">
                     <label class="input-group-label" for="BeneficiaryRelationId"> Relation:</label>
@@ -97,11 +113,6 @@
                         <span asp-validation-for="Income" class="text-danger"></span>
                     </div>
                 </div>
-                <partial name="Investigation/_BeneficiaryPhoneNumber" model="@Model" />
-
-
-            </div>
-            <div class="col-md-6">
                 <partial name="Investigation/_BeneficiaryAddress" model="@Model" />
 
                 <div class="form-group">
@@ -115,14 +126,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="input-group-label" for="createImageInput"> Beneficiary Photo:</label>
-                    <div class="input-group mb-3">
-                        <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Beneficiary Photo" />
-                        <i class="fa fa-asterisk asterik-style"></i>
-                        <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-title-id="beneficiary-document" required data-bs-toggle="tooltip" title="Upload Beneficiary Photo" />
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>

@@ -82,9 +82,88 @@ $(document).ready(function () {
             $('#check-domain').prop('disabled', true).removeClass('enabled-btn').addClass('disabled-btn');
         }
     });
+    const $emailInput = $("#emailAddress");
 
+    // Handle blur event
+    if ($emailInput) {
+        $emailInput.on("blur", function () {
+
+            if ($(this).val()) {
+                CheckIfEmailValid($(this).val());
+            }
+        });
+
+        // Handle keydown event
+        $emailInput.on("keydown", function (event) {
+            return alphaOnly(event);
+        });
+
+        // Handle click event
+        $emailInput.on("click", function () {
+            $(this).select();
+        });
+    }
+    $('#check-domain').on('click', function () {
+        checkDomain();
+    });
 });
 //ActivatedDate.max = new Date().toISOString().split("T")[0];
+function CheckIfEmailValid() {
+    var name = $('#emailAddress').val();
+    if (name && name.length > 4) {
+        $('#check-email').prop('disabled', false);
+    }
+    else {
+        $('#check-email').css('disabled', true);
+    }
+}
 
+// Example function: Allow only alphabetical characters
+function alphaOnly(event) {
+    const key = event.key;
+    if (!/^[a-zA-Z]$/.test(key) && key !== "Backspace" && key !== "Tab") {
+        event.preventDefault();
+        return false;
+    }
+    return true;
+}
+function checkDomain() {
+    $("#domainAddress").val('');
+    $('#mailAddress').val('');
+
+    var url = "/Account/CheckAgencyName";
+    var name = $('#emailAddress').val().toLowerCase();
+    var domain = $('#domain').val().toLowerCase();
+    if (name) {
+        $('#result').fadeOut(1000); // 1.5 seconds
+        $('#result').fadeOut('slow'); // 1.5 seconds
+        $.get(url, { input: name, domain: domain }, function (data) {
+            if (data == 0) { //available
+                $('#mailAddress').val($('#emailAddress').val());
+                $('#domainName').val($('#domain').val());
+                var mailDomain = $('#domain').val();
+                $("#domainAddress").val(mailDomain);
+                $("#result").html("<span class='available' title='Available' data-toggle='tooltip'> <i class='fas fa-check'></i></span>");
+                $('#result').addClass('result-padding');
+                $("#emailAddress").removeClass('error-border');
+                $('#result').fadeIn(1000); // 1.5 seconds
+                $('#result').fadeIn('slow'); // 1.5 seconds
+            }
+            else if (data == 1) {//domain exists
+                $("#domainAddress").val('');
+                $('#mailAddress').val('');
+                $("#result").html("<span class='unavailable' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
+                $('#result').addClass('result-padding');
+                $("#emailAddress").addClass('error-border');
+                $('#result').fadeIn(1000); // 1.5 seconds
+                $('#result').fadeIn('slow'); // 1.5 seconds
+            }
+            else if (data = null || data == undefined) {
+                $("#domainAddress").val('');
+                $('#mailAddress').val('');
+            }
+        });
+    }
+}
 
 $('#emailAddress').focus();

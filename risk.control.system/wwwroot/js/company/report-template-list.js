@@ -19,8 +19,18 @@
         ],
         columns: [
             { data: 'id', "bVisible": false },
-            { data: 'name' },
-            { data: 'insuranceType' },
+            {
+                data: 'name',
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'insuranceType',
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
             {
                 data: 'isActive',
                 render: function (data) {
@@ -34,7 +44,7 @@
                 render: function (data) {
                     if (!data) return '';
                     let date = new Date(data);
-                    return date.toLocaleString('en-IN', {
+                    var dateCreated= date.toLocaleString('en-IN', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
@@ -43,13 +53,39 @@
                         second: '2-digit',
                         hour12: true
                     });
+                    return '<span title="Date created: ' + dateCreated + '" data-bs-toggle="tooltip">' + dateCreated + '</span>';
                 }
             },
-            { data: 'locations' },
-            { data: 'faceCount' },
-            { data: 'docCount' },
-            { data: 'mediaCount' },
-            { data: 'questionCount' },
+            {
+                data: 'locations',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of locations: ' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'faceCount',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of face-capture(s): ' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'docCount',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of document capture(s): ' + row.policyId + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'mediaCount',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of media capture(s): : ' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'questionCount',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of question(s): ' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
             {
                 data: null,
                 orderable: false,
@@ -69,6 +105,16 @@
                 }
             }
         ],
+        "drawCallback": function (settings) {
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
+        },
         order: [[0, 'desc']]
     });
 

@@ -1,8 +1,11 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Services;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -10,17 +13,14 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class ReportController : Controller
     {
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService investigationService;
         private readonly IClaimsService claimsService;
 
-        public ReportController(IWebHostEnvironment webHostEnvironment,
-            INotyfService notifyService,
+        public ReportController(INotyfService notifyService,
             IInvestigationService investigationService,
             IClaimsService claimsService)
         {
-            this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
             this.investigationService = investigationService;
             this.claimsService = claimsService;

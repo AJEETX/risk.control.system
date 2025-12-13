@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers
                 .AsQueryable();
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!user.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
@@ -170,11 +170,11 @@ namespace risk.control.system.Controllers
 
         // GET: PinCodes/Create
         [Breadcrumb("Add New", FromAction = "Profile")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
             var district = new PinCode { IsUpdated = !user.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
             return View(district);

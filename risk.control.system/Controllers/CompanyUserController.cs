@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Net;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -30,7 +32,6 @@ namespace risk.control.system.Controllers
         private readonly IPasswordHasher<ClientCompanyApplicationUser> passwordHasher;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ApplicationDbContext _context;
@@ -43,7 +44,6 @@ namespace risk.control.system.Controllers
             IPasswordHasher<ClientCompanyApplicationUser> passwordHasher,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
-            IWebHostEnvironment webHostEnvironment,
             ISmsService SmsService,
              IHttpContextAccessor httpContextAccessor,
             IFeatureManager featureManager,
@@ -55,7 +55,6 @@ namespace risk.control.system.Controllers
             this.passwordHasher = passwordHasher;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
-            this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
             this.httpContextAccessor = httpContextAccessor;
             this.featureManager = featureManager;
@@ -67,9 +66,9 @@ namespace risk.control.system.Controllers
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        public IActionResult Index(long id)
+        public async Task<IActionResult> Index(long id)
         {
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == id);
+            var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == id);
 
             var model = new CompanyUsersViewModel
             {
@@ -112,9 +111,9 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanyApplicationUser/Create
         [Breadcrumb("Add New", FromAction = "Index")]
-        public IActionResult Create(long id)
+        public async Task<IActionResult> Create(long id)
         {
-            var company = _context.ClientCompany.Include(c => c.Country).FirstOrDefault(v => v.ClientCompanyId == id);
+            var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == id);
             var model = new ClientCompanyApplicationUser { Country = company.Country, CountryId = company.CountryId, ClientCompany = company };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
@@ -140,6 +139,9 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Email suffix is required!");
                 return View(user);
             }
+            emailSuffix = WebUtility.HtmlEncode(emailSuffix.Trim().ToLower());
+            user.Email = WebUtility.HtmlEncode(user.Email?.Trim().ToLower());
+
             var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
@@ -157,7 +159,10 @@ namespace risk.control.system.Controllers
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
-            user.PhoneNumber = user.PhoneNumber.TrimStart('0');
+            user.PhoneNumber = WebUtility.HtmlEncode(user.PhoneNumber.TrimStart('0'));
+            user.FirstName = WebUtility.HtmlEncode(user.FirstName);
+            user.LastName = WebUtility.HtmlEncode(user.LastName);
+            user.Addressline = WebUtility.HtmlEncode(user.Addressline);
             user.PinCodeId = user.SelectedPincodeId;
             user.DistrictId = user.SelectedDistrictId;
             user.StateId = user.SelectedStateId;
@@ -172,7 +177,7 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, user.UserRole.ToString());
-                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                 await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Company account created. \nDomain : " + user.Email + "\n" + portal_base_url);
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
 
@@ -272,7 +277,7 @@ namespace risk.control.system.Controllers
                         var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                         await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                         notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
-                        var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                        var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                         await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Company account edited. \nDomain : " + user.Email + "\n" + portal_base_url);
 
                         return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });

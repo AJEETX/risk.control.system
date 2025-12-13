@@ -39,7 +39,7 @@ namespace risk.control.system.Controllers.Api.Claims
             this.httpClientService = httpClientService;
         }
 
-        
+
         [HttpGet("GetPolicyDetail")]
         public async Task<IActionResult> GetPolicyDetail(long id)
         {
@@ -87,7 +87,7 @@ namespace risk.control.system.Controllers.Api.Claims
         public async Task<IActionResult> GetCustomerDetail(long id)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
-            var isAgencyUser = _context.VendorApplicationUser.Any(u => u.Email == currentUserEmail);
+            var isAgencyUser = await _context.VendorApplicationUser.AnyAsync(u => u.Email == currentUserEmail);
 
             var customer = await _context.CustomerDetail
                 .Include(c => c.Country)
@@ -204,11 +204,11 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetAgentDetail")]
-        public IActionResult GetAgentDetail(long caseId, long faceId)
+        public async Task<IActionResult> GetAgentDetail(long caseId, long faceId)
         {
             var claim = claimsService.GetCasesWithDetail()
                 .FirstOrDefault(c => c.Id == caseId);
-            var agentReport = _context.AgentIdReport.FirstOrDefault(l => l.Id == faceId);
+            var agentReport = await _context.AgentIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
 
             var longLat = agentReport.LongLat.IndexOf(",");
             var lat = agentReport?.LongLat.Substring(0, longLat)?.Trim();
@@ -261,11 +261,11 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok();
         }
         [HttpGet("GetFaceDetail")]
-        public IActionResult GetFaceDetail(long caseId, long faceId)
+        public async Task<IActionResult> GetFaceDetail(long caseId, long faceId)
         {
             var claim = claimsService.GetCasesWithDetail()
                 .FirstOrDefault(c => c.Id == caseId);
-            var faceReport = _context.DigitalIdReport.FirstOrDefault(l => l.Id == faceId);
+            var faceReport = await _context.DigitalIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
 
             var longLat = faceReport.LongLat.IndexOf(",");
             var lat = faceReport?.LongLat.Substring(0, longLat)?.Trim();
@@ -318,11 +318,11 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok();
         }
         [HttpGet("GetDocumentDetail")]
-        public IActionResult GetDocumentDetail(long caseId, long docId)
+        public async Task<IActionResult> GetDocumentDetail(long caseId, long docId)
         {
             var claim = claimsService.GetCasesWithDetail()
                 .FirstOrDefault(c => c.Id == caseId);
-            var docReport = _context.DocumentIdReport.FirstOrDefault(l => l.Id == docId);
+            var docReport = await _context.DocumentIdReport.FirstOrDefaultAsync(l => l.Id == docId);
 
             var longLat = docReport.LongLat.IndexOf(",");
             var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();
@@ -375,13 +375,13 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok();
         }
         [HttpGet("GetMediaDetail")]
-        public IActionResult GetMediaDetail(long caseId, long docId)
+        public async Task<IActionResult> GetMediaDetail(long caseId, long docId)
         {
             var currentUserEmail = HttpContext.User.Identity.Name;
-            var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == currentUserEmail);
+            var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var claim = claimsService.GetCasesWithDetail()
                 .FirstOrDefault(c => c.Id == caseId);
-            var docReport = _context.MediaReport.FirstOrDefault(l => l.Id == docId);
+            var docReport = await _context.MediaReport.FirstOrDefaultAsync(l => l.Id == docId);
 
             var longLat = docReport.LongLat.IndexOf(",");
             var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();

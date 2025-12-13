@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text.RegularExpressions;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -59,7 +60,7 @@ namespace risk.control.system.Controllers
                 .AsQueryable();
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!user.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
@@ -165,11 +166,11 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Add New", FromAction = "Profile")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.Include(u => u.Country).FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
             if (user.IsSuperAdmin)
             {
@@ -190,7 +191,7 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                state.Code = state.Code?.ToUpper();
+                state.Code = WebUtility.HtmlEncode(state.Code?.ToUpper());
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
                 if (exists)
                 {

@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
             var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
 
             var totalReadyToAssign = await service.GetAutoCount(userEmail);
@@ -112,7 +112,7 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> GetFileById(int uploadId)
         {
             var userEmail = HttpContext.User.Identity.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
             var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
             if (file == null)
             {

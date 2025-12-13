@@ -138,7 +138,7 @@
                         img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger' title='Download Error file' data-bs-toggle='tooltip'><i class='fa fa-download'></i> Error File</a> &nbsp;`;
                     }
                     else if (!row.hasError && row.status == 'Completed') {
-                        img += `<span class='btn btn-xs i-green upload-success' title='${title} Successfully' data-bs-toggle='tooltip'><i class='fa fa-check'></i> ${title} </span> &nbsp;`;
+                        img += `<span class='btn btn-xs i-green upload-success' title='${title} Successfully' data-bs-toggle='tooltip'><i class='fa fa-check'></i> ${title} </span> `;
                     } else {
                         img += `<span class='upload-progress' title='Action in-progress' data-bs-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </span> &nbsp;`;
                     }
@@ -330,7 +330,7 @@
                                     title: 'File has been Deleted!',
                                     content: response.message,
                                     type: 'red',
-                                    icon: 'fas fa-exclamation-triangle',
+                                    icon: 'fas fa-trash',
                                     closeIcon: true,
                                     buttons: {
                                         cancel: {

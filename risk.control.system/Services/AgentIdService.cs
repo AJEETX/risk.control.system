@@ -21,6 +21,7 @@ public interface IAgentIdService
 internal class AgentIdService : IAgentIdService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<AgentIdService> logger;
     private readonly IFileStorageService fileStorageService;
     private readonly IBackgroundJobClient backgroundJobClient;
     private readonly IPanCardService panCardService;
@@ -34,6 +35,7 @@ internal class AgentIdService : IAgentIdService
 
     //test PAN FNLPM8635N
     public AgentIdService(ApplicationDbContext context,
+        ILogger<AgentIdService> logger,
         IFileStorageService fileStorageService,
         IBackgroundJobClient backgroundJobClient,
         IPanCardService panCardService,
@@ -44,6 +46,7 @@ internal class AgentIdService : IAgentIdService
         IFaceMatchService faceMatchService)
     {
         this._context = context;
+        this.logger = logger;
         this.fileStorageService = fileStorageService;
         this.backgroundJobClient = backgroundJobClient;
         this.panCardService = panCardService;
@@ -90,13 +93,13 @@ internal class AgentIdService : IAgentIdService
             {
                 return null;
             }
-            var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == data.Email);
+            var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == data.Email);
 
             location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
 
-            var locationTemplate = _context.LocationReport
+            var locationTemplate = await _context.LocationReport
                 .Include(l => l.AgentIdReport)
-                .FirstOrDefault(l => l.Id == location.Id);
+                .FirstOrDefaultAsync(l => l.Id == location.Id);
 
             face = locationTemplate.AgentIdReport;
             var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
@@ -200,6 +203,7 @@ internal class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
+            logger.LogError(ex, "Failed agent Id match");
             face.LocationInfo = "No Data";
             face.DigitalIdImageMatchConfidence = string.Empty;
             face.LocationAddress = "No Address data";
@@ -370,6 +374,7 @@ internal class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
+            logger.LogError(ex, "Failed gace Id match");
             face.LocationInfo = "No Data";
             face.MatchConfidence = string.Empty;
             face.LocationAddress = "No Address data";
@@ -475,7 +480,7 @@ internal class AgentIdService : IAgentIdService
             doc.Distance = distance;
             doc.LocationMapUrl = map;
 
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
+            var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claim.ClientCompanyId);
             var imageReadOnly = await googleDetecTask;
             if (imageReadOnly != null && imageReadOnly.Count > 0)
             {
@@ -523,6 +528,7 @@ internal class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
+            logger.LogError(ex, "Failed face Id match");
             doc.LocationInfo = "No Data";
             doc.ImageValid = false;
             doc.LocationAddress = "No Address data";
@@ -562,9 +568,9 @@ internal class AgentIdService : IAgentIdService
 
             var location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
 
-            var locationTemplate = _context.LocationReport
+            var locationTemplate = await _context.LocationReport
                 .Include(l => l.MediaReports)
-                .FirstOrDefault(l => l.Id == location.Id);
+                .FirstOrDefaultAsync(l => l.Id == location.Id);
 
             // Save to DB
             media = locationTemplate.MediaReports.FirstOrDefault(c => c.ReportName == data.ReportName);
@@ -646,6 +652,7 @@ internal class AgentIdService : IAgentIdService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
+            logger.LogError(ex, "Failed media file capture");
             media.LocationInfo = "No Data";
             media.ImageValid = false;
             media.LocationAddress = "No Address data";
@@ -668,6 +675,8 @@ internal class AgentIdService : IAgentIdService
 
     public async Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
     {
+        try
+        {
         var claim = await _context.Investigations
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.ReportTemplate)
@@ -676,9 +685,9 @@ internal class AgentIdService : IAgentIdService
 
         var location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == locationName);
 
-        var locationTemplate = _context.LocationReport
+        var locationTemplate =await _context.LocationReport
             .Include(l => l.Questions)
-            .FirstOrDefault(l => l.Id == location.Id);
+            .FirstOrDefaultAsync(l => l.Id == location.Id);
 
         locationTemplate.Questions.RemoveAll(q => true);
         foreach (var q in Questions)
@@ -698,5 +707,12 @@ internal class AgentIdService : IAgentIdService
         _context.LocationReport.Update(locationTemplate);
         var rowsAffected = await _context.SaveChangesAsync(null, false);
         return rowsAffected > 0;
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed media file capture");
+            return false;
+        }
     }
 }

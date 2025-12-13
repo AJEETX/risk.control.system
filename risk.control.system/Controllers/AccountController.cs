@@ -221,7 +221,7 @@ namespace risk.control.system.Controllers
                 return View(model);
             }
 
-            var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+            var admin = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
             if (admin is null || admin.Country is null)
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
@@ -244,8 +244,8 @@ namespace risk.control.system.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
                 if (roles != null && roles.Count > 0)
                 {
-                    var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
-                    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
+                    var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
+                    var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
                     bool vendorIsActive = false;
                     bool companyIsActive = false;
                     string loggingUsername = "Admin";
@@ -401,15 +401,15 @@ namespace risk.control.system.Controllers
                 await _userManager.UpdateAsync(user);
 
                 await _signInManager.RefreshSignInAsync(user);
-                var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                var admin = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
                 var roles = await _userManager.GetRolesAsync(user);
                 if (roles != null && roles.Count > 0)
                 {
-                    var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user.Email && !u.Deleted);
-                    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == user.Email && !u.Deleted);
+                    var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
+                    var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
                     bool vendorIsActive = false;
                     bool companyIsActive = false;
 
@@ -481,7 +481,7 @@ namespace risk.control.system.Controllers
 
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
                 {
-                    var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                    var adminForFailed = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
                     string failedMessage = $"Dear {admin.Email}, \n" +
                         $"User {user.Email} password updated.  \n" +
                         $"{BaseUrl}";
@@ -565,7 +565,7 @@ namespace risk.control.system.Controllers
 
             var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
-            var userCount = await _userManager.Users.CountAsync(u => u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain);
+            var userCount = await _userManager.Users.CountAsync(u => u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain && !u.Deleted);
 
             return userCount == 0 ? 0 : 1;
 
@@ -582,7 +582,7 @@ namespace risk.control.system.Controllers
 
             var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
-            var agenccompanyCount = await _context.ClientCompany.CountAsync(u => u.Email.Trim().ToLower() == newDomain);
+            var agenccompanyCount = await _context.ClientCompany.CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
             var agencyCount = await _context.Vendor.CountAsync(u => u.Email.Trim().ToLower() == newDomain);
 
             return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
@@ -596,7 +596,7 @@ namespace risk.control.system.Controllers
                 return null;
             }
 
-            var userCount = await _userManager.Users.CountAsync(u => u.Email == input);
+            var userCount = await _userManager.Users.CountAsync(u => u.Email == input && !u.Deleted);
 
             return userCount == 0 ? 0 : 1;
         }

@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Net;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -21,6 +24,9 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}, {AGENT.DISPLAY_NAME}")]
     public class AgencyUserProfileController : Controller
     {
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         public List<UsersViewModel> UserList;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ApplicationDbContext _context;
@@ -32,7 +38,6 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
         private readonly ILogger<AgencyUserProfileController> logger;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private string portal_base_url = string.Empty;
 
         public AgencyUserProfileController(ApplicationDbContext context,
@@ -44,8 +49,7 @@ namespace risk.control.system.Controllers
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             ISmsService SmsService,
-            ILogger<AgencyUserProfileController> logger,
-            IWebHostEnvironment webHostEnvironment)
+            ILogger<AgencyUserProfileController> logger)
         {
             _context = context;
             this.fileStorageService = fileStorageService;
@@ -57,24 +61,23 @@ namespace risk.control.system.Controllers
             this.roleManager = roleManager;
             smsService = SmsService;
             this.logger = logger;
-            this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = _context.VendorApplicationUser
+                var vendorUser = await _context.VendorApplicationUser
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
                     .Include(u => u.State)
                     .Include(u => u.District)
-                    .FirstOrDefault(c => c.Email == userEmail);
+                    .FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 return View(vendorUser);
             }
@@ -128,50 +131,84 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
+        public async Task<IActionResult> Edit(string id, VendorApplicationUser model)
         {
             try
             {
-                if (id != applicationUser.Id.ToString())
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors");
+                    return View(model);
+                }
+                if (id != model.Id.ToString())
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var user = await userManager.FindByIdAsync(id);
-                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
+                if (model?.ProfileImage != null && model.ProfileImage.Length > 0)
                 {
-                    var domain = applicationUser.Email.Split('@')[1];
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(applicationUser.ProfileImage, domain, "user");
-                    using var dataStream = new MemoryStream();
-                    applicationUser.ProfileImage.CopyTo(dataStream);
-                    applicationUser.ProfilePicture = dataStream.ToArray();
+                    if (model.ProfileImage.Length > MAX_FILE_SIZE)
+                    {
+                        notifyService.Error($"Document image Size exceeds the max size: 5MB");
+                        ModelState.AddModelError(nameof(model.ProfileImage), "File too large.");
+                        return View(model);
+                    }
 
-                    applicationUser.ProfilePictureUrl = relativePath;
-                    applicationUser.ProfilePictureExtension = Path.GetExtension(fileName);
+                    var ext = Path.GetExtension(model.ProfileImage.FileName).ToLowerInvariant();
+                    if (!AllowedExt.Contains(ext))
+                    {
+                        notifyService.Error($"Invalid Document image type");
+                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid file type.");
+                        return View(model);
+                    }
+
+                    if (!AllowedMime.Contains(model.ProfileImage.ContentType))
+                    {
+                        notifyService.Error($"Invalid Document Image content type");
+                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Document Image  content type.");
+                        return View(model);
+                    }
+
+                    if (!ImageSignatureValidator.HasValidSignature(model.ProfileImage))
+                    {
+                        notifyService.Error($"Invalid or corrupted Document Image ");
+                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid file content.");
+                        return View(model);
+                    }
+                    var domain = model.Email.Split('@')[1];
+                    domain = WebUtility.HtmlEncode(domain);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(model.ProfileImage, domain, "user");
+                    using var dataStream = new MemoryStream();
+                    model.ProfileImage.CopyTo(dataStream);
+                    model.ProfilePicture = dataStream.ToArray();
+
+                    model.ProfilePictureUrl = relativePath;
+                    model.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
 
                 if (user != null)
                 {
-                    user.Addressline = applicationUser?.Addressline ?? user.Addressline;
-                    user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
-                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                    user.FirstName = applicationUser?.FirstName;
-                    user.LastName = applicationUser?.LastName;
-                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
+                    user.Addressline = WebUtility.HtmlEncode(model?.Addressline) ?? user.Addressline;
+                    user.ProfilePicture = model?.ProfilePicture ?? user.ProfilePicture;
+                    user.ProfilePictureUrl = model?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.FirstName = WebUtility.HtmlEncode(model?.FirstName);
+                    user.LastName = WebUtility.HtmlEncode(model?.LastName);
+                    if (!string.IsNullOrWhiteSpace(model?.Password))
                     {
-                        user.Password = applicationUser.Password;
+                        user.Password = model.Password;
                     }
-                    user.Email = applicationUser.Email;
-                    user.UserName = applicationUser.Email;
+                    user.Email = model.Email;
+                    user.UserName = model.Email;
                     user.EmailConfirmed = true;
-                    user.CountryId = applicationUser.SelectedCountryId;
-                    user.StateId = applicationUser.SelectedStateId;
-                    user.PinCodeId = applicationUser.SelectedPincodeId;
-                    user.DistrictId = applicationUser.SelectedDistrictId;
+                    user.CountryId = model.SelectedCountryId;
+                    user.StateId = model.SelectedStateId;
+                    user.PinCodeId = model.SelectedPincodeId;
+                    user.DistrictId = model.SelectedDistrictId;
                     user.IsUpdated = true;
                     user.Updated = DateTime.Now;
-                    user.Comments = applicationUser.Comments;
-                    user.PhoneNumber = applicationUser.PhoneNumber.TrimStart('0');
+                    user.Comments = WebUtility.HtmlEncode(model.Comments);
+                    user.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0'));
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
                     user.SecurityStamp = DateTime.Now.ToString();
                     var result = await userManager.UpdateAsync(user);
@@ -179,7 +216,7 @@ namespace risk.control.system.Controllers
                     {
                         notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
 
-                        var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                        var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                         await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited. \n Email : " + user.Email + "\n" + portal_base_url);
 
                         return RedirectToAction(nameof(Index), "Dashboard");
@@ -201,12 +238,12 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("Change Password ")]
-        public IActionResult ChangePassword()
+        public async Task<IActionResult> ChangePassword()
         {
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser != null)
                 {
                     return View();
@@ -231,22 +268,19 @@ namespace risk.control.system.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
                     var user = await userManager.GetUserAsync(User);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-                    var admin = _context.ApplicationUser.Include(u => u.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                    var admin = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                    //var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);
 
                     if (user == null)
                     {
                         notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
-
+                    model.CurrentPassword = WebUtility.HtmlEncode(model.CurrentPassword);
                     var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
 
                     if (!result.Succeeded)
@@ -289,13 +323,13 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("Password Change Succees")]
-        public IActionResult ChangePasswordConfirmation()
+        public async Task<IActionResult> ChangePasswordConfirmation()
         {
             try
             {
 
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser != null)
                 {
                     notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");

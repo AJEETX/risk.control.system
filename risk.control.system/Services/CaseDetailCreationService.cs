@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 
+using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
@@ -23,7 +25,6 @@ namespace risk.control.system.Services
         private readonly IBeneficiaryCreationService beneficiaryCreationService;
         private readonly ICustomerCreationService customerCreationService;
         private readonly ICaseImageCreationService caseImageCreationService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger<CaseDetailCreationService> logger;
 
         public CaseDetailCreationService(ApplicationDbContext context,
@@ -32,7 +33,6 @@ namespace risk.control.system.Services
             IBeneficiaryCreationService beneficiaryCreationService,
             ICustomerCreationService customerCreationService,
             ICaseImageCreationService caseImageCreationService,
-            IWebHostEnvironment webHostEnvironment,
             ILogger<CaseDetailCreationService> logger)
         {
             this.context = context;
@@ -41,7 +41,6 @@ namespace risk.control.system.Services
             this.beneficiaryCreationService = beneficiaryCreationService;
             this.customerCreationService = customerCreationService;
             this.caseImageCreationService = caseImageCreationService;
-            this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
         }
 
@@ -90,11 +89,11 @@ namespace risk.control.system.Services
                     caseErrors.Add($"[{nameof(uploadCase.ServiceType)}=null/empty]");
                 }
                 var servicetype = string.IsNullOrWhiteSpace(uploadCase.ServiceType)
-                    ? context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == caseType)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
-                    : context.InvestigationServiceType
-                        .FirstOrDefault(b => b.Code.ToLower() == uploadCase.ServiceType.ToLower() && b.InsuranceType == caseType)  // Case 2: Try matching Code + LineOfBusinessId
-                      ?? context.InvestigationServiceType
-                        .FirstOrDefault(b => b.InsuranceType == caseType);  // Case 3: If no match, retry ignoring LineOfBusinessId
+                    ? await context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == caseType)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
+                    : await context.InvestigationServiceType
+                        .FirstOrDefaultAsync(b => b.Code.ToLower() == uploadCase.ServiceType.ToLower() && b.InsuranceType == caseType)  // Case 2: Try matching Code + LineOfBusinessId
+                      ?? await context.InvestigationServiceType
+                        .FirstOrDefaultAsync(b => b.InsuranceType == caseType);  // Case 3: If no match, retry ignoring LineOfBusinessId
 
 
                 if (!string.IsNullOrWhiteSpace(uploadCase.Amount) && decimal.TryParse(uploadCase.Amount, out var amount))
@@ -179,9 +178,9 @@ namespace risk.control.system.Services
                     caseErrors.Add($"[{nameof(uploadCase.Reason)}=null/empty]");
                 }
                 var caseEnabler = string.IsNullOrWhiteSpace(uploadCase.Reason) ?
-                    context.CaseEnabler.FirstOrDefault() :
-                    context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Reason.Trim().ToLower())
-                    ?? context.CaseEnabler.FirstOrDefault();
+                    await context.CaseEnabler.FirstOrDefaultAsync() :
+                    await context.CaseEnabler.FirstOrDefaultAsync(c => c.Code.ToLower() == uploadCase.Reason.Trim().ToLower())
+                    ?? await context.CaseEnabler.FirstOrDefaultAsync();
 
 
                 if (string.IsNullOrWhiteSpace(uploadCase.Department))
@@ -197,9 +196,9 @@ namespace risk.control.system.Services
                 }
 
                 var department = string.IsNullOrWhiteSpace(uploadCase.Department) ?
-                   context.CostCentre.FirstOrDefault() :
-                   context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
-                   ?? context.CostCentre.FirstOrDefault();
+                   await context.CostCentre.FirstOrDefaultAsync() :
+                   await context.CostCentre.FirstOrDefaultAsync(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
+                   ?? await context.CostCentre.FirstOrDefaultAsync();
 
                 var savedNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(model, uploadCase.CaseId?.ToLower(), POLICY_IMAGE);
                 var extension = Path.GetExtension(POLICY_IMAGE).ToLower();

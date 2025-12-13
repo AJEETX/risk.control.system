@@ -24,7 +24,6 @@ namespace risk.control.system.Services
         private readonly IFileStorageService fileStorageService;
         private readonly IPhoneService phoneService;
         private readonly ICaseImageCreationService caseImageCreationService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger<BeneficiaryCreationService> logger;
 
         public BeneficiaryCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient,
@@ -32,7 +31,6 @@ namespace risk.control.system.Services
             IFileStorageService fileStorageService,
             IPhoneService phoneService,
             ICaseImageCreationService caseImageCreationService,
-            IWebHostEnvironment webHostEnvironment,
             ILogger<BeneficiaryCreationService> logger)
         {
             this.context = context;
@@ -41,7 +39,6 @@ namespace risk.control.system.Services
             this.fileStorageService = fileStorageService;
             this.phoneService = phoneService;
             this.caseImageCreationService = caseImageCreationService;
-            this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
         }
 
@@ -81,10 +78,10 @@ namespace risk.control.system.Services
                 PinCode? pinCode = null;
                 if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryPincode) && !string.IsNullOrWhiteSpace(uploadCase.BeneficiaryDistrictName))
                 {
-                    pinCode = context.PinCode.Include(p => p.District)
+                    pinCode = await context.PinCode.Include(p => p.District)
                                                     .Include(p => p.State)
                                                     .Include(p => p.Country)
-                                                    .FirstOrDefault(p => p.Code == uploadCase.BeneficiaryPincode &&
+                                                    .FirstOrDefaultAsync(p => p.Code == uploadCase.BeneficiaryPincode &&
                                                     p.District.Name.ToLower().Contains(uploadCase.BeneficiaryDistrictName.ToLower()));
                     if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
                     {
@@ -99,7 +96,7 @@ namespace risk.control.system.Services
 
                 if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 {
-                    var country = context.Country.FirstOrDefault(c => c.CountryId == companyUser.ClientCompany.CountryId);
+                    var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == companyUser.ClientCompany.CountryId);
                     var isMobile = phoneService.IsValidMobileNumber(uploadCase.BeneficiaryContact, country.ISDCode.ToString());
                     if (!isMobile)
                     {
@@ -112,9 +109,9 @@ namespace risk.control.system.Services
                     }
                 }
                 var relation = string.IsNullOrWhiteSpace(uploadCase.Relation)
-                    ? context.BeneficiaryRelation.FirstOrDefault()  // Get first record from the table
-                    : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower()) // Get matching record
-                    ?? context.BeneficiaryRelation.FirstOrDefault();
+                    ? await context.BeneficiaryRelation.FirstOrDefaultAsync()  // Get first record from the table
+                    : await context.BeneficiaryRelation.FirstOrDefaultAsync(b => b.Code.ToLower() == uploadCase.Relation.ToLower()) // Get matching record
+                    ?? await context.BeneficiaryRelation.FirstOrDefaultAsync();
 
 
                 if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryIncome) && Enum.TryParse<Income>(uploadCase.BeneficiaryIncome, true, out var incomeEnum))

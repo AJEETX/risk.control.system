@@ -8,12 +8,6 @@ namespace risk.control.system.Services
     }
     internal class GoogleApi : IGoogleApi
     {
-        private readonly IWebHostEnvironment webHostEnvironment;
-
-        public GoogleApi(IWebHostEnvironment webHostEnvironment)
-        {
-            this.webHostEnvironment = webHostEnvironment;
-        }
         public async Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath)
         {
             try

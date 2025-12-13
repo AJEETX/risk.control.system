@@ -22,10 +22,7 @@ namespace risk.control.system.Seeds
             noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
 
-            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.PinCodeId == vendor.PinCodeId);
-            var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-            var state = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
-            var countryId = context.Country.FirstOrDefault(s => s.CountryId == state.Country.CountryId)?.CountryId ?? default!;
+            var pinCode = await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == vendor.PinCodeId);
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(AGENCY_ADMIN.PROFILE_IMAGE));
             var adminImage = File.ReadAllBytes(adminImagePath);
@@ -53,9 +50,9 @@ namespace risk.control.system.Seeds
                 Addressline = vendor.Addressline,
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 Vendor = vendor,
-                CountryId = countryId,
-                DistrictId = district?.DistrictId ?? default!,
-                StateId = state?.StateId ?? default!,
+                CountryId = pinCode.CountryId,
+                DistrictId = pinCode?.DistrictId ?? default!,
+                StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 ProfilePicture = adminImage,

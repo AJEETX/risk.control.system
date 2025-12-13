@@ -24,6 +24,9 @@ namespace risk.control.system.Controllers.Company
     public class InvestigationPostController : Controller
     {
         private const string CLAIMS = "claims";
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly ApplicationDbContext _context;
         private readonly IPhoneService phoneService;
         private readonly IFeatureManager featureManager;
@@ -75,6 +78,11 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Custom($"Invalid File Upload Error. ", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
+                }
                 if (postedFile == null || model == null ||
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
                 string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
@@ -158,146 +166,6 @@ namespace risk.control.system.Controllers.Company
             return Json(new { progress });
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CreatePolicy(InvestigationTask model)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    notifyService.Error("Please correct the errors");
-                    return View(model);
-                }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (model == null || model.PolicyDetail == null || !model.PolicyDetail.IsValidCaseDetail())
-                {
-                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
-
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-                model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
-                model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
-                model.PolicyDetail.Comments = WebUtility.HtmlEncode(model.PolicyDetail.Comments);
-
-                var file = model.PolicyDetail.Document;
-
-                if (file == null || file.Length == 0)
-                {
-                    notifyService.Error("Invalid Document");
-                    return View(model);
-                }
-
-                // Validate file content-type
-                var allowedTypes = new[] { "image/jpeg", "image/png" };
-                if (!allowedTypes.Contains(file.ContentType))
-                {
-                    notifyService.Error("Invalid file format");
-                    return View(model);
-                }
-
-                // Validate file size (example 5 MB max)
-                if (file.Length > 5 * 1024 * 1024)
-                {
-                    notifyService.Error("File too large");
-                    return View(model);
-                }
-                var claim = await service.CreatePolicy(currentUserEmail, model);
-                if (claim == null)
-                {
-                    notifyService.Error("Error Creating Case detail");
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-                else
-                {
-                    notifyService.Custom($"Policy <b>#{claim.PolicyDetail.ContractNumber}</b> created successfully", 3, "green", "far fa-file-powerpoint");
-                }
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = claim.Id });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> EditPolicy(long id, InvestigationTask model)
-        {
-            try
-            {
-                if (id < 1)
-                {
-                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
-
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-                if (!ModelState.IsValid)
-                {
-                    notifyService.Error("Please correct the errors");
-                    return View(model);
-                }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (model == null || model.PolicyDetail == null || !model.PolicyDetail.IsValidCaseDetail())
-                {
-                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
-
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-                model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
-                model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
-                model.PolicyDetail.Comments = WebUtility.HtmlEncode(model.PolicyDetail.Comments);
-
-                var file = model.PolicyDetail.Document;
-
-                if (file == null || file.Length == 0)
-                {
-                    notifyService.Error("Invalid Document");
-                    return View(model);
-                }
-
-                // Validate file content-type
-                var allowedTypes = new[] { "image/jpeg", "image/png" };
-                if (!allowedTypes.Contains(file.ContentType))
-                {
-                    notifyService.Error("Invalid file format");
-                    return View(model);
-                }
-
-                // Validate file size (example 5 MB max)
-                if (file.Length > 5 * 1024 * 1024)
-                {
-                    notifyService.Error("File too large");
-                    return View(model);
-                }
-
-                var claim = await service.EditPolicy(currentUserEmail, model);
-                if (claim == null)
-                {
-                    notifyService.Error("OOPs !!!..Error editing policy");
-                    return RedirectToAction(nameof(InvestigationController.EditPolicy), "Investigation", new { id = id });
-                }
-                notifyService.Custom($"Policy <b>#{claim.PolicyDetail.ContractNumber}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = claim.Id });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
-
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAutoConfirmed(long id)
@@ -305,7 +173,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 if (id <= 0)
                 {
@@ -340,13 +208,17 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCases([FromBody] DeleteRequestModel request)
         {
-            if (request.claims == null || request.claims.Count == 0)
-            {
-                return Json(new { success = false, message = "No cases selected for deletion." });
-            }
-
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return Json(new { success = false, message = "Invalid request." });
+                }
+                if (request.claims == null || request.claims.Count == 0)
+                {
+                    return Json(new { success = false, message = "No cases selected for deletion." });
+                }
+
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 foreach (var claim in request.claims)
@@ -379,10 +251,9 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAuto(List<long> claims)
         {
-
             try
             {
-                if (claims == null || claims.Count == 0)
+                if (!ModelState.IsValid || claims == null || claims.Count == 0)
                 {
                     notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(InvestigationController.New), "Investigation");
@@ -419,14 +290,13 @@ namespace risk.control.system.Controllers.Company
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> AllocateSingle2Vendor(long selectedcase, long caseId)
         {
-            if (selectedcase < 1 || caseId < 1)
-            {
-                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
-            }
-            //set claim as manual assigned
             try
             {
+                if (!ModelState.IsValid || selectedcase < 1 || caseId < 1)
+                {
+                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var (policy, status) = await processCaseService.AllocateToVendor(currentUserEmail, caseId, selectedcase, false);
@@ -437,7 +307,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.New), "Investigation");
                 }
 
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
+                var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == selectedcase);
 
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -462,13 +332,13 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAutoSingle(long claims)
         {
-            if (claims < 1)
-            {
-                notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
-            }
             try
             {
+                if (!ModelState.IsValid || claims < 1)
+                {
+                    notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -499,14 +369,13 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (model == null || claimId < 1)
+                if (!ModelState.IsValid || model == null || claimId < 1)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var (company, vendorId) = await processCaseService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -515,7 +384,7 @@ namespace risk.control.system.Controllers.Company
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
                 //await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
 
-                notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "orange", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
 
@@ -532,42 +401,49 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, long claimId, string reportAiSummary)
+        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, long claimId, string reportAiSummary = "")
         {
-            if (string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
-            {
-                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
-            }
             try
             {
+                if (!ModelState.IsValid || string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
+                {
+                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                AssessorRemarkType reportUpdateStatus = (AssessorRemarkType)Enum.Parse(typeof(AssessorRemarkType), assessorRemarkType, true);
-
-                var (company, contract) = await processCaseService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
-
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-
-
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
-
-                if (reportUpdateStatus == AssessorRemarkType.OK)
+                if (Enum.TryParse<AssessorRemarkType>(assessorRemarkType, true, out var reportUpdateStatus))
                 {
-                    notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
-                }
-                else if (reportUpdateStatus == AssessorRemarkType.REJECT)
-                {
-                    notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
+                    assessorRemarks = WebUtility.HtmlEncode(assessorRemarks);
+                    reportAiSummary = WebUtility.HtmlEncode(reportAiSummary);
+
+                    var (company, contract) = await processCaseService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
+
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
+                    if (reportUpdateStatus == AssessorRemarkType.OK)
+                    {
+                        notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
+                    }
+                    else if (reportUpdateStatus == AssessorRemarkType.REJECT)
+                    {
+                        notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
+                    }
+                    else
+                    {
+                        notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
+                    }
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
                 }
                 else
                 {
-                    notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
+                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
                 }
-
-                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
             catch (Exception ex)
             {
@@ -582,25 +458,48 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public async Task<IActionResult> SubmitQuery(long claimId, string reply, CaseInvestigationVendorsModel request)
+        public async Task<IActionResult> SubmitQuery(long claimId, string reply, CaseInvestigationVendorsModel request, IFormFile? document)
         {
             try
             {
-                if (request == null || claimId < 1 || string.IsNullOrWhiteSpace(reply))
+                if (!ModelState.IsValid)
                 {
                     notifyService.Error("Bad Request..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
                 }
+                if (document != null && document.Length > 0)
+                {
+                    if (document.Length > MAX_FILE_SIZE)
+                    {
+                        notifyService.Error($"Document image Size exceeds the max size: 5MB");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                    var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
+                    if (!AllowedExt.Contains(ext))
+                    {
+                        notifyService.Error($"Invalid Document image type");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                    if (!AllowedMime.Contains(document.ContentType))
+                    {
+                        notifyService.Error($"Invalid Document Image content type");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                    if (!ImageSignatureValidator.HasValidSignature(document))
+                    {
+                        notifyService.Error($"Invalid or corrupted Document Image ");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                }
+
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 request.InvestigationReport.EnquiryRequest.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
 
-                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-
-                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, messageDocument);
+                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
                 if (model != null)
                 {
-                    var company = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                    var company = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -629,6 +528,11 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if (!ModelState.IsValid || claimId < 1 || string.IsNullOrWhiteSpace(name))
+                {
+                    notifyService.Error("Bad Request..");
+                    return Ok();
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var model = await processCaseService.SubmitNotes(currentUserEmail, claimId, name);

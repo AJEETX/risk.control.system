@@ -39,7 +39,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> GetAudit(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
         {
             var userEmail = HttpContext.User.Identity.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             var query = _context.AuditLogs.Where(a => !string.IsNullOrWhiteSpace(a.NewValues) &&
             !string.IsNullOrWhiteSpace(a.UserId) &&
             a.CompanyId == companyUser.ClientCompanyId &&

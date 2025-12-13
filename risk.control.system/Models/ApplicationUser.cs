@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
-using risk.control.system.AppConstant;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using Microsoft.AspNetCore.Identity;
+
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Models
 {
@@ -61,7 +63,6 @@ namespace risk.control.system.Models
         public DateTime? Updated { get; set; }
         public string? UpdatedBy { get; set; } = "--";
 
-        [Required]
         public string? Password { get; set; }
 
         [Display(Name = "Active")]
@@ -88,8 +89,7 @@ namespace risk.control.system.Models
         public long SelectedStateId { get; set; }
         [NotMapped]
         public long SelectedCountryId { get; set; }
-        [NotMapped]
-        public IList<AgencyRole> AgencyRole { get; set; }
+
         public override string ToString()
         {
             return $"User Information:\n" +

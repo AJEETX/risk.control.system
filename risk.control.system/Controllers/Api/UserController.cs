@@ -8,6 +8,7 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api
@@ -52,7 +53,7 @@ namespace risk.control.system.Controllers.Api
         public async Task<IActionResult> ActiveUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser != null && companyUser.IsSuperAdmin)
             {

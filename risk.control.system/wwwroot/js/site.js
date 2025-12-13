@@ -17,7 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (addressInput) {
         addressInput.addEventListener("input", function () {
             if (this.value.length > 0) {
-                this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                this.value = this.value.replace(/\b\w/g, function (char) {
+                    return char.toUpperCase();
+                });
             }
         });
     }
@@ -113,7 +115,7 @@ function checkFormCompletion(formSelector, create = false) {
     });
 
     // Additional check for PinCodeId field
-    if ($('#PinCodeId').length > 0 && ($('#PinCodeId').val() || []).length === 0) {
+    if ($('#PinCodeText').length > 0 && ($('#PinCodeText').val() || []).length === 0) {
         isFormComplete = false;
     }
     // Enable or disable the submit button
@@ -150,7 +152,7 @@ function validateFileInput(inputElement, allowedExtensions) {
         });
     }
     if (fileSize > MaxSizeInBytes) {
-        document.getElementById('createProfileImage').src = '/img/no-image.png';
+        document.getElementById('document-Image').src = '/img/no-image.png';
         document.getElementById('createImageInput').value = '';
         $.alert({
             title: "Image UPLOAD issue !",
@@ -166,7 +168,7 @@ function validateFileInput(inputElement, allowedExtensions) {
             }
         });
     } else {
-        document.getElementById('createProfileImage').src = window.URL.createObjectURL(file);
+        document.getElementById('document-Image').src = window.URL.createObjectURL(file);
     }
     return true;
 }

@@ -1,39 +1,102 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Net;
 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
+
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
     public interface IAgencyService
     {
-        Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail, string portal_base_url);
+        Task<bool> CreateAgency(Vendor vendor, string currentUserEmail, string domainAddress, string portal_base_url);
+        Task<bool> EditAgency(Vendor vendor, string currentUserEmail, string portal_base_url);
     }
     internal class AgencyService : IAgencyService
     {
-        private const string vendorMapSize = "800x800";
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly ICustomApiCLient customApiCLient;
         private readonly ApplicationDbContext context;
         private readonly ISmsService smsService;
         private readonly IFileStorageService fileStorageService;
+        private readonly IFeatureManager featureManager;
 
-        public AgencyService(IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient, ApplicationDbContext context, ISmsService SmsService, IFileStorageService fileStorageService)
+        public AgencyService(ApplicationDbContext context, ISmsService SmsService, IFileStorageService fileStorageService, IFeatureManager featureManager)
         {
-            this.webHostEnvironment = webHostEnvironment;
-            this.customApiCLient = customApiCLient;
             this.context = context;
             smsService = SmsService;
             this.fileStorageService = fileStorageService;
+            this.featureManager = featureManager;
         }
-        public async Task<bool> EditAgency(Vendor vendor, IFormFile vendorDocument, string currentUserEmail, string portal_base_url)
+
+        public async Task<bool> CreateAgency(Vendor vendor, string currentUserEmail, string domainAddress, string portal_base_url)
         {
-            if (vendorDocument is not null)
+            Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
+
+            vendor.Email = vendor.Email.ToLower() + domainData.GetEnumDisplayName();
+
+            if (vendor.Document is not null)
             {
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(vendor.Document, vendor.Email);
 
                 using var dataStream = new MemoryStream();
-                vendorDocument.CopyTo(dataStream);
+                vendor.Document.CopyTo(dataStream);
+                vendor.DocumentImage = dataStream.ToArray();
+
+                vendor.DocumentImageExtension = Path.GetExtension(fileName);
+                vendor.DocumentUrl = relativePath;
+            }
+            vendor.Status = VendorStatus.ACTIVE;
+            vendor.AgreementDate = DateTime.Now;
+            vendor.ActivatedDate = DateTime.Now;
+            vendor.DomainName = domainData;
+            vendor.BankName = WebUtility.HtmlEncode(vendor.BankName.ToUpper());
+            vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode.ToUpper());
+            vendor.PhoneNumber = WebUtility.HtmlEncode(vendor.PhoneNumber.TrimStart('0'));
+            vendor.Updated = DateTime.Now;
+            vendor.UpdatedBy = currentUserEmail;
+            vendor.CreatedUser = currentUserEmail;
+            vendor.PinCodeId = vendor.SelectedPincodeId;
+            vendor.DistrictId = vendor.SelectedDistrictId;
+            vendor.StateId = vendor.SelectedStateId;
+            vendor.CountryId = vendor.SelectedCountryId;
+
+            var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
+
+            context.Add(vendor);
+
+            var managerRole = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
+            var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+
+            var notification = new StatusNotification
+            {
+                Role = managerRole,
+                Company = companyUser.ClientCompany,
+                Symbol = "far fa-hand-point-right i-orangered",
+                Message = $"Agency {vendor.Email} created",
+                Status = "",
+                NotifierUserEmail = currentUserEmail
+            };
+            context.Notifications.Add(notification);
+            var rowsAffected = await context.SaveChangesAsync();
+            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+            {
+                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
+            }
+
+            return rowsAffected > 0;
+        }
+
+        public async Task<bool> EditAgency(Vendor vendor, string currentUserEmail, string portal_base_url)
+        {
+            if (vendor.Document is not null)
+            {
+                var (fileName, relativePath) = await fileStorageService.SaveAsync(vendor.Document, vendor.Email);
+
+                using var dataStream = new MemoryStream();
+                vendor.Document.CopyTo(dataStream);
                 vendor.DocumentImage = dataStream.ToArray();
 
                 vendor.DocumentImageExtension = Path.GetExtension(fileName);
@@ -41,7 +104,7 @@ namespace risk.control.system.Services
             }
             else
             {
-                var vendorUser = context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                var vendorUser = await context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 var existingVendor = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
                 if (existingVendor.DocumentImage != null || existingVendor.DocumentUrl != null)
                 {
@@ -53,29 +116,20 @@ namespace risk.control.system.Services
             vendor.DistrictId = vendor.SelectedDistrictId;
             vendor.StateId = vendor.SelectedStateId;
             vendor.CountryId = vendor.SelectedCountryId;
-            vendor.BankName = vendor.BankName.ToUpper();
-            vendor.IFSCCode = vendor.IFSCCode.ToUpper();
-            var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
-
-            //var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
-            //var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
-            //var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-            //var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-            //vendor.AddressLatitude = companyCoordinates.Latitude;
-            //vendor.AddressLongitude = companyCoordinates.Longitude;
-            //vendor.AddressMapLocation = url;
-            vendor.PhoneNumber = vendor.PhoneNumber.TrimStart('0');
+            vendor.BankName = WebUtility.HtmlEncode(vendor.BankName.ToUpper());
+            vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode.ToUpper());
+            vendor.PhoneNumber = WebUtility.HtmlEncode(vendor.PhoneNumber.TrimStart('0'));
+            var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
             vendor.IsUpdated = true;
             vendor.Updated = DateTime.Now;
             vendor.UpdatedBy = currentUserEmail;
             context.Vendor.Update(vendor);
             var rowsAffected = await context.SaveChangesAsync();
-            if (rowsAffected > 0)
+            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
             {
-                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency account created. \n\nDomain : " + vendor.Email + "\n" + portal_base_url);
-                return true;
+                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \n\nDomain : " + vendor.Email + "\n" + portal_base_url);
             }
-            return false;
+            return rowsAffected > 0;
         }
     }
 }

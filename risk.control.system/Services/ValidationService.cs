@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 using risk.control.system.Data;
@@ -42,7 +43,7 @@ namespace risk.control.system.Services
                 var userEmail = tokenHandler.ReadJwtToken(token).Claims.First(claim => claim.Type == ClaimTypes.Name).Value;
                 var userLocation = tokenHandler.ReadJwtToken(token).Claims.First(claim => claim.Type == ClaimTypes.StreetAddress).Value;
 
-                var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
+                var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Email == userEmail);
                 var userSessionAlive = new UserSessionAlive
                 {
                     Updated = DateTime.Now,

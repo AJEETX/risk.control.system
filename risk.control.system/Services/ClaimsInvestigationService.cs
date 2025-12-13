@@ -20,9 +20,9 @@ namespace risk.control.system.Services
         }
         public async Task<bool> SubmitNotes(string userEmail, long claimId, string notes)
         {
-            var claim = _context.Investigations
+            var claim = await _context.Investigations
                .Include(c => c.CaseNotes)
-               .FirstOrDefault(c => c.Id == claimId);
+               .FirstOrDefaultAsync(c => c.Id == claimId);
             claim.CaseNotes.Add(new CaseNote
             {
                 Comment = notes,

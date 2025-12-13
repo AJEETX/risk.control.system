@@ -70,7 +70,7 @@ namespace risk.control.system.Services
                 .OrderBy(u => u.IsUpdated)
                 .ThenBy(u => u.Updated)
                 .AsQueryable();
-            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
+            var result =await dashboardService.CalculateAgentCaseStatus(userEmail);
 
             foreach (var user in users)
             {

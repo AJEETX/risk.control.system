@@ -31,7 +31,7 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = _context.VendorApplicationUser.Include(v => v.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+            var vendorUser = await _context.VendorApplicationUser.Include(v => v.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
             var claims = await GetClaims()
                     .Where(i => i.VendorId == vendorUser.VendorId &&
@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var agentUser = _context.VendorApplicationUser.Include(v => v.Country).Include(u => u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
+            var agentUser = await _context.VendorApplicationUser.Include(v => v.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             var claims = await GetClaims()
                     .Where(i => i.VendorId == agentUser.VendorId &&
                     i.TaskedAgentEmail == currentUserEmail &&

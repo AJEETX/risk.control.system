@@ -34,11 +34,11 @@ namespace risk.control.system.Controllers.Company
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
         }
-        public IActionResult GetPolicyDocument(long id)
+        public async Task<IActionResult> GetPolicyDocument(long id)
         {
-            var task = context.Investigations
+            var task = await context.Investigations
                 .Include(x => x.PolicyDetail)
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (task?.PolicyDetail?.DocumentPath == null)
                 return NotFound();
@@ -61,10 +61,10 @@ namespace risk.control.system.Controllers.Company
 
             return File(fileBytes, contentType);
         }
-        public IActionResult GetCustomerDocument(long id)
+        public async Task<IActionResult> GetCustomerDocument(long id)
         {
-            var customer = context.CustomerDetail
-                .FirstOrDefault(x => x.CustomerDetailId == id);
+            var customer = await context.CustomerDetail
+                .FirstOrDefaultAsync(x => x.CustomerDetailId == id);
 
             if (customer?.ImagePath == null)
                 return NotFound();
@@ -88,10 +88,10 @@ namespace risk.control.system.Controllers.Company
             return File(fileBytes, contentType);
         }
 
-        public IActionResult GetBeneficiaryDocument(long id)
+        public async Task<IActionResult> GetBeneficiaryDocument(long id)
         {
-            var customer = context.BeneficiaryDetail
-                .FirstOrDefault(x => x.BeneficiaryDetailId == id);
+            var customer = await context.BeneficiaryDetail
+                .FirstOrDefaultAsync(x => x.BeneficiaryDetailId == id);
 
             if (customer?.ImagePath == null)
                 return NotFound();
@@ -115,10 +115,10 @@ namespace risk.control.system.Controllers.Company
             return File(fileBytes, contentType);
         }
 
-        public IActionResult GetCompanyDocument(long id)
+        public async Task<IActionResult> GetCompanyDocument(long id)
         {
-            var company = context.ClientCompany
-                .FirstOrDefault(x => x.ClientCompanyId == id);
+            var company = await context.ClientCompany
+                .FirstOrDefaultAsync(x => x.ClientCompanyId == id);
 
             if (company.DocumentUrl == null)
                 return NotFound();
@@ -142,10 +142,10 @@ namespace risk.control.system.Controllers.Company
             return File(fileBytes, contentType);
         }
 
-        public IActionResult GetAgencyDocument(long id)
+        public async Task<IActionResult> GetAgencyDocument(long id)
         {
-            var vendor = context.Vendor
-                .FirstOrDefault(x => x.VendorId == id);
+            var vendor = await context.Vendor
+                .FirstOrDefaultAsync(x => x.VendorId == id);
 
             if (vendor.DocumentUrl == null)
                 return NotFound();
@@ -168,10 +168,10 @@ namespace risk.control.system.Controllers.Company
 
             return File(fileBytes, contentType);
         }
-        public IActionResult GetCompanyUserDocument(long id)
+        public async Task<IActionResult> GetCompanyUserDocument(long id)
         {
-            var companyUser = context.ClientCompanyApplicationUser
-                .FirstOrDefault(x => x.Id == id);
+            var companyUser = await context.ClientCompanyApplicationUser
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (companyUser.ProfilePictureUrl == null)
                 return NotFound();
@@ -195,10 +195,10 @@ namespace risk.control.system.Controllers.Company
             return File(fileBytes, contentType);
         }
 
-        public IActionResult GetAgencyUserDocument(long id)
+        public async Task<IActionResult> GetAgencyUserDocument(long id)
         {
-            var vendorUser = context.VendorApplicationUser
-                .FirstOrDefault(x => x.Id == id);
+            var vendorUser = await context.VendorApplicationUser
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (vendorUser.ProfilePictureUrl == null)
                 return NotFound();
@@ -221,10 +221,10 @@ namespace risk.control.system.Controllers.Company
 
             return File(fileBytes, contentType);
         }
-        public IActionResult GetAgentDocument(long id)
+        public async Task<IActionResult> GetAgentDocument(long id)
         {
-            var agent = context.AgentIdReport
-                .FirstOrDefault(x => x.Id == id);
+            var agent = await context.AgentIdReport
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (agent.FilePath == null)
                 return NotFound();
@@ -247,10 +247,10 @@ namespace risk.control.system.Controllers.Company
 
             return File(fileBytes, contentType);
         }
-        public IActionResult GetFaceDocument(long id)
+        public async Task<IActionResult> GetFaceDocument(long id)
         {
-            var agent = context.DigitalIdReport
-                .FirstOrDefault(x => x.Id == id);
+            var agent = await context.DigitalIdReport
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (agent.FilePath == null)
                 return NotFound();
@@ -273,10 +273,10 @@ namespace risk.control.system.Controllers.Company
 
             return File(fileBytes, contentType);
         }
-        public IActionResult GetOcrDocument(long id)
+        public async Task<IActionResult> GetOcrDocument(long id)
         {
-            var agent = context.DocumentIdReport
-                .FirstOrDefault(x => x.Id == id);
+            var agent = await context.DocumentIdReport
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (agent.FilePath == null)
                 return NotFound();
@@ -299,9 +299,9 @@ namespace risk.control.system.Controllers.Company
 
             return File(fileBytes, contentType);
         }
-        public IActionResult GetMediaDocument(long id)
+        public async Task<IActionResult> GetMediaDocument(long id)
         {
-            var media = context.MediaReport.FirstOrDefault(x => x.Id == id);
+            var media = await context.MediaReport.FirstOrDefaultAsync(x => x.Id == id);
 
             if (media == null || string.IsNullOrWhiteSpace(media.FilePath))
                 return NotFound();
@@ -334,6 +334,5 @@ namespace risk.control.system.Controllers.Company
 
             return File(stream, contentType);  // StreamResult, does NOT load entire file
         }
-
     }
 }

@@ -48,8 +48,17 @@
         <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
-        <div class="row">
-            <div class="col-sm-6">
+        <div class="row top-margin-10">
+            <div class="col-md-6">
+
+                <div class="form-group text-center">
+                    <div class="profile-img-container">
+                        <img id="document-Image" class="form-Image" src="@Applicationsettings.NO_USER" title="Customer Photo" alt="Customer Photo" data-bs-toggle="tooltip" />
+                    </div>
+                    <label for="createImageInput" class="control-label">Customer Photo <i class="fa fa-asterisk asterik-style-logo"></i></label>
+                    <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" required class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="customer-document" title="Upload Customer Photo" data-bs-toggle="tooltip" />
+                    <span asp-validation-for="ProfileImage" class="text-danger"></span>
+                </div>
 
                 <div class="form-group">
                     <label class="input-group-label" for="CustomerName"> Customer Name:</label>
@@ -72,6 +81,7 @@
                         <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                     </div>
                 </div>
+                <partial name="Investigation/_CustomerPhoneNumber" model="@Model" />
 
                 <div class="form-group">
                     <label class="input-group-label" for="Gender"> Gender:</label>
@@ -98,6 +108,10 @@
                     </div>
                 </div> *@
                 
+                
+
+            </div>
+            <div class="col-md-6">
                 <div class="form-group">
                     <label class="input-group-label" for="Income">Annual Income (@ViewBag.Currency):</label>
                     <div class="input-group mb-3">
@@ -137,10 +151,6 @@
                         <span asp-validation-for="Education" class="text-danger"></span>
                     </div>
                 </div>
-
-            </div>
-            <div class="col-sm-6">
-                <partial name="Investigation/_CustomerPhoneNumber" model="@Model" />
                 <partial name="Investigation/_CustomerAddress" model="@Model" />
 
                 <div class="form-group">
@@ -166,15 +176,7 @@
                     </div>
                 </div>
  *@
-                <div class="form-group">
-                    <label class="input-group-label" for="createImageInput"> Customer Photo:</label>
-                    <div class="input-group mb-3">
-                        <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Customer Photo" />
-                        <i class="fa fa-asterisk asterik-style"></i>
-                        <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-title-id="customer-document"
-                        required data-bs-toggle="tooltip" title="Upload Customer Photo" />
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>

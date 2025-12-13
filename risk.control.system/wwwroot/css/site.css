@@ -782,6 +782,11 @@ dl.row {
     color: red;
     padding-bottom: 1rem;
 }
+.asterik-style-logo {
+    font-size: .5rem !important;
+    color: red;
+    padding-bottom: 1rem;
+}
 
 .asterik-style-red {
     font-size: .4rem;
@@ -2178,11 +2183,36 @@ select#PinCodeId {
     object-fit: cover; /* Ensures the image maintains aspect ratio while filling the area */
     transition: transform 0.3s ease; /* Smooth transition effect on hover */
 }
-
     #editProfileImage:hover {
         transform: scale(1.1); /* Slightly enlarges the image on hover */
         border-color: #007bff; /* Changes border color on hover */
     }
+
+#createProfileImage {
+    width: 11.6em; /* Set the desired width */
+    height: 11.6em; /* Set the desired height */
+    border: 3px solid #ccc; /* Add a border around the image */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow around the image */
+    object-fit: cover; /* Ensures the image maintains aspect ratio while filling the area */
+    transition: transform 0.3s ease; /* Smooth transition effect on hover */
+}
+
+    #createProfileImage:hover {
+        transform: scale(1.01); /* Slightly enlarges the image on hover */
+        border-color: #007bff; /* Changes border color on hover */
+    }
+
+    .top-margin-10{
+        margin-top:2em;
+    }
+#document-Image {
+    width: 10em; /* Set the desired width */
+    height: 10.1em; /* Set the desired height */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow around the image */
+    object-fit: cover; /* Ensures the image maintains aspect ratio while filling the area */
+    transition: transform 0.3s ease; /* Smooth transition effect on hover */
+}
+
 
 /* Optional: You can add some styling to the file input for better appearance */
 .document-image-input {
@@ -2409,9 +2439,14 @@ input#checkall {
     white-space: pre-wrap;
 }
 .profile-img{
-    width:10em;
+    width:15em;
     max-width:15em;
-    height:auto;
+    height:15em;
+}
+.profile-logo {
+    height: 115px;
+    max-height: 115px;
+    border:1px solid #ccc;
 }
 /* Highlight active tab */
 .nav-tabs .nav-link.active {
@@ -3033,9 +3068,13 @@ th.col-match {
 .upload-success {
     border: 2px solid forestgreen;
     cursor:text;
+    width:75px;
+    margin-right: 2px;
 }
-.upload-progress{
-    width:70px;
+.upload-progress {
+    width: 75px;
+    margin-right: 25px;
+    padding-left: 30px;
 }
 img.mobile-capture-info {
     padding: .1rem;
@@ -3168,7 +3207,7 @@ img.mobile-capture-map {
 
 /* Validation styles */
 .is-valid {
-    border-color: #28a745 !important;
+    /*border-color: #28a745 !important;*/
 }
 
 .is-invalid {

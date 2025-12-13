@@ -81,23 +81,25 @@ namespace risk.control.system.Services
             .FirstOrDefaultAsync(c => c.Id == claimId);
 
             var mobile = claim.CustomerDetail.PhoneNumber.ToString();
-            var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
+            var user = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == currentUser);
             var isdCode = claim.CustomerDetail.Country.ISDCode;
             var isInsurerUser = user is ClientCompanyApplicationUser;
             var isVendorUser = user is VendorApplicationUser;
 
-            string company = string.Empty;
+            string entityName = string.Empty;
             ClientCompanyApplicationUser insurerUser;
             VendorApplicationUser agencyUser;
             if (isInsurerUser)
             {
                 insurerUser = (ClientCompanyApplicationUser)user;
-                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == insurerUser.ClientCompanyId)?.Name;
+                var entity = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == insurerUser.ClientCompanyId);
+                entityName = entity?.Name ?? string.Empty;
             }
             else if (isVendorUser)
             {
                 agencyUser = (VendorApplicationUser)user;
-                company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
+                var entity = await context.Vendor.FirstOrDefaultAsync(v => v.VendorId == agencyUser.VendorId);
+                entityName = entity?.Name ?? string.Empty;
             }
             if (!isInsurerUser && !isVendorUser)
             {
@@ -108,7 +110,7 @@ namespace risk.control.system.Services
             message += $"Thanks\n\n";
             message += $"{user.FirstName} {user.LastName}\n\n";
             message += $"Policy #:{claim.PolicyDetail.ContractNumber}\n\n";
-            message += $"{company}\n\n";
+            message += $"{entityName}\n\n";
             message += $"{logo}";
 
             var scheduleMessage = new CaseMessage
@@ -134,24 +136,26 @@ namespace risk.control.system.Services
                .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
 
             var mobile = beneficiary.PhoneNumber.ToString();
-            var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
+            var user = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == currentUser);
             var isdCode = beneficiary.Country.ISDCode;
 
             var isInsurerUser = user is ClientCompanyApplicationUser;
             var isVendorUser = user is VendorApplicationUser;
 
-            string company = string.Empty;
+            string entityName = string.Empty;
             ClientCompanyApplicationUser insurerUser;
             VendorApplicationUser agencyUser;
             if (isInsurerUser)
             {
                 insurerUser = (ClientCompanyApplicationUser)user;
-                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == insurerUser.ClientCompanyId)?.Name;
+                var entity = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == insurerUser.ClientCompanyId);
+                entityName = entity.Name;
             }
             else if (isVendorUser)
             {
                 agencyUser = (VendorApplicationUser)user;
-                company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
+                var entity = await context.Vendor.FirstOrDefaultAsync(v => v.VendorId == agencyUser.VendorId);
+                entityName = entity.Name;
             }
             if (!isInsurerUser && !isVendorUser)
             {
@@ -162,7 +166,7 @@ namespace risk.control.system.Services
             message += $"Thanks\n\n";
             message += $"{user.FirstName} {user.LastName}\n\n";
             message += $"Policy #:{beneficiary.InvestigationTask.PolicyDetail.ContractNumber}\n\n";
-            message += $"{company}\n\n";
+            message += $"{entityName}\n\n";
             message += $"{logo}";
 
             var scheduleMessage = new CaseMessage
@@ -174,12 +178,12 @@ namespace risk.control.system.Services
                 UpdatedBy = user.Email,
                 Updated = DateTime.Now
             };
-            var claim = context.Investigations
+            var claim = await context.Investigations
             .Include(c => c.CaseMessages)
             .Include(c => c.PolicyDetail)
             .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
-            .FirstOrDefault(c => c.Id == claimId);
+            .FirstOrDefaultAsync(c => c.Id == claimId);
             claim.CaseMessages.Add(scheduleMessage);
             await context.SaveChangesAsync(null, false);
             await smsService.DoSendSmsAsync(beneficiary.Country.Code, "+" + isdCode + mobile, message);
@@ -189,16 +193,16 @@ namespace risk.control.system.Services
         public async Task<List<StatusNotification>> GetNotifications(string userEmail)
         {
 
-            var companyUser = context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             ApplicationRole role = null!;
             ClientCompany company = null!;
             Vendor agency = null!;
             if (companyUser != null)
             {
-                role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
-                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                role = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name == companyUser.Role.ToString());
+                company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var notifications = context.Notifications.Where(n => n.Company == company && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
                 if (role.Name == AppRoles.ASSESSOR.ToString())
@@ -221,8 +225,8 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
-                role = context.ApplicationRole.FirstOrDefault(r => r.Name == vendorUser.Role.ToString());
-                agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+                role = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name == vendorUser.Role.ToString());
+                agency = await context.Vendor.FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
 
                 var notifications = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
 
@@ -232,7 +236,7 @@ namespace risk.control.system.Services
                 }
                 else
                 {
-                    var superRole = context.ApplicationRole.FirstOrDefault(r => r.Name == AppRoles.SUPERVISOR.ToString());
+                    var superRole = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name == AppRoles.SUPERVISOR.ToString());
                     if (role.Name == AppRoles.SUPERVISOR.ToString())
                     {
                         notifications = notifications.Where(n =>
@@ -261,17 +265,17 @@ namespace risk.control.system.Services
 
         public async Task MarkAsRead(int id, string userEmail)
         {
-            var companyUser = context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             ApplicationRole role = null!;
             ClientCompany company = null!;
             Vendor agency = null!;
             if (companyUser != null)
             {
-                role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
-                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                var notification = context.Notifications.FirstOrDefault(s => s.StatusNotificationId == id);
+                role = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name == companyUser.Role.ToString());
+                company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                var notification = await context.Notifications.FirstOrDefaultAsync(s => s.StatusNotificationId == id);
                 if (notification == null)
                 {
                     return;
@@ -294,9 +298,9 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
-                role = context.ApplicationRole.FirstOrDefault(r => r.Name == vendorUser.Role.ToString());
-                agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-                var notification = context.Notifications.FirstOrDefault(s => s.Agency == agency && s.StatusNotificationId == id);
+                role = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name == vendorUser.Role.ToString());
+                agency = await context.Vendor.FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
+                var notification = await context.Notifications.FirstOrDefaultAsync(s => s.Agency == agency && s.StatusNotificationId == id);
                 if (notification == null)
                 {
                     return;

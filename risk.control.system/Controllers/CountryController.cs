@@ -1,12 +1,18 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Linq.Expressions;
+using System.Net;
+using System.Text.RegularExpressions;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using SmartBreadcrumbs.Attributes;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -135,6 +141,8 @@ namespace risk.control.system.Controllers
         {
             country.IsUpdated = true;
             country.Updated = DateTime.Now;
+            country.Code = WebUtility.HtmlEncode(country.Code?.ToUpper());
+            country.Name = WebUtility.HtmlEncode(country.Name);
             country.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(country);
             await _context.SaveChangesAsync();
@@ -178,6 +186,8 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    country.Code = WebUtility.HtmlEncode(country.Code?.ToUpper());
+                    country.Name = WebUtility.HtmlEncode(country.Name);
                     country.Updated = DateTime.Now;
                     country.IsUpdated = true;
                     country.UpdatedBy = HttpContext.User?.Identity?.Name;

@@ -12,7 +12,7 @@
                 <i class="fa fa-asterisk asterik-style"></i>
             </span>
         </div>
-        <input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode or name" value="" autocomplete="off" />
+        <input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
         <span asp-validation-for="PinCodeId" class="text-danger"></span>
         <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
         <input type="hidden" asp-for="PinCodeId" id="PinCodeId" />
@@ -31,7 +31,7 @@
                 <i class="fa fa-asterisk asterik-style-disabled"></i>
             </span>
         </div>
-        <input readonly type="text" id="DistrictText" class="form-control remarks" data-placeholder="district" data-bs-toggle="tooltip" placeholder="..." value="" tabindex="-1" />
+        <input readonly type="text" id="DistrictText" class="form-control remarks" data-placeholder="district" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" />
         <span asp-validation-for="DistrictId" class="text-danger"></span>
         <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" title="Auto-selected based on Pincode" />
         <input type="hidden" asp-for="DistrictId" id="DistrictId" />
@@ -53,7 +53,7 @@
                 <img src="@img" class="flag-icon" data-bs-toggle="tooltip" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
             </span>
         </div>
-        <input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." value="" tabindex="-1" />
+        <input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..."  tabindex="-1" />
         <span asp-validation-for="StateId" class="text-danger"></span>
         <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" title="Auto-selected based on Pincode" />
         <input type="hidden" asp-for="StateId" id="StateId" />

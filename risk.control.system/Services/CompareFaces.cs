@@ -50,6 +50,7 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine($"Failed to load source image:");
+                logger.LogError(ex, "Failed to compare faces");
                 return (false, 0, null);
             }
         }

@@ -23,7 +23,6 @@ namespace risk.control.system.Services
         private readonly IPhoneService phoneService;
         private readonly ICustomApiCLient customApiCLient;
         private readonly ICaseImageCreationService caseImageCreationService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger<CustomerCreationService> logger;
 
         public CustomerCreationService(ApplicationDbContext context,
@@ -32,7 +31,6 @@ namespace risk.control.system.Services
             IPhoneService phoneService,
             ICustomApiCLient customApiCLient,
             ICaseImageCreationService caseImageCreationService,
-            IWebHostEnvironment webHostEnvironment,
             ILogger<CustomerCreationService> logger)
         {
             this.context = context;
@@ -41,7 +39,6 @@ namespace risk.control.system.Services
             this.phoneService = phoneService;
             this.customApiCLient = customApiCLient;
             this.caseImageCreationService = caseImageCreationService;
-            this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
         }
 
@@ -101,11 +98,11 @@ namespace risk.control.system.Services
 
                 if (!string.IsNullOrWhiteSpace(uploadCase.CustomerPincode) && !string.IsNullOrWhiteSpace(uploadCase.CustomerDistrictName))
                 {
-                    pinCode = context.PinCode
+                    pinCode = await context.PinCode
                                            .Include(p => p.District)
                                            .Include(p => p.State)
                                            .Include(p => p.Country)
-                                           .FirstOrDefault(p => p.Code == uploadCase.CustomerPincode &&
+                                           .FirstOrDefaultAsync(p => p.Code == uploadCase.CustomerPincode &&
                                            p.District.Name.ToLower().Contains(uploadCase.CustomerDistrictName.ToLower()));
                     if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
                     {
@@ -119,7 +116,7 @@ namespace risk.control.system.Services
                 }
                 if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 {
-                    var country = context.Country.FirstOrDefault(c => c.CountryId == companyUser.ClientCompany.CountryId);
+                    var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == companyUser.ClientCompany.CountryId);
                     var isMobile = phoneService.IsValidMobileNumber(uploadCase.CustomerContact, country.ISDCode.ToString());
                     if (!isMobile)
                     {

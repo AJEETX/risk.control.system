@@ -77,7 +77,7 @@ namespace risk.control.system.Services
         {
             var fileName = Path.GetFileName(file.FileName);
             var extension = Path.GetExtension(file.FileName);
-            var company = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == uploadedBy);
+            var company = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == uploadedBy);
             int lastCompanySequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).MaxAsync(f => (int?)f.CompanySequenceNumber) ?? 0;
 
             // Get the last User-Level sequence (within the company)
@@ -107,7 +107,7 @@ namespace risk.control.system.Services
         [AutomaticRetry(Attempts = 0)]
         public async Task StartFileUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false)
         {
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
             var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
             var filePath = Path.Combine(webHostEnvironment.ContentRootPath, uploadFileData.FilePath);
 

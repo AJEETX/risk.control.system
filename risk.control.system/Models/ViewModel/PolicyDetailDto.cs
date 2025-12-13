@@ -65,9 +65,5 @@ namespace risk.control.system.Models.ViewModel
         [Required]
         [Display(Name = "Reason To Verify")]
         public long CaseEnablerId { get; set; }
-
-        [StringLength(500)]
-        [Display(Name = "Case remarks")]
-        public string? Comments { get; set; }
     }
 }

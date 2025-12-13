@@ -103,9 +103,9 @@ namespace risk.control.system.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteLog(int id)
+        public async Task<IActionResult> DeleteLog(int id)
         {
-            var file = _context.FilesOnFileSystem.FirstOrDefault(f => f.Id == id);
+            var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == id);
             if (file == null)
             {
                 return NotFound(new { success = false, message = "File not found." });

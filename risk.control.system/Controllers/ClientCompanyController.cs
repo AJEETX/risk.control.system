@@ -25,7 +25,6 @@ namespace risk.control.system.Controllers
         private const string vendorMapSize = "800x800";
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService fileStorageService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ICustomApiCLient customApiCLient;
@@ -35,7 +34,6 @@ namespace risk.control.system.Controllers
         public ClientCompanyController(
             ApplicationDbContext context,
             IFileStorageService fileStorageService,
-            IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             ICustomApiCLient customApiCLient,
@@ -44,7 +42,6 @@ namespace risk.control.system.Controllers
         {
             _context = context;
             this.fileStorageService = fileStorageService;
-            this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.customApiCLient = customApiCLient;
@@ -54,9 +51,9 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanies/Create
         [Breadcrumb("Add Company")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var country = _context.Country.FirstOrDefault();
+            var country = await _context.Country.FirstOrDefaultAsync();
             var model = new ClientCompany { Country = country, SelectedCountryId = country.CountryId, CountryId = country.CountryId };
             return View(model);
         }
@@ -87,7 +84,7 @@ namespace risk.control.system.Controllers
                 clientCompany.DocumentImage = dataStream.ToArray();
             }
 
-            var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == clientCompany.SelectedPincodeId);
+            var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
 
             var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
             var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
@@ -96,7 +93,7 @@ namespace risk.control.system.Controllers
             clientCompany.AddressLatitude = companyCoordinates.Latitude;
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
-            var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == clientCompany.SelectedCountryId)?.ISDCode;
+            var isdCode = (await _context.Country.FirstOrDefaultAsync(c => c.CountryId == clientCompany.SelectedCountryId))?.ISDCode;
             await smsService.DoSendSmsAsync(pinCode.Country.Code, isdCode + clientCompany.PhoneNumber, "Company account created. \n\nDomain : " + clientCompany.Email);
 
             //clientCompany.Description = "New company added.";
@@ -139,7 +136,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
 
             }
-            var hasClaims = _context.Investigations.Any(c => c.ClientCompanyId == id && !c.Deleted);
+            var hasClaims = await _context.Investigations.AnyAsync(c => c.ClientCompanyId == id && !c.Deleted);
             clientCompany.HasClaims = hasClaims;
             return View(clientCompany);
         }
@@ -266,7 +263,7 @@ namespace risk.control.system.Controllers
                         clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
                     }
                 }
-                var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == clientCompany.SelectedPincodeId);
+                var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
 
                 var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
                 var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);

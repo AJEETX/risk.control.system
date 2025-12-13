@@ -32,7 +32,6 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private string portal_base_url = string.Empty;
@@ -46,8 +45,7 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
-            ISmsService SmsService,
-            IWebHostEnvironment webHostEnvironment)
+            ISmsService SmsService)
         {
             _context = context;
             this.fileStorageService = fileStorageService;
@@ -57,7 +55,6 @@ namespace risk.control.system.Controllers
             this.roleManager = roleManager;
             this.notifyService = notifyService;
             smsService = SmsService;
-            this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
             this.httpContextAccessor = httpContextAccessor;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
@@ -111,7 +108,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        public IActionResult Create(long id)
+        public async Task<IActionResult> Create(long id)
         {
             try
             {
@@ -121,7 +118,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
+                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 var model = new VendorApplicationUser { Country = vendor.Country, Vendor = vendor };
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
@@ -183,7 +180,7 @@ namespace risk.control.system.Controllers
 
                 if (result.Succeeded)
                 {
-                    var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                    var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                     if (!user.Active)
                     {
                         var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -310,7 +307,7 @@ namespace risk.control.system.Controllers
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
-                        var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                        var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                         if (!user.Active)
                         {
                             var createdUser = await userManager.FindByEmailAsync(user.Email);

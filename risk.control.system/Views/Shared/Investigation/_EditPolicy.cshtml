@@ -44,8 +44,18 @@
         <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
-        <div class="row">
-            <div class="col-sm-6">
+        <div class="row top-margin-10">
+            <div class="col-md-6">
+
+                <div class="form-group text-center">
+                    <div class="profile-img-container">
+                        <img id="document-Image" class="form-Image" src="/Document/GetPolicyDocument/@Model.Id" title="Case Document" alt="Case Document" data-bs-toggle="tooltip" />
+                    </div>
+                    <label for="createImageInput" class="control-label">Case Document <i class="fa fa-asterisk asterik-style-logo"></i></label>
+                    <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="case-document" title="Upload Case Document" data-bs-toggle="tooltip" />
+                    <span asp-validation-for="Document" class="text-danger"></span>
+                </div>
+
                 <div class="form-group">
                     <label class="input-group-label" for="ContractNumber"> Case #:</label>
                     <div class="input-group mb-3">
@@ -62,7 +72,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                         </div>
-                        <select id="InsuranceType" required asp-for="PolicyDetail.InsuranceType" class="form-control remarks" asp-items="Html.GetEnumSelectList<InsuranceType>()">
+                        <select id="InsuranceType" required asp-for="PolicyDetail.InsuranceType" class="form-control remarks" asp-items="ViewBag.InsuranceType">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="PolicyDetail.InsuranceType" class="text-danger"></span>
@@ -80,6 +90,30 @@
                         <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
                     </div>
                 </div>
+                
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="input-group-label" for="ContractIssueDate"> Issue Date:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <input id="ContractIssueDate" required asp-for="PolicyDetail.ContractIssueDate" class="form-control remarks" type="date" />
+                        <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="input-group-label" for="DateOfIncident"> Incident Date:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <input id="DateOfIncident" required asp-for="PolicyDetail.DateOfIncident" class="form-control remarks" type="date" />
+                        <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label class="input-group-label" for="CaseEnablerId"> Reason To Verify:</label>
                     <div class="input-group mb-3">
@@ -92,7 +126,6 @@
                         <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
                     </div>
                 </div>
-                
                 <div class="form-group">
                     <label class="input-group-label" for="SumAssuredValue"> Assured Amount (@ViewBag.Currency):</label>
                     <div class="input-group mb-3">
@@ -100,45 +133,20 @@
                             <span class="input-group-text"><i class="fas fa-money-bill-wave"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <input id="SumAssuredValue" required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Assured Amount (@ViewBag.Currency) of minimum 100"
-                               min="100" maxlength="10" autocomplete="off" title="Assured Amount (@ViewBag.Currency) of minimum 100" data-bs-toggle="tooltip"/>
+                               min="100" maxlength="10" autocomplete="off" title="Assured Amount (@ViewBag.Currency) of minimum 100" data-bs-toggle="tooltip" />
                         <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                     </div>
                 </div>
-            </div>
-            
-            <div class="col-sm-6">
-                <div class="form-group">
-                    <label class="input-group-label" for="ContractIssueDate"> Issue Date:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <input required asp-for="PolicyDetail.ContractIssueDate" id="ContractIssueDate" class="form-control remarks" type="date" />
-                        <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
-                    </div>
-                </div>
-                <label class="input-group-label" for="DateOfIncident"> Incident Date:</label>
-                <div class="form-group">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <input required asp-for="PolicyDetail.DateOfIncident" id="DateOfIncident" class="form-control remarks" type="date" />
-                        <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
-                    </div>
-                </div>
-
                 <div class="form-group">
                     <label class="input-group-label" for="CauseOfLoss"> Cause Of Incident:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="nav-icon far fa-flag"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input required id="CauseOfLoss" asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="70" autocomplete="off" />
+                        <input id="CauseOfLoss" required asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="70" autocomplete="off" />
                         <span asp-validation-for="PolicyDetail.CauseOfLoss" class="text-danger"></span>
                     </div>
                 </div>
-
                 <div class="form-group">
                     <label class="input-group-label" for="CostCentreId"> Budget Centre:</label>
                     <div class="input-group mb-3">
@@ -151,27 +159,7 @@
                         <span asp-validation-for="PolicyDetail.CostCentreId" class="text-danger"></span>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label class="input-group-label" for="createImageInput"> Document:</label>
-                    <div class="input-group mb-3">
-                        @if (Model?.ExistingDocumentPath is not null)
-                        {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="/Document/GetPolicyDocument/@Model.Id" data-bs-toggle="tooltip" title="Case Document" />
-                            <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file" class="form-control remarks document-image-input valid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document"
-                                   data-bs-toggle="tooltip" title="Upload Case Document" data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
-                        }
-                        else
-                        {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src=@Applicationsettings.NO_POLICY_IMAGE data-bs-toggle="tooltip" title="No Case Document" />
-                            <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file" class="form-control remarks document-image-input invalid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="case-document" required 
-                            data-bs-toggle="tooltip" title="Upload Case Document" data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
-                        }
-                        <span asp-validation-for="Document" class="text-danger"></span>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>

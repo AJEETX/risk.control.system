@@ -18,7 +18,7 @@ namespace risk.control.system.Seeds
             string pinCodeCode)
         {
 
-            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(p => p.Code == pinCodeCode);
+            var pinCode =await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.Code == pinCodeCode);
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(PORTAL_ADMIN.PROFILE_IMAGE));
             var adminImage = File.ReadAllBytes(adminImagePath);

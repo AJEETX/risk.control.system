@@ -24,7 +24,7 @@ namespace risk.control.system.Seeds
             var extension = Path.GetExtension(agentImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(agentImage, extension, vendor.Email, "user");
 
-            var pincode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.Code == pinCode);
+            var pincode = await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(c => c.Code == pinCode);
             var address = addressLine + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
             var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
             var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;

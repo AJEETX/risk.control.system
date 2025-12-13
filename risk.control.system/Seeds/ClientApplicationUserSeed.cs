@@ -16,8 +16,8 @@ namespace risk.control.system.Seeds
             UserManager<ClientCompanyApplicationUser> userManager,
             ClientCompany clientCompany, IFileStorageService fileStorageService)
         {
-            var company = context.ClientCompany.FirstOrDefault(c => c.Email == clientCompany.Email);
-            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(p => p.PinCodeId == clientCompany.PinCodeId);
+            var company =await context.ClientCompany.FirstOrDefaultAsync(c => c.Email == clientCompany.Email);
+            var pinCode =await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == clientCompany.PinCodeId);
 
             //Seed client admin
             await CompanyAdminSeed.Seed(context, webHostEnvironment, userManager, clientCompany, company.Email, pinCode, fileStorageService);

@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text.RegularExpressions;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -51,7 +52,7 @@ namespace risk.control.system.Controllers
                 .AsQueryable();
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!user.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
@@ -162,11 +163,11 @@ namespace risk.control.system.Controllers
 
         // GET: District/Create
         [Breadcrumb("Add New", FromAction = "Profile")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
             var district = new District { IsUpdated = !user.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
             return View(district);
@@ -194,7 +195,8 @@ namespace risk.control.system.Controllers
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 district.Name = textInfo.ToTitleCase(district.Name.ToLower());
-
+                district.Name = WebUtility.HtmlEncode((district.Name));
+                district.Code = WebUtility.HtmlEncode(district.Code?.ToUpper());
                 district.Updated = DateTime.Now;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 district.CountryId = district.SelectedCountryId;
@@ -250,8 +252,8 @@ namespace risk.control.system.Controllers
                 }
                 var existingdistrict = await _context.District.FindAsync(id);
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                existingdistrict.Name = textInfo.ToTitleCase(district.Name.ToLower());
-                existingdistrict.Code = district.Code;
+                existingdistrict.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(district.Name.ToLower()));
+                existingdistrict.Code = WebUtility.HtmlEncode(district.Code);
                 existingdistrict.CountryId = district.SelectedCountryId;
                 existingdistrict.Updated = DateTime.Now;
                 existingdistrict.UpdatedBy = HttpContext.User?.Identity?.Name;

@@ -36,28 +36,28 @@
                                 }
                             </div>
                             <label for="ProfileImage" class="control-label">Profile Photo <i class="fa fa-asterisk asterik-style"></i></label>
-                            <input asp-for="ProfileImage" class="form-control document-image-input" type="file" id="editImageInput" data-preview-id="editProfileImage" title="Profile Image" />
+                            <input asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="editImageInput" data-preview-id="editProfileImage" title="Upload Profile Image" />
                         </div>
 
                         <!-- Name Sections (First & Last) -->
                         <div class="form-group">
-                            <label for="FirstName" class="input-group-label" for="FirstName">First Name:</label>
+                            <label class="input-group-label" for="FirstName">First Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20" />
+                                <input id="FirstName" type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20" />
                                 <span asp-validation-for="FirstName" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="FirstName" class="input-group-label" for="LastName">Last Name:</label>
+                            <label class="input-group-label" for="LastName">Last Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
+                                <input id="LastName" type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
                                 <span asp-validation-for="LastName" class="text-danger"></span>
                             </div>
                         </div>
@@ -80,24 +80,24 @@
                     <div class="col-md-6">
                         <!-- Email Section -->
                         <div class="form-group">
-                            <label for="Email" class="input-group-label" for="Email">Email Address:</label>
+                            <label class="input-group-label" for="Email">Email Address:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-at"></i><i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input readonly asp-for="Email" class="form-control readonly-input" />
+                                <input id="Email" readonly asp-for="Email" class="form-control readonly-input" />
                             </div>
                         </div>
 
 
                         <!-- Role Section -->
                         <div class="form-group">
-                            <label for="UserRole" class="input-group-label" for="UserRole">Role:</label>
+                            <label class="input-group-label" for="UserRole">Role:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input readonly asp-for="UserRole" class="form-control readonly-input" />
+                                <input id="UserRole" readonly asp-for="UserRole" class="form-control readonly-input" />
                             </div>
                         </div>
                         <partial name="_Address" model="@Model" />
@@ -106,9 +106,9 @@
                             <label class="input-group-label" for="Addressline"> Address:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" required />
+                                <input id="Addressline" type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" required />
                             </div>
                         </div>
                         @* <div class="form-group">
@@ -147,9 +147,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/agency/agency-edit-user-profile.js">
-
-    </script>
+    <script src="~/js/agency/agency-edit-user-profile.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
 }

@@ -14,16 +14,14 @@ namespace risk.control.system.Services
         Task<object> GetAuto(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
         Task<object> GetActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
         Task<object> GetManagerActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
-        InvestigationCreateModel Create(string currentUserEmail);
-        CreateCaseViewModel AddCasePolicy(string userEmail);
-        Task<InvestigationTask> CreatePolicy(string userEmail, InvestigationTask claimsInvestigation);
+        Task<InvestigationCreateModel> Create(string currentUserEmail);
+        Task<CreateCaseViewModel> AddCasePolicy(string userEmail);
         Task<InvestigationTask> CreatePolicy(string userEmail, CreateCaseViewModel claimsInvestigation);
-        Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation);
         Task<InvestigationTask> EditPolicy(string userEmail, EditPolicyDto dto);
-        Task<ClientCompany> CreateCustomer(string userEmail, CustomerDetail customerDetail);
-        Task<ClientCompany> EditCustomer(string userEmail, CustomerDetail customerDetail);
-        Task<ClientCompany> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary);
-        Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary);
+        Task<bool> CreateCustomer(string userEmail, CustomerDetail customerDetail);
+        Task<bool> EditCustomer(string userEmail, CustomerDetail customerDetail);
+        Task<bool> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary);
+        Task<bool> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary);
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
@@ -60,9 +58,9 @@ namespace risk.control.system.Services
             this.customApiCLient = customApiCLient;
         }
 
-        public InvestigationCreateModel Create(string currentUserEmail)
+        public async Task<InvestigationCreateModel> Create(string currentUserEmail)
         {
-            var companyUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+            var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             var claim = new InvestigationTask
             {
                 ClientCompany = companyUser.ClientCompany
@@ -93,119 +91,60 @@ namespace risk.control.system.Services
             };
             return model;
         }
-        public CreateCaseViewModel AddCasePolicy(string userEmail)
+        public async Task<CreateCaseViewModel> AddCasePolicy(string userEmail)
         {
-            var contractNumber = numberService.GetNumberSequence("PX");
+            var contractNumber = await numberService.GetNumberSequence("PX");
+            var caseEnabler = await context.CaseEnabler.FirstOrDefaultAsync();
+            var costCentre = await context.CostCentre.FirstOrDefaultAsync();
+            var service = await context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == InsuranceType.CLAIM);
             var policy = new PolicyDetail
             {
+                ContractNumber = contractNumber,
                 InsuranceType = InsuranceType.CLAIM,
-                CaseEnablerId = context.CaseEnabler.FirstOrDefault().CaseEnablerId,
-                CauseOfLoss = "LOST IN ACCIDENT",
-                ContractIssueDate = DateTime.Now.AddDays(-10),
-                CostCentreId = context.CostCentre.FirstOrDefault().CostCentreId,
-                DateOfIncident = DateTime.Now.AddDays(-3),
-                InvestigationServiceTypeId = context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == InsuranceType.CLAIM).InvestigationServiceTypeId,
-                Comments = "SOMETHING FISHY",
+                InvestigationServiceTypeId = service.InvestigationServiceTypeId,
+                CaseEnablerId = caseEnabler.CaseEnablerId,
                 SumAssuredValue = new Random().Next(10000, 99999),
-                ContractNumber = contractNumber
+                ContractIssueDate = DateTime.Now.AddDays(-10),
+                DateOfIncident = DateTime.Now.AddDays(-3),
+                CauseOfLoss = "LOST IN ACCIDENT",
+                CostCentreId = costCentre.CostCentreId
             };
             return new CreateCaseViewModel
             {
                 PolicyDetail = new PolicyDetailDto
                 {
+                    ContractNumber = policy.ContractNumber,
                     InsuranceType = policy.InsuranceType,
-                    CaseEnablerId = policy.CaseEnablerId,
-                    CauseOfLoss = policy.CauseOfLoss,
-                    ContractIssueDate = policy.ContractIssueDate,
-                    CostCentreId = policy.CostCentreId,
-                    DateOfIncident = policy.DateOfIncident,
                     InvestigationServiceTypeId = policy.InvestigationServiceTypeId,
-                    Comments = policy.Comments,
+                    CaseEnablerId = policy.CaseEnablerId,
                     SumAssuredValue = policy.SumAssuredValue,
-                    ContractNumber = policy.ContractNumber
+                    ContractIssueDate = policy.ContractIssueDate,
+                    DateOfIncident = policy.DateOfIncident,
+                    CauseOfLoss = policy.CauseOfLoss,
+                    CostCentreId = policy.CostCentreId,
                 }
             };
-
-            //var model = new InvestigationTask
-            //{
-            //    PolicyDetail = new PolicyDetail
-            //    {
-            //        InsuranceType = InsuranceType.CLAIM,
-            //        CaseEnablerId = context.CaseEnabler.FirstOrDefault().CaseEnablerId,
-            //        CauseOfLoss = "LOST IN ACCIDENT",
-            //        ContractIssueDate = DateTime.Now.AddDays(-10),
-            //        CostCentreId = context.CostCentre.FirstOrDefault().CostCentreId,
-            //        DateOfIncident = DateTime.Now.AddDays(-3),
-            //        InvestigationServiceTypeId = context.InvestigationServiceType.FirstOrDefault(i => i.InsuranceType == InsuranceType.CLAIM).InvestigationServiceTypeId,
-            //        Comments = "SOMETHING FISHY",
-            //        SumAssuredValue = new Random().Next(10000, 99999),
-            //        ContractNumber = contractNumber
-            //    },
-            //    Status = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR
-            //};
-            //return model;
-        }
-        public async Task<InvestigationTask> CreatePolicy(string userEmail, InvestigationTask claimsInvestigation)
-        {
-            try
-            {
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-
-                var (fileName, relativePath) = await fileStorageService.SaveAsync(claimsInvestigation.PolicyDetail.Document, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
-
-                claimsInvestigation.PolicyDetail.DocumentPath = relativePath;
-                claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
-
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
-
-                claimsInvestigation.IsNew = true;
-                claimsInvestigation.CreatedUser = userEmail;
-                claimsInvestigation.CaseOwner = userEmail;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.ORIGIN = ORIGIN.USER;
-                claimsInvestigation.UpdatedBy = userEmail;
-                claimsInvestigation.Status = CONSTANTS.CASE_STATUS.INITIATED;
-                claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR;
-                claimsInvestigation.CreatorSla = currentUser.ClientCompany.CreatorSla;
-                claimsInvestigation.ClientCompany = currentUser.ClientCompany;
-                claimsInvestigation.ClientCompanyId = currentUser.ClientCompanyId;
-                claimsInvestigation.ReportTemplate = reportTemplate;
-                claimsInvestigation.ReportTemplateId = reportTemplate.Id;
-                var aaddedClaimId = context.Investigations.Add(claimsInvestigation);
-                numberService.SaveNumberSequence("PX");
-                var saved = await context.SaveChangesAsync() > 0;
-
-                await timelineService.UpdateTaskStatus(claimsInvestigation.Id, userEmail);
-
-                return saved ? claimsInvestigation : null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return null!;
-            }
         }
         public async Task<InvestigationTask> CreatePolicy(string userEmail, CreateCaseViewModel model)
         {
             try
             {
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetail.ContractNumber);
                 var claimsInvestigation = new InvestigationTask
                 {
                     PolicyDetail = new PolicyDetail
                     {
+                        ContractNumber = model.PolicyDetail.ContractNumber,
                         InsuranceType = model.PolicyDetail.InsuranceType,
-                        CaseEnablerId = model.PolicyDetail.CaseEnablerId,
-                        CauseOfLoss = model.PolicyDetail.CauseOfLoss,
-                        ContractIssueDate = model.PolicyDetail.ContractIssueDate,
-                        CostCentreId = model.PolicyDetail.CostCentreId,
-                        DateOfIncident = model.PolicyDetail.DateOfIncident,
                         InvestigationServiceTypeId = model.PolicyDetail.InvestigationServiceTypeId,
-                        Comments = model.PolicyDetail.Comments,
+                        CaseEnablerId = model.PolicyDetail.CaseEnablerId,
                         SumAssuredValue = model.PolicyDetail.SumAssuredValue,
-                        ContractNumber = model.PolicyDetail.ContractNumber
+                        ContractIssueDate = model.PolicyDetail.ContractIssueDate,
+                        DateOfIncident = model.PolicyDetail.DateOfIncident,
+                        CauseOfLoss = model.PolicyDetail.CauseOfLoss,
+                        CostCentreId = model.PolicyDetail.CostCentreId,
                     }
                 };
 
@@ -228,56 +167,12 @@ namespace risk.control.system.Services
                 claimsInvestigation.ReportTemplate = reportTemplate;
                 claimsInvestigation.ReportTemplateId = reportTemplate.Id;
                 var aaddedClaimId = context.Investigations.Add(claimsInvestigation);
-                numberService.SaveNumberSequence("PX");
+                await numberService.SaveNumberSequence("PX");
                 var saved = await context.SaveChangesAsync() > 0;
 
                 await timelineService.UpdateTaskStatus(claimsInvestigation.Id, userEmail);
 
                 return saved ? claimsInvestigation : null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return null!;
-            }
-        }
-        public async Task<InvestigationTask> EditPolicy(string userEmail, InvestigationTask claimsInvestigation)
-        {
-            try
-            {
-                var existingPolicy = await context.Investigations
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.ClientCompany)
-                        .FirstOrDefaultAsync(c => c.Id == claimsInvestigation.Id);
-                existingPolicy.IsNew = true;
-                existingPolicy.PolicyDetail.ContractIssueDate = claimsInvestigation.PolicyDetail.ContractIssueDate;
-                existingPolicy.PolicyDetail.InvestigationServiceTypeId = claimsInvestigation.PolicyDetail.InvestigationServiceTypeId;
-                existingPolicy.PolicyDetail.CostCentreId = claimsInvestigation.PolicyDetail.CostCentreId;
-                existingPolicy.PolicyDetail.CaseEnablerId = claimsInvestigation.PolicyDetail.CaseEnablerId;
-                existingPolicy.PolicyDetail.DateOfIncident = claimsInvestigation.PolicyDetail.DateOfIncident;
-                existingPolicy.PolicyDetail.ContractNumber = claimsInvestigation.PolicyDetail.ContractNumber;
-                existingPolicy.PolicyDetail.SumAssuredValue = claimsInvestigation.PolicyDetail.SumAssuredValue;
-                existingPolicy.PolicyDetail.CauseOfLoss = claimsInvestigation.PolicyDetail.CauseOfLoss;
-                existingPolicy.Updated = DateTime.Now;
-                existingPolicy.UpdatedBy = userEmail;
-                existingPolicy.ORIGIN = ORIGIN.USER;
-                existingPolicy.PolicyDetail.InsuranceType = claimsInvestigation.PolicyDetail.InsuranceType;
-                if (claimsInvestigation.PolicyDetail.Document is not null)
-                {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(claimsInvestigation.PolicyDetail.Document, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
-                    existingPolicy.PolicyDetail.DocumentPath = relativePath;
-                    existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
-                }
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, existingPolicy.PolicyDetail.InsuranceType.Value);
-                existingPolicy.ReportTemplate = reportTemplate;
-                existingPolicy.ReportTemplateId = reportTemplate.Id;
-                context.Investigations.Update(existingPolicy);
-
-                var saved = await context.SaveChangesAsync() > 0;
-
-                return saved ? existingPolicy : null;
-
             }
             catch (Exception ex)
             {
@@ -294,19 +189,20 @@ namespace risk.control.system.Services
                     .Include(c => c.ClientCompany)
                         .FirstOrDefaultAsync(c => c.Id == dto.Id);
 
-                existingPolicy.IsNew = true;
-                existingPolicy.PolicyDetail.ContractIssueDate = dto.PolicyDetail.ContractIssueDate;
-                existingPolicy.PolicyDetail.InvestigationServiceTypeId = dto.PolicyDetail.InvestigationServiceTypeId;
-                existingPolicy.PolicyDetail.CostCentreId = dto.PolicyDetail.CostCentreId;
-                existingPolicy.PolicyDetail.CaseEnablerId = dto.PolicyDetail.CaseEnablerId;
-                existingPolicy.PolicyDetail.DateOfIncident = dto.PolicyDetail.DateOfIncident;
                 existingPolicy.PolicyDetail.ContractNumber = dto.PolicyDetail.ContractNumber;
+                existingPolicy.PolicyDetail.InsuranceType = dto.PolicyDetail.InsuranceType;
+                existingPolicy.PolicyDetail.InvestigationServiceTypeId = dto.PolicyDetail.InvestigationServiceTypeId;
+                existingPolicy.PolicyDetail.CaseEnablerId = dto.PolicyDetail.CaseEnablerId;
                 existingPolicy.PolicyDetail.SumAssuredValue = dto.PolicyDetail.SumAssuredValue;
+                existingPolicy.PolicyDetail.ContractIssueDate = dto.PolicyDetail.ContractIssueDate;
+                existingPolicy.PolicyDetail.DateOfIncident = dto.PolicyDetail.DateOfIncident;
                 existingPolicy.PolicyDetail.CauseOfLoss = dto.PolicyDetail.CauseOfLoss;
+                existingPolicy.PolicyDetail.CostCentreId = dto.PolicyDetail.CostCentreId;
+
+                existingPolicy.IsNew = true;
                 existingPolicy.Updated = DateTime.Now;
                 existingPolicy.UpdatedBy = userEmail;
                 existingPolicy.ORIGIN = ORIGIN.USER;
-                existingPolicy.PolicyDetail.InsuranceType = dto.PolicyDetail.InsuranceType;
                 if (dto.Document is not null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(dto.Document, "Case", dto.PolicyDetail.ContractNumber);
@@ -314,7 +210,7 @@ namespace risk.control.system.Services
                     existingPolicy.PolicyDetail.DocumentPath = relativePath;
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
                 }
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, existingPolicy.PolicyDetail.InsuranceType.Value);
                 existingPolicy.ReportTemplate = reportTemplate;
                 existingPolicy.ReportTemplateId = reportTemplate.Id;
@@ -332,14 +228,14 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<ClientCompany> CreateCustomer(string userEmail, CustomerDetail customerDetail)
+        public async Task<bool> CreateCustomer(string userEmail, CustomerDetail customerDetail)
         {
             try
             {
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                    .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
 
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (customerDetail?.ProfileImage is not null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
@@ -357,11 +253,11 @@ namespace risk.control.system.Services
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
                 customerDetail.PinCodeId = customerDetail.SelectedPincodeId;
 
-                var pincode = context.PinCode
+                var pincode = await context.PinCode
                     .Include(p => p.District)
                     .Include(p => p.State)
                     .Include(p => p.Country)
-                    .FirstOrDefault(p => p.PinCodeId == customerDetail.PinCodeId);
+                    .FirstOrDefaultAsync(p => p.PinCodeId == customerDetail.PinCodeId);
 
                 var address = customerDetail.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
                 var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
@@ -376,24 +272,22 @@ namespace risk.control.system.Services
                 var addedClaim = context.CustomerDetail.Add(customerDetail);
 
                 context.Investigations.Update(claimsInvestigation);
-                var saved = await context.SaveChangesAsync() > 0;
-
-                return saved ? currentUser.ClientCompany : null;
+                return await context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return null;
+                return false;
             }
         }
-        public async Task<ClientCompany> EditCustomer(string userEmail, CustomerDetail customerDetail)
+        public async Task<bool> EditCustomer(string userEmail, CustomerDetail customerDetail)
         {
             try
             {
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
 
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 if (customerDetail?.ProfileImage is not null)
                 {
@@ -403,10 +297,7 @@ namespace risk.control.system.Services
                 }
                 else
                 {
-                    var existingCustomer = await context.CustomerDetail
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(c => c.InvestigationTaskId == customerDetail.InvestigationTaskId);
-                    //customerDetail.ProfilePicture ??= existingCustomer.ProfilePicture;
+                    var existingCustomer = await context.CustomerDetail.AsNoTracking().FirstOrDefaultAsync(c => c.InvestigationTaskId == customerDetail.InvestigationTaskId);
                     customerDetail.ImagePath = existingCustomer.ImagePath;
                 }
                 claimsInvestigation.IsNew = true;
@@ -420,11 +311,11 @@ namespace risk.control.system.Services
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
                 customerDetail.PinCodeId = customerDetail.SelectedPincodeId;
 
-                var pincode = context.PinCode
+                var pincode = await context.PinCode
                         .Include(p => p.District)
                         .Include(p => p.State)
                         .Include(p => p.Country)
-                        .FirstOrDefault(p => p.PinCodeId == customerDetail.PinCodeId);
+                        .FirstOrDefaultAsync(p => p.PinCodeId == customerDetail.PinCodeId);
 
                 var address = customerDetail.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
                 var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
@@ -439,22 +330,20 @@ namespace risk.control.system.Services
                 context.Entry(customerDetail).State = EntityState.Modified;
                 context.Investigations.Update(claimsInvestigation);
                 // Save changes to the database
-                var saved = await context.SaveChangesAsync() > 0;
-
-                return saved ? currentUser.ClientCompany : null;
+                return await context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 Console.WriteLine(ex.StackTrace);
-                return null;
+                return false;
             }
         }
-        public async Task<ClientCompany> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary)
+        public async Task<bool> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary)
         {
             try
             {
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == ClaimsInvestigationId);
@@ -479,11 +368,11 @@ namespace risk.control.system.Services
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
                 beneficiary.PinCodeId = beneficiary.SelectedPincodeId;
 
-                var pincode = context.PinCode
+                var pincode = await context.PinCode
                     .Include(p => p.District)
                         .Include(p => p.State)
                         .Include(p => p.Country)
-                    .FirstOrDefault(p => p.PinCodeId == beneficiary.PinCodeId);
+                    .FirstOrDefaultAsync(p => p.PinCodeId == beneficiary.PinCodeId);
 
                 var address = beneficiary.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
@@ -496,24 +385,22 @@ namespace risk.control.system.Services
                 context.BeneficiaryDetail.Add(beneficiary);
 
                 context.Investigations.Update(claimsInvestigation);
-                var saved = await context.SaveChangesAsync() > 0;
-
-                return saved ? currentUser.ClientCompany : null;
+                return await context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return null;
+                return false;
             }
         }
-        public async Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary)
+        public async Task<bool> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary)
         {
             try
             {
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
 
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (beneficiary?.ProfileImage != null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
@@ -522,7 +409,7 @@ namespace risk.control.system.Services
                 }
                 else
                 {
-                    var existingBeneficiary = context.BeneficiaryDetail.AsNoTracking().Where(c => c.BeneficiaryDetailId == beneficiaryDetailId).FirstOrDefault();
+                    var existingBeneficiary = await context.BeneficiaryDetail.AsNoTracking().Where(c => c.BeneficiaryDetailId == beneficiaryDetailId).FirstOrDefaultAsync();
                     if (existingBeneficiary.ImagePath != null)
                     {
                         beneficiary.ImagePath = existingBeneficiary.ImagePath;
@@ -542,11 +429,11 @@ namespace risk.control.system.Services
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
                 beneficiary.PinCodeId = beneficiary.SelectedPincodeId;
 
-                var pincode = context.PinCode
+                var pincode = await context.PinCode
                     .Include(p => p.District)
                         .Include(p => p.State)
                         .Include(p => p.Country)
-                    .FirstOrDefault(p => p.PinCodeId == beneficiary.PinCodeId);
+                    .FirstOrDefaultAsync(p => p.PinCodeId == beneficiary.PinCodeId);
 
                 var address = beneficiary.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
@@ -560,15 +447,12 @@ namespace risk.control.system.Services
                 context.BeneficiaryDetail.Attach(beneficiary);
                 context.Entry(beneficiary).State = EntityState.Modified;
                 context.Investigations.Update(claimsInvestigation);
-                var saved = await context.SaveChangesAsync() > 0;
-
-                return saved ? currentUser.ClientCompany : null;
-
+                return await context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return null;
+                return false;
             }
         }
         public async Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id)
@@ -615,7 +499,7 @@ namespace risk.control.system.Services
                 var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
                 claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
-            var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var companyUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
             var timeTaken = DateTime.Now - claim.Created;
@@ -687,7 +571,7 @@ namespace risk.control.system.Services
                 var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
                 claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
-            var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var companyUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
             var timeTaken = endTIme - claim.Created;
@@ -698,7 +582,7 @@ namespace risk.control.system.Services
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == claim.InvestigationReportId);
             var templates = await context.ReportTemplates
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
@@ -714,8 +598,8 @@ namespace risk.control.system.Services
 
             claim.InvestigationReport.ReportTemplate = templates;
 
-            var tracker = context.PdfDownloadTracker
-                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == currentUserEmail);
+            var tracker = await context.PdfDownloadTracker
+                          .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
             bool canDownload = true;
             if (tracker != null)
             {
@@ -776,7 +660,7 @@ namespace risk.control.system.Services
             claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
             var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
             claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-            var companyUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var companyUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
             var timeTaken = DateTime.Now - claim.Created;
@@ -787,7 +671,7 @@ namespace risk.control.system.Services
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == claim.InvestigationReportId);
             var templates = await context.ReportTemplates
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
@@ -803,8 +687,8 @@ namespace risk.control.system.Services
 
             claim.InvestigationReport.ReportTemplate = templates;
 
-            var tracker = context.PdfDownloadTracker
-                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == currentUserEmail);
+            var tracker = await context.PdfDownloadTracker
+                          .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
             bool canDownload = true;
             if (tracker != null)
             {
@@ -888,7 +772,7 @@ namespace risk.control.system.Services
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == claim.InvestigationReportId);
             var templates = await context.ReportTemplates
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)

@@ -35,10 +35,9 @@ namespace risk.control.system.Services
 
         public async Task<VendorApplicationUser> GetAgent(string mobile, bool sendSMS = false)
         {
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+            var agentRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
-            var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
-                u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
+            var user2Onboard = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
 
             var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
             if (isAgent)
@@ -48,9 +47,9 @@ namespace risk.control.system.Services
 
         public async Task<VendorApplicationUser> GetPin(string agentEmail, string portal_base_url)
         {
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+            var agentRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
-            var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == agentEmail);
+            var user2Onboard = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == agentEmail);
 
             var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
             if (isAgent)
@@ -59,7 +58,7 @@ namespace risk.control.system.Services
         }
         public async Task<VendorApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false)
         {
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+            var agentRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
             var user2Onboards = _context.VendorApplicationUser.Include(c => c.Country).Where(
                 u => u.Country.ISDCode + u.PhoneNumber.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));

@@ -222,7 +222,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.isQueryCase) {
-                        buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
+                        buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a>'
                     }
                     else {
                         buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>'
@@ -386,7 +386,7 @@ function showenquiry(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     
-    $('a#details' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> ENQUIRY");
+    $('a#details' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Enquiry");
     disableAllInteractiveElements();
 
     var article = document.getElementById("article");

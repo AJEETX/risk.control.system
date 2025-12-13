@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Net;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -98,8 +100,8 @@ namespace risk.control.system.Controllers
             try
             {
 
-                costCentre.Code = costCentre.Code?.ToUpper();
-
+                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper());
+                costCentre.Name = WebUtility.HtmlEncode(costCentre.Name);
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre
                     .AnyAsync(x => x.Code == costCentre.Code);
@@ -170,7 +172,8 @@ namespace risk.control.system.Controllers
             try
             {
                 // Uppercase normalization
-                costCentre.Code = costCentre.Code?.ToUpper();
+                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper());
+                costCentre.Name = WebUtility.HtmlEncode(costCentre.Name);
 
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre.AnyAsync(x => x.Code == costCentre.Code && x.CostCentreId != id);
