@@ -1,6 +1,7 @@
-using System.Net;
+﻿using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading.RateLimiting;
 
 using Amazon;
 using Amazon.Rekognition;
@@ -95,18 +96,47 @@ builder.Logging.AddProvider(new CsvLoggerProvider(logDirectory, LogLevel.Error))
 builder.Services.Configure<FormOptions>(x =>
 {
     x.MultipartBodyLengthLimit = 20 * 1024 * 1024; // 20 MB
-    //x.ValueLengthLimit = 20000000; //not recommended value
-    //x.MemoryBufferThreshold = 20000000;
 });
-//builder.Services.AddRateLimiter(_ => _
-//    .AddFixedWindowLimiter(policyName: "fixed", options =>
-//    {
-//        options.PermitLimit = 100;
-//        options.Window = TimeSpan.FromSeconds(1);
-//        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-//        options.QueueLimit = 10;
-//    }));
-// forward headers configuration for reverse proxy
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+
+        await context.HttpContext.Response.WriteAsync(
+            """
+            {
+                "error": "Too many requests. Please try again later."
+            }
+            """,
+            token);
+    };
+
+    options.AddPolicy("PerUserOrIP", context =>
+    {
+        // 1️⃣ Try authenticated user
+        var userId = context.User?.Identity?.IsAuthenticated == true
+            ? context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            : null;
+
+        // 2️⃣ Fallback to IP
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        var partitionKey = userId ?? ip;
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: partitionKey,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 50,               // ⬅ max requests
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+});
+
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -180,7 +210,7 @@ builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler
 var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
 {
     Credentials = new BasicAWSCredentials(Environment.GetEnvironmentVariable("aws_id"), Environment.GetEnvironmentVariable("aws_secret")),
-    Region = Amazon.RegionEndpoint.APSoutheast2 // Specify the region as needed,
+    Region = RegionEndpoint.APSoutheast2 // Specify the region as needed,
 };
 builder.Services.AddDefaultAWSOptions(awsOptions);
 // Register AWS Transcribe Service with the configured options
@@ -213,10 +243,6 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopCenter;
 });
 
-//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//                        options.UseSqlServer(connectionString));
-
 var connectionString = "Data Source=" + Environment.GetEnvironmentVariable("COUNTRY") + "_" + builder.Configuration.GetConnectionString("Database");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                         options.UseSqlite(connectionString,
@@ -230,7 +256,6 @@ builder.Services.AddHangfireServer(options =>
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
     options.CheckConsentNeeded = context => false;
     options.MinimumSameSitePolicy = SameSiteMode.Strict;
 });
@@ -446,10 +471,11 @@ try
         }
         await next();
     });
-
+    app.UseRateLimiter();
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Dashboard}/{action=Index}/{id?}");
+        pattern: "{controller=Dashboard}/{action=Index}/{id?}")
+        .RequireRateLimiting("PerUserOrIP");
 
     //RecurringJob.AddOrUpdate<IHangfireJobService>(
     //    "clean-failed-jobs",

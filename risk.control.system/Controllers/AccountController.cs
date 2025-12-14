@@ -497,43 +497,52 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Forgot(LoginViewModel input)
+        public async Task<IActionResult> Forgot(ForgotPasswordViewModel input)
         {
-            string message = "Incorrect details. Try Again";
-            string imagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
-            byte[] image = System.IO.File.ReadAllBytes(imagePath);
-            var flagPath = $"/img/no-map.jpeg";
-            var model = new Models.ViewModel.ForgotPassword
+            ForgotPassword model = null;
+
+            if (!ModelState.IsValid)
             {
-                Message = message,
-                Reset = false,
-                Flag = flagPath,
-                ProfilePicture = image,
-                Email = input.Email
-            };
-            var user = await _userManager.FindByEmailAsync(input.Email);
-            if (user == null)
-            {
+                model = await CreateDefaultForgotPasswordModel(input?.Email);
                 return View(model);
             }
-            //var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var smsResult = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
 
-            //// Encode the token to make it URL-safe
-            //var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-
-            //// Generate the reset link
-            //var resetLink = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, token = encodedToken }, Request.Scheme);
-
-            var smsSent2User = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
-            if (smsSent2User != null)
+            if (smsResult == null)
             {
-                model.Message = $"{input.CountryId} (0) {input.Mobile}\n";
-                model.Flag = $"/flags/{smsSent2User.Country.Code}.png";
-                model.ProfilePicture = smsSent2User.ProfilePicture;
-                model.Reset = true;
+                model = await CreateDefaultForgotPasswordModel(input?.Email);
+                return View(model);
+            }
+            var successModel = new ForgotPassword
+            {
+                Email = input.Email,
+                Message = $"{input.CountryId} (0) {input.Mobile}",
+                Flag = $"/flags/{smsResult.CountryCode}.png",
+                ProfilePicture = smsResult.ProfilePicture,
+                Reset = true
+            };
+
+            return View(successModel);
+        }
+        private async Task<ForgotPassword> CreateDefaultForgotPasswordModel(string email)
+        {
+            var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
+
+            byte[] profilePicture = Array.Empty<byte>();
+
+            if (System.IO.File.Exists(imagePath))
+            {
+                profilePicture = await System.IO.File.ReadAllBytesAsync(imagePath);
             }
 
-            return View(model);
+            return new ForgotPassword
+            {
+                Message = "Incorrect details. Try Again",
+                Reset = false,
+                Flag = "/img/no-map.jpeg",
+                ProfilePicture = profilePicture,
+                Email = email
+            };
         }
 
         [HttpGet]

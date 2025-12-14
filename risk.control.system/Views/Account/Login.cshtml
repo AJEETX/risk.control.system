@@ -57,7 +57,11 @@
             <div class="form-content">
 
                 <partial name="_LoginPartial" model="Model" />
-                <partial name="_ResetPartial" model="Model" />
+
+                @{
+                    var forgotPassword = new ForgotPasswordViewModel();
+                }
+                <partial name="_ResetPartial" model="@forgotPassword" />
             </div>
         </div>
         

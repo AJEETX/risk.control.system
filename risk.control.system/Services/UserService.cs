@@ -70,7 +70,7 @@ namespace risk.control.system.Services
                 .OrderBy(u => u.IsUpdated)
                 .ThenBy(u => u.Updated)
                 .AsQueryable();
-            var result =await dashboardService.CalculateAgentCaseStatus(userEmail);
+            var result = await dashboardService.CalculateAgentCaseStatus(userEmail);
 
             foreach (var user in users)
             {
@@ -451,7 +451,8 @@ namespace risk.control.system.Services
                     Email = $"<a href='/CompanyUser/Edit?userId={user.Id}'>{user.Email}</a>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : user.ProfilePictureUrl,
+                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
                     Active = user.Active,
                     Addressline = user.Addressline + ", " + user.District.Name,
                     District = user.District.Name,

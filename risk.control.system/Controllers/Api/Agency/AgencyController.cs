@@ -28,17 +28,20 @@ namespace risk.control.system.Controllers.Api.Agency
         private readonly IDashboardService dashboardService;
         private readonly IFeatureManager featureManager;
         private readonly IUserService userService;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ICustomApiCLient customApiCLient;
 
         public AgencyController(ApplicationDbContext context,
             IFeatureManager featureManager,
             IUserService userService,
+            IWebHostEnvironment webHostEnvironment,
             ICustomApiCLient customApiCLient,
             IDashboardService dashboardService)
         {
             this.dashboardService = dashboardService;
             this.featureManager = featureManager;
             this.userService = userService;
+            this.webHostEnvironment = webHostEnvironment;
             this.customApiCLient = customApiCLient;
             _context = context;
             noUserImagefilePath = "/img/no-user.png";
@@ -71,7 +74,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
-                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)),
+                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, u.ProfilePictureUrl)))),
                     Active = u.Active,
                     Addressline = u.Addressline + ", " + u.District.Name,
                     District = u.District.Name,
@@ -109,7 +113,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 new
                 {
                     Id = u.VendorId,
-                    Document = u.DocumentImage == null ? noDataImagefilePath : $"data:image/*;base64,{Convert.ToBase64String(u.DocumentImage)}",
+                    Document = u.DocumentImage == null ? noDataImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, u.DocumentUrl)))),
                     Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
@@ -146,7 +151,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 new
                 {
                     Id = u.VendorId,
-                    Document = string.IsNullOrEmpty(u.DocumentUrl) ? noDataImagefilePath : u.DocumentUrl,
+                    Document = string.IsNullOrEmpty(u.DocumentUrl) ? noDataImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, u.DocumentUrl)))),
                     Domain = "<a href=''>" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
@@ -319,7 +325,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Id = agent.Id,
                     Photo = agent.ProfilePicture == null
                         ? noUserImagefilePath
-                        : $"data:image/*;base64,{Convert.ToBase64String(agent.ProfilePicture)}",
+                        : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(webHostEnvironment.ContentRootPath, agent.ProfilePictureUrl)))),
                     Email = agent.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(agent.MobileUId)
                         ? $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a>"
                         : $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a><span title='Onboarding incomplete !!!' data-toggle='tooltip'><i class='fa fa-asterisk asterik-style'></i></span>",

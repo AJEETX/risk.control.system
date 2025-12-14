@@ -70,6 +70,11 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Create));
             }
+            if (!ModelState.IsValid)
+            {
+                notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Create));
+            }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
             clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();

@@ -31,6 +31,9 @@
                             <input type="hidden" asp-for="AddressLatitude" />
                             <input type="hidden" asp-for="AddressLongitude" />
                             <input type="hidden" asp-for="AddressMapLocation" />
+                            <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+                            <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+                            <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="row">
                                 <div class="col-sm-6">
@@ -206,7 +209,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
+                                    @* <div class="form-group">
                                         <label class="input-group-label" for="CountryId" data-bs-toggle="tooltip" title="Registered Country"> Country:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -214,13 +217,12 @@
                                             </div>
                                             <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-bs-toggle="tooltip" title="Registered Country" tabindex="-1" />
                                             <span asp-validation-for="CountryId" class="text-danger"></span>
-                                            <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                             <div id="country-loading" class="loading-spinner">
                                                 <i class="fas fa-spinner fa-spin"></i>
                                             </div>
                                         </div>
                                     </div>
-
+ *@
                                     <div class="form-group">
                                         <label class="input-group-label" for="Addressline"> Address:</label>
                                         <div class="input-group mb-3">
