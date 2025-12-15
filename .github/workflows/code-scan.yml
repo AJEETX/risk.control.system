@@ -67,32 +67,42 @@ jobs:
       with:
           name: codacy-security-report
           path: results.sarif
+
     - name: Generate tabular report (Markdown)
       if: always()
       run: |
           echo "## 🔐 Codacy Security Scan Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [ ! -f results.sarif ]; then
-            echo "❌ No SARIF file found" >> $GITHUB_STEP_SUMMARY
-            exit 0
-          fi
+            if [ ! -f results.sarif ]; then
+              echo "❌ No SARIF file found" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
 
-          echo "| Severity | Rule | Message | File | Line |" >> $GITHUB_STEP_SUMMARY
-          echo "|----------|------|---------|------|------|" >> $GITHUB_STEP_SUMMARY
+            ISSUE_COUNT=$(jq '[.runs[]?.results // []][] | length' results.sarif)
 
-          jq -r '
-            .runs[].results[] |
-            [
-              (.level // "unknown"),
-              (.ruleId // "N/A"),
-              (.message.text // "N/A"),
-              (.locations[0].physicalLocation.artifactLocation.uri // "N/A"),
-              (.locations[0].physicalLocation.region.startLine // "N/A")
-            ] | @tsv
-          ' results.sarif | while IFS=$'\t' read -r severity rule msg file line; do
-            echo "| $severity | $rule | ${msg:0:80} | $file | $line |" >> $GITHUB_STEP_SUMMARY
-          done
+            if [ "$ISSUE_COUNT" -eq 0 ]; then
+              echo "✅ **No security issues found**" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+
+            echo "| Severity | Rule | Message | File | Line |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|------|---------|------|------|" >> $GITHUB_STEP_SUMMARY
+
+            jq -r '
+              .runs[]? |
+              (.results // [])[] |
+              [
+                (.level // "unknown"),
+                (.ruleId // "N/A"),
+                (.message.text // "N/A"),
+                (.locations[0].physicalLocation.artifactLocation.uri // "N/A"),
+                (.locations[0].physicalLocation.region.startLine // "N/A")
+              ] | @tsv
+            ' results.sarif | while IFS=$'\t' read -r severity rule msg file line; do
+              echo "| $severity | $rule | ${msg:0:80} | $file | $line |" >> $GITHUB_STEP_SUMMARY
+            done
+
 
   # ---------------------------------------------------
   # 2️⃣ Snyk Scan Job
