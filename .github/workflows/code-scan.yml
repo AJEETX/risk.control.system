@@ -4,7 +4,6 @@ on:
   workflow_call:
 
 permissions:
-  actions: read
   contents: read
   security-events: write
 
@@ -145,10 +144,6 @@ jobs:
     # Use the appropriate runner for building your source code. Ensure dev tools required to build your code are present and configured appropriately (MSBuild, Python, etc).
     name: Fortify Security Scan
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
 
     steps:
     # 1️⃣ Checkout source code
