@@ -52,7 +52,7 @@ jobs:
       env:
           CODACY_API_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}  
       run: |
-          codacy init --verbose
+          codacy init
 
     - name: Run Codacy analysis
       env:
