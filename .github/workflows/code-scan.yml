@@ -80,33 +80,36 @@ jobs:
               echo "❌ No SARIF file found" >> $GITHUB_STEP_SUMMARY
               exit 0
             fi
+            # Extract counts from SARIF file
             TOTAL=$(jq '[.runs[]?.results // []][] | length' results.sarif)
             ERRORS=$(jq '[.runs[]?.results // []][] | map(select(.level=="error")) | length' results.sarif)
             WARNS=$(jq '[.runs[]?.results // []][] | map(select(.level=="warning")) | length' results.sarif)
             NOTES=$(jq '[.runs[]?.results // []][] | map(select(.level=="note")) | length' results.sarif)
 
-            echo "### 📊 Codacy Security Summary" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-
-            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
-            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
-            echo "| Total Issues | $TOTAL |" >> $GITHUB_STEP_SUMMARY
-            echo "| 🛑 Critical / Error | $ERRORS |" >> $GITHUB_STEP_SUMMARY
-            echo "| ⚠️ Warning | $WARNS |" >> $GITHUB_STEP_SUMMARY
-            echo "| ℹ️ Note | $NOTES |" >> $GITHUB_STEP_SUMMARY
+            # Write table to GitHub Step Summary
+            {
+              echo "### 📊 Codacy Security Summary"
+              echo ""
+              echo "| Metric | Count |"
+              echo "|--------|-------|"
+              echo "| Total Issues | $TOTAL |"
+              echo "| 🛑 Critical / Error | $ERRORS |"
+              echo "| ⚠️ Warning | $WARNS |"
+              echo "| ℹ️ Note | $NOTES |"
+            } >> $GITHUB_STEP_SUMMARY
 
             if [ "$TOTAL" -eq 0 ]; then
               echo "✅ **No security issues found**" >> $GITHUB_STEP_SUMMARY
               exit 0
             fi
-
-            echo "### 🔎 Top $MAX_ROWS Issues" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔎 Top $MAX_ROWS Critical / Error Issues" >> $GITHUB_STEP_SUMMARY
             echo "| Severity | Rule | Message | File | Line |" >> $GITHUB_STEP_SUMMARY
             echo "|----------|------|---------|------|------|" >> $GITHUB_STEP_SUMMARY
 
             jq -r "
               .runs[]? |
               (.results // [])[] |
+              select(.level == \"error\") |
               [
                 (.level // \"unknown\"),
                 (.ruleId // \"N/A\"),
@@ -115,6 +118,7 @@ jobs:
                 (.locations[0].physicalLocation.region.startLine // \"N/A\")
               ] | @tsv
             " results.sarif | head -n $MAX_ROWS | while IFS=$'\t' read -r severity rule msg file line; do
+              # Limit message to 100 chars
               echo "| $severity | $rule | ${msg:0:100} | $file | $line |" >> $GITHUB_STEP_SUMMARY
             done
 
