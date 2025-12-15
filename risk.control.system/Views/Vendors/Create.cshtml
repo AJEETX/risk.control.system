@@ -23,10 +23,10 @@
                             <input asp-for="Email" id="emailAddress" class="form-control email-address remarks" type="text" required
                                    placeholder="domain name" maxlength="15" autocomplete="name" title="Enter unique domain name with minimum 5 character" data-bs-toggle="tooltip" />
                             <div class="input-group-append">
-                                <select id="domain" name="domain" asp-for="DomainName" class="form-control remarks" asp-items="Html.GetEnumSelectList<Domain>()">
+                                <select id="domain" name="domain" asp-for="DomainName" class="form-control remarks" asp-items="Html.GetEnumSelectList<Domain>()" title="domain" data-bs-toggle="tooltip">
                                 </select>
-                                <div class="input-group-append" data-bs-toggle="tooltip" title="Click to validate domain">
-                                    <button disabled id="check-domain" class="input-group-text disabled-btn validate-user">
+                                <div class="input-group-append">
+                                    <button disabled id="check-domain" class="input-group-text disabled-btn validate-user" data-bs-toggle="tooltip" title="Click to validate domain">
                                         <i class="far fa-question-circle"></i>
                                     </button>
                                     <span id="result"></span>

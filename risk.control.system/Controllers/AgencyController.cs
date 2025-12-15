@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text.RegularExpressions;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -26,6 +27,7 @@ namespace risk.control.system.Controllers
     public class AgencyController : Controller
     {
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private const string vallidDomainExpression = "^[a-zA-Z0-9.-]+$";
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly SignInManager<ApplicationUser> signInManager;
@@ -161,7 +163,7 @@ namespace risk.control.system.Controllers
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Please correct the errors");
-                    Load(model);
+                    await Load(model);
                     return View(model);
                 }
                 if (model.Document is not null)
@@ -170,7 +172,7 @@ namespace risk.control.system.Controllers
                     {
                         notifyService.Error($"Document image Size exceeds the max size: 5MB");
                         ModelState.AddModelError(nameof(model.Document), "File too large.");
-                        Load(model);
+                        await Load(model);
                         return View(model);
                     }
 
@@ -179,7 +181,7 @@ namespace risk.control.system.Controllers
                     {
                         notifyService.Error($"Invalid Document image type");
                         ModelState.AddModelError(nameof(model.Document), "Invalid file type.");
-                        Load(model);
+                        await Load(model);
                         return View(model);
                     }
 
@@ -187,7 +189,7 @@ namespace risk.control.system.Controllers
                     {
                         notifyService.Error($"Invalid Document Image content type");
                         ModelState.AddModelError(nameof(model.Document), "Invalid Document Image  content type.");
-                        Load(model);
+                        await Load(model);
                         return View(model);
                     }
 
@@ -195,7 +197,7 @@ namespace risk.control.system.Controllers
                     {
                         notifyService.Error($"Invalid or corrupted Document Image ");
                         ModelState.AddModelError(nameof(model.Document), "Invalid file content.");
-                        Load(model);
+                        await Load(model);
                         return View(model);
                     }
                 }
@@ -305,9 +307,13 @@ namespace risk.control.system.Controllers
                 if (!ModelState.IsValid || string.IsNullOrWhiteSpace(txn))
                 {
                     notifyService.Error($"Correct the error(s)");
-
                     await LoadModel(model);
-
+                    return View(model);
+                }
+                if (!Regex.IsMatch(emailSuffix, vallidDomainExpression))
+                {
+                    ModelState.AddModelError("", "Invalid domain address.");
+                    await LoadModel(model);
                     return View(model);
                 }
                 emailSuffix = WebUtility.HtmlEncode(emailSuffix);

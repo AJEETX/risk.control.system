@@ -146,7 +146,7 @@ function checkDomain() {
                 $('#domainName').val($('#domain').val());
                 var mailDomain = $('#domain').val();
                 $("#domainAddress").val(mailDomain);
-                $("#result").html("<span class='available' title='Available' data-toggle='tooltip'> <i class='fas fa-check'></i></span>");
+                $("#result").html("<span class='available' title='Available' data-bs-toggle='tooltip'> <i class='fas fa-check'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").removeClass('error-border');
                 $('#result').fadeIn(1000); // 1.5 seconds
@@ -155,7 +155,7 @@ function checkDomain() {
             else if (data == 1) {//domain exists
                 $("#domainAddress").val('');
                 $('#mailAddress').val('');
-                $("#result").html("<span class='unavailable' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
+                $("#result").html("<span class='unavailable' title='Domain exists' data-bs-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").addClass('error-border');
                 $('#result').fadeIn(1000); // 1.5 seconds
