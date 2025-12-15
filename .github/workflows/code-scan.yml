@@ -48,6 +48,11 @@ jobs:
             chmod +x "$BINARY"
             sudo mv "$BINARY" /usr/local/bin/codacy
 
+    - name: Initialize Codacy configuration
+      env:
+          CODACY_API_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}  
+      run: |
+          codacy init  --force --verbose
 
     - name: Run Codacy analysis
       env:
