@@ -80,18 +80,20 @@ jobs:
               echo "❌ No SARIF file found" >> $GITHUB_STEP_SUMMARY
               exit 0
             fi
-
             TOTAL=$(jq '[.runs[]?.results // []][] | length' results.sarif)
             ERRORS=$(jq '[.runs[]?.results // []][] | map(select(.level=="error")) | length' results.sarif)
             WARNS=$(jq '[.runs[]?.results // []][] | map(select(.level=="warning")) | length' results.sarif)
             NOTES=$(jq '[.runs[]?.results // []][] | map(select(.level=="note")) | length' results.sarif)
 
-            echo "### 📊 Summary" >> $GITHUB_STEP_SUMMARY
-            echo "- **Total Issues:** $TOTAL" >> $GITHUB_STEP_SUMMARY
-            echo "- 🛑 **Critical / Error:** $ERRORS" >> $GITHUB_STEP_SUMMARY
-            echo "- ⚠️ **Warning:** $WARNS" >> $GITHUB_STEP_SUMMARY
-            echo "- ℹ️ **Note:** $NOTES" >> $GITHUB_STEP_SUMMARY
+            echo "### 📊 Codacy Security Summary" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Total Issues | $TOTAL |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🛑 Critical / Error | $ERRORS |" >> $GITHUB_STEP_SUMMARY
+            echo "| ⚠️ Warning | $WARNS |" >> $GITHUB_STEP_SUMMARY
+            echo "| ℹ️ Note | $NOTES |" >> $GITHUB_STEP_SUMMARY
 
             if [ "$TOTAL" -eq 0 ]; then
               echo "✅ **No security issues found**" >> $GITHUB_STEP_SUMMARY
