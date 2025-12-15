@@ -107,22 +107,49 @@ jobs:
             echo "|----------|------|---------|------|------|" >> $GITHUB_STEP_SUMMARY
 
             jq -r "
-              .runs[]? |
-              (.results // [])[] |
-              select(.level == \"error\") |
               [
-                (.level // \"unknown\"),
-                (.ruleId // \"N/A\"),
-                (.message.text // \"N/A\" | gsub(\"\\n\"; \" \")),
-                (.locations[0].physicalLocation.artifactLocation.uri // \"N/A\"),
-                (.locations[0].physicalLocation.region.startLine // \"N/A\")
-              ] | @tsv
-            " results.sarif | head -n $MAX_ROWS | while IFS=$'\t' read -r severity rule msg file line; do
-              # Limit message to 100 chars
-              echo "| $severity | $rule | ${msg:0:100} | $file | $line |" >> $GITHUB_STEP_SUMMARY
-            done
+                .runs[]? |
+                (.results // [])[] |
+                select(.level == \"error\") |
 
-            echo "" >> $GITHUB_STEP_SUMMARY
+                # Extract file safely
+                . as \$r |
+                (\$r.locations[0].physicalLocation.artifactLocation.uri // \"\") as \$file |
+
+                # Include ONLY .cs files
+                select(\$file | ascii_downcase | endswith(\".cs\")) |
+
+                # Exclude folders
+                select(
+                  (\$file | ascii_downcase | contains(\"node_modules\") | not) and
+                  (\$file | ascii_downcase | contains(\"wwwroot\") | not)
+                ) |
+
+                {
+                  file: \$file,
+                  rule: (\$r.ruleId // \"N/A\"),
+                  message: (\$r.message.text // \"N/A\" | gsub(\"\\n\"; \" \")),
+                  line: (\$r.locations[0].physicalLocation.region.startLine // \"N/A\")
+                }
+              ]
+              | group_by(.file)
+              | map({
+                  file: .[0].file,
+                  count: length,
+                  issues: .
+                })
+              | sort_by(-.count)
+              | .[]
+              | \"### 📄 \\(.file) (❌ \\(.count) errors)\",
+                \"| Rule | Message | Line |\",
+                \"|------|---------|------|\",
+                (
+                  .issues[] |
+                  \"| \\(.rule) | \\(.message[0:100]) | \\(.line) |\"
+                ),
+                \"\"
+            " results.sarif >> \"$GITHUB_STEP_SUMMARY\"
+
             echo "📎 **Full report available as artifact:** \`codacy-security-report\`" >> $GITHUB_STEP_SUMMARY
 
 
