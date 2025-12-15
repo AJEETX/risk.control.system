@@ -25,10 +25,13 @@
                         form.submit();
                         var createForm = document.getElementById("edit-form");
                         if (createForm) {
-
-                            var nodes = createForm.getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            const formElements = createForm.getElementsByTagName("*");
+                            for (const element of formElements) {
+                                element.disabled = true;
+                                if (element.hasAttribute("readonly")) {
+                                    element.classList.remove("valid", "is-valid", "valid-border");
+                                    element.removeAttribute("aria-invalid");
+                                }
                             }
                         }
                     }

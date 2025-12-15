@@ -30,7 +30,7 @@ $(document).ready(function () {
         var imgPath = $(this)[0].value;
         var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
 
-        if (extn == "gif" || extn == "png" || extn == "jpg" || extn == "jpeg") {
+        if (extn == "png" || extn == "jpg" || extn == "jpeg") {
             if (typeof (FileReader) != "undefined") {
 
                 //loop for each file selected for uploaded.

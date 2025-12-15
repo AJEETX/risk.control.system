@@ -48,10 +48,10 @@
                 
                 <div class="form-group text-center">
                     <div class="profile-img-container">
-                        <img id="document-Image" class="form-Image" src="@Applicationsettings.POLICY_BLANK_IMAGE" title="Case Document" alt="Case Document" data-bs-toggle="tooltip" />
+                        <img id="document-Image" class="form-Image" src="/img/add-file.png" title="Case Document" alt="Case Document" data-bs-toggle="tooltip" />
                     </div>
                     <label for="createImageInput" class="control-label">Case Document <i class="fa fa-asterisk asterik-style-logo"></i></label>
-                    <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="case-document" title="Upload Case Document" data-bs-toggle="tooltip" />
+                    <input id="createImageInput" accept=".jpg,.jpeg,.png" required asp-for="Document" class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="case-document" title="Upload Case Document" data-bs-toggle="tooltip" />
                     <span asp-validation-for="Document" class="text-danger"></span>
                 </div>
                 

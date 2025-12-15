@@ -47,10 +47,10 @@
 
                 <div class="form-group text-center">
                     <div class="profile-img-container">
-                        <img id="document-Image" class="form-Image" src="/Document/GetBeneficiaryDocument/@Model.BeneficiaryDetailId" title="Beneficiary Photo" alt="Beneficiary Photo" data-bs-toggle="tooltip" />
+                        <img id="document-Image" class="form-Image  img-circle" src="/Document/GetBeneficiaryDocument/@Model.BeneficiaryDetailId" title="Beneficiary Photo" alt="Beneficiary" data-bs-toggle="tooltip" />
                     </div>
                     <label for="createImageInput" class="control-label">Beneficiary Photo <i class="fa fa-asterisk asterik-style-logo"></i></label>
-                    <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="beneficiary-document" title="Upload Beneficiary Photo" data-bs-toggle="tooltip" />
+                    <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="documentImage" data-title-id="beneficiary-document" title="Upload Beneficiary Photo" data-bs-toggle="tooltip" />
                     <span asp-validation-for="ProfileImage" class="text-danger"></span>
                 </div>
 

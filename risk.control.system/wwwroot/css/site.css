@@ -152,7 +152,7 @@ table {
 .form-Image {
     height: 2.4rem;
     width: 2.4rem;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
 }
 
 .rating {
@@ -382,13 +382,12 @@ a.table-link {
 }
 
 .block-data {
-    width: 8rem;
+    width: 8em;
+    height: 8em;
     border: 1px solid #ccc;
-    height: 6rem;
     overflow-y: auto;
     padding: 1px;
     font-weight: 400 !important;
-    border-radius: 5px;
 }
 
 .investigation-actual-image {
@@ -722,7 +721,7 @@ input.title-name {
 input.remarks[required]:valid {
     border-right: 3px solid green;
 }
-input.remarks[required].valid {
+input.remarks.filled-valid {
     border-right: 3px solid green;
 }
 input.remarks[required].is-invalid {
@@ -1236,7 +1235,7 @@ img.table-agency-image {
 }
 
 img.table-profile-image {
-    border-radius: 10%;
+    border-radius: 50%;
     height: 2.5rem;
     width: 2.5rem;
     border: 1px solid green;
@@ -1257,7 +1256,7 @@ img.table-profile-image-user-inactive {
 }
 
 img.table-profile-image-no-user {
-    border-radius: 10%;
+    border-radius: 50%;
     height: 2.5rem;
     width: 2.5rem;
     border: 2px solid red;
@@ -1704,6 +1703,7 @@ ul#messagesList {
 .modal-map-image {
     width: 100%;
     object-fit: contain;
+    border:2px solid #ccc;
 }
 
 .map-thumbnail {

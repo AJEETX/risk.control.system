@@ -7,10 +7,10 @@
         
         <div class="form-group text-center">
             <div class="profile-img-container">
-                <img id="document-Image" class="form-Image" src="/Document/GetAgencyUserDocument/@Model?.Id" title="User Photo" alt="User Photo" data-bs-toggle="tooltip" />
+                <img id="document-Image" class="form-Image img-circle" src="/Document/GetAgencyUserDocument/@Model?.Id" title="User Photo" alt="User " data-bs-toggle="tooltip" />
             </div>
             <label for="createImageInput" class="control-label">User Photo<i class="fa fa-asterisk asterik-style-logo"></i></label>
-            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
+            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
             <span asp-validation-for="ProfileImage" class="text-danger"></span>
         </div>
 
@@ -65,7 +65,7 @@
                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                     }
                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag"/>  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
                 <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />

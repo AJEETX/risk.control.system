@@ -14,7 +14,7 @@
                 <img id="createProfileImage" class="form-Image" src="/Document/GetAgencyDocument/@Model?.VendorId" title="Agency Logo" alt="Agency Logo" data-bs-toggle="tooltip" />
             </div>
             <label for="createImageInput" class="control-label">Agency Logo <i class="fa fa-asterisk asterik-style-logo"></i></label>
-            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" class="form-control remarks document-image-input" type="file" data-preview-id="createProfileImage" data-title-id="agency-document" title="Upload Agency Logo" data-bs-toggle="tooltip" />
+            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="agency-document" title="Upload Agency Logo" data-bs-toggle="tooltip" />
         </div>
 
         <div class="form-group">
@@ -47,7 +47,7 @@
                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                     }
                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag"/>  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
                 <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
@@ -149,7 +149,7 @@
                 <label class="input-group-label" for="Status"> Status:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" for="Status"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
                     <select required id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
                         <option value="">--- SELECT ---</option>
@@ -159,6 +159,5 @@
                 </div>
             </div>
         }
-        
     </div>
 </div>

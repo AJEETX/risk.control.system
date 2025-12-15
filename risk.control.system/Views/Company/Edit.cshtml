@@ -32,7 +32,7 @@
                                 <img id="createProfileImage" class="form-Image" src="/Document/GetCompanyDocument/@Model.ClientCompanyId" title="Company Logo" alt="Company Logo" data-bs-toggle="tooltip" />
                             </div>
                             <label for="createImageInput" class="control-label">Company Logo <i class="fa fa-asterisk asterik-style-logo"></i></label>
-                            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" class="form-control remarks document-image-input" type="file" data-preview-id="createProfileImage" data-title-id="company-document" title="Upload Company Logo" data-bs-toggle="tooltip" />
+                            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="company-document" title="Upload Company Logo" data-bs-toggle="tooltip" />
                         </div>
                         <div class="form-group">
                             <label class="input-group-label" for="Email"> Domain:</label>
@@ -72,7 +72,7 @@
                                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                                     }
                                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" title="@Model.Country.Name" />  +@Model?.Country.ISDCode
+                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" title="@Model.Country.Name" alt="flag" />  +@Model?.Country.ISDCode
                                     </span>
                                 </div>
                                 <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g., 9876543210)" data-bs-toggle="tooltip" />
@@ -169,12 +169,12 @@
                             <label class="input-group-label" for="PinCodeText">Pincode:</label>
                             <div class="input-group mb-3 autocomplete-wrapper">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" for="PinCodeId">
+                                    <span class="input-group-text">
                                         <i class="fas fa-map-pin"></i>
                                         <i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
-                                <input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
+                                <input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" required data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
                                 <span asp-validation-for="PinCodeId" class="text-danger"></span>
                                 <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
                                 <input type="hidden" asp-for="PinCodeId" id="PinCodeId" />
@@ -193,9 +193,9 @@
                                         <i class="fa fa-asterisk asterik-style-disabled"></i>
                                     </span>
                                 </div>
-                                <input readonly type="text" id="DistrictText" class="form-control remarks" data-placeholder="district" data-bs-toggle="tooltip" placeholder="..."  tabindex="-1" />
+                                <input readonly type="text" id="DistrictText" class="form-control remarks" data-placeholder="district" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" title="Auto-selected based on Pincode" />
                                 <span asp-validation-for="DistrictId" class="text-danger"></span>
-                                <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" title="Auto-selected based on Pincode" />
+                                <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId"/>
                                 <input type="hidden" asp-for="DistrictId" id="DistrictId" />
                                 <div id="district-loading" class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>
@@ -212,12 +212,12 @@
                                 <div class="input-group-prepend">
 
                                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
-                                        <img src="@img" class="flag-icon" data-bs-toggle="tooltip" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
+                                        <img src="@img" class="flag-icon" data-bs-toggle="tooltip" alt="flag" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
                                     </span>
                                 </div>
-                                <input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" />
+                                <input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" title="Auto-selected based on Pincode" />
                                 <span asp-validation-for="StateId" class="text-danger"></span>
-                                <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" title="Auto-selected based on Pincode" />
+                                <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                                 <input type="hidden" asp-for="StateId" id="StateId" />
                                 <div id="state-loading" class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>

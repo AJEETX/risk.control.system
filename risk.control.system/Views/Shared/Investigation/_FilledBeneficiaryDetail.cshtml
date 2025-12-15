@@ -79,17 +79,10 @@
                 <!-- Beneficiary Image and Map -->
                 <div class="col-5 text-center">
                     <p class="text-muted text-sm">
-                        @if (Model?.Location?.ImagePath != null)
-                        {
-                            <img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model.Location.BeneficiaryDetailId" data-bs-toggle="tooltip" title="@Model.Location?.Name Photo" />
-                        }
-                        else
-                        {
-                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" title="No Beneficiary Photo" data-bs-toggle="tooltip" />
-                        }
+                        <img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model.Location.BeneficiaryDetailId" data-bs-toggle="tooltip" title="@Model.Location?.Name Photo" alt="@Model.Location?.Name" />
                     </p>
                     <p class="text-muted text-sm">
-                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Beneficiary Address on Map" data-bs-toggle="tooltip" />
+                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Beneficiary Address on Map" data-bs-toggle="tooltip" alt="Beneficiary Address " />
                     </p>
                 </div>
             </div>

@@ -120,6 +120,17 @@
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
                             $('#create-form').submit();
+                            var form = document.getElementById("create-form");
+                            if (form) {
+                                const formElements = form.getElementsByTagName("*");
+                                for (const element of formElements) {
+                                    element.disabled = true;
+                                    if (element.hasAttribute("readonly")) {
+                                        element.classList.remove("valid", "is-valid", "valid-border");
+                                        element.removeAttribute("aria-invalid");
+                                    }
+                                }
+                            }
                         }
                     },
                     cancel: {

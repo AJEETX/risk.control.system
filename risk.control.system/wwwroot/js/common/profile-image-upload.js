@@ -108,6 +108,19 @@
                     }
                 }
             };
+            var imageToUpdate = document.getElementById('document-Image');
+            if (imageToUpdate) {
+                imageToUpdate.src = window.URL.createObjectURL($(this)[0].files[0]);
+            }
+            imageToUpdate = document.getElementById('createProfileImage');
+            if (imageToUpdate) {
+                imageToUpdate.src = window.URL.createObjectURL($(this)[0].files[0]);
+            }
+            imageToUpdate = document.getElementById('editProfileImage');
+            if (imageToUpdate) {
+                imageToUpdate.src = window.URL.createObjectURL($(this)[0].files[0]);
+            }
+
             fileReader.readAsDataURL(file);
         } else {
             showAlert(
@@ -150,33 +163,4 @@
         const previewElement = $(`#${inputElement.data('preview-id')}`);
         revertToOriginalImage(inputElement, previewElement);
     });
-
-    let dialogOpen = false;
-
-    // User opens file dialog
-    $(".document-image-input").on("click", function () {
-        dialogOpen = true;
-    });
-
-    // Dialog closes → detect Cancel
-    $(".document-image-input").on("blur", function () {
-        const input = $(this);
-
-        // If dialog was opened & no file chosen → user pressed Cancel
-        if (dialogOpen && input[0].files.length === 0) {
-            const preview = $("#" + input.data("preview-id"));
-            const defaultImg = input.data("default-image") || originalImageUrl;
-
-            // Reset preview image
-            preview.attr("src", defaultImg);
-
-            // Clear the file input
-            input.val("");
-
-            console.log("Cancelled → Reset image");
-        }
-
-        dialogOpen = false;
-    });
-
 });

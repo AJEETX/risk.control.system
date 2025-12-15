@@ -7,12 +7,12 @@
     <label class="input-group-label" for="PinCodeText">Pincode:</label>
     <div class="input-group mb-3 autocomplete-wrapper">
         <div class="input-group-prepend">
-            <span class="input-group-text" for="PinCodeId">
+            <span class="input-group-text">
                 <i class="fas fa-map-pin"></i>
                 <i class="fa fa-asterisk asterik-style"></i>
             </span>
         </div>
-        <input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
+        <input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" required data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
         <span asp-validation-for="PinCodeId" class="text-danger"></span>
         <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
         <input type="hidden" asp-for="PinCodeId" id="PinCodeId" />
