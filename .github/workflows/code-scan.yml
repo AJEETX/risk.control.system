@@ -71,7 +71,9 @@ jobs:
     - name: Generate tabular report (Markdown)
       if: always()
       run: |
-          echo "## 🔐 Codacy Security Scan Report" >> $GITHUB_STEP_SUMMARY
+          MAX_ROWS=50
+
+            echo "## 🔐 Codacy Security Scan Report" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
 
             if [ ! -f results.sarif ]; then
@@ -79,29 +81,44 @@ jobs:
               exit 0
             fi
 
-            ISSUE_COUNT=$(jq '[.runs[]?.results // []][] | length' results.sarif)
+            TOTAL=$(jq '[.runs[]?.results // []][] | length' results.sarif)
+            ERRORS=$(jq '[.runs[]?.results // []][] | map(select(.level=="error")) | length' results.sarif)
+            WARNS=$(jq '[.runs[]?.results // []][] | map(select(.level=="warning")) | length' results.sarif)
+            NOTES=$(jq '[.runs[]?.results // []][] | map(select(.level=="note")) | length' results.sarif)
 
-            if [ "$ISSUE_COUNT" -eq 0 ]; then
+            echo "### 📊 Summary" >> $GITHUB_STEP_SUMMARY
+            echo "- **Total Issues:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+            echo "- 🛑 **Critical / Error:** $ERRORS" >> $GITHUB_STEP_SUMMARY
+            echo "- ⚠️ **Warning:** $WARNS" >> $GITHUB_STEP_SUMMARY
+            echo "- ℹ️ **Note:** $NOTES" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$TOTAL" -eq 0 ]; then
               echo "✅ **No security issues found**" >> $GITHUB_STEP_SUMMARY
               exit 0
             fi
 
+            echo "### 🔎 Top $MAX_ROWS Issues" >> $GITHUB_STEP_SUMMARY
             echo "| Severity | Rule | Message | File | Line |" >> $GITHUB_STEP_SUMMARY
             echo "|----------|------|---------|------|------|" >> $GITHUB_STEP_SUMMARY
 
-            jq -r '
+            jq -r "
               .runs[]? |
               (.results // [])[] |
               [
-                (.level // "unknown"),
-                (.ruleId // "N/A"),
-                (.message.text // "N/A"),
-                (.locations[0].physicalLocation.artifactLocation.uri // "N/A"),
-                (.locations[0].physicalLocation.region.startLine // "N/A")
+                (.level // \"unknown\"),
+                (.ruleId // \"N/A\"),
+                (.message.text // \"N/A\" | gsub(\"\\n\"; \" \")),
+                (.locations[0].physicalLocation.artifactLocation.uri // \"N/A\"),
+                (.locations[0].physicalLocation.region.startLine // \"N/A\")
               ] | @tsv
-            ' results.sarif | while IFS=$'\t' read -r severity rule msg file line; do
-              echo "| $severity | $rule | ${msg:0:80} | $file | $line |" >> $GITHUB_STEP_SUMMARY
+            " results.sarif | head -n $MAX_ROWS | while IFS=$'\t' read -r severity rule msg file line; do
+              echo "| $severity | $rule | ${msg:0:100} | $file | $line |" >> $GITHUB_STEP_SUMMARY
             done
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📎 **Full report available as artifact:** \`codacy-security-report\`" >> $GITHUB_STEP_SUMMARY
+
 
 
   # ---------------------------------------------------
