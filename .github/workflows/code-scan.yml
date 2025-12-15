@@ -378,7 +378,7 @@ jobs:
   unified-security-summary:
     name: Unified Security Summary
     runs-on: ubuntu-latest
-    needs: [fortify, codeql, dependency-review,codacy-security-scan]
+    needs: [codacy-security-scan,snyk-scan,fortify, codeql, dependency-review]
 
     steps:
       - name: Generate Enhanced Security Summary

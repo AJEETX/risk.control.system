@@ -30,7 +30,7 @@ jobs:
   build:
     name: Build .Net Core Application
     runs-on: windows-latest
-    needs: unified-security-summary
+    needs: code-scan
     permissions:
       contents: read
 
