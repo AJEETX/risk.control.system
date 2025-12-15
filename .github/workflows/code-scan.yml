@@ -59,9 +59,7 @@ jobs:
           CODACY_API_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
       run: |
           codacy analyze \
-            --directory . \
-            --allow-network \
-            --verbose \
+            --format sarif \
             --output results.sarif
 
     - name: Upload SARIF report
