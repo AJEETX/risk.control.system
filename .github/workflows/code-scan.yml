@@ -71,7 +71,7 @@ jobs:
     - name: Generate tabular report (Markdown)
       if: always()
       run: |
-          MAX_ROWS=50
+          MAX_ROWS=100
 
             echo "## 🔐 Codacy Security Scan Report" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -86,10 +86,9 @@ jobs:
             WARNS=$(jq '[.runs[]?.results // []][] | map(select(.level=="warning")) | length' results.sarif)
             NOTES=$(jq '[.runs[]?.results // []][] | map(select(.level=="note")) | length' results.sarif)
 
-            # Write table to GitHub Step Summary
+            # Write single summary table to GitHub Step Summary
             {
               echo "### 📊 Codacy Security Summary"
-              echo ""
               echo "| Metric | Count |"
               echo "|--------|-------|"
               echo "| Total Issues | $TOTAL |"
@@ -97,6 +96,7 @@ jobs:
               echo "| ⚠️ Warning | $WARNS |"
               echo "| ℹ️ Note | $NOTES |"
             } >> $GITHUB_STEP_SUMMARY
+
 
             if [ "$TOTAL" -eq 0 ]; then
               echo "✅ **No security issues found**" >> $GITHUB_STEP_SUMMARY
