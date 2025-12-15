@@ -80,12 +80,11 @@ jobs:
               echo "❌ No SARIF file found" >> $GITHUB_STEP_SUMMARY
               exit 0
             fi
-            
-            # Extract counts from SARIF file (SINGLE values)
-            TOTAL=$(jq '[.runs[]?.results | length] | add // 0' results.sarif)
-            ERRORS=$(jq '[.runs[]?.results | map(select(.level=="error")) | length] | add // 0' results.sarif)
-            WARNS=$(jq '[.runs[]?.results | map(select(.level=="warning")) | length] | add // 0' results.sarif)
-            NOTES=$(jq '[.runs[]?.results | map(select(.level=="note")) | length] | add // 0' results.sarif)
+            # Extract counts from SARIF file
+            TOTAL=$(jq '[.runs[]?.results // [] | length] | add // 0' results.sarif)
+            ERRORS=$(jq '[.runs[]?.results // [] | map(select(.level=="error")) | length] | add // 0' results.sarif)
+            WARNS=$(jq '[.runs[]?.results // [] | map(select(.level=="warning")) | length] | add // 0' results.sarif)
+            NOTES=$(jq '[.runs[]?.results // [] | map(select(.level=="note")) | length] | add // 0' results.sarif)
 
             # Write single summary table to GitHub Step Summary
             {
@@ -97,6 +96,7 @@ jobs:
               echo "| ⚠️ Warning | $WARNS |"
               echo "| ℹ️ Note | $NOTES |"
             } >> $GITHUB_STEP_SUMMARY
+
 
             if [ "$TOTAL" -eq 0 ]; then
               echo "✅ **No security issues found**" >> $GITHUB_STEP_SUMMARY
