@@ -110,11 +110,6 @@ jobs:
               .runs[]? |
               (.results // [])[] |
               select(.level == \"error\") |
-              select(
-                (.locations[0].physicalLocation.artifactLocation.uri // \"\")
-                | endswith(\".js\")
-                | not
-              ) |
               [
                 (.level // \"unknown\"),
                 (.ruleId // \"N/A\"),
