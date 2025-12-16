@@ -141,7 +141,7 @@ jobs:
           [
             .runs[]? |
             (.results // [])[] |
-            select(.level == \"error\") |
+            select(.level == \"error\" or .level == \"warning\")  |
 
             . as \$r |
             (\$r.locations[0].physicalLocation.artifactLocation.uri // \"\") as \$file |
