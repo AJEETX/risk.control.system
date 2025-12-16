@@ -180,7 +180,7 @@
     // Function to fetch districts based on StateId and CountryId
     function fetchDistrict(districtId, stateId, countryId) {
         $.ajax({
-            url: '/GetDistrictName', // Your backend route to fetch districts
+            url: '/api/MasterData/GetDistrictName', // Your backend route to fetch districts
             type: 'GET',
             data: { id: districtId, stateId: stateId, countryId: countryId },
             success: function (data) {

@@ -10,7 +10,7 @@
 
     if (preloadedCountryId) {
         $.ajax({
-            url: '/api/Company/GetCountryName', // Endpoint to fetch PinCodeName
+            url: '/api/MasterData/GetCountryName', // Endpoint to fetch PinCodeName
             type: 'GET',
             data: { countryId: preloadedCountryId },
             success: function (response) {
@@ -26,7 +26,7 @@
     $("#CountryName").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: '/api/Company/SearchCountry',
+                url: '/api/MasterData/SearchCountry',
                 data: {
                     term: request.term
                 },

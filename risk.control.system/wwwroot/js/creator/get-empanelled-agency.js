@@ -3,7 +3,7 @@
     var vendorId = $('#vendorId').val();
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Company/GetEmpanelledAgency?claimId=' + claimId,
+            url: '/api/Company/GetEmpanelledAgency?caseId=' + claimId,
             dataSrc: '',
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);

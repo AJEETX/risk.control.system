@@ -16,7 +16,7 @@
 
     if (preloadedCountryId) {
         // Preload country name
-        fetchAndSetFieldValue("/api/Company/GetCountryName", { id: preloadedCountryId }, "#CountryText", "name");
+        fetchAndSetFieldValue("/api/MasterData/GetCountryName", { id: preloadedCountryId }, "#CountryText", "name");
 
         $("#StateText").prop("disabled", false);
         $("#PinCodeText").prop("disabled", false);
@@ -108,7 +108,7 @@ function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
     showLoader("#pincode-loading");
 
     $.ajax({
-        url: "/api/Company/GetPincode",
+        url: "/api/MasterData/GetPincode",
         type: "GET",
         data: { id: preloadedPincodeId, countryId: preloadedCountryId },
         success: function (response) {
@@ -122,7 +122,7 @@ function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
                 // Preload State
                 if (response.stateId) {
                     fetchAndSetFieldValue(
-                        "/api/Company/GetStateName",
+                        "/api/MasterData/GetStateName",
                         { id: response.stateId, CountryId: preloadedCountryId },
                         "#StateText",
                         "stateName"
@@ -132,7 +132,7 @@ function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
                 // Preload District
                 if (response.districtId) {
                     fetchAndSetFieldValue(
-                        "/api/Company/GetDistrictName",
+                        "/api/MasterData/GetDistrictName",
                         { id: response.districtId, stateId: response.stateId, CountryId: preloadedCountryId },
                         "#DistrictText",
                         "districtName"
@@ -201,7 +201,7 @@ function countryAutocomplete() {
 }
 function fetchCountrySuggestions(term, responseCallback) {
     $.ajax({
-        url: "/api/Company/GetCountrySuggestions", // API endpoint for country suggestions
+        url: "/api/MasterData/GetCountrySuggestions", // API endpoint for country suggestions
         type: "GET",
         data: { term: term },
         success: function (data) {
@@ -242,7 +242,7 @@ function validateCountrySelection(inputValue, countryId) {
     }
 
     $.ajax({
-        url: "/api/Company/GetCountrySuggestions",
+        url: "/api/MasterData/GetCountrySuggestions",
         type: "GET",
         data: { term: inputValue},
         success: function (data) {
@@ -313,7 +313,7 @@ function pincodeAutocomplete() {
 
 function fetchPincodeSuggestions(term, countryId, responseCallback) {
     $.ajax({
-        url: "/api/Company/GetPincodeSuggestions",
+        url: "/api/MasterData/GetPincodeSuggestions",
         type: "GET",
         data: { term: term, countryId: countryId },
         success: function (data) {
@@ -367,7 +367,7 @@ function validatePincodeSelection(inputValue, countryId) {
     }
 
     $.ajax({
-        url: "/api/Company/GetPincodeSuggestions",
+        url: "/api/MasterData/GetPincodeSuggestions",
         type: "GET",
         data: { term: inputValue, countryId: countryId },
         success: function (data) {
@@ -401,7 +401,7 @@ function validateStateSelection(inputValue, countryId) {
     }
 
     $.ajax({
-        url: "/api/Company/SearchState",
+        url: "/api/MasterData/SearchState",
         type: "GET",
         data: { term: inputValue, countryId: countryId },
         success: function (data) {
@@ -438,7 +438,7 @@ function validateDistrictSelection(inputValue, stateId, countryId) {
     }
 
     $.ajax({
-        url: "/api/Company/SearchDistrict",
+        url: "/api/MasterData/SearchDistrict",
         type: "GET",
         data: { term: inputValue, stateId: stateId, countryId: countryId },
         success: function (data) {
@@ -482,7 +482,7 @@ function stateAutocomplete() {
     $("#StateText").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: "/api/Company/SearchState",
+                url: "/api/MasterData/SearchState",
                 type: "GET",
                 data: { term: request.term, countryId: $("#SelectedCountryId").val() },
                 success: function (data) {
@@ -519,7 +519,7 @@ function districtAutocomplete() {
     $("#DistrictText").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: "/api/Company/SearchDistrict",
+                url: "/api/MasterData/SearchDistrict",
                 type: "GET",
                 data: { term: request.term, stateId: $("#SelectedStateId").val(), countryId: $("#SelectedCountryId").val() },
                 success: function (data) {

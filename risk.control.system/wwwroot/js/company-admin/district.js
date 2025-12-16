@@ -178,7 +178,7 @@
     // Function to fetch states based on countryId
     function fetchStates(countryId) {
         $.ajax({
-            url: '/api/Company/GetStateName',  // Your controller route to fetch states
+            url: '/api/MasterData/GetStateName',  // Your controller route to fetch states
             type: 'GET',
             data: { countryId: countryId },
             success: function (data) {
@@ -213,7 +213,7 @@
     if (selectedStateId) {
         // Fetch the state name from the backend if needed or directly fill the state name
         $.ajax({
-            url: '/api/Company/GetStateNameForCountry',  // Your controller route to fetch state name
+            url: '/api/MasterData/GetStateNameForCountry',  // Your controller route to fetch state name
             type: 'GET',
             data: { countryId: countryId, id: selectedStateId },
             success: function (data) {

@@ -47,7 +47,6 @@ namespace risk.control.system.Controllers.Api.Company
                 logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail);
                 return null;
             }
-
         }
 
         [HttpGet("GetReviewCases")]

@@ -177,7 +177,7 @@ $(document).ready(function () {
         source: function (request, response) {
             $("#loader").show(); // Show loader
             $.ajax({
-                url: "/api/Company/GetCountryIsdCode", // API endpoint for country suggestions
+                url: "/api/MasterData/GetCountryIsdCode", // API endpoint for country suggestions
                 type: "GET",
                 data: {
                     term: request.term
@@ -267,6 +267,5 @@ function onlyDigits(el) {
     el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
 }
 window.onload = function () {
-    //initGeolocation();
     focusLogin();
 }

@@ -77,6 +77,10 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetCompanyAgencyUser")]
         public async Task<IActionResult> GetCompanyAgencyUser(long id)
         {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid agency id.");
+            }
             var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -123,6 +127,10 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetAgentWithCases")]
         public async Task<IActionResult> GetAgentWithCases(long id)
         {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid agent id.");
+            }
             var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 

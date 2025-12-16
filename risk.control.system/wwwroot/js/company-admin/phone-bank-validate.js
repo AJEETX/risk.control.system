@@ -72,7 +72,7 @@
                 $('#ifsc-spinner').removeClass('d-none');
                 
                 $.ajax({
-                    url: '/api/company/bsb?code=' + encodeURIComponent(code),
+                    url: '/api/MasterData/bsb?code=' + encodeURIComponent(code),
                     method: 'GET',
                     success: function (data) {
                         $('#ifsc-spinner').addClass('d-none');
@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         showSpinner();
         try {
-            const response = await fetch(`/api/Company/IsValidMobileNumber?phone=${encodeURIComponent(phone)}&countryCode=${isd}`);
+            const response = await fetch(`/api/MasterData/IsValidMobileNumber?phone=${encodeURIComponent(phone)}&countryCode=${isd}`);
             const data = await response.json();
 
             if (data.valid) {

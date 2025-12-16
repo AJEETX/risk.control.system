@@ -1,6 +1,4 @@
-﻿using Google.Api;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -22,7 +20,7 @@ namespace risk.control.system.Services
         Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id);
         Task<CaseTransactionModel> GetPdfReport(long id);
         Task<(object[], bool)> GetFilesData(string userEmail, bool isManager, int uploadId = 0);
-        Task<(object[], bool)> GetFileById(string userEmail, bool isManager, int uploadId);
+        Task<(object, bool)> GetFileById(string userEmail, bool isManager, int uploadId);
     }
     internal class InvestigationService : IInvestigationService
     {
@@ -1234,7 +1232,7 @@ namespace risk.control.system.Services
             return (result.ToArray(), maxAssignReadyAllowedByCompany >= totalReadyToAssign);
         }
 
-        public async Task<(object[], bool)> GetFileById(string userEmail, bool isManager, int uploadId)
+        public async Task<(object, bool)> GetFileById(string userEmail, bool isManager, int uploadId)
         {
             var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
             var file = await context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
@@ -1267,7 +1265,7 @@ namespace risk.control.system.Services
                 TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
                 Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
             };//<i class='fas fa-sync fa-spin'></i>
-            return (new object[] { result }, maxAssignReadyAllowedByCompany >= totalForAssign);
+            return (new { result }, maxAssignReadyAllowedByCompany >= totalForAssign);
         }
     }
 }

@@ -107,6 +107,10 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetFileById/{uploadId}")]
         public async Task<IActionResult> GetFileById(int uploadId)
         {
+            if (uploadId <= 0)
+            {
+                return BadRequest("Invalid uploadId parameter.");
+            }
             var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
