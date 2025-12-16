@@ -71,88 +71,119 @@ jobs:
     - name: Generate tabular report (Markdown)
       if: always()
       run: |
-          MAX_ROWS=100
+        #!/usr/bin/env bash
+        set -e
 
-            echo "## 🔐 Codacy Security Scan Report" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+        MAX_ROWS=100
 
-            if [ ! -f results.sarif ]; then
-              echo "❌ No SARIF file found" >> $GITHUB_STEP_SUMMARY
-              exit 0
-            fi
-            # Extract counts from SARIF file
-            TOTAL=$(jq '[.runs[]?.results // [] | length] | add // 0' results.sarif)
-            ERRORS=$(jq '[.runs[]?.results // [] | map(select(.level=="error")) | length] | add // 0' results.sarif)
-            WARNS=$(jq '[.runs[]?.results // [] | map(select(.level=="warning")) | length] | add // 0' results.sarif)
-            NOTES=$(jq '[.runs[]?.results // [] | map(select(.level=="note")) | length] | add // 0' results.sarif)
+        # ------------------------------------------------------------------------------
+        # Ensure GitHub Step Summary file exists (CRITICAL FIX)
+        # ------------------------------------------------------------------------------
+        if [ -z "$GITHUB_STEP_SUMMARY" ]; then
+          echo "❌ GITHUB_STEP_SUMMARY is not set"
+          exit 1
+        fi
 
-            # Write single summary table to GitHub Step Summary
+        mkdir -p "$(dirname "$GITHUB_STEP_SUMMARY")"
+        touch "$GITHUB_STEP_SUMMARY"
+
+        # ------------------------------------------------------------------------------
+        # Header
+        # ------------------------------------------------------------------------------
+        echo "## 🔐 Codacy Security Scan Report" >> "$GITHUB_STEP_SUMMARY"
+        echo "" >> "$GITHUB_STEP_SUMMARY"
+
+        # ------------------------------------------------------------------------------
+        # Validate SARIF file
+        # ------------------------------------------------------------------------------
+        if [ ! -f results.sarif ]; then
+          echo "❌ No SARIF file found" >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+        fi
+
+        # ------------------------------------------------------------------------------
+        # Extract counts from SARIF (NULL-SAFE, MULTI-RUN SAFE)
+        # ------------------------------------------------------------------------------
+        TOTAL=$(jq '[.runs[]?.results // [] | length] | add // 0' results.sarif)
+        ERRORS=$(jq '[.runs[]?.results // [] | map(select(.level=="error")) | length] | add // 0' results.sarif)
+        WARNS=$(jq '[.runs[]?.results // [] | map(select(.level=="warning")) | length] | add // 0' results.sarif)
+        NOTES=$(jq '[.runs[]?.results // [] | map(select(.level=="note")) | length] | add // 0' results.sarif)
+
+        # ------------------------------------------------------------------------------
+        # Summary Table (SINGLE TABLE, CLEAN RENDER)
+        # ------------------------------------------------------------------------------
+        {
+          echo "### 📊 Codacy Security Summary"
+          echo "| Metric | Count |"
+          echo "|--------|-------|"
+          echo "| Total Issues | $TOTAL |"
+          echo "| 🛑 Critical / Error | $ERRORS |"
+          echo "| ⚠️ Warning | $WARNS |"
+          echo "| ℹ️ Note | $NOTES |"
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        # ------------------------------------------------------------------------------
+        # Exit early if no issues
+        # ------------------------------------------------------------------------------
+        if [ "$TOTAL" -eq 0 ]; then
+          echo ""
+          echo "✅ **No security issues found**" >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+        fi
+
+        # ------------------------------------------------------------------------------
+        # Grouped Errors (ONLY .cs, EXCLUDE node_modules & wwwroot)
+        # ------------------------------------------------------------------------------
+        echo "" >> "$GITHUB_STEP_SUMMARY"
+        echo "### 🔎 Critical / Error Issues (C# only)" >> "$GITHUB_STEP_SUMMARY"
+
+        jq -r "
+          [
+            .runs[]? |
+            (.results // [])[] |
+            select(.level == \"error\") |
+
+            . as \$r |
+            (\$r.locations[0].physicalLocation.artifactLocation.uri // \"\") as \$file |
+
+            # Include ONLY .cs files
+            select(\$file | ascii_downcase | endswith(\".cs\")) |
+
+            # Exclude folders
+            select(
+              (\$file | ascii_downcase | contains(\"node_modules\") | not) and
+              (\$file | ascii_downcase | contains(\"wwwroot\") | not)
+            ) |
+
             {
-              echo "### 📊 Codacy Security Summary"
-              echo "| Metric | Count |"
-              echo "|--------|-------|"
-              echo "| Total Issues | $TOTAL |"
-              echo "| 🛑 Critical / Error | $ERRORS |"
-              echo "| ⚠️ Warning | $WARNS |"
-              echo "| ℹ️ Note | $NOTES |"
-            } >> $GITHUB_STEP_SUMMARY
+              file: \$file,
+              rule: (\$r.ruleId // \"N/A\"),
+              message: (\$r.message.text // \"N/A\" | gsub(\"\\n\"; \" \")),
+              line: (\$r.locations[0].physicalLocation.region.startLine // \"N/A\")
+            }
+          ]
+          | group_by(.file)
+          | map({
+              file: .[0].file,
+              count: length,
+              issues: .
+            })
+          | sort_by(-.count)
+          | .[]
+          | \"### 📄 \\(.file) (❌ \\(.count) errors)\",
+            \"| Rule | Message | Line |\",
+            \"|------|---------|------|\",
+            (
+              .issues[] |
+              \"| \\(.rule) | \\(.message[0:100]) | \\(.line) |\"
+            ),
+            \"\"
+        " results.sarif >> "$GITHUB_STEP_SUMMARY"
 
-
-            if [ "$TOTAL" -eq 0 ]; then
-              echo "✅ **No security issues found**" >> $GITHUB_STEP_SUMMARY
-              exit 0
-            fi
-            echo "### 🔎 Top $MAX_ROWS Critical / Error Issues" >> $GITHUB_STEP_SUMMARY
-            echo "| Severity | Rule | Message | File | Line |" >> $GITHUB_STEP_SUMMARY
-            echo "|----------|------|---------|------|------|" >> $GITHUB_STEP_SUMMARY
-
-            jq -r "
-              [
-                .runs[]? |
-                (.results // [])[] |
-                select(.level == \"error\") |
-
-                # Extract file safely
-                . as \$r |
-                (\$r.locations[0].physicalLocation.artifactLocation.uri // \"\") as \$file |
-
-                # Include ONLY .cs files
-                select(\$file | ascii_downcase | endswith(\".cs\")) |
-
-                # Exclude folders
-                select(
-                  (\$file | ascii_downcase | contains(\"node_modules\") | not) and
-                  (\$file | ascii_downcase | contains(\"wwwroot\") | not)
-                ) |
-
-                {
-                  file: \$file,
-                  rule: (\$r.ruleId // \"N/A\"),
-                  message: (\$r.message.text // \"N/A\" | gsub(\"\\n\"; \" \")),
-                  line: (\$r.locations[0].physicalLocation.region.startLine // \"N/A\")
-                }
-              ]
-              | group_by(.file)
-              | map({
-                  file: .[0].file,
-                  count: length,
-                  issues: .
-                })
-              | sort_by(-.count)
-              | .[]
-              | \"### 📄 \\(.file) (❌ \\(.count) errors)\",
-                \"| Rule | Message | Line |\",
-                \"|------|---------|------|\",
-                (
-                  .issues[] |
-                  \"| \\(.rule) | \\(.message[0:100]) | \\(.line) |\"
-                ),
-                \"\"
-            " results.sarif >> \"$GITHUB_STEP_SUMMARY\"
-
-            echo "📎 **Full report available as artifact:** \`codacy-security-report\`" >> $GITHUB_STEP_SUMMARY
-
-
+        # ------------------------------------------------------------------------------
+        # Footer
+        # ------------------------------------------------------------------------------
+        echo "📎 **Full report available as artifact:** \`codacy-security-report\`" >> "$GITHUB_STEP_SUMMARY"
 
   # ---------------------------------------------------
   # 2️⃣ Snyk Scan Job
