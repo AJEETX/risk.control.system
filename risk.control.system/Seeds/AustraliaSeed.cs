@@ -10,7 +10,7 @@ namespace risk.control.system.Seeds
     public static class AustraliaSeed
     {
         public static async Task<string> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, UserManager<VendorApplicationUser> vendorUserManager,
-            UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiCLient customApiCLient, IHttpContextAccessor httpAccessor,
+            UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiClient customApiCLient, IHttpContextAccessor httpAccessor,
             List<Country> countries, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
             string COUNTRY_CODE = "AU";

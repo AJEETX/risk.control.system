@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
     public static class AgentSeed
     {
         public static async Task Seed(ApplicationDbContext context, string agentEmailwithSuffix,
-            IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient,
+            IWebHostEnvironment webHostEnvironment, ICustomApiClient customApiCLient,
             UserManager<VendorApplicationUser> userManager,
             Vendor vendor, string pinCode, string photo, string firstName, string lastName, IFileStorageService fileStorageService, string addressLine = "")
         {

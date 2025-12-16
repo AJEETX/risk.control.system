@@ -3,7 +3,7 @@ $(document).ready(function () {
 
     var table  = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Manager/GetActive',
+            url: '/api/Manager/GetActiveCases',
             type: 'GET',
             dataType: 'json',
             data: function (d) {

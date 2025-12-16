@@ -31,7 +31,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IPhoneService phoneService;
         private readonly IFeatureManager featureManager;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly ICustomApiCLient customApiCLient;
+        private readonly ICustomApiClient customApiCLient;
         private readonly IProcessCaseService processCaseService;
         private readonly IMailService mailboxService;
         private readonly IFtpService ftpService;
@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Company
             IPhoneService phoneService,
             IFeatureManager featureManager,
             IEmpanelledAgencyService empanelledAgencyService,
-            ICustomApiCLient customApiCLient,
+            ICustomApiClient customApiCLient,
             IProcessCaseService processCaseService,
             IMailService mailboxService,
             IFtpService ftpService,

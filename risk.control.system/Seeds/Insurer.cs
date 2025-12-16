@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
     {
         private const string companyMapSize = "800x800";
         public static async Task<ClientCompany> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
-                    ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, SeedInput input, IFileStorageService fileStorageService)
+                    ICustomApiClient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, SeedInput input, IFileStorageService fileStorageService)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 

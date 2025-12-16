@@ -19,14 +19,14 @@ namespace risk.control.system.Services
     {
 
         private readonly ApplicationDbContext context;
-        private readonly ICustomApiCLient customApiCLient;
+        private readonly ICustomApiClient customApiCLient;
         private readonly IFeatureManager featureManager;
         private readonly IFileStorageService fileStorageService;
         private readonly IPhoneService phoneService;
         private readonly ICaseImageCreationService caseImageCreationService;
         private readonly ILogger<BeneficiaryCreationService> logger;
 
-        public BeneficiaryCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient,
+        public BeneficiaryCreationService(ApplicationDbContext context, ICustomApiClient customApiCLient,
             IFeatureManager featureManager,
             IFileStorageService fileStorageService,
             IPhoneService phoneService,

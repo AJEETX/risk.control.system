@@ -27,7 +27,7 @@ namespace risk.control.system.Controllers
         private readonly IFileStorageService fileStorageService;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ICustomApiCLient customApiCLient;
+        private readonly ICustomApiClient customApiCLient;
         private readonly ISmsService smsService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
@@ -36,7 +36,7 @@ namespace risk.control.system.Controllers
             IFileStorageService fileStorageService,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
-            ICustomApiCLient customApiCLient,
+            ICustomApiClient customApiCLient,
             ISmsService SmsService,
             UserManager<ClientCompanyApplicationUser> userManager)
         {

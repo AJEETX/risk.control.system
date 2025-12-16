@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Claims;
 
-using risk.control.system.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -19,133 +18,118 @@ namespace risk.control.system.Controllers.Api.Company
     public class InvestigationController : ControllerBase
     {
 
-        private readonly ApplicationDbContext _context;
         private readonly IInvestigationService service;
+        private readonly ILogger<InvestigationController> logger;
 
-        public InvestigationController(ApplicationDbContext context, IInvestigationService service)
+        public InvestigationController(IInvestigationService service, ILogger<InvestigationController> logger)
         {
-            _context = context;
             this.service = service;
+            this.logger = logger;
         }
 
         [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         [HttpGet("GetAuto")]
         public async Task<IActionResult> GetAuto(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            var response = await service.GetAuto(currentUserEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            try
+            {
+                var response = await service.GetAuto(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
-            return Ok(response);
-
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error getting draft cases for user {UserEmail}", userEmail);
+                return null;
+            }
         }
 
         [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         [HttpGet("GetActive")]
         public async Task<IActionResult> GetActive(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            var response = await service.GetActive(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            try
+            {
 
-            return Ok(response);
+                var response = await service.GetActive(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error getting active cases for user {UserEmail}", userEmail);
+                return null;
+            }
         }
 
         [HttpGet("GetFilesData/{uploadId?}")]
         public async Task<IActionResult> GetFilesData(int uploadId = 0)
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            var companyUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-            var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
-
-            var totalReadyToAssign = await service.GetAutoCount(userEmail);
-            var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
-
-            if (uploadId > 0)
+            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
             {
-                var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
-                if (file == null)
+                return Unauthorized("User not authenticated.");
+            }
+            try
+            {
+                var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+                var result = await service.GetFilesData(userEmail, isManager, uploadId);
+                return Ok(new
                 {
-                    return NotFound(new { success = false, message = "File not found." });
-                }
-                if (file.ClaimsId != null && file.ClaimsId.Count > 0)
-                {
-                    totalReadyToAssign = totalReadyToAssign + file.ClaimsId.Count;
-                }
+                    data = result.Item1,
+                    maxAssignReadyAllowed = result.Item2
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error getting uploaded cases for user {UserEmail}", userEmail);
+                return null;
             }
 
-
-            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && ((f.UploadedBy == userEmail && !f.Deleted) || isManager && !f.Deleted)).ToListAsync();
-            var result = files.OrderBy(o => o.CreatedOn).Select(file => new
-            {
-                file.Id,
-                SequenceNumber = isManager ? file.CompanySequenceNumber : file.UserSequenceNumber,
-                file.Name,
-                file.Description,
-                file.FileType,
-                CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm:ss"),
-                file.UploadedBy,
-                Status = file.Status,
-                file.Message,
-                //Message = file.Message == "Upload In progress" ? file.Icon : file.Message,
-                Icon = file.Icon, // or use some other status representation
-                IsManager = isManager,
-                file.Completed,
-                file.DirectAssign,
-                hasError = (file.CompletedOn != null && file.ErrorByteData != null) ? true : false,
-                errorLog = (file.CompletedOn != null && file.ErrorByteData != null) ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "<i class='fas fa-sync fa-spin i-grey'></i>",
-                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
-                TimeTaken = file.CompletedOn != null ?
-                $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ?
-                1 : Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
-            }).ToList();
-
-            return Ok(new
-            {
-                data = result,
-                maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalReadyToAssign
-            });
         }
 
         [HttpGet("GetFileById/{uploadId}")]
         public async Task<IActionResult> GetFileById(int uploadId)
         {
-            var userEmail = HttpContext.User.Identity.Name;
-            var companyUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-            var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
-            if (file == null)
+            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
             {
-                return NotFound(new { success = false, message = "File not found." });
+                return Unauthorized("User not authenticated.");
             }
-            var totalReadyToAssign = await service.GetAutoCount(userEmail);
-            var totalForAssign = totalReadyToAssign + file.ClaimsId?.Count;
-            var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
-
-            var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
-            var result = new
+            try
             {
-                file.Id,
-                SequenceNumber = isManager ? file.CompanySequenceNumber : file.UserSequenceNumber,
-                file.Name,
-                file.Description,
-                file.FileType,
-                CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm:ss"),
-                file.UploadedBy,
-                Status = file.Status,
-                file.Completed,
-                Message = file.Message,
-                Icon = file.Icon, // or use some other status representation
-                IsManager = isManager,
-                file.DirectAssign,
-                hasError = (file.CompletedOn != null && file.ErrorByteData != null) ? true : false,
-                errorLog = (file.CompletedOn != null && file.ErrorByteData != null) ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "<i class='fas fa-sync fa-spin i-grey'></i>",
-                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
-                TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
-                Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
-            };//<i class='fas fa-sync fa-spin'></i>
+                var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+                var result = await service.GetFileById(userEmail, isManager, uploadId);
 
-            return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalForAssign });
+                return Ok(new
+                {
+                    data = result.Item1,
+                    maxAssignReadyAllowed = result.Item2
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error getting uploaded case by {uploadId} for user {UserEmail}", uploadId, userEmail);
+                return null;
+            }
         }
     }
 }

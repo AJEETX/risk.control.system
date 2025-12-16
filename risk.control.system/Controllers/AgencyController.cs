@@ -38,7 +38,7 @@ namespace risk.control.system.Controllers
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ICustomApiCLient customApiCLient;
+        private readonly ICustomApiClient customApiCLient;
         private readonly ISmsService smsService;
         private readonly IAgencyService agencyService;
         private readonly IFeatureManager featureManager;
@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
-            ICustomApiCLient customApiCLient,
+            ICustomApiClient customApiCLient,
             ISmsService SmsService,
             IAgencyService agencyService,
             IFeatureManager featureManager,

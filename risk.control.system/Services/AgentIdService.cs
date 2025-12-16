@@ -28,7 +28,7 @@ internal class AgentIdService : IAgentIdService
     private readonly IGoogleApi googleApi;
     private readonly IWebHostEnvironment webHostEnvironment;
     private readonly IHttpClientService httpClientService;
-    private readonly ICustomApiCLient customApiCLient;
+    private readonly ICustomApiClient customApiCLient;
     private readonly IFaceMatchService faceMatchService;
 
     private static HttpClient httpClient = new();
@@ -42,7 +42,7 @@ internal class AgentIdService : IAgentIdService
         IGoogleApi googleApi,
         IWebHostEnvironment webHostEnvironment,
         IHttpClientService httpClientService,
-        ICustomApiCLient customApiCLient,
+        ICustomApiClient customApiCLient,
         IFaceMatchService faceMatchService)
     {
         this._context = context;

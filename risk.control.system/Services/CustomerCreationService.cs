@@ -21,7 +21,7 @@ namespace risk.control.system.Services
         private readonly IFeatureManager featureManager;
         private readonly IFileStorageService fileStorageService;
         private readonly IPhoneService phoneService;
-        private readonly ICustomApiCLient customApiCLient;
+        private readonly ICustomApiClient customApiCLient;
         private readonly ICaseImageCreationService caseImageCreationService;
         private readonly ILogger<CustomerCreationService> logger;
 
@@ -29,7 +29,7 @@ namespace risk.control.system.Services
             IFeatureManager featureManager,
             IFileStorageService fileStorageService,
             IPhoneService phoneService,
-            ICustomApiCLient customApiCLient,
+            ICustomApiClient customApiCLient,
             ICaseImageCreationService caseImageCreationService,
             ILogger<CustomerCreationService> logger)
         {

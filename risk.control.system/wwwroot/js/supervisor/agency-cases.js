@@ -42,7 +42,7 @@
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/agency/VendorInvestigation/GetNew',
+            url: '/api/agency/VendorInvestigation/GetNewCases',
             dataSrc: '',
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);

@@ -31,6 +31,7 @@ namespace risk.control.system.Controllers.Company
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
 
         private readonly ILogger<InvestigationController> logger;
+        private readonly IAddInvestigationService addInvestigationService;
         private readonly ApplicationDbContext context;
         private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
@@ -39,6 +40,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IPhoneService phoneService;
 
         public InvestigationController(ILogger<InvestigationController> logger,
+            IAddInvestigationService addInvestigationService,
             ApplicationDbContext context,
             IFeatureManager featureManager,
             INotyfService notifyService, IInvestigationService service,
@@ -46,6 +48,7 @@ namespace risk.control.system.Controllers.Company
             IPhoneService phoneService)
         {
             this.logger = logger;
+            this.addInvestigationService = addInvestigationService;
             this.context = context;
             this.featureManager = featureManager;
             this.notifyService = notifyService;
@@ -125,7 +128,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var model = await service.Create(currentUserEmail);
+                var model = await addInvestigationService.Create(currentUserEmail);
                 if (model.Trial)
                 {
                     if (!model.AllowedToCreate)
@@ -157,7 +160,7 @@ namespace risk.control.system.Controllers.Company
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
-                    var model = await service.AddCasePolicy(currentUserEmail);
+                    var model = await addInvestigationService.AddCasePolicy(currentUserEmail);
                     LoadDropDowns(model.PolicyDetail, currentUser);
                     return View(model);
                 }
@@ -256,7 +259,7 @@ namespace risk.control.system.Controllers.Company
                 model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
                 model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
 
-                var caseDetail = await service.CreatePolicy(currentUserEmail, model);
+                var caseDetail = await addInvestigationService.CreatePolicy(currentUserEmail, model);
                 if (caseDetail == null)
                 {
                     notifyService.Error("OOPS!!! Error creating case detail. Try Again.");
@@ -440,7 +443,7 @@ namespace risk.control.system.Controllers.Company
                 model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
                 model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
 
-                var savedTask = await service.EditPolicy(currentUserEmail, model);
+                var savedTask = await addInvestigationService.EditPolicy(currentUserEmail, model);
                 notifyService.Custom($"Policy <b>#{savedTask.PolicyDetail.ContractNumber}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.Id });
             }
@@ -589,7 +592,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var result = await service.CreateCustomer(currentUserEmail, model);
+                var result = await addInvestigationService.CreateCustomer(currentUserEmail, model);
 
                 if (!result)
                 {
@@ -737,7 +740,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var edited = await service.EditCustomer(currentUserEmail, model);
+                var edited = await addInvestigationService.EditCustomer(currentUserEmail, model);
                 if (!edited)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
@@ -892,7 +895,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var created = await service.CreateBeneficiary(currentUserEmail, investigationTaskId, model);
+                var created = await addInvestigationService.CreateBeneficiary(currentUserEmail, investigationTaskId, model);
                 if (!created)
                 {
                     notifyService.Warning("Error creating Beneficiary !!! ");
@@ -1029,7 +1032,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var edited = await service.EditBeneficiary(currentUserEmail, beneficiaryDetailId, model);
+                var edited = await addInvestigationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, model);
                 if (!edited)
                 {
                     notifyService.Error("OOPs !!!..Error editing beneficiary");

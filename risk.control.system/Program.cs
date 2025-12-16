@@ -144,6 +144,11 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddScoped<IManagerService, ManagerService>();
+builder.Services.AddScoped<IAddInvestigationService, AddInvestigationService>();
+builder.Services.AddScoped<IAssessorService, AssessorService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<ISanitizerService, SanitizerService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
@@ -181,7 +186,7 @@ builder.Services.AddSingleton<IValidationService, ValidationService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
-builder.Services.AddScoped<ICustomApiCLient, CustomApiClient>();
+builder.Services.AddScoped<ICustomApiClient, CustomApiClient>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
 builder.Services.AddScoped<IClaimsAgentService, ClaimsAgentService>();
 builder.Services.AddScoped<ICompareFaces, CompareFaces>();

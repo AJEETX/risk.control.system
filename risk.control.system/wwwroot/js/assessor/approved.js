@@ -1,8 +1,8 @@
-$(document).ready(function () {
+﻿$(document).ready(function () {
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Manager/Get',
+            url: '/api/Assessor/GetApprovededCases',
             dataSrc: '',
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
@@ -12,36 +12,32 @@ $(document).ready(function () {
                 }
             }
         },
-        columnDefs: [{
-            'targets': 0,
-            'searchable': false,
-            'orderable': false,
-            'className': 'dt-body-center',
-            'render': function (data, type, full, meta) {
-                return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
-            }
+        columnDefs: [
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 0                      // Index of the column to style
         },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 0                      // Index of the column to style
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 8                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 10                      // Index of the column to style
             },
             {
                 className: 'max-width-column-number', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
+                targets: 11                      // Index of the column to style
             },
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
-            },
-            {
-                'targets': 16, // Index for the "Case Type" column
+                'targets': 17, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
-        order: [[13, 'asc']],
+        order: [[16, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -56,13 +52,13 @@ $(document).ready(function () {
                 "data": "policyNum",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.policyId + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "amount",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.amount + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -75,7 +71,7 @@ $(document).ready(function () {
                     img += '</div>';
                     return img;
                 }
-                ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+                ///<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
             {
                 "data": "pincode",
@@ -88,17 +84,16 @@ $(document).ready(function () {
                     return img;
                 }
             },
-
             {
                 "data": "distance",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.distance + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.distance + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "duration",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.duration + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -122,10 +117,11 @@ $(document).ready(function () {
                     img += '</div>';
                     return img;
                 }
-            }, {
+            },
+            {
                 "data": "name",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -142,19 +138,19 @@ $(document).ready(function () {
             {
                 "data": "beneficiaryName",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.beneficiaryName + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.beneficiaryName + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "serviceType",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.serviceType + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
                 "data": "created",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.created + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -164,39 +160,36 @@ $(document).ready(function () {
                     var buttons = "";
                     buttons += '<span class="checkbox">';
                     if (row.autoAllocated) {
-                        buttons += '<i class="fas fa-cog fa-spin" title="AUTO ALLOCATION" data-toggle="tooltip"></i>';
+                        buttons += '<i class="fas fa-cog fa-spin" title="AUTO ALLOCATION" data-bs-toggle="tooltip"></i>';
                     } else {
-                        buttons += '<i class="fas fa-user-tag" title="MANUAL ALLOCATION" data-toggle="tooltip"></i>';
+                        buttons += '<i class="fas fa-user-tag" title="MANUAL ALLOCATION" data-bs-toggle="tooltip"></i>';
                     }
                     buttons += '</span>';
 
                     return buttons;
                 }
             },
-            { "data": "timePending" },
+            {
+                "data": "timePending",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.timePending + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" href="AssessorDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>';
-
-                    if (row.autoAllocated) {
-
-                    }
-                    //if (row.withdrawable) {
-                    //    buttons += '<a href="withdraw?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Withdraw</a>&nbsp;'
-                    //}
+                    buttons += '<a id="details' + row.id + '" href="ApprovedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    //buttons += (row.canDownload)
+                    //    ? '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
+                    //    : '<button class="btn btn-xs btn-secondary" disabled><i class="far fa-file-pdf"></i> limit Reached</button>';
                     return buttons;
                 }
             },
+            { "data": "timeElapsed", "bVisible": false },
             { "data": "policy", bVisible: false }
         ],
-        "rowCallback": function (row, data,index) {
-            if (data.isNewAssigned) {
-                $('td', row).addClass('isNewAssigned');
-            }
-        },
         "drawCallback": function (settings, start, end, max, total, pre) {
 
             $('#customerTable tbody').on('click', '.btn-info', function (e) {
@@ -205,22 +198,28 @@ $(document).ready(function () {
                 getdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
         }
     });
-
     $('#caseTypeFilter').on('change', function () {
         table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"
     });
-    table.on('xhr.dt', function () {
-        $('#refreshIcon').removeClass('fa-spin');
-    });
-
     $('#refreshTable').click(function () {
         var $icon = $('#refreshIcon');
         if ($icon) {
             $icon.addClass('fa-spin');
         }
         table.ajax.reload(null, false); // false => Retains current page
+    });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
     });
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
@@ -239,85 +238,8 @@ $(document).ready(function () {
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
-    $('#allocatedcase').on('click', function (event) {
-        $("body").addClass("submit-progress-bg");
-
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assess");
-
-        $('#checkboxes').submit();
-
-        var article = document.getElementById("article");
-        if (article) {
-            var nodes = article.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
-            }
-        }
-
-    });
-    table.on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({
-            animated: 'fade',
-            placement: 'top',
-            html: true
-        });
-    });
-    if ($("input[type='radio'].selected-case:checked").length) {
-        $("#allocatedcase").prop('disabled', false);
-    }
-    else {
-        $("#allocatedcase").prop('disabled', true);
-    }
-
-    // When user checks a radio button, Enable submit button
-    $("input[type='radio'].selected-case").change(function (e) {
-        if ($(this).is(":checked")) {
-            $("#allocatedcase").prop('disabled', false);
-        }
-        else {
-            $("#allocatedcase").prop('disabled', true);
-        }
-    });
-
-    // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
-        // If checkbox is not checked
-        if (this.checked) {
-            $("#allocatedcase").prop('disabled', false);
-        } else {
-            $("#allocatedcase").prop('disabled', true);
-        }
-    });
-
-    // Handle form submission event
-    $('#checkboxes').on('submit', function (e) {
-        var form = this;
-
-        // Iterate over all checkboxes in the table
-        table.$('input[type="checkbox"]').each(function () {
-            // If checkbox doesn't exist in DOM
-            if (!$.contains(document, this)) {
-                // If checkbox is checked
-                if (this.checked) {
-                    // Create a hidden element
-                    $(form).append(
-                        $('<input>')
-                            .attr('type', 'hidden')
-                            .attr('name', this.name)
-                            .val(this.value)
-                    );
-                }
-            }
-        });
-    });
-    
 });
+
 function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
@@ -325,15 +247,9 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    // Disable all buttons, submit inputs, and anchors
-    $('button, input[type="submit"], a').prop('disabled', true);
-
-    // Add a class to visually indicate disabled state for anchors
-    $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault(); // Prevent default action for anchor clicks
-    });
 
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
+    disableAllInteractiveElements();
 
     var article = document.getElementById("article");
     if (article) {
@@ -343,3 +259,4 @@ function getdetails(id) {
         }
     }
 }
+

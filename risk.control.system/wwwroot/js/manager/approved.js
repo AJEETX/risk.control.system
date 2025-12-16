@@ -1,16 +1,16 @@
 ﻿$(document).ready(function () {
 
-    var table = $("#customerTable").DataTable({
+   var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Manager/GetReject',
-            dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
-                }
-            }
+            url: '/api/Manager/GetApprovedCases',
+           dataSrc: '',
+           error: function (xhr, status, error) {
+               console.error("AJAX Error:", status, error);
+               console.error("Response:", xhr.responseText);
+               if (xhr.status === 401 || xhr.status === 403) {
+                   window.location.href = '/Account/Login'; // Or session timeout handler
+               }
+           }
         },
         columnDefs: [
             {
@@ -20,6 +20,10 @@
             {
                 className: 'max-width-column-number', // Apply the CSS class,
                 targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
             },
             {
                 className: 'max-width-column-number', // Apply the CSS class,
@@ -65,22 +69,18 @@
                 "data": "agency",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agency + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" title="' + row.agency + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                    img += '</div>';
-                    return img;
+                    return '<span class="badge badge-light" title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+
                 }
                 ///<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
             {
                 "data": "pincode",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
                         return `
             <div class="map-thumbnail profile-image doc-profile-image">
-                <img src="${row.personMapAddressUrl}" title='${row.pincodeName}'
+                <img src="${row.personMapAddressUrl}" title='${row.pincodeName}' 
                      class="thumbnail profile-image doc-profile-image preview-map-image" 
                      data-toggle="modal" 
                      data-target="#mapModal" 
@@ -125,7 +125,8 @@
                     img += '</div>';
                     return img;
                 }
-            }, {
+            },
+            {
                 "data": "name",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
@@ -187,7 +188,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" href="RejectDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" href="ApprovedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     //buttons += (row.canDownload)
                     //    ? '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
                     //    : '<button class="btn btn-xs btn-secondary" disabled><i class="far fa-file-pdf"></i> limit Reached</button>';
@@ -214,8 +215,7 @@
                 });
             });
         }
-    });
-
+   });
     $('#caseTypeFilter').on('change', function () {
         table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"
     });
@@ -239,23 +239,13 @@
         modal.find('#modalMapImage').attr('src', imageUrl);
         modal.find('.modal-title').text(title || 'Map Preview');
     });
-   //table.on('mouseenter', '.map-thumbnail', function () {
-   //         const $this = $(this); // Cache the current element
-
-   //         // Set a timeout to show the full map after 1 second
-   //         hoverTimeout = setTimeout(function () {
-   //             $this.find('.full-map').show(); // Show full map
-   //         }, 1000); // Delay of 1 second
-   //     })
-   //     .on('mouseleave', '.map-thumbnail', function () {
-   //         const $this = $(this); // Cache the current element
-
-   //         // Clear the timeout to cancel showing the map
-   //         clearTimeout(hoverTimeout);
-
-   //         // Immediately hide the full map
-   //         $this.find('.full-map').hide();
-   //     });
+    table.on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'top',
+            html: true
+        });
+    });
 });
 
 function getdetails(id) {

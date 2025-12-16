@@ -10,7 +10,7 @@ namespace risk.control.system.Seeds
     {
         static string randomPinCode = string.Empty;
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, UserManager<VendorApplicationUser> vendorUserManager,
-            UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiCLient customApiCLient, IHttpContextAccessor httpAccessor,
+            UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiClient customApiCLient, IHttpContextAccessor httpAccessor,
             IFileStorageService fileStorageService)
         {
             var globalSetting = new GlobalSettings

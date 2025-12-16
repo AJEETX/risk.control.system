@@ -34,7 +34,7 @@ namespace risk.control.system.Controllers
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
-        private readonly ICustomApiCLient customApiCLient;
+        private readonly ICustomApiClient customApiCLient;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> appUserManager;
         private readonly ITinyUrlService urlService;
@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers
             UserManager<VendorApplicationUser> userAgencyManager,
             SignInManager<ApplicationUser> signInManager,
             INotyfService notifyService,
-            ICustomApiCLient customApiCLient,
+            ICustomApiClient customApiCLient,
             RoleManager<ApplicationRole> roleManager,
             IFeatureManager featureManager,
             IInvestigationService service,
