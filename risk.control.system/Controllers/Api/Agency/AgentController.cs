@@ -27,10 +27,9 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetNewCases")]
         public async Task<IActionResult> GetNewCases()
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -42,17 +41,16 @@ namespace risk.control.system.Controllers.Api.Agency
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetSubmittedCases")]
         public async Task<IActionResult> GetSubmittedCases()
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -64,7 +62,7 @@ namespace risk.control.system.Controllers.Api.Agency
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting submitted cases for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
     }

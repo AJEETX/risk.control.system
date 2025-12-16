@@ -23,16 +23,19 @@ namespace risk.control.system.Services
     internal class VendorInvestigationService : IVendorInvestigationService
     {
         private readonly ApplicationDbContext context;
+        private readonly IWeatherInfoService weatherInfoService;
         private readonly IWebHostEnvironment env;
         private readonly ITimelineService timelineService;
         private readonly ICustomApiClient customApiCLient;
 
         public VendorInvestigationService(ApplicationDbContext context,
+            IWeatherInfoService weatherInfoService,
             IWebHostEnvironment env,
             ITimelineService timelineService,
             ICustomApiClient customApiCLient)
         {
             this.context = context;
+            this.weatherInfoService = weatherInfoService;
             this.env = env;
             this.timelineService = timelineService;
             this.customApiCLient = customApiCLient;
@@ -375,12 +378,12 @@ namespace risk.control.system.Services
                 if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING && claim.CustomerDetail != null)
                 {
                     // Fetch weather data for HEALTH claims
-                    claim.CustomerDetail.AddressLocationInfo = await UpdateWeatherDataAsync(double.Parse(claim.CustomerDetail.Latitude), double.Parse(claim.CustomerDetail.Longitude));
+                    claim.CustomerDetail.AddressLocationInfo = await weatherInfoService.GetWeatherAsync(claim.CustomerDetail.Latitude, claim.CustomerDetail.Longitude);
                 }
                 else if (claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM && claim.BeneficiaryDetail != null)
                 {
                     // Fetch weather data for DEATH claims
-                    claim.BeneficiaryDetail.AddressLocationInfo = await UpdateWeatherDataAsync(double.Parse(claim.BeneficiaryDetail.Latitude), double.Parse(claim.BeneficiaryDetail.Longitude));
+                    claim.BeneficiaryDetail.AddressLocationInfo = await weatherInfoService.GetWeatherAsync(claim.BeneficiaryDetail.Latitude, claim.BeneficiaryDetail.Longitude);
                 }
             }
 
@@ -704,18 +707,6 @@ namespace risk.control.system.Services
                 await context.SaveChangesAsync(null, false); // mark as viewed
             }
             return response;
-        }
-        private async Task<string> UpdateWeatherDataAsync(double latitude, double longitude)
-        {
-            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-            using var httpClient = new HttpClient();
-            var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-
-            string weatherCustomData = $"Temperature: {weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                                       $"\r\nWindspeed: {weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                                       $"\r\nElevation(sea level): {weatherData.elevation} metres";
-
-            return weatherCustomData;
         }
         private static string GetSupervisorNewTimePending(InvestigationTask a)
         {

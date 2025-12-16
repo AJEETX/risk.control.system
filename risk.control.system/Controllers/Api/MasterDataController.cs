@@ -18,6 +18,7 @@ namespace risk.control.system.Controllers.Api
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class MasterDataController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -37,10 +38,9 @@ namespace risk.control.system.Controllers.Api
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetInvestigationServicesByInsuranceType(string insuranceType)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -57,7 +57,7 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting investigation types for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
         [HttpGet("GetUserBySearch")]
@@ -65,6 +65,12 @@ namespace risk.control.system.Controllers.Api
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetUserBySearch(string search = "")
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized("User not authenticated.");
+            }
             try
             {
                 var vendorAgentIds = await context.Set<VendorApplicationUser>()
@@ -93,17 +99,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting users");
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("SearchCountry")]
         public IActionResult SearchCountry(string term = "")
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -139,17 +144,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting countries for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("SearchState")]
         public IActionResult SearchState(long countryId, string term = "")
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -176,17 +180,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting states for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("SearchDistrict")]
         public IActionResult SearchDistrict(long stateId, long countryId, string term = "")
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -233,17 +236,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetCountryName")]
         public IActionResult GetCountryName(long id)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -257,17 +259,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting countries for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetStateName")]
         public IActionResult GetStateName(long id, long countryId)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -281,17 +282,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting states for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetStateNameForCountry")]
         public IActionResult GetStateNameForCountry(long countryId, long? id = null)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -315,17 +315,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting states for country for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetDistrictName")]
         public IActionResult GetDistrictName(long id, long stateId, long countryId)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -349,17 +348,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetDistrictNameForAgency")]
         public IActionResult GetDistrictNameForAgency(long id, long stateId, long countryId, long lob, long serviceId, long vendorId)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -383,7 +381,7 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting districts for agency for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -413,17 +411,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetPincodeSuggestions")]
         public IActionResult GetPincodeSuggestions(long countryId, string term = "")
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -510,16 +507,15 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting pincodes for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
         [HttpGet("GetCountrySuggestions")]
         public IActionResult GetCountrySuggestions(string term = "")
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -555,7 +551,7 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting country for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
         [AllowAnonymous]
@@ -596,17 +592,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting isd code");
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("ValidatePhone")]
         public async Task<IActionResult> ValidatePhone(string phone, int countryCode)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -643,16 +638,15 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while validating mobile for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
         [HttpGet("IsValidMobileNumber")]
         public async Task<IActionResult> IsValidMobileNumber(string phone, int countryCode)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -681,17 +675,16 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while checking mobile for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("bsb")]
         public IActionResult GetBSBDetails(string code)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -703,7 +696,7 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting bsb details for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
     }

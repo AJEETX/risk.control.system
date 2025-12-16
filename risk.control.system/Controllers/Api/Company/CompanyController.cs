@@ -1,14 +1,11 @@
-﻿using System.Data;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -50,10 +47,9 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("AllCompanies")]
         public async Task<IActionResult> AllCompanies()
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -65,7 +61,7 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting companies for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -76,10 +72,9 @@ namespace risk.control.system.Controllers.Api.Company
             {
                 return BadRequest("Invalid company ID.");
             }
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -92,7 +87,7 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -121,10 +116,9 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetEmpanelledVendors")]
         public async Task<IActionResult> GetEmpanelledVendors()
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -143,7 +137,7 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
         [HttpGet("GetEmpanelledAgency")]
@@ -153,10 +147,9 @@ namespace risk.control.system.Controllers.Api.Company
             {
                 return BadRequest("Invalid case ID.");
             }
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -175,18 +168,16 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
 
         [HttpGet("GetAvailableVendors")]
         public async Task<IActionResult> GetAvailableVendors()
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -198,17 +189,16 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting available agencies for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("AllServices")]
         public async Task<IActionResult> AllServices(long id)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -220,7 +210,7 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting agency services for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
     }

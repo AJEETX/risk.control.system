@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.Services;
@@ -31,10 +29,9 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetAuto")]
         public async Task<IActionResult> GetAuto(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -47,7 +44,7 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting draft cases for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -55,10 +52,9 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetActive")]
         public async Task<IActionResult> GetActive(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -72,17 +68,16 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting active cases for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetFilesData/{uploadId?}")]
         public async Task<IActionResult> GetFilesData(int uploadId = 0)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -99,7 +94,7 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting uploaded cases for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
 
         }
@@ -111,10 +106,9 @@ namespace risk.control.system.Controllers.Api.Company
             {
                 return BadRequest("Invalid uploadId parameter.");
             }
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -132,7 +126,7 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting uploaded case by {uploadId} for user {UserEmail}", uploadId, userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
     }

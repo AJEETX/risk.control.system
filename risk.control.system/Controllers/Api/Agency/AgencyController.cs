@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.Services;
@@ -32,10 +30,9 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("AllAgencies")]
         public async Task<IActionResult> AllAgencies()
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -48,17 +45,16 @@ namespace risk.control.system.Controllers.Api.Agency
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting agencies for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("AllServices")]
         public async Task<IActionResult> AllServices()
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -70,7 +66,7 @@ namespace risk.control.system.Controllers.Api.Agency
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting agency service for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -81,10 +77,9 @@ namespace risk.control.system.Controllers.Api.Agency
             {
                 return BadRequest("Invalid agency id.");
             }
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -97,17 +92,16 @@ namespace risk.control.system.Controllers.Api.Agency
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting agency users for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -119,7 +113,7 @@ namespace risk.control.system.Controllers.Api.Agency
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting agency users for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -131,10 +125,9 @@ namespace risk.control.system.Controllers.Api.Agency
             {
                 return BadRequest("Invalid agent id.");
             }
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User not authenticated.");
             }
@@ -146,7 +139,7 @@ namespace risk.control.system.Controllers.Api.Agency
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while getting agency users for user {UserEmail}", userEmail);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Text.RegularExpressions;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -28,7 +27,6 @@ namespace risk.control.system.Controllers
     public class CompanyController : Controller
     {
         private const string vendorMapSize = "800x800";
-        private const string vallidDomainExpression = "^[a-zA-Z0-9.-]+$";
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
@@ -382,9 +380,9 @@ namespace risk.control.system.Controllers
                     await LoadModel(model, currentUserEmail);
                     return View(model);
                 }
-                if (!Regex.IsMatch(emailSuffix, vallidDomainExpression))
+                if (!RegexHelper.IsMatch(emailSuffix))
                 {
-                    ModelState.AddModelError("", "Invalid domain address.");
+                    ModelState.AddModelError("", "Invalid email address.");
                     await LoadModel(model, currentUserEmail);
                     return View(model);
                 }
@@ -1047,9 +1045,9 @@ namespace risk.control.system.Controllers
                     await LoadModel(model);
                     return View(model);
                 }
-                if (!Regex.IsMatch(emailSuffix, vallidDomainExpression))
+                if (!RegexHelper.IsMatch(emailSuffix))
                 {
-                    ModelState.AddModelError("", "Invalid domain address.");
+                    ModelState.AddModelError("", "Invalid email address.");
                     await LoadModel(model);
                     return View(model);
                 }

@@ -2,6 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -20,7 +21,9 @@ public interface IAgentIdService
 
 internal class AgentIdService : IAgentIdService
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ApplicationDbContext context;
+    private readonly ICaseService caseService;
+    private readonly IWeatherInfoService weatherInfoService;
     private readonly ILogger<AgentIdService> logger;
     private readonly IFileStorageService fileStorageService;
     private readonly IBackgroundJobClient backgroundJobClient;
@@ -35,6 +38,8 @@ internal class AgentIdService : IAgentIdService
 
     //test PAN FNLPM8635N
     public AgentIdService(ApplicationDbContext context,
+        ICaseService caseService,
+        IWeatherInfoService weatherInfoService,
         ILogger<AgentIdService> logger,
         IFileStorageService fileStorageService,
         IBackgroundJobClient backgroundJobClient,
@@ -45,7 +50,9 @@ internal class AgentIdService : IAgentIdService
         ICustomApiClient customApiCLient,
         IFaceMatchService faceMatchService)
     {
-        this._context = context;
+        this.context = context;
+        this.caseService = caseService;
+        this.weatherInfoService = weatherInfoService;
         this.logger = logger;
         this.fileStorageService = fileStorageService;
         this.backgroundJobClient = backgroundJobClient;
@@ -65,39 +72,17 @@ internal class AgentIdService : IAgentIdService
         byte[] faceBytes;
         try
         {
-            claim = await _context.Investigations
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.ReportTemplate)
-                .ThenInclude(c => c.LocationReport)
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CaseNotes)
-                .FirstOrDefaultAsync(c => c.Id == data.CaseId);
+            claim = await caseService.GetCaseById(data.CaseId);
 
             if (claim.InvestigationReport == null)
             {
                 return null;
             }
-            var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == data.Email);
+            var agent = await context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == data.Email);
 
             location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
 
-            var locationTemplate = await _context.LocationReport
+            var locationTemplate = await context.LocationReport
                 .Include(l => l.AgentIdReport)
                 .FirstOrDefaultAsync(l => l.Id == location.Id);
 
@@ -105,19 +90,6 @@ internal class AgentIdService : IAgentIdService
             var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
             face.FilePath = relativePath;
             face.ImageExtension = Path.GetExtension(fileName);
-            //string imageFileNameWithExtension = Path.GetFileName(data.Image.FileName.ToLower());
-            //string onlyExtension = Path.GetExtension(imageFileNameWithExtension);
-            //face.ImageExtension = onlyExtension;
-
-            //var fileName = Guid.NewGuid().ToString() + Path.GetExtension(data.Image.FileName);
-            //var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "agent-face");
-
-            //if (!Directory.Exists(imagePath))
-            //{
-            //    Directory.CreateDirectory(imagePath);
-            //}
-
-            //filePath = Path.Combine(webHostEnvironment.WebRootPath, "agent-face", fileName);
             using (var dataStream = new MemoryStream())
             {
                 data.Image.CopyTo(dataStream);
@@ -126,7 +98,7 @@ internal class AgentIdService : IAgentIdService
             locationTemplate.Updated = DateTime.Now;
             locationTemplate.AgentEmail = agent.Email;
             locationTemplate.ValidationExecuted = true;
-            _context.LocationReport.Update(locationTemplate);
+            context.LocationReport.Update(locationTemplate);
             face.Updated = DateTime.Now;
             face.UpdatedBy = data.Email;
             face.LongLatTime = DateTime.Now;
@@ -135,7 +107,6 @@ internal class AgentIdService : IAgentIdService
             var latitude = face.LongLat.Substring(0, longLat)?.Trim();
             var longitude = face.LongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
-            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
             byte[]? registeredImage = agent.ProfilePicture;
 
             var expectedLat = string.Empty;
@@ -156,7 +127,7 @@ internal class AgentIdService : IAgentIdService
             #region FACE IMAGE PROCESSING
 
             var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, face.ImageExtension);
-            var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+            var weatherTask = weatherInfoService.GetWeatherAsync(latitude, longitude);
             var addressTask = httpClientService.GetRawAddress(latitude, longitude);
             #endregion FACE IMAGE PROCESSING
 
@@ -172,23 +143,20 @@ internal class AgentIdService : IAgentIdService
             face.DistanceInMetres = distanceInMetres;
             face.DurationInSeconds = durationInSecs;
 
-            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\n" +
-                $"Windspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}\r\n" +
-                $"Elevation(sea level):{weatherData.elevation} metres";
             face.LocationAddress = $"{address}";
             face.LongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             face.ValidationExecuted = true;
 
-            face.LocationInfo = weatherCustomData;
+            face.LocationInfo = weatherData;
             var (confidence, compressImage, similarity) = await faceMatchTask;
 
             await File.WriteAllBytesAsync(face.FilePath, compressImage);
             face.DigitalIdImageMatchConfidence = confidence;
             face.Similarity = similarity;
             face.ImageValid = similarity > 70;
-            _context.AgentIdReport.Update(face);
-            var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync(null, false);
+            context.AgentIdReport.Update(face);
+            var updateClaim = context.Investigations.Update(claim);
+            var rows = await context.SaveChangesAsync(null, false);
 
             return new AppiCheckifyResponse
             {
@@ -208,9 +176,9 @@ internal class AgentIdService : IAgentIdService
             face.DigitalIdImageMatchConfidence = string.Empty;
             face.LocationAddress = "No Address data";
             face.ValidationExecuted = true;
-            _context.AgentIdReport.Update(face);
-            var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync();
+            context.AgentIdReport.Update(face);
+            var updateClaim = context.Investigations.Update(claim);
+            var rows = await context.SaveChangesAsync();
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
@@ -230,39 +198,17 @@ internal class AgentIdService : IAgentIdService
         LocationReport location = null;
         try
         {
-            claim = await _context.Investigations
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.ReportTemplate)
-                .ThenInclude(c => c.LocationReport)
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CaseNotes)
-                .FirstOrDefaultAsync(c => c.Id == data.CaseId);
+            claim = await caseService.GetCaseById(data.CaseId);
 
             if (claim.InvestigationReport == null)
             {
                 return null;
             }
-            var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == data.Email);
+            var agent = context.VendorApplicationUser.FirstOrDefault(u => u.Email == data.Email);
 
             location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
 
-            var locationTemplate = _context.LocationReport
+            var locationTemplate = context.LocationReport
                 .Include(l => l.FaceIds)
                 .FirstOrDefault(l => l.Id == location.Id);
 
@@ -280,7 +226,7 @@ internal class AgentIdService : IAgentIdService
             locationTemplate.AgentEmail = agent.Email;
             locationTemplate.Updated = DateTime.Now;
             locationTemplate.ValidationExecuted = true;
-            _context.LocationReport.Update(locationTemplate);
+            context.LocationReport.Update(locationTemplate);
             face.Updated = DateTime.Now;
             face.UpdatedBy = data.Email;
             face.LongLatTime = DateTime.Now;
@@ -289,7 +235,6 @@ internal class AgentIdService : IAgentIdService
             var latitude = face.LongLat.Substring(0, longLat)?.Trim();
             var longitude = face.LongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
-            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
             byte[]? registeredImage = null;
 
             if (!hasCustomerVerification)
@@ -323,7 +268,7 @@ internal class AgentIdService : IAgentIdService
             #region FACE IMAGE PROCESSING
 
             var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, face.ImageExtension);
-            var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+            var weatherTask = weatherInfoService.GetWeatherAsync(latitude, longitude);
             var addressTask = httpClientService.GetRawAddress(latitude, longitude);
             #endregion FACE IMAGE PROCESSING
 
@@ -338,14 +283,7 @@ internal class AgentIdService : IAgentIdService
             face.Distance = distance;
             face.DistanceInMetres = distanceInMetres;
             face.DurationInSeconds = durationInSecs;
-
-            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                $"\r\n" +
-                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                $"\r\n" +
-                $"\r\nElevation(sea level):{weatherData.elevation} metres";
-
-            face.LocationInfo = weatherCustomData;
+            face.LocationInfo = weatherData;
             face.LocationAddress = $" {address}";
             face.LongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             face.ValidationExecuted = true;
@@ -357,9 +295,9 @@ internal class AgentIdService : IAgentIdService
             face.MatchConfidence = confidence;
             face.Similarity = similarity;
             face.ImageValid = similarity > 70;
-            _context.DigitalIdReport.Update(face);
-            var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync(null, false);
+            context.DigitalIdReport.Update(face);
+            var updateClaim = context.Investigations.Update(claim);
+            var rows = await context.SaveChangesAsync(null, false);
 
             return new AppiCheckifyResponse
             {
@@ -380,9 +318,9 @@ internal class AgentIdService : IAgentIdService
             face.LocationAddress = "No Address data";
             face.ValidationExecuted = true;
             face.ImageValid = false;
-            _context.DigitalIdReport.Update(face);
-            var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync();
+            context.DigitalIdReport.Update(face);
+            var updateClaim = context.Investigations.Update(claim);
+            var rows = await context.SaveChangesAsync();
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
@@ -402,33 +340,11 @@ internal class AgentIdService : IAgentIdService
         Task<string> addressTask = null;
         try
         {
-            claim = await _context.Investigations
-                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.ReportTemplate)
-                .ThenInclude(c => c.LocationReport)
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CaseNotes)
-                .FirstOrDefaultAsync(c => c.Id == data.CaseId);
+            claim = await caseService.GetCaseById(data.CaseId);
 
             var location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
 
-            var locationTemplate = _context.LocationReport
+            var locationTemplate = context.LocationReport
                 .Include(l => l.DocumentIds)
                 .FirstOrDefault(l => l.Id == location.Id);
 
@@ -444,7 +360,7 @@ internal class AgentIdService : IAgentIdService
 
             locationTemplate.ValidationExecuted = true;
             locationTemplate.Updated = DateTime.Now;
-            _context.LocationReport.Update(locationTemplate);
+            context.LocationReport.Update(locationTemplate);
             doc.LongLat = data.LocationLatLong;
             doc.LongLatTime = DateTime.Now;
             var longLat = doc.LongLat.IndexOf("/");
@@ -480,7 +396,7 @@ internal class AgentIdService : IAgentIdService
             doc.Distance = distance;
             doc.LocationMapUrl = map;
 
-            var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claim.ClientCompanyId);
+            var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claim.ClientCompanyId);
             var imageReadOnly = await googleDetecTask;
             if (imageReadOnly != null && imageReadOnly.Count > 0)
             {
@@ -512,9 +428,9 @@ internal class AgentIdService : IAgentIdService
             doc.LocationAddress = $"{rawAddress}";
             doc.LongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             doc.ValidationExecuted = true;
-            _context.DocumentIdReport.Update(doc);
-            _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync(null, false);
+            context.DocumentIdReport.Update(doc);
+            context.Investigations.Update(claim);
+            var rows = await context.SaveChangesAsync(null, false);
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
@@ -533,9 +449,9 @@ internal class AgentIdService : IAgentIdService
             doc.ImageValid = false;
             doc.LocationAddress = "No Address data";
             doc.ValidationExecuted = true;
-            _context.DocumentIdReport.Update(doc);
-            var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync();
+            context.DocumentIdReport.Update(doc);
+            var updateClaim = context.Investigations.Update(claim);
+            var rows = await context.SaveChangesAsync();
 
             return new AppiCheckifyResponse
             {
@@ -557,18 +473,11 @@ internal class AgentIdService : IAgentIdService
         byte[] fileBytes = null; ;
         try
         {
-            claim = await _context.Investigations
-                 .Include(c => c.PolicyDetail)
-                 .Include(c => c.CustomerDetail)
-                 .Include(c => c.BeneficiaryDetail)
-                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.ReportTemplate)
-                .ThenInclude(c => c.LocationReport)
-                .FirstOrDefaultAsync(c => c.Id == data.CaseId);
+            claim = await caseService.GetCaseByIdForMedia(data.CaseId);
 
             var location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
 
-            var locationTemplate = await _context.LocationReport
+            var locationTemplate = await context.LocationReport
                 .Include(l => l.MediaReports)
                 .FirstOrDefaultAsync(l => l.Id == location.Id);
 
@@ -588,8 +497,6 @@ internal class AgentIdService : IAgentIdService
             var latLongString = latitude + "," + longitude;
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
-            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
             if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
@@ -604,7 +511,7 @@ internal class AgentIdService : IAgentIdService
             }
             var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
-            var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+            var weatherTask = weatherInfoService.GetWeatherAsync(latitude, longitude);
             addressTask = httpClientService.GetRawAddress(latitude, longitude);
 
             await Task.WhenAll(addressTask, weatherTask, mapTask);
@@ -619,18 +526,12 @@ internal class AgentIdService : IAgentIdService
             media.DistanceInMetres = distanceInMetres;
             media.DurationInSeconds = durationInSecs;
 
-            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                $"\r\n" +
-                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                $"\r\n" +
-                $"\r\nElevation(sea level):{weatherData.elevation} metres";
-
             media.ImageExtension = media.ImageExtension;
             media.MediaExtension = media.ImageExtension.TrimStart('.');
             media.ValidationExecuted = true;
             media.ImageValid = true;
             media.LocationAddress = $"{address}";
-            media.LocationInfo = weatherCustomData;
+            media.LocationInfo = weatherData;
             media.LongLat = $"Latitude = {latitude}, Longitude = {longitude}";
             media.LongLatTime = DateTime.UtcNow;
             var mimeType = data.Image.ContentType.ToLower();
@@ -640,7 +541,7 @@ internal class AgentIdService : IAgentIdService
 
             media.MediaType = isVideo ? MediaType.VIDEO : MediaType.AUDIO;
 
-            await _context.SaveChangesAsync(null, false);
+            await context.SaveChangesAsync(null, false);
 
             //backgroundJobClient.Enqueue(() => httpClientService.TranscribeAsync(location.Id, data.ReportName, "media", fileName, filePath));
 
@@ -657,9 +558,9 @@ internal class AgentIdService : IAgentIdService
             media.ImageValid = false;
             media.LocationAddress = "No Address data";
             media.ValidationExecuted = true;
-            _context.MediaReport.Update(media);
-            var updateClaim = _context.Investigations.Update(claim);
-            var rows = await _context.SaveChangesAsync();
+            context.MediaReport.Update(media);
+            var updateClaim = context.Investigations.Update(claim);
+            var rows = await context.SaveChangesAsync();
 
             return new AppiCheckifyResponse
             {
@@ -677,36 +578,32 @@ internal class AgentIdService : IAgentIdService
     {
         try
         {
-        var claim = await _context.Investigations
-                .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.ReportTemplate)
-                .ThenInclude(c => c.LocationReport)
-                .FirstOrDefaultAsync(c => c.Id == caseId);
+            var claim = await caseService.GetCaseByIdForQuestions(caseId);
 
-        var location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == locationName);
+            var location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == locationName);
 
-        var locationTemplate =await _context.LocationReport
-            .Include(l => l.Questions)
-            .FirstOrDefaultAsync(l => l.Id == location.Id);
+            var locationTemplate = await context.LocationReport
+                .Include(l => l.Questions)
+                .FirstOrDefaultAsync(l => l.Id == location.Id);
 
-        locationTemplate.Questions.RemoveAll(q => true);
-        foreach (var q in Questions)
-        {
-            locationTemplate.Questions.Add(new Question
+            locationTemplate.Questions.RemoveAll(q => true);
+            foreach (var q in Questions)
             {
-                QuestionText = q.QuestionText,
-                QuestionType = q.QuestionType,
-                IsRequired = q.IsRequired,
-                Options = q.Options?.Trim(),
-                AnswerText = q.AnswerText?.Trim(),
-                Updated = DateTime.Now,
-            });
-        }
-        locationTemplate.ValidationExecuted = true;
-        locationTemplate.Updated = DateTime.Now;
-        _context.LocationReport.Update(locationTemplate);
-        var rowsAffected = await _context.SaveChangesAsync(null, false);
-        return rowsAffected > 0;
+                locationTemplate.Questions.Add(new Question
+                {
+                    QuestionText = q.QuestionText,
+                    QuestionType = q.QuestionType,
+                    IsRequired = q.IsRequired,
+                    Options = q.Options?.Trim(),
+                    AnswerText = q.AnswerText?.Trim(),
+                    Updated = DateTime.Now,
+                });
+            }
+            locationTemplate.ValidationExecuted = true;
+            locationTemplate.Updated = DateTime.Now;
+            context.LocationReport.Update(locationTemplate);
+            var rowsAffected = await context.SaveChangesAsync(null, false);
+            return rowsAffected > 0;
 
         }
         catch (Exception ex)

@@ -144,6 +144,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddScoped<IWeatherInfoService, WeatherInfoService>();
 builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<IAddInvestigationService, AddInvestigationService>();
 builder.Services.AddScoped<IAssessorService, AssessorService>();
@@ -197,7 +198,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
 builder.Services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
-builder.Services.AddScoped<IClaimsService, ClaimsService>();
+builder.Services.AddScoped<ICaseService, CaseService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IFtpService, FtpService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();

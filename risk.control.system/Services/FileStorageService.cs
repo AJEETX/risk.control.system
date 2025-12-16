@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace risk.control.system.Services
+﻿namespace risk.control.system.Services
 {
     public interface IFileStorageService
     {
@@ -123,10 +121,6 @@ namespace risk.control.system.Services
 
         private string GetOrCreateFolder(string category, string? subFolder, string? subSubFolder)
         {
-            //category = SanitizeFolderName(category);
-            //subFolder = SanitizeFolderName(subFolder ?? "");
-            //subSubFolder = SanitizeFolderName(subSubFolder ?? "");
-
             var folder = Path.Combine(env.ContentRootPath, RootFolder,        // ALWAYS start with Document/
                 category           // Policy, Agency, Company
             );
@@ -156,10 +150,6 @@ namespace risk.control.system.Services
             var path = Path.Combine(RootFolder, category, subFolder ?? "", subSubFolder ?? "", fileName).Replace("\\", "/");
 
             return path;
-        }
-        private string SanitizeFolderName(string name)
-        {
-            return Regex.Replace(name, "[^a-zA-Z0-9_-]", "");
         }
     }
 }

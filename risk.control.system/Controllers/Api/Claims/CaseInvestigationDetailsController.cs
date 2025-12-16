@@ -7,7 +7,6 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -23,415 +22,553 @@ namespace risk.control.system.Controllers.Api.Claims
     public class CaseInvestigationDetailsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly IClaimsService claimsService;
+        private readonly ILogger<CaseInvestigationDetailsController> logger;
+        private readonly ICaseService caseService;
+        private readonly IWeatherInfoService weatherInfoService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IHttpClientService httpClientService;
-        private static readonly HttpClient httpClient = new HttpClient();
 
         public CaseInvestigationDetailsController(ApplicationDbContext context,
-            IClaimsService claimsService,
-            IWebHostEnvironment webHostEnvironment,
-            IHttpClientService httpClientService)
+            ILogger<CaseInvestigationDetailsController> logger,
+            ICaseService caseService,
+            IWeatherInfoService weatherInfoService,
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
-            this.claimsService = claimsService;
+            this.logger = logger;
+            this.caseService = caseService;
+            this.weatherInfoService = weatherInfoService;
             this.webHostEnvironment = webHostEnvironment;
-            this.httpClientService = httpClientService;
         }
-
 
         [HttpGet("GetPolicyDetail")]
         public async Task<IActionResult> GetPolicyDetail(long id)
         {
-            var policy = await _context.PolicyDetail
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            try
+            {
+                var policy = await _context.PolicyDetail
                 .Include(p => p.InvestigationServiceType)
                 .Include(p => p.CostCentre)
                 .Include(p => p.CaseEnabler)
                 .FirstOrDefaultAsync(p => p.PolicyDetailId == id);
 
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
+                var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
 
-            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+                var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
-            var response = new
+                var response = new
+                {
+                    Document =
+                        policy.DocumentPath != null ? policy.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
+                    ContractNumber = policy.ContractNumber,
+                    ClaimType = policy.InsuranceType.GetEnumDisplayName(),
+                    ContractIssueDate = policy.ContractIssueDate.ToString("dd-MMM-yyyy"),
+                    DateOfIncident = policy.DateOfIncident.ToString("dd-MMM-yyyy"),
+                    SumAssuredValue = policy.SumAssuredValue,
+                    InvestigationServiceType = policy.InvestigationServiceType.Name,
+                    CaseEnabler = policy.CaseEnabler.Name,
+                    CauseOfLoss = policy.CauseOfLoss,
+                    CostCentre = policy.CostCentre.Name,
+                };
+                return Ok(response);
+            }
+            catch (Exception ex)
             {
-                Document =
-                    policy.DocumentPath != null ? policy.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
-                ContractNumber = policy.ContractNumber,
-                ClaimType = policy.InsuranceType.GetEnumDisplayName(),
-                ContractIssueDate = policy.ContractIssueDate.ToString("dd-MMM-yyyy"),
-                DateOfIncident = policy.DateOfIncident.ToString("dd-MMM-yyyy"),
-                SumAssuredValue = policy.SumAssuredValue,
-                InvestigationServiceType = policy.InvestigationServiceType.Name,
-                CaseEnabler = policy.CaseEnabler.Name,
-                CauseOfLoss = policy.CauseOfLoss,
-                CostCentre = policy.CostCentre.Name,
-            };
-            return Ok(response);
+                logger.LogError(ex, "Error occurred while getting case detail for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet("GetPolicyNotes")]
         public IActionResult GetPolicyNotes(long claimId)
         {
-            var claim = claimsService.GetCasesWithDetail()
-                .Include(c => c.CaseNotes)
-                .FirstOrDefault(c => c.Id == claimId);
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            var response = new
+            if (string.IsNullOrEmpty(userEmail))
             {
-                notes = claim.CaseNotes.ToList()
-            };
-            return Ok(response);
+                return Unauthorized("User not authenticated.");
+            }
+            try
+            {
+
+                var claim = caseService.GetCasesWithDetail()
+                    .Include(c => c.CaseNotes)
+                    .FirstOrDefault(c => c.Id == claimId);
+
+                var response = new
+                {
+                    notes = claim.CaseNotes.ToList()
+                };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting case notes for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
         [HttpGet("GetCustomerDetail")]
         public async Task<IActionResult> GetCustomerDetail(long id)
         {
-            var currentUserEmail = HttpContext.User.Identity.Name;
-            var isAgencyUser = await _context.VendorApplicationUser.AnyAsync(u => u.Email == currentUserEmail);
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            var customer = await _context.CustomerDetail
-                .Include(c => c.Country)
-                .Include(c => c.State)
-                .Include(c => c.District)
-                .Include(c => c.PinCode)
-                .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
-            if (isAgencyUser)
+            if (string.IsNullOrEmpty(userEmail))
             {
-                customer.PhoneNumber = new string('*', customer.PhoneNumber.Length - 4) + customer.PhoneNumber.Substring(customer.PhoneNumber.Length - 4);
+                return Unauthorized("User not authenticated.");
             }
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+            try
+            {
+                var isAgencyUser = await _context.VendorApplicationUser.AnyAsync(u => u.Email == userEmail);
 
-            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
-
-            return Ok(
-                new
+                var customer = await _context.CustomerDetail
+                    .Include(c => c.Country)
+                    .Include(c => c.State)
+                    .Include(c => c.District)
+                    .Include(c => c.PinCode)
+                    .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
+                if (isAgencyUser)
                 {
-                    Customer = customer?.ImagePath != null ? customer.ImagePath : "/img/user.png",
-                    CustomerName = customer.Name,
-                    PhoneNumber = new string('*', customer.PhoneNumber.ToString().Length - 4) + customer.PhoneNumber.ToString().Substring(customer.PhoneNumber.ToString().Length - 4),
-                    Address = customer.Addressline + "  " + customer.District.Name + "  " + customer.State.Name + "  " + customer.Country.Name + "  " + customer.PinCode.Code,
-                    Occupation = customer.Occupation.GetEnumDisplayName(),
-                    Income = customer.Income.GetEnumDisplayName(),
-                    Education = customer.Education.GetEnumDisplayName(),
-                    DateOfBirth = customer.DateOfBirth.GetValueOrDefault().ToString("dd-MM-yyyy"),
+                    customer.PhoneNumber = new string('*', customer.PhoneNumber.Length - 4) + customer.PhoneNumber.Substring(customer.PhoneNumber.Length - 4);
                 }
-                );
+                var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+
+                var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
+                return Ok(
+                    new
+                    {
+                        Customer = customer?.ImagePath != null ? customer.ImagePath : "/img/user.png",
+                        CustomerName = customer.Name,
+                        PhoneNumber = new string('*', customer.PhoneNumber.ToString().Length - 4) + customer.PhoneNumber.ToString().Substring(customer.PhoneNumber.ToString().Length - 4),
+                        Address = customer.Addressline + "  " + customer.District.Name + "  " + customer.State.Name + "  " + customer.Country.Name + "  " + customer.PinCode.Code,
+                        Occupation = customer.Occupation.GetEnumDisplayName(),
+                        Income = customer.Income.GetEnumDisplayName(),
+                        Education = customer.Education.GetEnumDisplayName(),
+                        DateOfBirth = customer.DateOfBirth.GetValueOrDefault().ToString("dd-MM-yyyy"),
+                    }
+                    );
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting customer for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet("GetBeneficiaryDetail")]
         public async Task<IActionResult> GetBeneficiaryDetail(long id, long claimId)
         {
-            var beneficiary = await _context.BeneficiaryDetail
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            try
+            {
+                var beneficiary = await _context.BeneficiaryDetail
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.Country)
                 .Include(c => c.State)
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.InvestigationTask.Id == claimId);
-            var currentUserEmail = HttpContext.User.Identity.Name;
+                var currentUserEmail = HttpContext.User.Identity.Name;
 
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+                var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
-            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+                var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
-            return Ok(new
-            {
-                Beneficiary = beneficiary?.ImagePath != null ? beneficiary?.ImagePath : "/img/user.png",
-                BeneficiaryName = beneficiary.Name,
-                Dob = (int)beneficiary.DateOfBirth.GetValueOrDefault().Subtract(DateTime.Now).TotalDays / 365,
-                Income = beneficiary.Income.GetEnumDisplayName(),
-                BeneficiaryRelation = beneficiary.BeneficiaryRelation.Name,
-                Address = beneficiary.Addressline + "  " + beneficiary.District.Name + "  " + beneficiary.State.Name + "  " + beneficiary.Country.Name + "  " + beneficiary.PinCode.Code,
-                PhoneNumber = new string('*', beneficiary.PhoneNumber.Length - 4) + beneficiary.PhoneNumber.Substring(beneficiary.PhoneNumber.Length - 4)
+                return Ok(new
+                {
+                    Beneficiary = beneficiary?.ImagePath != null ? beneficiary?.ImagePath : "/img/user.png",
+                    BeneficiaryName = beneficiary.Name,
+                    Dob = (int)beneficiary.DateOfBirth.GetValueOrDefault().Subtract(DateTime.Now).TotalDays / 365,
+                    Income = beneficiary.Income.GetEnumDisplayName(),
+                    BeneficiaryRelation = beneficiary.BeneficiaryRelation.Name,
+                    Address = beneficiary.Addressline + "  " + beneficiary.District.Name + "  " + beneficiary.State.Name + "  " + beneficiary.Country.Name + "  " + beneficiary.PinCode.Code,
+                    PhoneNumber = new string('*', beneficiary.PhoneNumber.Length - 4) + beneficiary.PhoneNumber.Substring(beneficiary.PhoneNumber.Length - 4)
+                }
+                );
             }
-            );
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting beneficiary for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
         [HttpGet("GetCustomerMap")]
         public async Task<IActionResult> GetCustomerMap(long id)
         {
-            var customer = await _context.CustomerDetail
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            try
+            {
+                var customer = await _context.CustomerDetail
                 .Include(c => c.Country)
                 .Include(c => c.State)
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
 
-            var latitude = customer.Latitude;
-            var longitude = customer.Longitude.Trim();
-            var latLongString = latitude + "," + longitude;
-            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-            var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var latitude = customer.Latitude;
+                var longitude = customer.Longitude.Trim();
+                var latLongString = latitude + "," + longitude;
 
-            var data = new
+                string weatherCustomData = await weatherInfoService.GetWeatherAsync(latitude, longitude); ;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+
+                var data = new
+                {
+                    profileMap = url,
+                    weatherData = weatherCustomData,
+                    address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name + " " + customer.Country.Name + " " + customer.PinCode.Code,
+                    position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
+                };
+                return Ok(data);
+            }
+            catch (Exception ex)
             {
-                profileMap = url,
-                weatherData = weatherCustomData,
-                address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name + " " + customer.Country.Name + " " + customer.PinCode.Code,
-                position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
-            };
-            return Ok(data);
+                logger.LogError(ex, "Error occurred while getting customer address map for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet("GetBeneficiaryMap")]
         public async Task<IActionResult> GetBeneficiaryMap(long id, long claimId)
         {
-            var beneficiary = await _context.BeneficiaryDetail
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.Country)
-                .Include(c => c.State)
-                .Include(c => c.District)
-                .Include(c => c.PinCode)
-                .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.InvestigationTaskId == claimId);
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            var latitude = beneficiary.Latitude;
-            var longitude = beneficiary.Longitude.Trim();
-            var latLongString = latitude + "," + longitude;
-            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-            var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
-
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-            var data = new
+            if (string.IsNullOrEmpty(userEmail))
             {
-                profileMap = url,
-                weatherData = weatherCustomData,
-                address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code,
-                position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
-            };
-            return Ok(data);
+                return Unauthorized("User not authenticated.");
+            }
+            try
+            {
+                var beneficiary = await _context.BeneficiaryDetail
+                               .Include(c => c.BeneficiaryRelation)
+                               .Include(c => c.Country)
+                               .Include(c => c.State)
+                               .Include(c => c.District)
+                               .Include(c => c.PinCode)
+                               .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.InvestigationTaskId == claimId);
+
+                var latitude = beneficiary.Latitude;
+                var longitude = beneficiary.Longitude.Trim();
+                string weatherCustomData = await weatherInfoService.GetWeatherAsync(latitude, longitude); ;
+                var latLongString = latitude + "," + longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var data = new
+                {
+                    profileMap = url,
+                    weatherData = weatherCustomData,
+                    address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code,
+                    position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
+                };
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting beneficiary address map for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet("GetAgentDetail")]
         public async Task<IActionResult> GetAgentDetail(long caseId, long faceId)
         {
-            var claim = claimsService.GetCasesWithDetail()
-                .FirstOrDefault(c => c.Id == caseId);
-            var agentReport = await _context.AgentIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            var longLat = agentReport.LongLat.IndexOf(",");
-            var lat = agentReport?.LongLat.Substring(0, longLat)?.Trim();
-            var LatitudeIndex = lat.IndexOf("=");
-            var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
-            var longi = agentReport?.LongLat.Substring(longLat + 1)?.Trim();
-            var LongitudeIndex = longi.IndexOf("=");
-            var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
-
-            if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+            if (string.IsNullOrEmpty(userEmail))
             {
-                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
-
-                if (agentReport is not null)
-                {
-                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new
-                    {
-                        center,
-                        dakota,
-                        frick,
-                        url = string.Format(agentReport.LocationMapUrl, "500", "500"),
-                        distance = agentReport.Distance,
-                        duration = agentReport.Duration,
-                        Address = "Life-Assured"
-                    });
-                }
+                return Unauthorized("User not authenticated.");
             }
-            else
+            try
             {
-                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var claim = caseService.GetCasesWithDetail()
+                                .FirstOrDefault(c => c.Id == caseId);
+                var agentReport = await _context.AgentIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
 
-                if (agentReport is not null)
+                var longLat = agentReport.LongLat.IndexOf(",");
+                var lat = agentReport?.LongLat.Substring(0, longLat)?.Trim();
+                var LatitudeIndex = lat.IndexOf("=");
+                var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
+                var longi = agentReport?.LongLat.Substring(longLat + 1)?.Trim();
+                var LongitudeIndex = longi.IndexOf("=");
+                var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
+
+                if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
                 {
-                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new
+                    var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                    var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+
+                    if (agentReport is not null)
                     {
-                        center,
-                        dakota,
-                        frick,
-                        url = string.Format(agentReport.LocationMapUrl, "500", "500"),
-                        distance = agentReport.Distance,
-                        duration = agentReport.Duration,
-                        Address = "Beneficiary"
-                    });
+                        var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                        return Ok(new
+                        {
+                            center,
+                            dakota,
+                            frick,
+                            url = string.Format(agentReport.LocationMapUrl, "500", "500"),
+                            distance = agentReport.Distance,
+                            duration = agentReport.Duration,
+                            Address = "Life-Assured"
+                        });
+                    }
                 }
+                else
+                {
+                    var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                    var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+
+                    if (agentReport is not null)
+                    {
+                        var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                        return Ok(new
+                        {
+                            center,
+                            dakota,
+                            frick,
+                            url = string.Format(agentReport.LocationMapUrl, "500", "500"),
+                            distance = agentReport.Distance,
+                            duration = agentReport.Duration,
+                            Address = "Beneficiary"
+                        });
+                    }
+                }
+                return Ok();
             }
-            return Ok();
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting agent detail for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
         [HttpGet("GetFaceDetail")]
         public async Task<IActionResult> GetFaceDetail(long caseId, long faceId)
         {
-            var claim = claimsService.GetCasesWithDetail()
-                .FirstOrDefault(c => c.Id == caseId);
-            var faceReport = await _context.DigitalIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            var longLat = faceReport.LongLat.IndexOf(",");
-            var lat = faceReport?.LongLat.Substring(0, longLat)?.Trim();
-            var LatitudeIndex = lat.IndexOf("=");
-            var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
-            var longi = faceReport?.LongLat.Substring(longLat + 1)?.Trim();
-            var LongitudeIndex = longi.IndexOf("=");
-            var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
-
-            if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+            if (string.IsNullOrEmpty(userEmail))
             {
-                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
-
-                if (faceReport is not null)
-                {
-                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new
-                    {
-                        center,
-                        dakota,
-                        frick,
-                        url = string.Format(faceReport.LocationMapUrl, "500", "500"),
-                        distance = faceReport.Distance,
-                        duration = faceReport.Duration,
-                        Address = "Life-Assured"
-                    });
-                }
+                return Unauthorized("User not authenticated.");
             }
-            else
+            try
             {
-                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var claim = caseService.GetCasesWithDetail()
+                    .FirstOrDefault(c => c.Id == caseId);
+                var faceReport = await _context.DigitalIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
 
-                if (faceReport is not null)
+                var longLat = faceReport.LongLat.IndexOf(",");
+                var lat = faceReport?.LongLat.Substring(0, longLat)?.Trim();
+                var LatitudeIndex = lat.IndexOf("=");
+                var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
+                var longi = faceReport?.LongLat.Substring(longLat + 1)?.Trim();
+                var LongitudeIndex = longi.IndexOf("=");
+                var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
+
+                if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
                 {
-                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new
+                    var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                    var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+
+                    if (faceReport is not null)
                     {
-                        center,
-                        dakota,
-                        frick,
-                        url = string.Format(faceReport.LocationMapUrl, "500", "500"),
-                        distance = faceReport.Distance,
-                        duration = faceReport.Duration,
-                        Address = "Beneficiary"
-                    });
+                        var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                        return Ok(new
+                        {
+                            center,
+                            dakota,
+                            frick,
+                            url = string.Format(faceReport.LocationMapUrl, "500", "500"),
+                            distance = faceReport.Distance,
+                            duration = faceReport.Duration,
+                            Address = "Life-Assured"
+                        });
+                    }
                 }
+                else
+                {
+                    var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                    var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+
+                    if (faceReport is not null)
+                    {
+                        var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                        return Ok(new
+                        {
+                            center,
+                            dakota,
+                            frick,
+                            url = string.Format(faceReport.LocationMapUrl, "500", "500"),
+                            distance = faceReport.Distance,
+                            duration = faceReport.Duration,
+                            Address = "Beneficiary"
+                        });
+                    }
+                }
+                return Ok();
+
             }
-            return Ok();
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting face detail for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
         [HttpGet("GetDocumentDetail")]
         public async Task<IActionResult> GetDocumentDetail(long caseId, long docId)
         {
-            var claim = claimsService.GetCasesWithDetail()
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized("User not authenticated.");
+            }
+            try
+            {
+                var claim = caseService.GetCasesWithDetail()
                 .FirstOrDefault(c => c.Id == caseId);
-            var docReport = await _context.DocumentIdReport.FirstOrDefaultAsync(l => l.Id == docId);
+                var docReport = await _context.DocumentIdReport.FirstOrDefaultAsync(l => l.Id == docId);
 
-            var longLat = docReport.LongLat.IndexOf(",");
-            var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();
-            var LatitudeIndex = lat.IndexOf("=");
-            var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
-            var longi = docReport?.LongLat.Substring(longLat + 1)?.Trim();
-            var LongitudeIndex = longi.IndexOf("=");
-            var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
+                var longLat = docReport.LongLat.IndexOf(",");
+                var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();
+                var LatitudeIndex = lat.IndexOf("=");
+                var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
+                var longi = docReport?.LongLat.Substring(longLat + 1)?.Trim();
+                var LongitudeIndex = longi.IndexOf("=");
+                var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
 
-            if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
-            {
-                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
-
-                if (docReport is not null)
+                if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
                 {
-                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new
-                    {
-                        center,
-                        dakota,
-                        frick,
-                        url = string.Format(docReport.LocationMapUrl, "500", "500"),
-                        distance = docReport.Distance,
-                        duration = docReport.Duration,
-                        Address = "Life-Assured"
-                    });
-                }
-            }
-            else
-            {
-                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                    var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                    var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
 
-                if (docReport is not null)
-                {
-                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new
+                    if (docReport is not null)
                     {
-                        center,
-                        dakota,
-                        frick,
-                        url = string.Format(docReport.LocationMapUrl, "500", "500"),
-                        distance = docReport.Distance,
-                        duration = docReport.Duration,
-                        Address = "Beneficiary"
-                    });
+                        var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                        return Ok(new
+                        {
+                            center,
+                            dakota,
+                            frick,
+                            url = string.Format(docReport.LocationMapUrl, "500", "500"),
+                            distance = docReport.Distance,
+                            duration = docReport.Duration,
+                            Address = "Life-Assured"
+                        });
+                    }
                 }
+                else
+                {
+                    var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                    var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+
+                    if (docReport is not null)
+                    {
+                        var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                        return Ok(new
+                        {
+                            center,
+                            dakota,
+                            frick,
+                            url = string.Format(docReport.LocationMapUrl, "500", "500"),
+                            distance = docReport.Distance,
+                            duration = docReport.Duration,
+                            Address = "Beneficiary"
+                        });
+                    }
+                }
+                return Ok();
             }
-            return Ok();
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting document detail for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
         [HttpGet("GetMediaDetail")]
         public async Task<IActionResult> GetMediaDetail(long caseId, long docId)
         {
-            var currentUserEmail = HttpContext.User.Identity.Name;
-            var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var claim = claimsService.GetCasesWithDetail()
-                .FirstOrDefault(c => c.Id == caseId);
-            var docReport = await _context.MediaReport.FirstOrDefaultAsync(l => l.Id == docId);
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            var longLat = docReport.LongLat.IndexOf(",");
-            var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();
-            var LatitudeIndex = lat.IndexOf("=");
-            var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
-            var longi = docReport?.LongLat.Substring(longLat + 1)?.Trim();
-            var LongitudeIndex = longi.IndexOf("=");
-            var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
-
-            if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+            if (string.IsNullOrEmpty(userEmail))
             {
-                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
-
-                if (docReport is not null)
-                {
-                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new
-                    {
-                        center,
-                        dakota,
-                        frick,
-                        url = string.Format(docReport.LocationMapUrl, "500", "500"),
-                        distance = docReport.Distance,
-                        duration = docReport.Duration,
-                        Address = "Life-Assured"
-                    });
-                }
+                return Unauthorized("User not authenticated.");
             }
-            else
+            try
             {
-                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var currentUserEmail = HttpContext.User.Identity.Name;
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var claim = caseService.GetCasesWithDetail()
+                    .FirstOrDefault(c => c.Id == caseId);
+                var docReport = await _context.MediaReport.FirstOrDefaultAsync(l => l.Id == docId);
 
-                if (docReport is not null)
+                var longLat = docReport.LongLat.IndexOf(",");
+                var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();
+                var LatitudeIndex = lat.IndexOf("=");
+                var latitude = lat.Substring(LatitudeIndex + 1)?.Trim();
+                var longi = docReport?.LongLat.Substring(longLat + 1)?.Trim();
+                var LongitudeIndex = longi.IndexOf("=");
+                var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
+
+                if (claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
                 {
-                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new
+                    var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                    var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+
+                    if (docReport is not null)
                     {
-                        center,
-                        dakota,
-                        frick,
-                        url = string.Format(docReport.LocationMapUrl, "500", "500"),
-                        distance = docReport.Distance,
-                        duration = docReport.Duration,
-                        Address = "Beneficiary"
-                    });
+                        var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                        return Ok(new
+                        {
+                            center,
+                            dakota,
+                            frick,
+                            url = string.Format(docReport.LocationMapUrl, "500", "500"),
+                            distance = docReport.Distance,
+                            duration = docReport.Duration,
+                            Address = "Life-Assured"
+                        });
+                    }
                 }
+                else
+                {
+                    var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                    var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+
+                    if (docReport is not null)
+                    {
+                        var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                        return Ok(new
+                        {
+                            center,
+                            dakota,
+                            frick,
+                            url = string.Format(docReport.LocationMapUrl, "500", "500"),
+                            distance = docReport.Distance,
+                            duration = docReport.Duration,
+                            Address = "Beneficiary"
+                        });
+                    }
+                }
+                return Ok();
             }
-            return Ok();
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting media detail for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }
