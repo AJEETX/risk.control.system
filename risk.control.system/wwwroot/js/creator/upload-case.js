@@ -111,18 +111,18 @@
                     if (row.completed) {
                         return `
                         <span class="custom-message-badge i-blue" title="${data}" data-toggle="tooltip">
-                             ${data}
+                            <small><strong> ${data}</strong></small>
                         </span>`;
                     } else {
                         if (row.status == 'Error') {
                             return `
                         <span class="custom-message-badge i-red" title="${data}" data-toggle="tooltip">
-                            ${data}
+                            <small><strong> ${data}</strong></small>
                         </span>`;
                         } else {
                             return `
                         <span class="custom-message-badge i-grey" title="${data}" data-toggle="tooltip">
-                            ${data}
+                            <small><strong> ${data}</strong></small>
                         </span>`;
                         }
                     }

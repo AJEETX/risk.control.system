@@ -126,18 +126,14 @@ $(document).ready(function () {
     $("#email, #resetemail").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
-            var token = $('input[name="__RequestVerificationToken"]').val();
             $.ajax({
                 url: "/api/MasterData/GetUserBySearch",
                 type: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token   // ✔ Correct header name
-                },
                 data: {
                     search: request.term
                 },
                 success: function (data) {
+                    console.log(data); // Check what the server is sending
                     // Ensure data is in the format [{ label: "email", value: "email" }]
                     response($.map(data, function (item) {
                         return { label: item, value: item };

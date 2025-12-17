@@ -62,15 +62,8 @@ namespace risk.control.system.Controllers.Api
         }
         [HttpGet("GetUserBySearch")]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetUserBySearch(string search = "")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var vendorAgentIds = await context.Set<VendorApplicationUser>()

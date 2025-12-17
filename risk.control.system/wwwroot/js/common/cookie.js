@@ -57,8 +57,9 @@
             })
         })
             .then(r => r.json())
-            .then(() => {
-
+            .then((r) => {
+                console.log('cookie saved');
+                console.log(r);
                 // Ensure main consent cookie exists
                 if (!getCookie("cookieConsent")) {
                     setCookie("cookieConsent", "Accepted", 365);
@@ -98,10 +99,9 @@ function acceptCookies() {
         body: JSON.stringify({})
     })
         .then(r => r.json())
-        .then(() => {
-            //localStorage.setItem("analyticsCookies", "true");
-            //localStorage.setItem("perfomanceCookies", "true");
-
+        .then((r) => {
+            console.log('cookie accepted');
+            console.log(r);
             if (!getCookie("cookieConsent")) {
                 setCookie("cookieConsent", "Accepted", 365);
             }
