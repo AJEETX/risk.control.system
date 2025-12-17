@@ -1,11 +1,4 @@
 ﻿
-let mapz;
-var showCustomerMap = false;
-var showBeneficiaryMap = false;
-var showFaceMap = false;
-var showLocationMap = false;
-var showOcrMap = false;
-const image = "/images/beachflag.png";
 const MaxSizeInBytes = 5242880; // 5MG for upload
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -44,26 +37,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+let internetPopup = null;
+
 function checkInternetConnection() {
     if (!navigator.onLine) {
-        $.confirm({
+
+        // If popup already exists, do not open another
+        if (internetPopup) return;
+
+        internetPopup = $.confirm({
             title: 'No Internet Connection',
             content: 'It looks like your internet connection is down. Please check and try again.',
             type: 'red',
+            closeIcon: false,
             buttons: {
                 tryAgain: {
                     text: 'Retry',
                     action: function () {
-                        checkInternetConnection(); // Retry check
+                        internetPopup = null; // reset before retry
+                        checkInternetConnection();
+                        return false; // keep dialog open if still offline
                     }
                 },
                 close: function () {
-                    // Do nothing
+                    internetPopup = null;
                 }
+            },
+            onDestroy: function () {
+                internetPopup = null;
             }
         });
     }
+    else {
+        // If connection is back, close popup automatically
+        if (internetPopup) {
+            internetPopup.close();
+            internetPopup = null;
+        }
+    }
 }
+
 function checkFormCompletion(formSelector, create = false) {
     let isFormComplete = true;
 
@@ -489,7 +502,6 @@ $(document).ready(function () {
             $(this).val(""); // clear the input
         }
     });
-    checkInternetConnection();
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -715,7 +727,8 @@ fetchIpInfo();
 // Load notifications on page load WITHOUT keeping it open
 loadNotifications(false);
 
-// Optional: Listen for offline events
-window.addEventListener('offline', function () {
-    checkInternetConnection();
+window.addEventListener('online', function () {
+    internetPopupOpen = false;
+    $('.jconfirm').remove();
 });
+
