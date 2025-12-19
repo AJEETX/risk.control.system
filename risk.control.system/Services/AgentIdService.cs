@@ -526,7 +526,6 @@ internal class AgentIdService : IAgentIdService
             media.DistanceInMetres = distanceInMetres;
             media.DurationInSeconds = durationInSecs;
 
-            media.ImageExtension = media.ImageExtension;
             media.MediaExtension = media.ImageExtension.TrimStart('.');
             media.ValidationExecuted = true;
             media.ImageValid = true;

@@ -88,7 +88,7 @@
                             </ul>
                         </div>
                         <div class="col-5 text-center">
-                            <img id="documentImage" alt="policy-image" class="img-fluid form-Image" src="@Applicationsettings.POLICY_BLANK_IMAGE" data-bs-toggle="tooltip" title="No Case Document" />
+                            <img id="documentImage" alt="policy-image" class="img-fluid form-Image" src="@Applicationsettings.POLICY_BLANK_IMAGE" data-bs-toggle="tooltip" title="No Case Document" alt="Case Document" />
                         </div>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                     <div class="text-right">
                         @if (Model.AllowedToCreate)
                         {
-                            <a id="create-policy" class="btn btn-success" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Add Case</a>
+                            <a id="create-policy" class="btn btn-success" asp-action="CreateCase"><i class="far fa-file-powerpoint"></i> Add Case</a>
                         }
                         else
                         {

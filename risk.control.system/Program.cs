@@ -144,6 +144,13 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddScoped<IVendorServiceTypeManager, VendorServiceTypeManager>();
+builder.Services.AddScoped<IAgencyUserCreateEditService, AgencyUserCreateEditService>();
+builder.Services.AddScoped<IAgencyCreateEditService, AgencyCreateEditService>();
+builder.Services.AddScoped<IValidateImageService, ValidateImageService>();
+builder.Services.AddScoped<IBeneficiaryCreateEditService, BeneficiaryCreateEditService>();
+builder.Services.AddScoped<ICustomerCreateEditService, CustomerCreateEditService>();
+builder.Services.AddScoped<ICaseCreateEditService, CaseCreateEditService>();
 builder.Services.AddScoped<IWeatherInfoService, WeatherInfoService>();
 builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<IAddInvestigationService, AddInvestigationService>();
@@ -469,14 +476,6 @@ try
     app.UseNotyf();
     app.UseFileServer();
 
-    app.Use(async (context, next) =>
-    {
-        if (context.Items.ContainsKey("CSP-Nonce"))
-        {
-            context.Items["CSP-Nonce"] = context.Items["CSP-Nonce"];
-        }
-        await next();
-    });
     app.UseRateLimiter();
     app.MapControllerRoute(
         name: "default",

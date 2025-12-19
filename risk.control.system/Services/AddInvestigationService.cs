@@ -2,7 +2,6 @@
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -10,112 +9,38 @@ namespace risk.control.system.Services
 {
     public interface IAddInvestigationService
     {
-        Task<InvestigationCreateModel> Create(string currentUserEmail);
-        Task<CreateCaseViewModel> AddCasePolicy(string userEmail);
         Task<InvestigationTask> CreatePolicy(string userEmail, CreateCaseViewModel claimsInvestigation);
         Task<InvestigationTask> EditPolicy(string userEmail, EditPolicyDto dto);
         Task<bool> CreateCustomer(string userEmail, CustomerDetail customerDetail);
         Task<bool> EditCustomer(string userEmail, CustomerDetail customerDetail);
-        Task<bool> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary);
-        Task<bool> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary);
+        Task<bool> CreateBeneficiary(string userEmail, BeneficiaryDetail beneficiary);
+        Task<bool> EditBeneficiary(string userEmail, BeneficiaryDetail beneficiary);
     }
     internal class AddInvestigationService : IAddInvestigationService
     {
         private readonly ApplicationDbContext context;
         private readonly IFileStorageService fileStorageService;
         private readonly INumberSequenceService numberService;
-        private readonly IChatSummarizer chatSummarizer;
         private readonly ICloneReportService cloneService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ITimelineService timelineService;
         private readonly ICustomApiClient customApiCLient;
 
         public AddInvestigationService(ApplicationDbContext context,
             IFileStorageService fileStorageService,
             INumberSequenceService numberService,
-            IChatSummarizer chatSummarizer,
             ICloneReportService cloneService,
-            IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
             ICustomApiClient customApiCLient)
         {
             this.context = context;
             this.fileStorageService = fileStorageService;
             this.numberService = numberService;
-            this.chatSummarizer = chatSummarizer;
             this.cloneService = cloneService;
-            this.webHostEnvironment = webHostEnvironment;
             this.timelineService = timelineService;
             this.customApiCLient = customApiCLient;
         }
 
-        public async Task<InvestigationCreateModel> Create(string currentUserEmail)
-        {
-            var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-            var claim = new InvestigationTask
-            {
-                ClientCompany = companyUser.ClientCompany
-            };
-            bool userCanCreate = true;
-            int availableCount = 0;
-            var trial = companyUser.ClientCompany.LicenseType == LicenseType.Trial;
-            if (trial)
-            {
-                var totalClaimsCreated = context.Investigations.Include(c => c.PolicyDetail).Where(c => !c.Deleted &&
-                    c.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
-                availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
 
-                if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
-                {
-                    userCanCreate = false;
-                }
-            }
-            var model = new InvestigationCreateModel
-            {
-                InvestigationTask = claim,
-                AllowedToCreate = userCanCreate,
-                AutoAllocation = companyUser.ClientCompany.AutoAllocation,
-                BeneficiaryDetail = new BeneficiaryDetail { },
-                AvailableCount = availableCount,
-                TotalCount = companyUser.ClientCompany.TotalCreatedClaimAllowed,
-                Trial = trial
-            };
-            return model;
-        }
-        public async Task<CreateCaseViewModel> AddCasePolicy(string userEmail)
-        {
-            var contractNumber = await numberService.GetNumberSequence("PX");
-            var caseEnabler = await context.CaseEnabler.FirstOrDefaultAsync();
-            var costCentre = await context.CostCentre.FirstOrDefaultAsync();
-            var service = await context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == InsuranceType.CLAIM);
-            var policy = new PolicyDetail
-            {
-                ContractNumber = contractNumber,
-                InsuranceType = InsuranceType.CLAIM,
-                InvestigationServiceTypeId = service.InvestigationServiceTypeId,
-                CaseEnablerId = caseEnabler.CaseEnablerId,
-                SumAssuredValue = new Random().Next(10000, 99999),
-                ContractIssueDate = DateTime.Now.AddDays(-10),
-                DateOfIncident = DateTime.Now.AddDays(-3),
-                CauseOfLoss = "LOST IN ACCIDENT",
-                CostCentreId = costCentre.CostCentreId
-            };
-            return new CreateCaseViewModel
-            {
-                PolicyDetail = new PolicyDetailDto
-                {
-                    ContractNumber = policy.ContractNumber,
-                    InsuranceType = policy.InsuranceType,
-                    InvestigationServiceTypeId = policy.InvestigationServiceTypeId,
-                    CaseEnablerId = policy.CaseEnablerId,
-                    SumAssuredValue = policy.SumAssuredValue,
-                    ContractIssueDate = policy.ContractIssueDate,
-                    DateOfIncident = policy.DateOfIncident,
-                    CauseOfLoss = policy.CauseOfLoss,
-                    CostCentreId = policy.CostCentreId,
-                }
-            };
-        }
         public async Task<InvestigationTask> CreatePolicy(string userEmail, CreateCaseViewModel model)
         {
             try
@@ -218,7 +143,6 @@ namespace risk.control.system.Services
                 return null!;
             }
         }
-
         public async Task<bool> CreateCustomer(string userEmail, CustomerDetail customerDetail)
         {
             try
@@ -330,14 +254,14 @@ namespace risk.control.system.Services
                 return false;
             }
         }
-        public async Task<bool> CreateBeneficiary(string userEmail, long ClaimsInvestigationId, BeneficiaryDetail beneficiary)
+        public async Task<bool> CreateBeneficiary(string userEmail, BeneficiaryDetail beneficiary)
         {
             try
             {
                 var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
-                    .FirstOrDefaultAsync(m => m.Id == ClaimsInvestigationId);
+                    .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
                 if (beneficiary?.ProfileImage != null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
@@ -384,7 +308,7 @@ namespace risk.control.system.Services
                 return false;
             }
         }
-        public async Task<bool> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary)
+        public async Task<bool> EditBeneficiary(string userEmail, BeneficiaryDetail beneficiary)
         {
             try
             {
@@ -400,7 +324,7 @@ namespace risk.control.system.Services
                 }
                 else
                 {
-                    var existingBeneficiary = await context.BeneficiaryDetail.AsNoTracking().Where(c => c.BeneficiaryDetailId == beneficiaryDetailId).FirstOrDefaultAsync();
+                    var existingBeneficiary = await context.BeneficiaryDetail.AsNoTracking().Where(c => c.BeneficiaryDetailId == beneficiary.BeneficiaryDetailId).FirstOrDefaultAsync();
                     if (existingBeneficiary.ImagePath != null)
                     {
                         beneficiary.ImagePath = existingBeneficiary.ImagePath;

@@ -1,12 +1,9 @@
-﻿using System.Net;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -26,35 +23,32 @@ namespace risk.control.system.Controllers.Company
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     public class InvestigationController : Controller
     {
-        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
-        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-
         private readonly ILogger<InvestigationController> logger;
-        private readonly IAddInvestigationService addInvestigationService;
+        private readonly ICaseCreateEditService createCreateEditService;
+        private readonly ICustomerCreateEditService customerCreateEditService;
+        private readonly IBeneficiaryCreateEditService beneficiaryCreateEditService;
         private readonly ApplicationDbContext context;
-        private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService service;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly IPhoneService phoneService;
 
         public InvestigationController(ILogger<InvestigationController> logger,
-            IAddInvestigationService addInvestigationService,
+            ICaseCreateEditService createCreateEditService,
+            ICustomerCreateEditService customerCreateEditService,
+            IBeneficiaryCreateEditService beneficiaryCreateEditService,
             ApplicationDbContext context,
-            IFeatureManager featureManager,
-            INotyfService notifyService, IInvestigationService service,
-            IEmpanelledAgencyService empanelledAgencyService,
-            IPhoneService phoneService)
+            INotyfService notifyService,
+            IInvestigationService service,
+            IEmpanelledAgencyService empanelledAgencyService)
         {
             this.logger = logger;
-            this.addInvestigationService = addInvestigationService;
+            this.createCreateEditService = createCreateEditService;
+            this.customerCreateEditService = customerCreateEditService;
+            this.beneficiaryCreateEditService = beneficiaryCreateEditService;
             this.context = context;
-            this.featureManager = featureManager;
             this.notifyService = notifyService;
             this.service = service;
             this.empanelledAgencyService = empanelledAgencyService;
-            this.phoneService = phoneService;
         }
         public IActionResult Index()
         {
@@ -128,7 +122,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var model = await addInvestigationService.Create(currentUserEmail);
+                var model = await createCreateEditService.Create(currentUserEmail);
                 if (model.Trial)
                 {
                     if (!model.AllowedToCreate)
@@ -151,17 +145,17 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(title: " Add Case", FromAction = "Create")]
-        public async Task<IActionResult> CreatePolicy()
+        public async Task<IActionResult> CreateCase()
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
-                    var model = await addInvestigationService.AddCasePolicy(currentUserEmail);
-                    LoadDropDowns(model.PolicyDetail, currentUser);
+                    var model = await createCreateEditService.AddCasePolicy(userEmail);
+                    await LoadDropDowns(model.PolicyDetail, userEmail);
                     return View(model);
                 }
                 else
@@ -179,108 +173,51 @@ namespace risk.control.system.Controllers.Company
                 logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!! Error creating case detail. Try Again.");
-                return RedirectToAction(nameof(CreatePolicy));
+                return RedirectToAction(nameof(CreateCase));
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CreatePolicy(CreateCaseViewModel model)
+        public async Task<IActionResult> CreateCase(CreateCaseViewModel model)
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var userEmail = HttpContext.User?.Identity?.Name;
 
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Please correct the errors");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
+                    await LoadDropDowns(model.PolicyDetail, userEmail);
                     return View(model);
                 }
-                if (model.Document == null || model.Document.Length == 0)
-                {
-                    notifyService.Error("Invalid Document Image ");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
-                if (model.Document.Length > MAX_FILE_SIZE)
-                {
-                    notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                    ModelState.AddModelError(nameof(model.Document), "File too large.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
-                var ext = Path.GetExtension(model.Document.FileName).ToLowerInvariant();
-                if (!AllowedExt.Contains(ext))
-                {
-                    notifyService.Error($"Invalid Document image type");
-                    ModelState.AddModelError(nameof(model.Document), "Invalid file type.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
-                if (!AllowedMime.Contains(model.Document.ContentType))
-                {
-                    notifyService.Error($"Invalid Document Image content type");
-                    ModelState.AddModelError(nameof(model.Document), "Invalid Document Image  content type.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
-                if (!ImageSignatureValidator.HasValidSignature(model.Document))
-                {
-                    notifyService.Error($"Invalid or corrupted Document Image ");
-                    ModelState.AddModelError(nameof(model.Document), "Invalid file content.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
-                if (model.PolicyDetail.DateOfIncident > DateTime.UtcNow)
-                {
-                    notifyService.Error($"Incident date cannot be in the future");
-                    ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident date cannot be in the future.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
-                if (model.PolicyDetail.ContractIssueDate > DateTime.UtcNow)
-                {
-                    notifyService.Error($"Issue date cannot be in the future");
-                    ModelState.AddModelError("PolicyDetail.ContractIssueDate", "Contract issue date cannot be in the future.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
-                if (model.PolicyDetail.DateOfIncident < model.PolicyDetail.ContractIssueDate)
-                {
-                    notifyService.Error($"Incident cannot be before Issue date");
-                    ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident cannot be before issue date.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
+                var result = await createCreateEditService.CreateAsync(userEmail, model);
 
-                model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
-                model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
+                if (!result.Success)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
 
-                var caseDetail = await addInvestigationService.CreatePolicy(currentUserEmail, model);
-                if (caseDetail == null)
-                {
-                    notifyService.Error("OOPS!!! Error creating case detail. Try Again.");
-                    return RedirectToAction(nameof(CreatePolicy));
+                    notifyService.Error("Please fix validation errors");
+                    await LoadDropDowns(model.PolicyDetail, userEmail);
+                    return View(model);
                 }
-                else
-                {
-                    notifyService.Custom($"Policy <b>#{caseDetail.PolicyDetail.ContractNumber}</b> created successfully", 3, "green", "far fa-file-powerpoint");
-                }
-                return RedirectToAction(nameof(Details), "Investigation", new { id = caseDetail.Id });
+                notifyService.Success($"Policy #{result.CaseId} created successfully");
+                return RedirectToAction(nameof(Details), "Investigation", new { id = result.Id });
             }
             catch (Exception ex)
             {
                 logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS!!! Error creating case detail. Try Again.");
-                return RedirectToAction(nameof(CreatePolicy));
+                return RedirectToAction(nameof(CreateCase));
             }
         }
-        private void LoadDropDowns(PolicyDetailDto model, ClientCompanyApplicationUser currentUser)
+        private async Task LoadDropDowns(PolicyDetailDto model, string userEmail)
         {
+            var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+
             ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
             ViewData["CaseEnablerId"] = new SelectList(
@@ -310,7 +247,7 @@ namespace risk.control.system.Controllers.Company
         }
 
         [Breadcrumb(title: " Edit Case", FromAction = "Details")]
-        public async Task<IActionResult> EditPolicy(long id)
+        public async Task<IActionResult> EditCase(long id)
         {
             try
             {
@@ -319,35 +256,15 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var claimsInvestigation = await context.Investigations
-                    .Include(c => c.PolicyDetail)
-                    .FirstOrDefaultAsync(i => i.Id == id);
 
-                if (claimsInvestigation == null)
+                var model = await createCreateEditService.GetEditPolicyDetail(id);
+                if (model == null)
                 {
                     notifyService.Error("Case Not Found!!!");
-                    return RedirectToAction(nameof(CreatePolicy));
+                    return RedirectToAction(nameof(CreateCase));
                 }
-                var model = new EditPolicyDto
-                {
-                    Id = claimsInvestigation.Id,
-                    PolicyDetail = new PolicyDetailDto
-                    {
-                        ContractNumber = claimsInvestigation.PolicyDetail.ContractNumber,
-                        InsuranceType = claimsInvestigation.PolicyDetail.InsuranceType,
-                        InvestigationServiceTypeId = claimsInvestigation.PolicyDetail.InvestigationServiceTypeId,
-                        CaseEnablerId = claimsInvestigation.PolicyDetail.CaseEnablerId,
-                        SumAssuredValue = claimsInvestigation.PolicyDetail.SumAssuredValue,
-                        ContractIssueDate = claimsInvestigation.PolicyDetail.ContractIssueDate,
-                        DateOfIncident = claimsInvestigation.PolicyDetail.DateOfIncident,
-                        CostCentreId = claimsInvestigation.PolicyDetail.CostCentreId,
-                        CauseOfLoss = claimsInvestigation.PolicyDetail.CauseOfLoss,
-                    },
-                    ExistingDocumentPath = claimsInvestigation.PolicyDetail.DocumentPath
-                };
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                LoadDropDowns(model.PolicyDetail, currentUser);
+                var userEmail = HttpContext.User?.Identity?.Name;
+                await LoadDropDowns(model.PolicyDetail, userEmail);
 
                 var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
@@ -360,91 +277,38 @@ namespace risk.control.system.Controllers.Company
             catch (Exception ex)
             {
                 logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Try Again");
-                return RedirectToAction(nameof(CreatePolicy));
+                notifyService.Error("OOPS!!!..Erro editing case detail. Try Again");
+                return RedirectToAction(nameof(CreateCase));
             }
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> EditPolicy(EditPolicyDto model)
+        public async Task<IActionResult> EditCase(EditPolicyDto model)
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var userEmail = HttpContext.User?.Identity?.Name;
 
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Please correct the errors");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
+                    await LoadDropDowns(model.PolicyDetail, userEmail);
                     return View(model);
                 }
-                if (model.Document != null && model.Document.Length > 0)
+                var result = await createCreateEditService.EditAsync(userEmail, model);
+
+                if (!result.Success)
                 {
-                    if (model.Document.Length > MAX_FILE_SIZE)
-                    {
-                        notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                        ModelState.AddModelError(nameof(model.Document), "File too large.");
-                        LoadDropDowns(model.PolicyDetail, currentUser);
-                        return View(model);
-                    }
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
 
-                    var ext = Path.GetExtension(model.Document.FileName).ToLowerInvariant();
-                    if (!AllowedExt.Contains(ext))
-                    {
-                        notifyService.Error($"Invalid Document image type");
-                        ModelState.AddModelError(nameof(model.Document), "Invalid file type.");
-                        LoadDropDowns(model.PolicyDetail, currentUser);
-                        return View(model);
-                    }
-
-                    if (!AllowedMime.Contains(model.Document.ContentType))
-                    {
-                        notifyService.Error($"Invalid Document Image content type");
-                        ModelState.AddModelError(nameof(model.Document), "Invalid Document Image  content type.");
-                        LoadDropDowns(model.PolicyDetail, currentUser);
-                        return View(model);
-                    }
-
-                    if (!ImageSignatureValidator.HasValidSignature(model.Document))
-                    {
-                        notifyService.Error($"Invalid or corrupted Document Image ");
-                        ModelState.AddModelError(nameof(model.Document), "Invalid file content.");
-                        LoadDropDowns(model.PolicyDetail, currentUser);
-                        return View(model);
-                    }
-                }
-                // Business validation: dates
-                if (model.PolicyDetail.DateOfIncident > DateTime.UtcNow)
-                {
-                    notifyService.Error("Incident date cannot be in the future");
-                    ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident date cannot be in the future.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
+                    notifyService.Error("Please fix validation errors");
+                    await LoadDropDowns(model.PolicyDetail, userEmail);
                     return View(model);
                 }
-                if (model.PolicyDetail.ContractIssueDate > DateTime.UtcNow)
-                {
-                    notifyService.Error("Issue date cannot be in the future");
-                    ModelState.AddModelError("PolicyDetail.ContractIssueDate", "Contract issue date cannot be in the future.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
-                if (model.PolicyDetail.DateOfIncident < model.PolicyDetail.ContractIssueDate)
-                {
-                    notifyService.Error("Incident cannot be before issue date");
-                    ModelState.AddModelError("PolicyDetail.DateOfIncident", "Incident cannot be before issue date.");
-                    LoadDropDowns(model.PolicyDetail, currentUser);
-                    return View(model);
-                }
-
-                model.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetail.ContractNumber);
-                model.PolicyDetail.CauseOfLoss = WebUtility.HtmlEncode(model.PolicyDetail.CauseOfLoss);
-
-                var savedTask = await addInvestigationService.EditPolicy(currentUserEmail, model);
-                notifyService.Custom($"Policy <b>#{savedTask.PolicyDetail.ContractNumber}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
+                notifyService.Custom($"Policy <b>#{result.CaseId}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.Id });
             }
             catch (Exception ex)
@@ -452,7 +316,7 @@ namespace risk.control.system.Controllers.Company
                 logger.LogError(ex.StackTrace);
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Error editing Case detail. Try again.");
-                return RedirectToAction(nameof(EditPolicy), new { id = model.Id });
+                return RedirectToAction(nameof(EditCase), new { id = model.Id });
             }
         }
 
@@ -464,42 +328,14 @@ namespace risk.control.system.Controllers.Company
                 if (id < 1)
                 {
                     notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(CreatePolicy));
+                    return RedirectToAction(nameof(CreateCase));
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-
-                var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
-                var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateCustomer", "Investigation", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
-                ViewData["BreadcrumbNode"] = editPage;
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
-                    var pinCode = await context.PinCode.Include(s => s.Country).FirstOrDefaultAsync(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
-                    var random = new Random();
-                    var customerDetail = new CustomerDetail
-                    {
-                        InvestigationTaskId = id,
-                        Addressline = random.Next(10, 99) + " Main Road",
-                        PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
-                        DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
-                        Education = Education.PROFESSIONAL,
-                        Income = Income.UPPER_INCOME,
-                        Name = NameGenerator.GenerateName(),
-                        Occupation = Occupation.SELF_EMPLOYED,
-                        Country = pinCode.Country,
-                        CountryId = pinCode.CountryId,
-                        SelectedCountryId = pinCode.CountryId.GetValueOrDefault(),
-                        StateId = pinCode.StateId,
-                        SelectedStateId = pinCode.StateId.GetValueOrDefault(),
-                        DistrictId = pinCode.DistrictId,
-                        SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault(),
-                        PinCodeId = pinCode.PinCodeId,
-                        SelectedPincodeId = pinCode.PinCodeId,
-                        Gender = Gender.MALE,
-                    };
+                    var customerDetail = await customerCreateEditService.GetCustomerDetailAsync(id, currentUser.ClientCompany.CountryId.Value);
                     await LoadDropDowns(customerDetail, currentUser);
                     return View(customerDetail);
                 }
@@ -512,6 +348,12 @@ namespace risk.control.system.Controllers.Company
                     ViewData["OccupationList"] = new SelectList(Enum.GetValues(typeof(Occupation)).Cast<Occupation>());
 
                     var blankCustomerDetail = new CustomerDetail { Country = currentUser.ClientCompany.Country, CountryId = currentUser.ClientCompany.CountryId, InvestigationTaskId = id };
+
+                    var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
+                    var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
+                    var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                    var editPage = new MvcBreadcrumbNode("CreateCustomer", "Investigation", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
+                    ViewData["BreadcrumbNode"] = editPage;
 
                     return View(blankCustomerDetail);
                 }
@@ -531,8 +373,8 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var currentUserEmail = HttpContext.User.Identity.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var userEmail = HttpContext.User.Identity.Name;
+                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (!ModelState.IsValid)
                 {
@@ -540,66 +382,18 @@ namespace risk.control.system.Controllers.Company
                     await LoadDropDowns(model, currentUser);
                     return View(model);
                 }
-                if (model.ProfileImage == null || model.ProfileImage.Length == 0)
-                {
-                    notifyService.Error("Invalid Profile Image ");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                if (model.ProfileImage.Length > MAX_FILE_SIZE)
-                {
-                    notifyService.Error($"Profile image Size exceeds the max size: 5MB");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "File too large.");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                var ext = Path.GetExtension(model.ProfileImage.FileName).ToLowerInvariant();
-                if (!AllowedExt.Contains(ext))
-                {
-                    notifyService.Error($"Invalid Profile image type");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Profile image type.");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                if (!AllowedMime.Contains(model.ProfileImage.ContentType))
-                {
-                    notifyService.Error($"Invalid Profile Image content type");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Profile Image  content type.");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                // Validate image signature
-                if (!ImageSignatureValidator.HasValidSignature(model.ProfileImage))
-                {
-                    notifyService.Error("Invalid or corrupted image");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "Invalid or corrupted image.");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                model.Name = WebUtility.HtmlEncode(model.Name);
-                model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber);
+                var result = await customerCreateEditService.CreateAsync(userEmail, model);
 
-                // Validate phone number
-                var country = await context.Country.FindAsync(model.SelectedCountryId);
-                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                if (!result.Success)
                 {
-                    if (!phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
-                    {
-                        notifyService.Error("Invalid mobile number");
-                        ModelState.AddModelError(nameof(model.PhoneNumber), "Invalid mobile number.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+
+                    notifyService.Error("Please fix validation errors.");
+                    await LoadDropDowns(model, currentUser);
+                    return View(model);
                 }
 
-                var result = await addInvestigationService.CreateCustomer(currentUserEmail, model);
-
-                if (!result)
-                {
-                    notifyService.Error("Error creating customer.");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
                 notifyService.Custom($"Customer <b>{model.Name}</b> added successfully", 3, "green", "fas fa-user-plus");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.InvestigationTaskId });
             }
@@ -682,8 +476,8 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (!ModelState.IsValid)
                 {
@@ -691,62 +485,18 @@ namespace risk.control.system.Controllers.Company
                     await LoadDropDowns(model, currentUser);
                     return View(model);
                 }
-                if (model.ProfileImage != null && model.ProfileImage.Length > 0)
-                {
-                    if (model.ProfileImage.Length > MAX_FILE_SIZE)
-                    {
-                        notifyService.Error($"Profile image Size exceeds the max size: 5MB");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "File too large.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                    var ext = Path.GetExtension(model.ProfileImage.FileName).ToLowerInvariant();
-                    if (!AllowedExt.Contains(ext))
-                    {
-                        notifyService.Error($"Invalid Profile image type");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Profile image type.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                    if (!AllowedMime.Contains(model.ProfileImage.ContentType))
-                    {
-                        notifyService.Error($"Invalid Profile Image content type");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Profile Image  content type.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                    // Validate image signature
-                    if (!ImageSignatureValidator.HasValidSignature(model.ProfileImage))
-                    {
-                        notifyService.Error("Invalid or corrupted image");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid or corrupted image.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                }
-                model.Name = WebUtility.HtmlEncode(model.Name);
-                model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber);
+                var result = await customerCreateEditService.EditAsync(userEmail, model);
 
-                // Validate phone number
-                var country = await context.Country.FindAsync(model.SelectedCountryId);
-                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                if (!result.Success)
                 {
-                    if (!phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
-                    {
-                        notifyService.Error("Invalid mobile number");
-                        ModelState.AddModelError(nameof(model.PhoneNumber), "Invalid mobile number.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                }
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
 
-                var edited = await addInvestigationService.EditCustomer(currentUserEmail, model);
-                if (!edited)
-                {
-                    notifyService.Error("OOPs !!!..Error edting customer");
+                    notifyService.Error("Please fix validation errors.");
                     await LoadDropDowns(model, currentUser);
                     return View(model);
                 }
+
                 notifyService.Custom($"Customer <b>{model.Name}</b> edited successfully", 3, "orange", "fas fa-user-plus");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.InvestigationTaskId });
             }
@@ -784,25 +534,7 @@ namespace risk.control.system.Controllers.Company
                     var pinCode = await context.PinCode.Include(s => s.Country).OrderBy(p => p.StateId).LastOrDefaultAsync(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
                     var random = new Random();
 
-                    var model = new BeneficiaryDetail
-                    {
-                        InvestigationTaskId = id,
-                        Addressline = random.Next(10, 99) + " Main Road",
-                        DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
-                        Income = Income.MEDIUM_INCOME,
-                        Name = NameGenerator.GenerateName(),
-                        BeneficiaryRelationId = beneRelation.BeneficiaryRelationId,
-                        Country = pinCode.Country,
-                        CountryId = pinCode.CountryId,
-                        SelectedCountryId = pinCode.CountryId.GetValueOrDefault(),
-                        StateId = pinCode.StateId,
-                        SelectedStateId = pinCode.StateId.GetValueOrDefault(),
-                        DistrictId = pinCode.DistrictId,
-                        SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault(),
-                        PinCodeId = pinCode.PinCodeId,
-                        SelectedPincodeId = pinCode.PinCodeId,
-                        PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
-                    };
+                    var model = await beneficiaryCreateEditService.GetBeneficiaryDetailAsync(id, currentUser.ClientCompany.CountryId.Value);
                     await LoadDropDowns(model, currentUser);
 
                     return View(model);
@@ -834,8 +566,8 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (!ModelState.IsValid)
                 {
@@ -843,62 +575,14 @@ namespace risk.control.system.Controllers.Company
                     await LoadDropDowns(model, currentUser);
                     return View(model);
                 }
-                if (model.ProfileImage == null || model.ProfileImage.Length == 0)
-                {
-                    notifyService.Error("Invalid Profile Image ");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                if (model.ProfileImage.Length > MAX_FILE_SIZE)
-                {
-                    notifyService.Error($"Profile image Size exceeds the max size: 5MB");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "File too large.");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                var ext = Path.GetExtension(model.ProfileImage.FileName).ToLowerInvariant();
-                if (!AllowedExt.Contains(ext))
-                {
-                    notifyService.Error($"Invalid Profile image type");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Profile image type.");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                if (!AllowedMime.Contains(model.ProfileImage.ContentType))
-                {
-                    notifyService.Error($"Invalid Profile Image content type");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Profile Image  content type.");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                // Validate image signature
-                if (!ImageSignatureValidator.HasValidSignature(model.ProfileImage))
-                {
-                    notifyService.Error("Invalid or corrupted image");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "Invalid or corrupted image.");
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                model.Name = WebUtility.HtmlEncode(model.Name);
-                model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber);
+                var result = await beneficiaryCreateEditService.CreateAsync(userEmail, model);
 
-                // Validate phone number
-                var country = await context.Country.FindAsync(model.SelectedCountryId);
-                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                if (!result.Success)
                 {
-                    if (!phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
-                    {
-                        notifyService.Error("Invalid mobile number");
-                        ModelState.AddModelError(nameof(model.PhoneNumber), "Invalid mobile number.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                }
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
 
-                var created = await addInvestigationService.CreateBeneficiary(currentUserEmail, investigationTaskId, model);
-                if (!created)
-                {
-                    notifyService.Warning("Error creating Beneficiary !!! ");
+                    notifyService.Error("Please fix validation errors.");
                     await LoadDropDowns(model, currentUser);
                     return View(model);
                 }
@@ -937,7 +621,7 @@ namespace risk.control.system.Controllers.Company
                 if (id < 1)
                 {
                     notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(CreatePolicy));
+                    return RedirectToAction(nameof(CreateCase));
                 }
                 var model = await context.BeneficiaryDetail
                     .Include(v => v.PinCode)
@@ -977,65 +661,23 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Please correct the errors and try again.");
                     await LoadDropDowns(model, currentUser);
                     return View(model);
                 }
-                if (model.ProfileImage != null && model.ProfileImage.Length > 0)
-                {
-                    if (model.ProfileImage.Length > MAX_FILE_SIZE)
-                    {
-                        notifyService.Error($"Profile image Size exceeds the max size: 5MB");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "File too large.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                    var ext = Path.GetExtension(model.ProfileImage.FileName).ToLowerInvariant();
-                    if (!AllowedExt.Contains(ext))
-                    {
-                        notifyService.Error($"Invalid Profile image type");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Profile image type.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                    if (!AllowedMime.Contains(model.ProfileImage.ContentType))
-                    {
-                        notifyService.Error($"Invalid Profile Image content type");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Profile Image  content type.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                    // Validate image signature
-                    if (!ImageSignatureValidator.HasValidSignature(model.ProfileImage))
-                    {
-                        notifyService.Error("Invalid or corrupted image");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid or corrupted image.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                }
-                model.Name = WebUtility.HtmlEncode(model.Name);
-                model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber);
-                var country = await context.Country.FindAsync(model.SelectedCountryId);
-                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-                {
-                    if (!phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
-                    {
-                        notifyService.Error("Invalid mobile number");
-                        ModelState.AddModelError(nameof(model.PhoneNumber), "Invalid mobile number.");
-                        await LoadDropDowns(model, currentUser);
-                        return View(model);
-                    }
-                }
 
-                var edited = await addInvestigationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, model);
-                if (!edited)
+                var result = await beneficiaryCreateEditService.EditAsync(userEmail, model);
+
+                if (!result.Success)
                 {
-                    notifyService.Error("OOPs !!!..Error editing beneficiary");
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+
+                    notifyService.Error("Please fix validation errors.");
                     await LoadDropDowns(model, currentUser);
                     return View(model);
 

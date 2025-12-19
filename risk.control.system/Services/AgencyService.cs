@@ -13,7 +13,7 @@ namespace risk.control.system.Services
 {
     public interface IAgencyService
     {
-        Task<bool> CreateAgency(Vendor vendor, string currentUserEmail, string domainAddress, string portal_base_url);
+        Task<bool> CreateAgency(Vendor vendor, string userEmail, string domainAddress, string portal_base_url);
         Task<bool> EditAgency(Vendor vendor, string currentUserEmail, string portal_base_url);
     }
     internal class AgencyService : IAgencyService
@@ -31,7 +31,7 @@ namespace risk.control.system.Services
             this.featureManager = featureManager;
         }
 
-        public async Task<bool> CreateAgency(Vendor vendor, string currentUserEmail, string domainAddress, string portal_base_url)
+        public async Task<bool> CreateAgency(Vendor vendor, string userEmail, string domainAddress, string portal_base_url)
         {
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
@@ -56,8 +56,8 @@ namespace risk.control.system.Services
             vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode.ToUpper());
             vendor.PhoneNumber = WebUtility.HtmlEncode(vendor.PhoneNumber.TrimStart('0'));
             vendor.Updated = DateTime.Now;
-            vendor.UpdatedBy = currentUserEmail;
-            vendor.CreatedUser = currentUserEmail;
+            vendor.UpdatedBy = userEmail;
+            vendor.CreatedUser = userEmail;
             vendor.PinCodeId = vendor.SelectedPincodeId;
             vendor.DistrictId = vendor.SelectedDistrictId;
             vendor.StateId = vendor.SelectedStateId;
@@ -68,7 +68,7 @@ namespace risk.control.system.Services
             context.Add(vendor);
 
             var managerRole = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
-            var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var notification = new StatusNotification
             {
@@ -77,7 +77,7 @@ namespace risk.control.system.Services
                 Symbol = "far fa-hand-point-right i-orangered",
                 Message = $"Agency {vendor.Email} created",
                 Status = "",
-                NotifierUserEmail = currentUserEmail
+                NotifierUserEmail = userEmail
             };
             context.Notifications.Add(notification);
             var rowsAffected = await context.SaveChangesAsync();
@@ -89,7 +89,7 @@ namespace risk.control.system.Services
             return rowsAffected > 0;
         }
 
-        public async Task<bool> EditAgency(Vendor vendor, string currentUserEmail, string portal_base_url)
+        public async Task<bool> EditAgency(Vendor vendor, string userEmail, string portal_base_url)
         {
             if (vendor.Document is not null)
             {
@@ -104,7 +104,7 @@ namespace risk.control.system.Services
             }
             else
             {
-                var vendorUser = await context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var vendorUser = await context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 var existingVendor = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
                 if (existingVendor.DocumentImage != null || existingVendor.DocumentUrl != null)
                 {
@@ -122,7 +122,7 @@ namespace risk.control.system.Services
             var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
             vendor.IsUpdated = true;
             vendor.Updated = DateTime.Now;
-            vendor.UpdatedBy = currentUserEmail;
+            vendor.UpdatedBy = userEmail;
             context.Vendor.Update(vendor);
             var rowsAffected = await context.SaveChangesAsync();
             if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))

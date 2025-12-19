@@ -1,14 +1,14 @@
-﻿@model risk.control.system.Models.ViewModel.CreateCaseViewModel
-@{
-    ViewData["Title"] = @Applicationsettings.CREATE;
-}
+﻿@model risk.control.system.Models.ViewModel.EditPolicyDto
 
+@{
+    ViewData["Title"] = "Edit";
+}
 <section class="content">
-    <form id="create-form" asp-action="CreatePolicy" method="post" enctype="multipart/form-data">
-        <partial name="Investigation/_CreateCase" model="Model" />
+    <form id="edit-form" method="post" asp-action="EditCase" enctype="multipart/form-data">
+        <partial name="Investigation/_EditCase" model="Model" />
+        
     </form>
 </section>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

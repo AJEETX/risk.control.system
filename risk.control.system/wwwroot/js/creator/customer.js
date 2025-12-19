@@ -52,6 +52,9 @@ $(document).ready(function () {
                         element.classList.remove("valid", "is-valid", "valid-border");
                         element.removeAttribute("aria-invalid");
                     }
+                    if (element.classList.contains("filled-valid")) {
+                        element.classList.remove("filled-valid");
+                    }
                 }
             });
         } else if (confirmationFlag) {
