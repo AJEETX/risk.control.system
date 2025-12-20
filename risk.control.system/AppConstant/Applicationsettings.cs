@@ -27,13 +27,11 @@
         public const string WEBSITE_TITLE = "iCheckify";
         public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
         public const string WEBSITE_SITE_DESIGNER = "its aby";
-        public const string WEBSITE_SITE_DESIGNER_URL = "http://itsaby.com.au";
         public static readonly string FTP_SITE = "ftp://ftp.drivehq.com/holosync/";
         public static readonly string FTP_SITE_LOG = "its.aby@email.com";
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
         public static readonly string REVERRSE_GEOCODING = "f2a54c0ec9ba4dfdbd450116509c6313";
 
-        public static readonly string IP_SITE = "http://ip-api.com/json/";
         public static readonly string DEFAULT_POLICY_IMAGE = "policy-design.png";
         public static readonly string NO_POLICY_IMAGE = "/img/no-policy.jpg";
         public static readonly string POLICY_BLANK_IMAGE = "/img/blank-document.png";

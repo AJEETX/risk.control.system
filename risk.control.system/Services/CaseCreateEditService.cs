@@ -76,7 +76,7 @@ namespace risk.control.system.Services
                 InsuranceType = InsuranceType.CLAIM,
                 InvestigationServiceTypeId = service.InvestigationServiceTypeId,
                 CaseEnablerId = caseEnabler.CaseEnablerId,
-                SumAssuredValue = new Random().Next(10000, 99999),
+                SumAssuredValue = 99999,
                 ContractIssueDate = DateTime.Now.AddDays(-10),
                 DateOfIncident = DateTime.Now.AddDays(-3),
                 CauseOfLoss = "LOST IN ACCIDENT",
@@ -111,7 +111,7 @@ namespace risk.control.system.Services
 
             Sanitize(model.PolicyDetail);
 
-            var caseDetail = await _addInvestigationService.CreatePolicy(userEmail, model);
+            var caseDetail = await _addInvestigationService.CreateCase(userEmail, model);
             return caseDetail == null
                 ? (false, null, null, errors)
                 : (true, caseDetail.Id, caseDetail.PolicyDetail.ContractNumber, errors);
@@ -151,7 +151,7 @@ namespace risk.control.system.Services
 
             Sanitize(model.PolicyDetail);
 
-            var caseDetail = await _addInvestigationService.EditPolicy(userEmail, model);
+            var caseDetail = await _addInvestigationService.EditCase(userEmail, model);
             return caseDetail == null
                 ? (false, null, errors)
                 : (true, caseDetail.PolicyDetail.ContractNumber, errors);

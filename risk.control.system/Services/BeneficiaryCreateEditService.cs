@@ -87,13 +87,12 @@ namespace risk.control.system.Services
         {
             var beneRelation = await context.BeneficiaryRelation.FirstOrDefaultAsync();
             var pinCode = await context.PinCode.Include(s => s.Country).OrderBy(p => p.StateId).LastOrDefaultAsync(s => s.Country.CountryId == countryId);
-            var random = new Random();
 
             var model = new BeneficiaryDetail
             {
                 InvestigationTaskId = id,
-                Addressline = random.Next(10, 99) + " Main Road",
-                DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
+                Addressline = "10 Main Road",
+                DateOfBirth = DateTime.Now.AddYears(-25).AddMonths(3),
                 Income = Income.MEDIUM_INCOME,
                 Name = NameGenerator.GenerateName(),
                 BeneficiaryRelationId = beneRelation.BeneficiaryRelationId,

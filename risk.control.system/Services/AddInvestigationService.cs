@@ -9,8 +9,8 @@ namespace risk.control.system.Services
 {
     public interface IAddInvestigationService
     {
-        Task<InvestigationTask> CreatePolicy(string userEmail, CreateCaseViewModel claimsInvestigation);
-        Task<InvestigationTask> EditPolicy(string userEmail, EditPolicyDto dto);
+        Task<InvestigationTask> CreateCase(string userEmail, CreateCaseViewModel claimsInvestigation);
+        Task<InvestigationTask> EditCase(string userEmail, EditPolicyDto dto);
         Task<bool> CreateCustomer(string userEmail, CustomerDetail customerDetail);
         Task<bool> EditCustomer(string userEmail, CustomerDetail customerDetail);
         Task<bool> CreateBeneficiary(string userEmail, BeneficiaryDetail beneficiary);
@@ -43,8 +43,7 @@ namespace risk.control.system.Services
             this.customApiCLient = customApiCLient;
         }
 
-
-        public async Task<InvestigationTask> CreatePolicy(string userEmail, CreateCaseViewModel model)
+        public async Task<InvestigationTask> CreateCase(string userEmail, CreateCaseViewModel model)
         {
             try
             {
@@ -99,7 +98,7 @@ namespace risk.control.system.Services
                 return null!;
             }
         }
-        public async Task<InvestigationTask> EditPolicy(string userEmail, EditPolicyDto dto)
+        public async Task<InvestigationTask> EditCase(string userEmail, EditPolicyDto dto)
         {
             try
             {

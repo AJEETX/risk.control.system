@@ -19,14 +19,14 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
         private readonly IClaimsAgentService agentService;
-        private readonly IAgentIdService agentIdService;
+        private readonly IAgentIdfyService agentIdService;
         private readonly ILogger<UploadsController> logger;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public UploadsController(ApplicationDbContext context,
             INotyfService notifyService,
             IClaimsAgentService agentService,
-            IAgentIdService agentIdService,
+            IAgentIdfyService agentIdService,
             ILogger<UploadsController> logger,
             IWebHostEnvironment webHostEnvironment)
         {
@@ -178,7 +178,7 @@ namespace risk.control.system.Controllers
                 Image = Image,
                 LocationLatLong = locationLongLat
             };
-            var response = await agentIdService.GetMedia(data);
+            var response = await agentIdService.CaptureMedia(data);
             return Json(new
             {
                 success = true,
@@ -205,7 +205,7 @@ namespace risk.control.system.Controllers
                 // e.g. return View(model);
                 return BadRequest("Some answers are missing.");
             }
-            var submitted = await agentIdService.Answers(locationName, CaseId, Questions);
+            var submitted = await agentIdService.CaptureAnswers(locationName, CaseId, Questions);
 
             if (submitted)
             {

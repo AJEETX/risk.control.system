@@ -10,21 +10,21 @@ using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services;
 
-public interface IAgentIdService
+public interface IAgentIdfyService
 {
-    Task<AppiCheckifyResponse> GetAgentId(FaceData data);
-    Task<AppiCheckifyResponse> GetFaceId(FaceData data);
-    Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
-    Task<AppiCheckifyResponse> GetMedia(DocumentData data);
-    Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions);
+    Task<AppiCheckifyResponse> CaptureAgentId(FaceData data);
+    Task<AppiCheckifyResponse> CaptureFaceId(FaceData data);
+    Task<AppiCheckifyResponse> CaptureDocumentId(DocumentData data);
+    Task<AppiCheckifyResponse> CaptureMedia(DocumentData data);
+    Task<bool> CaptureAnswers(string locationName, long caseId, List<QuestionTemplate> Questions);
 }
 
-internal class AgentIdService : IAgentIdService
+internal class AgentIdfyService : IAgentIdfyService
 {
     private readonly ApplicationDbContext context;
     private readonly ICaseService caseService;
     private readonly IWeatherInfoService weatherInfoService;
-    private readonly ILogger<AgentIdService> logger;
+    private readonly ILogger<AgentIdfyService> logger;
     private readonly IFileStorageService fileStorageService;
     private readonly IBackgroundJobClient backgroundJobClient;
     private readonly IPanCardService panCardService;
@@ -37,10 +37,10 @@ internal class AgentIdService : IAgentIdService
     private static HttpClient httpClient = new();
 
     //test PAN FNLPM8635N
-    public AgentIdService(ApplicationDbContext context,
+    public AgentIdfyService(ApplicationDbContext context,
         ICaseService caseService,
         IWeatherInfoService weatherInfoService,
-        ILogger<AgentIdService> logger,
+        ILogger<AgentIdfyService> logger,
         IFileStorageService fileStorageService,
         IBackgroundJobClient backgroundJobClient,
         IPanCardService panCardService,
@@ -64,7 +64,7 @@ internal class AgentIdService : IAgentIdService
         this.faceMatchService = faceMatchService;
     }
 
-    public async Task<AppiCheckifyResponse> GetAgentId(FaceData data)
+    public async Task<AppiCheckifyResponse> CaptureAgentId(FaceData data)
     {
         InvestigationTask claim = null;
         AgentIdReport face = null;
@@ -190,7 +190,7 @@ internal class AgentIdService : IAgentIdService
         }
     }
 
-    public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
+    public async Task<AppiCheckifyResponse> CaptureFaceId(FaceData data)
     {
         InvestigationTask claim = null;
         FaceIdReport face = null;
@@ -331,7 +331,7 @@ internal class AgentIdService : IAgentIdService
         }
     }
 
-    public async Task<AppiCheckifyResponse> GetDocumentId(DocumentData data)
+    public async Task<AppiCheckifyResponse> CaptureDocumentId(DocumentData data)
     {
         InvestigationTask claim = null;
         DocumentIdReport doc = null;
@@ -462,7 +462,7 @@ internal class AgentIdService : IAgentIdService
         }
     }
 
-    public async Task<AppiCheckifyResponse> GetMedia(DocumentData data)
+    public async Task<AppiCheckifyResponse> CaptureMedia(DocumentData data)
     {
         InvestigationTask claim = null;
         MediaReport media = null;
@@ -569,7 +569,7 @@ internal class AgentIdService : IAgentIdService
         }
     }
 
-    public async Task<bool> Answers(string locationName, long caseId, List<QuestionTemplate> Questions)
+    public async Task<bool> CaptureAnswers(string locationName, long caseId, List<QuestionTemplate> Questions)
     {
         try
         {

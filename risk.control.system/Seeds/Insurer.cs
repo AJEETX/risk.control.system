@@ -75,7 +75,7 @@ namespace risk.control.system.Seeds
                 EnablePassport = globalSettings.EnablePassport,
                 HasSampleData = globalSettings.HasSampleData,
                 PassportApiHost = globalSettings.PassportApiHost,
-                PassportApiData = globalSettings.PassportApiKey,
+                PassportApiData = globalSettings.PassportApiData,
                 PassportApiUrl = globalSettings.PassportApiUrl,
                 PanAPIHost = globalSettings.PanAPIHost,
                 PanAPIData = globalSettings.PanAPIData,

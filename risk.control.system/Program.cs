@@ -41,6 +41,7 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHsts(options =>
@@ -175,7 +176,7 @@ builder.Services.AddScoped<IPdfGenerativeService, PdfGenerativeService>();
 builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
 builder.Services.AddScoped<IPanCardService, PanCardService>();
 builder.Services.AddScoped<ICloneReportService, CloneReportService>();
-builder.Services.AddScoped<IAgentIdService, AgentIdService>();
+builder.Services.AddScoped<IAgentIdfyService, AgentIdfyService>();
 builder.Services.AddScoped<ICaseVendorService, CaseVendorService>();
 builder.Services.AddScoped<IVendorInvestigationService, VendorInvestigationService>();
 builder.Services.AddScoped<IDashboardCountService, DashboardCountService>();

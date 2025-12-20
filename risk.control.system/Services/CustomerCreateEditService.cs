@@ -80,17 +80,15 @@ namespace risk.control.system.Services
             model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber);
         }
 
-
         public async Task<CustomerDetail> GetCustomerDetailAsync(long id, long countryId)
         {
             var pinCode = await context.PinCode.Include(s => s.Country).FirstOrDefaultAsync(s => s.Country.CountryId == countryId);
-            var random = new Random();
             var customerDetail = new CustomerDetail
             {
                 InvestigationTaskId = id,
-                Addressline = random.Next(10, 99) + " Main Road",
+                Addressline = "12 Main Road",
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
-                DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
+                DateOfBirth = DateTime.Now.AddYears(-30).AddDays(20),
                 Education = Education.PROFESSIONAL,
                 Income = Income.UPPER_INCOME,
                 Name = NameGenerator.GenerateName(),

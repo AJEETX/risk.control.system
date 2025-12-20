@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigationService.GetClaimDetails(currentUserEmail, id);
+                var model = await investigationService.GetCaseDetails(currentUserEmail, id);
 
                 return View(model);
             }

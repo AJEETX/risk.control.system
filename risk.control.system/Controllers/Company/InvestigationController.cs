@@ -523,8 +523,6 @@ namespace risk.control.system.Controllers.Company
                 {
                     var beneRelation = await context.BeneficiaryRelation.FirstOrDefaultAsync();
                     var pinCode = await context.PinCode.Include(s => s.Country).OrderBy(p => p.StateId).LastOrDefaultAsync(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
-                    var random = new Random();
-
                     var model = await beneficiaryCreateEditService.GetBeneficiaryDetailAsync(id, currentUser.ClientCompany.CountryId.Value);
                     await LoadDropDowns(model, currentUser);
 
@@ -731,7 +729,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                var model = await service.GetClaimDetails(currentUserEmail, id);
+                var model = await service.GetCaseDetails(currentUserEmail, id);
                 return View(model);
             }
             catch (Exception ex)

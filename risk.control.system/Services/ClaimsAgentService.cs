@@ -9,9 +9,9 @@ namespace risk.control.system.Services
     }
     internal class ClaimsAgentService : IClaimsAgentService
     {
-        private readonly IAgentIdService agentIdService;
+        private readonly IAgentIdfyService agentIdService;
 
-        public ClaimsAgentService(IAgentIdService agentIdService)
+        public ClaimsAgentService(IAgentIdfyService agentIdService)
         {
             this.agentIdService = agentIdService;
         }
@@ -28,7 +28,7 @@ namespace risk.control.system.Services
                 Image = Image,
                 LocationLatLong = locationLongLat
             };
-            var result = await agentIdService.GetDocumentId(data);
+            var result = await agentIdService.CaptureDocumentId(data);
             return result;
         }
 
@@ -47,12 +47,12 @@ namespace risk.control.system.Services
             };
             if (isAgent)
             {
-                var result = await agentIdService.GetAgentId(data);
+                var result = await agentIdService.CaptureAgentId(data);
                 return result;
             }
             else
             {
-                var result = await agentIdService.GetFaceId(data);
+                var result = await agentIdService.CaptureFaceId(data);
                 return result;
             }
 
