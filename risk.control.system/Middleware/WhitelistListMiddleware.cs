@@ -27,7 +27,6 @@ namespace risk.control.system.Middleware
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
                 _logger.LogError(ex.StackTrace);
                 return;
             }

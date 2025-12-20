@@ -220,9 +220,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                logger.LogError(ex.StackTrace);
-                notifyService.Error($"Issue cloning Report!!!");
+                logger.LogError(ex, "Issue cloning Report");
+                notifyService.Error($"Issue cloning Report. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -247,8 +246,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Report activation failed.");
                 return Json(new { success = false, message = "Report activation failed! Try again" });
             }
         }
@@ -284,8 +282,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Exception to delete Template");
                 return Json(new { success = false, message = "Exception to delete Template" });
             }
         }
@@ -333,7 +330,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Add Question Error.");
                 return Json(new { success = false, message = "Add Question Error." });
             }
         }
@@ -364,7 +361,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error Question Delete");
                 return Json(new { success = false, message = "Error Question Delete." });
             }
         }
@@ -405,7 +402,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error Location Delete.");
                 return Json(new { success = false, message = "Error Location Delete." });
             }
         }
@@ -471,7 +468,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error Location Save.");
                 return Json(new { success = false, message = "Error Location Save." });
             }
         }

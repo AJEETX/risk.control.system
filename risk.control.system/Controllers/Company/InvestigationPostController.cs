@@ -117,8 +117,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "File Upload Error");
                 notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
                 return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
             }
@@ -196,9 +195,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
+                logger.LogError(ex, "Error deleting case");
+                notifyService.Error("Error deleting case. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -241,7 +239,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error deleting cases");
+                notifyService.Error("Error deleting cases. Try again.");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -279,9 +278,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error assigning case");
+                notifyService.Error("Error assigning case. Try again.");
             }
             return RedirectToAction(nameof(InvestigationController.New), "Investigation");
         }
@@ -321,9 +319,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error assigning case");
+                notifyService.Error("Error assigning case. Try again.");
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
             }
         }
@@ -354,9 +351,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error assigning case");
+                notifyService.Error("Error assigning case. Try again.");
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
             }
             return RedirectToAction(nameof(CaseActiveController.Active), "CaseActive");
@@ -391,9 +387,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error withdrawing case");
+                notifyService.Error("Error withdrawing case. Try again.");
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
             }
         }
@@ -447,9 +442,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error processing case");
+                notifyService.Error("Error processing case. Try again.");
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
 
@@ -514,9 +508,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error submitting query");
+                notifyService.Error("Error submitting query. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -546,10 +539,9 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return Ok();
+                logger.LogError(ex, "Error submitting notes");
+                notifyService.Error("Error submitting notes. Try again.");
+                return StatusCode(500);
             }
         }
         public class DeleteRequestModel

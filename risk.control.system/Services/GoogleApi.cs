@@ -8,6 +8,12 @@ namespace risk.control.system.Services
     }
     internal class GoogleApi : IGoogleApi
     {
+        private readonly ILogger<GoogleApi> logger;
+
+        public GoogleApi(ILogger<GoogleApi> logger)
+        {
+            this.logger = logger;
+        }
         public async Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath)
         {
             try
@@ -28,8 +34,8 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return null;
+                logger.LogError(ex, "Error occurred.");
+                throw;
             }
         }
     }

@@ -61,8 +61,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error sending SMS: " + ex.Message);
-                return ex.Message;
+                throw ex;
             }
         }
     }

@@ -62,9 +62,8 @@ namespace risk.control.system.Controllers
                 }
                 return BadRequest("Error !!!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.StackTrace);
                 return Unauthorized("Error !!!");
             }
         }

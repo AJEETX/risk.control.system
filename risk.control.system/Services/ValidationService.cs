@@ -17,10 +17,12 @@ namespace risk.control.system.Services
     internal class ValidationService : IValidationService
     {
         private readonly IConfiguration config;
+        private readonly ILogger<ValidationService> logger;
 
-        public ValidationService(IConfiguration config)
+        public ValidationService(IConfiguration config, ILogger<ValidationService> logger)
         {
             this.config = config;
+            this.logger = logger;
         }
         public async Task<bool> ValidateJwtToken(ApplicationDbContext context, HttpContext httpContext, string token)
         {
@@ -56,8 +58,8 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"JWT validation failed: {ex.Message}");
-                return false;
+                logger.LogError(ex, "Error occurred.");
+                throw;
             }
         }
     }

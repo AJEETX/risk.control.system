@@ -64,8 +64,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -110,8 +109,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(New));
             }
@@ -138,8 +136,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
                 notifyService.Error("OOPS!!!..Try Again");
                 return RedirectToAction(nameof(Create));
             }
@@ -170,9 +167,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!! Error creating case detail. Try Again.");
+                logger.LogError(ex, "Error occurred");
+                notifyService.Error("Error creating case detail. Try Again.");
                 return RedirectToAction(nameof(CreateCase));
             }
         }
@@ -208,9 +204,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!! Error creating case detail. Try Again.");
+                logger.LogError(ex, "Error occurred");
+                notifyService.Error("Error creating case detail. Try Again.");
                 return RedirectToAction(nameof(CreateCase));
             }
         }
@@ -276,9 +271,9 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Erro editing case detail. Try Again");
-                return RedirectToAction(nameof(CreateCase));
+                logger.LogError(ex, "Error occurred");
+                notifyService.Error("Error editing case detail. Try Again");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = id });
             }
         }
 
@@ -313,10 +308,9 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
                 notifyService.Error("OOPs !!!..Error editing Case detail. Try again.");
-                return RedirectToAction(nameof(EditCase), new { id = model.Id });
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.Id });
             }
         }
 
@@ -360,9 +354,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!.Error creating customer.Try Again");
+                logger.LogError(ex, "Error creating customer");
+                notifyService.Error("Error creating customer. Try Again");
                 return RedirectToAction(nameof(Details), new { id = id });
             }
         }
@@ -395,13 +388,13 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 notifyService.Custom($"Customer <b>{model.Name}</b> added successfully", 3, "green", "fas fa-user-plus");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.InvestigationTaskId });
+                return RedirectToAction(nameof(Details), "Investigation", new { id = model.InvestigationTaskId });
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error creating customer");
-                notifyService.Error("OOPS!!!.Error creating customer.Try Again");
-                return RedirectToAction(nameof(InvestigationController.Details), new { id = model.InvestigationTaskId });
+                notifyService.Error("Error creating customer.Try Again");
+                return RedirectToAction(nameof(Details), new { id = model.InvestigationTaskId });
             }
         }
         private async Task LoadDropDowns(CustomerDetail model, ClientCompanyApplicationUser currentUser)
@@ -463,9 +456,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!.Error editing Customer.Try Again");
+                logger.LogError(ex, "Error editing Customer.");
+                notifyService.Error("Error editing Customer.Try Again");
                 return RedirectToAction(nameof(Details), new { id = id });
             }
         }
@@ -502,9 +494,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Error edting customer");
+                logger.LogError(ex, "Error edting customer.");
+                notifyService.Error("Error edting customer. Try again.");
                 return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.InvestigationTaskId });
             }
         }
@@ -552,10 +543,9 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error creating beneficiary.");
+                notifyService.Error("Error creating beneficiary. Try again.");
+                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = id });
             }
 
         }
@@ -587,14 +577,13 @@ namespace risk.control.system.Controllers.Company
                     return View(model);
                 }
                 notifyService.Custom($"Beneficiary <b>{model.Name}</b> added successfully", 3, "green", "fas fa-user-tie");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.InvestigationTaskId });
+                return RedirectToAction(nameof(Details), "Investigation", new { id = model.InvestigationTaskId });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Warning("Error creating Beneficiary !!! ");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.InvestigationTaskId });
+                logger.LogError(ex, "Error creating Beneficiary.");
+                notifyService.Warning("Error creating Beneficiary. Try again. ");
+                return RedirectToAction(nameof(Details), "Investigation", new { id = model.InvestigationTaskId });
             }
         }
 
@@ -614,7 +603,7 @@ namespace risk.control.system.Controllers.Company
             ViewData["IncomeList"] = new SelectList(Enum.GetValues(typeof(Income)).Cast<Income>(), model.Income);
         }
         [Breadcrumb("Edit Beneficiary", FromAction = "Details")]
-        public async Task<IActionResult> EditBeneficiary(long id)
+        public async Task<IActionResult> EditBeneficiary(long id, long taskId)
         {
             try
             {
@@ -630,7 +619,6 @@ namespace risk.control.system.Controllers.Company
                     .Include(v => v.Country)
                     .Include(v => v.BeneficiaryRelation)
                     .FirstOrDefaultAsync(v => v.BeneficiaryDetailId == id);
-
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
@@ -640,18 +628,17 @@ namespace risk.control.system.Controllers.Company
 
                 var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
-                var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "Investigation", $"Edit beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
+                var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = model.InvestigationTaskId } };
+                var editPage = new MvcBreadcrumbNode("EditBeneficiary", "Investigation", $"Edit beneficiary") { Parent = details1Page, RouteValues = new { id = taskId } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error editing Beneficiary.");
+                notifyService.Error("Error editing Beneficiary. Try again.");
+                return RedirectToAction(nameof(Details), "Investigation", new { id = taskId });
             }
         }
         [HttpPost]
@@ -683,16 +670,13 @@ namespace risk.control.system.Controllers.Company
 
                 }
                 notifyService.Custom($"Beneficiary <b>{model.Name}</b> edited successfully", 3, "orange", "fas fa-user-tie");
-
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.InvestigationTaskId });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Error editing beneficiary");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.InvestigationTaskId });
+                logger.LogError(ex, "Error editing Beneficiary.");
+                notifyService.Error("Error editing Beneficiary. Try again.");
             }
+            return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.InvestigationTaskId });
         }
 
         [Breadcrumb(" Empanelled Agencies", FromAction = "New")]
@@ -721,9 +705,8 @@ namespace risk.control.system.Controllers.Company
             catch (Exception ex)
             {
                 logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                notifyService.Error("Error getting Agencies. Try again.");
+                return RedirectToAction(nameof(New));
             }
         }
 
@@ -740,8 +723,8 @@ namespace risk.control.system.Controllers.Company
         {
             if (id < 1)
             {
-                notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                notifyService.Error("Case Not Found.Try Again");
+                return RedirectToAction(nameof(New));
             }
             try
             {
@@ -753,10 +736,9 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting case details.");
+                notifyService.Error("Error getting case details. Try again.");
+                return RedirectToAction(nameof(New));
             }
         }
         [Breadcrumb(" Agency Detail", FromAction = "EmpanelledVendors")]
@@ -812,10 +794,9 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting case details.");
+                notifyService.Error("Error getting case details. Try again.");
+                return RedirectToAction(nameof(New));
             }
         }
     }

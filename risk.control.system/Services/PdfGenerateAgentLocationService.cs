@@ -96,7 +96,7 @@ namespace risk.control.system.Services
                     catch (Exception ex)
                     {
                         rowBuilder.AddCell().AddParagraph().AddText("Invalid image").SetFont(FNT9);
-                        Console.WriteLine("Image conversion error: " + ex.Message);
+                        throw ex;
                     }
                 }
                 else

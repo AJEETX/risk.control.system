@@ -21,11 +21,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<CostCentreController> logger;
 
-        public CostCentreController(ApplicationDbContext context, INotyfService notifyService)
+        public CostCentreController(ApplicationDbContext context, INotyfService notifyService, ILogger<CostCentreController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         // GET: CostCentre
@@ -75,8 +77,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error to get Budget Centre !");
+                logger.LogError(ex, "Error to get Budget Centre.");
+                notifyService.Error("Error to get Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -121,8 +123,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error creating Budget Centre !");
+                logger.LogError(ex, "Error creating Budget Centre.");
+                notifyService.Error("Error creating Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -192,8 +194,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error editing Budget Centre !");
+                logger.LogError(ex, "Error editing Budget Centre.");
+                notifyService.Error("Error editing Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -223,8 +225,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error deleting Budget Centre !");
+                logger.LogError(ex, "Error deleting Budget Centre. ");
+                notifyService.Error("Error deleting Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }

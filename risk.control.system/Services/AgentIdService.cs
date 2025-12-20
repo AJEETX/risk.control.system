@@ -170,7 +170,6 @@ internal class AgentIdService : IAgentIdService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.StackTrace);
             logger.LogError(ex, "Failed agent Id match");
             face.LocationInfo = "No Data";
             face.DigitalIdImageMatchConfidence = string.Empty;
@@ -311,7 +310,6 @@ internal class AgentIdService : IAgentIdService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.StackTrace);
             logger.LogError(ex, "Failed gace Id match");
             face.LocationInfo = "No Data";
             face.MatchConfidence = string.Empty;
@@ -443,7 +441,6 @@ internal class AgentIdService : IAgentIdService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.StackTrace);
             logger.LogError(ex, "Failed face Id match");
             doc.LocationInfo = "No Data";
             doc.ImageValid = false;
@@ -551,7 +548,6 @@ internal class AgentIdService : IAgentIdService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.StackTrace);
             logger.LogError(ex, "Failed media file capture");
             media.LocationInfo = "No Data";
             media.ImageValid = false;

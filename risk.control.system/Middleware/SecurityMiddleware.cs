@@ -100,8 +100,7 @@ namespace risk.control.system.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                _logger.LogError(ex, "Error occurred.");
                 return;
             }
         }

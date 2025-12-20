@@ -793,9 +793,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
+                logger.LogError(ex, "Error getting agency");
+                notifyService.Error("Error getting agency. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -834,9 +833,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
+                logger.LogError(ex, "Error deleting agency");
+                notifyService.Error("Error deleting agency. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

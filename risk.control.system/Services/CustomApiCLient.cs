@@ -56,7 +56,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 logger.LogError($"An error occurred: {ex.Message}");
-                Console.WriteLine($"An error occurred: {ex.Message}");
                 return ("0", "0"); // Return 0,0 if the request was unsuccessful
             }
         }
@@ -121,12 +120,11 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 logger.LogError($"{ex.Message}");
-                Console.WriteLine(ex.StackTrace);
                 return (null, 0, null, 0, null);
             }
 
         }
-        static string ParseRoute(string directionsJson)
+        private string ParseRoute(string directionsJson)
         {
             try
             {
@@ -155,8 +153,8 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error parsing route: {ex.Message}");
-                return null; // Return null to indicate failure
+                logger.LogError(ex, "Error occurred.");
+                throw;
             }
         }
         static async Task<(string Distance, float DistanceInMetres, string Duration, int DurationInTime)> GetDrivingDistance(string origin, string destination)

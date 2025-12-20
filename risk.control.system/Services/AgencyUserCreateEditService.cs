@@ -24,9 +24,6 @@ namespace risk.control.system.Services
     }
     public class AgencyUserCreateEditService : IAgencyUserCreateEditService
     {
-        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
-        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly IValidateImageService validateImageService;
         private readonly UserManager<VendorApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
@@ -62,6 +59,7 @@ namespace risk.control.system.Services
 
             if (!RegexHelper.IsMatch(request.EmailSuffix))
             {
+                modelState.AddModelError("Email", "Invalid email address.");
                 errors.Add("Email", "Invalid email address.");
                 return (false, "Invalid email address.", errors);
             }
@@ -72,6 +70,7 @@ namespace risk.control.system.Services
 
             if (await _userManager.Users.AnyAsync(u => u.Email == email && !u.Deleted))
             {
+                modelState.AddModelError("Email", $"User with email {email} already exists.");
                 errors.Add("Email", $"User with email {email} already exists.");
                 return (false, $"User with email {email} already exists.", errors);
             }

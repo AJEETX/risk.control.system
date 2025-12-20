@@ -24,18 +24,21 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext context;
         private readonly IWeatherInfoService weatherInfoService;
+        private readonly ILogger<VendorInvestigationService> logger;
         private readonly IWebHostEnvironment env;
         private readonly ITimelineService timelineService;
         private readonly ICustomApiClient customApiCLient;
 
         public VendorInvestigationService(ApplicationDbContext context,
             IWeatherInfoService weatherInfoService,
+            ILogger<VendorInvestigationService> logger,
             IWebHostEnvironment env,
             ITimelineService timelineService,
             ICustomApiClient customApiCLient)
         {
             this.context = context;
             this.weatherInfoService = weatherInfoService;
+            this.logger = logger;
             this.env = env;
             this.timelineService = timelineService;
             this.customApiCLient = customApiCLient;
@@ -268,8 +271,8 @@ namespace risk.control.system.Services
 
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return null!;
+                logger.LogError(ex, "Error occurred.");
+                throw;
             }
         }
 
@@ -305,8 +308,8 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return (null!, string.Empty);
+                logger.LogError(ex, "Error occurred.");
+                throw;
             }
         }
 

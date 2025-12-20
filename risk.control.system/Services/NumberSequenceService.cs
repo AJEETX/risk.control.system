@@ -13,10 +13,12 @@ namespace risk.control.system.Services
     internal class NumberSequenceService : INumberSequenceService
     {
         private readonly ApplicationDbContext context;
+        private readonly ILogger<NumberSequenceService> logger;
 
-        public NumberSequenceService(ApplicationDbContext context)
+        public NumberSequenceService(ApplicationDbContext context, ILogger<NumberSequenceService> logger)
         {
             this.context = context;
+            this.logger = logger;
         }
         public async Task<string> GetNumberSequence(string module)
         {
@@ -47,7 +49,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
             return result;

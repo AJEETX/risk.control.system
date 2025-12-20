@@ -22,11 +22,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<PinCodesController> logger;
 
-        public PinCodesController(ApplicationDbContext context, INotyfService notifyService)
+        public PinCodesController(ApplicationDbContext context, INotyfService notifyService, ILogger<PinCodesController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         // GET: PinCodes
@@ -206,7 +208,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to create Pincode!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -268,7 +270,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("An error occurred while updating the pincode!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -297,7 +299,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to delete District!");
                 return RedirectToAction(nameof(Profile));
             }

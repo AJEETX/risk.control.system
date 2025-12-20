@@ -19,20 +19,22 @@ namespace risk.control.system.Services
         private static readonly Regex panRegex = new Regex(@"[A-Z]{5}\d{4}[A-Z]{1}");
         private readonly IGoogleMaskHelper googleHelper;
         private readonly IHttpClientService httpClientService;
-        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IWebHostEnvironment env;
+        private readonly ILogger<PanCardService> logger;
 
-        public PanCardService(IGoogleMaskHelper googleHelper, IHttpClientService httpClientService, IWebHostEnvironment webHostEnvironment)
+        public PanCardService(IGoogleMaskHelper googleHelper, IHttpClientService httpClientService, IWebHostEnvironment env, ILogger<PanCardService> logger)
         {
             this.googleHelper = googleHelper;
             this.httpClientService = httpClientService;
-            this.webHostEnvironment = webHostEnvironment;
+            this.env = env;
+            this.logger = logger;
         }
         public async Task<DocumentIdReport> Process(byte[] IdImage, IReadOnlyList<EntityAnnotation> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension)
         {
             string panNumber = string.Empty;
             string docyTypePan = string.Empty;
             byte[]? ocrImaged = null;
-            var filePath = Path.Combine(webHostEnvironment.ContentRootPath, doc.FilePath);
+            var filePath = Path.Combine(env.ContentRootPath, doc.FilePath);
 
             var allPanText = imageReadOnly.FirstOrDefault().Description;
             var panTextPre = allPanText.IndexOf(panNumber2Find);
@@ -96,7 +98,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
                 await File.WriteAllBytesAsync(filePath, CompressImage.ProcessCompress(image, onlyExtension));
                 doc.LongLatTime = DateTime.Now;

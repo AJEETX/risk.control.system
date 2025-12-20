@@ -144,6 +144,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddScoped<ICompanyUserService, CompanyUserService>();
 builder.Services.AddScoped<IVendorServiceTypeManager, VendorServiceTypeManager>();
 builder.Services.AddScoped<IAgencyUserCreateEditService, AgencyUserCreateEditService>();
 builder.Services.AddScoped<IAgencyCreateEditService, AgencyCreateEditService>();
@@ -215,7 +216,6 @@ builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
 builder.Services.AddScoped<IChatSummarizer, OpenAISummarizer>();
 
 builder.Services.AddScoped<IHttpClientService, HttpClientService>();
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 //builder.Services.AddTransient<CustomCookieAuthenticationEvents>();

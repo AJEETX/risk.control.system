@@ -33,18 +33,21 @@ namespace risk.control.system.Services
     internal class ProcessCaseService : IProcessCaseService
     {
         private readonly ApplicationDbContext context;
+        private readonly ILogger<ProcessCaseService> logger;
         private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly IMailService mailboxService;
         private readonly ITimelineService timelineService;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public ProcessCaseService(ApplicationDbContext context,
+            ILogger<ProcessCaseService> logger,
             IPdfGenerativeService pdfGenerativeService,
             IMailService mailboxService,
             ITimelineService timelineService,
             IBackgroundJobClient backgroundJobClient)
         {
             this.context = context;
+            this.logger = logger;
             this.pdfGenerativeService = pdfGenerativeService;
             this.mailboxService = mailboxService;
             this.timelineService = timelineService;
@@ -94,8 +97,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                // Log the error properly instead of just rethrowing
-                Console.WriteLine("Error updating case allocation status", ex);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }
@@ -353,7 +355,7 @@ namespace risk.control.system.Services
 
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }
@@ -384,7 +386,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }
@@ -412,7 +414,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }
@@ -443,7 +445,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }
@@ -542,7 +544,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }
@@ -580,7 +582,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }
@@ -644,7 +646,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }
@@ -705,9 +707,9 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
+                throw;
             }
-            return (null!, string.Empty);
         }
 
         private async Task<(ClientCompany, string)> ApproveCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
@@ -749,9 +751,9 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
+                throw;
             }
-            return (null!, string.Empty);
         }
 
         public async Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long claimId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile messageDocument)
@@ -803,7 +805,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }

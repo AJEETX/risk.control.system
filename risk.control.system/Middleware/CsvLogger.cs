@@ -113,7 +113,7 @@ namespace risk.control.system.Middleware
                 catch (Exception ex)
                 {
                     // Optionally log cleanup failure to a fallback logger
-                    Console.WriteLine($"Failed to delete log file {file}: {ex.Message}");
+                    throw ex;
                 }
             }
         }

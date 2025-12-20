@@ -10,6 +10,12 @@ public interface IGoogleService
 internal class GoogleService : IGoogleService
 {
     private static HttpClient client = new HttpClient();
+    private readonly ILogger<GoogleService> logger;
+
+    public GoogleService(ILogger<GoogleService> logger)
+    {
+        this.logger = logger;
+    }
     public async Task<List<string>> GetAutocompleteSuggestions(string input, string types = "address")
     {
         // Google Places Autocomplete API endpoint
@@ -54,8 +60,8 @@ internal class GoogleService : IGoogleService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Exception: " + ex.Message);
-            return null;
+            logger.LogError(ex, "Error occurred.");
+            throw;
         }
     }
 }

@@ -32,14 +32,21 @@ namespace risk.control.system.Services
     internal class HttpClientService : IHttpClientService
     {
         private static HttpClient httpClient = new HttpClient();
-        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ILogger<HttpClientService> logger;
+        private readonly IWebHostEnvironment env;
         private readonly IAmazonTranscribeService _amazonTranscribeService;
         private readonly IAmazonS3 s3Client;
         private readonly IMediaDataService mediaDataService;
 
-        public HttpClientService(IWebHostEnvironment webHostEnvironment, IAmazonTranscribeService amazonTranscribeService, IAmazonS3 s3Client, IMediaDataService mediaDataService)
+        public HttpClientService(
+            ILogger<HttpClientService> logger,
+            IWebHostEnvironment env,
+            IAmazonTranscribeService amazonTranscribeService,
+            IAmazonS3 s3Client,
+            IMediaDataService mediaDataService)
         {
-            this.webHostEnvironment = webHostEnvironment;
+            this.logger = logger;
+            this.env = env;
             _amazonTranscribeService = amazonTranscribeService;
             this.s3Client = s3Client;
             this.mediaDataService = mediaDataService;
@@ -129,12 +136,12 @@ namespace risk.control.system.Services
             // Convert the byte array to a Base64 string
 
             string filePath = $"{Guid.NewGuid()}.{extension}";
-            string path = Path.Combine(webHostEnvironment.WebRootPath, "passport");
+            string path = Path.Combine(env.WebRootPath, "passport");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-            var imagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "passport", filePath);
+            var imagefilePath = Path.Combine(env.WebRootPath, "passport", filePath);
             // Write the byte array to a file
             File.WriteAllBytes(imagefilePath, imageBytes);
 
@@ -319,7 +326,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
             }
         }
 
@@ -331,7 +338,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception thrown: {ex.Message}");
+                logger.LogError(ex, "Error occurred");
                 return false;
             }
             //return await s3Client.DoesS3BucketExistAsync(bucketName);

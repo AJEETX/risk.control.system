@@ -8,11 +8,12 @@ public interface IChatSummarizer
 internal class OpenAISummarizer : IChatSummarizer
 {
     private static string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={Environment.GetEnvironmentVariable("GEMINI_KEY")}";
-    private readonly HttpClient _httpClient;
+    private readonly HttpClient _httpClient = new HttpClient();
+    private readonly ILogger<OpenAISummarizer> logger;
 
-    public OpenAISummarizer()
+    public OpenAISummarizer(ILogger<OpenAISummarizer> logger)
     {
-        _httpClient = new HttpClient();
+        this.logger = logger;
     }
 
     public async Task<string> SummarizeDataAsync(string inputText = "Long text to summarize...")
@@ -54,7 +55,7 @@ internal class OpenAISummarizer : IChatSummarizer
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            logger.LogError(ex, "Error occurred.");
             return "Error ||| Could not Summarize";
         }
     }

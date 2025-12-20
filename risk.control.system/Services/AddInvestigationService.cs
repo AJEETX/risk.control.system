@@ -19,6 +19,7 @@ namespace risk.control.system.Services
     internal class AddInvestigationService : IAddInvestigationService
     {
         private readonly ApplicationDbContext context;
+        private readonly ILogger<AddInvestigationService> logger;
         private readonly IFileStorageService fileStorageService;
         private readonly INumberSequenceService numberService;
         private readonly ICloneReportService cloneService;
@@ -26,6 +27,7 @@ namespace risk.control.system.Services
         private readonly ICustomApiClient customApiCLient;
 
         public AddInvestigationService(ApplicationDbContext context,
+            ILogger<AddInvestigationService> logger,
             IFileStorageService fileStorageService,
             INumberSequenceService numberService,
             ICloneReportService cloneService,
@@ -33,6 +35,7 @@ namespace risk.control.system.Services
             ICustomApiClient customApiCLient)
         {
             this.context = context;
+            this.logger = logger;
             this.fileStorageService = fileStorageService;
             this.numberService = numberService;
             this.cloneService = cloneService;
@@ -92,7 +95,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 return null!;
             }
         }
@@ -139,7 +142,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 return null!;
             }
         }
@@ -191,7 +194,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 return false;
             }
         }
@@ -249,8 +252,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 return false;
             }
         }
@@ -304,7 +306,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 return false;
             }
         }
@@ -366,7 +368,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 return false;
             }
         }

@@ -23,6 +23,7 @@ namespace risk.control.system.Controllers
     public class ClientCompanyController : Controller
     {
         private const string vendorMapSize = "800x800";
+        private readonly ILogger<ClientCompanyController> logger;
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService fileStorageService;
         private readonly INotyfService notifyService;
@@ -32,6 +33,7 @@ namespace risk.control.system.Controllers
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
         public ClientCompanyController(
+            ILogger<ClientCompanyController> logger,
             ApplicationDbContext context,
             IFileStorageService fileStorageService,
             INotyfService notifyService,
@@ -40,6 +42,7 @@ namespace risk.control.system.Controllers
             ISmsService SmsService,
             UserManager<ClientCompanyApplicationUser> userManager)
         {
+            this.logger = logger;
             _context = context;
             this.fileStorageService = fileStorageService;
             this.notifyService = notifyService;
@@ -295,7 +298,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Custom($"Error editing company.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Edit), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }

@@ -24,11 +24,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<DistrictController> logger;
 
-        public DistrictController(ApplicationDbContext context, INotyfService notifyService)
+        public DistrictController(ApplicationDbContext context, INotyfService notifyService, ILogger<DistrictController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         // GET: District
@@ -208,7 +210,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to create District!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -265,7 +267,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to edit District!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -302,7 +304,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to delete District!");
                 return RedirectToAction(nameof(Profile));
             }

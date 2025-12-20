@@ -24,11 +24,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<StateController> logger;
 
-        public StateController(ApplicationDbContext context, INotyfService notifyService)
+        public StateController(ApplicationDbContext context, INotyfService notifyService, ILogger<StateController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         // GET: RiskCaseStatus
@@ -210,7 +212,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to create State!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -270,7 +272,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to edit State!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -305,7 +307,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to delete State!");
                 return RedirectToAction(nameof(Profile));
             }

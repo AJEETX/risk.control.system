@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -30,20 +28,16 @@ namespace risk.control.system.Controllers
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
-        private readonly ICustomApiClient customApiCLient;
         private readonly ApplicationDbContext _context;
         private readonly ICompanyService companyService;
         private readonly IVendorServiceTypeManager vendorServiceTypeManager;
         private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
-        private readonly UserManager<ApplicationUser> appUserManager;
-        private readonly ITinyUrlService urlService;
         private readonly IAgencyCreateEditService agencyCreateEditService;
         private readonly IFileStorageService fileStorageService;
+        private readonly ICompanyUserService companyUserService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userAgencyManager;
-        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
         private readonly IFeatureManager featureManager;
         private readonly IInvestigationService service;
@@ -54,16 +48,12 @@ namespace risk.control.system.Controllers
             ICompanyService companyService,
             IVendorServiceTypeManager vendorServiceTypeManager,
             IAgencyUserCreateEditService agencyUserCreateEditService,
-            UserManager<ApplicationUser> appUserManager,
-        ITinyUrlService urlService,
-        IAgencyCreateEditService agencyCreateEditService,
+            IAgencyCreateEditService agencyCreateEditService,
             IFileStorageService fileStorageService,
+            ICompanyUserService companyUserService,
             UserManager<ClientCompanyApplicationUser> userManager,
             UserManager<VendorApplicationUser> userAgencyManager,
-            SignInManager<ApplicationUser> signInManager,
             INotyfService notifyService,
-            ICustomApiClient customApiCLient,
-            RoleManager<ApplicationRole> roleManager,
             IFeatureManager featureManager,
             IInvestigationService service,
              IHttpContextAccessor httpContextAccessor,
@@ -74,16 +64,12 @@ namespace risk.control.system.Controllers
             this.companyService = companyService;
             this.vendorServiceTypeManager = vendorServiceTypeManager;
             this.agencyUserCreateEditService = agencyUserCreateEditService;
-            this.appUserManager = appUserManager;
-            this.urlService = urlService;
             this.agencyCreateEditService = agencyCreateEditService;
             this.fileStorageService = fileStorageService;
-            this.signInManager = signInManager;
+            this.companyUserService = companyUserService;
             this.notifyService = notifyService;
-            this.customApiCLient = customApiCLient;
             this.userManager = userManager;
             this.userAgencyManager = userAgencyManager;
-            this.roleManager = roleManager;
             this.featureManager = featureManager;
             smsService = SmsService;
             this.service = service;
@@ -129,8 +115,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting Company.");
+                notifyService.Error("Error getting Company. Try again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -165,8 +151,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting Company.");
+                notifyService.Error("Error getting Company. Try again");
                 return RedirectToAction(nameof(CompanyProfile));
             }
         }
@@ -264,9 +250,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error creating user.");
+                notifyService.Error("Error creating user. Try again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -302,111 +287,28 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
+                var userEmail = HttpContext.User?.Identity?.Name;
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error($"Correct the error(s)");
-                    await LoadModel(model, currentUserEmail);
+                    notifyService.Error("Please correct the errors");
+                    await LoadModel(model, userEmail);
                     return View(model);
                 }
-                if (!RegexHelper.IsMatch(emailSuffix))
+                var result = await companyUserService.CreateAsync(model, emailSuffix, userEmail);
+
+                if (!result.Success)
                 {
-                    ModelState.AddModelError("", "Invalid email address.");
-                    await LoadModel(model, currentUserEmail);
-                    return View(model);
-                }
-                emailSuffix = WebUtility.HtmlEncode(emailSuffix.Trim().ToLower());
-                model.Email = WebUtility.HtmlEncode(model.Email.Trim().ToLower());
-                var userFullEmail = model.Email.Trim().ToLower() + "@" + emailSuffix;
-                var userExist = await appUserManager.Users.AnyAsync(u => u.Email == userFullEmail && !u.Deleted);
-                if (userExist)
-                {
-                    notifyService.Error($"User with email {userFullEmail} already exists.");
-                    ModelState.AddModelError(nameof(model.Email), "Email already in use.");
-                    await LoadModel(model, currentUserEmail);
-                    return View(model);
-                }
-                if (model.ProfileImage == null || model.ProfileImage.Length == 0)
-                {
-                    notifyService.Error("No Profile Image.");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "No Profile Image.");
-                    await LoadModel(model, currentUserEmail);
-                    return View(model);
-                }
-                if (model.ProfileImage.Length > MAX_FILE_SIZE)
-                {
-                    notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "File too large.");
-                    await LoadModel(model, currentUserEmail);
-                    return View(model);
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(error.Key, error.Value);
+                    }
+
+                    notifyService.Error("Correct the highlighted errors.");
+                    await LoadModel(model, userEmail);
+                    return View(model); // 🔥 fields now highlight
                 }
 
-                var ext = Path.GetExtension(model.ProfileImage.FileName).ToLowerInvariant();
-                if (!AllowedExt.Contains(ext))
-                {
-                    notifyService.Error($"Invalid Document image type");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "Invalid file type.");
-                    await LoadModel(model, currentUserEmail);
-                    return View(model);
-                }
-
-                if (!AllowedMime.Contains(model.ProfileImage.ContentType))
-                {
-                    notifyService.Error($"Invalid Document Image content type");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Document Image  content type.");
-                    await LoadModel(model, currentUserEmail);
-                    return View(model);
-                }
-
-                if (!ImageSignatureValidator.HasValidSignature(model.ProfileImage))
-                {
-                    notifyService.Error($"Invalid or corrupted Document Image ");
-                    ModelState.AddModelError(nameof(model.ProfileImage), "Invalid file content.");
-                    await LoadModel(model, currentUserEmail);
-                    return View(model);
-                }
-
-                if (model.ProfileImage != null && model.ProfileImage.Length > 0)
-                {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(model.ProfileImage, emailSuffix, "user");
-                    using var dataStream = new MemoryStream();
-                    model.ProfileImage.CopyTo(dataStream);
-                    model.ProfilePicture = dataStream.ToArray();
-                    model.ProfilePictureUrl = relativePath;
-                    model.ProfilePictureExtension = Path.GetExtension(fileName);
-                }
-                //DEMO
-                model.Active = true;
-                model.Password = Applicationsettings.TestingData;
-                model.Email = userFullEmail;
-                model.EmailConfirmed = true;
-                model.UserName = userFullEmail;
-                model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0'));
-                model.FirstName = WebUtility.HtmlEncode(model.FirstName);
-                model.LastName = WebUtility.HtmlEncode(model.LastName);
-                model.Addressline = WebUtility.HtmlEncode(model.Addressline);
-                model.CountryId = model.SelectedCountryId;
-                model.StateId = model.SelectedStateId;
-                model.DistrictId = model.SelectedDistrictId;
-                model.PinCodeId = model.SelectedPincodeId;
-
-                model.Updated = DateTime.Now;
-                model.UpdatedBy = HttpContext.User?.Identity?.Name;
-                model.Role = (AppRoles)Enum.Parse(typeof(AppRoles), model.UserRole.ToString());
-                model.IsClientAdmin = model.UserRole == CompanyRole.COMPANY_ADMIN;
-                IdentityResult result = await userManager.CreateAsync(model, model.Password);
-
-                if (result.Succeeded)
-                {
-                    var roles = await userManager.GetRolesAsync(model);
-                    var roleResult = await userManager.RemoveFromRolesAsync(model, roles);
-                    roleResult = await userManager.AddToRolesAsync(model, new List<string> { model.UserRole.ToString() });
-                    var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == model.CountryId);
-                    notifyService.Custom($"User <b>{model.Email}</b> created successfully.", 3, "green", "fas fa-user-plus");
-                    string message = "User created . \nEmail : " + model.Email + "\n" + portal_base_url;
-                    await smsService.DoSendSmsAsync(country.Code, country.ISDCode + model.PhoneNumber, message);
-                }
+                notifyService.Success(result.Message);
             }
             catch (Exception ex)
             {
@@ -469,149 +371,35 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var userEmail = HttpContext.User?.Identity?.Name;
 
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error($"Correct the error(s)");
-                    await LoadModel(model, currentUserEmail);
+                    await LoadModel(model, userEmail);
                     return View(model);
                 }
-                if (model.ProfileImage is not null)
+                var result = await companyUserService.UpdateAsync(id, model, User.Identity?.Name);
+
+                if (!result.Success)
                 {
-                    if (model.ProfileImage.Length > MAX_FILE_SIZE)
+                    foreach (var error in result.Errors)
                     {
-                        notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "File too large.");
-                        await LoadModel(model, currentUserEmail);
-                        return View(model);
+                        ModelState.AddModelError(error.Key, error.Value);
                     }
 
-                    var ext = Path.GetExtension(model.ProfileImage.FileName).ToLowerInvariant();
-                    if (!AllowedExt.Contains(ext))
-                    {
-                        notifyService.Error($"Invalid Document image type");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid file type.");
-                        await LoadModel(model, currentUserEmail);
-                        return View(model);
-                    }
-
-                    if (!AllowedMime.Contains(model.ProfileImage.ContentType))
-                    {
-                        notifyService.Error($"Invalid Document Image content type");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid Document Image  content type.");
-                        await LoadModel(model, currentUserEmail);
-                        return View(model);
-                    }
-
-                    if (!ImageSignatureValidator.HasValidSignature(model.ProfileImage))
-                    {
-                        notifyService.Error($"Invalid or corrupted Document Image ");
-                        ModelState.AddModelError(nameof(model.ProfileImage), "Invalid file content.");
-                        await LoadModel(model, currentUserEmail);
-                        return View(model);
-                    }
-                }
-                if (model.SelectedCountryId < 1 || model.SelectedStateId < 1 || model.SelectedDistrictId < 1 || model.SelectedPincodeId < 1)
-                {
-                    notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(EditUser), "Company", new { userid = id });
+                    notifyService.Error("Correct the highlighted errors.");
+                    await LoadModel(model, User.Identity?.Name);
+                    return View(model); // 🔥 fields now highlight
                 }
 
-                if (id != model.Id.ToString())
-                {
-                    notifyService.Error("USER NOT FOUND!");
-                    return RedirectToAction(nameof(CompanyController.Users), "Company");
-                }
-                var user = await userManager.FindByIdAsync(id);
-                if (model?.ProfileImage != null && model.ProfileImage.Length > 0)
-                {
-                    var domain = model.Email.Split('@')[1];
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(model.ProfileImage, domain, "user");
-
-                    model.ProfilePictureUrl = relativePath;
-                    using var dataStream = new MemoryStream();
-                    model.ProfileImage.CopyTo(dataStream);
-                    model.ProfilePicture = dataStream.ToArray();
-                    model.ProfilePictureExtension = Path.GetExtension(fileName);
-                }
-
-                if (user != null)
-                {
-                    user.ProfilePictureUrl = model?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                    user.ProfilePicture = model?.ProfilePicture ?? user.ProfilePicture;
-                    user.ProfilePictureExtension = model?.ProfilePictureExtension ?? user.ProfilePictureExtension;
-                    user.PhoneNumber = WebUtility.HtmlEncode(model?.PhoneNumber.TrimStart('0')) ?? user.PhoneNumber;
-                    user.FirstName = WebUtility.HtmlEncode(model?.FirstName);
-                    user.LastName = WebUtility.HtmlEncode(model?.LastName);
-                    if (!string.IsNullOrWhiteSpace(model?.Password))
-                    {
-                        user.Password = model.Password;
-                    }
-                    user.Active = model.Active;
-                    user.Addressline = WebUtility.HtmlEncode(model.Addressline);
-
-                    user.CountryId = model.SelectedCountryId;
-                    user.StateId = model.SelectedStateId;
-                    user.DistrictId = model.SelectedDistrictId;
-                    user.PinCodeId = model.SelectedPincodeId;
-
-                    user.IsUpdated = true;
-                    user.Updated = DateTime.Now;
-                    user.Comments = model.Comments;
-                    user.PhoneNumber = model.PhoneNumber.TrimStart('0');
-                    user.UserRole = model.UserRole;
-                    user.Role = model.Role != null ? model.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
-                    user.IsClientAdmin = user.UserRole == CompanyRole.COMPANY_ADMIN;
-                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    user.SecurityStamp = DateTime.Now.ToString();
-                    var result = await userManager.UpdateAsync(user);
-                    if (result.Succeeded)
-                    {
-                        var roles = await userManager.GetRolesAsync(user);
-                        var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                        await userManager.AddToRoleAsync(user, user.UserRole.ToString());
-                        var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-
-                        if (!user.Active)
-                        {
-                            var createdUser = await userManager.FindByEmailAsync(user.Email);
-                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
-
-                            if (lockUser.Succeeded && lockDate.Succeeded)
-                            {
-                                notifyService.Custom($"User <b>{createdUser.Email}</b> edited successfully.", 3, "orange", "fas fa-user-lock");
-                                string message = "User edited. \nEmail : " + createdUser.Email + "\n" + portal_base_url;
-                                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + createdUser.PhoneNumber, message);
-                                return RedirectToAction(nameof(CompanyController.Users), "Company");
-                            }
-                        }
-                        else
-                        {
-                            var createdUser = await userManager.FindByEmailAsync(user.Email);
-                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                            var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
-
-                            if (lockUser.Succeeded && lockDate.Succeeded)
-                            {
-                                notifyService.Custom($"User <b>{createdUser.Email}</b> edited successfully.", 3, "orange", "fas fa-user-check");
-                                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User edited . \nEmail : " + user.Email + "\n" + portal_base_url);
-                                return RedirectToAction(nameof(CompanyController.Users), "Company");
-                            }
-                        }
-                    }
-                }
+                notifyService.Success(result.Message);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error($"Error to create Company user.", 3);
-                return RedirectToAction(nameof(CompanyController.Users), "Company");
+                logger.LogError(ex, "Error to create Company user.");
+                notifyService.Error($"Error to create Company user. Try again.", 3);
             }
-
-            notifyService.Error($"Error to create Company user.", 3);
             return RedirectToAction(nameof(CompanyController.Users), "Company");
         }
 
@@ -622,26 +410,25 @@ namespace risk.control.system.Controllers
             {
                 if (userId < 1 || userId == 0)
                 {
-                    notifyService.Error("OOPS!!!.Id Not Found.Try Again");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("Invalid Data. Try Again");
+                    return RedirectToAction(nameof(Users));
                 }
 
                 var model = await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
                     .FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
-                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("User Not Found.Try Again");
+                    return RedirectToAction(nameof(Users));
                 }
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting user.");
+                notifyService.Error("Error getting user. Try again");
+                return RedirectToAction(nameof(Users));
             }
 
         }
@@ -653,17 +440,12 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 var model = await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
                     .FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("Error getting user. Try again");
+                    return RedirectToAction(nameof(Users));
                 }
 
                 model.Updated = DateTime.Now;
@@ -676,12 +458,10 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting user.");
+                notifyService.Error("Error getting user. Try again");
+                return RedirectToAction(nameof(Users));
             }
-
         }
 
         [Breadcrumb("Manage Agency(s)")]
@@ -749,9 +529,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
+                logger.LogError(ex, "Error getting Agency.");
+                notifyService.Error("Error getting Agency. Try again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -783,9 +562,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Agency Not Found");
+                logger.LogError(ex, "Agency Not Found.");
+                notifyService.Error("Agency Not Found. Try again.");
                 return RedirectToAction("EmpanelledVendors", "Vendors");
             }
 
@@ -827,9 +605,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Error editing agency. Try again.");
+                logger.LogError(ex, "Error editing agency.");
+                notifyService.Error("Error editing agency. Try again.");
             }
             return RedirectToAction(nameof(AgencyDetail), "Company", new { id = vendorId });
         }
@@ -955,10 +732,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting user.");
+                notifyService.Error("Error getting user. Try again");
+                return RedirectToAction(nameof(AgencyUsers));
             }
         }
 
@@ -1045,10 +821,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting user.");
+                notifyService.Error("Error getting user. Try again");
+                return RedirectToAction(nameof(AgencyUsers));
             }
 
         }
@@ -1082,10 +857,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error deleting user.");
+                notifyService.Error("Error deleting user. Try again");
+                return RedirectToAction(nameof(AgencyUsers));
             }
 
         }
@@ -1129,8 +903,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error occurred");
+                notifyService.Error("Error occurred. Try again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -1194,9 +968,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error occurred");
+                notifyService.Error("Error occurred. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -1263,9 +1036,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error deleting agency service");
+                notifyService.Error("Error deleting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -1298,9 +1070,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error deleting agency service");
+                notifyService.Error("Error deleting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -1344,9 +1115,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error empanelling agency(s)");
+                notifyService.Error("Error empanelling agency(s). Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -1364,7 +1134,6 @@ namespace risk.control.system.Controllers
         {
             try
             {
-
                 if (!ModelState.IsValid || vendors is null || vendors.Count == 0)
                 {
                     notifyService.Error("OOPs !!!..Not Agency Found");
@@ -1403,9 +1172,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error de-panelling  agency(s)");
+                notifyService.Error("Error de-panelling  agency(s). Try again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -1443,10 +1211,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting agency)");
+                notifyService.Error("Error getting agency. Try again");
+                return RedirectToAction(nameof(AvailableVendors));
             }
         }
 
@@ -1483,10 +1250,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting agency)");
+                notifyService.Error("Error getting agency. Try again");
+                return RedirectToAction(nameof(EmpanelledVendors));
             }
         }
     }

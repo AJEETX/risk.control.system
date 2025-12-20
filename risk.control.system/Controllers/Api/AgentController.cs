@@ -26,6 +26,7 @@ namespace risk.control.system.Controllers.Api
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<AgentController> logger;
         private readonly ICloneReportService cloneReportService;
         private readonly IHttpClientService httpClientService;
         private readonly IAgentIdService agentIdService;
@@ -43,6 +44,7 @@ namespace risk.control.system.Controllers.Api
 
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context,
+            ILogger<AgentController> logger,
             ICloneReportService cloneReportService,
             IHttpClientService httpClientService,
             IConfiguration configuration,
@@ -59,6 +61,7 @@ namespace risk.control.system.Controllers.Api
             IMailService mailboxService)
         {
             this._context = context;
+            this.logger = logger;
             this.cloneReportService = cloneReportService;
             this.httpClientService = httpClientService;
             this.agentIdService = agentIdService;
@@ -102,7 +105,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return BadRequest($"Agent does not exist or Error");
             }
         }
@@ -128,7 +131,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return BadRequest($"mobile number and/or Agent does not exist");
             }
         }
@@ -182,7 +185,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[VerifyMobile Error] {ex}");
+                logger.LogError(ex, $"Error occurred.");
                 return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
@@ -242,7 +245,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return BadRequest("face matcherror " + ex.StackTrace);
             }
         }
@@ -389,7 +392,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return StatusCode(500, ex.StackTrace);
             }
         }
@@ -464,8 +467,8 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
@@ -577,7 +580,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return StatusCode(500);
             }
         }
@@ -604,7 +607,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return StatusCode(500);
             }
         }
@@ -654,8 +657,8 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
@@ -694,8 +697,8 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
@@ -740,8 +743,8 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
@@ -772,8 +775,8 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
@@ -813,8 +816,8 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
     }

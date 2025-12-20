@@ -39,22 +39,22 @@ namespace risk.control.system.Services
     internal class MailService : IMailService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<MailService> logger;
         private readonly ISmsService smsService;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IFeatureManager featureManager;
 
         public MailService(ApplicationDbContext context,
+            ILogger<MailService> logger,
             ISmsService SmsService,
-            IHttpContextAccessor httpContextAccessor,
             UserManager<ClientCompanyApplicationUser> userManager,
             IFeatureManager featureManager,
             UserManager<VendorApplicationUser> userVendorManager)
         {
             this._context = context;
+            this.logger = logger;
             smsService = SmsService;
-            this.httpContextAccessor = httpContextAccessor;
             this.featureManager = featureManager;
             this.userManager = userManager;
             this.userVendorManager = userVendorManager;
@@ -116,7 +116,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
 
         }
@@ -177,7 +177,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -256,7 +256,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -324,7 +324,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -368,7 +368,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -406,7 +406,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -443,7 +443,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -513,7 +513,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -555,7 +555,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -591,7 +591,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -673,7 +673,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -727,7 +727,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -792,7 +792,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -860,7 +860,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -914,7 +914,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
 
@@ -961,7 +961,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error sending message");
             }
         }
     }

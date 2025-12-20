@@ -20,10 +20,6 @@ namespace risk.control.system.Services
     }
     internal class CustomerCreateEditService : ICustomerCreateEditService
     {
-        private const long MaxFileSize = 5 * 1024 * 1024;
-        private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
-        private static readonly HashSet<string> AllowedMime = new() { "image/jpeg", "image/png" };
-
         private readonly ApplicationDbContext context;
         private readonly IFeatureManager featureManager;
         private readonly IAddInvestigationService addInvestigationService;

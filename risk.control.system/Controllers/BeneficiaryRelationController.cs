@@ -19,11 +19,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<BeneficiaryRelationController> logger;
 
-        public BeneficiaryRelationController(ApplicationDbContext context, INotyfService notifyService)
+        public BeneficiaryRelationController(ApplicationDbContext context, INotyfService notifyService, ILogger<BeneficiaryRelationController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         // GET: BeneficiaryRelation
@@ -73,7 +75,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error to get Beneficiary Relation !");
                 return RedirectToAction(nameof(Profile));
             }
@@ -121,7 +123,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error to create Beneficiary Relation !");
                 return RedirectToAction(nameof(Profile));
             }
@@ -190,7 +192,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error editing Beneficiary Relation!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -220,7 +222,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error deleting Beneficiary Relation !");
                 return RedirectToAction(nameof(Profile));
             }

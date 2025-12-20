@@ -18,10 +18,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
-        public AnnualIncomeController(ApplicationDbContext context, INotyfService notifyService)
+        private readonly ILogger<AnnualIncomeController> logger;
+
+        public AnnualIncomeController(ApplicationDbContext context, INotyfService notifyService, ILogger<AnnualIncomeController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
         public IActionResult Index()
         {
@@ -127,7 +130,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error editing Income Type!");
                 return RedirectToAction(nameof(Profile));
             }

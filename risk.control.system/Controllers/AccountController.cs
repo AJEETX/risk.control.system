@@ -468,8 +468,7 @@ namespace risk.control.system.Controllers
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.LogError(ex.StackTrace);
-                                    Console.WriteLine(ex.ToString());
+                                    _logger.LogError(ex, "Error Occurred.");
                                 }
                             }
                         }

@@ -48,8 +48,6 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                Console.WriteLine($"Failed to load source image:");
                 logger.LogError(ex, "Failed to compare faces");
                 return (false, 0, null);
             }
@@ -57,7 +55,6 @@ namespace risk.control.system.Services
 
         public async Task DetectSampleAsync(byte[] bytes)
         {
-            Console.WriteLine("Detect Document Text");
             var detectResponse = await textractClient.DetectDocumentTextAsync(new DetectDocumentTextRequest
             {
                 Document = new Document
@@ -68,7 +65,7 @@ namespace risk.control.system.Services
 
             foreach (var block in detectResponse.Blocks)
             {
-                Console.WriteLine($"Type {block.BlockType}, Text: {block.Text}");
+                logger.LogError($"Type {block.BlockType}, Text: {block.Text}");
             }
         }
     }

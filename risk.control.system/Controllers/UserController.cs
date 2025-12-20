@@ -207,9 +207,8 @@ namespace risk.control.system.Controllers
                         Errors(result);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine(ex.StackTrace);
                     notifyService.Error("Error !!. The user con't be edited!");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }

@@ -19,17 +19,20 @@ namespace risk.control.system.Controllers
     public class DashboardController : Controller
     {
         private readonly IDashboardService dashboardService;
+        private readonly ILogger<DashboardController> logger;
         private readonly IDashboardCountService dashboardCountService;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
 
         public DashboardController(IDashboardService dashboardService,
+            ILogger<DashboardController> logger,
             IDashboardCountService dashboardCountService,
             SignInManager<Models.ApplicationUser> signInManager,
             INotyfService notifyService
             )
         {
             this.dashboardService = dashboardService;
+            this.logger = logger;
             this.dashboardCountService = dashboardCountService;
             this.signInManager = signInManager;
             this.notifyService = notifyService;
@@ -99,7 +102,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!...Contact Admin");
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await signInManager.SignOutAsync();

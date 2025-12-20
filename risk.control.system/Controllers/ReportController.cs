@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -14,16 +13,17 @@ namespace risk.control.system.Controllers
     public class ReportController : Controller
     {
         private readonly INotyfService notifyService;
+        private readonly ILogger<ReportController> logger;
         private readonly IInvestigationService investigationService;
-        private readonly ICaseService claimsService;
 
         public ReportController(INotyfService notifyService,
-            IInvestigationService investigationService,
-            ICaseService claimsService)
+            ILogger<ReportController> logger,
+            IInvestigationService investigationService
+            )
         {
             this.notifyService = notifyService;
+            this.logger = logger;
             this.investigationService = investigationService;
-            this.claimsService = claimsService;
         }
 
 
@@ -57,8 +57,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error occurred");
+                notifyService.Error("Error occurred. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Globalization;
 using System.IO.Compression;
-using System.Net;
 using System.Text;
 
 using CsvHelper;
@@ -12,7 +11,6 @@ using Hangfire;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -29,6 +27,7 @@ namespace risk.control.system.Services
     internal class FtpService : IFtpService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<FtpService> logger;
         private readonly IFileStorageService fileStorageService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ITimelineService timelineService;
@@ -36,11 +35,9 @@ namespace risk.control.system.Services
         private readonly IMailService mailService;
         private readonly IProcessCaseService processCaseService;
         private readonly IUploadService uploadService;
-        private static WebClient client = new WebClient
-        {
-            Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
-        };
+
         public FtpService(ApplicationDbContext context,
+            ILogger<FtpService> logger,
             IFileStorageService fileStorageService,
             IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
@@ -50,6 +47,7 @@ namespace risk.control.system.Services
             IUploadService uploadService)
         {
             _context = context;
+            this.logger = logger;
             this.fileStorageService = fileStorageService;
             this.webHostEnvironment = webHostEnvironment;
             this.timelineService = timelineService;
@@ -238,7 +236,7 @@ namespace risk.control.system.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.StackTrace);
+                    logger.LogError(ex, "Error occurred");
                     SetFileUploadFailure(uploadFileData, "Error Assigning cases", uploadAndAssign, uploadedCases.Select(u => u.Id).ToList());
                     await _context.SaveChangesAsync();
                     await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
@@ -248,7 +246,7 @@ namespace risk.control.system.Services
 
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                    logger.LogError(ex, "Error occurred");
                 SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
                 await _context.SaveChangesAsync();
                 await mailService.NotifyFileUpload(userEmail, uploadFileData, url);

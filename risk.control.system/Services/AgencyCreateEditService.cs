@@ -14,7 +14,6 @@ namespace risk.control.system.Services
     internal class AgencyCreateEditService : IAgencyCreateEditService
     {
         private readonly ApplicationDbContext context;
-        private readonly IFileStorageService fileStorageService;
         private readonly IFeatureManager featureManager;
         private readonly IValidateImageService validateImageService;
         private readonly IPhoneService phoneService;
@@ -22,14 +21,12 @@ namespace risk.control.system.Services
 
         public AgencyCreateEditService(
             ApplicationDbContext context,
-            IFileStorageService fileStorageService,
             IFeatureManager featureManager,
             IValidateImageService validateImageService,
             IPhoneService phoneService,
             IAgencyService agencyService)
         {
             this.context = context;
-            this.fileStorageService = fileStorageService;
             this.featureManager = featureManager;
             this.validateImageService = validateImageService;
             this.phoneService = phoneService;

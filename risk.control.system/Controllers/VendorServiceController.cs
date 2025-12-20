@@ -75,9 +75,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting agency service");
+                notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -102,9 +101,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting agency service");
+                notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -170,9 +168,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting agency service.");
+                notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -240,9 +237,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting agency service");
+                notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -275,9 +271,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error deleting agency service");
+                notifyService.Error("Error deleting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

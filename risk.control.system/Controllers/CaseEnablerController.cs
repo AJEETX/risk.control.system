@@ -21,11 +21,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<CaseEnablerController> logger;
 
-        public CaseEnablerController(ApplicationDbContext context, INotyfService notifyService)
+        public CaseEnablerController(ApplicationDbContext context, INotyfService notifyService, ILogger<CaseEnablerController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         public IActionResult Index()
@@ -73,7 +75,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error to get Reason !");
                 return RedirectToAction(nameof(Profile));
             }
@@ -115,7 +117,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error to create Reason!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -157,7 +159,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error in REASON!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -195,7 +197,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error editing Reason!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -225,7 +227,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error deleting REASON!");
                 return RedirectToAction(nameof(Profile));
             }
