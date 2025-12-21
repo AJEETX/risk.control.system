@@ -1,12 +1,8 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
 
 using risk.control.system.Data;
-using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
@@ -24,11 +20,7 @@ namespace risk.control.system.Controllers.Company
 
         public DocumentController(ILogger<InvestigationController> logger,
             ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
-            IFeatureManager featureManager,
-            INotyfService notifyService, IInvestigationService service,
-            IEmpanelledAgencyService empanelledAgencyService,
-            IPhoneService phoneService)
+            IWebHostEnvironment webHostEnvironment)
         {
             this.logger = logger;
             this.context = context;
@@ -194,7 +186,6 @@ namespace risk.control.system.Controllers.Company
 
             return File(fileBytes, contentType);
         }
-
         public async Task<IActionResult> GetAgencyUserDocument(long id)
         {
             var vendorUser = await context.VendorApplicationUser
@@ -333,6 +324,33 @@ namespace risk.control.system.Controllers.Company
             var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
 
             return File(stream, contentType);  // StreamResult, does NOT load entire file
+        }
+
+        public async Task<IActionResult> GetUserImage(string email)
+        {
+            var companyUser = await context.ApplicationUser
+                .FirstOrDefaultAsync(x => x.Email == email);
+
+            if (companyUser.ProfilePictureUrl == null)
+                return NotFound();
+
+            var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, companyUser.ProfilePictureUrl);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound();
+
+            var ext = Path.GetExtension(fullPath).ToLowerInvariant();
+            var contentType = ext switch
+            {
+                ".jpg" => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                _ => "application/octet-stream"
+            };
+
+            var fileBytes = System.IO.File.ReadAllBytes(fullPath);
+
+            return File(fileBytes, contentType);
         }
     }
 }

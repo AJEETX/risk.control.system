@@ -412,7 +412,7 @@ namespace risk.control.system.Controllers
                     await LoadModel(model);
                     return View(model);
                 }
-                return RedirectToAction(nameof(Users), "Vendors", new { d = model.VendorId });
+                return RedirectToAction(nameof(Users), "Vendors", new { id = model.VendorId });
 
             }
             catch (Exception ex)

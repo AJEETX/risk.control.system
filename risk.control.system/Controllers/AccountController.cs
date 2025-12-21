@@ -363,136 +363,131 @@ namespace risk.control.system.Controllers
             }
             var model = new ChangePasswordViewModel
             {
-                Email = email,
-                //CurrentPassword = user.Password,
-                //ProfilePicture = user.ProfilePicture
+                Email = user.Email
             };
             return View(model);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
 
-                if (user == null)
-                {
-                    notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
-
-                    return RedirectToAction("Login");
-                }
-
-                var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-                if (!changePasswordResult.Succeeded)
-                {
-
-                    notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
-
-                    return RedirectToAction("Login");
-                }
-
-                // Mark that the user has changed their password
-                user.Password = model.NewPassword;
-                user.Updated = DateTime.Now;
-                user.IsPasswordChangeRequired = false;
-                await _userManager.UpdateAsync(user);
-
-                await _signInManager.RefreshSignInAsync(user);
-                var admin = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-                var roles = await _userManager.GetRolesAsync(user);
-                if (roles != null && roles.Count > 0)
-                {
-                    var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
-                    var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
-                    bool vendorIsActive = false;
-                    bool companyIsActive = false;
-
-                    if (companyUser != null)
-                    {
-                        companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
-
-                    }
-                    else if (vendorUser != null)
-                    {
-                        vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-                        if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
-                        {
-                            var userIsAgent = vendorUser.Role == AppRoles.AGENT;
-                            if (userIsAgent)
-                            {
-                                if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
-                                {
-                                    vendorIsActive = false;
-                                }
-                                else
-                                {
-                                    vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
-                                }
-                            }
-                        }
-                    }
-                    if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
-                    {
-                        var timeout = config["SESSION_TIMEOUT_SEC"];
-                        var properties = new AuthenticationProperties
-                        {
-                            IsPersistent = true, // Makes the cookie persistent
-                            ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout ?? "900")), // Reset expiry time
-                        };
-                        await _signInManager.SignInAsync(user, properties);
-
-                        if (User is null || User.Identity is null)
-                        {
-                            return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
-                        }
-
-                        var isAuthenticated = User.Identity.IsAuthenticated;
-
-                        if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
-                        {
-                            string message = string.Empty;
-                            if (admin != null)
-                            {
-                                message = $"Dear {admin.Email}, \n" +
-                                $"User {user.Email} logged in. \n" +
-                                $"{BaseUrl}";
-                                try
-                                {
-                                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                                }
-                                catch (Exception ex)
-                                {
-                                    _logger.LogError(ex, "Error Occurred.");
-                                }
-                            }
-                        }
-
-                        notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
-                        return RedirectToAction("Index", "Dashboard");
-                    }
-                }
-
-                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
-                {
-                    var adminForFailed = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
-                    string failedMessage = $"Dear {admin.Email}, \n" +
-                        $"User {user.Email} password updated.  \n" +
-                        $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync(adminForFailed.Country.Code, "+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
-                }
-                notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
-                return RedirectToAction("Index", "Dashboard");
+                return View(model);
             }
-            notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
-            return View(model);
+            if (user == null)
+            {
+                notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+
+                return RedirectToAction("Login");
+            }
+
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, user.Password, model.NewPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+
+                notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+
+                return RedirectToAction("Login");
+            }
+
+            // Mark that the user has changed their password
+            user.Password = model.NewPassword;
+            user.Updated = DateTime.Now;
+            user.IsPasswordChangeRequired = false;
+            await _userManager.UpdateAsync(user);
+
+            await _signInManager.RefreshSignInAsync(user);
+            var admin = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles != null && roles.Count > 0)
+            {
+                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
+                bool vendorIsActive = false;
+                bool companyIsActive = false;
+
+                if (companyUser != null)
+                {
+                    companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
+
+                }
+                else if (vendorUser != null)
+                {
+                    vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
+                    {
+                        var userIsAgent = vendorUser.Role == AppRoles.AGENT;
+                        if (userIsAgent)
+                        {
+                            if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
+                            {
+                                vendorIsActive = false;
+                            }
+                            else
+                            {
+                                vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                            }
+                        }
+                    }
+                }
+                if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
+                {
+                    var timeout = config["SESSION_TIMEOUT_SEC"];
+                    var properties = new AuthenticationProperties
+                    {
+                        IsPersistent = true, // Makes the cookie persistent
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout ?? "900")), // Reset expiry time
+                    };
+                    await _signInManager.SignInAsync(user, properties);
+
+                    if (User is null || User.Identity is null)
+                    {
+                        return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
+                    }
+
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
+                    {
+                        string message = string.Empty;
+                        if (admin != null)
+                        {
+                            message = $"Dear {admin.Email}, \n" +
+                            $"User {user.Email} logged in. \n" +
+                            $"{BaseUrl}";
+                            try
+                            {
+                                await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Error Occurred.");
+                            }
+                        }
+                    }
+
+                    notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
+                    return RedirectToAction("Index", "Dashboard");
+                }
+            }
+
+            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
+            {
+                var adminForFailed = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
+                string failedMessage = $"Dear {admin.Email}, \n" +
+                    $"User {user.Email} password updated.  \n" +
+                    $"{BaseUrl}";
+                await smsService.DoSendSmsAsync(adminForFailed.Country.Code, "+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
+            }
+            notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
+            return RedirectToAction("Index", "Dashboard");
         }
         [HttpPost]
         [AllowAnonymous]

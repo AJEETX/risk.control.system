@@ -147,7 +147,7 @@ namespace risk.control.system.Services
             }
             await UpdateUserRolesAsync(user);
 
-            await HandleLockAndNotificationsAsync(user, portal_base_url);
+            await HandleLockAndNotificationsAsync(user, portal_base_url, false);
 
             await tx.CommitAsync();
 
@@ -225,7 +225,14 @@ namespace risk.control.system.Services
                 }
                 else
                 {
-                    await _sms.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "User created. \nEmail : " + user.Email + "\n" + portal_base_url);
+                    try
+                    {
+                        await _sms.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "User created. \nEmail : " + user.Email + "\n" + portal_base_url);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("SMS sending failed.");
+                    }
                     if (created)
                     {
                         _notify.Custom($"User <b> {user.Email}</b> created successfully.", 3, "green", "fas fa-user-check");
