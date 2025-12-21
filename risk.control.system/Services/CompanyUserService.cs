@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Globalization;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -57,7 +59,7 @@ namespace risk.control.system.Services
                     return result;
 
                 var fullEmail =
-                    $"{model.Email.Trim().ToLower()}@{emailSuffix.Trim().ToLower()}";
+                    $"{model.Email.Trim().ToLower(CultureInfo.InvariantCulture)}@{emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture)}";
 
                 if (await _userManager.Users.AnyAsync(u => u.Email == fullEmail && !u.Deleted))
                     return Fail("User already exists.");

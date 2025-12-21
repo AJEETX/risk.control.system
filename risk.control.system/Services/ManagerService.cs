@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -63,7 +65,7 @@ namespace risk.control.system.Services
             // Search filtering
             if (!string.IsNullOrEmpty(search))
             {
-                search = search.ToLower();
+                search = search.ToLower(CultureInfo.InvariantCulture);
                 query = query.Where(a =>
                     a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
                     a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||

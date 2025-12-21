@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Globalization;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -80,7 +82,7 @@ namespace risk.control.system.Controllers
             }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
-            clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
+            clientCompany.Email = mailAddress.ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
             if (clientCompany.Document is not null)
             {
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");

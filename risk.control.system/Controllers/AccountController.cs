@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Globalization;
+using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -588,7 +589,7 @@ namespace risk.control.system.Controllers
             }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
 
-            var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
+            var newDomain = input.Trim().ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
 
             var agenccompanyCount = await _context.ClientCompany.CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
             var agencyCount = await _context.Vendor.CountAsync(u => u.Email.Trim().ToLower() == newDomain);

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -139,8 +140,8 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Email suffix is required!");
                 return View(user);
             }
-            emailSuffix = WebUtility.HtmlEncode(emailSuffix.Trim().ToLower());
-            user.Email = WebUtility.HtmlEncode(user.Email?.Trim().ToLower());
+            emailSuffix = WebUtility.HtmlEncode(emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture));
+            user.Email = WebUtility.HtmlEncode(user.Email?.Trim().ToLower(CultureInfo.InvariantCulture));
 
             var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)

@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
@@ -17,7 +15,6 @@ namespace risk.control.system.Services
         Task<string> SendSms2Customer(string currentUser, long claimId, string sms);
 
         Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms);
-        bool IsWhiteListIpAddress(IPAddress remoteIp);
     }
 
     internal class NotificationService : INotificationService
@@ -27,10 +24,6 @@ namespace risk.control.system.Services
         private readonly IHttpClientService httpClientService;
         private readonly IFeatureManager featureManager;
         private static string logo = "https://icheckify.co.in";
-        private static System.Net.WebClient client = new System.Net.WebClient();
-        private const string IP_BASE_URL = "http://ip-api.com";
-
-        private static HttpClient _httpClient = new HttpClient();
 
         public NotificationService(ApplicationDbContext context,
             ISmsService SmsService,
@@ -41,32 +34,6 @@ namespace risk.control.system.Services
             smsService = SmsService;
             this.httpClientService = httpClientService;
             this.featureManager = featureManager;
-        }
-
-        public bool IsWhiteListIpAddress(IPAddress remoteIp)
-        {
-            var bytes = remoteIp.GetAddressBytes();
-            var whitelistedIp = false;
-            var ipAddresses = context.ClientCompany.Where(c => !string.IsNullOrWhiteSpace(c.WhitelistIpAddress)).Select(c => c.WhitelistIpAddress).ToList();
-
-            if (ipAddresses.Any())
-            {
-                var safelist = string.Join(";", ipAddresses);
-                var ips = safelist.Split(';');
-                var _safelist = new byte[ips.Length][];
-                for (var i = 0; i < ips.Length; i++)
-                {
-                    _safelist[i] = IPAddress.Parse(ips[i]).GetAddressBytes();
-                }
-                foreach (var address in _safelist)
-                {
-                    if (address.SequenceEqual(bytes))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return whitelistedIp;
         }
 
         public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)

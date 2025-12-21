@@ -110,10 +110,10 @@ namespace risk.control.system.Middleware
                         File.Delete(file);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Optionally log cleanup failure to a fallback logger
-                    throw ex;
+                    throw;
                 }
             }
         }

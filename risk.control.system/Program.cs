@@ -195,7 +195,6 @@ builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddSingleton<IValidationService, ValidationService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<ICustomApiClient, CustomApiClient>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
 builder.Services.AddScoped<IClaimsAgentService, ClaimsAgentService>();
@@ -214,7 +213,6 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
 builder.Services.AddScoped<IGoogleApi, GoogleApi>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
-builder.Services.AddScoped<IChatSummarizer, OpenAISummarizer>();
 
 builder.Services.AddScoped<IHttpClientService, HttpClientService>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();

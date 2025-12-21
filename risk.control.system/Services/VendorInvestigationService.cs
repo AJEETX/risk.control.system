@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -246,7 +248,7 @@ namespace risk.control.system.Services
                     LocationLatitude = claim.BeneficiaryDetail?.Latitude;
                     LocationLongitude = claim.BeneficiaryDetail?.Longitude;
                 }
-                (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(double.Parse(agentUser.AddressLatitude), double.Parse(agentUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
+                (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(agentUser.AddressLatitude, agentUser.AddressLongitude, LocationLatitude, LocationLongitude);
                 claim.AllocatingSupervisordEmail = currentUser;
                 claim.CaseOwner = vendorAgentEmail;
                 claim.TaskedAgentEmail = vendorAgentEmail;

@@ -492,10 +492,10 @@ namespace risk.control.system.Services
 
                 // Get map data asynchronously
                 var (distance, distanceInMetre, duration, durationInSec, map) = await customApiClient.GetMap(
-                    double.Parse(agent.AddressLatitude),
-                    double.Parse(agent.AddressLongitude),
-                    double.Parse(LocationLatitude),
-                    double.Parse(LocationLongitude));
+                    agent.AddressLatitude,
+                    agent.AddressLongitude,
+                    LocationLatitude,
+                    LocationLongitude);
 
                 var mapDetails = $"Driving distance: {distance}; Duration: {duration}";
 

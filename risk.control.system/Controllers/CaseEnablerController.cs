@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -98,7 +99,7 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code?.ToUpper());
+                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code?.ToUpper(CultureInfo.InvariantCulture));
                 bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code == caseEnabler.Code);
                 if (exists)
                 {
@@ -131,7 +132,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
 
-            code = code.ToUpper();
+            code = code.ToUpper(CultureInfo.InvariantCulture);
 
             // ✅ Check if any other record (not this one) already has the same code
             bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code.ToUpper() == code && (!id.HasValue || x.CaseEnablerId != id.Value));
@@ -177,7 +178,7 @@ namespace risk.control.system.Controllers
             try
             {
                 // Uppercase normalization
-                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code?.ToUpper());
+                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code?.ToUpper(CultureInfo.InvariantCulture));
                 caseEnabler.Name = WebUtility.HtmlEncode(caseEnabler.Name);
                 // Check for duplicate code before saving
                 bool exists = await _context.CaseEnabler.AnyAsync(x => x.CaseEnablerId != id && x.Code == caseEnabler.Code);
