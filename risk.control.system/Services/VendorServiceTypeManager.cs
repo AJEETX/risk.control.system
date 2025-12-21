@@ -20,9 +20,7 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
         private readonly ILogger<VendorServiceTypeManager> _logger;
 
-        public VendorServiceTypeManager(
-            ApplicationDbContext context,
-            ILogger<VendorServiceTypeManager> logger)
+        public VendorServiceTypeManager(ApplicationDbContext context, ILogger<VendorServiceTypeManager> logger)
         {
             _context = context;
             _logger = logger;
@@ -35,11 +33,6 @@ namespace risk.control.system.Services
                 return Fail("Invalid data.");
             }
 
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-
-            if (vendorUser?.VendorId == null)
-                return Fail("Vendor not found.");
-
             if (!await IsCountryStateValid(service))
                 return Fail("Invalid country/state.");
 
@@ -47,7 +40,7 @@ namespace risk.control.system.Services
 
             var existingServices = await _context.VendorInvestigationServiceType
                 .Where(v =>
-                    v.VendorId == vendorUser.VendorId &&
+                    v.VendorId == service.VendorId &&
                     v.InsuranceType == service.InsuranceType &&
                     v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                     v.CountryId == service.SelectedCountryId &&
@@ -69,7 +62,7 @@ namespace risk.control.system.Services
                 };
             }
 
-            PrepareNewService(service, vendorUser.VendorId.Value, currentUserEmail);
+            PrepareNewService(service, currentUserEmail);
 
             _context.VendorInvestigationServiceType.Add(service);
             await _context.SaveChangesAsync();
@@ -111,9 +104,8 @@ namespace risk.control.system.Services
             _context.Update(service);
         }
 
-        private static void PrepareNewService(VendorInvestigationServiceType service, long vendorId, string email)
+        private static void PrepareNewService(VendorInvestigationServiceType service, string email)
         {
-            service.VendorId = vendorId;
             service.CountryId = service.SelectedCountryId;
             service.StateId = service.SelectedStateId;
             service.IsUpdated = true;
@@ -128,18 +120,12 @@ namespace risk.control.system.Services
                 return FailEdit("Invalid service data.");
             }
 
-            var vendorUser = await _context.VendorApplicationUser
-                .FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-
-            if (vendorUser?.VendorId == null)
-                return FailEdit("Vendor not found.");
-
             bool isAllDistricts = service.SelectedDistrictIds.Contains(-1);
 
             var existingServices = await _context.VendorInvestigationServiceType
                 .AsNoTracking()
                 .Where(v =>
-                    v.VendorId == vendorUser.VendorId &&
+                    v.VendorId == service.VendorId &&
                     v.InsuranceType == service.InsuranceType &&
                     v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                     v.CountryId == service.SelectedCountryId &&
