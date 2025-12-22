@@ -1,7 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -24,20 +23,13 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class CompanyController : Controller
     {
-        private const string vendorMapSize = "800x800";
-        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
-        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
         private readonly ICompanyService companyService;
         private readonly IVendorServiceTypeManager vendorServiceTypeManager;
         private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
         private readonly IAgencyCreateEditService agencyCreateEditService;
-        private readonly IFileStorageService fileStorageService;
         private readonly ICompanyUserService companyUserService;
-        private readonly UserManager<ClientCompanyApplicationUser> userManager;
-        private readonly UserManager<VendorApplicationUser> userAgencyManager;
         private readonly ISmsService smsService;
         private readonly IFeatureManager featureManager;
         private readonly IInvestigationService service;
@@ -49,10 +41,7 @@ namespace risk.control.system.Controllers
             IVendorServiceTypeManager vendorServiceTypeManager,
             IAgencyUserCreateEditService agencyUserCreateEditService,
             IAgencyCreateEditService agencyCreateEditService,
-            IFileStorageService fileStorageService,
             ICompanyUserService companyUserService,
-            UserManager<ClientCompanyApplicationUser> userManager,
-            UserManager<VendorApplicationUser> userAgencyManager,
             INotyfService notifyService,
             IFeatureManager featureManager,
             IInvestigationService service,
@@ -65,11 +54,8 @@ namespace risk.control.system.Controllers
             this.vendorServiceTypeManager = vendorServiceTypeManager;
             this.agencyUserCreateEditService = agencyUserCreateEditService;
             this.agencyCreateEditService = agencyCreateEditService;
-            this.fileStorageService = fileStorageService;
             this.companyUserService = companyUserService;
             this.notifyService = notifyService;
-            this.userManager = userManager;
-            this.userAgencyManager = userAgencyManager;
             this.featureManager = featureManager;
             smsService = SmsService;
             this.service = service;

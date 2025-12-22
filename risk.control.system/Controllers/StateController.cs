@@ -151,7 +151,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
         {
-            if (id < 1 || _context.State == null)
+            if (id < 1)
             {
                 notifyService.Error("State not found!");
                 return RedirectToAction(nameof(Profile));
@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                state.Code = WebUtility.HtmlEncode(state.Code?.ToUpper());
+                state.Code = WebUtility.HtmlEncode(state.Code?.ToUpper(CultureInfo.InvariantCulture));
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
                 if (exists)
                 {
@@ -245,7 +245,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, State state)
         {
-            if (id < 1)
+            if (id < 1 && state is null)
             {
                 notifyService.Error("State Null!");
                 return RedirectToAction(nameof(Profile));

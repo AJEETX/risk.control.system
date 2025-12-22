@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -94,7 +95,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CostCentre costCentre)
         {
-            if (costCentre is null || !ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 notifyService.Error("Budget Centre  Empty!");
                 return RedirectToAction(nameof(Profile));
@@ -102,7 +103,7 @@ namespace risk.control.system.Controllers
             try
             {
 
-                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper());
+                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper(CultureInfo.InvariantCulture));
                 costCentre.Name = WebUtility.HtmlEncode(costCentre.Name);
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre
@@ -136,7 +137,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
 
-            bool exists = await _context.CostCentre.AnyAsync(x => x.Code.ToUpper() == code.ToUpper() && (!id.HasValue || x.CostCentreId != id.Value));
+            bool exists = await _context.CostCentre.AnyAsync(x => x.Code.ToUpper() == code.ToUpper(CultureInfo.InvariantCulture) && (!id.HasValue || x.CostCentreId != id.Value));
 
             return Json(exists);
         }
@@ -174,7 +175,7 @@ namespace risk.control.system.Controllers
             try
             {
                 // Uppercase normalization
-                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper());
+                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper(CultureInfo.InvariantCulture));
                 costCentre.Name = WebUtility.HtmlEncode(costCentre.Name);
 
                 // Check for duplicate code before saving

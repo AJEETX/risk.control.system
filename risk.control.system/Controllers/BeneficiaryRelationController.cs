@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Globalization;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -58,7 +60,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(long id)
         {
-            if (id < 1 || _context.BeneficiaryRelation == null)
+            if (id < 1)
             {
                 notifyService.Error("Beneficiary Relation Not found!");
                 return RedirectToAction(nameof(Profile));
@@ -95,7 +97,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BeneficiaryRelation beneficiaryRelation)
         {
-            if (beneficiaryRelation is null || !ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 notifyService.Error("Beneficiary Relation Empty!");
                 return RedirectToAction(nameof(Profile));
@@ -103,7 +105,7 @@ namespace risk.control.system.Controllers
             try
             {
 
-                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper();
+                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper(CultureInfo.InvariantCulture);
 
                 // Check for duplicate code before saving
                 bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code == beneficiaryRelation.Code);
@@ -136,7 +138,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
 
-            bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code.ToUpper() == code.ToUpper() && (!id.HasValue || x.BeneficiaryRelationId != id.Value));
+            bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code.ToUpper() == code.ToUpper(CultureInfo.InvariantCulture) && (!id.HasValue || x.BeneficiaryRelationId != id.Value));
 
             return Json(exists);
         }
@@ -173,7 +175,7 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper();
+                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper(CultureInfo.InvariantCulture);
 
                 // Check for duplicate code before saving
                 bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code == beneficiaryRelation.Code && x.BeneficiaryRelationId != id);

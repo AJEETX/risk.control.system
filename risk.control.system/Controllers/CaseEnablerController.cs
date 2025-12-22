@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(int id)
         {
-            if (id < 1 || _context.CaseEnabler == null)
+            if (id < 1)
             {
                 notifyService.Error("Reason Not found!");
                 return RedirectToAction(nameof(Profile));
@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CaseEnabler caseEnabler)
         {
-            if (caseEnabler is null || !ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 notifyService.Error("Reason Empty!");
                 return RedirectToAction(nameof(Profile));

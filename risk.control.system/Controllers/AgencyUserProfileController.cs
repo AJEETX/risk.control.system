@@ -258,7 +258,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(CancellationToken ct, ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             try
             {
