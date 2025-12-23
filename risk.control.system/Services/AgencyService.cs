@@ -41,10 +41,6 @@ namespace risk.control.system.Services
             {
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(vendor.Document, vendor.Email);
 
-                using var dataStream = new MemoryStream();
-                vendor.Document.CopyTo(dataStream);
-                vendor.DocumentImage = dataStream.ToArray();
-
                 vendor.DocumentImageExtension = Path.GetExtension(fileName);
                 vendor.DocumentUrl = relativePath;
             }
@@ -95,10 +91,6 @@ namespace risk.control.system.Services
             {
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(vendor.Document, vendor.Email);
 
-                using var dataStream = new MemoryStream();
-                vendor.Document.CopyTo(dataStream);
-                vendor.DocumentImage = dataStream.ToArray();
-
                 vendor.DocumentImageExtension = Path.GetExtension(fileName);
                 vendor.DocumentUrl = relativePath;
             }
@@ -106,9 +98,9 @@ namespace risk.control.system.Services
             {
                 var vendorUser = await context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 var existingVendor = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
-                if (existingVendor.DocumentImage != null || existingVendor.DocumentUrl != null)
+                if (existingVendor.DocumentUrl != null)
                 {
-                    vendor.DocumentImage = existingVendor.DocumentImage;
+                    vendor.DocumentImageExtension = existingVendor.DocumentImageExtension;
                     vendor.DocumentUrl = existingVendor.DocumentUrl;
                 }
             }

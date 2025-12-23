@@ -357,7 +357,7 @@ namespace risk.control.system.Services
                 new
                 {
                     Id = u.VendorId,
-                    Document = u.DocumentImage == null ? noDataImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? noDataImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, u.DocumentUrl)))),
                     Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
                     Name = u.Name,

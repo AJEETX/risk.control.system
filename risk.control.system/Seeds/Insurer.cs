@@ -57,7 +57,6 @@ namespace risk.control.system.Seeds
                 //Description = "CORPORATE OFFICE ",
                 Email = input.DOMAIN,
                 DocumentUrl = relativePath,
-                DocumentImage = insurerImage,
                 PhoneNumber = input.PHONE,
                 ExpiryDate = DateTime.Now.AddDays(5),
                 EmpanelledVendors = vendors,

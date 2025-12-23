@@ -1,4 +1,6 @@
 ﻿$(document).ready(function () {
+    $('#CurrentPassword').focus();
+
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
@@ -41,3 +43,4 @@
         }
     })
 });
+

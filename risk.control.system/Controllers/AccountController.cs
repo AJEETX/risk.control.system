@@ -204,7 +204,7 @@ namespace risk.control.system.Controllers
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
-                model.LoginError = "Invalid credentials.";
+                model.LoginError = "Bad Request.";
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
@@ -231,6 +231,15 @@ namespace risk.control.system.Controllers
                     _logger.LogError("User account not allowed.");
                     return View(model);
                 }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid credentials.");
+                    model.LoginError = $"Invalid credentials. Contact admin.";
+                    model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                    _logger.LogError("Invalid credentials.");
+                    return View(model);
+                }
             }
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
@@ -241,11 +250,17 @@ namespace risk.control.system.Controllers
                 model.LoginError = "User can't login.";
                 return View(model);
             }
-            if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
+            var admin = await _userManager.IsInRoleAsync(user, AppRoles.PORTAL_ADMIN.ToString());
+            if (!admin)
             {
-                return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
+                if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
+                {
+                    if (user.IsPasswordChangeRequired)
+                    {
+                        return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
+                    }
+                }
             }
-
             var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
             var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
             bool vendorIsActive = false;
@@ -431,9 +446,5 @@ namespace risk.control.system.Controllers
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(AccountController.Login), "Account");
         }
-    }
-    public class KeepSessionRequest
-    {
-        public string CurrentPage { get; set; }
     }
 }

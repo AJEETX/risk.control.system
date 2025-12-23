@@ -97,9 +97,9 @@
                             Document
                         </dt>
                         <dd class="col-sm-8">
-                            @if (Model?.DocumentImage is not null)
+                            @if (Model?.DocumentUrl is not null)
                             {
-                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                <img id="documentImage" class="form-Image" src="/Document/GetAgencyDocument/@Model.VendorId" alt="Profile"/>
                             }
                             else
                             {

@@ -59,7 +59,6 @@ namespace risk.control.system.Seeds
                 Email = input.DOMAIN,
                 PhoneNumber = input.PHONE,
                 DocumentUrl = relativePath,
-                DocumentImage = agencyImage,
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
                 CanChangePassword = globalSettings.CanChangePassword,

@@ -88,10 +88,6 @@ namespace risk.control.system.Controllers
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
                 clientCompany.DocumentUrl = relativePath;
                 clientCompany.DocumentImageExtension = Path.GetExtension(fileName);
-
-                using var dataStream = new MemoryStream();
-                clientCompany.Document.CopyTo(dataStream);
-                clientCompany.DocumentImage = dataStream.ToArray();
             }
 
             var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
@@ -260,17 +256,14 @@ namespace risk.control.system.Controllers
                     clientCompany.DocumentUrl = relativePath;
                     clientCompany.DocumentImageExtension = Path.GetExtension(fileName);
 
-                    using var dataStream = new MemoryStream();
-                    clientCompany.Document.CopyTo(dataStream);
-                    clientCompany.DocumentImage = dataStream.ToArray();
                 }
                 else
                 {
                     var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
                     if (existingClientCompany.DocumentUrl != null)
                     {
-                        clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                         clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
+                        clientCompany.DocumentImageExtension = existingClientCompany.DocumentImageExtension;
                     }
                 }
                 var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);

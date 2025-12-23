@@ -53,13 +53,13 @@
                                     <input id="@item.VendorId" class="vendors" name="vendors" type="checkbox" value="@item.VendorId" checked="@item.SelectedByCompany" />
                                 </td>
                                 <td>
-                                    @if (item?.DocumentImage is not null)
+                                    @if (item?.DocumentUrl is not null)
                                     {
-                                        <img id="profileImage" class="profileImage" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                        <img id="profileImage" class="profileImage" src="/Document/GetAgencyDocument/@item.VendorId" alt="Profile">
                                     }
                                     else
                                     {
-                                        <img id="profileImage" class="profileImage" src="@Applicationsettings.NO_IMAGE">
+                                        <img id="profileImage" class="profileImage" src="@Applicationsettings.NO_IMAGE" alt="Profile">
                                     }
                                 </td>
                                 <td>

@@ -103,7 +103,8 @@ namespace risk.control.system.Services
                     BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i></span>" :
                         a.BeneficiaryDetail.Name,
-                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
+                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(env.ContentRootPath, a.Vendor.DocumentUrl)))),
                     Agency = a.Vendor?.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
@@ -182,7 +183,8 @@ namespace risk.control.system.Services
                                       "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                                       a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds,
-                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
+                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(env.ContentRootPath, a.Vendor.DocumentUrl)))),
                     Agent = a.Vendor.Name,
                     IsNewAssigned = a.IsNewSubmittedToCompany,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
@@ -418,7 +420,8 @@ namespace risk.control.system.Services
                     BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i></span>" :
                         a.BeneficiaryDetail.Name,
-                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
+                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(env.ContentRootPath, a.Vendor.DocumentUrl)))),
                     Agency = a.Vendor?.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),

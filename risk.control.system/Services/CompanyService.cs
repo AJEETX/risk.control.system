@@ -141,10 +141,6 @@ namespace risk.control.system.Services
             var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, model.Email, "user");
 
             company.DocumentUrl = relativePath;
-
-            using var ms = new MemoryStream();
-            model.Document.CopyTo(ms);
-            company.DocumentImage = ms.ToArray();
             company.DocumentImageExtension = Path.GetExtension(fileName);
         }
 

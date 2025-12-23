@@ -405,7 +405,8 @@ namespace risk.control.system.Services
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i></span>" :
                     a.BeneficiaryDetail.Name,
                 Agency = a.Vendor?.Name,
-                OwnerDetail = $"data:image/*;base64,{Convert.ToBase64String(a.Vendor.DocumentImage)}",
+                OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(env.ContentRootPath, a.Vendor.DocumentUrl)))),
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
                 PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                 Distance = a.SelectedAgentDrivingDistance,
@@ -522,7 +523,8 @@ namespace risk.control.system.Services
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" :
                     a.BeneficiaryDetail.Name,
-                OwnerDetail = $"data:image/*;base64,{Convert.ToBase64String(a.Vendor.DocumentImage)}",
+                OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                    Path.Combine(env.ContentRootPath, a.Vendor.DocumentUrl)))),
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
                 PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
