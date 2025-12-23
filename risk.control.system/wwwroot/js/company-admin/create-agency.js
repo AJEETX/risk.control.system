@@ -134,7 +134,7 @@ function checkDomain() {
     $("#domainAddress").val('');
     $('#mailAddress').val('');
 
-    var url = "/Account/CheckAgencyName";
+    var url = "/api/Masterdata/CheckAgencyName";
     var name = $('#emailAddress').val().toLowerCase();
     var domain = $('#domain').val().toLowerCase();
     if (name) {

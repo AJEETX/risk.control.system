@@ -15,7 +15,7 @@ namespace risk.control.system.Services
     {
         Task<ServiceResult> CreateAsync(ClientCompanyApplicationUser model, string emailSuffix, string performedBy);
 
-        Task<ServiceResult> UpdateAsync(string id, ClientCompanyApplicationUser model, string performedBy);
+        Task<ServiceResult> UpdateAsync(long id, ClientCompanyApplicationUser model, string performedBy);
     }
 
     public sealed class CompanyUserService : ICompanyUserService
@@ -97,11 +97,11 @@ namespace risk.control.system.Services
                 return Fail("Unexpected error while creating user.");
             }
         }
-        public async Task<ServiceResult> UpdateAsync(string id, ClientCompanyApplicationUser model, string performedBy)
+        public async Task<ServiceResult> UpdateAsync(long id, ClientCompanyApplicationUser model, string performedBy)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(id);
+                var user = await _userManager.FindByIdAsync(id.ToString());
                 if (user == null)
                     return Fail("User not found.");
                 var result = new ServiceResult();
@@ -156,9 +156,7 @@ namespace risk.control.system.Services
         }
 
         private static ServiceResult Success(string msg) => new() { Success = true, Message = msg };
-
         private static ServiceResult Fail(string msg) => new() { Success = false, Message = msg };
-
         private bool ValidateProfileImage(IFormFile file, ServiceResult result)
         {
             if (file == null || file.Length == 0)
@@ -199,15 +197,9 @@ namespace risk.control.system.Services
 
             return true;
         }
-
         private async Task SetProfileImageAsync(ClientCompanyApplicationUser user, IFormFile file, string domain)
         {
             var (fileName, relativePath) = await _fileStorage.SaveAsync(file, domain, "user");
-
-            using var ms = new MemoryStream();
-            await file.CopyToAsync(ms);
-
-            user.ProfilePicture = ms.ToArray();
             user.ProfilePictureUrl = relativePath;
             user.ProfilePictureExtension = Path.GetExtension(fileName);
         }

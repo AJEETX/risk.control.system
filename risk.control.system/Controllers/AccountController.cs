@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Web;
+﻿using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -158,8 +157,7 @@ namespace risk.control.system.Controllers
             var passwordModelJson = System.Text.Json.JsonSerializer.Serialize(new
             {
                 email = user.Email,
-                currentPassword = user.Password,
-                profilePicture = Convert.ToBase64String(user.ProfilePicture) // Ensure it's Base64
+                currentPassword = user.Password
             });
 
             await Response.WriteAsync($"data: PASSWORD_UPDATE|{passwordModelJson}\n");
@@ -212,141 +210,104 @@ namespace risk.control.system.Controllers
                 return View(model);
             }
             var email = HttpUtility.HtmlEncode(model.Email);
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user is null || user.Email is null || string.IsNullOrWhiteSpace(user.Email))
-            {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                model.LoginError = "Invalid credentials.";
-                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
-                return View(model);
-            }
-
-            var admin = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
-            if (admin is null || admin.Country is null)
-            {
-                ModelState.AddModelError(string.Empty, "Bad Request.");
-                model.LoginError = "Server Error. Try again.";
-                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
-                return View(model);
-            }
             var pwd = HttpUtility.HtmlEncode(model.Password);
             var result = await _signInManager.PasswordSignInAsync(email, pwd, model.RememberMe, lockoutOnFailure: false);
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
+                if (result.IsLockedOut)
                 {
-                    if (user.IsPasswordChangeRequired)
-                    {
-                        return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
-                    }
+                    model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                    _logger.LogError("User account locked out.");
+                    model.LoginError = "User account locked out.";
+                    return View(model);
                 }
-                var roles = await _userManager.GetRolesAsync(user);
-                if (roles != null && roles.Count > 0)
+                else if (result.IsNotAllowed)
                 {
-                    var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
-                    var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
-                    bool vendorIsActive = false;
-                    bool companyIsActive = false;
-                    string loggingUsername = "Admin";
-                    if (companyUser != null)
-                    {
-                        companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
-                        loggingUsername = companyUser.FirstName;
-                    }
-                    else if (vendorUser != null)
-                    {
-                        loggingUsername = vendorUser.FirstName;
-                        vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-                        if (agent_login != "agent_login")
-                        {
-                            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
-                            {
-                                var userIsAgent = vendorUser.Role == AppRoles.AGENT;
-                                if (userIsAgent)
-                                {
-                                    if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
-                                    {
-                                        vendorIsActive = false;
-                                    }
-                                    else
-                                    {
-                                        vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
-                    {
-                        var timeout = config["SESSION_TIMEOUT_SEC"];
-                        var properties = new AuthenticationProperties
-                        {
-                            IsPersistent = true, // Makes the cookie persistent
-                            ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout ?? "900")), // Reset expiry time
-                        };
-                        await _signInManager.SignInAsync(user, properties);
-                        if (User is null || User.Identity is null)
-                        {
-                            return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
-                        }
-                        notifyService.Success($"Welcome <b>{loggingUsername}</b>, Login successful");
-                        if (Url.IsLocalUrl(model.ReturnUrl))
-                            return Redirect(model.ReturnUrl);
-
-                        return RedirectToAction("Index", "Dashboard");
-                    }
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    model.LoginError = $"{nameof(result.IsNotAllowed)}. Contact admin.";
+                    model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                    _logger.LogError("User account not allowed.");
+                    return View(model);
                 }
-                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-                {
-                    string failedMessage = $"Dear {admin.Email} ,\n" +
-                             $"User {user.Email} can't log in. \n" +
-                             $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
-                }
+            }
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                 _logger.LogCritical("User can't login.");
                 model.LoginError = "User can't login.";
                 return View(model);
             }
-            else if (result.IsLockedOut)
+            if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
             {
-                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-                {
-                    string message = $"Dear {admin.Email}, \n" +
-                        $"{model.Email} locked out.\n " +
-                        $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                }
-                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                _logger.LogError("User account locked out.");
-                model.LoginError = "User account locked out.";
-                return View(model);
+                return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
             }
-            else if (result.IsNotAllowed)
+
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
+            bool vendorIsActive = false;
+            bool companyIsActive = false;
+            string loggingUsername = "Admin";
+            if (companyUser != null)
             {
-                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-                {
-                    string message = $"Dear {admin.Email}, \n" +
-                        $"{model.Email} failed login attempt. {nameof(result.IsNotAllowed)}. \n" +
-                        $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                }
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                model.LoginError = $"{nameof(result.IsNotAllowed)}. Contact admin.";
-                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                _logger.LogError("User account not allowed.");
-                return View(model);
+                companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
+                loggingUsername = companyUser.FirstName;
             }
-            _logger.LogError("Invalid credentials. Try again.");
-            ModelState.AddModelError(string.Empty, "Bad Request.");
-            model.LoginError = "Invalid credentials. Try again";
+            else if (vendorUser != null)
+            {
+                loggingUsername = vendorUser.FirstName;
+                vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
+                if (agent_login != "agent_login")
+                {
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
+                    {
+                        var userIsAgent = vendorUser.Role == AppRoles.AGENT;
+                        if (userIsAgent)
+                        {
+                            if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
+                            {
+                                vendorIsActive = false;
+                            }
+                            else
+                            {
+                                vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (
+                (companyIsActive && user.Active) ||  // Company user active
+                (vendorIsActive && user.Active) ||  // Vendor user active
+                (companyUser == null && vendorUser == null) // SuperAdmin user 
+                )
+            {
+                var timeout = config["SESSION_TIMEOUT_SEC"];
+                var properties = new AuthenticationProperties
+                {
+                    IsPersistent = true, // Makes the cookie persistent
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout ?? "900")), // Reset expiry time
+                };
+                await _signInManager.SignInAsync(user, properties);
+                if (User is null || User.Identity is null)
+                {
+                    return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
+                }
+                notifyService.Success($"Welcome <b>{loggingUsername}</b>, Login successful");
+                if (Url.IsLocalUrl(model.ReturnUrl))
+                    return Redirect(model.ReturnUrl);
+
+                return RedirectToAction("Index", "Dashboard");
+            }
+
             model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
+            ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+            _logger.LogCritical("User can't login.");
+            model.LoginError = "User can't login.";
             return View(model);
         }
 
@@ -378,116 +339,29 @@ namespace risk.control.system.Controllers
 
                 return View(model);
             }
-            var user = await _userManager.FindByEmailAsync(model.Email);
-
-            if (user == null)
+            try
             {
-                notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+                var result = await accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, BaseUrl);
 
-                return RedirectToAction("Login");
-            }
-
-            var changePasswordResult = await _userManager.ChangePasswordAsync(user, user.Password, model.NewPassword);
-            if (!changePasswordResult.Succeeded)
-            {
-
-                notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
-
-                return RedirectToAction("Login");
-            }
-
-            // Mark that the user has changed their password
-            user.Password = model.NewPassword;
-            user.Updated = DateTime.Now;
-            user.IsPasswordChangeRequired = false;
-            await _userManager.UpdateAsync(user);
-
-            await _signInManager.RefreshSignInAsync(user);
-            var admin = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-            var roles = await _userManager.GetRolesAsync(user);
-            if (roles != null && roles.Count > 0)
-            {
-                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
-                bool vendorIsActive = false;
-                bool companyIsActive = false;
-
-                if (companyUser != null)
+                if (!result.Success)
                 {
-                    companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
+                    notifyService.Error(result.Message);
 
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+
+                    return View(model);
                 }
-                else if (vendorUser != null)
-                {
-                    vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-                    if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
-                    {
-                        var userIsAgent = vendorUser.Role == AppRoles.AGENT;
-                        if (userIsAgent)
-                        {
-                            if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
-                            {
-                                vendorIsActive = false;
-                            }
-                            else
-                            {
-                                vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
-                            }
-                        }
-                    }
-                }
-                if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
-                {
-                    var timeout = config["SESSION_TIMEOUT_SEC"];
-                    var properties = new AuthenticationProperties
-                    {
-                        IsPersistent = true, // Makes the cookie persistent
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout ?? "900")), // Reset expiry time
-                    };
-                    await _signInManager.SignInAsync(user, properties);
 
-                    if (User is null || User.Identity is null)
-                    {
-                        return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
-                    }
-
-                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
-                    {
-                        string message = string.Empty;
-                        if (admin != null)
-                        {
-                            message = $"Dear {admin.Email}, \n" +
-                            $"User {user.Email} logged in. \n" +
-                            $"{BaseUrl}";
-                            try
-                            {
-                                await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(ex, "Error Occurred.");
-                            }
-                        }
-                    }
-
-                    notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
-                    return RedirectToAction("Index", "Dashboard");
-                }
+                notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
+                return RedirectToAction("Index", "Dashboard");
             }
-
-            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
+            catch (Exception ex)
             {
-                var adminForFailed = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
-                string failedMessage = $"Dear {admin.Email}, \n" +
-                    $"User {user.Email} password updated.  \n" +
-                    $"{BaseUrl}";
-                await smsService.DoSendSmsAsync(adminForFailed.Country.Code, "+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
+                _logger.LogError(ex, "Error occurred while changing password");
+                notifyService.Error("OOPS !!!..Contact Admin");
+                return RedirectToAction(nameof(Login));
             }
-            notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
-            return RedirectToAction("Index", "Dashboard");
         }
         [HttpPost]
         [AllowAnonymous]
@@ -556,53 +430,6 @@ namespace risk.control.system.Controllers
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(AccountController.Login), "Account");
-        }
-
-        [HttpGet]
-        public async Task<int?> CheckUserName(string input, string domain)
-        {
-            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(domain))
-            {
-                return null;
-            }
-            Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
-
-            var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
-
-            var userCount = await _userManager.Users.CountAsync(u => u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain && !u.Deleted);
-
-            return userCount == 0 ? 0 : 1;
-
-        }
-
-        [HttpGet]
-        public async Task<int?> CheckAgencyName(string input, string domain)
-        {
-            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(domain))
-            {
-                return null;
-            }
-            Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
-
-            var newDomain = input.Trim().ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
-
-            var agenccompanyCount = await _context.ClientCompany.CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
-            var agencyCount = await _context.Vendor.CountAsync(u => u.Email.Trim().ToLower() == newDomain);
-
-            return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
-        }
-
-        [HttpGet]
-        public async Task<int?> CheckUserEmail(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return null;
-            }
-
-            var userCount = await _userManager.Users.CountAsync(u => u.Email == input && !u.Deleted);
-
-            return userCount == 0 ? 0 : 1;
         }
     }
     public class KeepSessionRequest

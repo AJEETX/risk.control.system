@@ -159,7 +159,7 @@ function alphaOnly(event) {
 };
 
 function checkUserEmail() {
-    var url = "/Account/CheckUserEmail";
+    var url = "/api/MasterData/CheckUserEmail";
     var name = $('#emailAddress').val().toLowerCase();
     var emailSuffix = $('#emailSuffix').val().toLowerCase();
     $('#mailAddress').val('');

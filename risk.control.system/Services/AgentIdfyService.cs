@@ -104,7 +104,7 @@ internal class AgentIdfyService : IAgentIdfyService
             var latitude = face.LongLat.Substring(0, longLat)?.Trim();
             var longitude = face.LongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
-            byte[]? registeredImage = agent.ProfilePicture;
+                var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, agent.ProfilePictureUrl));
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
@@ -235,13 +235,11 @@ internal class AgentIdfyService : IAgentIdfyService
 
             if (!hasCustomerVerification)
             {
-                var beneficiaryFilePath = claim.BeneficiaryDetail.ImagePath.Substring(1);
                 var image = Path.Combine(webHostEnvironment.ContentRootPath, claim.BeneficiaryDetail.ImagePath);
                 registeredImage = await File.ReadAllBytesAsync(image);
             }
             else
             {
-                var customerFilePath = claim.CustomerDetail.ImagePath.Substring(1);
                 var image = Path.Combine(webHostEnvironment.ContentRootPath, claim.CustomerDetail.ImagePath);
                 registeredImage = await File.ReadAllBytesAsync(image);
             }

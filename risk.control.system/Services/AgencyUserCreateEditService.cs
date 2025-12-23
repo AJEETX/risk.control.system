@@ -153,7 +153,6 @@ namespace risk.control.system.Services
 
             return (true, $"User {user.Email} updated successfully", errors);
         }
-
         private async Task SaveProfileImageAsync(VendorApplicationUser model, string suffix)
         {
             var safeFolder = Regex.Replace(suffix, @"[^a-zA-Z0-9\-\.]", "");
@@ -162,12 +161,7 @@ namespace risk.control.system.Services
 
             model.ProfilePictureUrl = path;
             model.ProfilePictureExtension = Path.GetExtension(fileName);
-
-            using var ms = new MemoryStream();
-            await model.ProfileImage.CopyToAsync(ms);
-            model.ProfilePicture = ms.ToArray();
         }
-
         private static void PopulateUserEntity(VendorApplicationUser model, string email, string createdBy)
         {
             model.Email = email;
@@ -188,7 +182,6 @@ namespace risk.control.system.Services
             model.Role = model.Role != null ? model.Role : (AppRoles)Enum.Parse(typeof(AppRoles), model.UserRole.ToString());
             model.IsVendorAdmin = model.UserRole == AgencyRole.AGENCY_ADMIN;
         }
-
         private async Task HandleLockAndNotificationsAsync(VendorApplicationUser user, string portal_base_url, bool created = true)
         {
             await _userManager.SetLockoutEnabledAsync(user, !user.Active);

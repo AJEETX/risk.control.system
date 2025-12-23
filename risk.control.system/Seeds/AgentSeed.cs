@@ -54,7 +54,6 @@ namespace risk.control.system.Seeds
                 StateId = pincode?.StateId ?? default!,
                 PinCodeId = pincode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
-                ProfilePicture = agentImage,
                 Role = AppRoles.AGENT,
                 UserRole = AgencyRole.AGENT,
                 Updated = DateTime.Now,

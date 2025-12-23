@@ -502,7 +502,7 @@ namespace risk.control.system.Services
                 var agentInfo = new AgentData
                 {
                     Id = agent.Id,
-                    Photo = agent.ProfilePicture == null
+                    Photo = string.IsNullOrWhiteSpace(agent.ProfilePictureUrl)
                         ? noUserImagefilePath
                         : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, agent.ProfilePictureUrl)))),

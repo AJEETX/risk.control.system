@@ -52,7 +52,7 @@
 
 $(document).ready(function () {
 
-    const currentpassword = $('#NewPassword');
+    const currentpassword = $('#CurrentPassword');
     if (currentpassword) {
         currentpassword.focus()
     }

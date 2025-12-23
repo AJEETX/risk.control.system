@@ -26,17 +26,10 @@
                         <!-- Profile Image Section -->
                         <div class="form-group text-center">
                             <div class="profile-img-container">
-                                @if (Model?.ProfilePictureUrl is not null)
-                                {
-                                    <img id="editProfileImage" class="form-Image" src="/Document/GetCompanyUserDocument/@Model?.Id" alt="Profile Image" />
-                                }
-                                else
-                                {
-                                    <img id="editProfileImage" class="form-Image" src="@Applicationsettings.NO_USER" alt="Profile Image" />
-                                }
+                                <img id="editProfileImage" class="form-Image" src="/Document/GetCompanyUserDocument/@Model?.Id" alt="Profile" />
                             </div>
-                            <label for="ProfileImage" class="control-label">Profile Photo <i class="fa fa-asterisk asterik-style"></i></label>
-                            <input asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="editImageInput" data-preview-id="editProfileImage" title="User Photo"/>
+                            <label for="editImageInput" class="control-label">Profile Photo <i class="fa fa-asterisk asterik-style"></i></label>
+                            <input asp-for="ProfileImage" class="form-control remarks document-image-input filled-valid" type="file" id="editImageInput" data-preview-id="editProfileImage" title="User Photo" />
                         </div>
 
                        
@@ -69,11 +62,19 @@
                                 <div class="input-group-prepend">
                                     @* Display Country Code *@
                                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
-                                        <img src="@("/flags/" + @Model.Country.Code.ToLower() + ".png")" class="flag-icon" />
+                                        <img src="@("/flags/" + @Model.Country.Code.ToLower() + ".png")" class="flag-icon" alt="flag"/>
                                         +@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
                                 <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" autocomplete="off" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
+                                <span id="phone-spinner" class="text-secondary phone-icon d-none">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                                <span id="phone-valid" class="text-success phone-icon d-none">
+                                </span>
+                                <span id="phone-invalid" class="text-danger phone-icon d-none">
+                                    <i class="fas fa-times-circle"></i>
+                                </span>
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -89,7 +90,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-at"></i><i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input readonly asp-for="Email" class="form-control readonly-input" />
+                                <input readonly asp-for="Email" class="form-control readonly-input valid-border" />
                             </div>
                         </div>
 
@@ -101,7 +102,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input readonly asp-for="UserRole" class="form-control readonly-input" />
+                                <input readonly asp-for="UserRole" class="form-control readonly-input valid-border" />
                             </div>
                         </div>
                         <partial name="_Address" model="@Model" />
@@ -111,9 +112,9 @@
                             <label class="input-group-label" for="Addressline"> Address:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" required />
+                                <input  id="Addressline" type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" required />
                             </div>
                         </div>
 

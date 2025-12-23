@@ -160,10 +160,6 @@ namespace risk.control.system.Controllers
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
-
-                    using var dataStream = new MemoryStream();
-                    user.ProfileImage.CopyTo(dataStream);
-                    user.ProfilePicture = dataStream.ToArray();
                 }
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 user.PhoneNumber = user.PhoneNumber.TrimStart('0');
@@ -269,15 +265,10 @@ namespace risk.control.system.Controllers
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, domain, "user");
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
-
-                    using var dataStream = new MemoryStream();
-                    user.ProfileImage.CopyTo(dataStream);
-                    user.ProfilePicture = dataStream.ToArray();
                 }
 
                 if (user != null)
                 {
-                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                     user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
                     user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                     user.FirstName = applicationUser?.FirstName;

@@ -353,7 +353,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(string id, ClientCompanyApplicationUser model)
+        public async Task<IActionResult> EditUser(long id, ClientCompanyApplicationUser model)
         {
             try
             {

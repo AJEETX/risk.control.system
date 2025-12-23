@@ -269,17 +269,21 @@ namespace risk.control.system.Services
             if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
                 a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
             {
-                var agentProfile = context.Vendor.FirstOrDefault(u => u.VendorId == a.VendorId)?.DocumentImage;
-                if (agentProfile != null)
+                var agent = context.Vendor.FirstOrDefault(u => u.VendorId == a.VendorId);
+                if (agent != null && !string.IsNullOrWhiteSpace(agent.DocumentUrl))
                 {
+                    var agentImagePath = Path.Combine(env.ContentRootPath, agent.DocumentUrl);
+                    var agentProfile = System.IO.File.ReadAllBytes(agentImagePath);
                     return agentProfile;
                 }
             }
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                var vendorImage = context.VendorApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail)?.ProfilePicture;
-                if (vendorImage != null)
+                var vendor = context.VendorApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
+                if (vendor != null && !string.IsNullOrWhiteSpace(vendor.ProfilePictureUrl))
                 {
+                    var vendorImagePath = Path.Combine(env.ContentRootPath, vendor.ProfilePictureUrl);
+                    var vendorImage = System.IO.File.ReadAllBytes(vendorImagePath);
                     return vendorImage;
                 }
             }
@@ -291,10 +295,12 @@ namespace risk.control.system.Services
                 a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
                 )
             {
-                var company = context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId).DocumentImage;
-                if (company != null)
+                var company = context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId);
+                if (company != null && !string.IsNullOrWhiteSpace(company.DocumentUrl))
                 {
-                    return company;
+                    var companyImagePath = Path.Combine(env.ContentRootPath, company.DocumentUrl);
+                    var companyImage = System.IO.File.ReadAllBytes(companyImagePath);
+                    return companyImage;
                 }
             }
             return noDataimage;

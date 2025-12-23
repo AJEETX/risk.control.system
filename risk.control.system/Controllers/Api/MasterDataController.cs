@@ -1,12 +1,15 @@
-﻿using System.Security.Claims;
+﻿using System.Globalization;
+using System.Security.Claims;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -24,16 +27,53 @@ namespace risk.control.system.Controllers.Api
         private readonly ApplicationDbContext context;
         private readonly IPhoneService phoneService;
         private readonly IFeatureManager featureManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly ILogger<MasterDataController> logger;
 
-        public MasterDataController(ApplicationDbContext context, IPhoneService phoneService, IFeatureManager featureManager, ILogger<MasterDataController> logger)
+        public MasterDataController(
+            ApplicationDbContext context,
+            IPhoneService phoneService,
+            IFeatureManager featureManager,
+            UserManager<ApplicationUser> userManager,
+            ILogger<MasterDataController> logger)
         {
             this.context = context;
             this.phoneService = phoneService;
             this.featureManager = featureManager;
+            this.userManager = userManager;
             this.logger = logger;
         }
 
+        [HttpGet("CheckAgencyName")]
+        public async Task<int?> CheckAgencyName(string input, string domain)
+        {
+            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(domain))
+            {
+                return null;
+            }
+            Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
+
+            var newDomain = input.Trim().ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
+
+            var agenccompanyCount = await context.ClientCompany.CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
+            var agencyCount = await context.Vendor.CountAsync(u => u.Email.Trim().ToLower() == newDomain);
+
+            return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
+        }
+
+
+        [HttpGet("CheckUserEmail")]
+        public async Task<int?> CheckUserEmail(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null;
+            }
+
+            var userCount = await userManager.Users.CountAsync(u => u.Email == input && !u.Deleted);
+
+            return userCount == 0 ? 0 : 1;
+        }
         [HttpGet("GetInvestigationServicesByInsuranceType")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetInvestigationServicesByInsuranceType(string insuranceType)

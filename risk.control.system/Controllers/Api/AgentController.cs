@@ -219,9 +219,9 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
                 }
-                if (mobileUidExist.ProfilePicture == null)
+                if (mobileUidExist.ProfilePictureUrl == null || string.IsNullOrWhiteSpace(mobileUidExist.ProfilePictureUrl))
                 {
-                    return BadRequest($"{mobileUidExist.Email}  {nameof(mobileUidExist.ProfilePicture)}  does not exists");
+                    return BadRequest($"{mobileUidExist.Email}  {nameof(mobileUidExist.ProfilePictureUrl)}  does not exists");
                 }
                 if (!request.VerifyId)
                 {
@@ -229,21 +229,14 @@ namespace risk.control.system.Controllers.Api
                 }
 
                 var image = Convert.FromBase64String(request.Image);
-
-                var matched = await compareFaces.DoFaceMatch(mobileUidExist.ProfilePicture, image);
+                var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, mobileUidExist.ProfilePictureUrl));
+                var matched = await compareFaces.DoFaceMatch(registeredImage, image);
                 if (matched.Item1)
                 {
                     return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
                 }
 
                 return BadRequest("face mismatch");
-
-                //var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = saveImageBase64Image2Verify }, FaceMatchBaseUrl);
-
-                //if (faceImageDetail == null || faceImageDetail?.Confidence == null)
-                //{
-                //    return BadRequest("face mismatch");
-                //}
             }
             catch (Exception ex)
             {

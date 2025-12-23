@@ -18,7 +18,7 @@ namespace risk.control.system.Seeds
             string pinCodeCode)
         {
 
-            var pinCode =await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.Code == pinCodeCode);
+            var pinCode = await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.Code == pinCodeCode);
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(PORTAL_ADMIN.PROFILE_IMAGE));
             var adminImage = File.ReadAllBytes(adminImagePath);
@@ -51,7 +51,6 @@ namespace risk.control.system.Seeds
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = PORTAL_ADMIN.PROFILE_IMAGE,
-                ProfilePicture = adminImage,
                 Role = AppRoles.PORTAL_ADMIN,
                 Updated = DateTime.Now
             };

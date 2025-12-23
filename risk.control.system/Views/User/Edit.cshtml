@@ -39,39 +39,33 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> Profile Photo:</label>
+                            <label class="input-group-label" for="createProfileImage"> Profile Photo:</label>
                             <div class="input-group mb-3">
-                                @if (Model?.ProfilePicture is not null)
-                                {
-                                    <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="Profile Image" />
-                                }
-                                else
-                                {
-                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
-                                }
+                                <img id="createProfileImage" class="form-Image" src="/Document/GetAgencyUserDocument/@Model.Id" alt="Profile" />
+
                                 <i class="fa fa-asterisk asterik-style"></i>
                                 <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" />
-                                <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                                <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> First Name:</label>
+                            <label class="input-group-label" for="FirstName"> First Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20">
+                                <input id="FirstName" type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20">
                                 <span asp-validation-for="FirstName" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="input-group-label"> Last Name:</label>
+                            <label class="input-group-label" for="LastName"> Last Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20">
+                                <input id="LastName" type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20">
                                 <span asp-validation-for="LastName" class="text-danger"></span>
                             </div>
                         </div>

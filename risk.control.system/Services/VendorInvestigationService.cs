@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -847,17 +845,25 @@ namespace risk.control.system.Services
             {
                 ownerEmail = a.TaskedAgentEmail;
                 var agencyUser = context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail);
-                if (agencyUser != null && agencyUser?.ProfilePicture != null)
+                if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser?.ProfilePictureUrl))
                 {
-                    return agencyUser?.ProfilePicture;
+                    var agencyUserImagePath = Path.Combine(env.ContentRootPath, agencyUser.ProfilePictureUrl);
+                    if (System.IO.File.Exists(agencyUserImagePath))
+                    {
+                        return System.IO.File.ReadAllBytes(agencyUserImagePath);
+                    }
                 }
             }
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
             {
                 var companyUser = context.ClientCompany.FirstOrDefault(u => u.ClientCompanyId == a.ClientCompanyId);
-                if (companyUser != null && companyUser?.DocumentImage != null)
+                if (companyUser != null && !string.IsNullOrWhiteSpace(companyUser?.DocumentUrl))
                 {
-                    return companyUser?.DocumentImage;
+                    var companyUserImagePath = Path.Combine(env.ContentRootPath, companyUser.DocumentUrl);
+                    if (System.IO.File.Exists(companyUserImagePath))
+                    {
+                        return System.IO.File.ReadAllBytes(companyUserImagePath);
+                    }
                 }
             }
             return noDataimage;

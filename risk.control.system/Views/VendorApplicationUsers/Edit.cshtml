@@ -42,17 +42,10 @@
                         <div class="form-group">
                             <span class="input-group-label"> Photo:</span>
                             <div class="input-group mb-3">
-                                @if (Model?.ProfilePicture is not null)
-                                {
-                                    <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="Profile Image" />
-                                }
-                                else
-                                {
-                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
-                                }
+                                <img id="createProfileImage" class="form-Image" src="/Document/GetAgencyUserDocument/@Model.Id" alt="Profile" />
                                 <i class="fa fa-asterisk asterik-style"></i>
                                 <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" />
-                                <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                                <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
                             </div>
                         </div>
 

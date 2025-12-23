@@ -24,7 +24,11 @@
                             $('a').addClass('disabled-anchor').on('click', function (e) {
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
-
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#create-form').attr('disabled', 'disabled');
+                            $('#create-form').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Update");
                             $('#create-form').submit();
                         }
                     },

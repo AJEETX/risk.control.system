@@ -188,13 +188,13 @@ namespace risk.control.system.Controllers.Company
         }
         public async Task<IActionResult> GetAgencyUserDocument(long id)
         {
-            var vendorUser = await context.VendorApplicationUser
+            var user = await context.ApplicationUser
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (vendorUser.ProfilePictureUrl == null)
+            if (user.ProfilePictureUrl == null)
                 return NotFound();
 
-            var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, vendorUser.ProfilePictureUrl);
+            var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl);
 
             if (!System.IO.File.Exists(fullPath))
                 return NotFound();

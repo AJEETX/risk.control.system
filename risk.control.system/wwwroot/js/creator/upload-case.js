@@ -482,9 +482,9 @@
                                 disableAllInteractiveElements();
                                 // Customize the button text before the submission
                                 if (isChecked) {
-                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Assigning...');
+                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Assign...');
                                 } else {
-                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Uploading...');
+                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Upload...');
                                 }
                                 $(formId).submit();
 

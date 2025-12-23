@@ -41,7 +41,6 @@
                     {
                         UserId = companyUser.Id,
                         Email = companyUser.Email,
-                        ProfilePicture = companyUser.ProfilePicture,
                         CanChangePassword = company.CanChangePassword,
                         CountryCode = company.Country.Code,
                         Country = $"{company.Country.Name} ({company.Country.Code})",
@@ -61,7 +60,6 @@
                     {
                         UserId = vendorUser.Id,
                         Email = vendorUser.Email,
-                        ProfilePicture = vendorUser.ProfilePicture,
                         CanChangePassword = vendor.CanChangePassword,
                         CountryCode = vendor.Country.Code,
                         Country = $"{vendor.Country.Name} ({vendor.Country.Code})",
@@ -80,7 +78,6 @@
                     {
                         UserId = admin.Id,
                         Email = admin.Email,
-                        ProfilePicture = admin.ProfilePicture,
                         CanChangePassword = true,
                         CountryCode = admin.Country.Code,
                         Country = $"{admin.Country.Name} ({admin.Country.Code})",

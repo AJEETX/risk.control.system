@@ -145,6 +145,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddScoped<IVendorUserService, VendorUserService>();
 builder.Services.AddScoped<ICompanyUserService, CompanyUserService>();
 builder.Services.AddScoped<IVendorServiceTypeManager, VendorServiceTypeManager>();
 builder.Services.AddScoped<IAgencyUserCreateEditService, AgencyUserCreateEditService>();
