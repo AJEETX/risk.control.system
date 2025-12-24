@@ -134,14 +134,13 @@ namespace risk.control.system.Controllers
                     return View(model);
                 }
                 notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
-                return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
             }
+            return RedirectToAction(nameof(Index), "Dashboard");
         }
 
         [HttpGet]

@@ -492,10 +492,10 @@ namespace risk.control.system.Services
 
                 // Get map data asynchronously
                 var (distance, distanceInMetre, duration, durationInSec, map) = await customApiClient.GetMap(
-                    agent.AddressLatitude,
-                    agent.AddressLongitude,
-                    LocationLatitude,
-                    LocationLongitude);
+                    double.Parse(agent.AddressLatitude),
+                    double.Parse(agent.AddressLongitude),
+                    double.Parse(LocationLatitude),
+                    double.Parse(LocationLongitude));
 
                 var mapDetails = $"Driving distance: {distance}; Duration: {duration}";
 
@@ -503,12 +503,12 @@ namespace risk.control.system.Services
                 {
                     Id = agent.Id,
                     Photo = string.IsNullOrWhiteSpace(agent.ProfilePictureUrl)
-                        ? noUserImagefilePath
-                        : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(env.ContentRootPath, agent.ProfilePictureUrl)))),
+                       ? noUserImagefilePath
+                       : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                   Path.Combine(env.ContentRootPath, agent.ProfilePictureUrl)))),
                     Email = agent.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(agent.MobileUId)
-                        ? $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a>"
-                        : $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a><span title='Onboarding incomplete !!!' data-toggle='tooltip'><i class='fa fa-asterisk asterik-style'></i></span>",
+                       ? $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a>"
+                       : $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a><span title='Onboarding incomplete !!!' data-toggle='tooltip'><i class='fa fa-asterisk asterik-style'></i></span>",
                     Name = $"{agent.FirstName} {agent.LastName}",
                     Phone = $"(+{agent.Country.ISDCode}) {agent.PhoneNumber}",
                     Addressline = $"{agent.Addressline}, {agent.District.Name}, {agent.State.Code}, {agent.Country.Code}",
@@ -516,8 +516,8 @@ namespace risk.control.system.Services
                     Flag = $"/flags/{agent.Country.Code.ToLower()}.png",
                     Active = agent.Active,
                     Roles = agent.UserRole != null
-                        ? $"<span class='badge badge-light'>{agent.UserRole.GetEnumDisplayName()}</span>"
-                        : "<span class='badge badge-light'>...</span>",
+                       ? $"<span class='badge badge-light'>{agent.UserRole.GetEnumDisplayName()}</span>"
+                       : "<span class='badge badge-light'>...</span>",
                     Count = claimCount,
                     UpdateBy = agent.UpdatedBy,
                     Role = agent.UserRole.GetEnumDisplayName(),
@@ -531,11 +531,12 @@ namespace risk.control.system.Services
                     Duration = duration,
                     DurationInSeconds = durationInSec,
                     AddressLocationInfo = claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                        ? claim.CustomerDetail.AddressLocationInfo
-                        : claim.BeneficiaryDetail.AddressLocationInfo
+                       ? claim.CustomerDetail.AddressLocationInfo
+                       : claim.BeneficiaryDetail.AddressLocationInfo
                 };
 
                 agentList.Add(agentInfo);
+
             }));
             return agentList;
         }

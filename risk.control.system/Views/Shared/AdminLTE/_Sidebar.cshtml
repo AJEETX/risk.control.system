@@ -37,7 +37,12 @@
 
                 <!-- ADMIN_SETTINGS Menu -->
                 <li class="nav-item">
-                    <a asp-controller="ClientCompany" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                    <a asp-controller="ClientCompany" asp-action="Index" is-active-page class="navlink-border nav-link 
+                    @Url.MakeActiveClass("ClientCompany","") 
+                    @Url.MakeActiveClass("Vendors","") 
+                    @Url.MakeActiveClass("CompanyUser","") 
+                    @Url.MakeActiveClass("VendorUser","") 
+                    @Url.MakeActiveClass("VendorService","")">
                         <i class="nav-icon fas fa-shield-alt"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.ADMIN_SETTINGS

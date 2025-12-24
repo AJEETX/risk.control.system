@@ -104,7 +104,7 @@ internal class AgentIdfyService : IAgentIdfyService
             var latitude = face.LongLat.Substring(0, longLat)?.Trim();
             var longitude = face.LongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
-                var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, agent.ProfilePictureUrl));
+            var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, agent.ProfilePictureUrl));
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
@@ -119,7 +119,7 @@ internal class AgentIdfyService : IAgentIdfyService
                 expectedLong = claim.CustomerDetail.Longitude;
             }
 
-            var mapTask = customApiCLient.GetMap(expectedLat, expectedLong, latitude, longitude, "A", "X", "300", "300", "green", "red");
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
             #region FACE IMAGE PROCESSING
 
@@ -257,7 +257,7 @@ internal class AgentIdfyService : IAgentIdfyService
                 expectedLong = claim.CustomerDetail.Longitude;
             }
 
-            var mapTask = customApiCLient.GetMap(expectedLat, expectedLong, latitude, longitude, "A", "X", "300", "300", "green", "red");
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
             #region FACE IMAGE PROCESSING
 
@@ -374,7 +374,7 @@ internal class AgentIdfyService : IAgentIdfyService
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
             }
-            var mapTask = customApiCLient.GetMap(expectedLat, expectedLong, latitude, longitude, "A", "X", "300", "300", "green", "red");
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
             var googleDetecTask = googleApi.DetectTextAsync(doc.FilePath);
 
@@ -501,7 +501,7 @@ internal class AgentIdfyService : IAgentIdfyService
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
             }
-            var mapTask = customApiCLient.GetMap(expectedLat, expectedLong, latitude, longitude, "A", "X", "300", "300", "green", "red");
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
             var weatherTask = weatherInfoService.GetWeatherAsync(latitude, longitude);
             addressTask = httpClientService.GetRawAddress(latitude, longitude);

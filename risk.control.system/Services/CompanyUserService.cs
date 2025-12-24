@@ -118,7 +118,6 @@ namespace risk.control.system.Services
                 user.LastName = model.LastName;
                 user.Addressline = model.Addressline;
                 user.PhoneNumber = model.PhoneNumber.TrimStart('0');
-                user.Active = model.Active;
 
                 user.UserRole = model.UserRole;
                 user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), model.UserRole.ToString());
@@ -135,15 +134,19 @@ namespace risk.control.system.Services
                 var roles = await _userManager.GetRolesAsync(user);
                 await _userManager.RemoveFromRolesAsync(user, roles);
                 await _userManager.AddToRoleAsync(user, user.UserRole.ToString());
+                if (user.Email != performedBy)
+                {
+                    user.Active = model.Active;
 
-                if (!user.Active)
-                {
-                    await _userManager.SetLockoutEnabledAsync(user, true);
-                    await _userManager.SetLockoutEndDateAsync(user, DateTime.MaxValue);
-                }
-                else
-                {
-                    await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+                    if (!user.Active)
+                    {
+                        await _userManager.SetLockoutEnabledAsync(user, true);
+                        await _userManager.SetLockoutEndDateAsync(user, DateTime.MaxValue);
+                    }
+                    else
+                    {
+                        await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+                    }
                 }
 
                 return Success("User updated successfully.");

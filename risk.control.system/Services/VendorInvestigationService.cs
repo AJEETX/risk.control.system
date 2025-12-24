@@ -246,7 +246,11 @@ namespace risk.control.system.Services
                     LocationLatitude = claim.BeneficiaryDetail?.Latitude;
                     LocationLongitude = claim.BeneficiaryDetail?.Longitude;
                 }
-                (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(agentUser.AddressLatitude, agentUser.AddressLongitude, LocationLatitude, LocationLongitude);
+                (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(
+                  double.Parse(agentUser.AddressLatitude),
+                  double.Parse(agentUser.AddressLongitude),
+                   double.Parse(LocationLatitude),
+                    double.Parse(LocationLongitude));
                 claim.AllocatingSupervisordEmail = currentUser;
                 claim.CaseOwner = vendorAgentEmail;
                 claim.TaskedAgentEmail = vendorAgentEmail;

@@ -130,9 +130,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting user Profile.");
                 notifyService.Error("Error getting user Profile. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            notifyService.Error("OOPS !!!..Contact Admin");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
         private async Task LoadModel(ClientCompanyApplicationUser model, string currentUserEmail)
