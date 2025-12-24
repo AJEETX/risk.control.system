@@ -1,17 +1,12 @@
-﻿using System.Web;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -23,6 +18,7 @@ namespace risk.control.system.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILoginService loginService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration config;
@@ -38,6 +34,7 @@ namespace risk.control.system.Controllers
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
+            ILoginService loginService,
             IWebHostEnvironment webHostEnvironment,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration config,
@@ -51,6 +48,7 @@ namespace risk.control.system.Controllers
             ApplicationDbContext context)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
+            this.loginService = loginService;
             this.webHostEnvironment = webHostEnvironment;
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.config = config;
@@ -202,127 +200,41 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Login(LoginViewModel model, string agent_login = "")
         {
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
-            {
-                ModelState.AddModelError(string.Empty, "Bad Request.");
-                model.LoginError = "Bad Request.";
-                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
-                return View(model);
-            }
-            var email = HttpUtility.HtmlEncode(model.Email);
-            var pwd = HttpUtility.HtmlEncode(model.Password);
-            var result = await _signInManager.PasswordSignInAsync(email, pwd, model.RememberMe, lockoutOnFailure: false);
+                return await PrepareInvalidView(model, "Bad Request.");
+
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+
             if (!result.Succeeded)
-            {
-                if (result.IsLockedOut)
-                {
-                    model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                    _logger.LogError("User account locked out.");
-                    model.LoginError = "User account locked out.";
-                    return View(model);
-                }
-                else if (result.IsNotAllowed)
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    model.LoginError = $"{nameof(result.IsNotAllowed)}. Contact admin.";
-                    model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                    _logger.LogError("User account not allowed.");
-                    return View(model);
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid credentials.");
-                    model.LoginError = $"Invalid credentials. Contact admin.";
-                    model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                    _logger.LogError("Invalid credentials.");
-                    return View(model);
-                }
-            }
-            var user = await _userManager.FindByEmailAsync(email);
+                return await PrepareInvalidView(model, loginService.GetErrorMessage(result));
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
+                return await PrepareInvalidView(model, "User can't login.");
+            var (isAuthorized, displayName, isAdmin) = await loginService.GetUserStatusAsync(user, agent_login);
+
+            if (!isAuthorized)
+                return await PrepareInvalidView(model, "Account inactive or unauthorized.");
+
+            bool forceChangeEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+
+            if (!isAdmin && forceChangeEnabled && user.IsPasswordChangeRequired)
             {
-                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                _logger.LogCritical("User can't login.");
-                model.LoginError = "User can't login.";
-                return View(model);
-            }
-            var admin = await _userManager.IsInRoleAsync(user, AppRoles.PORTAL_ADMIN.ToString());
-            if (!admin)
-            {
-                if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
-                {
-                    if (user.IsPasswordChangeRequired)
-                    {
-                        return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
-                    }
-                }
-            }
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted);
-            bool vendorIsActive = false;
-            bool companyIsActive = false;
-            string loggingUsername = "Admin";
-            if (companyUser != null)
-            {
-                companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
-                loggingUsername = companyUser.FirstName;
-            }
-            else if (vendorUser != null)
-            {
-                loggingUsername = vendorUser.FirstName;
-                vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-                if (agent_login != "agent_login")
-                {
-                    if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
-                    {
-                        var userIsAgent = vendorUser.Role == AppRoles.AGENT;
-                        if (userIsAgent)
-                        {
-                            if (await featureManager.IsEnabledAsync(FeatureFlags.AGENT_LOGIN_DISABLED_ON_PORTAL))
-                            {
-                                vendorIsActive = false;
-                            }
-                            else
-                            {
-                                vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
-                            }
-                        }
-                    }
-                }
+                return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
             }
 
-            if (
-                (companyIsActive && user.Active) ||  // Company user active
-                (vendorIsActive && user.Active) ||  // Vendor user active
-                (companyUser == null && vendorUser == null) // SuperAdmin user 
-                )
-            {
-                var timeout = config["SESSION_TIMEOUT_SEC"];
-                var properties = new AuthenticationProperties
-                {
-                    IsPersistent = true, // Makes the cookie persistent
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout ?? "900")), // Reset expiry time
-                };
-                await _signInManager.SignInAsync(user, properties);
-                if (User is null || User.Identity is null)
-                {
-                    return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
-                }
-                notifyService.Success($"Welcome <b>{loggingUsername}</b>, Login successful");
-                if (Url.IsLocalUrl(model.ReturnUrl))
-                    return Redirect(model.ReturnUrl);
+            await loginService.SignInWithTimeoutAsync(user);
 
-                return RedirectToAction("Index", "Dashboard");
-            }
+            notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
 
+            return Url.IsLocalUrl(model.ReturnUrl) ? Redirect(model.ReturnUrl) : RedirectToAction("Index", "Dashboard");
+        }
+
+        private async Task<IActionResult> PrepareInvalidView(LoginViewModel model, string error)
+        {
+            model.LoginError = error;
+            ModelState.AddModelError(string.Empty, error);
             model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-            _logger.LogCritical("User can't login.");
-            model.LoginError = "User can't login.";
+            ViewData["Users"] = await loginService.GetUserSelectListAsync();
             return View(model);
         }
 

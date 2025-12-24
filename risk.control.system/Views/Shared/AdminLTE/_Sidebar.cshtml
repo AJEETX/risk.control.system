@@ -1,11 +1,6 @@
-﻿@using Microsoft.EntityFrameworkCore;
+﻿@using risk.control.system.Models;
 @using risk.control.system.Helpers;
-@using risk.control.system.Models;
-@using risk.control.system.Components;
-@inject SignInManager<ApplicationUser> SignInManager
-@inject ApplicationDbContext context
-@inject UserManager<ApplicationUser> UserManager
-
+@model ApplicationUser
 <aside class="main-sidebar elevation-2 sidebar-light-primary">
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
@@ -17,33 +12,15 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user (optional) -->
-        @if (SignInManager.IsSignedIn(User))
-        {
-            var user = UserManager.GetUserAsync(User).Result;
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-
-                @if (user?.ProfilePictureUrl != null)
-                {
-                    <div class="image">
-                        <img class="elevation-2 sidebar-profile" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
-                    </div>
-                }
-                else
-                {
-                    <div class="image">
-                        <img class="elevation-2 sidebar-profile" src="@Applicationsettings.NO_IMAGE">
-                    </div>
-                }
-                <a href="#" class="d-block">
-                    @UserManager.GetUserAsync(User).Result?.FirstName
-                    @if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
-                    {
-                        <span class="badge badge-danger">@Applicationsettings.PORTAL_ADMIN.CODE</span>
-                    }
-                </a>
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserImage?email=@Model.Email" alt="Profile">
             </div>
-        }
-
+            <a href="#" class="d-block">
+                @Model.FirstName
+                <span class="badge badge-danger">@Applicationsettings.PORTAL_ADMIN.CODE</span>
+            </a>
+        </div>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
@@ -57,8 +34,6 @@
                         </p>
                     </a>
                 </li>
-
-
 
                 <!-- ADMIN_SETTINGS Menu -->
                 <li class="nav-item">
@@ -93,6 +68,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a is-active-page asp-controller="ClientCompany" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Create")
                                             ">
@@ -102,6 +78,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a is-active-page asp-controller="Vendors" asp-action="Agencies" class="actual-link nav-link @Url.MakeActiveClass("Vendors","")
                                     @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
@@ -111,6 +88,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a asp-controller="User" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","")
                             @Url.MakeActiveClass("ActiveUser","") @Url.MakeActiveClass("Roles","")">
@@ -121,6 +99,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a is-active-page asp-controller="User" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("User","")">
                         <i class="fas fa-user-friends nav-icon"></i>
@@ -129,6 +108,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a is-active-page asp-controller="Roles" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Roles","")">
                         <i class="fas fa-user-lock nav-icon"></i>
@@ -138,6 +118,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a asp-controller="LineOfBusiness" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","")
                     @Url.MakeActiveClass("InvestigationCaseStatus","") @Url.MakeActiveClass("CaseEnabler","") @Url.MakeActiveClass("Costcentre","") 
@@ -151,6 +132,7 @@
                         </p>
                     </a>
                 </li>
+
                 @* <li class="nav-item">
                     <a is-active-page asp-controller="LineOfBusiness" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("LineOfBusiness","")">
                         <i class="fas fa-business-time nav-icon"></i>
@@ -192,6 +174,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a is-active-page asp-controller="Costcentre" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Costcentre","")">
                         <i class="fas fa-building nav-icon"></i>
@@ -216,6 +199,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a asp-controller="Country" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") 
                         @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") 
@@ -237,6 +221,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a is-active-page asp-controller="State" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("State","")">
                         <i class="nav-icon fas fa-map-marker-alt"></i>
@@ -245,6 +230,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a is-active-page asp-controller="District" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("District","")">
                         <i class="nav-icon fas fa-city"></i>
@@ -253,6 +239,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a is-active-page asp-controller="PinCodes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("PinCodes","")">
                         <i class="nav-icon fas fa-file"></i>
@@ -261,6 +248,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a is-active-page asp-controller="Global" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Global","")">
                         <i class="nav-icon fas fa-wrench"></i>

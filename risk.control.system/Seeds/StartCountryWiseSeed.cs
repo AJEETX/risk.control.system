@@ -38,7 +38,7 @@ namespace risk.control.system.Seeds
                 randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, countries, servicesTypes, fileStorageService);
             }
 
-            await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode);
+            await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode, fileStorageService);
         }
     }
 }

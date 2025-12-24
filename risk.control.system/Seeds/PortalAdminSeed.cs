@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -15,7 +16,8 @@ namespace risk.control.system.Seeds
             IWebHostEnvironment webHostEnvironment,
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
-            string pinCodeCode)
+            string pinCodeCode,
+            IFileStorageService fileStorageService)
         {
 
             var pinCode = await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.Code == pinCodeCode);
@@ -28,6 +30,10 @@ namespace risk.control.system.Seeds
                 adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(USER_PHOTO));
                 adminImage = File.ReadAllBytes(adminImagePath);
             }
+            var extension = Path.GetExtension(adminImagePath);
+
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, "portal-admin");
+
             //Seed portal admin
             var portalAdmin = new ApplicationUser()
             {
@@ -50,7 +56,7 @@ namespace risk.control.system.Seeds
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = PORTAL_ADMIN.PROFILE_IMAGE,
+                ProfilePictureUrl = relativePath,
                 Role = AppRoles.PORTAL_ADMIN,
                 Updated = DateTime.Now
             };

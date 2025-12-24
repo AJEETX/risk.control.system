@@ -9,7 +9,6 @@
     <form id="login-form" asp-controller="Account" method="post">
         @Html.AntiForgeryToken()
         <input name="agent_login" title="agent_login" type="text" id="agent_login" value="">
-        <input type="hidden" id="defaultpassword" value="@Applicationsettings.TestingData" />
 
         <div class="input-boxes">
 
