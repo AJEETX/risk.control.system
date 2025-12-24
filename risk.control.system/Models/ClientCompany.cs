@@ -45,6 +45,8 @@ namespace risk.control.system.Models
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
         [NotMapped]
+        public IFormFile? Document { get; set; }
+        [NotMapped]
         public long SelectedPincodeId { get; set; }
         [NotMapped]
         public long SelectedDistrictId { get; set; }
@@ -82,11 +84,11 @@ namespace risk.control.system.Models
         public bool EnablePassport { get; set; } = false;
         public bool EnableMedia { get; set; } = false;
         public string PanIdfyUrl { get; set; } = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
-        public string PanAPIKey { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
+        public string PanAPIData { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         public string PanAPIHost { get; set; } = "pan-card-verification-at-lowest-price.p.rapidapi.com";
         public string? RapidAPIPanRemainCount { get; set; }
         public string? PassportApiUrl { get; set; } = "https://document-ocr1.p.rapidapi.com/idr";
-        public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
+        public string? PassportApiData { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
         public bool CanChangePassword { get; set; } = false;
         public bool BulkUpload { get; set; } = false;
@@ -136,11 +138,11 @@ namespace risk.control.system.Models
                 $"- Enable Passport: {EnablePassport}\n" +
                 $"- Enable Media: {EnableMedia}\n" +
                 $"- Pan IDfy URL: {PanIdfyUrl}\n" +
-                $"- Rapid API Key: {PanAPIKey}\n" +
+                $"- Rapid API Key: {PanAPIData}\n" +
                 $"- Rapid API Host: {PanAPIHost}\n" +
                 $"- Rapid API Pan Remain Count: {RapidAPIPanRemainCount}\n" +
                 $"- Passport API URL: {PassportApiUrl}\n" +
-                $"- Passport API Key: {PassportApiKey}\n" +
+                $"- Passport API Key: {PassportApiData}\n" +
                 $"- Passport API Host: {PassportApiHost}\n" +
                 $"- Can Change Password: {CanChangePassword}\n";
         }

@@ -42,9 +42,9 @@
 							@if (doc.ValidationExecuted)
 							{
 								<img id="doc-img-@doc.Id"
-									 src="@(doc?.FilePath)"
+									 src="/Document/GetOcrDocument/@doc.Id"
 									 class="mobile-capture-info  preview-image"
-									 title="@@doc.ReportName" />
+									 title="@doc.ReportName" />
 							}
 							else
 							{

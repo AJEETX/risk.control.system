@@ -14,7 +14,7 @@ namespace risk.control.system.Services
         List<string> GetUploadJobIds(string userEmail);
         List<string> GetAssignmentJobIds(string userEmail);
     }
-    public class ProgressService : IProgressService
+    internal class ProgressService : IProgressService
     {
         private static ConcurrentDictionary<int, int> jobProgress = new();
         private static ConcurrentDictionary<string, int> jobAssignmentProgress = new();

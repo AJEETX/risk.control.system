@@ -7,6 +7,8 @@
     <form id="edit-form" asp-action="EditUser" enctype="multipart/form-data">
         <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
         <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompany.ClientCompanyId" />
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title"><i class="fas fa-user-plus"></i> @Applicationsettings.EDIT User</h3>
@@ -15,19 +17,23 @@
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="row">
+            <div class="row top-margin-10">
                     <div class="col-md-6">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="Id" />
-                        <div class="form-group hide-id">
-                            <label asp-for="ClientCompany" class="control-label"></label>
-                            <input asp-for="ClientCompanyId" class="form-control remarks" value="@Model.ClientCompany.ClientCompanyId" />
-                            <span asp-validation-for="ClientCompanyId" class="text-danger"></span>
+                        
+                        <div class="form-group text-center">
+                            <div class="profile-img-container">
+                                <img id="document-Image" class="form-Image img-circle" src="/Document/GetCompanyUserDocument/@Model?.Id" title="User Photo" alt="User" data-bs-toggle="tooltip" />
+                            </div>
+                            <label for="createImageInput" class="control-label">User Photo<i class="fa fa-asterisk asterik-style-logo"></i></label>
+                            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
+                            <span asp-validation-for="ProfileImage" class="text-danger"></span>
                         </div>
+
                         <div class="form-group">
                             <label class="input-group-label" for="Email">
                                 Email:
-                                @if(@Model.IsPasswordChangeRequired)
+                                @if (@Model.IsPasswordChangeRequired)
                                 {
                                     <i class="fa fa-check-circle text-light-green" title="User Login verified" data-bs-toggle="tooltip"></i>
                                 }
@@ -41,23 +47,6 @@
                                     <span class="input-group-text" id="email"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
                                 </div>
                                 <input readonly asp-for="Email" class="form-control readonly-input valid-border" />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="input-group-label" for="createImageInput"> User Photo:</label>
-                            <div class="input-group mb-3">
-                                @if (Model?.ProfilePicture is not null)
-                                {
-                                    <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="User Photo" data-bs-toggle="tooltip" title="User Photo" />
-                                }
-                                else
-                                {
-                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No User Photo" />
-                                }
-                                <i class="fa fa-asterisk asterik-style"></i>
-                                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-title-id="user-document"
-                                       data-preview-id="createProfileImage" data-bs-toggle="tooltip" title="Upload User Photo" />
-                                <span asp-validation-for="ProfilePicture" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="form-group">
@@ -89,7 +78,7 @@
                                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                                     }
                                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
                                 <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
@@ -104,6 +93,9 @@
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>
+                        
+                    </div>
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="input-group-label" for="UserRole"> Role:</label>
                             <div class="input-group mb-3">
@@ -125,9 +117,6 @@
                                 <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        
                         <partial name="_Address" model="@Model" />
 
                         <div class="form-group">
@@ -143,9 +132,9 @@
                             <label class="input-group-label" for="Comments"> Note:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
                                 </div>
-                                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="70" />
+                                <input id="Comments" type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="70" />
                             </div>
                         </div>
                         @if (Model.UserRole == CompanyRole.COMPANY_ADMIN)
@@ -198,6 +187,7 @@
     }
     <script src="~/js/common/manage-user.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
-    <script src="~/js/common/profile-image-upload.js"></script>
+    <script src="~/js/company-admin/phone-bank-validate.js"></script>
+    <script src="~/js/common/image-upload.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 }

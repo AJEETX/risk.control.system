@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Net;
+using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -23,11 +24,14 @@ namespace risk.control.system.Controllers.Company
     public class InvestigationPostController : Controller
     {
         private const string CLAIMS = "claims";
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly ApplicationDbContext _context;
         private readonly IPhoneService phoneService;
         private readonly IFeatureManager featureManager;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly ICustomApiCLient customApiCLient;
+        private readonly ICustomApiClient customApiCLient;
         private readonly IProcessCaseService processCaseService;
         private readonly IMailService mailboxService;
         private readonly IFtpService ftpService;
@@ -42,7 +46,7 @@ namespace risk.control.system.Controllers.Company
             IPhoneService phoneService,
             IFeatureManager featureManager,
             IEmpanelledAgencyService empanelledAgencyService,
-            ICustomApiCLient customApiCLient,
+            ICustomApiClient customApiCLient,
             IProcessCaseService processCaseService,
             IMailService mailboxService,
             IFtpService ftpService,
@@ -74,6 +78,11 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Custom($"Invalid File Upload Error. ", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
+                }
                 if (postedFile == null || model == null ||
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
                 string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
@@ -108,8 +117,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "File Upload Error");
                 notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
                 return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
             }
@@ -157,370 +165,6 @@ namespace risk.control.system.Controllers.Company
             return Json(new { progress });
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CreatePolicy(InvestigationTask model)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (model == null || model.PolicyDetail == null || !model.PolicyDetail.IsValidCaseDetail())
-                {
-                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
-
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-                var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
-                {
-                    notifyService.Warning("No Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-                var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
-                if (file == null)
-                {
-                    notifyService.Warning("Invalid Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-
-                var claim = await service.CreatePolicy(currentUserEmail, model, file);
-                if (claim == null)
-                {
-                    notifyService.Error("Error Creating Case detail");
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-                else
-                {
-                    notifyService.Custom($"Policy <b>#{claim.PolicyDetail.ContractNumber}</b> created successfully", 3, "green", "far fa-file-powerpoint");
-                }
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = claim.Id });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> EditPolicy(long id, InvestigationTask model)
-        {
-            try
-            {
-                if (id < 1)
-                {
-                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
-
-                    return RedirectToAction(nameof(InvestigationController.CreatePolicy), "Investigation");
-                }
-                if (model == null || model.PolicyDetail == null || !model.PolicyDetail.IsValidCaseDetail())
-                {
-                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
-
-                    return RedirectToAction(nameof(InvestigationController.EditPolicy), "Investigation", new { id = id });
-                }
-
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                IFormFile documentFile = null;
-                var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
-                {
-                    var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
-                    if (file != null)
-                    {
-                        documentFile = file;
-                    }
-                }
-
-                var claim = await service.EditPolicy(currentUserEmail, model, documentFile);
-                if (claim == null)
-                {
-                    notifyService.Error("OOPs !!!..Error editing policy");
-                    return RedirectToAction(nameof(InvestigationController.EditPolicy), "Investigation", new { id = id });
-                }
-                notifyService.Custom($"Policy <b>#{claim.PolicyDetail.ContractNumber}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = claim.Id });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CreateCustomer(CustomerDetail customerDetail)
-        {
-            try
-            {
-                if (customerDetail == null || customerDetail.InvestigationTaskId < 1)
-                {
-                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
-                    return RedirectToAction(nameof(InvestigationController.Create), "Investigation");
-                }
-                if (customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 ||
-                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.PhoneNumber) ||
-                    customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null || customerDetail.ProfileImage == null)
-                {
-                    notifyService.Error("OOPs !!!..Incomplete/Invalid input");
-                    return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
-                }
-
-                var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
-                {
-                    notifyService.Warning("No Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
-                }
-                var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
-                if (file == null)
-                {
-                    notifyService.Warning("Invalid Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
-                }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-                {
-                    var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == customerDetail.SelectedCountryId);
-                    var countryCode = country?.ISDCode.ToString();
-                    var isMobile = phoneService.IsValidMobileNumber(customerDetail.PhoneNumber, countryCode);
-                    if (!isMobile)
-                    {
-                        notifyService.Error("Invalid mobile number. Please check and try again.");
-                        var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                        return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
-                    }
-                }
-
-                var company = await service.CreateCustomer(currentUserEmail, customerDetail, file);
-                if (company == null)
-                {
-                    notifyService.Error("OOPs !!!..Error creating customer");
-                    return RedirectToAction(nameof(InvestigationController.CreateCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
-
-                }
-                notifyService.Custom($"Customer <b>{customerDetail.Name}</b> added successfully", 3, "green", "fas fa-user-plus");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = customerDetail.InvestigationTaskId });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        public async Task<IActionResult> EditCustomer(long investigationTaskId, CustomerDetail customerDetail)
-        {
-            try
-            {
-                if (customerDetail == null || investigationTaskId < 1)
-                {
-                    notifyService.Error("OOPs !!!..Error creating customer");
-                    return RedirectToAction(nameof(InvestigationController.Create), "Investigation");
-                }
-                if (customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 ||
-                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.PhoneNumber) ||
-                    customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null)
-                {
-                    notifyService.Error("OOPs !!!..Error creating customer");
-                    return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = investigationTaskId });
-                }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-                {
-                    var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == customerDetail.SelectedCountryId);
-                    var countryCode = country?.ISDCode.ToString();
-                    var isMobile = phoneService.IsValidMobileNumber(customerDetail.PhoneNumber, countryCode);
-                    if (!isMobile)
-                    {
-                        notifyService.Error("Invalid mobile number. Please check and try again.");
-                        var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                        return RedirectToAction(nameof(InvestigationController.EditCustomer), "Investigation", new { id = customerDetail.InvestigationTaskId });
-                    }
-                }
-                IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-                if (files != null && files.Count > 0)
-                {
-                    var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
-                }
-
-                var company = await service.EditCustomer(currentUserEmail, customerDetail, profileFile);
-                if (company == null)
-                {
-                    notifyService.Error("OOPs !!!..Error edting customer");
-                    return RedirectToAction(nameof(InvestigationController.EditCustomer), "Investigation", new { id = investigationTaskId });
-                }
-                notifyService.Custom($"Customer <b>{customerDetail.Name}</b> edited successfully", 3, "orange", "fas fa-user-plus");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = customerDetail.InvestigationTaskId });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBeneficiary(long investigationTaskId, BeneficiaryDetail beneficiary)
-        {
-            try
-            {
-                if (investigationTaskId < 1)
-                {
-                    notifyService.Error("OOPs !!!..Error creating customer");
-                    return RedirectToAction(nameof(InvestigationController.Create), "Investigation");
-                }
-                if (beneficiary == null || beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1 ||
-                    string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelationId < 1 || string.IsNullOrWhiteSpace(beneficiary.PhoneNumber) ||
-                    beneficiary.DateOfBirth == null || beneficiary.Income == null || beneficiary.ProfileImage == null)
-                {
-                    notifyService.Error("OOPs !!!..Error creating customer");
-                    return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
-                {
-                    notifyService.Warning("No Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                }
-
-                var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
-                if (file == null)
-                {
-                    notifyService.Warning("Invalid Image Error !!! ");
-                    return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                }
-                // ✅ PHONE VALIDATION USING RAPIDAPI
-                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-                {
-                    var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == beneficiary.SelectedCountryId);
-                    var countryCode = country?.ISDCode.ToString();
-                    var isMobile = phoneService.IsValidMobileNumber(beneficiary.PhoneNumber, countryCode);
-                    if (!isMobile)
-                    {
-                        notifyService.Error("Invalid phone number. Please check and try again.");
-                        var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-
-                        return RedirectToAction(nameof(InvestigationController.CreateBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                    }
-                }
-
-                var company = await service.CreateBeneficiary(currentUserEmail, investigationTaskId, beneficiary, file);
-                if (company == null)
-                {
-                    notifyService.Warning("Error creating Beneficiary !!! ");
-                    return RedirectToAction(nameof(InvestigationController.CreateBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                }
-                notifyService.Custom($"Beneficiary <b>{beneficiary.Name}</b> added successfully", 3, "green", "fas fa-user-tie");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> EditBeneficiary(long beneficiaryDetailId, BeneficiaryDetail beneficiary)
-        {
-            try
-            {
-                if (beneficiaryDetailId < 0 || beneficiary == null || beneficiary.InvestigationTaskId < 1)
-                {
-                    notifyService.Error("OOPs !!!..Error editing customer");
-                    return RedirectToAction(nameof(InvestigationController.Create), "Investigation");
-                }
-                if (beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1 ||
-                    string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelationId < 1 || string.IsNullOrWhiteSpace(beneficiary.PhoneNumber) ||
-                    beneficiary.DateOfBirth == null || beneficiary.Income == null)
-                {
-                    notifyService.Error("OOPs !!!..Error editing customer");
-                    return RedirectToAction(nameof(InvestigationController.Create), "Investigation");
-                }
-
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                // ✅ PHONE VALIDATION USING RAPIDAPI
-                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-                {
-                    var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == beneficiary.SelectedCountryId);
-                    var countryCode = country?.ISDCode.ToString();
-                    var isMobile = phoneService.IsValidMobileNumber(beneficiary.PhoneNumber, countryCode);
-                    if (!isMobile)
-                    {
-                        notifyService.Error("Invalid mobile number. Please check and try again.");
-                        var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                        ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                        return RedirectToAction(nameof(InvestigationController.EditBeneficiary), "Investigation", new { id = beneficiary.InvestigationTaskId });
-                    }
-                }
-
-                IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
-                {
-                    var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
-                }
-                var company = await service.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
-                if (company == null)
-                {
-                    notifyService.Error("OOPs !!!..Error editing customer");
-
-                }
-                if (company != null)
-                {
-                    notifyService.Custom($"Beneficiary <b>{beneficiary.Name}</b> edited successfully", 3, "orange", "fas fa-user-tie");
-                }
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = beneficiary.InvestigationTaskId });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAutoConfirmed(long id)
@@ -528,7 +172,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 if (id <= 0)
                 {
@@ -551,9 +195,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
+                logger.LogError(ex, "Error deleting case");
+                notifyService.Error("Error deleting case. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -563,13 +206,17 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCases([FromBody] DeleteRequestModel request)
         {
-            if (request.claims == null || request.claims.Count == 0)
-            {
-                return Json(new { success = false, message = "No cases selected for deletion." });
-            }
-
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return Json(new { success = false, message = "Invalid request." });
+                }
+                if (request.claims == null || request.claims.Count == 0)
+                {
+                    return Json(new { success = false, message = "No cases selected for deletion." });
+                }
+
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 foreach (var claim in request.claims)
@@ -592,7 +239,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error deleting cases");
+                notifyService.Error("Error deleting cases. Try again.");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -602,10 +250,9 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAuto(List<long> claims)
         {
-
             try
             {
-                if (claims == null || claims.Count == 0)
+                if (!ModelState.IsValid || claims == null || claims.Count == 0)
                 {
                     notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(InvestigationController.New), "Investigation");
@@ -631,9 +278,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error assigning case");
+                notifyService.Error("Error assigning case. Try again.");
             }
             return RedirectToAction(nameof(InvestigationController.New), "Investigation");
         }
@@ -642,14 +288,13 @@ namespace risk.control.system.Controllers.Company
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> AllocateSingle2Vendor(long selectedcase, long caseId)
         {
-            if (selectedcase < 1 || caseId < 1)
-            {
-                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
-            }
-            //set claim as manual assigned
             try
             {
+                if (!ModelState.IsValid || selectedcase < 1 || caseId < 1)
+                {
+                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var (policy, status) = await processCaseService.AllocateToVendor(currentUserEmail, caseId, selectedcase, false);
@@ -660,7 +305,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.New), "Investigation");
                 }
 
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
+                var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == selectedcase);
 
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -674,9 +319,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error assigning case");
+                notifyService.Error("Error assigning case. Try again.");
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
             }
         }
@@ -685,13 +329,13 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAutoSingle(long claims)
         {
-            if (claims < 1)
-            {
-                notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
-            }
             try
             {
+                if (!ModelState.IsValid || claims < 1)
+                {
+                    notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -707,9 +351,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error assigning case");
+                notifyService.Error("Error assigning case. Try again.");
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
             }
             return RedirectToAction(nameof(CaseActiveController.Active), "CaseActive");
@@ -722,14 +365,13 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (model == null || claimId < 1)
+                if (!ModelState.IsValid || model == null || claimId < 1)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var (company, vendorId) = await processCaseService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -738,16 +380,15 @@ namespace risk.control.system.Controllers.Company
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
                 //await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
 
-                notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "orange", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
 
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error withdrawing case");
+                notifyService.Error("Error withdrawing case. Try again.");
                 return RedirectToAction(nameof(InvestigationController.New), "Investigation");
             }
         }
@@ -755,48 +396,54 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, long claimId, string reportAiSummary)
+        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, long claimId, string reportAiSummary = "")
         {
-            if (string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
-            {
-                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
-            }
             try
             {
+                if (!ModelState.IsValid || string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
+                {
+                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                AssessorRemarkType reportUpdateStatus = (AssessorRemarkType)Enum.Parse(typeof(AssessorRemarkType), assessorRemarkType, true);
-
-                var (company, contract) = await processCaseService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
-
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-
-
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
-
-                if (reportUpdateStatus == AssessorRemarkType.OK)
+                if (Enum.TryParse<AssessorRemarkType>(assessorRemarkType, true, out var reportUpdateStatus))
                 {
-                    notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
-                }
-                else if (reportUpdateStatus == AssessorRemarkType.REJECT)
-                {
-                    notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
+                    assessorRemarks = WebUtility.HtmlEncode(assessorRemarks);
+                    reportAiSummary = WebUtility.HtmlEncode(reportAiSummary);
+
+                    var (company, contract) = await processCaseService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
+
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
+                    if (reportUpdateStatus == AssessorRemarkType.OK)
+                    {
+                        notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
+                    }
+                    else if (reportUpdateStatus == AssessorRemarkType.REJECT)
+                    {
+                        notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
+                    }
+                    else
+                    {
+                        notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
+                    }
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
                 }
                 else
                 {
-                    notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
+                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
                 }
-
-                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error processing case");
+                notifyService.Error("Error processing case. Try again.");
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
 
@@ -805,25 +452,48 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public async Task<IActionResult> SubmitQuery(long claimId, string reply, CaseInvestigationVendorsModel request)
+        public async Task<IActionResult> SubmitQuery(long claimId, string reply, CaseInvestigationVendorsModel request, IFormFile? document)
         {
             try
             {
-                if (request == null || claimId < 1 || string.IsNullOrWhiteSpace(reply))
+                if (!ModelState.IsValid)
                 {
                     notifyService.Error("Bad Request..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
                 }
+                if (document != null && document.Length > 0)
+                {
+                    if (document.Length > MAX_FILE_SIZE)
+                    {
+                        notifyService.Error($"Document image Size exceeds the max size: 5MB");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                    var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
+                    if (!AllowedExt.Contains(ext))
+                    {
+                        notifyService.Error($"Invalid Document image type");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                    if (!AllowedMime.Contains(document.ContentType))
+                    {
+                        notifyService.Error($"Invalid Document Image content type");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                    if (!ImageSignatureValidator.HasValidSignature(document))
+                    {
+                        notifyService.Error($"Invalid or corrupted Document Image ");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                }
+
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 request.InvestigationReport.EnquiryRequest.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
 
-                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-
-                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, messageDocument);
+                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
                 if (model != null)
                 {
-                    var company = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                    var company = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -838,9 +508,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error submitting query");
+                notifyService.Error("Error submitting query. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -852,6 +521,11 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if (!ModelState.IsValid || claimId < 1 || string.IsNullOrWhiteSpace(name))
+                {
+                    notifyService.Error("Bad Request..");
+                    return Ok();
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var model = await processCaseService.SubmitNotes(currentUserEmail, claimId, name);
@@ -865,10 +539,9 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return Ok();
+                logger.LogError(ex, "Error submitting notes");
+                notifyService.Error("Error submitting notes. Try again.");
+                return StatusCode(500);
             }
         }
         public class DeleteRequestModel

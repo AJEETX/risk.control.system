@@ -144,8 +144,8 @@
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
                         const formattedUrl = row.personMapAddressUrl
-                            .replace("{0}", "500")
-                            .replace("{1}", "500");
+                            .replace("{0}", "400")
+                            .replace("{1}", "400");
 
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
@@ -155,7 +155,7 @@
                                  data-bs-toggle="tooltip"
                                  data-bs-placement="top"
                                  data-img='${formattedUrl}'
-                                 data-title='${row.pincodeName}' />
+                                 data-title='Addresss: ${row.pincodeName}' />
                         </div>`;
                     }
                     else {
@@ -168,8 +168,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Case Document: ' + row.policyId + '" data-img="' + row.document + '" src="' + row.document + '" class="thumbnail profile-image doc-profile-image open-map-modal" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -184,8 +183,7 @@
                     }
                     else {
                         var img = '<div class="map-thumbnail table-profile-image">';
-                        img += '<img src="' + row.customer + '" class="full-map" title="' + row.customerFullName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Full map image with class 'full-map'
-                        img += '<img src="' + row.customer + '" class="table-profile-image" title="' + row.customerFullName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Thumbnail image with class 'thumbnail'
+                        img += '<img data-title="Customer: ' + row.customerFullName + '" data-img="' + row.customer + '" src="' + row.customer + '" class="thumbnail table-profile-image open-map-modal" title="' + row.customerFullName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Thumbnail image with class 'thumbnail'
                         img += '</div>';
                         return img;
                     }
@@ -207,8 +205,7 @@
                     }
                     else {
                         var img = '<div class="map-thumbnail table-profile-image">';
-                        img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                        img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '<img data-title="Beneficiary: ' + row.beneficiaryFullName + '" data-img="' + row.beneficiaryPhoto + '" src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image open-map-modal" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                         img += '</div>';
                         return img;
                     }
@@ -249,7 +246,6 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    console.log(row.status);
                     if (row.ready2Assign) {
                         buttons += '<a  id="assign' + row.id + '" href="/Investigation/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
                         buttons += '<i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
@@ -363,6 +359,7 @@
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete this case?',
             type: 'red',
+            icon: 'fas fa-trash',
             buttons: {
                 confirm: {
                     text: 'Yes, delete it',
@@ -375,7 +372,7 @@
                             url: url,
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {
@@ -383,7 +380,15 @@
                                 $.alert({
                                     title: 'Deleted!',
                                     content: response.message,
-                                    type: 'red'
+                                    closeIcon: true,
+                                    type: 'red',
+                                    icon: 'fas fa-trash',
+                                    buttons: {
+                                        ok: {
+                                            text: 'Close',
+                                            btnClass: 'btn-default',
+                                        }
+                                    }
                                 });
 
                                 // Reload the DataTable
@@ -536,6 +541,7 @@
                 content: "Please select Case(s) to delete.",
                 type: 'red',
                 closeIcon: true,
+                icon: 'fas fa-trash',
                 buttons: {
                     cancel: {
                         text: "OK",
@@ -573,7 +579,7 @@
             type: "POST",
             data: JSON.stringify({ claims: claims }),
             headers: {
-                "X-CSRF-TOKEN": $('input[name="icheckifyAntiforgery"]').val(),
+                "X-CSRF-TOKEN": $('input[name="__RequestVerificationToken"]').val(),
             },
             contentType: "application/json",
             success: function (response) {
@@ -581,6 +587,7 @@
                     $.alert({
                         title: "Deleted!",
                         content: "Selected case(s) have been deleted.",
+                        icon: 'fas fa-trash',
                         type: 'red',
                         buttons: {
                             ok: {

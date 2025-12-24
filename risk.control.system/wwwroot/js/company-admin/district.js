@@ -86,12 +86,15 @@
                             $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
 
                             $('#create-form').submit();
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+                            var form = document.getElementById("create-form");
+                            if (form) {
+                                const formElements = form.getElementsByTagName("*");
+                                for (const element of formElements) {
+                                    element.disabled = true;
+                                    if (element.hasAttribute("readonly")) {
+                                        element.classList.remove("valid", "is-valid", "valid-border");
+                                        element.removeAttribute("aria-invalid");
+                                    }
                                 }
                             }
                         }
@@ -137,13 +140,15 @@
                             });
                             $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
                             $('#edit-form').submit();
-
-                            var createForm = document.getElementById("edit-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+                            var form = document.getElementById("edit-form");
+                            if (form) {
+                                const formElements = form.getElementsByTagName("*");
+                                for (const element of formElements) {
+                                    element.disabled = true;
+                                    if (element.hasAttribute("readonly")) {
+                                        element.classList.remove("valid", "is-valid", "valid-border");
+                                        element.removeAttribute("aria-invalid");
+                                    }
                                 }
                             }
                         }
@@ -173,7 +178,7 @@
     // Function to fetch states based on countryId
     function fetchStates(countryId) {
         $.ajax({
-            url: '/api/Company/GetStateName',  // Your controller route to fetch states
+            url: '/api/MasterData/GetStateName',  // Your controller route to fetch states
             type: 'GET',
             data: { countryId: countryId },
             success: function (data) {
@@ -208,7 +213,7 @@
     if (selectedStateId) {
         // Fetch the state name from the backend if needed or directly fill the state name
         $.ajax({
-            url: '/api/Company/GetStateNameForCountry',  // Your controller route to fetch state name
+            url: '/api/MasterData/GetStateNameForCountry',  // Your controller route to fetch state name
             type: 'GET',
             data: { countryId: countryId, id: selectedStateId },
             success: function (data) {
@@ -273,7 +278,7 @@
                             url: '/District/Delete',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {

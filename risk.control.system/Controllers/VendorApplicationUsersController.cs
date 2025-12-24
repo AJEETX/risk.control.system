@@ -25,18 +25,19 @@ namespace risk.control.system.Controllers
     public class VendorApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileStorageService fileStorageService;
         private readonly ILogger<VendorApplicationUsersController> logger;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private string portal_base_url = string.Empty;
 
         public VendorApplicationUsersController(ApplicationDbContext context,
+            IFileStorageService fileStorageService,
             ILogger<VendorApplicationUsersController> logger,
             UserManager<VendorApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
@@ -44,17 +45,16 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
-            ISmsService SmsService,
-            IWebHostEnvironment webHostEnvironment)
+            ISmsService SmsService)
         {
             _context = context;
+            this.fileStorageService = fileStorageService;
             this.logger = logger;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.roleManager = roleManager;
             this.notifyService = notifyService;
             smsService = SmsService;
-            this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
             this.httpContextAccessor = httpContextAccessor;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
@@ -101,14 +101,13 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
 
-        public IActionResult Create(long id)
+        public async Task<IActionResult> Create(long id)
         {
             try
             {
@@ -118,7 +117,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
+                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 var model = new VendorApplicationUser { Country = vendor.Country, Vendor = vendor };
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
@@ -132,8 +131,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -159,27 +157,14 @@ namespace risk.control.system.Controllers
                 }
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
-                    string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    user.ProfilePictureUrl = "/agency/" + newFileName;
-
-                    using var dataStream = new MemoryStream();
-                    user.ProfileImage.CopyTo(dataStream);
-                    user.ProfilePicture = dataStream.ToArray();
-                    user.ProfilePictureExtension = fileExtension;
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
+                    user.ProfilePictureUrl = relativePath;
+                    user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 user.PhoneNumber = user.PhoneNumber.TrimStart('0');
                 //DEMO
-                user.Password = Applicationsettings.Password;
+                user.Password = Applicationsettings.TestingData;
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
@@ -189,7 +174,7 @@ namespace risk.control.system.Controllers
 
                 if (result.Succeeded)
                 {
-                    var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                    var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                     if (!user.Active)
                     {
                         var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -220,8 +205,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -257,8 +241,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -278,27 +261,14 @@ namespace risk.control.system.Controllers
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    string newFileName = user.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
-                    using var dataStream = new MemoryStream();
-                    applicationUser.ProfileImage.CopyTo(dataStream);
-                    applicationUser.ProfilePicture = dataStream.ToArray();
-                    applicationUser.ProfilePictureExtension = fileExtension;
+                    var domain = user.Email.Split('@')[1];
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, domain, "user");
+                    user.ProfilePictureUrl = relativePath;
+                    user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
 
                 if (user != null)
                 {
-                    user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
-                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                     user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
                     user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                     user.FirstName = applicationUser?.FirstName;
@@ -324,7 +294,7 @@ namespace risk.control.system.Controllers
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
-                        var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                        var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                         if (!user.Active)
                         {
                             var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -355,8 +325,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -450,7 +419,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -508,8 +477,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

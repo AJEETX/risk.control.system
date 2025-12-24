@@ -1,14 +1,13 @@
-﻿# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - icheckify
+﻿name: Build and deploy ASP.Net Core app to Azure Web App - icheckify
 
 on:
   push:
     branches:
       - master
   workflow_dispatch:
+
 permissions:
+  id-token: write
   contents: read
   security-events: write
 
@@ -16,282 +15,21 @@ env:
   APP_SERVICE_NAME: "icheckify"
 
 jobs:
-  # ---------------------------------------------------
-  # 1️⃣ Fortify Scan Job
-  # ---------------------------------------------------
-  fortify:
-    # Use the appropriate runner for building your source code. Ensure dev tools required to build your code are present and configured appropriately (MSBuild, Python, etc).
-    name: Fortify Security Scan
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    steps:
-    # 1️⃣ Checkout source code
-      - name: Fortify Check Out Source Code
-        uses: actions/checkout@v4
-
-    # 2️⃣ Setup .NET 8
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
-        with:
-            dotnet-version: 8.0.x
-
-    # 3️⃣ Restore dependencies
-      - name: Restore dependencies
-        run: dotnet restore
-
-    # 4️⃣ Build solution
-      - name: Build solution
-        run: dotnet build --configuration Release
-
-    # 5️⃣ Run Fortify SAST + OSS scan
-      - name: Run Fortify Scan
-        uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
-        with:
-          sast-scan: true
-          debricked-sca-scan: true
-    
-     # 6️⃣ Extract SAST + OSS results separately
-      - name: Parse SAST + OSS Results
-        id: parse
-        run: |
-            mkdir -p fortify-logs
-            echo "$FORTIFY_ACTION_OUTPUT" > fortify-logs/fortify-log.txt
-
-            LOG=fortify-logs/fortify-log.txt
-
-            # -------------------------
-            # 🔍 Parse SAST findings
-            # -------------------------
-
-            SAST_CRIT=$(grep -i "SAST" $LOG | grep -i "Critical" | wc -l || echo 0)
-            SAST_HIGH=$(grep -i "SAST" $LOG | grep -i "High" | wc -l || echo 0)
-            SAST_MED=$(grep -i "SAST" $LOG | grep -i "Medium" | wc -l || echo 0)
-            SAST_LOW=$(grep -i "SAST" $LOG | grep -i "Low" | wc -l || echo 0)
-
-            # -------------------------
-            # 🔍 Parse OSS dependencies findings (Debricked)
-            # -------------------------
-            OSS_CRIT=$(grep -i "Debricked" $LOG | grep -i "Critical" | wc -l || echo 0)
-            OSS_HIGH=$(grep -i "Debricked" $LOG | grep -i "High" | wc -l || echo 0)
-            OSS_MED=$(grep -i "Debricked" $LOG | grep -i "Medium" | wc -l || echo 0)
-            OSS_LOW=$(grep -i "Debricked" $LOG | grep -i "Low" | wc -l || echo 0)
-
-            echo "sast_critical=$SAST_CRIT" >> $GITHUB_OUTPUT
-            echo "sast_high=$SAST_HIGH" >> $GITHUB_OUTPUT
-            echo "sast_medium=$SAST_MED" >> $GITHUB_OUTPUT
-            echo "sast_low=$SAST_LOW" >> $GITHUB_OUTPUT
-
-            echo "oss_critical=$OSS_CRIT" >> $GITHUB_OUTPUT
-            echo "oss_high=$OSS_HIGH" >> $GITHUB_OUTPUT
-            echo "oss_medium=$OSS_MED" >> $GITHUB_OUTPUT
-            echo "oss_low=$OSS_LOW" >> $GITHUB_OUTPUT
-     
-    # 7️⃣ Add summary with two tables
-      - name: Add Summary Output
-        run: |
-            echo "## ✔️ Fortify Scan Completed" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-
-            echo "## 🔐 SAST Vulnerability Summary" >> $GITHUB_STEP_SUMMARY
-            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
-            echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
-            echo "| 🛑 Critical | ${{ steps.parse.outputs.sast_critical }} |" >> $GITHUB_STEP_SUMMARY
-            echo "| 🔥 High     | ${{ steps.parse.outputs.sast_high }} |" >> $GITHUB_STEP_SUMMARY
-            echo "| ⚠️ Medium   | ${{ steps.parse.outputs.sast_medium }} |" >> $GITHUB_STEP_SUMMARY
-            echo "| ℹ️ Low      | ${{ steps.parse.outputs.sast_low }} |" >> $GITHUB_STEP_SUMMARY
-
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "## 📦 OSS / Open Source Dependency Vulnerability Summary (Debricked)" >> $GITHUB_STEP_SUMMARY
-            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
-            echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
-            echo "| 🛑 Critical | ${{ steps.parse.outputs.oss_critical }} |" >> $GITHUB_STEP_SUMMARY
-            echo "| 🔥 High     | ${{ steps.parse.outputs.oss_high }} |" >> $GITHUB_STEP_SUMMARY
-            echo "| ⚠️ Medium   | ${{ steps.parse.outputs.oss_medium }} |" >> $GITHUB_STEP_SUMMARY
-            echo "| ℹ️ Low      | ${{ steps.parse.outputs.oss_low }} |" >> $GITHUB_STEP_SUMMARY
-
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "[📄 **Download Full Fortify Logs**](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-
-
-    # 7️⃣ Upload scan artifacts
-      - name: Upload Fortify logs artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: fortify-logs
-          path: ./fortify-logs
 
   # ---------------------------------------------------
-  # 2️⃣ CodeQL Security Scan Job
+  # 1️⃣ Code Scan Job
   # ---------------------------------------------------
-  codeql:
-    name: CodeQL Security Scan
-    runs-on: ubuntu-latest
+  code-scan:
+    uses: ./.github/workflows/code-scan.yml
+    secrets: inherit
 
-    steps:
-      - name: CodeQL Checkout
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: csharp
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-            output: ./codeql-results
-            category: security-scan
-
-      - name: Upload SARIF results
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-scan
-          path: ./codeql-results
-
-    # Extract Number of Alerts from SARIF
-      - name: Extract CodeQL Alert Counts
-        id: sarif-stats
-        run: |
-            sarif_file=$(find ./codeql-results -name "*.sarif" | head -n 1)
-
-            if [ -z "$sarif_file" ]; then
-              echo "No SARIF file found!"
-              echo "alerts=0" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-
-            alerts=$(jq '[.. | objects | select(.ruleId?)] | length' "$sarif_file")
-
-            echo "alerts=$alerts" >> $GITHUB_OUTPUT
-
-    # Summary Output with Table + Badges
-      - name: Add Summary Output
-        run: |
-            {
-              echo "## ✔️ CodeQL Security Scan Summary"
-              echo ""
-              echo "| Item | Details |"
-              echo "|------|---------|"
-              echo "| **Status** | Completed Successfully |"
-              echo "| **Language** | C# |"
-              echo "| **Total Alerts Found** | **${{ steps.sarif-stats.outputs.alerts }}** |"
-              echo "| **Results Format** | SARIF |"
-              echo "| **Report Artifact** | [View Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |"
-              echo "| **Category** | security-scan |"
-              echo ""
-              echo "### 🏷️ Badges"
-              echo ""
-              echo "![Status](https://img.shields.io/badge/CodeQL-Completed-brightgreen)"
-              echo "![Alerts](https://img.shields.io/badge/Alerts-${{ steps.sarif-stats.outputs.alerts }}-orange)"
-              echo "![Language](https://img.shields.io/badge/Language-CSharp-blue)"
-              echo ""
-              echo "### 📌 Notes"
-              echo "- CodeQL used GitHub's default security queries."
-              echo "- SARIF file can be imported into Visual Studio Code or SARIF Explorer."
-            } >> $GITHUB_STEP_SUMMARY
-
-# ======================================================
-# 3️⃣ DEPENDENCY VULNERABILITY SCAN
-# ======================================================
-  dependency-review:
-    name: Dependency Review (NuGet Security)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Review dependencies for security issues
-        uses: actions/dependency-review-action@v4
-        with:
-            repo-token: ${{ secrets.GITHUB_TOKEN }}
-            base-ref: "master"
-            head-ref: ${{ github.ref_name }}
-
-      - name: Extract Vulnerability Count
-        id: vuln-count
-        run: |
-            json="${{ steps.depreview.outputs.report }}"
-            if [ -z "$json" ]; then
-              echo "vulnerabilities=0" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-
-            vulnerabilities=$(echo "$json" | jq '.vulnerabilities | length')
-            echo "vulnerabilities=$vulnerabilities" >> $GITHUB_OUTPUT
-      - name: Add Summary Output
-        run: |
-            {
-              echo "## ✔️ Dependency Review Security Summary"
-              echo ""
-              echo "| Item | Details |"
-              echo "|------|---------|"
-              echo "| **Status** | Completed Successfully |"
-              echo "| **Total Vulnerable Dependencies** | **${{ steps.vuln-count.outputs.vulnerabilities }}** |"
-              echo "| **Scan Type** | NuGet dependency security |"
-              echo "| **Base Branch** | master |"
-              echo "| **Compared Against** | ${{ github.ref_name }} |"
-              echo "| **GitHub Security Dashboard** | [View Security Alerts](https://github.com/${{ github.repository }}/security/dependabot) |"
-              echo ""
-              echo "### 🏷️ Badges"
-              echo "![Dependency Review](https://img.shields.io/badge/Dependency%20Review-Completed-brightgreen)"
-              echo "![Vulnerabilities](https://img.shields.io/badge/Vulnerabilities-${{ steps.vuln-count.outputs.vulnerabilities }}-red)"
-              echo "![NuGet](https://img.shields.io/badge/Package%20Source-NuGet-blue)"
-              echo ""
-              echo "### 📌 Notes"
-              echo "- GitHub detected and analyzed all updated packages."
-              echo "- Vulnerable packages require review under the repository’s **Security > Dependabot** tab."
-              echo ""
-            } >> $GITHUB_STEP_SUMMARY
   # ---------------------------------------------------
-  # 4️⃣ Unified Security Summary Job
-  # ---------------------------------------------------  
-  unified-security-summary:
-    name: Unified Security Summary
-    runs-on: ubuntu-latest
-    needs: [fortify, codeql, dependency-review]
-    steps:
-      - name: Generate Enhanced Security Summary
-        run: |
-          echo "## 🛡️ Unified Security Scan Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Scan | Status | Vulnerabilities | Artifact / Link |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|--------|----------------|----------------|" >> $GITHUB_STEP_SUMMARY
-
-          # Fortify
-          FORTIFY_HIGH=${{ needs.fortify.outputs.high_vulns || 'N/A' }}
-          FORTIFY_MEDIUM=${{ needs.fortify.outputs.medium_vulns || 'N/A' }}
-          FORTIFY_LOW=${{ needs.fortify.outputs.low_vulns || 'N/A' }}
-          echo "| Fortify SAST + OSS | ✔️ Completed | 🔴 High: $FORTIFY_HIGH ⚠️ Medium: $FORTIFY_MEDIUM 🟢 Low: $FORTIFY_LOW | [Download Fortify Logs](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=fortify-logs) |" >> $GITHUB_STEP_SUMMARY
-
-          # CodeQL
-          CODEQL_HIGH=${{ needs.codeql.outputs.high_vulns || 'N/A' }}
-          CODEQL_MEDIUM=${{ needs.codeql.outputs.medium_vulns || 'N/A' }}
-          CODEQL_LOW=${{ needs.codeql.outputs.low_vulns || 'N/A' }}
-          echo "| CodeQL Analysis | ✔️ Completed | 🔴 High: $CODEQL_HIGH ⚠️ Medium: $CODEQL_MEDIUM 🟢 Low: $CODEQL_LOW | [Download CodeQL SARIF](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=security-scan) |" >> $GITHUB_STEP_SUMMARY
-
-          # Dependency Review
-          DEP_VULN_COUNT=${{ needs.dependency-review.outputs.vulnerabilities || 'N/A' }}
-          echo "| Dependency Review | ✔️ Completed | Vulnerable Dependencies: $DEP_VULN_COUNT | [View in Security Tab](https://github.com/${GITHUB_REPOSITORY}/security/dependabot) |" >> $GITHUB_STEP_SUMMARY
-
-          echo ""
-          echo "### ✅ Notes"
-          echo "- Click the artifact links to download full logs/reports."
-          echo "- Review CodeQL SARIF and Dependency Review alerts in GitHub Security tab for details."
-  # ---------------------------------------------------
-  # 5️⃣  Build  .Net Core Application Job
+  # 2️⃣   Build  .Net Core Application Job
   # ---------------------------------------------------
   build:
     name: Build .Net Core Application
     runs-on: windows-latest
-    needs: unified-security-summary
+    needs: code-scan
     permissions:
       contents: read
 
@@ -321,7 +59,7 @@ jobs:
             echo "The .NET application has been built and published successfully." >> $GITHUB_STEP_SUMMARY
 
  # ---------------------------------------------------
-  # 5️⃣ Deploy to Azure Job
+  # 3️⃣ Deploy to Azure Job
   # ---------------------------------------------------
   deploy:
     name: Deploy to Azure Web App
@@ -359,7 +97,10 @@ jobs:
         run: |
             echo "## Deployment Completed" >> $GITHUB_STEP_SUMMARY
             echo "The application has been deployed to Azure Web App successfully." >> $GITHUB_STEP_SUMMARY
-
+            
+ # ---------------------------------------------------
+  # 4️⃣ Warmup Job
+  # ---------------------------------------------------
   warmup:
     name: Warm Up Azure Web App
     runs-on: ubuntu-latest
@@ -396,7 +137,7 @@ jobs:
         echo "The Azure Web App warm-up job has finished." >> $GITHUB_STEP_SUMMARY
             
  # ---------------------------------------------------
-  # 6️⃣ OWASP ZAP Baseline Scan Job
+  # 5️⃣ OWASP ZAP Baseline Scan Job
   # ---------------------------------------------------
   zap-scan:
     name: OWASP ZAP Baseline Scan

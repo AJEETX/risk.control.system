@@ -94,8 +94,8 @@ $(document).ready(function () {
         formData.append("isAgent", isAgent);
 
         // Get anti-forgery token
-        var token = $('input[name="icheckifyAntiforgery"]').val();
-        formData.append("icheckifyAntiforgery", token);
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        formData.append("__RequestVerificationToken", token);
         // Show uploading indicator
         statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
         button.prop("disabled", true);
@@ -107,7 +107,7 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             headers: {
-                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
             },
             success: function (response) {
                 if (response.success) {
@@ -162,8 +162,8 @@ $(document).ready(function () {
         formData.append("reportName", reportName);
         formData.append("locationName", locationName);
         // Get anti-forgery token
-        var token = $('input[name="icheckifyAntiforgery"]').val();
-        formData.append("icheckifyAntiforgery", token);
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        formData.append("__RequestVerificationToken", token);
         statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
         button.prop("disabled", true);
 
@@ -224,8 +224,8 @@ $(document).ready(function () {
         formData.append("reportName", reportName);
         formData.append("locationName", locationName);
         // Get anti-forgery token
-        var token = $('input[name="icheckifyAntiforgery"]').val();
-        formData.append("icheckifyAntiforgery", token);
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        formData.append("__RequestVerificationToken", token);
         statusDiv.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>');
         button.prop("disabled", true);
         const allowedTypes = [
@@ -265,7 +265,7 @@ $(document).ready(function () {
                     docImage.replaceWith(`<div id="doc-img-${docId}">${mediaTag}</div>`);
                     $(fileInput).val('');
                 } else {
-
+                    statusDiv.html('<span class="text-danger">Upload failed.</span>');
                 }
             },
             error: function (err) {

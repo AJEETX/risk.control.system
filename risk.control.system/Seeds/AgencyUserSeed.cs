@@ -17,15 +17,12 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             UserManager<VendorApplicationUser> userManager,
-            Vendor vendor, ICustomApiCLient customApiCLient)
+            Vendor vendor, ICustomApiClient customApiCLient, IFileStorageService fileStorageService)
         {
             noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
 
-            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.PinCodeId == vendor.PinCodeId);
-            var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-            var state = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
-            var countryId = context.Country.FirstOrDefault(s => s.CountryId == state.Country.CountryId)?.CountryId ?? default!;
+            var pinCode = await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == vendor.PinCodeId);
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(AGENCY_ADMIN.PROFILE_IMAGE));
             var adminImage = File.ReadAllBytes(adminImagePath);
@@ -34,6 +31,9 @@ namespace risk.control.system.Seeds
             {
                 adminImage = File.ReadAllBytes(noUserImagePath);
             }
+            var extension = Path.GetExtension(adminImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, vendor.Email, "user");
+
             var vendorAdmin = new VendorApplicationUser()
             {
                 UserName = adminEmailwithSuffix,
@@ -43,19 +43,18 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Active = true,
-                Password = Password,
+                Password = TestingData,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = true,
-                Addressline = "1 Gandhi Nagar",
+                Addressline = vendor.Addressline,
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 Vendor = vendor,
-                CountryId = countryId,
-                DistrictId = district?.DistrictId ?? default!,
-                StateId = state?.StateId ?? default!,
+                CountryId = pinCode.CountryId,
+                DistrictId = pinCode?.DistrictId ?? default!,
+                StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = AGENCY_ADMIN.PROFILE_IMAGE,
-                ProfilePicture = adminImage,
+                ProfilePictureUrl = relativePath,
                 Role = AppRoles.AGENCY_ADMIN,
                 UserRole = AgencyRole.AGENCY_ADMIN,
                 Updated = DateTime.Now
@@ -65,7 +64,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(vendorAdmin.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(vendorAdmin, Password);
+                    await userManager.CreateAsync(vendorAdmin, TestingData);
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.AGENCY_ADMIN.ToString());
                     //var vendorAdminRole = new ApplicationRole(AppRoles.AGENCY_ADMIN.ToString(), AppRoles.AGENCY_ADMIN.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorAdminRole);
@@ -81,11 +80,12 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Supervisor
-            await SupervisorSeed.Seed(context, SUPERVISOR.CODE, webHostEnvironment, userManager, vendor, pinCode, SUPERVISOR.PROFILE_IMAGE, SUPERVISOR.FIRST_NAME, SUPERVISOR.LAST_NAME);
+            await SupervisorSeed.Seed(context, SUPERVISOR.CODE, webHostEnvironment, userManager, vendor, pinCode, SUPERVISOR.PROFILE_IMAGE, SUPERVISOR.FIRST_NAME, SUPERVISOR.LAST_NAME, fileStorageService);
 
             //Seed Vendor Agent
             string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
-            await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME, "2 Jawahar Nagar");
+            await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME,
+                fileStorageService);
 
             //if (!System.Diagnostics.Debugger.IsAttached)
             //{

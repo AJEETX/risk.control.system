@@ -77,8 +77,22 @@ namespace risk.control.system.Middleware
         public void Dispose() { }
     }
 
-    public static class LogCleanup
+    public static class LogSetup
     {
+        public static string CreateLogging(string path)
+        {
+            var baseDirectory = Path.Combine(path, "Logs");
+            string safeSubDirectory = Path.GetFileName("");
+            var logDirectory = Path.Combine(baseDirectory, safeSubDirectory);
+            string fullPath = Path.GetFullPath(logDirectory);
+            if (!fullPath.StartsWith(baseDirectory, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new UnauthorizedAccessException("Invalid directory path.");
+            }
+            Directory.CreateDirectory(logDirectory);
+            DeleteOldLogFiles(logDirectory, 30);
+            return logDirectory;
+        }
         public static void DeleteOldLogFiles(string logDirectory, int maxAgeInDays)
         {
             if (!Directory.Exists(logDirectory)) return;
@@ -96,10 +110,10 @@ namespace risk.control.system.Middleware
                         File.Delete(file);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Optionally log cleanup failure to a fallback logger
-                    Console.WriteLine($"Failed to delete log file {file}: {ex.Message}");
+                    throw;
                 }
             }
         }

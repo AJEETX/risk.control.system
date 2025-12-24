@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Globalization;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,25 +25,28 @@ namespace risk.control.system.Controllers
     public class ClientCompanyController : Controller
     {
         private const string vendorMapSize = "800x800";
+        private readonly ILogger<ClientCompanyController> logger;
         private readonly ApplicationDbContext _context;
-        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IFileStorageService fileStorageService;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ICustomApiCLient customApiCLient;
+        private readonly ICustomApiClient customApiCLient;
         private readonly ISmsService smsService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
         public ClientCompanyController(
+            ILogger<ClientCompanyController> logger,
             ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
+            IFileStorageService fileStorageService,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
-            ICustomApiCLient customApiCLient,
+            ICustomApiClient customApiCLient,
             ISmsService SmsService,
             UserManager<ClientCompanyApplicationUser> userManager)
         {
+            this.logger = logger;
             _context = context;
-            this.webHostEnvironment = webHostEnvironment;
+            this.fileStorageService = fileStorageService;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.customApiCLient = customApiCLient;
@@ -51,9 +56,9 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanies/Create
         [Breadcrumb("Add Company")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var country = _context.Country.FirstOrDefault();
+            var country = await _context.Country.FirstOrDefaultAsync();
             var model = new ClientCompany { Country = country, SelectedCountryId = country.CountryId, CountryId = country.CountryId };
             return View(model);
         }
@@ -70,31 +75,22 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Create));
             }
+            if (!ModelState.IsValid)
+            {
+                notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Create));
+            }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
-            clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
-            IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
-            if (companyDocument is not null)
+            clientCompany.Email = mailAddress.ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
+            if (clientCompany.Document is not null)
             {
-                string newFileName = clientCompany.Email;
-                string fileExtension = Path.GetExtension(Path.GetFileName(companyDocument.FileName));
-                newFileName += fileExtension;
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-                companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                clientCompany.DocumentUrl = "/company/" + newFileName;
-
-                using var dataStream = new MemoryStream();
-                companyDocument.CopyTo(dataStream);
-                clientCompany.DocumentImage = dataStream.ToArray();
-                clientCompany.DocumentImageExtension = fileExtension;
+                var (fileName, relativePath) = await fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
+                clientCompany.DocumentUrl = relativePath;
+                clientCompany.DocumentImageExtension = Path.GetExtension(fileName);
             }
 
-            var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == clientCompany.SelectedPincodeId);
+            var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
 
             var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
             var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
@@ -103,7 +99,7 @@ namespace risk.control.system.Controllers
             clientCompany.AddressLatitude = companyCoordinates.Latitude;
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
-            var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == clientCompany.SelectedCountryId)?.ISDCode;
+            var isdCode = (await _context.Country.FirstOrDefaultAsync(c => c.CountryId == clientCompany.SelectedCountryId))?.ISDCode;
             await smsService.DoSendSmsAsync(pinCode.Country.Code, isdCode + clientCompany.PhoneNumber, "Company account created. \n\nDomain : " + clientCompany.Email);
 
             //clientCompany.Description = "New company added.";
@@ -146,7 +142,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
 
             }
-            var hasClaims = _context.Investigations.Any(c => c.ClientCompanyId == id && !c.Deleted);
+            var hasClaims = await _context.Investigations.AnyAsync(c => c.ClientCompanyId == id && !c.Deleted);
             clientCompany.HasClaims = hasClaims;
             return View(clientCompany);
         }
@@ -254,36 +250,23 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
-                if (companyDocument is not null)
+                if (clientCompany.Document is not null)
                 {
-                    string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(companyDocument.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
+                    clientCompany.DocumentUrl = relativePath;
+                    clientCompany.DocumentImageExtension = Path.GetExtension(fileName);
 
-                    using var dataStream = new MemoryStream();
-                    companyDocument.CopyTo(dataStream);
-                    clientCompany.DocumentImage = dataStream.ToArray();
-                    companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                    clientCompany.DocumentUrl = "/company/" + newFileName;
-                    clientCompany.DocumentImageExtension = fileExtension;
                 }
                 else
                 {
                     var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
                     if (existingClientCompany.DocumentUrl != null)
                     {
-                        clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                         clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
+                        clientCompany.DocumentImageExtension = existingClientCompany.DocumentImageExtension;
                     }
                 }
-                var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == clientCompany.SelectedPincodeId);
+                var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
 
                 var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
                 var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
@@ -310,7 +293,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Custom($"Error editing company.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Edit), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }

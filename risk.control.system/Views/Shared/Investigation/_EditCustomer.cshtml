@@ -49,11 +49,20 @@
         <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
-        <div class="row">
-            <div class="col-sm-6">
+        <div class="row top-margin-10">
+            <div class="col-md-6">
+
+                <div class="form-group text-center">
+                    <div class="profile-img-container">
+                        <img id="document-Image" class="form-Image  img-circle" src="/Document/GetCustomerDocument/@Model.CustomerDetailId" title="Customer Photo" alt="Customer" data-bs-toggle="tooltip" />
+                    </div>
+                    <label for="createImageInput" class="control-label">Customer Photo <i class="fa fa-asterisk asterik-style-logo"></i></label>
+                    <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="documentImage" data-title-id="customer-document" title="Upload Customer Photo" data-bs-toggle="tooltip" />
+                    <span asp-validation-for="ProfileImage" class="text-danger"></span>
+                </div>
 
                 <div class="form-group">
-                    <label class="input-group-label" for="Name"> Customer Name:</label>
+                    <label class="input-group-label" for="CustomerName"> Customer Name:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -72,13 +81,15 @@
                         <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                     </div>
                 </div>
+                <partial name="Investigation/_CustomerPhoneNumber" model="@Model" />
+
                 <div class="form-group">
                     <label class="input-group-label" for="Gender"> Gender:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Gender" class="form-control remarks" asp-items="Html.GetEnumSelectList<Gender>()">
+                        <select id="Gender" required asp-for="Gender" class="form-control remarks" asp-items="Html.GetEnumSelectList<Gender>()">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Gender" class="text-danger"></span>
@@ -97,13 +108,17 @@
                     </div>
                 </div> *@
 
+                
+
+            </div>
+            <div class="col-md-6">
                 <div class="form-group">
                     <label class="input-group-label" for="Income">Annual Income (@ViewBag.Currency):</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                        <select id="Income" required asp-for="Income" class="form-control remarks" asp-items="@ViewBag.IncomeList">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Income" class="text-danger"></span>
@@ -117,7 +132,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Occupation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Occupation>()">
+                        <select id="Occupation" required asp-for="Occupation" class="form-control remarks" asp-items="@ViewBag.OccupationList">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Occupation" class="text-danger"></span>
@@ -130,17 +145,12 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select required asp-for="Education" class="form-control remarks" asp-items="Html.GetEnumSelectList<Education>()">
+                        <select id="Education" required asp-for="Education" class="form-control remarks" asp-items="@ViewBag.EducationList">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="Education" class="text-danger"></span>
-
                     </div>
                 </div>
-
-            </div>
-            <div class="col-sm-6">
-                <partial name="Investigation/_CustomerPhoneNumber" model="@Model" />
                 <partial name="Investigation/_CustomerAddress" model="@Model" />
 
                 <div class="form-group">
@@ -166,24 +176,7 @@
                     </div>
                 </div> *@
 
-                <div class="form-group">
-                    <label class="input-group-label" for="createImageInput"> Customer Photo:</label>
-                    <div class="input-group mb-3">
-                        @if (Model?.ImagePath is not null)
-                        {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.ImagePath" data-bs-toggle="tooltip" title="Customer Photo" />
-                            <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-title-id="customer-document" data-bs-toggle="tooltip" title="Upload Customer Photo" />
-                        }
-                        else
-                        {
-                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="Customer Photo" />
-                            <i class="fa fa-asterisk asterik-style"></i>
-                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input  invalid-border" type="file" id="createImageInput" data-preview-id="createProfileImage" data-title-id="customer-document" data-bs-toggle="tooltip" title="Upload Customer Photo" required />
-                        }
-                        <span asp-validation-for="ImagePath" class="text-danger"></span>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>

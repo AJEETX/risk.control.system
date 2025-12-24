@@ -15,15 +15,25 @@
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
                 <input type="hidden" asp-for="ClientCompanyId" />
-                <input type="hidden" asp-for="AddressMapLocation" value="@Model.AddressMapLocation" />
-                <input type="hidden" asp-for="AddressLatitude" value="@Model.AddressLatitude" />
-                <input type="hidden" asp-for="AddressLongitude" value="@Model.AddressLongitude" />
+                <input type="hidden" id="CountryId" value="@Model?.CountryId" />
                 <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
                 <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+                <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-md-6">
+                        <div class="form-group text-center">
+                            <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-bs-toggle="tooltip" title="Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")"> Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</label>
+                        </div>
 
+                        <div class="form-group text-center">
+                            <div class="profile-img-container">
+                                <img id="createProfileImage" class="form-Image" src="/Document/GetCompanyDocument/@Model.ClientCompanyId" title="Company Logo" alt="Company Logo" data-bs-toggle="tooltip" />
+                            </div>
+                            <label for="createImageInput" class="control-label">Company Logo <i class="fa fa-asterisk asterik-style-logo"></i></label>
+                            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="company-document" title="Upload Company Logo" data-bs-toggle="tooltip" />
+                        </div>
                         <div class="form-group">
                             <label class="input-group-label" for="Email"> Domain:</label>
                             <div class="input-group mb-3">
@@ -62,7 +72,7 @@
                                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                                     }
                                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" title="@Model.Country.Name" />  +@Model?.Country.ISDCode
+                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" title="@Model.Country.Name" alt="flag" />  +@Model?.Country.ISDCode
                                     </span>
                                 </div>
                                 <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g., 9876543210)" data-bs-toggle="tooltip" />
@@ -78,7 +88,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        @* <div class="form-group">
                             <label class="input-group-label" for="Branch"> Branch Name: </label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
@@ -87,7 +97,33 @@
                                 <input type="text" id="Branch" asp-for="Branch" class="form-control  title-name remarks" required placeholder="Branch Name" maxlength="30">
                                 <span asp-validation-for="Branch" class="text-danger"></span>
                             </div>
+                        </div> *@
+                        
+                    </div>
+                    <div class="col-md-6">
+
+                        @* 
+
+                        <div class="form-group">
+                            <label class="input-group-label" for="AgreementDate"> Agreement Date: </label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input readonly type="text" id="AgreementDate" asp-for="AgreementDate" class="form-control remarks valid-border" placeholder="Agreement Date">
+                                <span asp-validation-for="AgreementDate" class="text-danger"></span>
+                            </div>
                         </div>
+                        <div class="form-group">
+                            <span class="input-group-label"> Activated Date: </span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input readonly type="text" id="ActivatedDate" asp-for="ActivatedDate" class="form-control remarks" required placeholder="Activated Date">
+                                <span asp-validation-for="ActivatedDate" class="text-danger"></span>
+                            </div>
+                        </div> *@
                         <div class="form-group">
                             <label class="input-group-label" for="IFSCCode"> IFSC Code: </label>
                             <div class="input-group mb-3 position-relative">
@@ -129,45 +165,19 @@
                                 <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-sm-6">
-
-
                         <div class="form-group">
-                            <label class="input-group-label" for="AgreementDate"> Agreement Date: </label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input readonly type="text" id="AgreementDate" asp-for="AgreementDate" class="form-control remarks valid-border" placeholder="Agreement Date">
-                                <span asp-validation-for="AgreementDate" class="text-danger"></span>
-                            </div>
-                        </div>
-@* 
-                        <div class="form-group">
-                            <span class="input-group-label"> Activated Date: </span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input readonly type="text" id="ActivatedDate" asp-for="ActivatedDate" class="form-control remarks" required placeholder="Activated Date">
-                                <span asp-validation-for="ActivatedDate" class="text-danger"></span>
-                            </div>
-                        </div> *@
-                        <div class="form-group">
-                            <label class="input-group-label" for="PinCodeId">Pincode:</label>
+                            <label class="input-group-label" for="PinCodeText">Pincode:</label>
                             <div class="input-group mb-3 autocomplete-wrapper">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" for="PinCodeId">
+                                    <span class="input-group-text">
                                         <i class="fas fa-map-pin"></i>
                                         <i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
-                                <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown"
-                                       data-placeholder="pincode" placeholder="Type pincode or name" asp-for="PinCodeId"
-                                       required value="" autocomplete="off" />
+                                <input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" required data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
                                 <span asp-validation-for="PinCodeId" class="text-danger"></span>
                                 <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
+                                <input type="hidden" asp-for="PinCodeId" id="PinCodeId" />
                                 <div id="pincode-loading" class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </div>
@@ -175,38 +185,48 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="input-group-label" for="DistrictId">District:</label>
+                            <label class="input-group-label" for="DistrictText">District:</label>
                             <div class="input-group mb-3 autocomplete-wrapper">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" for="DistrictId" data-bs-toggle="tooltip">
+                                    <span class="input-group-text" for="DistrictId">
                                         <i class="fas fa-city"></i>
                                         <i class="fa fa-asterisk asterik-style-disabled"></i>
                                     </span>
                                 </div>
-                                <input readonly type="text" id="DistrictId" class="form-control remarks valid-border" data-placeholder="district" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
+                                <input readonly type="text" id="DistrictText" class="form-control remarks" data-placeholder="district" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" title="Auto-selected based on Pincode" />
                                 <span asp-validation-for="DistrictId" class="text-danger"></span>
-                                <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" title="Auto-selected based on Pincode" />
+                                <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId"/>
+                                <input type="hidden" asp-for="DistrictId" id="DistrictId" />
                                 <div id="district-loading" class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </div>
                             </div>
                         </div>
+
                         <div class="form-group">
-                            <label class="input-group-label" for="StateId"> State:</label>
+                            <label class="input-group-label" for="StateText"> State:</label>
                             <div class="input-group mb-3 autocomplete-wrapper">
+                                @{
+                                    var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+                                }
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" for="StateId" data-bs-toggle="tooltip"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style-disabled"></i></span>
+
+                                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
+                                        <img src="@img" class="flag-icon" data-bs-toggle="tooltip" alt="flag" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
+                                    </span>
                                 </div>
-                                <input readonly type="text" id="StateId" class="form-control remarks valid-border" data-placeholder="state" placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
+                                <input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" title="Auto-selected based on Pincode" />
                                 <span asp-validation-for="StateId" class="text-danger"></span>
-                                <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" title="Auto-selected based on Pincode" />
+                                <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
+                                <input type="hidden" asp-for="StateId" id="StateId" />
                                 <div id="state-loading" class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="input-group-label" for="CountryId"> Country:</label>
+
+                        @* <div class="form-group">
+                            <label class="input-group-label" for="CountryText"> Country:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     
@@ -214,14 +234,14 @@
                                         <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  @Model?.Country.Code
                                     </span>
                                 </div>
-                                <input readonly type="text" id="CountryId" class="form-control remarks valid-border" data-placeholder="country" asp-for="CountryId" data-bs-toggle="tooltip" title="Registered Country" value="" tabindex="-1" />
+                                <input readonly type="text" id="CountryText" class="form-control remarks valid-border" data-placeholder="country" data-bs-toggle="tooltip" title="Registered Country"  tabindex="-1" />
                                 <span asp-validation-for="CountryId" class="text-danger"></span>
                                 <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                 <div id="country-loading" class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </div>
                             </div>
-                        </div>
+                        </div> *@
 
                         <div class="form-group">
                             <label class="input-group-label" for="Addressline"> Address:</label>
@@ -233,21 +253,8 @@
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="input-group-label" for="createImageInput"> Document: </label>
-                            <div class="input-group mb-3">
-                                @if (Model?.DocumentImage is not null)
-                                {
-                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))" title="Company Document" data-bs-toggle="tooltip" />
-                                }
-                                else
-                                {
-                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_IMAGE" data-bs-toggle="tooltip" />
-                                }
-                                <i class="fa fa-asterisk asterik-style"></i>
-                                <input asp-for="DocumentImage" type="file" class="form-control remarks document-image-input valid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="company-document" title="Upload Company Document" data-bs-toggle="tooltip" />
-                            </div>
-                        </div>
+
+                        
 @* 
 
                         <div class="form-group">
@@ -262,17 +269,18 @@
                         </div> *@
                     </div>
                 </div>
-                <div class="card-footer">
-                    <div class="row  float-right">
-                        <div class="col-md-12">
-                            <a id="cancel" asp-controller="Company" asp-action="Index" class="btn btn-secondary">
-                                <i class="fa fa-window-close"></i>
-                                @Applicationsettings.CANCEL
-                            </a>
-                            <button id="edit" type="submit" class="btn btn-warning">
-                                <i class="fas fa-building"></i>  Save Company
-                            </button>
-                        </div>
+                
+            </div>
+            <div class="card-footer">
+                <div class="row  float-right">
+                    <div class="col-md-12">
+                        <a id="cancel" asp-controller="Company" asp-action="Index" class="btn btn-secondary">
+                            <i class="fa fa-window-close"></i>
+                            @Applicationsettings.CANCEL
+                        </a>
+                        <button id="edit" type="submit" class="btn btn-warning">
+                            <i class="fas fa-building"></i>  Save Company
+                        </button>
                     </div>
                 </div>
             </div>
@@ -286,6 +294,7 @@
     }
     <script src="~/js/company-admin/edit-company.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/company-admin/phone-bank-validate.js"></script>
     <script src="~/js/common/profile-image-upload.js">    </script>
     <script src="~/js/common/form-validation.js"></script>
 }

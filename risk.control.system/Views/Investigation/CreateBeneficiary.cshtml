@@ -4,7 +4,7 @@
 }
 
 <section class="content">
-    <form id="create-form" asp-controller="InvestigationPost" asp-action="CreateBeneficiary" enctype="multipart/form-data">
+    <form id="create-form" asp-action="CreateBeneficiary" enctype="multipart/form-data">
         <partial name="Investigation/_CreateBeneficiary" model="@Model" />
     </form>
 </section>
@@ -15,7 +15,8 @@
     }
     <script src="~/js/creator/beneficiary.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
-    <script src="~/js/common/profile-image-upload.js"></script>
+    <script src="~/js/company-admin/phone-bank-validate.js"></script>
+    <script src="~/js/common/image-upload.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 
 }

@@ -5,7 +5,17 @@
     <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
     <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-md-6">
+
+            <div class="form-group text-center">
+            <div class="profile-img-container">
+                    <img id="document-Image" class="form-Image" src="/img/add-logo.png" title="Agency Logo" alt="Agency Logo" data-bs-toggle="tooltip" />
+            </div>
+            <label for="createImageInput" class="control-label">Agency Logo <i class="fa fa-asterisk asterik-style-logo"></i></label>
+            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" required class="form-control remarks document-image-input" type="file" data-preview-id="createProfileImage" data-title-id="agency-document" title="Upload Agency Logo" data-bs-toggle="tooltip" />
+                <span asp-validation-for="Document" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <label class="input-group-label" for="Name"> Agency Name: </label>
                 <div class="input-group mb-3">
@@ -37,7 +47,7 @@
                             var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                         }
                         <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                            <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                            <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                         </span>
                     </div>
                     <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
@@ -84,6 +94,10 @@
                 </div>
             </div>
 
+            
+        </div>
+        <div class="col-md-6">
+
             <div class="form-group">
                 <label class="input-group-label" for="BankName"> Bank Name: </label>
                 <div class="input-group mb-3">
@@ -93,7 +107,7 @@
                             <i class="fa fa-asterisk asterik-style"></i>
                         </span>
                     </div>
-                    <input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="..." maxlength="50" readonly tabindex="-1" title="Auto-selected" data-bs-toggle="tooltip"/>
+                    <input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="..." maxlength="50" readonly tabindex="-1" title="Auto-selected" data-bs-toggle="tooltip" />
                     <span asp-validation-for="BankName" class="text-danger"></span>
                 </div>
             </div>
@@ -108,44 +122,6 @@
                     <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                 </div>
             </div>
-            
-        </div>
-        <div class="col-sm-6">
-
-           @*  <div class="form-group">
-                <span class="input-group-label"> Active Date: </span>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                    </div>
-                    <input type="date" id="ActivatedDate" asp-for="ActivatedDate" id="AgreementDate" class="form-control remarks" required placeholder="Agreement Date" value="@DateTime.Now">
-                    <span asp-validation-for="ActivatedDate" class="text-danger"></span>
-                </div>
-            </div>
- *@
-            @*<div class="form-group">
-            <label asp-for="ActivatedDate" class="control-label"></label>
-            <input asp-for="ActivatedDate" class="form-control remarks" />
-            <span asp-validation-for="ActivatedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-            <label asp-for="DeListedDate" class="control-label"></label>
-            <input asp-for="DeListedDate" class="form-control remarks" />
-            <span asp-validation-for="DeListedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-            <label asp-for="Status" class="control-label"></label>
-            <select asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
-            <option>--- SELECT STATUS ---</option>
-            </select>
-            <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-            <label asp-for="DelistReason" class="control-label"></label>
-            <textarea asp-for="DelistReason" class="form-control remarks"></textarea>
-            <span asp-validation-for="DelistReason" class="text-danger"></span>
-            </div>*@
-
             <partial name="Vendor/_AgencyAddress" model="@Model" />
             
             <div class="form-group">
@@ -168,17 +144,7 @@
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
             </div> *@
-            <div class="form-group">
-                <label class="input-group-label" for="createImageInput"> Document:</label>
-                <div class="input-group mb-3">
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-bs-toggle="tooltip" title="No Agency Document" />
-                    <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="DocumentImage" type="file"
-                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-bs-toggle="tooltip" title="Upload Agency Document" data-title-id="agency-document"
-                           data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
-                    <span asp-validation-for="DocumentImage" class="text-danger"></span>
-                </div>
-            </div>
+            
 @* 
             <div class="form-group">
                 <span class="input-group-label"> Status:</span>

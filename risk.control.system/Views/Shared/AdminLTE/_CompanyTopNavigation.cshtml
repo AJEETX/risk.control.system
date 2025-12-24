@@ -40,7 +40,7 @@
 
                 <!-- Country -->
                 <div class="dropdown-item info-item-top">
-                    <img src="@img" class="flag-icon" />
+                    <img src="@img" class="flag-icon" alt="flag" />
                     <span class="info-label-top">Country:</span>
                     <span class="info-value">@Model?.Country</span>
                 </div>
@@ -94,18 +94,21 @@
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 settings-dropdown">
                 <!-- Profile Section -->
                 <div class="text-center profile-section">
-                    <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))"
+                    <img src="/Document/GetCompanyUserDocument/@Model.UserId"
                          class="rounded-circle shadow-sm border sidebar-profile"
                          alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                     <p class="text-muted user-email">@Model.Email</p>
                     @if (Model.CanChangePassword)
                     {
-                        <a id="back" href="/CompanyUserProfile/Edit?userId=@Model.UserId" class="btn btn-sm btn-outline-warning edit-profile-btn">
+                        <a id="back" href="/CompanyUserProfile/Edit?userId=@Model.UserId" class="btn btn-sm btn-outline-warning">
                             <i class="fas fa-user-edit"></i> Edit Profile
+                        </a>
+                  <hr />
+                        <a href="/CompanyUserProfile/ChangePassword" class="btn btn-sm btn-outline-secondary">
+                            <i class="fa fa-key"></i> Change Password
                         </a>
                     }
                 </div>
-
                 <!-- Logout Link -->
                 <a class="dropdown-item d-flex align-items-center py-2 text-danger font-weight-bold btn btn-outline-danger"
                    href="#" data-toggle="modal" data-target="#logoutModal">
@@ -113,45 +116,5 @@
                 </a>
             </div>
         </li>
-        @*     <li class="nav-item dropdown  top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Settings">
-                <i class="fas fa-cog"></i>
-            </a>
-
-            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0">
-                <div class="dropdown-header text-center bg-light py-2 rounded-top">
-                        <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))"
-                         class="rounded-circle shadow-lg border sidebar-profile" alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
-                    </div>
-                @if (Model.CanChangePassword)
-                {
-                    <div class="dropdown-divider"></div>
-                    @* <div class="accent-secondary">
-                    <a id="password" class="dropdown-item" href="/agencyuserprofile/ChangePassword">
-                    <i class="fas fa-lock-open"></i>   Change Password
-                    </a>
-                    </div>
-                    <div class="dropdown-divider"></div>
-
-                    <!-- Profile Link -->
-                    <a class="dropdown-item d-flex align-items-center py-2 hover-bg-light" href="/companyuserprofile">
-                        <i class="fas fa-user-circle text-warning mr-2"></i> Profile
-                    </a>
-                }
-                <div class="dropdown-divider"></div>
-
-                <!-- Logout Link -->
-                <a class="dropdown-item d-flex align-items-center py-2 text-danger font-weight-bold hover-bg-danger"
-                   href="#" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                </a>
-            </div>
-        </li>
-
-              <li class="nav-item">
-        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-        <i class="fas fa-th-large"></i>
-        </a>
-        </li>*@
     </ul>
 </nav>

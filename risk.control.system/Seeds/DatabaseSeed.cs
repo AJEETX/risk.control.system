@@ -18,8 +18,9 @@ namespace risk.control.system.Seeds
             var vendorUserManager = scope.ServiceProvider.GetRequiredService<UserManager<VendorApplicationUser>>();
             var clientUserManager = scope.ServiceProvider.GetRequiredService<UserManager<ClientCompanyApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-            var customApiCLient = scope.ServiceProvider.GetRequiredService<ICustomApiCLient>();
+            var customApiCLient = scope.ServiceProvider.GetRequiredService<ICustomApiClient>();
             var httpAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+            var fileStorageService = scope.ServiceProvider.GetRequiredService<IFileStorageService>();
 
             context.Database.EnsureCreated();
 
@@ -47,7 +48,7 @@ namespace risk.control.system.Seeds
 
             await ClientCompanySetupSeed.Seed(context);
 
-            await StartCountryWiseSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor);
+            await StartCountryWiseSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor,fileStorageService);
         }
     }
 }

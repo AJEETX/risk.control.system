@@ -9,7 +9,6 @@
     <form id="login-form" asp-controller="Account" method="post">
         @Html.AntiForgeryToken()
         <input name="agent_login" title="agent_login" type="text" id="agent_login" value="">
-        <input type="hidden" id="defaultpassword" value="@Applicationsettings.Password" />
 
         <div class="input-boxes">
 
@@ -26,7 +25,7 @@
                 <i class="fas fa-lock left-padd"></i>
                 @if (Model.SetPassword)
                 {
-                    <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
+                    <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.TestingData" autocomplete="off" required />
                 }
                 else 
                 {

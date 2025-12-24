@@ -15,30 +15,30 @@ namespace risk.control.system.Services
     {
         Task<(BeneficiaryDetail, List<UploadError>, List<string>)> AddBeneficiary(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data);
     }
-    public class BeneficiaryCreationService : IBeneficiaryCreationService
+    internal class BeneficiaryCreationService : IBeneficiaryCreationService
     {
 
         private readonly ApplicationDbContext context;
-        private readonly ICustomApiCLient customApiCLient;
+        private readonly ICustomApiClient customApiCLient;
         private readonly IFeatureManager featureManager;
+        private readonly IFileStorageService fileStorageService;
         private readonly IPhoneService phoneService;
         private readonly ICaseImageCreationService caseImageCreationService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger<BeneficiaryCreationService> logger;
 
-        public BeneficiaryCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient,
+        public BeneficiaryCreationService(ApplicationDbContext context, ICustomApiClient customApiCLient,
             IFeatureManager featureManager,
+            IFileStorageService fileStorageService,
             IPhoneService phoneService,
             ICaseImageCreationService caseImageCreationService,
-            IWebHostEnvironment webHostEnvironment,
             ILogger<BeneficiaryCreationService> logger)
         {
             this.context = context;
             this.customApiCLient = customApiCLient;
             this.featureManager = featureManager;
+            this.fileStorageService = fileStorageService;
             this.phoneService = phoneService;
             this.caseImageCreationService = caseImageCreationService;
-            this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
         }
 
@@ -78,10 +78,10 @@ namespace risk.control.system.Services
                 PinCode? pinCode = null;
                 if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryPincode) && !string.IsNullOrWhiteSpace(uploadCase.BeneficiaryDistrictName))
                 {
-                    pinCode = context.PinCode.Include(p => p.District)
+                    pinCode = await context.PinCode.Include(p => p.District)
                                                     .Include(p => p.State)
                                                     .Include(p => p.Country)
-                                                    .FirstOrDefault(p => p.Code == uploadCase.BeneficiaryPincode &&
+                                                    .FirstOrDefaultAsync(p => p.Code == uploadCase.BeneficiaryPincode &&
                                                     p.District.Name.ToLower().Contains(uploadCase.BeneficiaryDistrictName.ToLower()));
                     if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
                     {
@@ -96,7 +96,7 @@ namespace risk.control.system.Services
 
                 if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 {
-                    var country = context.Country.FirstOrDefault(c => c.CountryId == companyUser.ClientCompany.CountryId);
+                    var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == companyUser.ClientCompany.CountryId);
                     var isMobile = phoneService.IsValidMobileNumber(uploadCase.BeneficiaryContact, country.ISDCode.ToString());
                     if (!isMobile)
                     {
@@ -109,32 +109,11 @@ namespace risk.control.system.Services
                     }
                 }
                 var relation = string.IsNullOrWhiteSpace(uploadCase.Relation)
-                    ? context.BeneficiaryRelation.FirstOrDefault()  // Get first record from the table
-                    : context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower()) // Get matching record
-                    ?? context.BeneficiaryRelation.FirstOrDefault();
+                    ? await context.BeneficiaryRelation.FirstOrDefaultAsync()  // Get first record from the table
+                    : await context.BeneficiaryRelation.FirstOrDefaultAsync(b => b.Code.ToLower() == uploadCase.Relation.ToLower()) // Get matching record
+                    ?? await context.BeneficiaryRelation.FirstOrDefaultAsync();
 
-                var extension = Path.GetExtension(BENEFICIARY_IMAGE).ToLower();
-                var fileName = Guid.NewGuid().ToString() + extension;
-                var beneficiaryNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), BENEFICIARY_IMAGE);
-                if (beneficiaryNewImage == null)
-                {
-                    errors.Add(new UploadError
-                    {
-                        UploadData = "[Beneficiary image : null/empty]",
-                        Error = "null/empty"
-                    });
-                    errorBeneficiary.Add($"[Beneficiary image=`{BENEFICIARY_IMAGE}` null/not found]");
-                }
-                else
-                {
-                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary");
-                    if (!Directory.Exists(imagePath))
-                    {
-                        Directory.CreateDirectory(imagePath);
-                    }
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "beneficiary", fileName);
-                    await File.WriteAllBytesAsync(filePath, beneficiaryNewImage);
-                }
+
                 if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryIncome) && Enum.TryParse<Income>(uploadCase.BeneficiaryIncome, true, out var incomeEnum))
                 {
                     uploadCase.BeneficiaryIncome = incomeEnum.ToString();
@@ -171,8 +150,24 @@ namespace risk.control.system.Services
                     });
                     errorBeneficiary.Add("[Beneficiary addressline=null/empty]");
                 }
+                var extension = Path.GetExtension(BENEFICIARY_IMAGE).ToLower();
+                string filePath = string.Empty;
+                var beneficiaryNewImage = await caseImageCreationService.GetImagesWithDataInSubfolder(data, uploadCase.CaseId?.ToLower(), BENEFICIARY_IMAGE);
+                if (beneficiaryNewImage == null)
+                {
+                    errors.Add(new UploadError
+                    {
+                        UploadData = "[Beneficiary image : null/empty]",
+                        Error = "null/empty"
+                    });
+                    errorBeneficiary.Add($"[Beneficiary image=`{BENEFICIARY_IMAGE}` null/not found]");
+                }
+                else
+                {
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiaryNewImage, extension, "Case", uploadCase.CaseId);
+                    filePath = relativePath;
+                }
 
-                string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", BENEFICIARY_IMAGE);
                 var beneficairy = new BeneficiaryDetail
                 {
                     Name = uploadCase.BeneficiaryName,
@@ -186,8 +181,8 @@ namespace risk.control.system.Services
                     StateId = pinCode?.StateId,
                     CountryId = pinCode?.CountryId,
                     //ProfilePicture = beneficiaryNewImage,
-                    ImagePath = "/beneficiary/" + fileName,
-                    ProfilePictureExtension = Path.GetExtension(BENEFICIARY_IMAGE),
+                    ImagePath = filePath,
+                    ProfilePictureExtension = extension,
                     Updated = DateTime.Now,
                     UpdatedBy = companyUser.Email
                 };

@@ -22,11 +22,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<PinCodesController> logger;
 
-        public PinCodesController(ApplicationDbContext context, INotyfService notifyService)
+        public PinCodesController(ApplicationDbContext context, INotyfService notifyService, ILogger<PinCodesController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         // GET: PinCodes
@@ -50,7 +52,7 @@ namespace risk.control.system.Controllers
                 .AsQueryable();
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!user.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
@@ -170,11 +172,11 @@ namespace risk.control.system.Controllers
 
         // GET: PinCodes/Create
         [Breadcrumb("Add New", FromAction = "Profile")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
             var district = new PinCode { IsUpdated = !user.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
             return View(district);
@@ -206,7 +208,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to create Pincode!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -268,7 +270,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("An error occurred while updating the pincode!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -297,7 +299,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to delete District!");
                 return RedirectToAction(nameof(Profile));
             }

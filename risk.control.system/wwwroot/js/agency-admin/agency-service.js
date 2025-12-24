@@ -16,17 +16,24 @@ $(document).ready(function () {
 
     // Function to handle the Edit button
     function showedit(id) {
+
+        // Sanitize the ID to prevent scanner warnings
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+
         $("body").addClass("submit-progress-bg");
         setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
         disableAllElements();
-        showSpinnerOnButton(`a#edit${id}.btn.btn-warning`, "Edit");
 
-        // Navigate after showing spinner
-        const editUrl = `/Agency/EditService?id=${id}`;
+        const selector = `a#edit${id}.btn.btn-warning`;
+        showSpinnerOnButton(selector, "Edit");
+
+        const editUrl = `/Agency/EditService?id=${encodeURIComponent(id)}`;
+
         setTimeout(() => {
             window.location.href = editUrl;
         }, 1000);
     }
+
 
     // Function to handle the Delete button
     function getdetails(id) {

@@ -61,7 +61,7 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <div class="row">
-                <partial name="Investigation/_DeletePolicy" model="Model" />
+                <partial name="Investigation/_DeleteCase" model="Model" />
                 <partial name="Investigation/_DeleteCustomer" model="Model" />
                 <partial name="Investigation/_DeleteBeneficiary" model="Model" />
             </div>
@@ -85,27 +85,25 @@
 
             <input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
             <partial name="Investigation/_TimelineReport" model="@Model" />
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <a id="back" asp-controller="Manager" asp-action="Active" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i>
-                            <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
-                        </a>
-                    </div>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <a id="back" asp-controller="Manager" asp-action="Active" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
+                    </a>
                 </div>
             </div>
         </div>
+
     </div>
-
-    
 </section>
-
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="~/js/purify.min.js"></script>
     <script src="~/js/company/policy-detail.js"></script>
     <script src="~/js/common/case-details.js"></script>
     <script src="~/js/creator/report-template.js"></script>

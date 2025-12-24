@@ -17,20 +17,10 @@ namespace risk.control.system.Services
 {
     public interface IHttpClientService
     {
-        Task<List<PincodeApiData>> GetPinCodeLatLng(string pinCode);
-
-        Task<FaceImageDetail> GetMaskedImage(MaskImage image, string baseUrl);
-
-        Task<FaceMatchDetail> GetFaceMatch(MatchImage image, string baseUrl);
 
         Task<PanResponse?> VerifyPanNew(string pan, string panUrl, string key, string host);
 
-        Task<MapAddress> GetAddress(string lat, string lon);
-
         Task<string> GetRawAddress(string lat, string lon);
-
-        Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress);
-        Task<bool> WhitelistIP(string url, string domain, string ipaddress);
 
         Task<bool> VerifyPassport(string passport, string dateOfBirth);
 
@@ -39,80 +29,27 @@ namespace risk.control.system.Services
         Task<AudioTranscript> TranscribeAsync(long locationId, string reportName, string bucketName, string fileName, string filePath);
     }
 
-    public class HttpClientService : IHttpClientService
+    internal class HttpClientService : IHttpClientService
     {
         private static HttpClient httpClient = new HttpClient();
-        private static string PinCodeBaseUrl = "https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode";
-        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ILogger<HttpClientService> logger;
+        private readonly IWebHostEnvironment env;
         private readonly IAmazonTranscribeService _amazonTranscribeService;
         private readonly IAmazonS3 s3Client;
         private readonly IMediaDataService mediaDataService;
 
-        public HttpClientService(IWebHostEnvironment webHostEnvironment, IAmazonTranscribeService amazonTranscribeService, IAmazonS3 s3Client, IMediaDataService mediaDataService)
+        public HttpClientService(
+            ILogger<HttpClientService> logger,
+            IWebHostEnvironment env,
+            IAmazonTranscribeService amazonTranscribeService,
+            IAmazonS3 s3Client,
+            IMediaDataService mediaDataService)
         {
-            this.webHostEnvironment = webHostEnvironment;
+            this.logger = logger;
+            this.env = env;
             _amazonTranscribeService = amazonTranscribeService;
             this.s3Client = s3Client;
             this.mediaDataService = mediaDataService;
-        }
-        public async Task<List<PincodeApiData>> GetPinCodeLatLng(string pinCode)
-        {
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri($"{PinCodeBaseUrl}/{pinCode}"),
-                Headers =
-                            {
-                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
-                            },
-            };
-            using (var response = await httpClient.SendAsync(request))
-            {
-                response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
-                var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
-                return pinCodeData;
-            }
-        }
-
-        public async Task<FaceImageDetail> GetMaskedImage(MaskImage image, string baseUrl)
-        {
-            var response = await httpClient.PostAsJsonAsync(baseUrl + "/ocr", image);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var maskedImage = await response.Content.ReadAsStringAsync();
-
-                var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
-
-                return maskedImageDetail;
-            }
-            var error = await response.Content.ReadAsStringAsync();
-
-            return null;
-        }
-
-        public async Task<FaceMatchDetail> GetFaceMatch(MatchImage image, string baseUrl)
-        {
-            try
-            {
-                var response = await httpClient.PostAsJsonAsync(baseUrl + "/faceMatch", image);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var maskedImage = await response.Content.ReadAsStringAsync();
-
-                    var facematchDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(maskedImage);
-
-                    return facematchDetail;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
-            return null!;
         }
 
         public async Task<string> GetRawAddress(string lat, string lon)
@@ -135,78 +72,6 @@ namespace risk.control.system.Services
             catch (Exception)
             {
                 return "Troy Court, Forest Hill, Melbourne, City of Whitehorse, Victoria, 3131, Australia";
-            }
-
-        }
-        public async Task<MapAddress> GetAddress(string lat, string lon)
-        {
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri($"https://api.geoapify.com/v1/geocode/reverse?lat={lat}&lon={lon}&apiKey={Applicationsettings.REVERRSE_GEOCODING}"),
-            };
-            try
-            {
-                using (var response = await httpClient.SendAsync(request))
-                {
-                    response.EnsureSuccessStatusCode();
-                    var body = await response.Content.ReadAsStringAsync();
-                    var addressData = JsonConvert.DeserializeObject<MapAddress>(body);
-                    return (addressData);
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-        }
-
-        public async Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress)
-        {
-            var Ip_Api_Url = $"{Applicationsettings.IP_SITE}{ipAddress}"; // 206.189.139.232 - This is a sample IP address. You can pass yours if you want to test
-            httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            // Pass API address to get the Geolocation details
-            httpClient.BaseAddress = new Uri(Ip_Api_Url);
-            HttpResponseMessage httpResponse = await httpClient.GetAsync(Ip_Api_Url);
-            // If API is success and receive the response, then get the location details
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                var geolocationInfo = await httpResponse.Content.ReadFromJsonAsync<LocationDetails_IpApi>();
-                if (geolocationInfo != null)
-                {
-                    Console.WriteLine("Country: " + geolocationInfo.country);
-                    Console.WriteLine("Region: " + geolocationInfo.regionName);
-                    Console.WriteLine("City: " + geolocationInfo.city);
-                    Console.WriteLine("Zip: " + geolocationInfo.zip);
-                    //Console.ReadKey();
-                    return geolocationInfo;
-                }
-            }
-            return null!;
-        }
-
-        public async Task<bool> WhitelistIP(string url, string domain, string ipaddress)
-        {
-            string relativeUrl = "api/agent/setip";
-            try
-            {
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.BaseAddress = new Uri(url);
-                HttpResponseMessage httpResponse = await httpClient.PostAsJsonAsync(relativeUrl, new IPWhitelistRequest { Domain = domain, IpAddress = ipaddress, Url = url });
-
-                if (httpResponse.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                throw;
             }
 
         }
@@ -271,12 +136,12 @@ namespace risk.control.system.Services
             // Convert the byte array to a Base64 string
 
             string filePath = $"{Guid.NewGuid()}.{extension}";
-            string path = Path.Combine(webHostEnvironment.WebRootPath, "passport");
+            string path = Path.Combine(env.WebRootPath, "passport");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-            var imagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "passport", filePath);
+            var imagefilePath = Path.Combine(env.WebRootPath, "passport", filePath);
             // Write the byte array to a file
             File.WriteAllBytes(imagefilePath, imageBytes);
 
@@ -461,7 +326,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
             }
         }
 
@@ -473,7 +338,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception thrown: {ex.Message}");
+                logger.LogError(ex, "Error occurred");
                 return false;
             }
             //return await s3Client.DoesS3BucketExistAsync(bucketName);

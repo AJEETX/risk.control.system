@@ -3,8 +3,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using Newtonsoft.Json;
-
 using risk.control.system.Helpers;
 using risk.control.system.Services;
 
@@ -23,21 +21,18 @@ namespace risk.control.system.Controllers.Company
         private readonly IInvoiceService invoiceService;
         private readonly IInvestigationService investigationService;
         private readonly ILogger<AssessorController> logger;
-        private readonly IChatSummarizer chatSummarizer;
 
         public AssessorController(INotyfService notifyService,
             ICaseVendorService caseVendorService,
             IInvoiceService invoiceService,
             IInvestigationService investigationService,
-            ILogger<AssessorController> logger,
-            IChatSummarizer chatSummarizer)
+            ILogger<AssessorController> logger)
         {
             this.notifyService = notifyService;
             this.caseVendorService = caseVendorService;
             this.invoiceService = invoiceService;
             this.investigationService = investigationService;
             this.logger = logger;
-            this.chatSummarizer = chatSummarizer;
         }
         public IActionResult Index()
         {
@@ -60,8 +55,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -84,23 +78,14 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index));
                 }
                 var model = await caseVendorService.GetInvestigateReport(currentUserEmail, selectedcase);
-                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
-                {
-                    var report = model.InvestigationReport.ToString();
-                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(report);
-                    model.InvestigationReport.AiSummaryUpdated = DateTime.Now;
-                    string jsonWrapped = JsonConvert.SerializeObject(new { report = investigationSummary }, Formatting.Indented);
 
-                    model.ReportAiSummary = jsonWrapped;
-                }
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -134,8 +119,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -156,8 +140,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -186,8 +169,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -225,8 +207,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -254,18 +235,13 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await investigationService.GetClaimDetailsReport(currentUserEmail, id);
-                //if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
-                //{
-                //    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
-                //    model.ReportAiSummary = investigationSummary;
-                //}
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -300,8 +276,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -331,8 +306,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

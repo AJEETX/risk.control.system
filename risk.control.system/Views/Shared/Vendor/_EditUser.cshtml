@@ -1,8 +1,20 @@
 ﻿@model risk.control.system.Models.VendorApplicationUser
-<div class="row">
+        <div class="row top-margin-10">
+    <input type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
     <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
     <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
     <div class="col-md-6">
+        
+        <div class="form-group text-center">
+            <div class="profile-img-container">
+                <img id="document-Image" class="form-Image img-circle" src="/Document/GetAgencyUserDocument/@Model?.Id" title="User Photo" alt="User " data-bs-toggle="tooltip" />
+            </div>
+            <label for="createImageInput" class="control-label">User Photo<i class="fa fa-asterisk asterik-style-logo"></i></label>
+            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
+            <span asp-validation-for="ProfileImage" class="text-danger"></span>
+        </div>
+
+
         <div class="form-group">
             <label class="input-group-label" for="Email">
                 Email:
@@ -21,28 +33,6 @@
                     <span class="input-group-text" id="email"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
                 <input readonly asp-for="Email" class="form-control readonly-input valid-border" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="input-group-label" for="createImageInput"> User Photo:</label>
-            <div class="input-group mb-3">
-                @if (Model?.ProfilePicture is not null)
-                {
-                    <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="Profile Image" data-bs-toggle="tooltip" title="User Photo" />
-                    <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input valid-border" type="file" id="createImageInput" data-title-id="user-document"
-                    data-preview-id="createProfileImage" data-bs-toggle="tooltip" title="Upload User Photo" />
-                    <span asp-validation-for="ProfilePicture" class="text-danger"></span>
-                }
-                else
-                {
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No User Photo" />
-                    <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input invalid-border" type="file" id="createImageInput" data-title-id="user-document"
-                           data-preview-id="createProfileImage" data-bs-toggle="tooltip" title="Upload User Photo" required />
-                    <span asp-validation-for="ProfilePicture" class="text-danger"></span>
-                }
-                
             </div>
         </div>
         <div class="form-group">
@@ -75,7 +65,7 @@
                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                     }
                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag"/>  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
                 <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
@@ -90,6 +80,9 @@
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
         </div>
+        
+    </div>
+    <div class="col-md-6">
         <div class="form-group">
             <label class="input-group-label" for="UserRole"> Role:</label>
             <div class="input-group mb-3">
@@ -97,7 +90,6 @@
                     <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
                 @{
-                    // Get the enum values except the one you want to exclude
                     var roles = Enum.GetValues(typeof(AgencyRole))
                     .Cast<AgencyRole>()
                     .Where(role => role != AgencyRole.AGENCY_ADMIN) // Replace RoleToExclude with the actual enum value
@@ -123,11 +115,7 @@
                 }
             </div>
         </div>
-        
-        
-    </div>
-    <div class="col-md-6">
-        
+
         <partial name="_Address" model="@Model" />
 
         <div class="form-group">

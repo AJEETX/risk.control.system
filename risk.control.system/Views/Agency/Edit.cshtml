@@ -20,21 +20,13 @@
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="row">
+                @* <div class="row">
 
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="input-group-label" for="Email"> Domain:</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="email"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input readonly asp-for="Email" class="form-control readonly-input valid-border" />
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        
                     </div>
                     
-                    <div class="col-sm-6">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="input-group-label" for="ActivatedDate"> Activated Date: </label>
                             <div class="input-group mb-3">
@@ -46,7 +38,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> *@
                 <partial name="Vendor/_Edit" model="Model" />
 
             </div>
@@ -78,6 +70,7 @@
     }
     <script src="~/js/company-admin/edit-agency.js"> </script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/company-admin/phone-bank-validate.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 }

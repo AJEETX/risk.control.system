@@ -28,6 +28,16 @@
                         $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Save Profile");
 
                         form.submit();
+                        if (form) {
+                            const formElements = form.getElementsByTagName("*");
+                            for (const element of formElements) {
+                                element.disabled = true;
+                                if (element.hasAttribute("readonly")) {
+                                    element.classList.remove("valid", "is-valid", "valid-border");
+                                    element.removeAttribute("aria-invalid");
+                                }
+                            }
+                        }
                     }
                 },
                 cancel: {

@@ -23,16 +23,16 @@ namespace risk.control.system.Data
         {
             if (notseed)
             {
-                OnBeforeSaveChanges(userId);
+                await OnBeforeSaveChanges(userId);
             }
             var result = await base.SaveChangesAsync();
             return result;
         }
 
-        private void OnBeforeSaveChanges(string userId)
+        private async Task OnBeforeSaveChanges(string userId)
         {
             var userEmail = userId ?? httpContext?.HttpContext?.User?.Identity.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             ChangeTracker.DetectChanges();
             var auditEntries = new List<AuditEntry>();
             foreach (var entry in ChangeTracker.Entries())

@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Globalization;
+using System.Net.Http.Headers;
 using System.Text;
 
 using Microsoft.FeatureManagement;
@@ -14,7 +15,7 @@ namespace risk.control.system.Services
         Task DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false);
     }
 
-    public class SmsService : ISmsService
+    internal class SmsService : ISmsService
     {
         private static HttpClient client = new HttpClient();
         private readonly IFeatureManager featureManager;
@@ -40,9 +41,9 @@ namespace risk.control.system.Services
                 //var localIps = GetActiveIPAddressesInNetwork();
                 var url = Environment.GetEnvironmentVariable("SMS_Url");
 
-                var username = countryCode.ToLower() == "au" ? Environment.GetEnvironmentVariable("SMS_User") : Environment.GetEnvironmentVariable("SMS_User_India");
-                var password = countryCode.ToLower() == "au" ? Environment.GetEnvironmentVariable("SMS_Pwd") : Environment.GetEnvironmentVariable("SMS_Pwd_India");
-                var sim = countryCode.ToLower() == "au" ? Environment.GetEnvironmentVariable("SMS_Sim") : Environment.GetEnvironmentVariable("SMS_Sim_India");
+                var username = countryCode.ToLower(CultureInfo.InvariantCulture) == "au" ? Environment.GetEnvironmentVariable("SMS_User") : Environment.GetEnvironmentVariable("SMS_User_India");
+                var password = countryCode.ToLower(CultureInfo.InvariantCulture) == "au" ? Environment.GetEnvironmentVariable("SMS_Pwd") : Environment.GetEnvironmentVariable("SMS_Pwd_India");
+                var sim = countryCode.ToLower(CultureInfo.InvariantCulture) == "au" ? Environment.GetEnvironmentVariable("SMS_Sim") : Environment.GetEnvironmentVariable("SMS_Sim_India");
                 var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
 
@@ -62,7 +63,7 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine("Error sending SMS: " + ex.Message);
-                return ex.Message;
+                return string.Empty;
             }
         }
     }

@@ -43,7 +43,7 @@
         //localStorage.setItem("analyticsCookies", analyticsCookies);
         //localStorage.setItem("perfomanceCookies", perfomanceCookies);
 
-        const token = $('input[name="icheckifyAntiforgery"]').val();
+        const token = $('input[name="__RequestVerificationToken"]').val();
 
         fetch('/api/auth/SavePreferences', {
             method: 'POST',
@@ -57,8 +57,9 @@
             })
         })
             .then(r => r.json())
-            .then(() => {
-
+            .then((r) => {
+                console.log('cookie saved');
+                console.log(r);
                 // Ensure main consent cookie exists
                 if (!getCookie("cookieConsent")) {
                     setCookie("cookieConsent", "Accepted", 365);
@@ -87,7 +88,7 @@
 
 function acceptCookies() {
 
-    var token = $('input[name="icheckifyAntiforgery"]').val();
+    var token = $('input[name="__RequestVerificationToken"]').val();
 
     fetch('/api/auth/AcceptCookies', {
         method: 'POST',
@@ -98,10 +99,9 @@ function acceptCookies() {
         body: JSON.stringify({})
     })
         .then(r => r.json())
-        .then(() => {
-            //localStorage.setItem("analyticsCookies", "true");
-            //localStorage.setItem("perfomanceCookies", "true");
-
+        .then((r) => {
+            console.log('cookie accepted');
+            console.log(r);
             if (!getCookie("cookieConsent")) {
                 setCookie("cookieConsent", "Accepted", 365);
             }
@@ -111,7 +111,7 @@ function acceptCookies() {
 
 async function revokeCookies() {
 
-    const token = $('input[name="icheckifyAntiforgery"]').val();
+    const token = $('input[name="__RequestVerificationToken"]').val();
 
     await fetch('/api/auth/RevokeCookies',
         {
@@ -145,7 +145,12 @@ function getCookie(name) {
 }
 
 function deleteCookie(name) {
-    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    document.cookie =
+        `${name}=; ` +
+        "expires=Thu, 01 Jan 1970 00:00:00 UTC; " +
+        "path=/; " +
+        "Secure; " +        // ✔ ensures cookie only sent over HTTPS
+        "SameSite=Strict";  // ✔ prevents CSRF leakage
 }
 
 function clearAllCookies() {

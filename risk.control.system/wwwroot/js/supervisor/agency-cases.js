@@ -42,7 +42,7 @@
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/agency/VendorInvestigation/GetNew',
+            url: '/api/agency/VendorInvestigation/GetNewCases',
             dataSrc: '',
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
@@ -152,7 +152,7 @@
                                  data-bs-toggle="tooltip"
                                  data-bs-placement="top"
                                  data-img='${formattedUrl}'
-                                 data-title='${row.pincodeName}' />
+                                 data-title='Addresss: ${row.pincodeName}' />
                         </div>`;
                     } else {
                         return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
@@ -164,8 +164,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Case Document: ' + row.policyId + '" data-img="' + row.document + '" src="' + row.document + '" class="thumbnail profile-image doc-profile-image open-map-modal" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -175,8 +174,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.customer + '" class="table-profile-image" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Name: ' + row.name + '" data-img="' + row.customer + '" src="' + row.customer + '" class="thumbnail table-profile-image open-map-modal" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -224,7 +222,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.isQueryCase) {
-                        buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
+                        buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a>'
                     }
                     else {
                         buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>'
@@ -388,7 +386,7 @@ function showenquiry(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     
-    $('a#details' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> ENQUIRY");
+    $('a#details' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Enquiry");
     disableAllInteractiveElements();
 
     var article = document.getElementById("article");

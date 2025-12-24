@@ -13,7 +13,7 @@ $(document).ready(function () {
 
     $("#InsuranceType").on("change", function () {
         var value = $(this).val();
-        var token = $('input[name="icheckifyAntiforgery"]').val();
+        var token = $('input[name="__RequestVerificationToken"]').val();
 
         if (value === '') {
             // Clear and reset InvestigationServiceTypeId dropdown
@@ -145,7 +145,7 @@ function preloadFieldData() {
     if (preloadedCountryId) {
         console.log("Preloaded Country ID: ", preloadedCountryId);
         // Fetch and set the Country field value
-        fetchAndSetFieldValue("/api/Company/GetCountryName", { id: preloadedCountryId }, "#CountryId", "name", () => {
+        fetchAndSetFieldValue("/api/MasterData/GetCountryName", { id: preloadedCountryId }, "#CountryId", "name", () => {
             // After Country is loaded, load State, District, and Pincode based on preloaded values
             loadStateData(preloadedCountryId);
         });
@@ -159,7 +159,7 @@ function loadStateData(countryId) {
     const preloadedStateId = $("#SelectedStateId").val();
     if (preloadedStateId) {
         console.log("Preloaded State ID: ", preloadedStateId);
-        fetchAndSetFieldValue("/api/Company/GetStateName", { id: preloadedStateId, countryId: countryId }, "#StateId", "stateName", () => {
+        fetchAndSetFieldValue("/api/MasterData/GetStateName", { id: preloadedStateId, countryId: countryId }, "#StateId", "stateName", () => {
             // After State is loaded, load District and Pincode based on preloaded values
             loadDistrictData(countryId, preloadedStateId);
         });
@@ -183,7 +183,7 @@ function loadDistrictData(countryId, stateId) {
     $spinner.removeClass("d-none"); // Show spinner
 
     $.ajax({
-        url: "/api/Company/GetDistrictNameForAgency",
+        url: "/api/MasterData/GetDistrictNameForAgency",
         type: "GET",
         data: {
             stateId: stateId,
@@ -196,16 +196,22 @@ function loadDistrictData(countryId, stateId) {
             const $districtSelect = $("#SelectedDistrictIds");
             $districtSelect.empty();
 
-            if (response && response.length > 0) {
+            if (Array.isArray(response) && response.length > 0) {
+
                 response.forEach(d => {
-                    $districtSelect.append(`<option value="${d.districtId}">${d.districtName}</option>`);
+                    const opt = $("<option>")
+                        .val(d.districtId)
+                        .text(d.districtName);
+                    $districtSelect.append(opt);
                 });
 
-                // Optional: Pre-select if there are existing values
                 const preselected = $("#SelectedDistrictIds").data("selected")?.toString().split(",") || [];
                 $districtSelect.val(preselected);
+
             } else {
-                $districtSelect.append(`<option disabled>No districts found</option>`);
+                $districtSelect.append(
+                    $("<option>").prop("disabled", true).text("No districts found")
+                );
             }
         },
         error: function () {
@@ -265,37 +271,17 @@ function initializeAutocomplete() {
     const autocompleteConfig = [
         {
             field: "#CountryId",
-            url: "/api/Company/SearchCountry",
+            url: "/api/MasterData/SearchCountry",
             onSelect: (ui) => handleAutocompleteSelect(ui, "#CountryId", "#SelectedCountryId", countryDependentFields),
             dependentFields: countryDependentFields
         },
         {
             field: "#StateId",
-            url: "/api/Company/SearchState",
+            url: "/api/MasterData/SearchState",
             extraData: () => ({ countryId: $("#SelectedCountryId").val() }),
             onSelect: (ui) => handleAutocompleteSelect(ui, "#StateId", "#SelectedStateId", stateDependentFields),
             dependentFields: stateDependentFields
-        },
-        //{
-        //    field: "#DistrictId",
-        //    url: "/api/Company/SearchDistrict",
-        //    extraData: () => ({
-        //        countryId: $("#SelectedCountryId").val(),
-        //        stateId: $("#SelectedStateId").val()
-        //    }),
-        //    onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", null),
-        //    dependentFields: []
-        //},
-        //{
-        //    field: "#PinCodeId",
-        //    url: "/api/Company/SearchPincode",
-        //    extraData: () => ({
-        //        countryId: $("#SelectedCountryId").val(),
-        //        stateId: $("#SelectedStateId").val(),
-        //        districtId: $("#SelectedDistrictId").val()
-        //    }),
-        //    onSelect: (ui) => handleAutocompleteSelect(ui, "#PinCodeId", "#SelectedPincodeId")
-        //}
+        }
     ];
 
     autocompleteConfig.forEach(config => {

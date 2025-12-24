@@ -9,7 +9,7 @@ const refreshSessionPath = "/Account/KeepSessionAlive"; // Path to refresh sessi
 async function refreshSession() {
     const currentPageUrl = window.location.href;
     console.log(`Refreshing session on ${currentPageUrl}`);
-    var token = $('input[name="icheckifyAntiforgery"]').val();
+    var token = $('input[name="__RequestVerificationToken"]').val();
 
     try {
         // Send a POST request to keep the session alive

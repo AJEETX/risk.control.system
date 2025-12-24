@@ -1,6 +1,7 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
 <input type="hidden" id="CountryId" asp-for="CountryId" />
 <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+<input id="vendorId" type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
 <div class="row">
     <div class="col-md-6">
 
@@ -38,7 +39,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="Price"> <i class="fas fa-money-bill-wave"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input id="Price" asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency)" value="" required maxlength="10" autocomplete="off" />
+                <input id="Price" asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency)"  required maxlength="10" autocomplete="off" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
         </div>
@@ -53,7 +54,7 @@
                         <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  @Model?.Country.Code
                     </span>
                 </div>
-                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Search state ..." asp-for="StateId" required value="" />
+                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Search state ..." asp-for="StateId" required />
 
                 <span asp-validation-for="StateId" class="text-danger"></span>
                 <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />

@@ -1,6 +1,7 @@
-using System.Net;
+﻿using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading.RateLimiting;
 
 using Amazon;
 using Amazon.Rekognition;
@@ -40,6 +41,7 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHsts(options =>
@@ -63,9 +65,7 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.ActiveLiClasses = "breadcrumb-item active";
 });
 // Set up logging
-var logDirectory = Path.Combine(builder.Environment.ContentRootPath, "Logs");
-Directory.CreateDirectory(logDirectory);
-LogCleanup.DeleteOldLogFiles(logDirectory, maxAgeInDays: 7);
+var logDirectory = LogSetup.CreateLogging(builder.Environment.ContentRootPath);
 
 builder.Logging.ClearProviders();
 builder.Logging.SetMinimumLevel(LogLevel.Error); // Optional global filter
@@ -84,31 +84,60 @@ builder.Logging.AddProvider(new CsvLoggerProvider(logDirectory, LogLevel.Error))
 //builder.Services.AddTransient<CaseApproved>();
 //builder.Services.AddTransient<CaseRejected>();
 
-builder.Services.AddCors(opt =>
-{
-    opt.AddDefaultPolicy(builder =>
-    {
-        builder.AllowAnyOrigin()
-        .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+//builder.Services.AddCors(opt =>
+//{
+//    opt.AddDefaultPolicy(builder =>
+//    {
+//        builder.AllowAnyOrigin()
+//        .AllowAnyHeader()
+//            .AllowAnyMethod();
+//    });
+//});
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
     x.MultipartBodyLengthLimit = 20 * 1024 * 1024; // 20 MB
-    //x.ValueLengthLimit = 20000000; //not recommended value
-    //x.MemoryBufferThreshold = 20000000;
 });
-//builder.Services.AddRateLimiter(_ => _
-//    .AddFixedWindowLimiter(policyName: "fixed", options =>
-//    {
-//        options.PermitLimit = 100;
-//        options.Window = TimeSpan.FromSeconds(1);
-//        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-//        options.QueueLimit = 10;
-//    }));
-// forward headers configuration for reverse proxy
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+
+        await context.HttpContext.Response.WriteAsync(
+            """
+            {
+                "error": "Too many requests. Please try again later."
+            }
+            """,
+            token);
+    };
+
+    options.AddPolicy("PerUserOrIP", context =>
+    {
+        // 1️⃣ Try authenticated user
+        var userId = context.User?.Identity?.IsAuthenticated == true
+            ? context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            : null;
+
+        // 2️⃣ Fallback to IP
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        var partitionKey = userId ?? ip;
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: partitionKey,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 50,               // ⬅ max requests
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+});
+
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -116,6 +145,24 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IVendorUserService, VendorUserService>();
+builder.Services.AddScoped<ICompanyUserService, CompanyUserService>();
+builder.Services.AddScoped<IVendorServiceTypeManager, VendorServiceTypeManager>();
+builder.Services.AddScoped<IAgencyUserCreateEditService, AgencyUserCreateEditService>();
+builder.Services.AddScoped<IAgencyCreateEditService, AgencyCreateEditService>();
+builder.Services.AddScoped<IValidateImageService, ValidateImageService>();
+builder.Services.AddScoped<IBeneficiaryCreateEditService, BeneficiaryCreateEditService>();
+builder.Services.AddScoped<ICustomerCreateEditService, CustomerCreateEditService>();
+builder.Services.AddScoped<ICaseCreateEditService, CaseCreateEditService>();
+builder.Services.AddScoped<IWeatherInfoService, WeatherInfoService>();
+builder.Services.AddScoped<IManagerService, ManagerService>();
+builder.Services.AddScoped<IAddInvestigationService, AddInvestigationService>();
+builder.Services.AddScoped<IAssessorService, AssessorService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddScoped<ISanitizerService, SanitizerService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
 builder.Services.AddScoped<IPhoneService, PhoneService>();
 builder.Services.AddScoped<IMediaDataService, MediaDataService>();
@@ -131,7 +178,7 @@ builder.Services.AddScoped<IPdfGenerativeService, PdfGenerativeService>();
 builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
 builder.Services.AddScoped<IPanCardService, PanCardService>();
 builder.Services.AddScoped<ICloneReportService, CloneReportService>();
-builder.Services.AddScoped<IAgentIdService, AgentIdService>();
+builder.Services.AddScoped<IAgentIdfyService, AgentIdfyService>();
 builder.Services.AddScoped<ICaseVendorService, CaseVendorService>();
 builder.Services.AddScoped<IVendorInvestigationService, VendorInvestigationService>();
 builder.Services.AddScoped<IDashboardCountService, DashboardCountService>();
@@ -150,8 +197,7 @@ builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddSingleton<IValidationService, ValidationService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IGoogleService, GoogleService>();
-builder.Services.AddScoped<ICustomApiCLient, CustomApiClient>();
+builder.Services.AddScoped<ICustomApiClient, CustomApiClient>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
 builder.Services.AddScoped<IClaimsAgentService, ClaimsAgentService>();
 builder.Services.AddScoped<ICompareFaces, CompareFaces>();
@@ -162,18 +208,15 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
 builder.Services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
-builder.Services.AddScoped<IClaimsService, ClaimsService>();
+builder.Services.AddScoped<ICaseService, CaseService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IFtpService, FtpService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
 builder.Services.AddScoped<IGoogleApi, GoogleApi>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
-builder.Services.AddScoped<IChatSummarizer, OpenAISummarizer>();
-builder.Services.AddScoped<ISqliteSchemaService, SqliteSchemaService>();
 
 builder.Services.AddScoped<IHttpClientService, HttpClientService>();
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 //builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
@@ -181,7 +224,7 @@ builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler
 var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
 {
     Credentials = new BasicAWSCredentials(Environment.GetEnvironmentVariable("aws_id"), Environment.GetEnvironmentVariable("aws_secret")),
-    Region = Amazon.RegionEndpoint.APSoutheast2 // Specify the region as needed,
+    Region = RegionEndpoint.APSoutheast2 // Specify the region as needed,
 };
 builder.Services.AddDefaultAWSOptions(awsOptions);
 // Register AWS Transcribe Service with the configured options
@@ -214,10 +257,6 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopCenter;
 });
 
-//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//                        options.UseSqlServer(connectionString));
-
 var connectionString = "Data Source=" + Environment.GetEnvironmentVariable("COUNTRY") + "_" + builder.Configuration.GetConnectionString("Database");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                         options.UseSqlite(connectionString,
@@ -231,7 +270,6 @@ builder.Services.AddHangfireServer(options =>
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
     options.CheckConsentNeeded = context => false;
     options.MinimumSameSitePolicy = SameSiteMode.Strict;
 });
@@ -335,7 +373,7 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require secure cookies (only over HTTPS)
     options.Cookie.SameSite = SameSiteMode.Strict; // Apply a strict SameSite policy
     options.HeaderName = "X-CSRF-TOKEN"; // Set a custom header name
-    options.FormFieldName = "icheckifyAntiforgery"; // Set a custom form field name
+    options.FormFieldName = "__RequestVerificationToken"; // Set a custom form field name
     options.SuppressXFrameOptionsHeader = false; // Enable the X-Frame-Options header
 });
 
@@ -439,18 +477,11 @@ try
     app.UseNotyf();
     app.UseFileServer();
 
-    app.Use(async (context, next) =>
-    {
-        if (context.Items.ContainsKey("CSP-Nonce"))
-        {
-            context.Items["CSP-Nonce"] = context.Items["CSP-Nonce"];
-        }
-        await next();
-    });
-
+    app.UseRateLimiter();
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Dashboard}/{action=Index}/{id?}");
+        pattern: "{controller=Dashboard}/{action=Index}/{id?}")
+        .RequireRateLimiting("PerUserOrIP");
 
     //RecurringJob.AddOrUpdate<IHangfireJobService>(
     //    "clean-failed-jobs",

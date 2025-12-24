@@ -1,7 +1,9 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Utils;
+
 using risk.control.system.Models;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 
@@ -11,7 +13,7 @@ namespace risk.control.system.Services
     {
         SectionBuilder Build(SectionBuilder section, LocationReport loc);
     }
-    public class PdfGenerateQuestionLocationService : IPdfGenerateQuestionLocationService
+    internal class PdfGenerateQuestionLocationService : IPdfGenerateQuestionLocationService
     {
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);

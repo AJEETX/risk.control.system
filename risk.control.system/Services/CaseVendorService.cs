@@ -17,7 +17,7 @@ namespace risk.control.system.Services
 
     }
 
-    public class CaseVendorService : ICaseVendorService
+    internal class CaseVendorService : ICaseVendorService
     {
         private readonly ApplicationDbContext _context;
 
@@ -134,7 +134,7 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (claim is null) return null;
 
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
             var timeTaken = endTIme - claim.Created;
@@ -145,7 +145,7 @@ namespace risk.control.system.Services
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = _context.VendorInvoice.FirstOrDefault(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var invoice = await _context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == claim.InvestigationReportId);
             var templates = await _context.ReportTemplates
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)

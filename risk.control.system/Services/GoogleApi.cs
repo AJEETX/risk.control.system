@@ -6,13 +6,13 @@ namespace risk.control.system.Services
     {
         Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath);
     }
-    public class GoogleApi : IGoogleApi
+    internal class GoogleApi : IGoogleApi
     {
-        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ILogger<GoogleApi> logger;
 
-        public GoogleApi(IWebHostEnvironment webHostEnvironment)
+        public GoogleApi(ILogger<GoogleApi> logger)
         {
-            this.webHostEnvironment = webHostEnvironment;
+            this.logger = logger;
         }
         public async Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath)
         {
@@ -34,8 +34,8 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return null;
+                logger.LogError(ex, "Error occurred.");
+                throw;
             }
         }
     }

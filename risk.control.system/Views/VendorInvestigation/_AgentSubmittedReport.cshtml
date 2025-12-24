@@ -64,4 +64,34 @@
             }
         </div>
     </div>
+    <div class="card-footer">
+        <form id="withdraw-form" method="post" asp-action="WithdrawCaseFromAgent" asp-controller="CaseVendorPost">
+            <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
+            <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
+            <div class="row">
+                <div class="col-md-12">
+                    <a id="back" asp-action="Open" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
+                    </a>
+                    @*  @if (@Model.ClaimsInvestigation.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
+                    {
+                        <button id="withdraw-case" type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
+                    }
+                    else
+                    {
+                        <button id="withdraw-case" disabled class="btn btn-danger" title="Can't  be withdrawn"><i class="fas fa-undo"></i> Withdraw</button>
+                    } *@
+
+                    <span id="decline-information-popup" class="badge badge-light">
+                        <div class="btn btn-outline-danger">
+                            <span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Decline <span class="badge badge-danger">
+                                <i class="fas fa-info"></i>
+                            </span>
+                        </div>
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>

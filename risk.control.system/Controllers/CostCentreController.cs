@@ -1,4 +1,7 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Globalization;
+using System.Net;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,11 +22,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<CostCentreController> logger;
 
-        public CostCentreController(ApplicationDbContext context, INotyfService notifyService)
+        public CostCentreController(ApplicationDbContext context, INotyfService notifyService, ILogger<CostCentreController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         // GET: CostCentre
@@ -73,8 +78,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error to get Budget Centre !");
+                logger.LogError(ex, "Error to get Budget Centre.");
+                notifyService.Error("Error to get Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -90,7 +95,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CostCentre costCentre)
         {
-            if (costCentre is null || !ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 notifyService.Error("Budget Centre  Empty!");
                 return RedirectToAction(nameof(Profile));
@@ -98,8 +103,8 @@ namespace risk.control.system.Controllers
             try
             {
 
-                costCentre.Code = costCentre.Code?.ToUpper();
-
+                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper(CultureInfo.InvariantCulture));
+                costCentre.Name = WebUtility.HtmlEncode(costCentre.Name);
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre
                     .AnyAsync(x => x.Code == costCentre.Code);
@@ -119,8 +124,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error creating Budget Centre !");
+                logger.LogError(ex, "Error creating Budget Centre.");
+                notifyService.Error("Error creating Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -132,7 +137,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
 
-            bool exists = await _context.CostCentre.AnyAsync(x => x.Code.ToUpper() == code.ToUpper() && (!id.HasValue || x.CostCentreId != id.Value));
+            bool exists = await _context.CostCentre.AnyAsync(x => x.Code.ToUpper() == code.ToUpper(CultureInfo.InvariantCulture) && (!id.HasValue || x.CostCentreId != id.Value));
 
             return Json(exists);
         }
@@ -170,7 +175,8 @@ namespace risk.control.system.Controllers
             try
             {
                 // Uppercase normalization
-                costCentre.Code = costCentre.Code?.ToUpper();
+                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper(CultureInfo.InvariantCulture));
+                costCentre.Name = WebUtility.HtmlEncode(costCentre.Name);
 
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre.AnyAsync(x => x.Code == costCentre.Code && x.CostCentreId != id);
@@ -189,8 +195,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error editing Budget Centre !");
+                logger.LogError(ex, "Error editing Budget Centre.");
+                notifyService.Error("Error editing Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -220,8 +226,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error deleting Budget Centre !");
+                logger.LogError(ex, "Error deleting Budget Centre. ");
+                notifyService.Error("Error deleting Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }

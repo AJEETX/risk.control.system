@@ -48,6 +48,13 @@ $(document).ready(function () {
                 const formElements = document.getElementById(formId).getElementsByTagName("*");
                 for (const element of formElements) {
                     element.disabled = true;
+                    if (element.hasAttribute("readonly")) {
+                        element.classList.remove("valid", "is-valid", "valid-border");
+                        element.removeAttribute("aria-invalid");
+                    }
+                    if (element.classList.contains("filled-valid")) {
+                        element.classList.remove("filled-valid");
+                    }
                 }
             });
         } else if (confirmationFlag) {
@@ -117,7 +124,7 @@ $(document).ready(function () {
         var value = $(this).val();
 
         if (value != '') {
-            var token = $('input[name="icheckifyAntiforgery"]').val();
+            var token = $('input[name="__RequestVerificationToken"]').val();
 
             $.ajax({
                 url: "/api/MasterData/GetInvestigationServicesByInsuranceType",

@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
 
 using Hangfire;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +17,8 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
@@ -23,9 +27,10 @@ namespace risk.control.system.Controllers.Api
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<AgentController> logger;
         private readonly ICloneReportService cloneReportService;
         private readonly IHttpClientService httpClientService;
-        private readonly IAgentIdService agentIdService;
+        private readonly IAgentIdfyService agentIdService;
         private readonly IVendorInvestigationService service;
         private readonly ICompareFaces compareFaces;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
@@ -40,10 +45,11 @@ namespace risk.control.system.Controllers.Api
 
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context,
+            ILogger<AgentController> logger,
             ICloneReportService cloneReportService,
             IHttpClientService httpClientService,
             IConfiguration configuration,
-            IAgentIdService agentIdService,
+            IAgentIdfyService agentIdService,
             IVendorInvestigationService service,
             ICompareFaces compareFaces,
             UserManager<VendorApplicationUser> userVendorManager,
@@ -56,6 +62,7 @@ namespace risk.control.system.Controllers.Api
             IMailService mailboxService)
         {
             this._context = context;
+            this.logger = logger;
             this.cloneReportService = cloneReportService;
             this.httpClientService = httpClientService;
             this.agentIdService = agentIdService;
@@ -99,7 +106,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return BadRequest($"Agent does not exist or Error");
             }
         }
@@ -125,7 +132,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return BadRequest($"mobile number and/or Agent does not exist");
             }
         }
@@ -161,7 +168,8 @@ namespace risk.control.system.Controllers.Api
                         if (isAgent && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active)
                         {
                             user.MobileUId = request.Uid;
-                            user.SecretPin = randomNumber.Next(1000, 9999).ToString();
+                            int pin = RandomNumberGenerator.GetInt32(0, 10000);
+                            user.SecretPin = pin.ToString("D4");
                             _context.VendorApplicationUser.Update(user);
                             await _context.SaveChangesAsync();
                             await SendVerificationSmsAsync(user.Country.Code, user.Email, request.Mobile, user.SecretPin);
@@ -179,7 +187,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[VerifyMobile Error] {ex}");
+                logger.LogError(ex, $"Error occurred.");
                 return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
@@ -206,14 +214,14 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Uid And/Or Image is empty/null");
                 }
-                var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
+                var mobileUidExist = await _context.VendorApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
                 if (mobileUidExist == null)
                 {
                     return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
                 }
-                if (mobileUidExist.ProfilePicture == null)
+                if (mobileUidExist.ProfilePictureUrl == null || string.IsNullOrWhiteSpace(mobileUidExist.ProfilePictureUrl))
                 {
-                    return BadRequest($"{mobileUidExist.Email}  {nameof(mobileUidExist.ProfilePicture)}  does not exists");
+                    return BadRequest($"{mobileUidExist.Email}  {nameof(mobileUidExist.ProfilePictureUrl)}  does not exists");
                 }
                 if (!request.VerifyId)
                 {
@@ -221,25 +229,18 @@ namespace risk.control.system.Controllers.Api
                 }
 
                 var image = Convert.FromBase64String(request.Image);
-
-                var matched = await compareFaces.DoFaceMatch(mobileUidExist.ProfilePicture, image);
+                var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, mobileUidExist.ProfilePictureUrl));
+                var matched = await compareFaces.DoFaceMatch(registeredImage, image);
                 if (matched.Item1)
                 {
                     return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
                 }
 
                 return BadRequest("face mismatch");
-
-                //var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = saveImageBase64Image2Verify }, FaceMatchBaseUrl);
-
-                //if (faceImageDetail == null || faceImageDetail?.Confidence == null)
-                //{
-                //    return BadRequest("face mismatch");
-                //}
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return BadRequest("face matcherror " + ex.StackTrace);
             }
         }
@@ -291,8 +292,10 @@ namespace risk.control.system.Controllers.Api
         //}
 
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpGet("agent")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> GetAll(string email)
         {
             try
@@ -301,7 +304,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Email is empty/null");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -316,7 +319,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
                 if (vendorUser == null)
                 {
                     return Unauthorized("Invalid User !!!");
@@ -351,7 +354,7 @@ namespace risk.control.system.Controllers.Api
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                         claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentPath != null ?
-                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c.PolicyDetail.DocumentPath.Substring(1)))) :
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, c.PolicyDetail.DocumentPath))) :
                         Applicationsettings.NO_POLICY_IMAGE,
                         CustomerName = c.CustomerDetail.Name,
                         CustomerEmail = email,
@@ -360,7 +363,7 @@ namespace risk.control.system.Controllers.Api
                         c.CustomerDetail.Addressline,
                         c.CustomerDetail.PinCode.Code,
                         CustomerPhoto = c?.CustomerDetail.ImagePath != null ?
-                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c?.CustomerDetail.ImagePath.Substring(1)))) :
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, c?.CustomerDetail.ImagePath))) :
                         Applicationsettings.USER_PHOTO,
                         Country = c.CustomerDetail.Country.Name,
                         State = c.CustomerDetail.State.Name,
@@ -370,7 +373,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             c.BeneficiaryDetail.BeneficiaryDetailId,
                             Photo = c.BeneficiaryDetail?.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, c.BeneficiaryDetail.ImagePath.Substring(1)))) :
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, c.BeneficiaryDetail.ImagePath))) :
                             Applicationsettings.USER_PHOTO,
                             c.BeneficiaryDetail.Country.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
@@ -384,13 +387,13 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return StatusCode(500, ex.StackTrace);
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("agent-map")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> IndexMap(string email)
         {
             try
@@ -399,7 +402,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Email is empty/null");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -412,7 +415,7 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
                 if (vendorUser == null)
                 {
                     return Unauthorized("Invalid User !!!");
@@ -459,12 +462,13 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpGet("get")]
         public async Task<IActionResult> Get(long caseId, string email)
         {
@@ -474,7 +478,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Invalid caseId And/Or Email is empty/null");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -487,7 +491,7 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var claim = _context.Investigations
+                var claim = await _context.Investigations
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(c => c.CostCentre)
                     .Include(c => c.PolicyDetail)
@@ -500,31 +504,31 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
-                    .FirstOrDefault(c => c.Id == caseId);
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                var beneficiary = _context.BeneficiaryDetail
+                var beneficiary = await _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
                     .Include(c => c.PinCode)
                     .Include(c => c.District)
                     .Include(c => c.State)
                     .Include(c => c.Country)
-                    .FirstOrDefault(c => c.InvestigationTaskId == caseId);
+                    .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
 
                 object locations = null;
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
                 {
                     locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
                 }
-                var docPath = Path.Combine(webHostEnvironment.WebRootPath, claim.PolicyDetail.DocumentPath.Substring(1));
+                var docPath = Path.Combine(webHostEnvironment.ContentRootPath, claim.PolicyDetail.DocumentPath);
                 var docByte = System.IO.File.ReadAllBytes(docPath);
                 var docBase64 = Convert.ToBase64String(docByte);
                 var documentPhoto = claim.PolicyDetail.DocumentPath != null ? docBase64 : Applicationsettings.NO_POLICY_IMAGE;
                 var customerPhoto = claim.CustomerDetail.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, claim.CustomerDetail.ImagePath.Substring(1)))) : Applicationsettings.USER_PHOTO;
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, claim.CustomerDetail.ImagePath))) : Applicationsettings.USER_PHOTO;
                 var beneficiaryPhoto = beneficiary.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, beneficiary.ImagePath.Substring(1)))) : Applicationsettings.USER_PHOTO;
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, beneficiary.ImagePath))) : Applicationsettings.USER_PHOTO;
                 return Ok(
                     new
                     {
@@ -571,12 +575,13 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return StatusCode(500);
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpGet("get-template")]
         public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email)
         {
@@ -586,7 +591,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Invalid caseId And/Or Email is empty/null");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -597,12 +602,13 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, $"Error occurred.");
                 return StatusCode(500);
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
@@ -617,7 +623,7 @@ namespace risk.control.system.Controllers.Api
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
                 {
@@ -633,25 +639,26 @@ namespace risk.control.system.Controllers.Api
                 var isAgentReportName = data.ReportName == DigitalIdReportType.AGENT_FACE.GetEnumDisplayName();
                 if (isAgentReportName)
                 {
-                    var response = await agentIdService.GetAgentId(data);
+                    var response = await agentIdService.CaptureAgentId(data);
                     response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                     return Ok(response);
                 }
                 else
                 {
-                    var response = await agentIdService.GetFaceId(data);
+                    var response = await agentIdService.CaptureFaceId(data);
                     response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                     return Ok(response);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
@@ -666,7 +673,7 @@ namespace risk.control.system.Controllers.Api
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
                 {
@@ -679,18 +686,19 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var response = await agentIdService.GetDocumentId(data);
+                var response = await agentIdService.CaptureDocumentId(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("media")]
         public async Task<IActionResult> Media(DocumentData data)
         {
@@ -711,7 +719,7 @@ namespace risk.control.system.Controllers.Api
                 if (!supportedExtensions.Contains(extension))
                     return BadRequest("Unsupported media format.");
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
                 {
@@ -724,18 +732,19 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var response = await agentIdService.GetMedia(data);
+                var response = await agentIdService.CaptureMedia(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("answers")]
         public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
         {
@@ -753,7 +762,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Some answers are missing.");
                 }
-                var answerSubmitted = await agentIdService.Answers(locationName, caseId, Questions);
+                var answerSubmitted = await agentIdService.CaptureAnswers(locationName, caseId, Questions);
                 if (answerSubmitted)
                     return Ok(new { success = answerSubmitted });
                 else
@@ -761,12 +770,13 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
         {
@@ -780,7 +790,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("All fields (Email, Remarks, CaseId) are required and must be valid.");
                 }
-                var agent = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -801,8 +811,8 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
+                return StatusCode(500);
             }
         }
     }

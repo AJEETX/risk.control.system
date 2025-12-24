@@ -15,7 +15,7 @@ namespace risk.control.system.Models
         public long InvestigationServiceTypeId { get; set; } = default!;
 
         [Display(Name = "Investigation service type")]
-        public InvestigationServiceType InvestigationServiceType { get; set; } = default!;
+        public InvestigationServiceType? InvestigationServiceType { get; set; } = default!;
 
         public InsuranceType? InsuranceType { get; set; }
 
@@ -50,7 +50,7 @@ namespace risk.control.system.Models
         public decimal Price { get; set; }
 
         public long VendorId { get; set; }
-        public Vendor Vendor { get; set; }
+        public Vendor? Vendor { get; set; }
         public bool Deleted { get; set; } = false;
         public override string ToString()
         {

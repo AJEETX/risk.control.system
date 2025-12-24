@@ -1,4 +1,6 @@
-﻿using risk.control.system.Data;
+﻿using Microsoft.EntityFrameworkCore;
+
+using risk.control.system.Data;
 
 namespace risk.control.system.Middleware
 {
@@ -16,7 +18,7 @@ namespace risk.control.system.Middleware
             if (context.User.Identity.IsAuthenticated)
             {
                 var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
-                var user = dbContext.ApplicationUser.FirstOrDefault(u => u.Email == context.User.Identity.Name);
+                var user = await dbContext.ApplicationUser.FirstOrDefaultAsync(u => u.Email == context.User.Identity.Name);
                 if (user != null)
                 {
                     user.LastActivityDate = DateTime.Now;

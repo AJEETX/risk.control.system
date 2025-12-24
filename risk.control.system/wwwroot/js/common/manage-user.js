@@ -28,10 +28,13 @@
                             $('#create-form').submit();
                             var createForm = document.getElementById("create-form");
                             if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+                                const formElements = createForm.getElementsByTagName("*");
+                                for (const element of formElements) {
+                                    element.disabled = true;
+                                    if (element.hasAttribute("readonly")) {
+                                        element.classList.remove("valid", "is-valid", "valid-border");
+                                        element.removeAttribute("aria-invalid");
+                                    }
                                 }
                             }
                         }
@@ -89,10 +92,13 @@
                             $('#edit-form').submit();
                             var createForm = document.getElementById("edit-form");
                             if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+                                const formElements = createForm.getElementsByTagName("*");
+                                for (const element of formElements) {
+                                    element.disabled = true;
+                                    if (element.hasAttribute("readonly")) {
+                                        element.classList.remove("valid", "is-valid", "valid-border");
+                                        element.removeAttribute("aria-invalid");
+                                    }
                                 }
                             }
                         }
@@ -153,7 +159,7 @@ function alphaOnly(event) {
 };
 
 function checkUserEmail() {
-    var url = "/Account/CheckUserEmail";
+    var url = "/api/MasterData/CheckUserEmail";
     var name = $('#emailAddress').val().toLowerCase();
     var emailSuffix = $('#emailSuffix').val().toLowerCase();
     $('#mailAddress').val('');
@@ -183,15 +189,9 @@ function CheckIfEmailValid() {
     var name = $('#email').val();
     if (name && name.length > 4) {
         $('#check-email').prop('disabled', false);
-        //$("#check-email").css('color', 'white');
-        //$("#check-email").css('background-color', '#004788');
-        //$("#check-email").css('cursor', 'default');
     }
     else {
         $('#check-email').css('disabled', true);
-        //$("#check-email").css('color', '#ccc');
-        //$("#check-email").css('background-color', 'grey');
-        //$("#check-email").css('cursor', 'not-allowed');
     }
 }
 

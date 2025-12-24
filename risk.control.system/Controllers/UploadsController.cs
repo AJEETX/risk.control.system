@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,14 +19,14 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
         private readonly IClaimsAgentService agentService;
-        private readonly IAgentIdService agentIdService;
+        private readonly IAgentIdfyService agentIdService;
         private readonly ILogger<UploadsController> logger;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public UploadsController(ApplicationDbContext context,
             INotyfService notifyService,
             IClaimsAgentService agentService,
-            IAgentIdService agentIdService,
+            IAgentIdfyService agentIdService,
             ILogger<UploadsController> logger,
             IWebHostEnvironment webHostEnvironment)
         {
@@ -49,29 +47,42 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
-                if (file == null)
+                var file = await _context.FilesOnFileSystem
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (file == null || string.IsNullOrWhiteSpace(file.FilePath))
                 {
                     notifyService.Error("OOPs !!!.. Download error");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                string zipPath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", file.Name);
-                var fileBytes = System.IO.File.ReadAllBytes(zipPath);
-                return File(fileBytes, "application/zip", Path.GetFileName(zipPath));
+
+                string fullPath = Path.Combine(webHostEnvironment.ContentRootPath, file.FilePath);
+
+                if (!System.IO.File.Exists(fullPath))
+                {
+                    notifyService.Error("File not found on server");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+
+                string fileName = Path.GetFileName(fullPath);
+
+                return File(stream, "application/zip", fileName);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error downloading ZIP");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
         public async Task<IActionResult> DownloadErrorLog(long id)
         {
             try
             {
-                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+                var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(x => x.Id == id);
                 if (file == null)
                 {
                     notifyService.Error("OOPs !!!.. Download error");
@@ -84,17 +95,16 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error occurred.");
+                notifyService.Error("Error occurred. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteLog(int id)
+        public async Task<IActionResult> DeleteLog(int id)
         {
-            var file = _context.FilesOnFileSystem.FirstOrDefault(f => f.Id == id);
+            var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == id);
             if (file == null)
             {
                 return NotFound(new { success = false, message = "File not found." });
@@ -114,7 +124,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error deleting file");
                 return BadRequest(new { success = false, message = "Error deleting file: " + ex.Message });
             }
         }
@@ -168,7 +178,7 @@ namespace risk.control.system.Controllers
                 Image = Image,
                 LocationLatLong = locationLongLat
             };
-            var response = await agentIdService.GetMedia(data);
+            var response = await agentIdService.CaptureMedia(data);
             return Json(new
             {
                 success = true,
@@ -195,7 +205,7 @@ namespace risk.control.system.Controllers
                 // e.g. return View(model);
                 return BadRequest("Some answers are missing.");
             }
-            var submitted = await agentIdService.Answers(locationName, CaseId, Questions);
+            var submitted = await agentIdService.CaptureAnswers(locationName, CaseId, Questions);
 
             if (submitted)
             {

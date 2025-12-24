@@ -27,7 +27,6 @@
                     data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Customer Address Location</b>');
                     self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
-                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><img class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
                     self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');
@@ -148,7 +147,8 @@
                     self.setContentAppend('<b><i class="fas fa-building"></i> Budget Centre</b>:  ' + response.costCentre);
                     self.setContentAppend('</p');
                     self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Case Document</b>:');
-                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.document + '" /> ');
+                    var policyDataUrl = '/Document/GetPolicyDocument/' + $('#claimId').val();
+                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="'+policyDataUrl + '" /> ');
                     self.setContentAppend('</p');
                     self.setContentAppend('</div>');
                     self.setContentAppend('</div>');
@@ -197,7 +197,9 @@
                     self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b> : ' + response.address);
                     self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b> : ' + response.phoneNumber);
                     self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Customer Image</b>:');
-                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.customer + '" />');
+                    var customerUrl = '/Document/GetCustomerDocument/' + $('#customerDetailId').val();
+
+                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + customerUrl + '" />');
                     self.setTitle('Customer details');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
@@ -239,7 +241,8 @@
                     self.setContentAppend('<br><b><i class="fa fa-money"></i> Annual Income</b>: ' + response.income);
                     self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b>: ' + response.address);
                     self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Beneficiary Image</b>:');
-                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.beneficiary + '" /> ');
+                    var beneficiaryUrl = '/Document/GetBeneficiaryDocument/' + $('#beneficiaryId').val();
+                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + beneficiaryUrl + '" /> ');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });

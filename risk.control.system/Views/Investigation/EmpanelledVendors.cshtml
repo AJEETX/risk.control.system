@@ -89,7 +89,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <partial name="Investigation/_DeletePolicy" model="@detailedModel" />
+                            <partial name="Investigation/_DeleteCase" model="@detailedModel" />
                             <partial name="Investigation/_DeleteCustomer" model="@detailedModel" />
                             <partial name="Investigation/_DeleteBeneficiary" model="@detailedModel" />
                         </div>
@@ -139,7 +139,7 @@
                     <thead>
                         <tr>
                             <th data-orderable="false">
-                                <img class="action-image" src="~/headers/arrow-down.gif" title="Select Agency" alt="Select Agency" />
+                                <img class="action-image" src="~/headers/arrow-down.gif" title="Select Agency" alt="Select Agency" data-toggle="tooltip" />
                             </th>
                             <th>Domain</th>
                             <th data-orderable="false">
@@ -150,7 +150,7 @@
                             <th>Address</th>
                             <th>District</th>
                             <th>State</th>
-                            <th title="Service available (No of current cases)"><span><i class="fa fa-commenting-o"></i></span></th>
+                            <th title="Service available (No of current cases)" data-toggle="tooltip"><span><i class="fa fa-commenting-o"></i></span></th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -189,6 +189,7 @@
     </div>
 </section>
 @section Scripts {
+    <script src="~/js/purify.min.js"></script>
     <script src="~/js/creator/get-empanelled-agency.js"></script>
     <script src="~/js/common/case-details.js"></script>
     <script src="~/js/company/report-template-list.js"></script>

@@ -7,7 +7,7 @@ namespace risk.control.system.Services
     {
         Task<UploadResult> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] model, ORIGIN fileOrFTP);
     }
-    public class CaseCreationService : ICaseCreationService
+    internal class CaseCreationService : ICaseCreationService
     {
 
         private readonly ICaseDetailCreationService caseDetailCreationService;
@@ -38,8 +38,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
                 return null;
             }
         }

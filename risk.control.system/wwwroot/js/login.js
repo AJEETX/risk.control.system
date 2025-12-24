@@ -126,25 +126,22 @@ $(document).ready(function () {
     $("#email, #resetemail").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
-            var token = $('input[name="icheckifyAntiforgery"]').val();
             $.ajax({
                 url: "/api/MasterData/GetUserBySearch",
                 type: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token   // ✔ Correct header name
-                },
                 data: {
                     search: request.term
                 },
                 success: function (data) {
+                    console.log(data); // Check what the server is sending
                     // Ensure data is in the format [{ label: "email", value: "email" }]
                     response($.map(data, function (item) {
                         return { label: item, value: item };
                     }));
                     $("#loader").hide(); // Hide loader
                 },
-                error: function () {
+                error: function (err) {
+                    console.log(err);
                     response([]);
                     $("#loader").hide(); // Hide loader
                 }
@@ -176,7 +173,7 @@ $(document).ready(function () {
         source: function (request, response) {
             $("#loader").show(); // Show loader
             $.ajax({
-                url: "/api/Company/GetCountryIsdCode", // API endpoint for country suggestions
+                url: "/api/MasterData/GetCountryIsdCode", // API endpoint for country suggestions
                 type: "GET",
                 data: {
                     term: request.term
@@ -266,6 +263,5 @@ function onlyDigits(el) {
     el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
 }
 window.onload = function () {
-    //initGeolocation();
     focusLogin();
 }

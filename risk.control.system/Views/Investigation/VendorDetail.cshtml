@@ -30,7 +30,7 @@
                         <p class="info-box-number">Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</p>
 
                         <div class="profile-img-container">
-                            <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))"
+                        <img src="/Document/GetAgencyDocument/@Model.VendorId"
                                  class="shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                         </div>
                         <h5 class="mt-3">@Model.Email</h5>
@@ -155,7 +155,7 @@
                 </div>
             </div>
             <div class="card-footer">
-                <div class="row float-right">
+                <div class="row float-left">
                     <div class="col-md-12">
                         <div class="form-group">
                             <a id="back" asp-controller="Investigation" asp-action="EmpanelledVendors" asp-route-id="@Model.SelectedPincodeId" asp-route-vendorId="@Model.VendorId" class="btn btn-outline-secondary">

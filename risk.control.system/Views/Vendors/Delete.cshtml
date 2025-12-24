@@ -122,7 +122,7 @@
                                         <li class="small">
                                             @if (Model?.DocumentUrl is not null)
                                             {
-                                                <img id="documentImage" class="img-fluid" src="@Model?.DocumentUrl">
+                                                    <img id="documentImage" class="img-fluid" src="/Document/GetAgencyDocument/@Model?.VendorId">
                                             }
                                             else
                                             {
@@ -182,7 +182,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
-        <script src="~/js/common/delete-user.js">
-    </script>
+     <script src="~/js/common/delete-user.js"></script>
 }

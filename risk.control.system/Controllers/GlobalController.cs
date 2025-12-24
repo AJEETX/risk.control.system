@@ -22,12 +22,14 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
         private readonly IFeatureManager manager;
+        private readonly ILogger<GlobalController> logger;
 
-        public GlobalController(ApplicationDbContext context, INotyfService notifyService, IFeatureManager manager)
+        public GlobalController(ApplicationDbContext context, INotyfService notifyService, IFeatureManager manager, ILogger<GlobalController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
             this.manager = manager;
+            this.logger = logger;
         }
 
         // GET: RiskCaseStatus
@@ -79,7 +81,7 @@ namespace risk.control.system.Controllers
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    logger.LogError(ex, "Error occurred.");
                     notifyService.Error("Error to edit Global-settings!");
                     return View(settings);
                 }

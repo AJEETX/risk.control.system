@@ -1,8 +1,10 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using risk.control.system.Controllers.Api.Claims;
+
 using risk.control.system.Services;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -10,20 +12,18 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class ReportController : Controller
     {
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
+        private readonly ILogger<ReportController> logger;
         private readonly IInvestigationService investigationService;
-        private readonly IClaimsService claimsService;
 
-        public ReportController(IWebHostEnvironment webHostEnvironment,
-            INotyfService notifyService,
-            IInvestigationService investigationService,
-            IClaimsService claimsService)
+        public ReportController(INotyfService notifyService,
+            ILogger<ReportController> logger,
+            IInvestigationService investigationService
+            )
         {
-            this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
+            this.logger = logger;
             this.investigationService = investigationService;
-            this.claimsService = claimsService;
         }
 
 
@@ -57,8 +57,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error occurred");
+                notifyService.Error("Error occurred. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

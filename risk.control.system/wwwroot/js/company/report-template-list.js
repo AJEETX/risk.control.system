@@ -19,8 +19,18 @@
         ],
         columns: [
             { data: 'id', "bVisible": false },
-            { data: 'name' },
-            { data: 'insuranceType' },
+            {
+                data: 'name',
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'insuranceType',
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
             {
                 data: 'isActive',
                 render: function (data) {
@@ -34,7 +44,7 @@
                 render: function (data) {
                     if (!data) return '';
                     let date = new Date(data);
-                    return date.toLocaleString('en-IN', {
+                    var dateCreated= date.toLocaleString('en-IN', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
@@ -43,13 +53,39 @@
                         second: '2-digit',
                         hour12: true
                     });
+                    return '<span title="Date created: ' + dateCreated + '" data-bs-toggle="tooltip">' + dateCreated + '</span>';
                 }
             },
-            { data: 'locations' },
-            { data: 'faceCount' },
-            { data: 'docCount' },
-            { data: 'mediaCount' },
-            { data: 'questionCount' },
+            {
+                data: 'locations',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of locations: ' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'faceCount',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of face-capture(s): ' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'docCount',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of document capture(s): ' + row.policyId + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'mediaCount',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of media capture(s): : ' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                data: 'questionCount',
+                "mRender": function (data, type, row) {
+                    return '<span title="Number of question(s): ' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
             {
                 data: null,
                 orderable: false,
@@ -69,6 +105,16 @@
                 }
             }
         ],
+        "drawCallback": function (settings) {
+            // Reinitialize Bootstrap 5 tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
+            });
+        },
         order: [[0, 'desc']]
     });
 
@@ -93,6 +139,8 @@
 
         // Reset form and set location
         $('#questionAddForm')[0].reset();
+        $('#optionsInput').prop('required', false); // prevent validation error
+
         $('#addQuestionModal').find('input[name="LocationId"]').val(locationId);
 
         // Handle options visibility based on the selected type (default state)
@@ -111,25 +159,18 @@
             .modal('show'); // show after binding
     });
 
-    // helper to escape text (avoid XSS when injecting server text)
-    function escapeHtml(text) {
-        if (!text) return "";
-        return text
-            .toString()
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
     // toggle options container when type changes (optional)
     $(document).on('change', '#QuestionType', function () {
         const t = $(this).val();
+        const $optionsContainer = $('#optionsContainer');
+        const $optionsInput = $('#optionsInput');
+
         if (t === 'dropdown' || t === 'radiobutton' || t === 'checkbox') {
-            $('#optionsContainer').removeClass('d-none').show();
+            $optionsContainer.removeClass('d-none').show();
+            $optionsInput.prop('required', true); // enable required
         } else {
-            $('#optionsContainer').addClass('d-none').hide();
+            $optionsContainer.addClass('d-none').hide();
+            $optionsInput.prop('required', false); // disable required
         }
     });
 
@@ -137,19 +178,29 @@
     $(document).on('submit', '#questionAddForm', function (e) {
         e.preventDefault();
 
-        var locationId = $('#questionAddForm input[name="LocationId"]').val();
-        var optionsInput = $('#optionsInput').val();
-        var newQuestionText = $('#QuestionText').val();
-        var newQuestionType = $('#QuestionType').val();
-        // <-- THIS IS THE FIX: check checked state
-        var isRequired = $('#isRequired').is(':checked'); // returns true/false
+        // read + normalize inputs
+        var locationIdRaw = $('#questionAddForm input[name="LocationId"]').val();
+        var locationId = sanitizeId(locationIdRaw);
+
+        var optionsInput = $('#optionsInput').val() || "";
+        var newQuestionText = $('#QuestionText').val() || "";
+        var newQuestionType = $('#QuestionType').val() || "";
+
+        // fix: explicit boolean read
+        var isRequired = !!$('#isRequired').is(':checked');
+
+        // optional: basic client-side validation
+        if (!newQuestionText.trim()) {
+            $.alert({ title: 'Validation', content: 'Question text cannot be empty.', type: 'orange' });
+            return;
+        }
 
         $.ajax({
             url: '/ReportTemplate/AddQuestion',
             method: 'POST',
             data: {
-                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
-                locationId: locationId,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                locationId: locationId,                 // sanitized
                 optionsInput: optionsInput,
                 newQuestionText: newQuestionText,
                 newQuestionType: newQuestionType,
@@ -157,50 +208,108 @@
             },
             success: function (response) {
                 if (response.success) {
-                    // close correct modal id
                     $('#addQuestionModal').modal('hide');
 
-                    // show jConfirm success dialog
                     $.confirm({
                         title: '<span class="i-green"> <i class="fas fa-question"></i> </span> Question',
                         content: 'Question has been added successfully.',
                         type: 'green',
-                        buttons: {
-                            ok: function () { /* do nothing */ }
-                        }
+                        buttons: { ok: function () { /* no-op */ } }
                     });
 
-                    // optionally append/prepend the new question to UI so user sees it immediately
                     var q = response.updatedQuestion;
                     if (q && locationId) {
-                        var requiredHtml = q.isRequired ? ' <span class="required-asterisk" title="Required field">*</span>' : '';
-                        var optionsHtml = '';
-                        if (q.questionType && q.questionType.toLowerCase() !== 'text' && q.options) {
-                            var opts = (q.options || '').split(',').map(function (o) { return '<span class="badge bg-light text-dark border me-1">' + escapeHtml(o.trim()) + '</span>'; }).join(' ');
-                            optionsHtml = '<div class="mt-4">' + opts + '</div>';
-                        }
-                        var newHtml = '<li class="mb-2">' +
-                            '<div class="border rounded p-2 bg-light">' +
-                            '<div class="row">' +
-                            '<div class="col-md-11">' +
-                            '<span>' + escapeHtml(q.questionText) + '</span>' + requiredHtml +
-                            ' <small class="text-muted">[' + escapeHtml(q.questionType) + ']</small>' +
-                            optionsHtml +
-                            '</div>' +
-                            '<div class="mt-2">' +
-                            '<button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="' + q.id + '" data-locationid="' + locationId + '">' +
-                            '<i class="fas fa-trash me-1"></i><small> Delete </small>' +
-                            '</button>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</li>';
 
-                        // find the add button for this location and insert into its question list
-                        var $addBtn = $('button.add-question-btn[data-locationid="' + locationId + '"]');
+                        // Sanitize remote question properties
+                        var qText = safeText(q.questionText);
+                        var qType = safeText(q.questionType);
+                        var qOptions = String(q.options || "");
+                        var qIsRequired = !!q.isRequired; // coerce
+                        var qId = sanitizeId(q.id);       // sanitize id before using as data attr
+
+                        // Create list item
+                        var $li = $("<li>").addClass("mb-2");
+
+                        var $container = $("<div>").addClass("border rounded p-2 bg-light");
+                        var $row = $("<div>").addClass("row");
+
+                        // Left column
+                        var $colLeft = $("<div>").addClass("col-md-11");
+
+                        var $spanText = $("<span>").text(qText);
+                        $colLeft.append($spanText);
+
+                        // Required asterisk
+                        if (qIsRequired) {
+                            var $required = $("<span>")
+                                .addClass("required-asterisk text-danger fw-bold")
+                                .text("*")
+                                .attr("data-bs-toggle", "tooltip")
+                                .attr("data-bs-placement", "top")
+                                .attr("title", "Required field");
+
+                            $colLeft.append(" ").append($required);
+                        }
+
+                        // Question type
+                        if (qType) {
+                            var $smallType = $("<small>")
+                                .addClass("text-muted")
+                                .text("[" + qType + "]");
+                            $colLeft.append(document.createTextNode(" ")).append($smallType);
+                        }
+
+                        // Options (non-text questions)
+                        if (qType && qType.toLowerCase() !== "text" && qOptions) {
+                            var $optionsDiv = $("<div>").addClass("mt-4");
+
+                            // Parse options, sanitize each option text
+                            var optionList = qOptions.split(",")
+                                .map(function (o) { return safeText(o.trim()); })
+                                .filter(function (o) { return o.length > 0; });
+
+                            optionList.forEach(function (optText) {
+                                var $opt = $("<span>")
+                                    .addClass("badge bg-light text-dark border me-1")
+                                    .text(optText);
+                                $optionsDiv.append($opt);
+                            });
+
+                            $colLeft.append($optionsDiv);
+                        }
+
+                        // Right column: Delete button
+                        var $colRight = $("<div>").addClass("mt-2 text-end"); // align right
+
+                        var $deleteBtn = $("<button>")
+                            .addClass("btn btn-sm btn-outline-danger delete-question-btn")
+                            .attr("data-questionid", qId)        // sanitized
+                            .attr("data-locationid", locationId); // sanitized
+
+                        var $icon = $("<i>").addClass("fas fa-trash me-1");
+                        var $small = $("<small>").text(" Delete");
+
+                        $deleteBtn.append($icon).append($small);
+                        $colRight.append($deleteBtn);
+
+                        // assemble
+                        $row.append($colLeft).append($colRight);
+                        $container.append($row);
+                        $li.append($container);
+
+                        // find the target list safely (avoid interpolated selector)
+                        var $addBtns = $('button.add-question-btn[data-locationid]');
+                        var $addBtn = $addBtns.filter(function () {
+                            // compare the sanitized attribute value to sanitized locationId
+                            return String($(this).attr('data-locationid')) === String(locationId);
+                        }).first();
+
                         var $list = $addBtn.closest('.col-md-9').find('ul.list-unstyled').first();
-                        if ($list.length) {
-                            $list.append(newHtml);
+                        if ($list && $list.length) {
+                            $list.append($li);
+                        } else {
+                            // fallback: append to a known container if selector fails
+                            $('#questionsFallbackList').append($li);
                         }
                     }
                 } else {
@@ -248,7 +357,7 @@
                             url: '/ReportTemplate/DeleteQuestion',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: questionId,
                                 locationId: locationId
                             },
@@ -334,7 +443,7 @@
                                 url: '/ReportTemplate/DeleteLocation',
                                 type: 'POST',
                                 data: {
-                                    icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                     id: locationId,
                                     locationDeletable: $('#locationCount').val() > 1
                                 },
@@ -457,7 +566,7 @@
                             type: 'POST',
                             contentType: 'application/json',
                             headers: {
-                                'X-CSRF-TOKEN': $('input[name="icheckifyAntiforgery"]').val()
+                                'X-CSRF-TOKEN': $('input[name="__RequestVerificationToken"]').val()
                             },
                             data: JSON.stringify({
                                 TemplateId: templateId,
@@ -542,7 +651,7 @@
                             data: {
                                 locationId: locationId,
                                 reportTemplateId: reportTemplateId,
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                             },
                             success: function (response) {
                                 if (response.success) {
@@ -615,7 +724,7 @@
                         url: '/ReportTemplate/Activate',
                         type: 'POST',
                         data: {
-                            icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                             id: id
                         },
                         success: function (response) {
@@ -691,7 +800,7 @@
                                 url: '/ReportTemplate/CloneDetails',
                                 type: 'POST',
                                 data: {
-                                    icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                     templateId: id
                                 },
                                 success: function (response) {
@@ -787,7 +896,7 @@
                             url: '/ReportTemplate/DeleteTemplate',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {
@@ -836,6 +945,7 @@
         });
     });
 
+    //activate
     $(document).on('click', '.activation-btn', function (e) {
         e.preventDefault();
         var id = $(this).data('id');
@@ -867,7 +977,7 @@
                             url: '/ReportTemplate/Activate',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {
@@ -922,3 +1032,14 @@
         });
     });
 });
+
+function safeText(v) {
+    // keep this as your current implementation: it encodes any HTML special chars
+    return $('<div>').text(v || "").text();
+}
+
+function sanitizeId(v) {
+    if (v === null || v === undefined) return "";
+    // allow only alphanum, underscore, hyphen (adjust to your id format if needed)
+    return String(v).replace(/[^a-zA-Z0-9_\-]/g, "");
+}

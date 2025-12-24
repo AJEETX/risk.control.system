@@ -39,39 +39,33 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> Profile Photo:</label>
+                            <label class="input-group-label" for="createProfileImage"> Profile Photo:</label>
                             <div class="input-group mb-3">
-                                @if (Model?.ProfilePicture is not null)
-                                {
-                                    <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="Profile Image" />
-                                }
-                                else
-                                {
-                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
-                                }
+                                <img id="createProfileImage" class="form-Image" src="/Document/GetAgencyUserDocument/@Model.Id" alt="Profile" />
+
                                 <i class="fa fa-asterisk asterik-style"></i>
                                 <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" />
-                                <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                                <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="input-group-label"> First Name:</label>
+                            <label class="input-group-label" for="FirstName"> First Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20">
+                                <input id="FirstName" type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20">
                                 <span asp-validation-for="FirstName" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="input-group-label"> Last Name:</label>
+                            <label class="input-group-label" for="LastName"> Last Name:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20">
+                                <input id="LastName" type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20">
                                 <span asp-validation-for="LastName" class="text-danger"></span>
                             </div>
                         </div>
@@ -110,7 +104,7 @@
                                 </div>
                                 <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown"
                                        data-placeholder="pincode" placeholder="Type pincode or name" asp-for="PinCodeId"
-                                       required value="" autocomplete="off" />
+                                       required  autocomplete="off" />
                                 <span asp-validation-for="PinCodeId" class="text-danger"></span>
                                 <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
                                 <div id="pincode-loading" class="loading-spinner">
@@ -128,7 +122,7 @@
                                         <i class="fa fa-asterisk asterik-style-disabled"></i>
                                     </span>
                                 </div>
-                                <input readonly type="text" id="DistrictId" class="form-control remarks" data-placeholder="district" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
+                                <input readonly type="text" id="DistrictId" class="form-control remarks" data-placeholder="district" placeholder="..." asp-for="DistrictId" required  tabindex="-1" />
                                 <span asp-validation-for="DistrictId" class="text-danger"></span>
                                 <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
                                 <div id="district-loading" class="loading-spinner">
@@ -142,7 +136,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style-disabled"></i></span>
                                 </div>
-                                <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
+                                <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" placeholder="..." asp-for="StateId" required  tabindex="-1" />
                                 <span asp-validation-for="StateId" class="text-danger"></span>
                                 <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                                 <div id="state-loading" class="loading-spinner">
@@ -156,7 +150,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" for="CountryId" data-toggle="tooltip" title="Registered Country"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style-info"></i></span>
                                 </div>
-                                <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-toggle="tooltip" title="Registered Country" value="" tabindex="-1" />
+                                <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-toggle="tooltip" title="Registered Country"  tabindex="-1" />
                                 <span asp-validation-for="CountryId" class="text-danger"></span>
                                 <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                 <div id="country-loading" class="loading-spinner">

@@ -7,15 +7,18 @@ namespace risk.control.system.Services
     {
         Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP);
     }
-    public class UploadService : IUploadService
+    internal class UploadService : IUploadService
     {
         private readonly IProgressService uploadProgressService;
         private readonly ICaseCreationService _caseCreationService;
+        private readonly ILogger<UploadService> logger;
 
         public UploadService(ICaseCreationService caseCreationService,
+            ILogger<UploadService> logger,
             IProgressService uploadProgressService)
         {
             _caseCreationService = caseCreationService;
+            this.logger = logger;
             this.uploadProgressService = uploadProgressService;
         }
 
@@ -45,7 +48,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred.");
                 return uploadedClaims;
             }
         }

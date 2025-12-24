@@ -12,7 +12,7 @@ namespace risk.control.system.Services
         Task<ReportTemplate> GetReportTemplate(long caseId);
     }
 
-    public class EmpanelledAgencyService : IEmpanelledAgencyService
+    internal class EmpanelledAgencyService : IEmpanelledAgencyService
     {
         private readonly ApplicationDbContext _context;
 
@@ -41,13 +41,13 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.Id == selectedcase);
-            var beneficiary = _context.BeneficiaryDetail
+            var beneficiary = await _context.BeneficiaryDetail
                .Include(c => c.PinCode)
                .Include(c => c.BeneficiaryRelation)
                .Include(c => c.District)
                .Include(c => c.State)
                .Include(c => c.Country)
-               .FirstOrDefault(c => c.InvestigationTaskId == selectedcase);
+               .FirstOrDefaultAsync(c => c.InvestigationTaskId == selectedcase);
             return new CaseInvestigationVendorsModel
             {
                 Location = beneficiary,

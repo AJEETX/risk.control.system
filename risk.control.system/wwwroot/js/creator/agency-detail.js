@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
 
-    const countryCode = $('#CountryCode').val();
+    const countryCode = $('#countryCode').val();
     const isdCode = $('#Isd').val();
 
     const isIndia = (countryCode === 'IN' || isdCode === '91');

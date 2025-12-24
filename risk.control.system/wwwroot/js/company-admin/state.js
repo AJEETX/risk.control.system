@@ -10,7 +10,7 @@
 
     if (preloadedCountryId) {
         $.ajax({
-            url: '/api/Company/GetCountryName', // Endpoint to fetch PinCodeName
+            url: '/api/MasterData/GetCountryName', // Endpoint to fetch PinCodeName
             type: 'GET',
             data: { countryId: preloadedCountryId },
             success: function (response) {
@@ -26,7 +26,7 @@
     $("#CountryName").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: '/api/Company/SearchCountry',
+                url: '/api/MasterData/SearchCountry',
                 data: {
                     term: request.term
                 },
@@ -140,12 +140,15 @@
                             $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
 
                             $('#create-form').submit();
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+                            var form = document.getElementById("create-form");
+                            if (form) {
+                                const formElements = form.getElementsByTagName("*");
+                                for (const element of formElements) {
+                                    element.disabled = true;
+                                    if (element.hasAttribute("readonly")) {
+                                        element.classList.remove("valid", "is-valid", "valid-border");
+                                        element.removeAttribute("aria-invalid");
+                                    }
                                 }
                             }
                         }
@@ -191,13 +194,15 @@
                             });
                             $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
                             $('#edit-form').submit();
-
-                            var createForm = document.getElementById("edit-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+                            var form = document.getElementById("edit-form");
+                            if (form) {
+                                const formElements = form.getElementsByTagName("*");
+                                for (const element of formElements) {
+                                    element.disabled = true;
+                                    if (element.hasAttribute("readonly")) {
+                                        element.classList.remove("valid", "is-valid", "valid-border");
+                                        element.removeAttribute("aria-invalid");
+                                    }
                                 }
                             }
                         }
@@ -233,7 +238,7 @@
                             url: '/State/Delete',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {

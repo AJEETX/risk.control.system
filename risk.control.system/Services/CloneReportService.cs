@@ -14,7 +14,7 @@ namespace risk.control.system.Services
         Task<bool> Activate(long templateId);
         Task<object> GetReportTemplate(long caseId, string agentEmail);
     }
-    public class CloneReportService : ICloneReportService
+    internal class CloneReportService : ICloneReportService
     {
         private readonly ApplicationDbContext context;
 

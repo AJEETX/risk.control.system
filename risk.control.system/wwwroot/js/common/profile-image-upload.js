@@ -58,10 +58,10 @@
         const currentPreviewUrl = previewElement.attr('src');
 
         // Validate file type
-        if (!["gif", "png", "jpg", "jpeg"].includes(fileExtension)) {
+        if (!["png", "jpg", "jpeg"].includes(fileExtension)) {
             showAlert(
                 "INVALID FILE TYPE",
-                "Please select only image files with extensions: jpg, png, gif, jpeg!",
+                "Please select only image files with extensions: jpg, png, jpeg!",
                 'red'
             );
             resetImageInput(inputElement, previewElement, originalImageUrl);
@@ -85,7 +85,7 @@
             const fileReader = new FileReader();
             fileReader.onload = function (e) {
                 if (previewElement) {
-
+                    inputElement.removeClass('invalid-border')
                     previewElement.attr('src', e.target.result); // Set the preview image source
                     if (previewElementTitle === 'case-document') {
                         previewElement.attr('data-bs-original-title', 'Case Document'); // Set the preview image source
@@ -108,6 +108,19 @@
                     }
                 }
             };
+            var imageToUpdate = document.getElementById('document-Image');
+            if (imageToUpdate) {
+                imageToUpdate.src = window.URL.createObjectURL($(this)[0].files[0]);
+            }
+            imageToUpdate = document.getElementById('createProfileImage');
+            if (imageToUpdate) {
+                imageToUpdate.src = window.URL.createObjectURL($(this)[0].files[0]);
+            }
+            imageToUpdate = document.getElementById('editProfileImage');
+            if (imageToUpdate) {
+                imageToUpdate.src = window.URL.createObjectURL($(this)[0].files[0]);
+            }
+
             fileReader.readAsDataURL(file);
         } else {
             showAlert(

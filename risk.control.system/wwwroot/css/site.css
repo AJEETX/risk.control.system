@@ -137,12 +137,6 @@ table {
         max-height: 50px;
     }
 
-.sidebar-profile {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-}
-
 .content-wrapper-main {
     padding: 10px;
     min-height: 530.031px;
@@ -152,7 +146,7 @@ table {
 .form-Image {
     height: 2.4rem;
     width: 2.4rem;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
 }
 
 .rating {
@@ -382,13 +376,12 @@ a.table-link {
 }
 
 .block-data {
-    width: 8rem;
+    width: 8em;
+    height: 8em;
     border: 1px solid #ccc;
-    height: 6rem;
     overflow-y: auto;
     padding: 1px;
     font-weight: 400 !important;
-    border-radius: 5px;
 }
 
 .investigation-actual-image {
@@ -722,7 +715,7 @@ input.title-name {
 input.remarks[required]:valid {
     border-right: 3px solid green;
 }
-input.remarks[required].valid {
+input.remarks.filled-valid {
     border-right: 3px solid green;
 }
 input.remarks[required].is-invalid {
@@ -778,6 +771,11 @@ dl.row {
     }
 
 .asterik-style {
+    font-size: .5rem !important;
+    color: red;
+    padding-bottom: 1rem;
+}
+.asterik-style-logo {
     font-size: .5rem !important;
     color: red;
     padding-bottom: 1rem;
@@ -1231,7 +1229,7 @@ img.table-agency-image {
 }
 
 img.table-profile-image {
-    border-radius: 10%;
+    border-radius: 50%;
     height: 2.5rem;
     width: 2.5rem;
     border: 1px solid green;
@@ -1252,7 +1250,7 @@ img.table-profile-image-user-inactive {
 }
 
 img.table-profile-image-no-user {
-    border-radius: 10%;
+    border-radius: 50%;
     height: 2.5rem;
     width: 2.5rem;
     border: 2px solid red;
@@ -1699,6 +1697,7 @@ ul#messagesList {
 .modal-map-image {
     width: 100%;
     object-fit: contain;
+    border:2px solid #ccc;
 }
 
 .map-thumbnail {
@@ -2178,11 +2177,36 @@ select#PinCodeId {
     object-fit: cover; /* Ensures the image maintains aspect ratio while filling the area */
     transition: transform 0.3s ease; /* Smooth transition effect on hover */
 }
-
     #editProfileImage:hover {
         transform: scale(1.1); /* Slightly enlarges the image on hover */
         border-color: #007bff; /* Changes border color on hover */
     }
+
+#createProfileImage {
+    width: 11.6em; /* Set the desired width */
+    height: 11.6em; /* Set the desired height */
+    border: 3px solid #ccc; /* Add a border around the image */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow around the image */
+    object-fit: cover; /* Ensures the image maintains aspect ratio while filling the area */
+    transition: transform 0.3s ease; /* Smooth transition effect on hover */
+}
+
+    #createProfileImage:hover {
+        transform: scale(1.01); /* Slightly enlarges the image on hover */
+        border-color: #007bff; /* Changes border color on hover */
+    }
+
+    .top-margin-10{
+        margin-top:2em;
+    }
+#document-Image {
+    width: 10em; /* Set the desired width */
+    height: 10.1em; /* Set the desired height */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow around the image */
+    object-fit: cover; /* Ensures the image maintains aspect ratio while filling the area */
+    transition: transform 0.3s ease; /* Smooth transition effect on hover */
+}
+
 
 /* Optional: You can add some styling to the file input for better appearance */
 .document-image-input {
@@ -2409,9 +2433,14 @@ input#checkall {
     white-space: pre-wrap;
 }
 .profile-img{
-    width:10em;
+    width:15em;
     max-width:15em;
-    height:auto;
+    height:15em;
+}
+.profile-logo {
+    height: 115px;
+    max-height: 115px;
+    border:1px solid #ccc;
 }
 /* Highlight active tab */
 .nav-tabs .nav-link.active {
@@ -2556,8 +2585,8 @@ input#checkall {
 
 /* Profile image */
 .sidebar-profile {
-    width: 60px;
-    height: 60px;
+    width: 60px !important;
+    height: 60px !important;
     object-fit: cover;
     border: 3px solid #fff;
 }
@@ -3033,9 +3062,13 @@ th.col-match {
 .upload-success {
     border: 2px solid forestgreen;
     cursor:text;
+    width:75px;
+    margin-right: 2px;
 }
-.upload-progress{
-    width:70px;
+.upload-progress {
+    width: 75px;
+    margin-right: 25px;
+    padding-left: 30px;
 }
 img.mobile-capture-info {
     padding: .1rem;
@@ -3168,7 +3201,7 @@ img.mobile-capture-map {
 
 /* Validation styles */
 .is-valid {
-    border-color: #28a745 !important;
+    /*border-color: #28a745 !important;*/
 }
 
 .is-invalid {

@@ -4,6 +4,7 @@ using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,23 +14,29 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     [DefaultBreadcrumb("Home")]
     public class DashboardController : Controller
     {
         private readonly IDashboardService dashboardService;
+        private readonly ILogger<DashboardController> logger;
         private readonly IDashboardCountService dashboardCountService;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
 
         public DashboardController(IDashboardService dashboardService,
+            ILogger<DashboardController> logger,
             IDashboardCountService dashboardCountService,
             SignInManager<Models.ApplicationUser> signInManager,
             INotyfService notifyService
             )
         {
             this.dashboardService = dashboardService;
+            this.logger = logger;
             this.dashboardCountService = dashboardCountService;
             this.signInManager = signInManager;
             this.notifyService = notifyService;
@@ -49,44 +56,44 @@ namespace risk.control.system.Controllers
 
                 if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
                 {
-                    var model = dashboardCountService.GetCreatorCount(currentUserEmail, userRole.Value);
+                    var model = await dashboardCountService.GetCreatorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()))
                 {
-                    var model = dashboardCountService.GetSuperAdminCount(currentUserEmail, userRole.Value);
+                    var model = await dashboardCountService.GetSuperAdminCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()))
                 {
-                    var model = dashboardCountService.GetCompanyAdminCount(currentUserEmail, userRole.Value);
+                    var model = await dashboardCountService.GetCompanyAdminCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
                 {
-                    var model = dashboardCountService.GetAssessorCount(currentUserEmail, userRole.Value);
+                    var model = await dashboardCountService.GetAssessorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
 
                 else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
                 {
-                    var model = dashboardCountService.GetManagerCount(currentUserEmail, userRole.Value);
+                    var model = await dashboardCountService.GetManagerCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
                 {
-                    var model = dashboardCountService.GetSupervisorCount(currentUserEmail, userRole.Value);
+                    var model = await dashboardCountService.GetSupervisorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
                 else if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
                 {
-                    var model = dashboardCountService.GetAgentCount(currentUserEmail, userRole.Value);
+                    var model = await dashboardCountService.GetAgentCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
@@ -99,7 +106,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!...Contact Admin");
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await signInManager.SignOutAsync();
@@ -107,7 +114,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        public JsonResult GetAgentClaim()
+        public async Task<JsonResult> GetAgentClaim()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -119,12 +126,12 @@ namespace risk.control.system.Controllers
                                 || userRole.Value.Contains(AppRoles.CREATOR.ToString())
                                 )
                 {
-                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyClaimStatus(userEmail);
+                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgencyClaimStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
                 else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
                 {
-                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgentCaseStatus(userEmail);
+                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgentCaseStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
             }
@@ -132,7 +139,7 @@ namespace risk.control.system.Controllers
             return new JsonResult(null);
         }
 
-        public JsonResult GetAgentUnderwriting()
+        public async Task<JsonResult> GetAgentUnderwriting()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -144,12 +151,12 @@ namespace risk.control.system.Controllers
                                 || userRole.Value.Contains(AppRoles.CREATOR.ToString())
                                 )
                 {
-                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyUnderwritingStatus(userEmail);
+                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgencyUnderwritingStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
                 else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
                 {
-                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgentCaseStatus(userEmail);
+                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgentCaseStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
             }
@@ -157,46 +164,46 @@ namespace risk.control.system.Controllers
             return new JsonResult(null);
         }
 
-        public JsonResult GetMonthlyClaim()
+        public async Task<JsonResult> GetMonthlyClaim()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            var monthlyExpense = dashboardService.CalculateMonthlyCaseStatus(userEmail);
+            var monthlyExpense = await dashboardService.CalculateMonthlyCaseStatus(userEmail);
             return new JsonResult(monthlyExpense);
         }
 
-        public JsonResult GetWeeklyClaim()
+        public async Task<JsonResult> GetWeeklyClaim()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = dashboardService.CalculateWeeklyCaseStatus(userEmail);
+            var monthlyExpense = await dashboardService.CalculateWeeklyCaseStatus(userEmail);
             return new JsonResult(monthlyExpense);
         }
 
-        public JsonResult GetWeeklyPieClaim()
+        public async Task<JsonResult> GetWeeklyPieClaim()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = dashboardService.CalculateWeeklyCaseStatusPieClaims(userEmail);
+            var monthlyExpense = await dashboardService.CalculateWeeklyCaseStatusPieClaims(userEmail);
             return new JsonResult(monthlyExpense);
         }
 
-        public JsonResult GetWeeklyPieUnderwriting()
+        public async Task<JsonResult> GetWeeklyPieUnderwriting()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = dashboardService.CalculateWeeklyCaseStatusPieUnderwritings(userEmail);
+            var monthlyExpense = await dashboardService.CalculateWeeklyCaseStatusPieUnderwritings(userEmail);
             return new JsonResult(monthlyExpense);
         }
 
-        public JsonResult GetClaimChart()
+        public async Task<JsonResult> GetClaimChart()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = dashboardService.CalculateCaseChart(userEmail);
+            var monthlyExpense = await dashboardService.CalculateCaseChart(userEmail);
             return new JsonResult(monthlyExpense);
         }
 
-        public JsonResult GetClaimWeeklyTat()
+        public async Task<JsonResult> GetClaimWeeklyTat()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = dashboardService.CalculateTimespan(userEmail);
+            var monthlyExpense = await dashboardService.CalculateTimespan(userEmail);
             return new JsonResult(monthlyExpense);
         }
     }

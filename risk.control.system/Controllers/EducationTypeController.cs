@@ -18,10 +18,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
-        public EducationTypeController(ApplicationDbContext context, INotyfService notifyService)
+        private readonly ILogger<EducationTypeController> logger;
+
+        public EducationTypeController(ApplicationDbContext context, INotyfService notifyService, ILogger<EducationTypeController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
         public IActionResult Index()
         {
@@ -127,8 +130,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error editing Education Type!");
+                logger.LogError(ex, "Error editing Education Type");
+                notifyService.Error("Error editing Education Type. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }

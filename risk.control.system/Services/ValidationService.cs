@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 using risk.control.system.Data;
@@ -13,13 +14,15 @@ namespace risk.control.system.Services
     {
         Task<bool> ValidateJwtToken(ApplicationDbContext context, HttpContext httpConext, string token);
     }
-    public class ValidationService : IValidationService
+    internal class ValidationService : IValidationService
     {
         private readonly IConfiguration config;
+        private readonly ILogger<ValidationService> logger;
 
-        public ValidationService(IConfiguration config)
+        public ValidationService(IConfiguration config, ILogger<ValidationService> logger)
         {
             this.config = config;
+            this.logger = logger;
         }
         public async Task<bool> ValidateJwtToken(ApplicationDbContext context, HttpContext httpContext, string token)
         {
@@ -42,7 +45,7 @@ namespace risk.control.system.Services
                 var userEmail = tokenHandler.ReadJwtToken(token).Claims.First(claim => claim.Type == ClaimTypes.Name).Value;
                 var userLocation = tokenHandler.ReadJwtToken(token).Claims.First(claim => claim.Type == ClaimTypes.StreetAddress).Value;
 
-                var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
+                var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Email == userEmail);
                 var userSessionAlive = new UserSessionAlive
                 {
                     Updated = DateTime.Now,
@@ -55,8 +58,8 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"JWT validation failed: {ex.Message}");
-                return false;
+                logger.LogError(ex, "Error occurred.");
+                throw;
             }
         }
     }

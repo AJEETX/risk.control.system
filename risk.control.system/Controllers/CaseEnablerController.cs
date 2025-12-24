@@ -1,4 +1,7 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Globalization;
+using System.Net;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,11 +22,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<CaseEnablerController> logger;
 
-        public CaseEnablerController(ApplicationDbContext context, INotyfService notifyService)
+        public CaseEnablerController(ApplicationDbContext context, INotyfService notifyService, ILogger<CaseEnablerController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         public IActionResult Index()
@@ -54,7 +59,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(int id)
         {
-            if (id < 1 || _context.CaseEnabler == null)
+            if (id < 1)
             {
                 notifyService.Error("Reason Not found!");
                 return RedirectToAction(nameof(Profile));
@@ -71,7 +76,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error to get Reason !");
                 return RedirectToAction(nameof(Profile));
             }
@@ -87,14 +92,14 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CaseEnabler caseEnabler)
         {
-            if (caseEnabler is null || !ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 notifyService.Error("Reason Empty!");
                 return RedirectToAction(nameof(Profile));
             }
             try
             {
-                caseEnabler.Code = caseEnabler.Code?.ToUpper();
+                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code?.ToUpper(CultureInfo.InvariantCulture));
                 bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code == caseEnabler.Code);
                 if (exists)
                 {
@@ -102,7 +107,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Reason Code already exists!");
                     return View(caseEnabler);
                 }
-
+                caseEnabler.Name = WebUtility.HtmlEncode(caseEnabler.Name);
                 caseEnabler.Updated = DateTime.Now;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
 
@@ -113,7 +118,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error to create Reason!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -127,7 +132,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
 
-            code = code.ToUpper();
+            code = code.ToUpper(CultureInfo.InvariantCulture);
 
             // ✅ Check if any other record (not this one) already has the same code
             bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code.ToUpper() == code && (!id.HasValue || x.CaseEnablerId != id.Value));
@@ -155,7 +160,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error in REASON!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -173,8 +178,8 @@ namespace risk.control.system.Controllers
             try
             {
                 // Uppercase normalization
-                caseEnabler.Code = caseEnabler.Code?.ToUpper();
-
+                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code?.ToUpper(CultureInfo.InvariantCulture));
+                caseEnabler.Name = WebUtility.HtmlEncode(caseEnabler.Name);
                 // Check for duplicate code before saving
                 bool exists = await _context.CaseEnabler.AnyAsync(x => x.CaseEnablerId != id && x.Code == caseEnabler.Code);
                 if (exists)
@@ -183,6 +188,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Reason Code already exists!");
                     return View(caseEnabler);
                 }
+
                 caseEnabler.Updated = DateTime.Now;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(caseEnabler);
@@ -192,7 +198,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error editing Reason!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -222,7 +228,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, $"Error occurred.");
                 notifyService.Error("Error deleting REASON!");
                 return RedirectToAction(nameof(Profile));
             }

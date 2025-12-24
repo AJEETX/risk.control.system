@@ -95,7 +95,7 @@
                     <p class="text-muted text-sm">
                         @if (Model?.CaseLocation?.ImagePath is not null)
                         {
-                            <img id="bImage" class="img-fluid block-data" src="@Model?.CaseLocation?.ImagePath" data-bs-toggle="tooltip" title="Beneficiary Photo" />
+                            <img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.CaseLocation?.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo" />
                         }
                         else
                         {

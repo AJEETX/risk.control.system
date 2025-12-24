@@ -9,7 +9,6 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="Id" />
         <input type="hidden" id="editby" name="editby" value="company" />
-        <input type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title"><i class="fas fa-user-plus"></i> @Applicationsettings.EDIT   User </h3>
@@ -48,6 +47,7 @@
     }
     <script src="~/js/common/manage-user.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/company-admin/phone-bank-validate.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 }

@@ -5,7 +5,7 @@
     var email = Model.Vendor.Email;
 }
 <section class="content">
-    <form id="edit-form" asp-controller="Vendors" asp-action="EditUser" enctype="multipart/form-data">
+    <form id="edit-form" asp-action="EditAgencyUser" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="Id" />
         <input type="hidden" id="editby" name="editby" value="empanelled" />
@@ -50,6 +50,7 @@
     }
     <script src="~/js/common/manage-user.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/company-admin/phone-bank-validate.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 }

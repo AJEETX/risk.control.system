@@ -85,12 +85,15 @@
                             $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
 
                             $('#create-form').submit();
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+                            var form = document.getElementById("create-form");
+                            if (form) {
+                                const formElements = form.getElementsByTagName("*");
+                                for (const element of formElements) {
+                                    element.disabled = true;
+                                    if (element.hasAttribute("readonly")) {
+                                        element.classList.remove("valid", "is-valid", "valid-border");
+                                        element.removeAttribute("aria-invalid");
+                                    }
                                 }
                             }
                         }
@@ -136,13 +139,15 @@
                             });
                             $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
                             $('#edit-form').submit();
-
-                            var createForm = document.getElementById("edit-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+                            var form = document.getElementById("edit-form");
+                            if (form) {
+                                const formElements = form.getElementsByTagName("*");
+                                for (const element of formElements) {
+                                    element.disabled = true;
+                                    if (element.hasAttribute("readonly")) {
+                                        element.classList.remove("valid", "is-valid", "valid-border");
+                                        element.removeAttribute("aria-invalid");
+                                    }
                                 }
                             }
                         }
@@ -175,7 +180,7 @@
     // Function to fetch districts based on StateId and CountryId
     function fetchDistrict(districtId, stateId, countryId) {
         $.ajax({
-            url: '/GetDistrictName', // Your backend route to fetch districts
+            url: '/api/MasterData/GetDistrictName', // Your backend route to fetch districts
             type: 'GET',
             data: { id: districtId, stateId: stateId, countryId: countryId },
             success: function (data) {
@@ -254,7 +259,7 @@
                             url: '/Pincodes/Delete',
                             type: 'POST',
                             data: {
-                                icheckifyAntiforgery: $('input[name="icheckifyAntiforgery"]').val(),
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                                 id: id
                             },
                             success: function (response) {

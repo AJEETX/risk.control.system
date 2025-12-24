@@ -40,10 +40,10 @@
                 </form>
                 <div class="col-12 text-center">
                     <input type="hidden" id="locationCount" value="@Model.LocationReport.Count" />
-                    <span class="badge badge-default">
-                        Template Name :
+                    <span>
+                        Template Name:
                     </span>
-                    <span class="badge badge-success">@Model.Name</span>
+                    <strong>@Model.Name</strong>
                 </div>
                 @foreach (var location in Model.LocationReport)
                 {

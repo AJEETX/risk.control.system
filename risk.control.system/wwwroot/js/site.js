@@ -1,13 +1,4 @@
-﻿(g => { var h, a, k, p = "API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
-    ({ key: "AIzaSyCYPyGotbPJAcE9Ap_ATSKkKOrXCQC4ops", v: "beta" });
-
-let mapz;
-var showCustomerMap = false;
-var showBeneficiaryMap = false;
-var showFaceMap = false;
-var showLocationMap = false;
-var showOcrMap = false;
-const image = "/images/beachflag.png";
+﻿
 const MaxSizeInBytes = 5242880; // 5MG for upload
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -15,6 +6,16 @@ document.addEventListener("DOMContentLoaded", function () {
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
+    const addressInput = document.getElementById("Addressline");
+    if (addressInput) {
+        addressInput.addEventListener("input", function () {
+            if (this.value.length > 0) {
+                this.value = this.value.replace(/\b\w/g, function (char) {
+                    return char.toUpperCase();
+                });
+            }
+        });
+    }
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -36,26 +37,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+let internetPopup = null;
+
 function checkInternetConnection() {
     if (!navigator.onLine) {
-        $.confirm({
+
+        // If popup already exists, do not open another
+        if (internetPopup) return;
+
+        internetPopup = $.confirm({
             title: 'No Internet Connection',
             content: 'It looks like your internet connection is down. Please check and try again.',
             type: 'red',
+            closeIcon: false,
             buttons: {
                 tryAgain: {
                     text: 'Retry',
                     action: function () {
-                        checkInternetConnection(); // Retry check
+                        internetPopup = null; // reset before retry
+                        checkInternetConnection();
+                        return false; // keep dialog open if still offline
                     }
                 },
                 close: function () {
-                    // Do nothing
+                    internetPopup = null;
                 }
+            },
+            onDestroy: function () {
+                internetPopup = null;
             }
         });
     }
+    else {
+        // If connection is back, close popup automatically
+        if (internetPopup) {
+            internetPopup.close();
+            internetPopup = null;
+        }
+    }
 }
+
 function checkFormCompletion(formSelector, create = false) {
     let isFormComplete = true;
 
@@ -107,7 +128,7 @@ function checkFormCompletion(formSelector, create = false) {
     });
 
     // Additional check for PinCodeId field
-    if ($('#PinCodeId').length > 0 && ($('#PinCodeId').val() || []).length === 0) {
+    if ($('#PinCodeText').length > 0 && ($('#PinCodeText').val() || []).length === 0) {
         isFormComplete = false;
     }
     // Enable or disable the submit button
@@ -144,7 +165,7 @@ function validateFileInput(inputElement, allowedExtensions) {
         });
     }
     if (fileSize > MaxSizeInBytes) {
-        document.getElementById('createProfileImage').src = '/img/no-image.png';
+        document.getElementById('document-Image').src = '/img/no-image.png';
         document.getElementById('createImageInput').value = '';
         $.alert({
             title: "Image UPLOAD issue !",
@@ -160,7 +181,7 @@ function validateFileInput(inputElement, allowedExtensions) {
             }
         });
     } else {
-        document.getElementById('createProfileImage').src = window.URL.createObjectURL(file);
+        document.getElementById('document-Image').src = window.URL.createObjectURL(file);
     }
     return true;
 }
@@ -206,23 +227,9 @@ function error(err) {
 
 async function fetchIpInfo() {
     try {
-        //if (!latlong) throw new Error("Latitude and longitude are not available");
-
-        //const url = `/api/Notification/GetClientIp?url=${encodeURIComponent(window.location.pathname)}&latlong=${encodeURIComponent(latlong)}`;
         const parser = new UAParser();
         const browserInfo = parser.getResult();
-
-        //const response = await fetch(url);
-        //if (!response.ok) {
-        //    console.error(`IP fetch failed with status: ${response.status}`);
-        //    displayUnavailableInfo();
-        //    return;
-        //}
-
-        //const data = await response.json();
         updateInfoDisplay({
-            //ipAddress: data.ipAddress || 'Not available',
-            //city: data.district || 'Not available',
             browser: `${browserInfo.browser.name?.toLowerCase()} ${browserInfo.browser.major}` || 'Not available',
             device: getDeviceType() || 'Not available',
             os: `${browserInfo.os.name?.toLowerCase()} ${browserInfo.os.version}` || 'Not available',
@@ -235,8 +242,6 @@ async function fetchIpInfo() {
 
 function updateInfoDisplay(info) {
     const fields = {
-        //ipAddress: '#ipAddress .info-data',
-        //city: '#city .info-data',
         browser: '#browser .info-data',
         device: '#device .info-data',
         os: '#os .info-data',
@@ -250,8 +255,6 @@ function updateInfoDisplay(info) {
 
 function displayUnavailableInfo() {
     updateInfoDisplay({
-        //ipAddress: 'Not available',
-        //city: 'Not available',
         browser: 'Not available',
         device: 'Not available',
         os: 'Not available',
@@ -286,11 +289,14 @@ function getMobileType() {
 
 var moreInfo = "...";
 
-
 function markNotificationAsRead(notificationId) {
+    var token = $('input[name="__RequestVerificationToken"]').val();
     $.ajax({
         url: '/api/Notification/MarkAsRead',
         type: 'POST',
+        headers: {
+            "X-CSRF-TOKEN": token,
+        },
         contentType: 'application/json', // Specify JSON format
         data: JSON.stringify({ Id: notificationId }), // Convert data to JSON
         success: function () {
@@ -307,62 +313,110 @@ function markNotificationAsRead(notificationId) {
     });
 }
 function loadNotifications(keepOpen = false) {
-    $.get('/api/Notification/GetNotifications', function (response) {
-        $("#notificationList").html("");
-        var totalCount = response.total;
-        if (response.maxCountReached) {
-            var maxText = `${response.maxCount}+`;
-            $("#notificationCount").text(maxText);
-        }
-        else {
-            $("#notificationCount").text(totalCount);
-        }
 
-        if (response.data.length > 0) {
+    $.get('/api/Notification/GetNotifications', function (response) {
+
+        const $list = $("#notificationList");
+        $list.empty();
+
+        // Safe count display
+        const totalCount = response.total;
+        $("#notificationCount").text(
+            response.maxCountReached ? `${response.maxCount}+` : totalCount
+        );
+
+        if (Array.isArray(response.data) && response.data.length > 0) {
+
             response.data.forEach(function (item) {
-                $("#notificationList").append(
-                    `<a href="#" class="notification-item" data-id="${item.id}">
-                        <!-- First Row: Icon, Message, Status -->
-                        <div class="notification-content">
-                            <i class="${item.symbol}"></i> 
-                            <span class="notification-message text-muted text-xs">${item.message}</span>
-                            <span class="badge badge-light text-muted text-xs">${item.status}</span>
-                            <div class=".notification-action-content">
-                                <div class="float-right">
-                                    <span class="notification-time text-muted text-xs">
-                                        <i class="far fa-clock"></i> ${item.createdAt}
-                                    </span>
-                                    <span class="delete-notification" data-id="${item.id}">
-                                        <i class="fas fa-trash"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Second Row: User, Time, Delete Icon -->
-                        
-                    </a>`
-                );
+
+                // ===== SANITIZE ALL REMOTE DATA (Very important) =====
+
+                const safeMessage = sanitizeText(item.message);
+                const safeStatus = sanitizeText(item.status);
+                const safeCreatedAt = sanitizeDate(item.createdAt);
+                const safeIconClass = sanitizeCssClass(item.symbol);
+
+                // ===== BUILD DOM SAFELY (No HTML strings) =====
+
+                const $a = $("<a>")
+                    .addClass("notification-item")
+                    .attr("href", "#")
+                    .attr("data-id", item.id);
+
+                const $icon = $("<i>").addClass(safeIconClass);
+
+                const $message = $("<span>")
+                    .addClass("notification-message text-muted text-xs")
+                    .text(safeMessage);
+
+                const $status = $("<span>")
+                    .addClass("badge badge-light text-muted text-xs")
+                    .text(safeStatus);
+
+                // Clock text + icon (no HTML strings)
+                const $time = $("<span>")
+                    .addClass("notification-time text-muted text-xs");
+
+                const $clockIcon = $("<i>").addClass("far fa-clock");
+                const $created = $("<span>").text(" " + safeCreatedAt);
+                $time.append($clockIcon).append($created);
+
+                // Delete button
+                const $delete = $("<span>")
+                    .addClass("delete-notification")
+                    .attr("data-id", item.id)
+                    .append($("<i>").addClass("fas fa-trash"));
+
+                // Build content
+                const $content = $("<div>")
+                    .addClass("notification-content")
+                    .append($icon)
+                    .append($message)
+                    .append($status)
+                    .append(
+                        $("<div>")
+                            .addClass("notification-action-content float-right")
+                            .append($time)
+                            .append($delete)
+                    );
+
+                $a.append($content);
+                $list.append($a);
             });
 
-            // Enable the "Clear All" icon
             $("#clearNotifications").removeClass("clear-disabled");
 
         } else {
-            $("#notificationList").append("<div class='text-center text-muted'>No notifications</div>");
 
-            // Disable the "Clear All" icon when no notifications exist
+            $list.append(
+                $("<div>")
+                    .addClass("text-center text-muted")
+                    .text("No notifications")
+            );
+
             $("#clearNotifications").addClass("clear-disabled");
         }
-        // Click event to mark as read
-        $(".delete-notification").on("click", function (e) {
-            e.stopPropagation(); // Prevent closing the dropdown
+
+        // ===== DELETE HANDLER SAFE ATTACH =====
+
+        $(".delete-notification").off("click").on("click", function (e) {
+            e.stopPropagation();
+
+            const $this = $(this);
+
+            // Keep dropdown open
             $("#notificationDropdown").addClass("show");
             $("#notificationToggle").attr("aria-expanded", "true");
-            $(this).addClass("fa-spin");
-            var notificationId = $(this).data("id");
+
+            $this.addClass("fa-spin");
+
+            const notificationId = $this.data("id");
             markNotificationAsRead(notificationId);
-            setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+
+            setTimeout(() => $this.removeClass("fa-spin"), 1000);
         });
+
+        // ===== KEEP DROPDOWN OPEN IF NEEDED =====
 
         if (keepOpen) {
             $("#notificationDropdown").addClass("show");
@@ -370,10 +424,37 @@ function loadNotifications(keepOpen = false) {
         }
     });
 }
+
+/* ===============================
+   SANITIZATION HELPERS (SAFE)
+   =============================== */
+
+// Allow letters, numbers, spaces, punctuation
+function sanitizeText(str) {
+    if (!str) return "";
+    return String(str).replace(/[<>]/g, ""); // Remove tags entirely
+}
+
+// Allow only safe date characters
+function sanitizeDate(str) {
+    if (!str) return "";
+    return String(str).replace(/[^0-9A-Za-z:\-\/\s]/g, "");
+}
+
+// Allow only valid CSS class characters
+function sanitizeCssClass(str) {
+    if (!str) return "";
+    return String(str).replace(/[^a-zA-Z0-9\-\s]/g, "");
+}
+
 function clearAllNotifications() {
+    var token = $('input[name="__RequestVerificationToken"]').val();
     $.ajax({
         url: '/api/Notification/ClearAll', // Backend endpoint to clear notifications
         type: 'POST',
+        headers: {
+            "X-CSRF-TOKEN": token,
+        },
         success: function () {
             $("#notificationList").html('<div class="text-muted text-center">No notifications</div>');
             $("#notificationCount").text("0");
@@ -421,7 +502,6 @@ $(document).ready(function () {
             $(this).val(""); // clear the input
         }
     });
-    checkInternetConnection();
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -576,32 +656,6 @@ $(document).ready(function () {
         }
     });
 
-    // delete messages
-    $('#delete-messages').on('click', function () {
-        let ids = [];
-        let form = $('#listForm');
-        let checkboxArray = document.getElementsByName('ids');
-
-        // check if checkbox is checked
-        for (let i = 0; i < checkboxArray.length; i++) {
-            if (checkboxArray[i].checked)
-                ids.push(checkboxArray[i].value);
-        }
-
-        // submit form
-        if (ids.length > 0) {
-            if (confirm("Are you sure you want to delete this item(s)?")) {
-                form.submit();
-            }
-        }
-    });
-
-    $('#delete-message').on('click', function () {
-        $('#deleteForm').submit();
-    });
-
-    // Attach the call to toggleChecked to the
-    // click event of the global checkbox:
     $("#checkall").click(function () {
         var status = $("#checkall").prop('checked');
         $('#manage-vendors').prop('disabled', !status)
@@ -654,29 +708,6 @@ function checkIfAnyChecked(elements) {
     return hasAnyCheckboxChecked;
 }
 
-async function initPopMap(_position, title) {
-    const { Map } = await google.maps.importLibrary("maps");
-    // The location of Uluru
-    var position = { lat: -25.344, lng: 131.031 };
-    if (_position) {
-        position = _position;
-    }
-    var element = document.getElementById("pop-map");
-    // The map, centered at Uluru
-    mapz = new Map(element, {
-        scaleControl: true,
-        zoom: 14,
-        center: position,
-        mapId: "4504f8b37365c3d0",
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-    });
-
-    var marker = new google.maps.Marker({ position: position, map: mapz, title: title })
-}
-function enableSubmitButton(obj, showDefaultOption = true) {
-    var value = obj.value;
-    $('#create-pincode').prop('disabled', false);
-}
 function toggleChecked(status) {
     $("#checkboxes input").each(function () {
         // Set the checked status of each to match the
@@ -696,7 +727,8 @@ fetchIpInfo();
 // Load notifications on page load WITHOUT keeping it open
 loadNotifications(false);
 
-// Optional: Listen for offline events
-window.addEventListener('offline', function () {
-    checkInternetConnection();
+window.addEventListener('online', function () {
+    internetPopupOpen = false;
+    $('.jconfirm').remove();
 });
+

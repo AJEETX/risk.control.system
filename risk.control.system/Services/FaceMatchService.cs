@@ -6,11 +6,10 @@ namespace risk.control.system.Services
     {
         Task<(string, byte[], float)> GetFaceMatchAsync(byte[] registeredImage, byte[] faceImageBytes, string onlyExtension);
     }
-    public class FaceMatchService : IFaceMatchService
+    internal class FaceMatchService : IFaceMatchService
     {
         private readonly ICompareFaces compareFaces;
         private readonly ILogger<FaceMatchService> logger;
-
         public FaceMatchService(ICompareFaces compareFaces, ILogger<FaceMatchService> logger)
         {
             this.compareFaces = compareFaces;
@@ -26,7 +25,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Failed face match");
                 return ("0", CompressImage.ProcessCompress(faceImageBytes, onlyExtension), 0);
             }
         }

@@ -9,7 +9,7 @@ namespace risk.control.system.Services
     {
         Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> DoFaceMatch(byte[] data, byte[] tdata);
     }
-    public class CompareFaces : ICompareFaces
+    internal class CompareFaces : ICompareFaces
     {
         private readonly IAmazonRekognition rekognitionClient;
         private readonly IAmazonTextract textractClient;
@@ -48,15 +48,13 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                Console.WriteLine($"Failed to load source image:");
+                logger.LogError(ex, "Failed to compare faces");
                 return (false, 0, null);
             }
         }
 
         public async Task DetectSampleAsync(byte[] bytes)
         {
-            Console.WriteLine("Detect Document Text");
             var detectResponse = await textractClient.DetectDocumentTextAsync(new DetectDocumentTextRequest
             {
                 Document = new Document
@@ -67,7 +65,7 @@ namespace risk.control.system.Services
 
             foreach (var block in detectResponse.Blocks)
             {
-                Console.WriteLine($"Type {block.BlockType}, Text: {block.Text}");
+                logger.LogError($"Type {block.BlockType}, Text: {block.Text}");
             }
         }
     }

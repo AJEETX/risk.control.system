@@ -40,38 +40,40 @@
         var MaxSizeInBytes = 5242880; //5 MB
         //Get count of selected files
         var countFiles = $(this)[0].files.length;
-
+        var inputElement = $(this);
         var imgPath = $(this)[0].value;
         var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+        const imageElement = $('#policyImage');
+        
 
-        if (extn == "gif" || extn == "png" || extn == "jpg" || extn == "jpeg") {
-            if (typeof (FileReader) != "undefined") {
-
-                //loop for each file selected for uploaded.
-                for (var i = 0; i < countFiles; i++) {
-                    var fileSize = $(this)[0].files[i].size;
-                    if (fileSize > MaxSizeInBytes) {
-                        document.getElementById('policyImage').src = '/img/no-policy.jpg';
-                        document.getElementById('documentImageInput').value = '';
-                        $.alert(
-                            {
-                                title: " Image UPLOAD issue !",
-                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 5 MB!",
-                                icon: 'fas fa-exclamation-triangle',
-                                type: 'red',
-                                closeIcon: true,
-                                buttons: {
-                                    cancel: {
-                                        text: "CLOSE",
-                                        btnClass: 'btn-danger'
-                                    }
+        var reader = typeof (FileReader);
+        if (extn == "png" || extn == "jpg" || extn == "jpeg") {
+            if (reader != "undefined") {
+                const fileReader = new FileReader();
+                var fileSize = $(this)[0].files[0].size;
+                if (fileSize > MaxSizeInBytes) {
+                    imageElement.attr('src', '/img/no-policy.jpg');
+                    inputElement.val('');
+                    $.alert(
+                        {
+                            title: " Image UPLOAD issue !",
+                            content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 5 MB!",
+                            icon: 'fas fa-exclamation-triangle',
+                            type: 'red',
+                            closeIcon: true,
+                            buttons: {
+                                cancel: {
+                                    text: "CLOSE",
+                                    btnClass: 'btn-danger'
                                 }
                             }
-                        );
-                    }
-                    else {
-                        document.getElementById('policyImage').src = window.URL.createObjectURL(this.files[0])
-                    }
+                        }
+                    );
+                }
+                else {
+                    imageElement.attr('src',window.URL.createObjectURL(this.files[0]));
+                    imageElement.attr('data-bs-original-title', 'Additional Document'); // Set the preview image source
+                    imageElement.attr('data-original-title', 'Additional Document'); // Set the preview image source
                 }
 
             } else {
@@ -93,22 +95,52 @@
                 );
             }
         } else {
-            $.alert(
-                {
-                    title: "FILE UPLOAD TYPE !!",
-                    content: "Pls select only image with extension jpg, png,gif ! ",
-                    icon: 'fas fa-exclamation-triangle',
+            if (countFiles == 0 && extn =='') {
+                imageElement.attr('src', '/img/no-policy.jpg');
+                inputElement.val('');
+                imageElement.attr('data-bs-original-title', 'No Additional Document'); // Set the preview image source
+                imageElement.attr('data-original-title', 'No Additional Document'); // Set the preview image source
+                $.alert(
+                    {
+                        title: "Image removed !!",
+                        content: "Pls select  image with extension jpg,jpeg, png to upload ! ",
+                        icon: 'fas fa-exclamation-triangle',
 
-                    type: 'red',
-                    closeIcon: true,
-                    buttons: {
-                        cancel: {
-                            text: "CLOSE",
-                            btnClass: 'btn-danger'
+                        type: 'blue',
+                        closeIcon: true,
+                        buttons: {
+                            cancel: {
+                                text: "CLOSE",
+                                btnClass: 'btn-info'
+                            }
                         }
                     }
+                );
+            }
+            else {
+                if (extn != "png" && extn != "jpg" && extn != "jpeg") {
+                    $.alert(
+                        {
+                            title: "FILE UPLOAD TYPE !!",
+                            content: "Pls select only image with extension jpg, jpeg, png ! ",
+                            icon: 'fas fa-exclamation-triangle',
+
+                            type: 'red',
+                            closeIcon: true,
+                            buttons: {
+                                cancel: {
+                                    text: "CLOSE",
+                                    btnClass: 'btn-danger'
+                                }
+                            }
+                        }
+                    );
+                    imageElement.attr('src', '/img/no-policy.jpg');
+                    inputElement.val('');
+                    imageElement.attr('data-bs-original-title', 'No Additional Document'); // Set the preview image source
+                    imageElement.attr('data-original-title', 'No Additional Document'); // Set the preview image source
                 }
-            );
+            }
         }
     });
 

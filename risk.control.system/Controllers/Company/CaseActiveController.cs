@@ -74,8 +74,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -109,8 +108,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -122,7 +120,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 if (id < 1)
                 {
@@ -130,14 +128,13 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigationService.GetClaimDetails(currentUserEmail, id);
+                var model = await investigationService.GetCaseDetails(currentUserEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

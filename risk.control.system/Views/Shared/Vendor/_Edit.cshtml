@@ -3,7 +3,31 @@
 <div class="row">
     <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
     <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
-    <div class="col-sm-6">
+    <div class="col-md-6">
+
+        <div class="form-group text-center">
+                            <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-bs-toggle="tooltip" title="Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")"> Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</label>
+                        </div>
+
+        <div class="form-group text-center">
+            <div class="profile-img-container">
+                <img id="createProfileImage" class="form-Image" src="/Document/GetAgencyDocument/@Model?.VendorId" title="Agency Logo" alt="Agency Logo" data-bs-toggle="tooltip" />
+            </div>
+            <label for="createImageInput" class="control-label">Agency Logo <i class="fa fa-asterisk asterik-style-logo"></i></label>
+            <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="agency-document" title="Upload Agency Logo" data-bs-toggle="tooltip" />
+        </div>
+
+        <div class="form-group">
+                            <label class="input-group-label" for="Email"> Domain:</label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="email"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input readonly asp-for="Email" class="form-control readonly-input valid-border" />
+                            </div>
+                        </div>
+
+
         <div class="form-group">
             <label class="input-group-label" for="Name"> Agency Name: </label>
             <div class="input-group mb-3">
@@ -18,13 +42,12 @@
         <div class="form-group">
             <label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
             <div class="input-group">
-
                 <div class="input-group-prepend">
                     @{
                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                     }
                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag"/>  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
                 <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
@@ -39,17 +62,29 @@
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
         </div>
-        @* <div class="form-group">
-        <span class="input-group-label"> Branch Name: </span>
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-        </div>
-        <input type="text" id="Branch" asp-for="Branch" class="form-control remarks title-name" required placeholder="Enter Branch Name" maxlength="30">
-        <span asp-validation-for="Branch" class="text-danger"></span>
-        </div>
-        </div> *@
+        
 
+        @if (Model.SelectedByCompany)
+        {
+            <input asp-for="CanChangePassword" id="CanChangePassword" type="hidden" />
+        }
+        else
+        {
+            <div class="row toggle-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="input-group-label" for="CanChangePassword"> Edit Profile:</label>
+                        <div class="checkbox-wrapper">
+                            <input asp-for="CanChangePassword" type="checkbox" id="CanChangePasswordCheckbox" class="custom-checkbox">
+                            <label for="CanChangePasswordCheckbox" class="custom-checkbox-label"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+    <div class="col-md-6">
         <div class="form-group">
             <label class="input-group-label" for="IFSCCode"> IFSC Code: </label>
             <div class="input-group mb-3 position-relative">
@@ -59,7 +94,7 @@
                         <i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
-                <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="11" data-bs-toggle="tooltip"/>
+                <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="11" data-bs-toggle="tooltip" />
                 <span id="ifsc-spinner" class="text-secondary phone-icon d-none">
                     <i class="fas fa-spinner fa-spin"></i>
                 </span>
@@ -91,41 +126,6 @@
                 <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
             </div>
         </div>
-
-        @if (Model.SelectedByCompany)
-        {
-            <input asp-for="CanChangePassword" id="CanChangePassword" type="hidden" />
-        }
-        else
-        {
-            <div class="row toggle-row">
-
-                @* <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="input-group-label"> Enable Mailbox:</label>
-                        <div class="checkbox-wrapper">
-                            <input asp-for="EnableMailbox" type="checkbox" id="EnableMailboxCheckbox" class="custom-checkbox">
-                            <label for="EnableMailboxCheckbox" class="custom-checkbox-label"></label>
-                        </div>
-                        
-                    </div>
-                </div> *@
-
-                <div class="col-md-6">
-
-                    <div class="form-group">
-                        <label class="input-group-label" for="CanChangePassword"> Edit Profile:</label>
-                        <div class="checkbox-wrapper">
-                            <input asp-for="CanChangePassword" type="checkbox" id="CanChangePasswordCheckbox" class="custom-checkbox">
-                            <label for="CanChangePasswordCheckbox" class="custom-checkbox-label"></label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-
-    </div>
-    <div class="col-sm-6">
         <partial name="Vendor/_AgencyAddress" model="@Model" />
 
         <div class="form-group">
@@ -139,17 +139,6 @@
             </div>
         </div>
 
-        @*
-        <div class="form-group">
-        <span class="input-group-label"> Note:</span>
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text" ><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-        </div>
-        <input type="text" id="Description" asp-for="Description" class="form-control remarks" placeholder="Enter Remarks" required maxlength="50" />
-        </div>
-        <span asp-validation-for="Description" class="text-danger"></span>
-        </div> *@
         @if (Model.SelectedByCompany)
         {
             <input type="hidden" id="Status" asp-for="Status" />
@@ -160,7 +149,7 @@
                 <label class="input-group-label" for="Status"> Status:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" for="Status"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
                     <select required id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
                         <option value="">--- SELECT ---</option>
@@ -170,26 +159,5 @@
                 </div>
             </div>
         }
-        <div class="form-group">
-            <label class="input-group-label" for="createImageInput"> Document:</label>
-            <div class="input-group mb-3">
-                @if (Model?.DocumentUrl is not null)
-                {
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))" data-bs-toggle="tooltip" title="Agency Document" />
-                    <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
-                           class="form-control remarks document-image-input valid-border" id="createImageInput" data-preview-id="createProfileImage" data-title-id="agency-document" data-bs-toggle="tooltip" title="Upload Agency Document" data-default-image="@Applicationsettings.NO_IMAGE" />
-                }
-                else
-                {
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src=@Applicationsettings.NO_IMAGE data-bs-toggle="tooltip" title="No Agency Document" />
-                    <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
-                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" data-title-id="agency-document" required data-bs-toggle="tooltip" title="Upload Agency Document" data-default-image="@Applicationsettings.NO_IMAGE" />
-                    <span asp-validation-for="Document" class="text-danger"></span>
-                }
-            </div>
-        </div>
-
     </div>
 </div>

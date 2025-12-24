@@ -12,7 +12,7 @@ namespace risk.control.system.Services
         Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true);
 
     }
-    public class PdfGenerateDocumentLocationService : IPdfGenerateDocumentLocationService
+    internal class PdfGenerateDocumentLocationService : IPdfGenerateDocumentLocationService
     {
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);

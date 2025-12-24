@@ -11,7 +11,7 @@ namespace risk.control.system.Services
     {
         Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true);
     }
-    public class PdfGenerateAgentLocationService : IPdfGenerateAgentLocationService
+    internal class PdfGenerateAgentLocationService : IPdfGenerateAgentLocationService
     {
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);
@@ -96,7 +96,7 @@ namespace risk.control.system.Services
                     catch (Exception ex)
                     {
                         rowBuilder.AddCell().AddParagraph().AddText("Invalid image").SetFont(FNT9);
-                        Console.WriteLine("Image conversion error: " + ex.Message);
+                        throw;
                     }
                 }
                 else

@@ -54,7 +54,37 @@
                                     faceMapUrl.classList.remove('hidden');
                                 }
                                 if (faceMsg) {
-                                    faceMsg.innerHTML = `<p class="agent-block">Distance from ${data.address} Address: <em>${data.distance}</em>, Duration: <em>${data.duration}</em>.</p>`;
+                                    // Clear container
+                                    faceMsg.innerHTML = "";
+
+                                    // Create paragraph
+                                    const p = document.createElement("p");
+                                    p.classList.add("agent-block");
+
+                                    // Build text segments using createTextNode
+                                    p.append(
+                                        document.createTextNode("Distance from "),
+                                        document.createTextNode(data.address || ""), // SAFE
+                                        document.createTextNode(" Address: ")
+                                    );
+
+                                    // Distance <em>
+                                    const dist = document.createElement("em");
+                                    dist.textContent = data.distance || "";
+                                    p.append(dist);
+
+                                    // Middle text
+                                    p.append(document.createTextNode(", Duration: "));
+
+                                    // Duration <em>
+                                    const dur = document.createElement("em");
+                                    dur.textContent = data.duration || "";
+                                    p.append(dur);
+
+                                    p.append(document.createTextNode("."));
+
+                                    // Append safely
+                                    faceMsg.appendChild(p);
                                     faceMsg.classList.remove('hidden');
                                 }
                                 if (liveMap) liveMap.classList.remove('hidden');

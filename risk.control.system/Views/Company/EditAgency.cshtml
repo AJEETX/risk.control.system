@@ -20,16 +20,16 @@
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="row">
+                @* <div class="row">
 
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="input-group-label" for="Email"> Domain:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="email"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input readonly asp-for="Email" class="form-control readonly-input valid-border" />
+                                <input id="Email" readonly asp-for="Email" class="form-control readonly-input valid-border" />
                             </div>
                         </div>
                     </div>
@@ -39,16 +39,15 @@
                             <label class="input-group-label" for="ActivatedDate"> Activated Date: </label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="ActivatedDate"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input readonly type="date" asp-for="ActivatedDate" class="form-control remarks  valid-border" required placeholder="Agreement Date" />
+                                <input id="ActivatedDate" readonly type="date" asp-for="ActivatedDate" class="form-control remarks  valid-border" required placeholder="Agreement Date" />
                                 <span asp-validation-for="ActivatedDate" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> *@
                 <partial name="Vendor/_Edit" model="Model" />
-
                 
             </div>
             <div class="card-footer">
@@ -79,6 +78,7 @@
     }
     <script src="~/js/company-admin/edit-agency.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/company-admin/phone-bank-validate.js"></script>
     <script src="~/js/common/profile-image-upload.js">    </script>
     <script src="~/js/common/form-validation.js"></script>
 }

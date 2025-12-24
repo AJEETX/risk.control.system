@@ -11,7 +11,7 @@ namespace risk.control.system.Services
     {
         Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true);
     }
-    public class PdfGenerateDetailReportService : IPdfGenerateDetailReportService
+    internal class PdfGenerateDetailReportService : IPdfGenerateDetailReportService
     {
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);
@@ -44,15 +44,18 @@ namespace risk.control.system.Services
         public IPdfGenerateAgentLocationService agentService;
         private readonly IPdfGenerateFaceLocationService faceService;
         private readonly IPdfGenerateDocumentLocationService documentService;
+        private readonly IWebHostEnvironment env;
         private readonly IPdfGenerateQuestionLocationService questionService;
 
         public PdfGenerateDetailReportService(IPdfGenerateAgentLocationService agentService,
             IPdfGenerateFaceLocationService faceService, IPdfGenerateDocumentLocationService documentService,
+            IWebHostEnvironment env,
             IPdfGenerateQuestionLocationService questionService)
         {
             this.agentService = agentService;
             this.faceService = faceService;
             this.documentService = documentService;
+            this.env = env;
             this.questionService = questionService;
         }
         public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true)
@@ -67,7 +70,8 @@ namespace risk.control.system.Services
                 //var cellBuilder = rowBuilder.AddCell();
                 //cellBuilder.SetPadding(2, 2, 2, 0);
                 //cellBuilder.AddImage("");
-                var pngBytes = ImageConverterToPng.ConvertToPng(investigation.Vendor.DocumentImage, investigation.Vendor.DocumentImageExtension);
+                var imageByte = System.IO.File.ReadAllBytes(Path.Combine(env.ContentRootPath, investigation.Vendor.DocumentUrl));
+                var pngBytes = ImageConverterToPng.ConvertToPng(imageByte, investigation.Vendor.DocumentImageExtension);
 
 
                 paragraph.AddInlineImage(pngBytes)

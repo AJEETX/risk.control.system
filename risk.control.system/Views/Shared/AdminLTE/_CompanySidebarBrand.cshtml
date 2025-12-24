@@ -3,7 +3,7 @@
     <div>
         @if (Model?.DocumentUrl is not null)
         {
-            <img src="@Model.DocumentUrl" alt="logo" class="brand-image elevation-2">
+            <img src="/Document/GetCompanyDocument/@Model.ClientCompanyId" alt="logo" class="brand-image elevation-2">
         }
         else
         {

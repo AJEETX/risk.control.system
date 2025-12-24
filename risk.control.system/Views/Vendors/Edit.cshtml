@@ -18,7 +18,7 @@
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="row">
+                @* <div class="row">
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="input-group-label"> Domain:</label>
@@ -61,7 +61,7 @@
                         </div>
                     </div>
                     }
-                </div>
+                </div> *@
                 <partial name="Vendor/_Edit" model="Model" />
             </div>
             <div class="card-footer">
@@ -91,6 +91,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/company-admin/edit-agency.js"></script>
+    <script src="~/js/company-admin/phone-bank-validate.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/common/profile-image-upload.js">    </script>
     <script src="~/js/common/form-validation.js"></script>

@@ -3,6 +3,7 @@
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -13,7 +14,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, string emailSuffix,
             IWebHostEnvironment webHostEnvironment,
             UserManager<VendorApplicationUser> userManager,
-            Vendor vendor, PinCode pinCode, string photo, string firstName, string lastName)
+            Vendor vendor, PinCode pinCode, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
@@ -27,6 +28,8 @@ namespace risk.control.system.Seeds
             {
                 supervisorImage = File.ReadAllBytes(noUserImagePath);
             }
+            var extension = Path.GetExtension(supervisorImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(supervisorImage, extension, vendor.Email, "user");
             var vendorSupervisor = new VendorApplicationUser()
             {
                 UserName = supervisorEmailwithSuffix,
@@ -36,19 +39,18 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 Active = true,
                 PhoneNumberConfirmed = true,
-                Password = Password,
+                Password = TestingData,
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 Vendor = vendor,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
-                Addressline = "55 Donvale Road",
+                Addressline = vendor.Addressline,
                 IsVendorAdmin = false,
                 CountryId = pinCode.CountryId,
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = photo,
-                ProfilePicture = supervisorImage,
+                ProfilePictureUrl = relativePath,
                 Role = AppRoles.SUPERVISOR,
                 UserRole = AgencyRole.SUPERVISOR,
                 Updated = DateTime.Now
@@ -58,7 +60,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(vendorSupervisor.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(vendorSupervisor, Password);
+                    await userManager.CreateAsync(vendorSupervisor, TestingData);
                     await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.SUPERVISOR.ToString());
                     //var vendorSuperVisorRole = new ApplicationRole(AppRoles.SUPERVISOR.ToString(), AppRoles.Supervisor.ToString());
                     //vendorSupervisor.ApplicationRoles.Add(vendorSuperVisorRole);

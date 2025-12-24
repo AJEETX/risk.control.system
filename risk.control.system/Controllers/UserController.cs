@@ -23,6 +23,7 @@ namespace risk.control.system.Controllers
     public class UserController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IFileStorageService fileStorageService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
@@ -31,6 +32,8 @@ namespace risk.control.system.Controllers
         private readonly IFeatureManager featureManager;
 
         public UserController(UserManager<ApplicationUser> userManager,
+
+            IFileStorageService fileStorageService,
             IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             IFeatureManager featureManager,
@@ -38,6 +41,7 @@ namespace risk.control.system.Controllers
             ApplicationDbContext context)
         {
             this.userManager = userManager;
+            this.fileStorageService = fileStorageService;
             this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
             smsService = SmsService;
@@ -64,16 +68,9 @@ namespace risk.control.system.Controllers
         {
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                string newFileName = Guid.NewGuid().ToString();
-                string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
-                newFileName += fileExtension;
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
-                user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                user.ProfilePictureUrl = "/img/" + newFileName;
-                using var dataStream = new MemoryStream();
-                user.ProfileImage.CopyTo(dataStream);
-                user.ProfilePicture = dataStream.ToArray();
-                user.ProfilePictureExtension = fileExtension;
+                var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, "admin", "user");
+                user.ProfilePictureUrl = relativePath;
+                user.ProfilePictureExtension = Path.GetExtension(fileName);
             }
             user.EmailConfirmed = true;
             user.Email = user.Email.Trim().ToLower();
@@ -91,7 +88,7 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                var country = context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                 await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User created. \n\nEmail : " + user.Email);
 
                 return RedirectToAction(nameof(Index));
@@ -144,79 +141,62 @@ namespace risk.control.system.Controllers
                 notifyService.Error("user not found!");
                 return NotFound();
             }
-
-            if (applicationUser is not null)
+            try
             {
-                try
+                var user = await userManager.FindByIdAsync(id);
+                if (user == null)
                 {
-                    var user = await userManager.FindByIdAsync(id);
-                    if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
-                    {
-                        string newFileName = user.Email + Guid.NewGuid().ToString();
-                        string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                        newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
-                        applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        applicationUser.ProfilePictureUrl = "/img/" + newFileName;
-
-                        using var dataStream = new MemoryStream();
-                        applicationUser.ProfileImage.CopyTo(dataStream);
-                        applicationUser.ProfilePicture = dataStream.ToArray();
-                        applicationUser.ProfilePictureExtension = fileExtension;
-                    }
-
-                    if (user != null)
-                    {
-                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
-                        user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                        user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                        user.PhoneNumber = user.PhoneNumber.TrimStart('0');
-                        user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
-                        user.FirstName = applicationUser?.FirstName;
-                        user.LastName = applicationUser?.LastName;
-                        if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                        {
-                            user.Password = applicationUser.Password;
-                        }
-                        user.Country = applicationUser.Country;
-                        user.Active = applicationUser.Active;
-                        user.Addressline = applicationUser.Addressline;
-
-                        user.CountryId = applicationUser.SelectedCountryId;
-                        user.StateId = applicationUser.SelectedStateId;
-                        user.DistrictId = applicationUser.SelectedDistrictId;
-                        user.PinCodeId = applicationUser.SelectedPincodeId;
-
-                        user.IsUpdated = true;
-                        user.Updated = DateTime.Now;
-                        user.PhoneNumber = applicationUser.PhoneNumber;
-                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        user.SecurityStamp = DateTime.Now.ToString();
-                        var result = await userManager.UpdateAsync(user);
-                        if (result.Succeeded)
-                        {
-                            var roles = await userManager.GetRolesAsync(user);
-                            var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                            await userManager.AddToRoleAsync(user, user.Role.ToString());
-                            var country = context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User edited. \n\nEmail : " + user.Email);
-                            notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
-                            return RedirectToAction(nameof(Index));
-                        }
-                        notifyService.Error("Error !!. The user can't be edited!");
-                        Errors(result);
-                    }
+                    notifyService.Error("user not found!");
+                    return NotFound();
                 }
-                catch (Exception ex)
+                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    Console.WriteLine(ex.StackTrace);
-                    notifyService.Error("Error !!. The user con't be edited!");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, "admin", "user");
+                    user.ProfilePictureUrl = relativePath;
+                    user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
+
+                user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
+                user.FirstName = applicationUser?.FirstName;
+                user.LastName = applicationUser?.LastName;
+                if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
+                {
+                    user.Password = applicationUser.Password;
+                }
+                user.Country = applicationUser.Country;
+                user.Active = applicationUser.Active;
+                user.Addressline = applicationUser.Addressline;
+
+                user.CountryId = applicationUser.SelectedCountryId;
+                user.StateId = applicationUser.SelectedStateId;
+                user.DistrictId = applicationUser.SelectedDistrictId;
+                user.PinCodeId = applicationUser.SelectedPincodeId;
+
+                user.IsUpdated = true;
+                user.Updated = DateTime.Now;
+                user.PhoneNumber = applicationUser.PhoneNumber;
+                user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                user.SecurityStamp = DateTime.Now.ToString();
+                var result = await userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    notifyService.Error("user not found!");
+                    return NotFound();
+                }
+                var roles = await userManager.GetRolesAsync(user);
+                var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                await userManager.AddToRoleAsync(user, user.Role.ToString());
+                var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
+                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User edited. \n\nEmail : " + user.Email);
+                notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
+                return RedirectToAction(nameof(Index));
             }
-
-            notifyService.Error("Error !!. The user con't be edited!");
-            return RedirectToAction(nameof(User));
+            catch (Exception)
+            {
+                notifyService.Error("Error !!. The user con't be edited!");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         private void Errors(IdentityResult result)

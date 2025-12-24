@@ -2,7 +2,7 @@
 <input type="hidden" id="CountryId" asp-for="CountryId" />
 <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
 <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
-<input id="vendorId" type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
+<input id="vendorId" type="hidden" asp-for="VendorId" value="@Model.VendorId" />
 <div class="row">
     <div class="col-md-6">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>

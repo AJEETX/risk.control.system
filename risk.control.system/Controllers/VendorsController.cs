@@ -23,16 +23,12 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class VendorsController : Controller
     {
-        private const string vendorMapSize = "800x800";
         private readonly ApplicationDbContext _context;
-        private readonly ITinyUrlService urlService;
+        private readonly IAgencyCreateEditService agencyCreateEditService;
+        private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
         private readonly UserManager<VendorApplicationUser> userManager;
-        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
-        private readonly ICustomApiCLient customApiCLient;
-        private readonly ISmsService smsService;
         private readonly IInvestigationService service;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ILogger<VendorsController> logger;
@@ -40,30 +36,24 @@ namespace risk.control.system.Controllers
 
         public VendorsController(
             ApplicationDbContext context,
-            ITinyUrlService urlService,
+            IAgencyCreateEditService agencyCreateEditService,
+            IAgencyUserCreateEditService agencyUserCreateEditService,
             UserManager<VendorApplicationUser> userManager,
-            RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
-            ICustomApiCLient customApiCLient,
-            ISmsService SmsService,
             IInvestigationService service,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<VendorsController> logger,
-            IWebHostEnvironment webHostEnvironment)
+            ILogger<VendorsController> logger)
         {
             _context = context;
-            this.urlService = urlService;
+            this.agencyCreateEditService = agencyCreateEditService;
+            this.agencyUserCreateEditService = agencyUserCreateEditService;
             this.userManager = userManager;
-            this.roleManager = roleManager;
             this.notifyService = notifyService;
-            this.customApiCLient = customApiCLient;
-            smsService = SmsService;
             this.service = service;
             this.featureManager = featureManager;
             this.httpContextAccessor = httpContextAccessor;
             this.logger = logger;
-            this.webHostEnvironment = webHostEnvironment;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -92,27 +82,27 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (vendors is null || vendors.Count == 0)
+                if (!ModelState.IsValid || vendors is null || vendors.Count == 0)
                 {
                     notifyService.Error("OOPs !!!..Not Agency Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction("EmpanelledVendors", "Vendors");
                 }
 
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..User Not Found. Try again.");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var company = _context.ClientCompany
+                var company = await _context.ClientCompany
                     .Include(c => c.EmpanelledVendors)
-                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                    .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
                 if (company == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPs !!!..Company Not Found. Try again.");
+                    return RedirectToAction("EmpanelledVendors", "Vendors");
                 }
                 var empanelledVendors2Depanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
 
@@ -125,15 +115,14 @@ namespace risk.control.system.Controllers
                 company.UpdatedBy = currentUserEmail;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
-                notifyService.Custom($"Agency(s) De-panelled successfully.", 3, "orange", "far fa-thumbs-down");
+                notifyService.Custom($"Agency(s) De-panelled successfully.", 3, "orange", "far fa-hand-pointer");
                 return RedirectToAction("EmpanelledVendors", "Vendors");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error occurred empanelling Agencies");
+                notifyService.Error("Error occurred empanelling Agencies. Try again.");
+                return RedirectToAction("EmpanelledVendors", "Vendors");
             }
         }
 
@@ -146,28 +135,28 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AvailableVendors(List<string> vendors)
         {
-            if (vendors is null || vendors.Count == 0)
-            {
-                notifyService.Error("No agency selected !!!");
-                return RedirectToAction(nameof(AvailableVendors), "Company");
-            }
             try
             {
+                if (!ModelState.IsValid || vendors is null || vendors.Count == 0)
+                {
+                    notifyService.Error("No agency selected !!!");
+                    return RedirectToAction(nameof(AvailableVendors), "Company");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPs !!!..User Not Found");
+                    return RedirectToAction("AvailableVendors", "Vendors");
                 }
-                var company = _context.ClientCompany.Include(c => c.EmpanelledVendors)
-                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                var company = await _context.ClientCompany.Include(c => c.EmpanelledVendors)
+                    .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
                 if (company == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPs !!!..Company Not Found");
+                    return RedirectToAction("AvailableVendors", "Vendors");
                 }
                 var vendors2Empanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
                 company.EmpanelledVendors.AddRange(vendors2Empanel.ToList());
@@ -182,18 +171,17 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error occurred depanelling Agencies");
+                notifyService.Error("Error occurred depanelling Agencies. Try again.");
+                return RedirectToAction("AvailableVendors", "Vendors");
             }
 
         }
-        public JsonResult PostRating(int rating, long mid)
+        public async Task<JsonResult> PostRating(int rating, long mid)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var existingRating = _context.Ratings.FirstOrDefault(r => r.VendorId == mid && r.UserEmail == currentUserEmail);
+            var existingRating = await _context.Ratings.FirstOrDefaultAsync(r => r.VendorId == mid && r.UserEmail == currentUserEmail);
             if (existingRating != null)
             {
                 existingRating.Rate = rating;
@@ -213,7 +201,7 @@ namespace risk.control.system.Controllers
             return Json("You rated this " + rating.ToString() + " star(s)");
         }
 
-        public JsonResult PostDetailRating(int rating, long vendorId)
+        public async Task<JsonResult> PostDetailRating(int rating, long vendorId)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
@@ -222,7 +210,7 @@ namespace risk.control.system.Controllers
                 return Json(new { success = false, message = "You must be logged in to rate." });
             }
 
-            var existingRating = _context.Ratings.FirstOrDefault(r => r.VendorId == vendorId && r.UserEmail == currentUserEmail);
+            var existingRating = await _context.Ratings.FirstOrDefaultAsync(r => r.VendorId == vendorId && r.UserEmail == currentUserEmail);
 
             if (existingRating != null)
             {
@@ -257,8 +245,8 @@ namespace risk.control.system.Controllers
             {
                 if (id <= 0)
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("Error getting Agency");
+                    return RedirectToAction("AvailableVendors", "Vendors");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
@@ -272,8 +260,8 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.VendorId == id);
                 if (vendor == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("Error getting Agency");
+                    return RedirectToAction("AvailableVendors", "Vendors");
                 }
                 var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
                 var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
@@ -299,10 +287,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting Agency.");
+                notifyService.Error("Error getting Agency. Try again.");
+                return RedirectToAction("AvailableVendors", "Vendors");
             }
 
         }
@@ -322,7 +309,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Add User", FromAction = "Users")]
-        public IActionResult CreateUser(long id)
+        public async Task<IActionResult> CreateUser(long id)
         {
             if (id <= 0)
             {
@@ -331,18 +318,16 @@ namespace risk.control.system.Controllers
             }
             var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList();
             AgencyRole? role = null;
-            string? adminEmail = null;
-            var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
+            var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
             if (vendor == null)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var currentVendorUserCount = _context.VendorApplicationUser.Count(v => v.VendorId == id);
+            var currentVendorUserCount = await _context.VendorApplicationUser.CountAsync(v => v.VendorId == id);
             bool status = false;
             if (currentVendorUserCount == 0)
             {
-                adminEmail = "admin";
                 role = AgencyRole.AGENCY_ADMIN;
                 status = true;
                 allRoles = allRoles.Where(r => r == AgencyRole.AGENCY_ADMIN).ToList();
@@ -351,7 +336,15 @@ namespace risk.control.system.Controllers
             {
                 allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
             }
-            var model = new VendorApplicationUser { Email = adminEmail, Active = status, Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles, UserRole = role };
+            var model = new VendorApplicationUser
+            {
+                Active = status,
+                Country = vendor.Country,
+                CountryId = vendor.CountryId,
+                Vendor = vendor,
+                AgencyRole = allRoles,
+                UserRole = role
+            };
 
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
             var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
@@ -362,124 +355,71 @@ namespace risk.control.system.Controllers
 
             return View(model);
         }
+        private async Task LoadModel(VendorApplicationUser model)
+        {
+            var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList();
+            AgencyRole? role = null;
+            var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
 
+            var currentVendorUserCount = await _context.VendorApplicationUser.CountAsync(v => v.VendorId == model.VendorId);
+            bool status = false;
+            if (currentVendorUserCount == 0)
+            {
+                role = AgencyRole.AGENCY_ADMIN;
+                status = true;
+                allRoles = allRoles.Where(r => r == AgencyRole.AGENCY_ADMIN).ToList();
+            }
+            else
+            {
+                allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
+            }
+            model.Active = status;
+            model.Vendor = vendor;
+            model.Country = vendor.Country;
+            model.CountryId = vendor.CountryId;
+            model.StateId = model.SelectedStateId;
+            model.DistrictId = model.SelectedDistrictId;
+            model.PinCodeId = model.SelectedPincodeId;
+            model.AgencyRole = allRoles;
+            model.UserRole = role;
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string createdBy = "")
+        public async Task<IActionResult> CreateUser(VendorApplicationUser model, string emailSuffix)
         {
-            if (user is null || string.IsNullOrEmpty(emailSuffix) || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
-            {
-                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(CreateUser), "Vendors", new { userid = user.Id });
-            }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (user.ProfileImage != null && user.ProfileImage.Length > 0)
+                if (!ModelState.IsValid)
                 {
-                    string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    user.ProfilePictureUrl = "/agency/" + newFileName;
-
-                    using var dataStream = new MemoryStream();
-                    user.ProfileImage.CopyTo(dataStream);
-                    user.ProfilePicture = dataStream.ToArray();
-                    user.ProfilePictureExtension = fileExtension;
+                    notifyService.Error($"Correct the error(s)");
+                    await LoadModel(model);
+                    return View(model);
                 }
-                var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
-                //DEMO
-                user.Password = Applicationsettings.Password;
-                user.Email = userFullEmail;
-                user.EmailConfirmed = true;
-                user.UserName = userFullEmail;
-                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
-                user.PinCodeId = user.SelectedPincodeId;
-                user.DistrictId = user.SelectedDistrictId;
-                user.StateId = user.SelectedStateId;
-                user.CountryId = user.SelectedCountryId;
-
-                user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
-                user.Updated = DateTime.Now;
-                user.UpdatedBy = currentUserEmail;
-                user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
-                if (user.Role == AppRoles.AGENT)
+                model.Id = 0; // Ensure Id is 0 for new user
+                var vendorUserModel = new CreateVendorUserRequest
                 {
-                    var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
-                    var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
-                    var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
-                    var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
-                    user.AddressLatitude = coordinates.Latitude;
-                    user.AddressLongitude = coordinates.Longitude;
-                    user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                }
-                IdentityResult result = await userManager.CreateAsync(user, user.Password);
+                    User = model,
+                    EmailSuffix = emailSuffix,
+                    CreatedBy = User?.Identity?.Name
+                };
+                var result = await agencyUserCreateEditService.CreateVendorUserAsync(vendorUserModel, ModelState, portal_base_url);
 
-                if (result.Succeeded)
+                if (!result.Success)
                 {
-                    var roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
-                    var roles = await userManager.GetRolesAsync(user);
-                    var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                    if (!user.Active)
-                    {
-                        var createdUser = await userManager.FindByEmailAsync(user.Email);
-                        var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                        var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
-
-                        if (lockUser.Succeeded && lockDate.Succeeded)
-                        {
-                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
-                            notifyService.Custom($"User <b>{user.Email}<b> created successfully", 3, "orange", "fas fa-user-lock");
-                        }
-                    }
-                    else
-                    {
-
-                        await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
-
-                        var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
-
-                        if (onboardAgent)
-                        {
-                            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
-
-                            string tinyUrl = await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
-
-                            var message = $"Dear {user.FirstName}\n";
-                            message += $"Click on link below to install the mobile app\n\n";
-                            message += $"{tinyUrl}\n\n";
-                            message += $"Thanks\n\n";
-                            message += $"{portal_base_url}";
-
-                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, message, true);
-                            notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
-                        }
-                        else
-                        {
-                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email + "\n" + portal_base_url);
-                        }
-                        notifyService.Custom($"User <b>{user.Email}<b> created successfully.", 3, "green", "fas fa-user-plus");
-                    }
-                    return RedirectToAction(nameof(Users), "Vendors", new { id = user.VendorId });
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+                    notifyService.Error(result.Message);
+                    await LoadModel(model);
+                    return View(model);
                 }
+                return RedirectToAction(nameof(Users), "Vendors", new { id = model.VendorId });
 
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error Creating User. Try again.");
+                notifyService.Error("OOPS !!!..Error Creating User. Try again.");
+                return RedirectToAction(nameof(CreateUser), "Vendors", new { id = model.VendorId });
             }
         }
 
@@ -517,164 +457,53 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting User.");
+                notifyService.Error("Error getting User. Try again.");
+                return RedirectToAction(nameof(Users));
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(string id, VendorApplicationUser applicationUser, string editby)
+        public async Task<IActionResult> EditUser(string id, VendorApplicationUser model, string editby)
         {
-            if (applicationUser is null || applicationUser.SelectedCountryId < 1 || applicationUser.SelectedStateId < 1 || applicationUser.SelectedDistrictId < 1 || applicationUser.SelectedPincodeId < 1)
-            {
-                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(EditUser), "Vendors", new { userid = id });
-            }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (string.IsNullOrWhiteSpace(id) || applicationUser is null)
+                if (!ModelState.IsValid)
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error($"Correct the error(s)");
+                    await LoadModel(model);
+                    return View(model);
                 }
-                var user = await userManager.FindByIdAsync(id);
-                if (user == null)
+                var result = await agencyUserCreateEditService.EditVendorUserAsync(new EditVendorUserRequest
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
-                {
-                    string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
-                    using var dataStream = new MemoryStream();
-                    applicationUser.ProfileImage.CopyTo(dataStream);
-                    applicationUser.ProfilePicture = dataStream.ToArray();
-                    applicationUser.ProfilePictureExtension = fileExtension;
-                }
-                user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
-                user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
-                user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
-                user.FirstName = applicationUser?.FirstName;
-                user.LastName = applicationUser?.LastName;
-                if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                {
-                    user.Password = applicationUser.Password;
-                }
-                user.Addressline = applicationUser.Addressline;
-                user.Active = applicationUser.Active;
+                    UserId = id,
+                    Model = model,
+                    UpdatedBy = User?.Identity?.Name
+                },
+                ModelState, portal_base_url);
 
-                user.PinCodeId = applicationUser.SelectedPincodeId;
-                user.DistrictId = applicationUser.SelectedDistrictId;
-                user.StateId = applicationUser.SelectedStateId;
-                user.CountryId = applicationUser.SelectedCountryId;
-
-                user.IsUpdated = true;
-                user.Updated = DateTime.Now;
-                user.Comments = applicationUser.Comments;
-                user.PhoneNumber = applicationUser.PhoneNumber;
-                user.UpdatedBy = currentUserEmail;
-                user.SecurityStamp = DateTime.Now.ToString();
-                user.UserRole = applicationUser.UserRole;
-                user.IsVendorAdmin = user.UserRole == null;
-                user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
-
-                if (user.Role == AppRoles.AGENT)
+                if (!result.Success)
                 {
-                    var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
-                    var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
-                    var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
-                    var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
-                    user.AddressLatitude = coordinates.Latitude;
-                    user.AddressLongitude = coordinates.Longitude;
-                    user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                }
-                var result = await userManager.UpdateAsync(user);
-                if (result.Succeeded)
-                {
-                    var roles = await userManager.GetRolesAsync(user);
-                    var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                    await userManager.AddToRoleAsync(user, user.UserRole.ToString());
-                    var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                    if (!user.Active)
-                    {
-                        var createdUser = await userManager.FindByEmailAsync(user.Email);
-                        var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                        var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
-
-                        if (lockUser.Succeeded && lockDate.Succeeded)
-                        {
-                            await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
-                            notifyService.Custom($"User <b>{user.Email}<b> edited and locked.", 3, "orange", "fas fa-user-lock");
-                        }
-                    }
-                    else
-                    {
-                        var createdUser = await userManager.FindByEmailAsync(user.Email);
-                        var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                        var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
-                        var onboardAgent = createdUser.Role == AppConstant.AppRoles.AGENT && string.IsNullOrWhiteSpace(user.MobileUId);
-                        if (lockUser.Succeeded && lockDate.Succeeded)
-                        {
-                            if (onboardAgent)
-                            {
-                                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
-                                string tinyUrl = await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
-
-                                var message = $"Dear {user.FirstName}\n";
-                                message += $"Click on link below to install the mobile app\n\n";
-                                message += $"{tinyUrl}\n\n";
-                                message += $"Thanks\n\n";
-                                message += $"{portal_base_url}";
-                                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, message, true);
-                                notifyService.Custom($"Agent onboarding initiated.", 3, "orange", "fas fa-user-check");
-                            }
-                            else
-                            {
-                                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited.\n Email : " + user.Email + "\n" + portal_base_url);
-                                notifyService.Custom($"User <b>{user.Email}<b> edited successfully.", 3, "orange", "fas fa-user-check");
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    notifyService.Error("OOPS !!!..Error Editing User, Contact Admin");
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+                    notifyService.Error(result.Message);
+                    await LoadModel(model);
+                    return View(model);
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Error Editing User, Contact Admin");
+                logger.LogError(ex, "Error editing User..");
+                notifyService.Error("Error editing User. Try again.");
             }
             if (editby == "company")
             {
-                return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
-            }
-            else if (editby == "empanelled")
-            {
-                return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = applicationUser.VendorId });
+                return RedirectToAction(nameof(Users), "Vendors", new { id = model.VendorId });
             }
             else
             {
-                return RedirectToAction(nameof(AgencyController.Users), "Agency");
+                return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = model.VendorId });
             }
         }
 
@@ -685,16 +514,16 @@ namespace risk.control.system.Controllers
             {
                 if (userId < 1 || userId == 0)
                 {
-                    notifyService.Error("OOPS!!!.Id Not Found.Try Again");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("Error getting User. Try again.");
+                    return RedirectToAction(nameof(Users));
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
-                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("Error getting User. Try again.");
+                    return RedirectToAction(nameof(Users));
                 }
 
                 var agencySubStatuses = new[]{
@@ -717,10 +546,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error deleting User.");
+                notifyService.Error("Error deleting User. Try again.");
+                return RedirectToAction(nameof(Users));
             }
 
         }
@@ -754,97 +582,11 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error deleting User.");
+                notifyService.Error("Error deleting User. Try again.");
+                return RedirectToAction(nameof(Users));
             }
 
-        }
-
-        [Breadcrumb(" Roles", FromAction = "EditUser")]
-        public async Task<IActionResult> UserRoles(string userId)
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var userRoles = new List<VendorUserRoleViewModel>();
-            //ViewBag.userId = userId;
-            VendorApplicationUser user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                notifyService.Error("User Not Found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            //ViewBag.UserName = user.UserName;
-            foreach (var role in roleManager.Roles.Where(r =>
-                r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()) ||
-                r.Name.Contains(AppRoles.SUPERVISOR.ToString()) ||
-                r.Name.Contains(AppRoles.AGENT.ToString())))
-            {
-                var userRoleViewModel = new VendorUserRoleViewModel
-                {
-                    RoleId = role.Id.ToString(),
-                    RoleName = role?.Name
-                };
-                if (await userManager.IsInRoleAsync(user, role?.Name))
-                {
-                    userRoleViewModel.Selected = true;
-                }
-                else
-                {
-                    userRoleViewModel.Selected = false;
-                }
-                userRoles.Add(userRoleViewModel);
-            }
-            var model = new VendorUserRolesViewModel
-            {
-                UserId = userId,
-                VendorId = user.VendorId.Value,
-                UserName = user.UserName,
-                VendorUserRoleViewModel = userRoles
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                notifyService.Error("OOPs !!!..User Not Found");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.Now;
-            user.UpdatedBy = HttpContext.User?.Identity?.Name;
-            var roles = await userManager.GetRolesAsync(user);
-            var result = await userManager.RemoveFromRolesAsync(user, roles);
-            var newRoles = model.VendorUserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName);
-
-            result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
-                Where(x => x.Selected).Select(y => y.RoleName));
-            var onboardAgent = newRoles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active;
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
-            string tinyUrl = await urlService.ShortenUrlAsync(vendor.MobileAppUrl);
-
-            var message = $"Dear {user.FirstName}\n";
-            message += $"Please click on the link below to install the mobile\n";
-            message += $"{tinyUrl}\n";
-            message += $"{portal_base_url}";
-            if (onboardAgent)
-            {
-                notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
-            }
-            else
-            {
-                notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
-            }
-            return RedirectToAction("Users", "Vendors", new { id = model.VendorId });
         }
 
         [Breadcrumb("Manage Service", FromAction = "Details")]
@@ -869,106 +611,63 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Add Agency")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.Country).Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.Include(c => c.Country).Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             var vendor = new Vendor { CountryId = companyUser.ClientCompany.CountryId, Country = companyUser.ClientCompany.Country, SelectedCountryId = companyUser.ClientCompany.CountryId.Value };
             return View(vendor);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Vendor vendor, string domainAddress, string mailAddress)
+        public async Task<IActionResult> Create(Vendor model, string domainAddress)
         {
-            if (vendor is null || string.IsNullOrWhiteSpace(domainAddress) || string.IsNullOrWhiteSpace(mailAddress) || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
-            {
-                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(Create), "Vendors");
-            }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
-
-                vendor.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
-
-                IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
-                if (vendorDocument is not null)
+                if (!ModelState.IsValid)
                 {
-                    string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                    vendor.DocumentUrl = "/agency/" + newFileName;
-
-                    using var dataStream = new MemoryStream();
-                    vendorDocument.CopyTo(dataStream);
-                    vendor.DocumentImage = dataStream.ToArray();
-                    vendor.DocumentImageExtension = fileExtension;
+                    notifyService.Error("Please correct the errors");
+                    await LoadModel(model);
+                    return View(model);
                 }
-                vendor.Status = VendorStatus.ACTIVE;
-                vendor.AgreementDate = DateTime.Now;
-                vendor.ActivatedDate = DateTime.Now;
-                vendor.DomainName = domainData;
-                vendor.BankName = vendor.BankName.ToUpper();
-                vendor.IFSCCode = vendor.IFSCCode.ToUpper();
-                vendor.Updated = DateTime.Now;
-                vendor.UpdatedBy = currentUserEmail;
-                vendor.CreatedUser = currentUserEmail;
-                vendor.PhoneNumber = vendor.PhoneNumber.TrimStart('0');
-                vendor.PinCodeId = vendor.SelectedPincodeId;
-                vendor.DistrictId = vendor.SelectedDistrictId;
-                vendor.StateId = vendor.SelectedStateId;
-                vendor.CountryId = vendor.SelectedCountryId;
-
-                var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
-
-                //var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
-                //var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
-                //var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-                //var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                //vendor.AddressLatitude = companyCoordinates.Latitude;
-                //vendor.AddressLongitude = companyCoordinates.Longitude;
-                //vendor.AddressMapLocation = url;
-                _context.Add(vendor);
-
-                var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
-                var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
-
-                var notification = new StatusNotification
+                if (!RegexHelper.IsMatch(domainAddress))
                 {
-                    Role = managerRole,
-                    Company = companyUser.ClientCompany,
-                    Symbol = "far fa-hand-point-right i-orangered",
-                    Message = $"Agency {vendor.Email} created",
-                    Status = "Empanel",
-                    NotifierUserEmail = currentUserEmail
-                };
-                _context.Notifications.Add(notification);
-                await _context.SaveChangesAsync();
-                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-                {
-                    await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
+                    ModelState.AddModelError("Email", "Invalid email address.");
+                    await LoadModel(model);
+                    return View(model);
                 }
+                var userEmail = HttpContext.User?.Identity?.Name;
 
-                notifyService.Custom($"Agency <b>{vendor.Email}</b>  created successfully.", 3, "green", "fas fa-building");
+                var result = await agencyCreateEditService.CreateAsync(domainAddress, userEmail, model, portal_base_url);
+                if (!result.Success)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+
+                    notifyService.Error("Please fix validation errors");
+                    await LoadModel(model);
+                    return View(model);
+                }
+                notifyService.Custom($"Agency <b>{model.Email}</b>  created successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(CompanyController.AvailableVendors), "Vendors");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error creating Agency");
+                notifyService.Error("OOPS !!!..Error creating Agency. Try again.");
+                return RedirectToAction(nameof(Create));
             }
+        }
+
+        private async Task LoadModel(Vendor model)
+        {
+            var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == model.SelectedCountryId);
+            model.Country = country;
+            model.CountryId = model.SelectedCountryId;
+            model.StateId = model.SelectedStateId;
+            model.DistrictId = model.SelectedDistrictId;
+            model.PinCodeId = model.SelectedPincodeId;
         }
 
         [Breadcrumb(" Edit Agency", FromAction = "Details")]
@@ -978,15 +677,15 @@ namespace risk.control.system.Controllers
             {
                 if (1 > id)
                 {
-                    notifyService.Error("OOPS !!!..Id Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("Error getting User. Try again.");
+                    return RedirectToAction(nameof(Users));
                 }
 
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 if (vendor == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("Error getting User. Try again.");
+                    return RedirectToAction(nameof(Users));
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var isSuperAdmin = await _context.ApplicationUser.AnyAsync(u => u.Email.ToLower() == currentUserEmail.ToLower() && u.IsSuperAdmin);
@@ -1001,90 +700,44 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error getting User.");
+                notifyService.Error("Error getting User. Try again.");
+                return RedirectToAction(nameof(Users));
             }
-
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long vendorId, Vendor vendor)
+        public async Task<IActionResult> Edit(long vendorId, Vendor model)
         {
-            if (vendor is null || vendorId != vendor.VendorId || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
-            {
-                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(Edit), "Vendors", new { id = vendorId });
-            }
-
             try
             {
-                IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
-                if (vendorDocument is not null)
+                if (!ModelState.IsValid)
                 {
-                    string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-
-                    using var dataStream = new MemoryStream();
-                    vendorDocument.CopyTo(dataStream);
-                    vendor.DocumentImage = dataStream.ToArray();
-                    vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                    vendor.DocumentUrl = "/agency/" + newFileName;
-                    vendor.DocumentImageExtension = fileExtension;
+                    notifyService.Error("Please correct the errors");
+                    await LoadModel(model);
+                    return View(model);
                 }
-                else
+
+                var userEmail = HttpContext.User?.Identity?.Name;
+
+                var result = await agencyCreateEditService.EditAsync(userEmail, model, portal_base_url);
+                if (!result.Success)
                 {
-                    var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorId);
-                    if (existingVendor.DocumentImage != null || existingVendor.DocumentUrl != null)
-                    {
-                        vendor.DocumentImage = existingVendor.DocumentImage;
-                        vendor.DocumentUrl = existingVendor.DocumentUrl;
-                    }
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+
+                    notifyService.Error("Please fix validation errors");
+                    await LoadModel(model);
+                    return View(model);
                 }
-                vendor.IsUpdated = true;
-                vendor.Updated = DateTime.Now;
-                vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
-                vendor.PhoneNumber = vendor.PhoneNumber.TrimStart('0');
-                vendor.BankName = vendor.BankName.ToUpper();
-                vendor.IFSCCode = vendor.IFSCCode.ToUpper();
-
-                vendor.PinCodeId = vendor.SelectedPincodeId;
-                vendor.DistrictId = vendor.SelectedDistrictId;
-                vendor.StateId = vendor.SelectedStateId;
-                vendor.CountryId = vendor.SelectedCountryId;
-                var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
-
-                //var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
-                //var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
-                //var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-                //var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                //vendor.AddressLatitude = companyCoordinates.Latitude;
-                //vendor.AddressLongitude = companyCoordinates.Longitude;
-                //vendor.AddressMapLocation = url;
-
-                _context.Vendor.Update(vendor);
-
-                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \nDomain : " + vendor.Email + "\n" + portal_base_url);
-
-                await _context.SaveChangesAsync();
+                notifyService.Custom($"Agency <b>{model.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(ex, "Error editing Agency.");
+                notifyService.Error("Error editing Agency. Try again.");
             }
-            notifyService.Custom($"Agency <b>{vendor.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
             return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = vendorId });
         }
 
@@ -1140,9 +793,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
+                logger.LogError(ex, "Error getting agency");
+                notifyService.Error("Error getting agency. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -1181,9 +833,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
+                logger.LogError(ex, "Error deleting agency");
+                notifyService.Error("Error deleting agency. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

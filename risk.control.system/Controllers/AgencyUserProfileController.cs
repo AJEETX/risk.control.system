@@ -1,7 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,64 +20,47 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}, {AGENT.DISPLAY_NAME}")]
     public class AgencyUserProfileController : Controller
     {
-        public List<UsersViewModel> UserList;
-        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<VendorApplicationUser> userManager;
-        private readonly INotificationService service;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IVendorUserService vendorUserService;
+        private readonly IAccountService accountService;
         private readonly INotyfService notifyService;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ISmsService smsService;
         private readonly ILogger<AgencyUserProfileController> logger;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private string portal_base_url = string.Empty;
 
         public AgencyUserProfileController(ApplicationDbContext context,
-            UserManager<VendorApplicationUser> userManager,
-            INotificationService service,
+            IVendorUserService vendorUserService,
+            IAccountService accountService,
              IHttpContextAccessor httpContextAccessor,
             INotyfService notifyService,
-            SignInManager<ApplicationUser> signInManager,
-            RoleManager<ApplicationRole> roleManager,
-            ISmsService SmsService,
-            ILogger<AgencyUserProfileController> logger,
-            IWebHostEnvironment webHostEnvironment)
+            ILogger<AgencyUserProfileController> logger)
         {
             _context = context;
-            this.signInManager = signInManager;
-            this.userManager = userManager;
-            this.service = service;
-            this.httpContextAccessor = httpContextAccessor;
+            this.vendorUserService = vendorUserService;
+            this.accountService = accountService;
             this.notifyService = notifyService;
-            this.roleManager = roleManager;
-            smsService = SmsService;
             this.logger = logger;
-            this.webHostEnvironment = webHostEnvironment;
-            UserList = new List<UsersViewModel>();
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = _context.VendorApplicationUser
+                var vendorUser = await _context.VendorApplicationUser
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
                     .Include(u => u.State)
                     .Include(u => u.District)
-                    .FirstOrDefault(c => c.Email == userEmail);
+                    .FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 return View(vendorUser);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -116,8 +98,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -125,79 +106,39 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
+        public async Task<IActionResult> Edit(string id, VendorApplicationUser model)
         {
             try
             {
-                if (id != applicationUser.Id.ToString())
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Please correct the errors");
+                    return View(model);
+                }
+                if (id != model.Id.ToString())
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var user = await userManager.FindByIdAsync(id);
-                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
+                var result = await vendorUserService.UpdateUserAsync(id, model, User?.Identity?.Name, portal_base_url);
+
+                if (!result.Success)
                 {
-                    string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
+                    notifyService.Error(result.Message ?? "Validation failed");
+
+                    foreach (var error in result.Errors)
                     {
-                        Directory.CreateDirectory(path);
+                        ModelState.AddModelError(error.Key, error.Value);
                     }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
-                    using var dataStream = new MemoryStream();
-                    applicationUser.ProfileImage.CopyTo(dataStream);
-                    applicationUser.ProfilePicture = dataStream.ToArray();
-                    applicationUser.ProfilePictureExtension = fileExtension;
+
+                    return View(model);
                 }
-
-                if (user != null)
-                {
-                    user.Addressline = applicationUser?.Addressline ?? user.Addressline;
-                    user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
-                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                    user.FirstName = applicationUser?.FirstName;
-                    user.LastName = applicationUser?.LastName;
-                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                    {
-                        user.Password = applicationUser.Password;
-                    }
-                    user.Email = applicationUser.Email;
-                    user.UserName = applicationUser.Email;
-                    user.EmailConfirmed = true;
-                    user.CountryId = applicationUser.SelectedCountryId;
-                    user.StateId = applicationUser.SelectedStateId;
-                    user.PinCodeId = applicationUser.SelectedPincodeId;
-                    user.DistrictId = applicationUser.SelectedDistrictId;
-                    user.IsUpdated = true;
-                    user.Updated = DateTime.Now;
-                    user.Comments = applicationUser.Comments;
-                    user.PhoneNumber = applicationUser.PhoneNumber.TrimStart('0');
-                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    user.SecurityStamp = DateTime.Now.ToString();
-                    var result = await userManager.UpdateAsync(user);
-                    if (result.Succeeded)
-                    {
-                        notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
-
-                        var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                        await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Agency user edited. \n Email : " + user.Email + "\n" + portal_base_url);
-
-                        return RedirectToAction(nameof(Index), "Dashboard");
-                    }
-                    Errors(result);
-                }
-
-                notifyService.Custom($"Error to create edit user.", 3, "red", "fas fa-user");
+                notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -205,12 +146,12 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("Change Password ")]
-        public IActionResult ChangePassword()
+        public async Task<IActionResult> ChangePassword()
         {
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser != null)
                 {
                     return View();
@@ -218,8 +159,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -229,65 +169,30 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(CancellationToken ct, ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
+            if (!ModelState.IsValid)
+                return View(model);
+
             try
             {
+                var result = await accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, portal_base_url);
 
-                if (ModelState.IsValid)
+                if (!result.Success)
                 {
-                    var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
-                    var user = await userManager.GetUserAsync(User);
-                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                    var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-                    var admin = _context.ApplicationUser.Include(u => u.Country).FirstOrDefault(u => u.IsSuperAdmin);
-                    var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                    //var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);
+                    notifyService.Error(result.Message);
 
-                    if (user == null)
-                    {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
 
-                        notifyService.Error("OOPS !!!..Contact Admin");
-                        return RedirectToAction("/Account/Login");
-                    }
-
-                    var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-
-                    if (!result.Succeeded)
-                    {
-                        string failedMessage = $"Dear {admin.Email}\n";
-                        failedMessage += $"User {user.Email} changed password. New password: {model.NewPassword}\n";
-                        failedMessage += $"{BaseUrl}";
-                        await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
-                        notifyService.Error("OOPS !!!..Contact Admin");
-                        return RedirectToAction("/Account/Login");
-                    }
-
-                    await signInManager.RefreshSignInAsync(user);
-
-                    string message = $"Dear {admin.Email}\n";
-                    message += $"User {user.Email} changed password. New password: {model.NewPassword}\n";
-                    message += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-
-
-                    message = string.Empty;
-                    message = $"Dear {user.Email}\n";
-                    message += $"Your changed password: {model.NewPassword}\n";
-                    message += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + user.PhoneNumber, message);
-
-                    return View("ChangePasswordConfirmation");
+                    return View(model);
                 }
 
-                return View(model);
+                return View("ChangePasswordConfirmation");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred while changing password");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -295,34 +200,10 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("Password Change Succees")]
-        public IActionResult ChangePasswordConfirmation()
+        public async Task<IActionResult> ChangePasswordConfirmation()
         {
-            try
-            {
-
-                var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                if (vendorUser != null)
-                {
-                    notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
-                    return View();
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            notifyService.Error("Error to create Agency user!");
-            return RedirectToAction(nameof(Index), "Dashboard");
-        }
-
-        private void Errors(IdentityResult result)
-        {
-            foreach (IdentityError error in result.Errors)
-                ModelState.AddModelError("", error.Description);
+            notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
+            return View();
         }
     }
 }

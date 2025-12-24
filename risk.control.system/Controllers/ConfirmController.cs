@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.Services;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class ConfirmController : Controller
     {
         private readonly INotificationService notificationService;
@@ -62,9 +65,8 @@ namespace risk.control.system.Controllers
                 }
                 return BadRequest("Error !!!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.StackTrace);
                 return Unauthorized("Error !!!");
             }
         }

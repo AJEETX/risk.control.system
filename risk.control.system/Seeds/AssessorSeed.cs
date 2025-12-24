@@ -3,6 +3,7 @@
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -13,7 +14,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             UserManager<ClientCompanyApplicationUser> userManager,
-            ClientCompany clientCompany, PinCode pinCode, string assessorEmailwithSuffix, string photo, string firstName, string lastName)
+            ClientCompany clientCompany, PinCode pinCode, string assessorEmailwithSuffix, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
@@ -25,7 +26,8 @@ namespace risk.control.system.Seeds
             {
                 assessorImage = File.ReadAllBytes(noUserImagePath);
             }
-
+            var extension = Path.GetExtension(assessorImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(assessorImage, extension, clientCompany.Email, "user");
             var clientAssessor = new ClientCompanyApplicationUser()
             {
                 UserName = assessorEmailwithSuffix,
@@ -34,14 +36,14 @@ namespace risk.control.system.Seeds
                 LastName = lastName,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Password = Password,
+                Password = TestingData,
                 Active = true,
                 ClientCompany = clientCompany,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
                 IsClientManager = true,
-                Addressline = "139 Sector 44",
+                Addressline = clientCompany.Addressline,
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 PinCode = pinCode,
                 Country = pinCode.Country,
@@ -49,8 +51,7 @@ namespace risk.control.system.Seeds
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = photo,
-                ProfilePicture = assessorImage,
+                ProfilePictureUrl = relativePath,
                 Role = AppRoles.ASSESSOR,
                 UserRole = CompanyRole.ASSESSOR,
                 Updated = DateTime.Now,
@@ -60,7 +61,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(clientAssessor.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(clientAssessor, Password);
+                    await userManager.CreateAsync(clientAssessor, TestingData);
                     await userManager.AddToRoleAsync(clientAssessor, AppRoles.ASSESSOR.ToString());
                     //var clientAssessorRole = new ApplicationRole(AppRoles.ASSESSOR.ToString(), AppRoles.ASSESSOR.ToString());
                     //clientAssigner.ApplicationRoles.Add(clientAssessorRole);

@@ -44,11 +44,11 @@ namespace risk.control.system.Models
         public string WeatherUri { get; set; } = "https://api.open-meteo.com/v1/forecast";
 
         public string PanIdfyUrl { get; set; } = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
-        public string PanAPIKey { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
+        public string PanAPIData { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         public string PanAPIHost { get; set; } = "pan-card-verification-at-lowest-price.p.rapidapi.com";
 
         public string? PassportApiUrl { get; set; } = "https://document-ocr1.p.rapidapi.com/idr";
-        public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
+        public string? PassportApiData { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
 
         public string AiApiUrl { get; set; } = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"; // HUGGING FACE

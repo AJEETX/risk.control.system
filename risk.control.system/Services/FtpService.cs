@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Globalization;
 using System.IO.Compression;
-using System.Net;
 using System.Text;
 
 using CsvHelper;
@@ -12,7 +11,6 @@ using Hangfire;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -26,20 +24,21 @@ namespace risk.control.system.Services
 
     }
 
-    public class FtpService : IFtpService
+    internal class FtpService : IFtpService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<FtpService> logger;
+        private readonly IFileStorageService fileStorageService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ITimelineService timelineService;
         private readonly IInvestigationService investigationService;
         private readonly IMailService mailService;
         private readonly IProcessCaseService processCaseService;
         private readonly IUploadService uploadService;
-        private static WebClient client = new WebClient
-        {
-            Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
-        };
+
         public FtpService(ApplicationDbContext context,
+            ILogger<FtpService> logger,
+            IFileStorageService fileStorageService,
             IWebHostEnvironment webHostEnvironment,
             ITimelineService timelineService,
             IInvestigationService investigationService,
@@ -48,6 +47,8 @@ namespace risk.control.system.Services
             IUploadService uploadService)
         {
             _context = context;
+            this.logger = logger;
+            this.fileStorageService = fileStorageService;
             this.webHostEnvironment = webHostEnvironment;
             this.timelineService = timelineService;
             this.investigationService = investigationService;
@@ -58,20 +59,15 @@ namespace risk.control.system.Services
 
         public async Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, bool uploadAndAssign = false)
         {
-            string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            var fileName = Guid.NewGuid().ToString() + Path.GetFileName(postedFile.FileName);
-            var uploadFilePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", fileName);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(postedFile, "UploadFile");
+
             using (var dataStream = new MemoryStream())
             {
                 await postedFile.CopyToAsync(dataStream);
-                await File.WriteAllBytesAsync(uploadFilePath, dataStream.ToArray());
+                await File.WriteAllBytesAsync(relativePath, dataStream.ToArray());
             }
 
-            var uploadId = await SaveUpload(postedFile, uploadFilePath, fileName, userEmail, autoOrManual, ORIGIN.FILE, uploadAndAssign);
+            var uploadId = await SaveUpload(postedFile, relativePath, fileName, userEmail, autoOrManual, ORIGIN.FILE, uploadAndAssign);
             return uploadId;
         }
 
@@ -79,7 +75,7 @@ namespace risk.control.system.Services
         {
             var fileName = Path.GetFileName(file.FileName);
             var extension = Path.GetExtension(file.FileName);
-            var company = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == uploadedBy);
+            var company = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == uploadedBy);
             int lastCompanySequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).MaxAsync(f => (int?)f.CompanySequenceNumber) ?? 0;
 
             // Get the last User-Level sequence (within the company)
@@ -109,9 +105,9 @@ namespace risk.control.system.Services
         [AutomaticRetry(Attempts = 0)]
         public async Task StartFileUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false)
         {
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
             var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-file", uploadFileData.Description);
+            var filePath = Path.Combine(webHostEnvironment.ContentRootPath, uploadFileData.FilePath);
 
             var zipFileByteData = await File.ReadAllBytesAsync(filePath);
             var (validRecords, errors) = ReadPipeDelimitedCsvFromZip(zipFileByteData); // Read the first CSV file from the ZIP archive
@@ -240,7 +236,7 @@ namespace risk.control.system.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.StackTrace);
+                    logger.LogError(ex, "Error occurred");
                     SetFileUploadFailure(uploadFileData, "Error Assigning cases", uploadAndAssign, uploadedCases.Select(u => u.Id).ToList());
                     await _context.SaveChangesAsync();
                     await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
@@ -250,7 +246,7 @@ namespace risk.control.system.Services
 
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                    logger.LogError(ex, "Error occurred");
                 SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
                 await _context.SaveChangesAsync();
                 await mailService.NotifyFileUpload(userEmail, uploadFileData, url);

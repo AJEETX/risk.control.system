@@ -1,7 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,61 +19,50 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{COMPANY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class CompanyUserProfileController : Controller
     {
-        public List<UsersViewModel> UserList;
-        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<ClientCompanyApplicationUser> userManager;
-        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ICompanyUserService companyUserService;
+        private readonly IAccountService accountService;
         private readonly ILogger<CompanyUserProfileController> logger;
-        private readonly ISmsService smsService;
         private string portal_base_url = string.Empty;
 
         public CompanyUserProfileController(ApplicationDbContext context,
-            UserManager<ClientCompanyApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
+            ICompanyUserService companyUserService,
+            IAccountService accountService,
             INotyfService notifyService,
              IHttpContextAccessor httpContextAccessor,
-            IWebHostEnvironment webHostEnvironment,
-            ILogger<CompanyUserProfileController> logger,
-            ISmsService SmsService)
+            ILogger<CompanyUserProfileController> logger)
         {
             this._context = context;
-            this.signInManager = signInManager;
+            this.companyUserService = companyUserService;
+            this.accountService = accountService;
             this.notifyService = notifyService;
-            this.httpContextAccessor = httpContextAccessor;
-            this.userManager = userManager;
-            this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
-            smsService = SmsService;
-            UserList = new List<UsersViewModel>();
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var companyUser = _context.ClientCompanyApplicationUser
+                var companyUser = await _context.ClientCompanyApplicationUser
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
                     .Include(u => u.State)
                     .Include(u => u.District)
-                    .FirstOrDefault(c => c.Email == userEmail);
+                    .FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 return View(companyUser);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
+                logger.LogError(ex, "Error getting user Profile.");
+                notifyService.Error("Error getting user Profile. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-
         }
 
         [Breadcrumb("Edit Profile")]
@@ -99,12 +87,10 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
+                logger.LogError(ex, "Error getting user Profile.");
+                notifyService.Error("Error getting user Profile. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-
         }
 
         // POST: ClientCompanyApplicationUser/Edit/5
@@ -112,84 +98,59 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ClientCompanyApplicationUser applicationUser)
+        public async Task<IActionResult> Edit(long id, ClientCompanyApplicationUser model)
         {
             try
             {
-                if (id != applicationUser.Id.ToString() || applicationUser is null)
-                {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var user = await userManager.FindByIdAsync(id);
-                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
-                {
-                    string newFileName = user.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    applicationUser.ProfilePictureUrl = "/company/" + newFileName;
-                    using var dataStream = new MemoryStream();
-                    applicationUser.ProfileImage.CopyTo(dataStream);
-                    applicationUser.ProfilePicture = dataStream.ToArray();
-                    applicationUser.ProfilePictureExtension = fileExtension;
-                }
+                var userEmail = HttpContext.User?.Identity?.Name;
 
-                if (user != null)
+                if (!ModelState.IsValid)
                 {
-                    user.Addressline = applicationUser?.Addressline ?? user.Addressline;
-                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                    user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
-                    user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
-                    user.FirstName = applicationUser?.FirstName;
-                    user.LastName = applicationUser?.LastName;
-                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                    {
-                        user.Password = applicationUser.Password;
-                    }
-                    user.Email = applicationUser.Email;
-                    user.UserName = applicationUser.Email;
-                    user.EmailConfirmed = true;
-                    user.CountryId = applicationUser.SelectedCountryId;
-                    user.StateId = applicationUser.SelectedStateId;
-                    user.DistrictId = applicationUser.SelectedDistrictId;
-                    user.PinCodeId = applicationUser.SelectedPincodeId;
-                    user.Updated = DateTime.Now;
-                    user.IsUpdated = true;
-                    user.Comments = applicationUser.Comments;
-                    user.PhoneNumber = applicationUser.PhoneNumber.TrimStart('0');
-                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    user.SecurityStamp = DateTime.Now.ToString();
-                    var result = await userManager.UpdateAsync(user);
-                    if (result.Succeeded)
-                    {
-                        notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
-                        var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                        await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User edited . \nEmail : " + user.Email + "\n" + portal_base_url);
-                        return RedirectToAction(nameof(Index), "Dashboard");
-                    }
+                    notifyService.Error($"Correct the error(s)");
+                    await LoadModel(model, userEmail);
+                    return View(model);
                 }
+                var result = await companyUserService.UpdateAsync(id, model, User.Identity?.Name);
+
+                if (!result.Success)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(error.Key, error.Value);
+                    }
+
+                    notifyService.Error("Correct the highlighted errors.");
+                    await LoadModel(model, User.Identity?.Name);
+                    return View(model); // 🔥 fields now highlight
+                }
+                notifyService.Success(result.Message);
+
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
+                logger.LogError(ex, "Error getting user Profile.");
+                notifyService.Error("Error getting user Profile. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             notifyService.Error("OOPS !!!..Contact Admin");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
+        private async Task LoadModel(ClientCompanyApplicationUser model, string currentUserEmail)
+        {
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
+            model.ClientCompany = company;
+            model.Country = company.Country;
+            model.CountryId = company.CountryId;
+
+            model.StateId = model.SelectedStateId;
+            model.DistrictId = model.SelectedDistrictId;
+            model.PinCodeId = model.SelectedPincodeId;
+        }
 
         [Breadcrumb("Change Password")]
         [HttpGet]
-        public IActionResult ChangePassword()
+        public async Task<IActionResult> ChangePassword()
         {
             try
             {
@@ -199,7 +160,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
@@ -210,71 +171,37 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS !!!..Contact Admin");
+                logger.LogError(ex, "Error occurred.");
+                notifyService.Error("Error occurred. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangePassword(CancellationToken ct, ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
+            if (!ModelState.IsValid)
+                return View(model);
+
             try
             {
+                var result = await accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, portal_base_url);
 
-                if (ModelState.IsValid)
+                if (!result.Success)
                 {
-                    var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
-                    var user = await userManager.GetUserAsync(User);
-                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                    var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-                    var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(u => u.IsSuperAdmin);
-                    var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                    //var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);
+                    notifyService.Error(result.Message);
 
-                    if (user == null)
-                    {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
 
-                        notifyService.Error("OOPS !!!..Contact Admin");
-                        return RedirectToAction("/Account/Login");
-                    }
-
-                    var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-
-                    if (!result.Succeeded)
-                    {
-                        string failedMessage = $"Dear {admin.Email}\n" +
-                        $"User {user.Email} failed changed password. New password: {model.NewPassword}\n" +
-                        $"{BaseUrl}";
-                        await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, failedMessage);
-                        notifyService.Error("OOPS !!!..Contact Admin");
-                        return RedirectToAction("/Account/Login");
-                    }
-
-                    await signInManager.RefreshSignInAsync(user);
-
-                    string message = $"Dear {admin.Email}\n" +
-                    $"User {user.Email} changed password. New password: {model.NewPassword}\n" +
-                    $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                    message = string.Empty;
-                    message = $"Dear {user.Email}\n" +
-                    $"Your changed password: {model.NewPassword}\n" +
-                    $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + user.PhoneNumber, message);
-
-                    return View("ChangePasswordConfirmation");
+                    return View(model);
                 }
 
-                return View(model);
+                return View("ChangePasswordConfirmation");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
+                logger.LogError(ex, "Error occurred while changing password");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

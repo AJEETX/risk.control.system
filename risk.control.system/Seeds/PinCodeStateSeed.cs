@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -211,9 +212,9 @@ namespace risk.control.system.Seeds
             return pincodes;
         }
 
-        private static List<StateModel> LoadStates(string filePath)
+        private static async Task<List<StateModel>> LoadStates(string filePath)
         {
-            var lines = File.ReadAllLines(filePath);
+            var lines =await File.ReadAllLinesAsync(filePath);
             var states = new List<StateModel>();
 
             // Skip header
@@ -237,7 +238,7 @@ namespace risk.control.system.Seeds
         }
         public static async Task<List<PinCodeState>> CsvRead_IndiaAsync()
         {
-            var states = LoadStates(indian_states);
+            var states =await LoadStates(indian_states);
             var pincodes = new List<PinCodeState>();
             var lines = await File.ReadAllLinesAsync(all_india_pincodes);
             foreach (var line in lines.Skip(1))

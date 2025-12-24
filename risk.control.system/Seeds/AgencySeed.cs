@@ -13,36 +13,36 @@ namespace risk.control.system.Seeds
     {
         private const string vendorMapSize = "800x800";
         public static async Task<Vendor> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
-                    ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input, List<InvestigationServiceType> servicesTypes)
+                    ICustomApiClient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
-            var globalSettings = context.GlobalSettings.FirstOrDefault();
+            var globalSettings = await context.GlobalSettings.FirstOrDefaultAsync();
 
             //CREATE VENDOR COMPANY
 
-            var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefault(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
-            var addressline = input.ADDRESSLINE;
+            var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefaultAsync(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
 
             var states = context.State.Include(s => s.Country).Where(s => s.Country.Code == input.COUNTRY).ToList();
 
-            var address = addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+            var address = input.ADDRESSLINE + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
             var addressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
             var latLong = addressCoordinates.Latitude + "," + addressCoordinates.Longitude;
             var addressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
-            string checkerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
-            var checkerImage = File.ReadAllBytes(checkerImagePath);
+            string agencyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
+            var agencyImage = File.ReadAllBytes(agencyImagePath);
 
-            if (checkerImage == null)
+            if (agencyImage == null)
             {
-                checkerImage = File.ReadAllBytes(noCompanyImagePath);
+                agencyImage = File.ReadAllBytes(noCompanyImagePath);
             }
-
+            var extension = Path.GetExtension(agencyImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(agencyImage, extension, input.DOMAIN);
             var checker = new Vendor
             {
                 Name = input.NAME,
-                Addressline = addressline,
+                Addressline = input.ADDRESSLINE,
                 Branch = input.BRANCH,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
@@ -57,9 +57,8 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = input.DOMAIN,
-                PhoneNumber = "9888004739",
-                DocumentUrl = input.PHOTO,
-                DocumentImage = checkerImage,
+                PhoneNumber = input.PHONE,
+                DocumentUrl = relativePath,
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
                 CanChangePassword = globalSettings.CanChangePassword,
@@ -94,7 +93,7 @@ namespace risk.control.system.Seeds
             checker.VendorInvestigationServiceTypes = agencyServices;
 
             await context.SaveChangesAsync(null, false);
-            await AgencyUserSeed.Seed(context, webHostEnvironment, vendorUserManager, checkerAgency.Entity, customApiCLient);
+            await AgencyUserSeed.Seed(context, webHostEnvironment, vendorUserManager, checkerAgency.Entity, customApiCLient, fileStorageService);
 
             return checkerAgency.Entity;
         }

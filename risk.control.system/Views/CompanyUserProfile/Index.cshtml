@@ -17,7 +17,7 @@
                     <div class="col-md-4 text-center">
 
                         <div class="profile-img-container">
-                            <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))"
+                        <img src="/Document/GetCompanyUserDocument/@Model?.Id"
                                  class="rounded-circle shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                         </div>
                         <h5 class="mt-3">@Model.FirstName @Model.LastName</h5>
@@ -108,6 +108,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/common/profile.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 }

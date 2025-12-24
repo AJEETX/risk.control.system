@@ -27,12 +27,11 @@
 			<td>
 				@if (agent.ValidationExecuted)
 				{
-					@location.AgentEmail
-					
+					<small> @location.AgentEmail</small>
 				}
 				else
 				{
-					@agent.ReportType.GetEnumDisplayName()
+					<small>@agent.ReportType.GetEnumDisplayName()</small>
 				}
 				@if (agent.IsRequired)
 				{
@@ -44,7 +43,7 @@
 				@if (agent.ValidationExecuted)
 				{
 					<img id="face-img-@agent.Id"
-						 src="@agent.FilePath"
+							 src="/Document/GetAgentDocument/@agent.Id"
 						 class="thumbnail-image thumbnail profile-image doc-profile-image preview-image"
 						 title="Click to view @location.AgentEmail photo" />
 				}

@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'none';
-        connect-src 'self' wss:;
+        connect-src 'self';
         script-src 'self';
         style-src 'self';
         font-src 'self';
@@ -57,7 +57,11 @@
             <div class="form-content">
 
                 <partial name="_LoginPartial" model="Model" />
-                <partial name="_ResetPartial" model="Model" />
+
+                @{
+                    var forgotPassword = new ForgotPasswordViewModel();
+                }
+                <partial name="_ResetPartial" model="@forgotPassword" />
             </div>
         </div>
         

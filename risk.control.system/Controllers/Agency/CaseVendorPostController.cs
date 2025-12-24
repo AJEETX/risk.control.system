@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -22,6 +23,9 @@ namespace risk.control.system.Controllers.Agency
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class CaseVendorPostController : Controller
     {
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         public List<UsersViewModel> UserList;
         private readonly IProcessCaseService processCaseService;
         private readonly IVendorInvestigationService vendorInvestigationService;
@@ -60,7 +64,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(selectedcase) || claimId < 1)
+                if (!ModelState.IsValid || string.IsNullOrWhiteSpace(selectedcase) || claimId < 1)
                 {
                     notifyService.Error($"No case selected!!!. Please select case to be allocate.", 3);
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
@@ -71,7 +75,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendorAgent = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Id.ToString() == selectedcase);
+                var vendorAgent = await _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Id.ToString() == selectedcase);
                 if (vendorAgent == null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
@@ -96,8 +100,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error Occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -110,13 +113,13 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
+                if (!ModelState.IsValid)
                 {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    notifyService.Error("OOPs !!!..Error in submitting report");
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = model.ClaimsInvestigation.Id });
                 }
 
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var (vendor, contract) = await vendorInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
                     WebUtility.HtmlDecode(remarks));
                 if (vendor == null)
@@ -136,8 +139,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
             }
@@ -169,35 +171,52 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, long claimId, string remarks = "")
+        public async Task<IActionResult> ProcessReport(string supervisorRemarks, long claimId, string remarks, IFormFile? supervisorAttachment)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(supervisorRemarks) || claimId < 1)
+                if (!ModelState.IsValid || claimId < 1)
                 {
-                    notifyService.Error("No Supervisor remarks entered!!!. Please enter remarks.");
-                    return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), new { selectedcase = claimId });
+                    notifyService.Error("Error in submitting report");
+                    return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), "VendorInvestigation", new { selectedcase = claimId });
+                }
+                if (supervisorAttachment != null && supervisorAttachment.Length > 0)
+                {
+                    if (supervisorAttachment.Length > MAX_FILE_SIZE)
+                    {
+                        notifyService.Error($"Document image Size exceeds the max size: 5MB");
+                        return RedirectToAction("GetInvestigateReport", "VendorInvestigation", new { selectedcase = claimId });
+                    }
+                    var ext = Path.GetExtension(supervisorAttachment.FileName).ToLowerInvariant();
+                    if (!AllowedExt.Contains(ext))
+                    {
+                        notifyService.Error($"Invalid Document image type");
+                        return RedirectToAction("GetInvestigateReport", "VendorInvestigation", new { selectedcase = claimId });
+                    }
+                    if (!AllowedMime.Contains(supervisorAttachment.ContentType))
+                    {
+                        notifyService.Error($"Invalid Document Image content type");
+                        return RedirectToAction("GetInvestigateReport", "VendorInvestigation", new { selectedcase = claimId });
+                    }
+                    if (!ImageSignatureValidator.HasValidSignature(supervisorAttachment))
+                    {
+                        notifyService.Error($"Invalid or corrupted Document Image ");
+                        return RedirectToAction("GetInvestigateReport", "VendorInvestigation", new { selectedcase = claimId });
+                    }
                 }
                 string userEmail = HttpContext?.User?.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), new { selectedcase = claimId });
-                }
-
                 var reportUpdateStatus = SupervisorRemarkType.OK;
 
-                var success = await processCaseService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, reportUpdateStatus, Request.Form.Files.FirstOrDefault(), remarks);
+                var success = await processCaseService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, reportUpdateStatus, supervisorAttachment, remarks);
 
                 if (success != null)
                 {
-                    var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == userEmail);
+                    var agencyUser = await _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
                     backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, baseUrl));
-                    //await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
 
                     notifyService.Custom($"Case <b> #{success.PolicyDetail.ContractNumber}</b>  Report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }
@@ -209,10 +228,9 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), new { selectedcase = claimId });
+                return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), "VendorInvestigation", new { selectedcase = claimId });
             }
         }
 
@@ -223,7 +241,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (model == null || claimId < 1)
+                if (!ModelState.IsValid || model == null || claimId < 1)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
@@ -250,8 +268,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
 
@@ -264,7 +281,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (model == null || claimId < 1)
+                if (!ModelState.IsValid || model == null || claimId < 1)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
@@ -291,8 +308,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
 
@@ -302,31 +318,53 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> ReplyQuery(long claimId, CaseInvestigationVendorsModel request, EnquiryRequest enquiryRequest, List<EnquiryRequest> enquiryRequests)
+        public async Task<IActionResult> ReplyQuery(long claimId, CaseInvestigationVendorsModel request, IFormFile? document)
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
+                }
+                if (document != null && document.Length > 0)
+                {
+                    if (document.Length > MAX_FILE_SIZE)
+                    {
+                        notifyService.Error($"Document image Size exceeds the max size: 5MB");
+                        return RedirectToAction("ReplyEnquiry", "VendorInvestigation", new { id = claimId });
+                    }
+                    var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
+                    if (!AllowedExt.Contains(ext))
+                    {
+                        notifyService.Error($"Invalid Document image type");
+                        return RedirectToAction("ReplyEnquiry", "VendorInvestigation", new { id = claimId });
+                    }
+                    if (!AllowedMime.Contains(document.ContentType))
+                    {
+                        notifyService.Error($"Invalid Document Image content type");
+                        return RedirectToAction("ReplyEnquiry", "VendorInvestigation", new { id = claimId });
+                    }
+                    if (!ImageSignatureValidator.HasValidSignature(document))
+                    {
+                        notifyService.Error($"Invalid or corrupted Document Image ");
+                        return RedirectToAction("ReplyEnquiry", "VendorInvestigation", new { id = claimId });
+                    }
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
                 }
-                if (request == null)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
 
-                }
                 request.InvestigationReport.EnquiryRequest.DescriptiveAnswer = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveAnswer);
 
-                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-
-                var claim = await processCaseService.SubmitQueryReplyToCompany(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, messageDocument);
+                var claim = await processCaseService.SubmitQueryReplyToCompany(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
 
                 if (claim != null)
                 {
-                    var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
+                    var agencyUser = await _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -342,8 +380,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
             }

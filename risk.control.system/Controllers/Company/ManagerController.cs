@@ -51,9 +51,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting case(s).");
+                notifyService.Error("Error getting case(s). Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -82,9 +81,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting case detail.");
+                notifyService.Error("Error getting case detail. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -103,9 +101,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting case(s).");
+                notifyService.Error("Error getting case(s). Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -133,9 +130,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting case detail.");
+                notifyService.Error("Error getting case detail. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -174,9 +170,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting case detail.");
+                notifyService.Error("Error getting case detail. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -216,9 +211,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting case detail.");
+                notifyService.Error("Error getting case detail. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -253,9 +247,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error getting invoice detail.");
+                notifyService.Error("Error getting invoice detail. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -284,9 +277,8 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                logger.LogError(ex, "Error printing invoice.");
+                notifyService.Error("Error printing invoice. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

@@ -1,5 +1,7 @@
-﻿using risk.control.system.AppConstant;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Models
 {
@@ -10,5 +12,7 @@ namespace risk.control.system.Models
         public AgencyRole? UserRole { get; set; }
         public Vendor? Vendor { get; set; } = default!;
         public string? Comments { get; set; } = default!;
+        [NotMapped]
+        public IList<AgencyRole> AgencyRole { get; set; } = new List<AgencyRole>();
     }
 }

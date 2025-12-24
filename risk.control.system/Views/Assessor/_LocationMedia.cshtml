@@ -39,7 +39,7 @@
 									@if (doc.MediaType == MediaType.VIDEO)
 									{
 										<video class="media-view" controls>
-											<source src="@doc.FilePath" type="video/@doc.MediaExtension">
+											<source src="/Document/GetMediaDocument/@doc.Id" type="video/@doc.MediaExtension">
 											Your browser does not support the video tag.
 										</video>
 									}

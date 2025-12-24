@@ -3,7 +3,7 @@
     var vendorId = $('#vendorId').val();
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Company/GetEmpanelledAgency?claimId=' + claimId,
+            url: '/api/Company/GetEmpanelledAgency?caseId=' + claimId,
             dataSrc: '',
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
@@ -195,13 +195,6 @@
         $('#refreshIcon').removeClass('fa-spin');
     });
 
-    table.on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({
-            animated: 'fade',
-            placement: 'bottom',
-            html: true
-        });
-    });
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -397,7 +390,8 @@
 
                 $.get("/Investigation/GetReportTemplate", { caseId: caseId })
                     .done(function (html) {
-                        $container.html(html);
+                        const safe = DOMPurify.sanitize(html, { RETURN_TRUSTED_TYPE: false });
+                        $container.html(safe);
                     })
                     .fail(function () {
                         $container.html("<div class='alert alert-danger'>Failed to load report template.</div>");

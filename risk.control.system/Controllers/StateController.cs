@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text.RegularExpressions;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -23,11 +24,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly ILogger<StateController> logger;
 
-        public StateController(ApplicationDbContext context, INotyfService notifyService)
+        public StateController(ApplicationDbContext context, INotyfService notifyService, ILogger<StateController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
 
         // GET: RiskCaseStatus
@@ -59,7 +62,7 @@ namespace risk.control.system.Controllers
                 .AsQueryable();
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!user.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
@@ -148,7 +151,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
         {
-            if (id < 1 || _context.State == null)
+            if (id < 1)
             {
                 notifyService.Error("State not found!");
                 return RedirectToAction(nameof(Profile));
@@ -165,11 +168,11 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Add New", FromAction = "Profile")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.Include(u => u.Country).FirstOrDefault(u => u.Email == userEmail);
+            var user = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
             if (user.IsSuperAdmin)
             {
@@ -190,7 +193,7 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                state.Code = state.Code?.ToUpper();
+                state.Code = WebUtility.HtmlEncode(state.Code?.ToUpper(CultureInfo.InvariantCulture));
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
                 if (exists)
                 {
@@ -209,7 +212,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to create State!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -242,7 +245,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, State state)
         {
-            if (id < 1)
+            if (id < 1 && state is null)
             {
                 notifyService.Error("State Null!");
                 return RedirectToAction(nameof(Profile));
@@ -269,7 +272,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to edit State!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -304,7 +307,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error to delete State!");
                 return RedirectToAction(nameof(Profile));
             }

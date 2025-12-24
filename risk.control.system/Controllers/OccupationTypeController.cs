@@ -18,10 +18,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
-        public OccupationTypeController(ApplicationDbContext context, INotyfService notifyService)
+        private readonly ILogger<OccupationTypeController> logger;
+
+        public OccupationTypeController(ApplicationDbContext context, INotyfService notifyService, ILogger<OccupationTypeController> logger)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.logger = logger;
         }
         public IActionResult Index()
         {
@@ -127,8 +130,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("Error editing Occupation Type!");
+                logger.LogError(ex, "Error editing Occupation Type");
+                notifyService.Error("Error editing Occupation Type. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }

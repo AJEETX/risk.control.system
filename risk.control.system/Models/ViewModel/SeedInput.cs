@@ -11,5 +11,6 @@
         public string COUNTRY { get; set; }
         public string PINCODE { get; set; }
         public string PHOTO { get; set; }
+        public string PHONE { get; set; }
     }
 }

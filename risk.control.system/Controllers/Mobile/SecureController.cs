@@ -85,10 +85,10 @@ namespace risk.control.system.Controllers.Mobile
                 var roles = await _userManager.GetRolesAsync(user);
                 if (roles != null && roles.Count > 0)
                 {
-                    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted && u.Role == AppRoles.AGENT);
+                    var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted && u.Role == AppRoles.AGENT);
 
                     bool vendorIsActive = false;
-                    vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
+                    vendorIsActive = await _context.Vendor.AnyAsync(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
                     if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
                     {
                         vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
@@ -101,7 +101,7 @@ namespace risk.control.system.Controllers.Mobile
 
                         if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null)
                         {
-                            var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                            var admin = await _context.ApplicationUser.Include(c => c.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
                             if (admin != null)
                             {
                                 message = $"Dear {admin.Email}\n\n" +
