@@ -18,6 +18,7 @@ using Hangfire.MemoryStorage;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -26,6 +27,8 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -240,6 +243,7 @@ AWSConfigs.LoggingConfig.LogResponses = ResponseLoggingOption.Always;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews()
+    .AddMicrosoftIdentityUI()
     .AddRazorRuntimeCompilation()
     .AddJsonOptions(options =>
     {
@@ -294,47 +298,22 @@ builder.Services.Configure<IdentityOptions>(options =>
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
-
-builder.Services.ConfigureApplicationCookie(options =>
+builder.Services.AddAuthentication(options =>
 {
-    options.Events.OnValidatePrincipal = async context =>
-    {
-        var userPrincipal = context.Principal;
+    // Use Cookies as the default for the browser/UI
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+// 2. Add Microsoft Entra ID (Azure AD)
+// This handles its own cookie internally but links to the OIDC scheme
+.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"),
+    OpenIdConnectDefaults.AuthenticationScheme,
+    CookieAuthenticationDefaults.AuthenticationScheme)
+    .EnableTokenAcquisitionToCallDownstreamApi()
+    .AddInMemoryTokenCaches();
 
-        // Check if the cookie is close to expiring
-        var now = DateTimeOffset.UtcNow;
-        var issuedUtc = context.Properties.IssuedUtc;
-        var expiresUtc = context.Properties.ExpiresUtc;
-
-        var sessionTimeout = double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]);
-        var renewalThreshold = sessionTimeout * 0.9; // Renew when 90% of the session timeout has passed.
-
-        if (expiresUtc.HasValue && now > expiresUtc.Value.AddSeconds(-renewalThreshold))
-        {
-            context.Properties.ExpiresUtc = now.AddSeconds(sessionTimeout);
-            context.ShouldRenew = true;
-        }
-
-        await Task.CompletedTask;
-    };
-    //options.EventsType = typeof(CustomCookieAuthenticationEvents);
-    // General cookie settings
-    options.Cookie.HttpOnly = true; // Ensures the cookie cannot be accessed via JavaScript (enhances security).
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensures the cookie is sent only over HTTPS.
-    options.Cookie.SameSite = SameSiteMode.Strict; // Prevents the cookie from being sent in cross-site requests (CSRF protection).
-    options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME; // Custom name for the authentication cookie.
-    options.Cookie.Path = "/"; // Specifies the cookie path.
-    options.Cookie.IsEssential = true; // Ensures the cookie is marked as essential, bypassing consent if required.
-    // Authentication-specific settings
-    options.LoginPath = AppCookie.LOGIN_PATH; // Redirect to this path if the user is not authenticated.
-    options.LogoutPath = AppCookie.LOGOUT_PATH; // Redirect to this path after logout.
-    options.AccessDeniedPath = AppCookie.LOGOUT_PATH; // Redirect here if the user lacks the required permissions.
-
-    // Expiration settings
-    options.SlidingExpiration = true; // Renews the cookie expiration time on every valid request.
-    options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"])); // Sets the lifetime of the cookie.
-}).AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie()
+// 3. Add JWT Bearer for API calls (if needed)
+builder.Services.AddAuthentication()
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -345,27 +324,26 @@ builder.Services.ConfigureApplicationCookie(options =>
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-            ),
-            ClockSkew = TimeSpan.Zero // Reduce delay tolerance for token expiration.
-        };
-
-        // Optional: Add token validation events for custom behavior.
-        options.Events = new JwtBearerEvents
-        {
-            OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
-            {
-                Console.WriteLine("Token validated successfully.");
-                return Task.CompletedTask;
-            }
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+            ClockSkew = TimeSpan.Zero
         };
     });
+// 4. Configure the Identity Cookie (Do this AFTER AddAuthentication)
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Your custom expiration logic
+    options.Events.OnValidatePrincipal = async context => { /* ... your logic ... */ };
 
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME;
+    options.LoginPath = AppCookie.LOGIN_PATH;
+    options.LogoutPath = AppCookie.LOGOUT_PATH;
+    options.AccessDeniedPath = AppCookie.LOGOUT_PATH;
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
+});
 builder.Services.AddAntiforgery(options =>
 {
     options.Cookie.Name = AppCookie.ANTI_FORGERY_COOKIE_NAME; // Set a custom cookie name

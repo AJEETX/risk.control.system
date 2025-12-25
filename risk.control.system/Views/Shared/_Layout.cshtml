@@ -9,18 +9,15 @@
     <partial name="AdminLTE/_Styles" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <partial name="AdminLTE/_DataTableStylePartial" />
-
 </head>
 <body>
-    
     <div class="container">
         <main role="main">
             <header>
-               
                 <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
                     <div class="container">
                         <div class="navbar-collapse collapse w-100 d-flex justify-content-center">
-                            <img class="icheckify-logo" src="/img/iCheckifyLogo.png" />™️
+                            <img class="icheckify-logo" src="/img/iCheckifyLogo.png" alt="logo"/>™️
                         </div>
                     </div>
                 </nav>
@@ -29,6 +26,7 @@
             @RenderBody()
         </main>
     </div>
+    <partial name="_LoginIdentity" />
     <partial name="_PasswordAdvise" />
 
     <script src="~/js/jquery-3.7.1.js"></script>

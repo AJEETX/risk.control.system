@@ -278,6 +278,8 @@ namespace risk.control.system.Services
         }
         private static void UpdateUserFields(VendorApplicationUser input, VendorApplicationUser user, string updatedBy)
         {
+            user.ProfilePictureUrl = input.ProfilePictureUrl ?? user.ProfilePictureUrl;
+            user.ProfilePictureExtension = input.ProfilePictureExtension ?? user.ProfilePictureExtension;
             user.FirstName = WebUtility.HtmlEncode(input.FirstName);
             user.LastName = WebUtility.HtmlEncode(input.LastName);
             user.Addressline = WebUtility.HtmlEncode(input.Addressline);
