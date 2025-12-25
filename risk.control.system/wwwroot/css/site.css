@@ -2579,8 +2579,7 @@ input#checkall {
 /* Profile section */
 .profile-section {
     border-bottom: 1px solid #eaeaea;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 /* Profile image */

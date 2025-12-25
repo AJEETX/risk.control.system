@@ -72,7 +72,7 @@
 
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"  id="notificationToggle">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" id="notificationToggle">
                 <i class="far fa-bell" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Notifications"></i>
                 <span class="badge badge-warning" id="notificationCount">0</span>
             </a>
@@ -100,22 +100,28 @@
                          class="rounded-circle shadow-sm border sidebar-profile"
                          alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                     <p class="text-muted user-email">@Model.Email</p>
-                    @if(Model.CanChangePassword)
+                    @if (Model.CanChangePassword)
                     {
-                        <a id="back" href="/AgencyUserProfile/Edit?userid=@Model.UserId" class="btn btn-sm btn-outline-warning">
-                            <i class="fas fa-user-edit"></i> Edit Profile
-                        </a>
-                  <hr />
-                        <a href="/AgencyUserProfile/ChangePassword" class="btn btn-sm btn-outline-secondary">
-                            <i class="fa fa-key"></i> Change Password
-                        </a>
+                        <div class="text-center profile-section">
+
+                            <a id="back" href="/AgencyUserProfile/Edit?userid=@Model.UserId" class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-user-edit"></i> Edit Profile
+                            </a>
+                        </div>
+                        <div class="text-center profile-section">
+                            <a href="/AgencyUserProfile/ChangePassword" class="btn btn-sm btn-outline-secondary">
+                                <i class="fa fa-key"></i> Change Password
+                            </a>
+                        </div>
                     }
+                    <!-- Logout Link -->
+                    <div class="text-center profile-section">
+                        <a class="font-weight-bold btn btn-sm btn-outline-danger"
+                           href="#" data-toggle="modal" data-target="#logoutModal">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
                 </div>
-                <!-- Logout Link -->
-                <a class="dropdown-item d-flex align-items-center text-danger font-weight-bold btn btn-outline-danger"
-                   href="#" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                </a>
             </div>
         </li>
     </ul>

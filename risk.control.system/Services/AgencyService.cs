@@ -96,8 +96,7 @@ namespace risk.control.system.Services
             }
             else
             {
-                var vendorUser = await context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-                var existingVendor = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
+                var existingVendor = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendor.VendorId);
                 if (existingVendor.DocumentUrl != null)
                 {
                     vendor.DocumentImageExtension = existingVendor.DocumentImageExtension;
