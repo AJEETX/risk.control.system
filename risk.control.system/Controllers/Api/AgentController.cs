@@ -27,9 +27,12 @@ namespace risk.control.system.Controllers.Api
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAnswerService answerService;
+        private readonly IMediaIdfyService mediaIdfyService;
+        private readonly IDocumentIdfyService documentIdfyService;
+        private readonly IAgentFaceIdfyService agentFaceIdfyService;
         private readonly ILogger<AgentController> logger;
         private readonly ICloneReportService cloneReportService;
-        private readonly IHttpClientService httpClientService;
         private readonly IAgentIdfyService agentIdService;
         private readonly IVendorInvestigationService service;
         private readonly ICompareFaces compareFaces;
@@ -40,14 +43,16 @@ namespace risk.control.system.Controllers.Api
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
         private readonly IMailService mailboxService;
-        private static Random randomNumber = new Random();
         private string portal_base_url = string.Empty;
 
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context,
+            IAnswerService answerService,
+            IMediaIdfyService mediaIdfyService,
+            IDocumentIdfyService documentIdfyService,
+            IAgentFaceIdfyService agentFaceIdfyService,
             ILogger<AgentController> logger,
             ICloneReportService cloneReportService,
-            IHttpClientService httpClientService,
             IConfiguration configuration,
             IAgentIdfyService agentIdService,
             IVendorInvestigationService service,
@@ -62,9 +67,12 @@ namespace risk.control.system.Controllers.Api
             IMailService mailboxService)
         {
             this._context = context;
+            this.answerService = answerService;
+            this.mediaIdfyService = mediaIdfyService;
+            this.documentIdfyService = documentIdfyService;
+            this.agentFaceIdfyService = agentFaceIdfyService;
             this.logger = logger;
             this.cloneReportService = cloneReportService;
-            this.httpClientService = httpClientService;
             this.agentIdService = agentIdService;
             this.service = service;
             this.compareFaces = compareFaces;
@@ -639,7 +647,7 @@ namespace risk.control.system.Controllers.Api
                 var isAgentReportName = data.ReportName == DigitalIdReportType.AGENT_FACE.GetEnumDisplayName();
                 if (isAgentReportName)
                 {
-                    var response = await agentIdService.CaptureAgentId(data);
+                    var response = await agentFaceIdfyService.CaptureAgentId(data);
                     response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                     return Ok(response);
                 }
@@ -686,7 +694,7 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var response = await agentIdService.CaptureDocumentId(data);
+                var response = await documentIdfyService.CaptureDocumentId(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
@@ -732,7 +740,7 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var response = await agentIdService.CaptureMedia(data);
+                var response = await mediaIdfyService.CaptureMedia(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
@@ -762,7 +770,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Some answers are missing.");
                 }
-                var answerSubmitted = await agentIdService.CaptureAnswers(locationName, caseId, Questions);
+                var answerSubmitted = await answerService.CaptureAnswers(locationName, caseId, Questions);
                 if (answerSubmitted)
                     return Ok(new { success = answerSubmitted });
                 else

@@ -148,6 +148,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<IAnswerService, AnswerService>();
+builder.Services.AddScoped<IMediaIdfyService, MediaIdfyService>();
+builder.Services.AddScoped<IDocumentIdfyService, DocumentIdfyService>();
+builder.Services.AddScoped<IAgentFaceIdfyService, AgentFaceIdfyService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IVendorUserService, VendorUserService>();
 builder.Services.AddScoped<ICompanyUserService, CompanyUserService>();

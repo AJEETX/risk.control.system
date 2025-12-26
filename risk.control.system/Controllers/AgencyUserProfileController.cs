@@ -199,7 +199,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("Password Change Succees")]
-        public async Task<IActionResult> ChangePasswordConfirmation()
+        public IActionResult ChangePasswordConfirmation()
         {
             notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
             return View();
