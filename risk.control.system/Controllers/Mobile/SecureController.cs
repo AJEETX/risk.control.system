@@ -21,15 +21,10 @@ namespace risk.control.system.Controllers.Mobile
     [ApiController]
     public class SecureController : ControllerBase
     {
-        private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly ITokenService tokenService;
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly IPhoneService phoneService;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly INotificationService service;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly ILogger _logger;
         private readonly IFeatureManager featureManager;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
@@ -38,24 +33,15 @@ namespace risk.control.system.Controllers.Mobile
             IPhoneService phoneService,
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
-            INotificationService service,
-            IPdfGenerativeService pdfGenerativeService,
-            IWebHostEnvironment webHostEnvironment,
-            ILogger<AccountController> logger,
             IFeatureManager featureManager,
             ISmsService SmsService,
             ApplicationDbContext context,
             ITokenService tokenService)
         {
-            this.pdfGenerativeService = pdfGenerativeService;
             _userManager = userManager ?? throw new ArgumentNullException();
             this.phoneService = phoneService;
             _signInManager = signInManager ?? throw new ArgumentNullException();
-            this.httpContextAccessor = httpContextAccessor;
-            this.service = service;
-            this.webHostEnvironment = webHostEnvironment;
             this._context = context;
-            _logger = logger;
             this.featureManager = featureManager;
             smsService = SmsService;
             this.tokenService = tokenService;
@@ -236,7 +222,7 @@ namespace risk.control.system.Controllers.Mobile
             string msg = $"Dear {mobile} user,\n\n" +
                              $"iCheckify: {message}\n\n" +
                              $"Thanks\n{baseUrl}";
-            var response = await SmsService.SendSmsAsync(countryCode, mobile, msg);
+            var response = await smsService.SendSmsAsync(countryCode, mobile, msg);
             return Ok(new { message = response });
         }
 

@@ -147,7 +147,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
-
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IVendorUserService, VendorUserService>();
 builder.Services.AddScoped<ICompanyUserService, CompanyUserService>();

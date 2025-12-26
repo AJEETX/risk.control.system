@@ -15,10 +15,11 @@ namespace risk.control.system.Services
     {
         private static readonly string geocodeUrl = "https://maps.googleapis.com/maps/api/geocode/json";
         private readonly ILogger<CustomApiClient> logger;
-        private static HttpClient client = new HttpClient();
-        public CustomApiClient(ILogger<CustomApiClient> logger)
+        private readonly IHttpClientFactory httpClientFactory;
+        public CustomApiClient(ILogger<CustomApiClient> logger, IHttpClientFactory httpClientFactory)
         {
             this.logger = logger;
+            this.httpClientFactory = httpClientFactory;
         }
         public async Task<(string Latitude, string Longitude)> GetCoordinatesFromAddressAsync(string address)
         {
@@ -27,7 +28,8 @@ namespace risk.control.system.Services
                 string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={Uri.EscapeDataString(address)}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
                 // Send the GET request
-                HttpResponseMessage response = await client.GetAsync(url);
+                var httpClient = httpClientFactory.CreateClient();
+                HttpResponseMessage response = await httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 // Read the response content as a string
@@ -68,8 +70,10 @@ namespace risk.control.system.Services
                 // Construct the request URL
                 var requestUrl = $"{geocodeUrl}?latlng={latitude},{longitude}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
+                var httpClient = httpClientFactory.CreateClient();
+
                 // Make the HTTP GET request to the Google Geocoding API
-                var response = await client.GetStringAsync(requestUrl);
+                var response = await httpClient.GetStringAsync(requestUrl);
 
                 // Parse the JSON response
                 var jsonResponse = JObject.Parse(response);
@@ -98,9 +102,12 @@ namespace risk.control.system.Services
         {
             try
             {
-                var driving = await GetDrivingDistance((startLat.ToString() + "," + startLong.ToString()), (endLat.ToString() + "," + endLong.ToString()));
+                var httpClient = httpClientFactory.CreateClient();
+
+                var driving = await GetDrivingDistance(httpClient, (startLat.ToString() + "," + startLong.ToString()), (endLat.ToString() + "," + endLong.ToString()));
                 string directionsUrl = $"https://maps.googleapis.com/maps/api/directions/json?origin={startLat},{startLong}&destination={endLat},{endLong}&mode=driving&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                var response = await client.GetStringAsync(directionsUrl);
+
+                var response = await httpClient.GetStringAsync(directionsUrl);
                 var route = ParseRoute(response);
                 string encodedPolyline = WebUtility.UrlEncode(route); // URL-encode the polyline
                 var distanceMap = string.Format(
@@ -157,11 +164,11 @@ namespace risk.control.system.Services
                 return null; // Return null to indicate failure
             }
         }
-        static async Task<(string Distance, float DistanceInMetres, string Duration, int DurationInTime)> GetDrivingDistance(string origin, string destination)
+        private async Task<(string Distance, float DistanceInMetres, string Duration, int DurationInTime)> GetDrivingDistance(HttpClient httpClient, string origin, string destination)
         {
             string url = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode=driving&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
-            HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = await httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 

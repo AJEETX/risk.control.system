@@ -13,16 +13,18 @@ namespace risk.control.system.Services
     public interface ISmsService
     {
         Task DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false);
+        Task<string> SendSmsAsync(string countryCode, string mobile = "+61432854196", string message = "Testing fom Azy");
     }
 
     internal class SmsService : ISmsService
     {
-        private static HttpClient client = new HttpClient();
         private readonly IFeatureManager featureManager;
+        private readonly IHttpClientFactory httpClientFactory;
 
-        public SmsService(IFeatureManager featureManager)
+        public SmsService(IFeatureManager featureManager, IHttpClientFactory httpClientFactory)
         {
             this.featureManager = featureManager;
+            this.httpClientFactory = httpClientFactory;
         }
 
         public async Task DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false)
@@ -33,7 +35,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public static async Task<string> SendSmsAsync(string countryCode, string mobile = "+61432854196", string message = "Testing fom Azy")
+        public async Task<string> SendSmsAsync(string countryCode, string mobile = "+61432854196", string message = "Testing fom Azy")
         {
             try
             {
@@ -45,13 +47,14 @@ namespace risk.control.system.Services
                 var password = countryCode.ToLower(CultureInfo.InvariantCulture) == "au" ? Environment.GetEnvironmentVariable("SMS_Pwd") : Environment.GetEnvironmentVariable("SMS_Pwd_India");
                 var sim = countryCode.ToLower(CultureInfo.InvariantCulture) == "au" ? Environment.GetEnvironmentVariable("SMS_Sim") : Environment.GetEnvironmentVariable("SMS_Sim_India");
                 var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+                var httpClient = httpClientFactory.CreateClient();
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
 
                 var newContent = new { message = message, phoneNumbers = new List<string> { mobile }, simNumber = int.Parse(sim) };
                 var jsonContent = JsonConvert.SerializeObject(newContent);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var response = await client.PostAsync(url, content);
+                var response = await httpClient.PostAsync(url, content);
 
                 // Log the response
                 Console.WriteLine($"Response Status Code: {response.StatusCode}");
