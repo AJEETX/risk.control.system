@@ -2,15 +2,15 @@
 using Google.Cloud.Vision.V1;
 namespace risk.control.system.Services
 {
-    public interface IGoogleApi
+    public interface IGoogleService
     {
         Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath);
     }
-    internal class GoogleApi : IGoogleApi
+    internal class GoogleService : IGoogleService
     {
-        private readonly ILogger<GoogleApi> logger;
+        private readonly ILogger<GoogleService> logger;
 
-        public GoogleApi(ILogger<GoogleApi> logger)
+        public GoogleService(ILogger<GoogleService> logger)
         {
             this.logger = logger;
         }
@@ -35,7 +35,7 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
-                throw;
+                return null!;
             }
         }
     }

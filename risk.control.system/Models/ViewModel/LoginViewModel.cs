@@ -46,4 +46,11 @@ namespace risk.control.system.Models.ViewModel
         public string CountryCode { get; set; }
         public byte[] ProfilePicture { get; set; }
     }
+    public class OtpLoginModel
+    {
+        public string CountryIsd { get; set; }
+        public string MobileNumber { get; set; }
+        public string? Otp { get; set; }
+        public string? LoginError { get; set; }
+    }
 }

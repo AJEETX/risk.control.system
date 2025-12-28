@@ -3210,3 +3210,54 @@ img.mobile-capture-map {
 .text-orange {
     color: red !important;
 }
+.face-preview-image {
+    /* Define a fixed or relative width */
+    width: 100%;
+    max-width: 400px; /* Limits size on large screens */
+    /* Force a specific shape (Square) even when empty */
+    aspect-ratio: 1 / 1;
+    /* Standardizes how the photo fits the box */
+    object-fit: cover;
+    /* Styling for the 'blank' state */
+    background-color: #f8f9fa; /* Light grey placeholder */
+    display: block !important; /* Overrides 'd-none' if you want it visible while empty */
+    border: 2px dashed #dee2e6;
+}
+
+    /* Optional: Add a subtle 'plus' or icon via background when blank */
+    .face-preview-image[src="#"], .face-preview-image:not([src]) {
+        opacity: 0.5;
+    }
+
+.document-preview-image {
+    width: 100%;
+    height: auto;
+    min-height: 300px;
+    max-height: 300px;
+    overflow-y:scroll;
+    aspect-ratio: 4 / 3;
+    object-fit: contain; /* Shows the whole document without cropping */
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+}
+#ocrResult {
+    height: 300px;
+    min-height: 300px;
+    overflow-y: scroll;
+    background-color: #fffde7;
+}
+.std-height {
+    height: 300px;
+    min-height: 300px;
+}
+#drop-zone {
+    cursor: pointer;
+    border-style: dashed !important;
+    transition: 0.3s;
+}
+#previewDoc {
+    max-height: 200px;
+}
+#previewOriginal, #previewMatch {
+    max-height: 150px;
+}

@@ -1,0 +1,59 @@
+﻿@using risk.control.system.Models;
+@using risk.control.system.Helpers;
+@model ApplicationUser
+<aside class="main-sidebar elevation-2 sidebar-light-primary">
+    <input type="hidden" id="no-notification" value="true" />
+    <!-- Brand Logo -->
+    <a href="/" class="brand-link">
+        <img src="@Applicationsettings.WEBSITE_SITE_MENU_LOGO" alt="icheckify logo" class="brand-image elevation-2">™️
+        <div>
+            <span class="brand-text font-weight-light">&nbsp;</span>
+        </div>
+    </a>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img class="elevation-2 sidebar-profile img-circle" src="@Applicationsettings.USER_PHOTO" alt="Profile">
+            </div>
+            <a href="#" class="d-block">
+                @Model.FirstName
+                <span class="badge badge-default">guest</span>
+            </a>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- GUEST Menu -->
+                <li class="nav-item">
+                    <a is-active-page asp-controller="Home" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Home", "")">
+                        <i class="nav-icon fas fa-home"></i>
+                        <p>
+                            Home
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="FaceMatch" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("FaceMatch", "")">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>
+                            Face Match
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="OCr" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Ocr", "")">
+                        <i class="nav-icon fas fa-file"></i>
+                        <p>
+                            Ocr Extract
+                        </p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>

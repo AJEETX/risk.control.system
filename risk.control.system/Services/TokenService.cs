@@ -12,7 +12,7 @@ namespace risk.control.system.Services
 {
     public interface ITokenService
     {
-        string GenerateJwtToken(AgentLoginModel model);
+        string GenerateJwtToken(ApplicationUser model);
         Task<RefreshToken> GenerateRefreshTokenAsync(string userId);
     }
     internal class TokenService : ITokenService
@@ -25,7 +25,7 @@ namespace risk.control.system.Services
             this.config = config;
             this.context = context;
         }
-        public string GenerateJwtToken(AgentLoginModel model)
+        public string GenerateJwtToken(ApplicationUser model)
         {
             // Fetch the signing key from configuration
             var key = config["Jwt:Data"];
@@ -38,8 +38,7 @@ namespace risk.control.system.Services
                 new Claim(JwtRegisteredClaimNames.Sub, model.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Name, model.Email),
-                new Claim(ClaimTypes.StreetAddress, model.Latlong),
-                new Claim(ClaimTypes.Role, model.Role)
+                new Claim(ClaimTypes.Role, model.Role.ToString())
             };
 
             // Generate the token

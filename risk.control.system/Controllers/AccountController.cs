@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.FeatureManagement;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -17,6 +20,7 @@ namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly IMemoryCache cache;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILoginService loginService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -33,6 +37,7 @@ namespace risk.control.system.Controllers
         private readonly string BaseUrl;
 
         public AccountController(
+            IMemoryCache cache,
             UserManager<ApplicationUser> userManager,
             ILoginService loginService,
             IWebHostEnvironment webHostEnvironment,
@@ -47,6 +52,7 @@ namespace risk.control.system.Controllers
             ISmsService SmsService,
             ApplicationDbContext context)
         {
+            this.cache = cache;
             _userManager = userManager ?? throw new ArgumentNullException();
             this.loginService = loginService;
             this.webHostEnvironment = webHostEnvironment;
@@ -341,6 +347,107 @@ namespace risk.control.system.Controllers
             };
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult SendOtp()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendOtp(OtpLoginModel model)
+        {
+            // 1. Generate a 6-digit code
+            var otp = new Random().Next(1000, 9999).ToString();
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(5))
+                // Add this line. '1' represents 1 unit of your SizeLimit.
+                .SetSize(1);
+            // 2. Store in Cache/Database with an expiration (e.g., 5 mins)
+            cache.Set($"{model.CountryIsd.TrimStart('+')}{model.MobileNumber}", otp, cacheOptions);
+
+            var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == model.CountryIsd.TrimStart('+'));
+            // 3. Send SMS via provider (Twilio, Infobip, etc.)
+            await smsService.SendSmsAsync(country.Code, model.CountryIsd + model.MobileNumber, $"Your code is {otp}");
+
+            // Store number in session for the next step
+            TempData["MobileNumber"] = model.MobileNumber;
+            TempData["Isd"] = model.CountryIsd;
+
+            return RedirectToAction("VerifyOtp");
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult VerifyOtp()
+        {
+            return View();
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyOtp(string mobileNumber, string userEnteredOtp, string isd)
+        {
+            if (!ModelState.IsValid)
+            {
+                var model = new OtpLoginModel();
+                model.LoginError = "Bad Request";
+                ModelState.AddModelError(string.Empty, "Bad Request");
+                return View(model);
+            }
+            string cacheKey = $"{isd.TrimStart('+')}{mobileNumber}";
+            string? correctOtp = string.Empty;
+            if (!cache.TryGetValue(cacheKey, out correctOtp))
+            {
+                ModelState.AddModelError("", "Invalid OTP");
+                return View();
+            }
+            if (correctOtp != userEnteredOtp.Trim())
+            {
+                ModelState.AddModelError("", "Invalid OTP");
+                return View();
+            }
+            // OTP is valid, proceed with login or registration
+            var username = isd.TrimStart('+') + mobileNumber + "@icheckify.co.in";
+            var userExist = await _userManager.FindByNameAsync(username);
+            if (userExist != null)
+            {
+                await loginService.SignInWithTimeoutAsync(userExist);
+                return RedirectToAction("Index", "Home");
+            }
+            var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == isd.TrimStart('+'));
+            var apppUser = new ApplicationUser
+            {
+                FirstName = "Guest",
+                LastName = "Guest",
+                PhoneNumber = mobileNumber,
+                UserName = username,
+                Email = username,
+                CountryId = country.CountryId
+            };
+            var result = await _userManager.CreateAsync(apppUser);
+            if (!result.Succeeded)
+            {
+                return PrepareGuestInvalidView(result.Errors.FirstOrDefault());
+
+            }
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(apppUser, AppRoles.GUEST.ToString());
+
+                await loginService.SignInWithTimeoutAsync(apppUser);
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+        private IActionResult PrepareGuestInvalidView(IdentityError error)
+        {
+            var model = new OtpLoginModel();
+            model.LoginError = error.Description;
+            ModelState.AddModelError(string.Empty, error.Description);
+            return View(model);
+        }
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
@@ -357,6 +464,14 @@ namespace risk.control.system.Controllers
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(AccountController.Login), "Account");
+        }
+        [HttpGet]
+        public async Task<IActionResult> LogoutGuest()
+        {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out.");
+            return RedirectToAction(nameof(AccountController.SendOtp), "Account");
         }
     }
 }

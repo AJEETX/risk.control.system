@@ -24,7 +24,6 @@ namespace risk.control.system.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IFileStorageService fileStorageService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
         public List<UsersViewModel> UserList;
@@ -34,7 +33,6 @@ namespace risk.control.system.Controllers
         public UserController(UserManager<ApplicationUser> userManager,
 
             IFileStorageService fileStorageService,
-            IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             IFeatureManager featureManager,
             ISmsService SmsService,
@@ -42,7 +40,6 @@ namespace risk.control.system.Controllers
         {
             this.userManager = userManager;
             this.fileStorageService = fileStorageService;
-            this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
             smsService = SmsService;
             this.featureManager = featureManager;
@@ -199,10 +196,30 @@ namespace risk.control.system.Controllers
             }
         }
 
-        private void Errors(IdentityResult result)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAutoConfirmed(long id)
         {
-            foreach (IdentityError error in result.Errors)
-                ModelState.AddModelError("", error.Description);
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (id <= 0)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var appUser = await context.ApplicationUser.FindAsync(id);
+                context.ApplicationUser.Remove(appUser!);
+
+                await context.SaveChangesAsync();
+                return Json(new { success = true, message = "User deleted successfully!" });
+            }
+            catch (Exception)
+            {
+                notifyService.Error("Error deleting user. Try again.");
+                return Json(new { success = false, message = "Error deleting user. Try again." });
+            }
         }
     }
 }

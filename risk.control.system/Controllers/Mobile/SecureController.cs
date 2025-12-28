@@ -52,90 +52,64 @@ namespace risk.control.system.Controllers.Mobile
 
         [AllowAnonymous]
         [HttpPost("agent-login")]
-        public async Task<IActionResult> Login(CancellationToken ct, AgentLoginModel model)
+        public async Task<IActionResult> Login(AgentLoginModel model)
         {
-            var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-            var ipAddressWithoutPort = ipAddress?.Split(':')[0];
-
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
             {
                 return BadRequest("Invalid login attempt.");
             }
-            var email = System.Web.HttpUtility.HtmlEncode(model.Email);
-            var pwd = System.Web.HttpUtility.HtmlEncode(model.Password);
-            var result = await _signInManager.PasswordSignInAsync(email, pwd, false, lockoutOnFailure: false);
 
-            if (result.Succeeded)
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, lockoutOnFailure: false);
+            if (!result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(email);
-                var roles = await _userManager.GetRolesAsync(user);
-                if (roles != null && roles.Count > 0)
+                if (result.IsLockedOut)
                 {
-                    var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email && !u.Deleted && u.Role == AppRoles.AGENT);
-
-                    bool vendorIsActive = false;
-                    vendorIsActive = await _context.Vendor.AnyAsync(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-                    if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
-                    {
-                        vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
-                    }
-                    if (vendorIsActive && user.Active)
-                    {
-                        var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                        string message = string.Empty;
-                        //var ipApiResponse = await service.GetAgentIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, model.Latlong);
-
-                        if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null)
-                        {
-                            var admin = await _context.ApplicationUser.Include(c => c.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
-                            if (admin != null)
-                            {
-                                message = $"Dear {admin.Email}\n\n" +
-                                $"{baseUrl}";
-                                try
-                                {
-                                    await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine(ex.ToString());
-                                }
-                            }
-                            message = string.Empty;
-                            message += $"User {user.Email} logged in\n\n" +
-                            $"{baseUrl}";
-                            try
-                            {
-                                await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.ToString());
-                            }
-                        }
-                        model.Role = vendorUser.Role.ToString();
-                        var token = tokenService.GenerateJwtToken(model);
-                        var refreshToken = await tokenService.GenerateRefreshTokenAsync(model.Email);
-
-                        return Ok(new TokenResponse
-                        {
-                            AccessToken = token,
-                            RefreshToken = refreshToken.Token,
-                            ExpiresAt = DateTime.UtcNow.AddMinutes(15) // Matches access token lifetime
-                        });
-                    }
+                    return BadRequest("User account locked out.");
                 }
+                else
+                {
+                    return BadRequest("Invalid login attempt.");
+                }
+            }
 
-                return BadRequest();
-            }
-            else if (result.IsLockedOut)
-            {
-                return BadRequest("User account locked out.");
-            }
-            else
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
             {
                 return BadRequest("Invalid login attempt.");
             }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles == null || roles.Count == 0)
+            {
+                return BadRequest("Invalid login attempt.");
+            }
+
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == model.Email && !u.Deleted && u.Role == AppRoles.AGENT);
+            if (vendorUser == null)
+            {
+                return BadRequest("Invalid login attempt.");
+            }
+            bool vendorIsActive = false;
+            vendorIsActive = await _context.Vendor.AnyAsync(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
+            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
+            {
+                vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+            }
+
+            if (!vendorIsActive || !user.Active)
+            {
+                return BadRequest("Invalid login attempt.");
+            }
+
+            var token = tokenService.GenerateJwtToken(user);
+            var refreshToken = await tokenService.GenerateRefreshTokenAsync(user.Email);
+
+            return Ok(new TokenResponse
+            {
+                AccessToken = token,
+                RefreshToken = refreshToken.Token,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15) // Matches access token lifetime
+            });
         }
 
         [AllowAnonymous]
@@ -159,13 +133,9 @@ namespace risk.control.system.Controllers.Mobile
             tokenEntity.IsUsed = true;
             _context.RefreshTokens.Update(tokenEntity);
             await _context.SaveChangesAsync();
-            var model = new AgentLoginModel
-            {
-                Email = user.Email,
-                Role = user.Role.ToString()
-            };
+
             // Generate new tokens
-            var newAccessToken = tokenService.GenerateJwtToken(model);
+            var newAccessToken = tokenService.GenerateJwtToken(user);
             var newRefreshToken = await tokenService.GenerateRefreshTokenAsync(user.Email);
 
             return Ok(new TokenResponse
@@ -194,13 +164,13 @@ namespace risk.control.system.Controllers.Mobile
         [HttpGet("test-2-get-jwt-token")]
         public async Task<IActionResult> Jwt(string username = "agent@verify.com")
         {
-            var model = new AgentLoginModel
+            var user = await _userManager.FindByEmailAsync(username);
+            if (user == null)
             {
-                Email = username,
-                Role = $"{AGENT.DISPLAY_NAME}"
-            };
-            var token = tokenService.GenerateJwtToken(model);
-            await Task.Delay(10);
+                return BadRequest("Invalid login attempt.");
+            }
+
+            var token = tokenService.GenerateJwtToken(user);
             return Ok(new { token });
         }
         // This endpoint requires JWT authentication.
@@ -241,6 +211,7 @@ namespace risk.control.system.Controllers.Mobile
             var result = phoneService.IsValidMobileNumber(phoneNumber, country);
             return Ok(result);
         }
+
         //[AllowAnonymous]
         //[HttpGet("pdf")]
         //public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")

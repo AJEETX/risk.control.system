@@ -35,7 +35,7 @@ namespace risk.control.system.Controllers.Api
         private readonly ICloneReportService cloneReportService;
         private readonly IAgentIdfyService agentIdService;
         private readonly IVendorInvestigationService service;
-        private readonly ICompareFaces compareFaces;
+        private readonly IAmazonService compareFaces;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
         private readonly IFeatureManager featureManager;
@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Api
             IConfiguration configuration,
             IAgentIdfyService agentIdService,
             IVendorInvestigationService service,
-            ICompareFaces compareFaces,
+            IAmazonService compareFaces,
             UserManager<VendorApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
             IAgentService agentService,
@@ -238,7 +238,7 @@ namespace risk.control.system.Controllers.Api
 
                 var image = Convert.FromBase64String(request.Image);
                 var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, mobileUidExist.ProfilePictureUrl));
-                var matched = await compareFaces.DoFaceMatch(registeredImage, image);
+                var matched = await compareFaces.FaceMatch(registeredImage, image);
                 if (matched.Item1)
                 {
                     return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });

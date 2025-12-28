@@ -11,7 +11,8 @@ namespace risk.control.system.AppConstant
         [Display(Name = Applicationsettings.ASSESSOR.DISPLAY_NAME)] ASSESSOR,
         [Display(Name = Applicationsettings.MANAGER.DISPLAY_NAME)] MANAGER,
         [Display(Name = Applicationsettings.SUPERVISOR.DISPLAY_NAME)] SUPERVISOR,
-        [Display(Name = Applicationsettings.AGENT.DISPLAY_NAME)] AGENT
+        [Display(Name = Applicationsettings.AGENT.DISPLAY_NAME)] AGENT,
+        [Display(Name = Applicationsettings.GUEST.DISPLAY_NAME)] GUEST
     }
     public enum CompanyRole
     {

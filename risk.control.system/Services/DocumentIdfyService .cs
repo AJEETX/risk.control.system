@@ -22,7 +22,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
     private readonly ILogger<AgentIdfyService> logger;
     private readonly IFileStorageService fileStorageService;
     private readonly IPanCardService panCardService;
-    private readonly IGoogleApi googleApi;
+    private readonly IGoogleService googleApi;
     private readonly IHttpClientService httpClientService;
     private readonly ICustomApiClient customApiCLient;
 
@@ -31,7 +31,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
         ILogger<AgentIdfyService> logger,
         IFileStorageService fileStorageService,
         IPanCardService panCardService,
-        IGoogleApi googleApi,
+        IGoogleService googleApi,
         IHttpClientService httpClientService,
         ICustomApiClient customApiCLient)
     {

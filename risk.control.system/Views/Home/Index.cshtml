@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Tool testing";
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title"><i class="fas fa-tool"></i> Test tools</h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-light shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-check fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">Face Match Comparison</h5>
+                            <p class="card-text text-muted">
+                                Verify identity by comparing two images. This tool uses biometric analysis to determine if the faces in both photos belong to the same person.
+                            </p>
+                            <a class="btn btn-outline-primary" href="/FaceMatch/Index">
+                                Launch Face Match
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-light shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-invoice fa-3x text-success mb-3"></i>
+                            <h5 class="card-title">OCR Data Extraction</h5>
+                            <p class="card-text text-muted">
+                                Automatically extract text from ID cards, passports, or documents. Converts visual data into structured digital formats instantly.
+                            </p>
+                            <a class="btn btn-outline-success" href="/Ocr/Index">
+                                Launch OCR Tool
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

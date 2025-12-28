@@ -47,6 +47,10 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 1024; // Arbitrary units
+});
 builder.Services.AddHsts(options =>
 {
     options.MaxAge = TimeSpan.FromDays(365);       // 1 year
@@ -207,7 +211,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICustomApiClient, CustomApiClient>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
 builder.Services.AddScoped<IClaimsAgentService, ClaimsAgentService>();
-builder.Services.AddScoped<ICompareFaces, CompareFaces>();
+builder.Services.AddScoped<risk.control.system.Services.IAmazonService, AmazonService>();
 builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<INumberSequenceService, NumberSequenceService>();
@@ -220,7 +224,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IFtpService, FtpService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
-builder.Services.AddScoped<IGoogleApi, GoogleApi>();
+builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
 
 builder.Services.AddScoped<IHttpClientService, HttpClientService>();

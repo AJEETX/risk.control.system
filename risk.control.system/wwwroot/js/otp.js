@@ -7,29 +7,19 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('#reset-pwd').addClass('login-disabled');
-
+        $('#otp').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Send OTP');
         $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
-        $('#reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Get');
 
+        $('#otp').attr('disabled', 'disabled');
         $('#login').attr('disabled', 'disabled');
+        $('#otp').addClass('login-disabled');
         $('#login').addClass('login-disabled');
         $('html a').addClass('anchor-disabled');
         $('.text').addClass('anchor-disabled');
 
-        $('#cancelConsent').attr('disabled', 'disabled');
-        $('#cancelConsent').addClass('login-disabled');
         form.submit();
 
         $('#login-form').attr('disabled', 'disabled');
-        $('#reset-form').attr('disabled', 'disabled');
-
-        $('#email, .login-link').attr('disabled', 'disabled');
-        $('.login-link').addClass('anchor-disabled');
-
-        $('#resetemail').attr('disabled', 'disabled');
-
-        $('#Password').attr('disabled', 'disabled');
 
         var loginForm = document.getElementById("login-form");
         if (loginForm) {
@@ -38,16 +28,9 @@
                 nodes[i].disabled = true;
             }
         }
-        
-        var resetForm = document.getElementById("reset-form");
-        if (resetForm) {
-            var nodes = resetForm.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
-            }
-        }
     }
 });
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // Reference to the modal and close button
@@ -74,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
             termsModal.classList.remove('show'); // Remove the 'show' class to hide the modal
         });
     }
-    
+
     // Optionally, you can close the modal if clicked outside the modal content
     window.addEventListener('click', function (e) {
         if (e.target === termsModal) {
@@ -87,67 +70,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 $(document).ready(function () {
 
-    validateMobile('#mobile', /[^0-9]/g); // Allow numeric only no spaces
-    $("#flip").change(function () {
-        if ($(this).prop("checked")) {
-            // If checkbox is checked (Forgot Password form)
-            $("#resetemail").focus(); // Focus on resetemail input
-        } else {
-            // If checkbox is unchecked (Login form)
-            $("#email").focus(); // Focus on email input
-        }
-    });
-
+    validateMobile('#MobileNumber', /[^0-9]/g); // Allow numeric only no spaces
    
     $("#login-form").validate();
-    $("#reset-form").validate();
-    $("#email, #resetemail").autocomplete({
-        source: function (request, response) {
-            $("#loader").show(); // Show loader
-            $.ajax({
-                url: "/api/MasterData/GetUserBySearch",
-                type: "GET",
-                data: {
-                    search: request.term
-                },
-                success: function (data) {
-                    console.log(data); // Check what the server is sending
-                    // Ensure data is in the format [{ label: "email", value: "email" }]
-                    response($.map(data, function (item) {
-                        return { label: item, value: item };
-                    }));
-                    $("#loader").hide(); // Hide loader
-                },
-                error: function (err) {
-                    console.log(err);
-                    response([]);
-                    $("#loader").hide(); // Hide loader
-                }
-            });
-        },
-        minLength: 1, // Start showing suggestions after 1 character
-        select: function (event, ui) {
-            // Set the selected value to the input field
-            $(this).val(ui.item.value);
-        },
-        messages: {
-            noResults: "No results found",
-            results: function (data) {
-                return `${data} result${data > 1 ? "s" : ""} found`;
-            }
-        }
-    });
-    // Trigger autocomplete on focus for both fields
-    $("#email, #resetemail").on("focus", function () {
-        console.log("Focus triggered");
-        const emailValue = $(this).val();
-
-        // If the field is empty, trigger autocomplete
-        if (!emailValue.trim()) {
-            $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
-        }
-    });
-    $("#CountryId").autocomplete({
+   
+    $("#CountryIsd").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
             $.ajax({
@@ -181,7 +108,7 @@ $(document).ready(function () {
             // Set the selected value to the input field
             $(this).val('+' + ui.item.value);
             // Optionally, set the CountryId in a hidden input or elsewhere if needed
-            $("#CountryId").val(ui.item.value);
+            $("#CountryIsd").val(ui.item.value);
 
             // Set the flag image based on the selected country
             $("#country-flag").attr("src", ui.item.flag); // Update the flag image source
@@ -209,7 +136,7 @@ $(document).ready(function () {
     });
 
     // Trigger autocomplete on focus for country code field
-    $("#CountryId").on("focus", function () {
+    $("#CountryIsd").on("focus", function () {
         const countryCodeValue = $(this).val();
         // If the field is empty, trigger autocomplete
         if (!countryCodeValue.trim()) {
@@ -230,10 +157,14 @@ function validateMobile(selector, regex) {
         $(this).val(value.replace(regex, ''));
     });
 }
-function focusLogin() {
-    const login = document.getElementById("email");
-    if (login) {
-        login.focus();
+function focusOtp() {
+    const otp = document.getElementById("CountryIsd");
+    if (otp) {
+        otp.focus();
+    }
+    const verifyOtp = document.getElementById("userEnteredOtp");
+    if (verifyOtp) {
+        verifyOtp.focus();
     }
 }
 
@@ -241,7 +172,7 @@ function onlyDigits(el) {
     el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
 }
 window.onload = function () {
-    focusLogin();
+    focusOtp();
 }
 
 let timeLeft = 300;

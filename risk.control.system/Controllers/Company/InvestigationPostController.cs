@@ -197,7 +197,7 @@ namespace risk.control.system.Controllers.Company
             {
                 logger.LogError(ex, "Error deleting case");
                 notifyService.Error("Error deleting case. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return Json(new { success = false, message = "Error deleting case. Try again." });
             }
         }
 

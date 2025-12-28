@@ -1,0 +1,55 @@
+﻿@model DocumentOcrData
+
+@{
+    ViewData["Title"] = "Document OCR Tool";
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-dark text-white">
+            <h3 class="mb-0"><i class="fas fa-file-alt mr-2"></i> OCR Data Extraction</h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <form id="ocrForm" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="form-label font-weight-bold" for="DocumentImage">Upload Document/Image</label>
+
+                        <div id="drop-zone" class="border border-primary rounded d-flex flex-column align-items-center justify-content-center p-4 bg-light">
+                            <input id="DocumentImage" asp-for="DocumentImage" type="file" class="d-none" accept="image/*" required />
+
+                            <div class="text-center" id="drop-zone-content">
+                                <img id="previewDoc" src="/img/add-file.png" alt="Preview" class="img-thumbnail document-preview-image mb-2" />
+                                <p class="mb-0 text-muted" id="drop-text">Drag & drop your document here or <strong>click to browse</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                <div class="row">
+                    <div class="col-md-12 std-height">
+                        <label class="form-label font-weight-bold" for="ocrResult">Extracted Text</label>
+                        <div id="loader" class="text-center d-none my-5">
+                            <i class="fas fa-sync fa-spin fa-3x text-primary"></i>
+                            <p class="mt-2">Reading document...</p>
+                        </div>
+                        <textarea id="ocrResult" class="form-control" placeholder="Extracted text will appear here..." readonly></textarea>
+                    </div>
+                </div>
+
+                <hr />
+
+                <button type="submit" id="btnSubmit" class="btn btn-outline-success btn-lg w-100">
+                    Extract Text
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/tool/ocr.js"></script>
+}

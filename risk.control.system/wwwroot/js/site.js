@@ -313,7 +313,10 @@ function markNotificationAsRead(notificationId) {
     });
 }
 function loadNotifications(keepOpen = false) {
-
+    var noNotification = $('#no-notification').val();
+    if (noNotification =='true') {
+        return;
+    }
     $.get('/api/Notification/GetNotifications', function (response) {
 
         const $list = $("#notificationList");

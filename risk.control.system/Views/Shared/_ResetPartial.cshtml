@@ -30,13 +30,13 @@
                 </div>
                 @* <i class="fa fa-globe left-padd" aria-hidden="true" title="Country code"></i> *@
                 <input type="text" id="CountryId" name="CountryId" asp-for="CountryId" title="ISD code" class="form-control remarks country-code auto-dropdown" required placeholder="Isd code" maxlength="5" autocomplete="off">
+                <span asp-validation-for="CountryId" class="text-danger"></span>
                 <div class="input-group-append-caret">
                     <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
                 </div>
 
-                <span asp-validation-for="CountryId" class="text-danger"></span>
                 <i class="fa fa-mobile right-padd-mobile-icon" aria-hidden="true"></i>
-                <input asp-for="Mobile" id="mobile" name="mobile" class="form-control remarks" title="Mobile #" maxlength="10" type="text" placeholder="Mobile #" autocomplete="number" required>
+                <input asp-for="Mobile" id="mobile" name="mobile" class="form-control remarks" title="Mobile #" maxlength="10" type="text" placeholder="Mobile #" autocomplete="number" required />
                 <span asp-validation-for="Mobile" class="text-danger"></span>
             </div>
             <p class="account">By clicking <strong> <span class="fa fa-unlock" aria-hidden="true"></span> Get</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
@@ -56,5 +56,4 @@
             </p>
         }
     </div>
-    @* <div id="ipAddress1" class="info-item"><span class="info-title">Location: </span><a href="/page/ip.html"> <span class="info-data">Loading...</span></a></div> *@
 </div>

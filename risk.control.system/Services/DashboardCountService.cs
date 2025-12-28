@@ -60,7 +60,7 @@ namespace risk.control.system.Services
         {
             var allCompaniesCount = await _context.ClientCompany.CountAsync(c => !c.Deleted);
             var allAgenciesCount = await _context.Vendor.CountAsync(v => !v.Deleted);
-            var AllUsersCount = await _context.ApplicationUser.CountAsync(u => !u.Deleted);
+            var AllUsersCount = await _context.ApplicationUser.CountAsync(u => !u.Deleted && u.Email != userEmail);
             //var availableAgenciesCount = GetAvailableAgencies(userEmail);
 
             var data = new DashboardData();

@@ -1,0 +1,62 @@
+﻿@model FaceMatchData
+
+@{
+    ViewData["Title"] = "Face Match Tool";
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white">
+            <h3 class="mb-0">Face Match Comparison</h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <form id="faceMatchForm" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label font-weight-bold" for="OriginalFaceImage">Original Face (Source)</label>
+                        <div id="drop-zone-original" class="drop-zone border border-primary rounded d-flex flex-column align-items-center justify-content-center p-3 bg-light">
+                            <input id="OriginalFaceImage" asp-for="OriginalFaceImage" type="file" class="d-none" accept="image/*" required />
+                            <div class="text-center">
+                                <img id="previewOriginal" src="/img/user.png" alt="Preview" class="img-thumbnail face-preview-image mb-2" />
+                                <p class="small text-muted mb-0">Drag source image or <strong>click</strong></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label font-weight-bold" for="MatchFaceImage">Face to Match (Target)</label>
+                        <div id="drop-zone-match" class="drop-zone border border-primary rounded d-flex flex-column align-items-center justify-content-center p-3 bg-light">
+                            <input id="MatchFaceImage" asp-for="MatchFaceImage" type="file" class="d-none" accept="image/*" required />
+                            <div class="text-center">
+                                <img id="previewMatch" src="/img/user.png" alt="Preview" class="img-thumbnail face-preview-image mb-2" />
+                                <p class="small text-muted mb-0">Drag target image or <strong>click</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <button type="submit" id="btnSubmit" class="btn btn-outline-primary btn-lg w-100">
+                    <span id="btnText">Compare Faces</span>
+                    <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            </form>
+
+            <div id="resultContainer" class="mt-4 d-none">
+                <div class="alert alert-default">
+                    <h5>Match Result:</h5>
+                    <pre id="jsonResult" class="bg-light p-3 border"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/tool/facematch.js"></script>
+}

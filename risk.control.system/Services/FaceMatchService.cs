@@ -8,19 +8,18 @@ namespace risk.control.system.Services
     }
     internal class FaceMatchService : IFaceMatchService
     {
-        private readonly ICompareFaces compareFaces;
+        private readonly IAmazonService compareFaces;
         private readonly ILogger<FaceMatchService> logger;
-        public FaceMatchService(ICompareFaces compareFaces, ILogger<FaceMatchService> logger)
+        public FaceMatchService(IAmazonService compareFaces, ILogger<FaceMatchService> logger)
         {
             this.compareFaces = compareFaces;
             this.logger = logger;
         }
         public async Task<(string, byte[], float)> GetFaceMatchAsync(byte[] registeredImage, byte[] faceImageBytes, string onlyExtension)
         {
-            string ImageData = string.Empty;
             try
             {
-                var matched = await compareFaces.DoFaceMatch(registeredImage, faceImageBytes);
+                var matched = await compareFaces.FaceMatch(registeredImage, faceImageBytes);
                 return matched.Item1 ? (matched.Item2.ToString(), CompressImage.ProcessCompress(faceImageBytes, onlyExtension, 10, 99, matched.Item3), matched.Item2) : ("0", CompressImage.ProcessCompress(faceImageBytes, onlyExtension, 10, 99, matched.Item3), 0);
             }
             catch (Exception ex)

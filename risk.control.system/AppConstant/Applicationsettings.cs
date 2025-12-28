@@ -334,34 +334,14 @@
             public const string PROFILE_IMAGE = "/img/agent.jpeg";
         }
 
-        public static class AGENTZ
+        public static class GUEST
         {
-            public const string DISPLAY_NAME = "AGENT";
-            public const string CODE = "agentz";
-            public const string USERNAME = "agentz";
+            public const string DISPLAY_NAME = "GUEST";
+            public const string CODE = "guest";
+            public const string USERNAME = "guest";
             public const string FIRST_NAME = "Zenny";
             public const string LAST_NAME = "Tobbs";
             public const string PROFILE_IMAGE = "/img/assigner.jpeg";
-        }
-
-        public static class AGENTX
-        {
-            public const string DISPLAY_NAME = "AGENT";
-            public const string CODE = "agentx";
-            public const string USERNAME = "agentx";
-            public const string FIRST_NAME = "Xavier";
-            public const string LAST_NAME = "Piccasso";
-            public const string PROFILE_IMAGE = "/img/creator.jpeg";
-        }
-
-        public static class AGENTY
-        {
-            public const string DISPLAY_NAME = "AGENT";
-            public const string CODE = "agenty";
-            public const string USERNAME = "agenty";
-            public const string FIRST_NAME = "Jason";
-            public const string LAST_NAME = "Trantor";
-            public const string PROFILE_IMAGE = "/img/company-admin.jpeg";
         }
     }
 }
