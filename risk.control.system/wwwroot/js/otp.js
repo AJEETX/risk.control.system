@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 $(document).ready(function () {
 
-    validateMobile('#MobileNumber', /[^0-9]/g); // Allow numeric only no spaces
+    validateNumber('#MobileNumber', /[^0-9]/g); // Allow numeric only no spaces
    
     $("#login-form").validate();
    
@@ -78,7 +78,7 @@ $(document).ready(function () {
         source: function (request, response) {
             $("#loader").show(); // Show loader
             $.ajax({
-                url: "/api/MasterData/GetCountryIsdCode", // API endpoint for country suggestions
+                url: "/api/MasterData/GetIsdCode", // API endpoint for country suggestions
                 type: "GET",
                 data: {
                     term: request.term
@@ -144,13 +144,66 @@ $(document).ready(function () {
         }
     });
 
-
     $('input').on('focus', function () {
         $(this).select();
     });
+
+    let timeLeft = 30;
+    let countdown; // Move this variable here so it's accessible everywhere
+    const timerElement = $('#timer');
+    const resendBtn = $('#resendBtn');
+    const loginForm = $('#login-form');
+
+    function startTimer() {
+        resendBtn.prop('disabled', true);
+        // Clear any existing interval before starting a new one
+        if (countdown) clearInterval(countdown);
+
+        countdown = setInterval(function () {
+            timeLeft--;
+            timerElement.text(timeLeft);
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                resendBtn.prop('disabled', false);
+                resendBtn.html('<span class="fa fa-sync"></span> Resend OTP');
+            }
+        }, 1000);
+    }
+
+    if (timerElement && resendBtn) {
+        startTimer();
+    }
+    loginForm.on('submit', function () {
+        clearInterval(countdown); // This stops the timer immediately
+    });
+    $('#resendBtn').click(function () {
+        const isd = $('input[name="isd"]').val();
+        const mobileNumber = $('input[name="mobileNumber"]').val();
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: '/Account/ResendOtp',
+            type: 'POST',
+            data: {
+                isd: isd,
+                mobileNumber: mobileNumber,
+                __RequestVerificationToken: token
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    timeLeft = 60; // Increase cooldown for next attempt
+                    startTimer();
+                }
+            },
+            error: function () {
+                alert('Error resending OTP. Please try again later.');
+            }
+        });
+    });
 });
 
-function validateMobile(selector, regex) {
+function validateNumber(selector, regex) {
     $(selector).on('input', function () {
         const value = $(this).val();
         // Remove invalid characters directly using the regex
@@ -173,19 +226,4 @@ function onlyDigits(el) {
 }
 window.onload = function () {
     focusOtp();
-}
-
-let timeLeft = 300;
-const timerElem = document.getElementById('timer');
-const resendBtn = document.getElementById('resendBtn');
-if (timerElem) {
-    const countdown = setInterval(() => {
-        timeLeft--;
-        timerElem.innerText = timeLeft;
-        if (timeLeft <= 0) {
-            clearInterval(countdown);
-            resendBtn.innerText = "Resend OTP";
-            resendBtn.disabled = false;
-        }
-    }, 1000);
 }

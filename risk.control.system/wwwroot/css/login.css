@@ -311,11 +311,14 @@ input:focus {
     }
 
 .forms .form-content .login-text,
-.forms .form-content .sign-up-text {
+.forms .form-content .sign-up-text, .try-again {
     text-align: center;
     margin-top: 25px;
 }
-
+.try-again {
+    text-align: center;
+    margin-top: 25px;
+}
 .forms .form-content label.login-link {
     color: rgba(0, 0, 238);
 }

@@ -5,7 +5,8 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -85,23 +86,10 @@
                         CurrencyName = $"{admin.Country.CurrencyName} ({Extensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
                         Language = admin.Country.Language
                     };
-                    if(admin.Role ==null)
-                    {
-                        <partial name="AdminLTE/_TopGuestNavigation" model="@navigationModel" />
-                    <partial name="AdminLTE/_SidebarGuest" model="@admin"/>
-                        <div class="content-wrapper content-wrapper-main">
-                            <div id="main-content" class="content">
-                                <main>
-                                    @RenderBody()
-                                </main>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
                     <partial name="AdminLTE/_TopNavigation" model="@navigationModel" />
                     <partial name="AdminLTE/_Sidebar" model="@admin"/>
-                    <div class="content-wrapper content-wrapper-main">
+                }
+                <div class="content-wrapper content-wrapper-main">
                     <breadcrumb class="no-print"></breadcrumb>
                     <div id="main-content" class="content">
                         <main>
@@ -109,9 +97,6 @@
                         </main>
                     </div>
                 </div>
-                    }
-                }
-                
                 <partial name="AdminLTE/_Footer" />
             }
         </div>

@@ -349,7 +349,7 @@ namespace risk.control.system.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult SendOtp()
+        public IActionResult Otp()
         {
             return View();
         }
@@ -357,32 +357,35 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendOtp(OtpLoginModel model)
+        public async Task<IActionResult> Otp(OtpLoginModel model)
         {
-            // 1. Generate a 6-digit code
             var otp = new Random().Next(1000, 9999).ToString();
-            var cacheOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(5))
-                // Add this line. '1' represents 1 unit of your SizeLimit.
-                .SetSize(1);
-            // 2. Store in Cache/Database with an expiration (e.g., 5 mins)
-            cache.Set($"{model.CountryIsd.TrimStart('+')}{model.MobileNumber}", otp, cacheOptions);
+            var cacheOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)).SetSize(1);
+
+            cache.Set($"{model.CountryIsd.TrimStart('+')}{model.MobileNumber.TrimStart('0')}", otp, cacheOptions);
 
             var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == model.CountryIsd.TrimStart('+'));
-            // 3. Send SMS via provider (Twilio, Infobip, etc.)
-            await smsService.SendSmsAsync(country.Code, model.CountryIsd + model.MobileNumber, $"Your code is {otp}");
 
-            // Store number in session for the next step
-            TempData["MobileNumber"] = model.MobileNumber;
-            TempData["Isd"] = model.CountryIsd;
+            await smsService.SendSmsAsync(country.Code, model.CountryIsd + model.MobileNumber.TrimStart('0'), $"Your code is {otp}");
 
-            return RedirectToAction("VerifyOtp");
+            return RedirectToAction("VerifyOtp", new
+            {
+                isd = model.CountryIsd,
+                mobileNumber = model.MobileNumber.TrimStart('0')
+            });
         }
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult VerifyOtp()
+        public IActionResult VerifyOtp(string isd, string mobileNumber)
         {
-            return View();
+            // Map the incoming parameters to the model for the View
+            var model = new OtpLoginModel
+            {
+                CountryIsd = isd,
+                MobileNumber = mobileNumber
+            };
+
+            return View(model);
         }
         [HttpPost]
         [AllowAnonymous]
@@ -396,7 +399,7 @@ namespace risk.control.system.Controllers
                 ModelState.AddModelError(string.Empty, "Bad Request");
                 return View(model);
             }
-            string cacheKey = $"{isd.TrimStart('+')}{mobileNumber}";
+            string cacheKey = $"{isd.TrimStart('+')}{mobileNumber.TrimStart('0')}";
             string? correctOtp = string.Empty;
             if (!cache.TryGetValue(cacheKey, out correctOtp))
             {
@@ -409,7 +412,7 @@ namespace risk.control.system.Controllers
                 return View();
             }
             // OTP is valid, proceed with login or registration
-            var username = isd.TrimStart('+') + mobileNumber + "@icheckify.co.in";
+            var username = isd.TrimStart('+') + mobileNumber.TrimStart('0') + "@icheckify.co.in";
             var userExist = await _userManager.FindByNameAsync(username);
             if (userExist != null)
             {
@@ -421,7 +424,7 @@ namespace risk.control.system.Controllers
             {
                 FirstName = "Guest",
                 LastName = "Guest",
-                PhoneNumber = mobileNumber,
+                PhoneNumber = mobileNumber.TrimStart('0'),
                 UserName = username,
                 Email = username,
                 CountryId = country.CountryId
@@ -440,6 +443,33 @@ namespace risk.control.system.Controllers
             }
 
             return RedirectToAction("Index", "Home");
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendOtp(string isd, string mobileNumber)
+        {
+            if (string.IsNullOrEmpty(mobileNumber) || string.IsNullOrEmpty(isd))
+            {
+                return BadRequest(new { success = false, message = "Invalid data." });
+            }
+
+            // 1. Generate new 4-digit code
+            var newOtp = new Random().Next(1000, 9999).ToString();
+            var cacheKey = $"{isd.TrimStart('+')}{mobileNumber.TrimStart('0')}";
+
+            // 2. Update Cache
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(5))
+                .SetSize(1);
+            cache.Set(cacheKey, newOtp, cacheOptions);
+
+            // 3. Resend SMS
+            // Note: You'll need to fetch the 'country' object again as you did in the first method
+            var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == isd.TrimStart('+'));
+            await smsService.SendSmsAsync(country.Code, isd + mobileNumber.TrimStart('0'), $"Your new code is {newOtp}");
+
+            return Ok(new { success = true, message = "OTP Resent Successfully!" });
         }
         private IActionResult PrepareGuestInvalidView(IdentityError error)
         {
@@ -471,7 +501,7 @@ namespace risk.control.system.Controllers
             var user = await _signInManager.UserManager.GetUserAsync(User);
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(AccountController.SendOtp), "Account");
+            return RedirectToAction(nameof(AccountController.Otp), "Account");
         }
     }
 }

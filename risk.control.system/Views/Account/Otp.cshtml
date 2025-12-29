@@ -39,18 +39,18 @@
                         Otp Login
                         <sup class="fa fa-info-circle password-info-icon"></sup>
                     </div>
-                    <form id="login-form" asp-action="SendOtp" method="post">
+                    <form id="login-form" asp-action="Otp" method="post">
                         @Html.AntiForgeryToken()
                         <div class="input-boxes">
                             <div class="input-box">
 
                                 <div class="input-group-prepend">
                                     <span class="form-group input-group mb-3 input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code">
-                                        <img id="country-flag" src="~/flags/blank-flag.png" class="flag-icon" data-bs-toggle="tooltip" alt="country flag" />
+                                        <img id="country-flag" src="~/img/no-map.jpeg" class="flag-icon" data-bs-toggle="tooltip" alt="country flag" />
                                     </span>
                                 </div>
                                 @* <i class="fa fa-globe left-padd" aria-hidden="true" title="Country code"></i> *@
-                                <input type="text" id="CountryIsd" name="CountryIsd" asp-for="CountryIsd" title="ISD code" class="form-control remarks country-isdcode auto-dropdown" required placeholder="Isd code" maxlength="5" autocomplete="off">
+                                <input type="text" id="CountryIsd" name="CountryIsd" asp-for="CountryIsd" title="Country ISD code" class="form-control remarks country-isdcode auto-dropdown" required placeholder="Country ISD code" autocomplete="off">
                                 <span asp-validation-for="CountryIsd" class="text-danger"></span>
                                 <div class="input-group-append-caret">
                                     <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
@@ -58,7 +58,7 @@
                             </div>
                             <div class="input-box">
                                 <i class="fa fa-mobile left-padd" aria-hidden="true"></i>
-                                <input id="MobileNumber" asp-for="MobileNumber" class="form-control remarks" placeholder="e.g. 9823456789" required />
+                                <input id="MobileNumber" type="text" asp-for="MobileNumber" class="form-control remarks" placeholder="Mobile number e.g. 9823456789" maxlength="10" required />
                                 <span asp-validation-for="MobileNumber" class="text-danger"></span>
                             </div>
                             <p class="account">By clicking <strong><span class="fa fa-key" aria-hidden="true"></span> Send OTP</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
@@ -69,7 +69,7 @@
                     </form>
                 </div>
             </div>
-            <partial name="_TermsConditions" />
+            <partial name="_TnC" />
 
         </div>
 </body>

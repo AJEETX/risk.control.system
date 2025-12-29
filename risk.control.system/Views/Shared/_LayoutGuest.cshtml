@@ -58,5 +58,6 @@
     <partial name="AdminLTE/_DataTableScriptPartial"  />
     <script src="~/js/site.js"></script>
     @RenderSection("Scripts", required: false)
+    @await Component.InvokeAsync("Notyf")
 </body>
 </html>
