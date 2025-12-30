@@ -37,7 +37,7 @@ namespace risk.control.system.Services
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.context = context;
-            smsService = SmsService;
+            this.smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
             this.httpContextAccessor = httpContextAccessor;
         }
