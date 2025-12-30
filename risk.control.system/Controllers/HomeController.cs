@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
-using SmartBreadcrumbs.Nodes;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 namespace risk.control.system.Controllers
@@ -10,11 +10,14 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = GUEST.DISPLAY_NAME)]
     public class HomeController : Controller
     {
+        private readonly INotyfService notifyService;
+        public HomeController(INotyfService notifyService)
+        {
+            this.notifyService = notifyService;
+        }
         public IActionResult Index()
         {
-            var page = new MvcBreadcrumbNode("Index", "Home", "Home");
-            ViewData["BreadcrumbNode"] = page;
-
+            notifyService.Success($"Welcome <b>{GUEST.DISPLAY_NAME}</b>, Login successful");
             return View();
         }
     }

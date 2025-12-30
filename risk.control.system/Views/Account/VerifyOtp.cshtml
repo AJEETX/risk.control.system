@@ -13,6 +13,7 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="~/css/jquery-ui.css">
+    <link rel="stylesheet" href="~/css/jquery-confirm.min.css">
     <link rel="stylesheet" href="~/css/login.css">
     <link rel="stylesheet" href="~/css/cookie.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,14 +47,22 @@
                         <div class="input-boxes">
                             <input type="hidden" name="mobileNumber" value="@Model.MobileNumber" />
                             <input type="hidden" name="isd" value="@Model.CountryIsd" />
-                            <div class="input-box">
-                                <i class="fa fa-key left-padd"></i>
-                                <input id=userEnteredOtp name="userEnteredOtp" class="form-control remarks text-center fs-2 fw-bold" placeholder="0000" maxlength="4" required autocomplete="off" />
+
+                            <input type="hidden" id="userEnteredOtp" name="userEnteredOtp" required />
+
+                            <div class="otp-container">
+                                <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
+                                <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
+                                <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
+                                <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
                             </div>
+
                             <div class="button input-box">
-                                <button id="login" type="submit" class="btn btn-success btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
+                                <button id="login" type="submit" class="btn btn-success btn-block">
+                                    <span class="fa fa-key" aria-hidden="true"></span> Login
+                                </button>
                             </div>
-                            </div>
+                        </div>
                     </form>
                     <div class="error-message">
 
@@ -88,5 +97,6 @@
 @{
             await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
+<script src="~/js/jqueryconfirm/dist/jquery-confirm.min.js"></script>
 <script src="~/js/otp.js"></script>
 </html>

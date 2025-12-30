@@ -366,19 +366,26 @@ namespace risk.control.system.Controllers
 
             var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == model.CountryIsd.TrimStart('+'));
 
-            await smsService.SendSmsAsync(country.Code, model.CountryIsd + model.MobileNumber.TrimStart('0'), $"Your code is {otp}");
-
-            return RedirectToAction("VerifyOtp", new
+            var smsResponse = await smsService.SendSmsAsync(country.Code, model.CountryIsd + model.MobileNumber.TrimStart('0'), $"Your code is {otp}");
+            if (!string.IsNullOrWhiteSpace(smsResponse))
             {
-                isd = model.CountryIsd,
-                mobileNumber = model.MobileNumber.TrimStart('0')
-            });
+                //notifyService.Success($"Otp sent to {model.CountryIsd} {model.MobileNumber}");
+                return RedirectToAction("VerifyOtp", new
+                {
+                    isd = model.CountryIsd,
+                    mobileNumber = model.MobileNumber.TrimStart('0')
+                });
+            }
+            else
+            {
+                notifyService.Warning($"Error to send Otp to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Try again.");
+                return RedirectToAction(nameof(Otp));
+            }
         }
         [HttpGet]
         [AllowAnonymous]
         public IActionResult VerifyOtp(string isd, string mobileNumber)
         {
-            // Map the incoming parameters to the model for the View
             var model = new OtpLoginModel
             {
                 CountryIsd = isd,
@@ -438,7 +445,6 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(apppUser, AppRoles.GUEST.ToString());
-
                 await loginService.SignInWithTimeoutAsync(apppUser);
             }
 
@@ -467,9 +473,15 @@ namespace risk.control.system.Controllers
             // 3. Resend SMS
             // Note: You'll need to fetch the 'country' object again as you did in the first method
             var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == isd.TrimStart('+'));
-            await smsService.SendSmsAsync(country.Code, isd + mobileNumber.TrimStart('0'), $"Your new code is {newOtp}");
-
-            return Ok(new { success = true, message = "OTP Resent Successfully!" });
+            var smsResponse = await smsService.SendSmsAsync(country.Code, isd + mobileNumber.TrimStart('0'), $"Your new code is {newOtp}");
+            if (!string.IsNullOrWhiteSpace(smsResponse))
+            {
+                return Ok(new { success = true, message = "OTP Resent Successfully!" });
+            }
+            else
+            {
+                return Ok(new { success = false, message = "Failed to resend OTP. Please try again later." });
+            }
         }
         private IActionResult PrepareGuestInvalidView(IdentityError error)
         {

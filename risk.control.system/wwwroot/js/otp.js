@@ -191,15 +191,105 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.success) {
-                    alert(response.message);
+                    $.alert({
+                        title: 'Otp Send!',
+                        content: response.message,
+                        closeIcon: true,
+                        type: 'green',
+                        icon: 'fas fa-key',
+                        buttons: {
+                            ok: {
+                                text: 'Close',
+                                btnClass: 'btn-default',
+                            }
+                        }
+                    });
                     timeLeft = 60; // Increase cooldown for next attempt
                     startTimer();
                 }
+                else {
+                    $.alert({
+                        title: 'Otp Error!',
+                        content: response.message,
+                        closeIcon: true,
+                        type: 'red',
+                        icon: 'fas fa-key',
+                        buttons: {
+                            ok: {
+                                text: 'Close',
+                                btnClass: 'btn-default',
+                            }
+                        }
+                    });
+                }
             },
             error: function () {
-                alert('Error resending OTP. Please try again later.');
+                $.alert({
+                    title: 'Otp Error!',
+                    content: 'Error resending OTP. Please try again later.',
+                    closeIcon: true,
+                    type: 'red',
+                    icon: 'fas fa-key',
+                    buttons: {
+                        ok: {
+                            text: 'Close',
+                            btnClass: 'btn-default',
+                        }
+                    }
+                });
             }
         });
+    });
+
+    const inputs = $('.otp-input');
+    const hiddenInput = $('#userEnteredOtp');
+
+    inputs.on('input', function (e) {
+        const target = $(e.target);
+        const val = target.val();
+
+        // Allow only numbers
+        if (isNaN(val)) {
+            target.val("");
+            return;
+        }
+
+        // Move to next input
+        if (val != "") {
+            target.next('.otp-input').focus();
+        }
+
+        updateHiddenInput();
+    });
+
+    inputs.on('keydown', function (e) {
+        const target = $(e.target);
+
+        // Handle Backspace
+        if (e.key === 'Backspace' && target.val() === '') {
+            target.prev('.otp-input').focus();
+        }
+    });
+
+    function updateHiddenInput() {
+        let otp = "";
+        inputs.each(function () {
+            otp += $(this).val();
+        });
+        hiddenInput.val(otp);
+    }
+
+    // Handle paste events for the whole code
+    inputs.first().on('paste', function (e) {
+        const pasteData = (e.originalEvent || e).clipboardData.getData('text').slice(0, 4);
+        if (!/^\d+$/.test(pasteData)) return;
+
+        const pasteArray = pasteData.split('');
+        inputs.each(function (i) {
+            $(this).val(pasteArray[i] || "");
+        });
+        updateHiddenInput();
+        inputs.last().focus();
     });
 });
 

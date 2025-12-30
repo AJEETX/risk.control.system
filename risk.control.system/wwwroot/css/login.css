@@ -631,3 +631,27 @@ img.logo {
     font-size: .9em; /* Adjust the size as needed */
     font-family: Arial, Helvetica, sans-serif;
 }
+.otp-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.otp-input {
+    width: 50px;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+    .otp-input:focus {
+        border-color: #28a745; /* Success green to match your button */
+        outline: none;
+        box-shadow: 0 0 8px rgba(40, 167, 69, 0.2);
+    }
