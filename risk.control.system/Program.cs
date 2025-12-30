@@ -211,7 +211,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICustomApiClient, CustomApiClient>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
 builder.Services.AddScoped<IClaimsAgentService, ClaimsAgentService>();
-builder.Services.AddScoped<risk.control.system.Services.IAmazonService, AmazonService>();
+builder.Services.AddScoped<IAmazonApiService, AmazonApiService>();
 builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<INumberSequenceService, NumberSequenceService>();
@@ -226,6 +226,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
+builder.Services.AddScoped<ITextAnalyticsService, TextAnalyticsService>();
 
 builder.Services.AddScoped<IHttpClientService, HttpClientService>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();

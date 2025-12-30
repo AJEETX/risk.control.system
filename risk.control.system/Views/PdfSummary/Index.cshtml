@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "PDF Summarizer";
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+}
+
+<section class="content">
+    <div class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-info text-white text-center">
+            <h3 class="card-title"><i class="fas fa-file-alt"></i> PDF Summarizer</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Summarize" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="pdfFile">Select PDF Document</label>
+                    <input id=pdfFile type="file" name="pdfFile" class="form-control" accept=".pdf" />
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Extract Summary</button>
+            </form>
+
+            @if (ViewBag.Summary != null)
+            {
+                <div class="mt-4 p-3 border rounded bg-light">
+                    <h5><i class="fas fa-magic"></i> AI Generated Summary:</h5>
+                    <p style="white-space: pre-wrap;">@ViewBag.Summary</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>

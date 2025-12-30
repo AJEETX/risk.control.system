@@ -20,12 +20,6 @@ namespace risk.control.system.Models.ViewModel
         public bool SetPassword { get; set; }
 
         public string? LoginError { get; set; }
-        public string? ReturnUrl { get; set; }
-        public string? ResetError { get; set; }
-        public string? CountryId { get; set; }
-        public string? Mobile { get; set; }
-        public List<string>? Users { get; set; }
-        public bool OtpLogin { get; set; }
     }
 
     public class ForgotPasswordViewModel
@@ -39,7 +33,6 @@ namespace risk.control.system.Models.ViewModel
         [Required]
         public string Mobile { get; set; }
         public string? ResetError { get; set; }
-        public string? ResetMessage { get; set; }
     }
     public class ForgotPasswordResult
     {
@@ -50,7 +43,6 @@ namespace risk.control.system.Models.ViewModel
     {
         public string CountryIsd { get; set; }
         public string MobileNumber { get; set; }
-        public string? Otp { get; set; }
         public string? LoginError { get; set; }
     }
 }

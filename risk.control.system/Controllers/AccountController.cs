@@ -1,7 +1,5 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -188,14 +186,10 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null)
+        public async Task<IActionResult> Login()
         {
-            var timer = DateTime.Now;
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await _signInManager.SignOutAsync();
             var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
-            return View(new LoginViewModel { SetPassword = setPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN), ReturnUrl = returnUrl });
+            return View(new LoginViewModel { SetPassword = setPassword });
         }
 
         [HttpPost]
@@ -230,17 +224,16 @@ namespace risk.control.system.Controllers
 
             notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
 
-            return Url.IsLocalUrl(model.ReturnUrl) ? Redirect(model.ReturnUrl) : RedirectToAction("Index", "Dashboard");
+            return RedirectToAction("Index", "Dashboard");
         }
-        private async Task<IActionResult> PrepareInvalidView(LoginViewModel model, string error)
+        [HttpGet]
+        public async Task<IActionResult> Logout()
         {
-            model.LoginError = error;
-            ModelState.AddModelError(string.Empty, error);
-            model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            ViewData["Users"] = await loginService.GetUserSelectListAsync();
-            return View(model);
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out.");
+            return RedirectToAction(nameof(Login));
         }
-
         [HttpGet]
         public async Task<IActionResult> ChangePassword(string email)
         {
@@ -323,6 +316,15 @@ namespace risk.control.system.Controllers
 
             return View(successModel);
         }
+        private async Task<IActionResult> PrepareInvalidView(LoginViewModel model, string error)
+        {
+            model.LoginError = error;
+            ModelState.AddModelError(string.Empty, error);
+            model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            ViewData["Users"] = await loginService.GetUserSelectListAsync();
+            return View(model);
+        }
+
         private async Task<ForgotPassword> CreateDefaultForgotPasswordModel(string email)
         {
             var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");

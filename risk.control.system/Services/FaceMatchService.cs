@@ -8,9 +8,9 @@ namespace risk.control.system.Services
     }
     internal class FaceMatchService : IFaceMatchService
     {
-        private readonly IAmazonService compareFaces;
+        private readonly IAmazonApiService compareFaces;
         private readonly ILogger<FaceMatchService> logger;
-        public FaceMatchService(IAmazonService compareFaces, ILogger<FaceMatchService> logger)
+        public FaceMatchService(IAmazonApiService compareFaces, ILogger<FaceMatchService> logger)
         {
             this.compareFaces = compareFaces;
             this.logger = logger;

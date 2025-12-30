@@ -12,9 +12,9 @@ namespace risk.control.system.Controllers.Tools
     [Authorize(Roles = GUEST.DISPLAY_NAME)]
     public class FaceMatchController : Controller
     {
-        private readonly IAmazonService amazonService;
+        private readonly IAmazonApiService amazonService;
 
-        public FaceMatchController(IAmazonService amazonService)
+        public FaceMatchController(IAmazonApiService amazonService)
         {
             this.amazonService = amazonService;
         }

@@ -35,7 +35,7 @@ namespace risk.control.system.Controllers.Api
         private readonly ICloneReportService cloneReportService;
         private readonly IAgentIdfyService agentIdService;
         private readonly IVendorInvestigationService service;
-        private readonly IAmazonService compareFaces;
+        private readonly IAmazonApiService compareFaces;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
         private readonly IFeatureManager featureManager;
@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Api
             IConfiguration configuration,
             IAgentIdfyService agentIdService,
             IVendorInvestigationService service,
-            IAmazonService compareFaces,
+            IAmazonApiService compareFaces,
             UserManager<VendorApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
             IAgentService agentService,

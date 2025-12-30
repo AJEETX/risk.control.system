@@ -20,6 +20,7 @@
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.2" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.4.6.5" />
     <PackageReference Include="HtmlSanitizer" Version="9.0.889" />
+    <PackageReference Include="itext7" Version="9.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.20" />

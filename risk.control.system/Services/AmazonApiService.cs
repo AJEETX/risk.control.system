@@ -5,19 +5,19 @@ using Amazon.Textract.Model;
 
 namespace risk.control.system.Services
 {
-    public interface IAmazonService
+    public interface IAmazonApiService
     {
         Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> FaceMatch(byte[] originalImage, byte[] targetImage);
         Task<CompareFacesResponse> CompareFaceMatch(byte[] originalImage, byte[] targetImage);
         Task<DetectDocumentTextResponse> ExtractTextAsync(byte[] bytes);
     }
-    internal class AmazonService : IAmazonService
+    internal class AmazonApiService : IAmazonApiService
     {
         private readonly IAmazonRekognition rekognitionClient;
         private readonly IAmazonTextract textractClient;
-        private readonly ILogger<AmazonService> logger;
+        private readonly ILogger<AmazonApiService> logger;
 
-        public AmazonService(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, ILogger<AmazonService> logger)
+        public AmazonApiService(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, ILogger<AmazonApiService> logger)
         {
             this.rekognitionClient = rekognitionClient;
             this.textractClient = textractClient;
