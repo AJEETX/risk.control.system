@@ -43,6 +43,7 @@ namespace risk.control.system.Models.ViewModel
     {
         public string CountryIsd { get; set; }
         public string MobileNumber { get; set; }
+        public string? UserEnteredOtp { get; set; }
         public string? LoginError { get; set; }
     }
 }

@@ -152,6 +152,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IMediaIdfyService, MediaIdfyService>();
 builder.Services.AddScoped<IDocumentIdfyService, DocumentIdfyService>();
@@ -284,7 +285,7 @@ builder.Services.AddHangfireServer(options =>
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.CheckConsentNeeded = context => false;
-    options.MinimumSameSitePolicy = SameSiteMode.Strict;
+    options.MinimumSameSitePolicy = SameSiteMode.Lax;
 });
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
@@ -315,9 +316,7 @@ builder.Services.AddAuthentication(options =>
 })
 // 2. Add Microsoft Entra ID (Azure AD)
 // This handles its own cookie internally but links to the OIDC scheme
-.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"),
-    OpenIdConnectDefaults.AuthenticationScheme,
-    CookieAuthenticationDefaults.AuthenticationScheme)
+.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
     .EnableTokenAcquisitionToCallDownstreamApi()
     .AddInMemoryTokenCaches();
 

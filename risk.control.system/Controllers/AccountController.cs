@@ -1,5 +1,8 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Security.Claims;
 
+using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -225,6 +228,61 @@ namespace risk.control.system.Controllers
             notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
 
             return RedirectToAction("Index", "Dashboard");
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AzureLogin(string returnUrl = null)
+        {
+            // Redirect to ExternalLoginCallback once Azure is done
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(
+                OpenIdConnectDefaults.AuthenticationScheme, redirectUrl);
+
+            return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            if (remoteError != null)
+                return await PrepareInvalidView(new LoginViewModel(), $"Error from Azure: {remoteError}");
+
+            // Get the login information back from Azure AD
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+                return RedirectToAction(nameof(Login));
+
+            // Extract the email claim
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email) ??
+                        info.Principal.FindFirstValue(ClaimTypes.Upn);
+
+            if (string.IsNullOrEmpty(email))
+                return await PrepareInvalidView(new LoginViewModel(), "Email claim not received from Azure.");
+
+            // 1. Find the local user
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return await PrepareInvalidView(new LoginViewModel(), "User not found in local system.");
+
+            // 2. Reuse your existing verification logic
+            var (isAuthorized, displayName, isAdmin) = await loginService.GetUserStatusAsync(user);
+
+            if (!isAuthorized)
+                return await PrepareInvalidView(new LoginViewModel(), "Account inactive or unauthorized.");
+
+            // 3. Link the login if not already linked (Optional but recommended)
+            var userLogins = await _userManager.GetLoginsAsync(user);
+            if (!userLogins.Any(x => x.LoginProvider == info.LoginProvider))
+            {
+                await _userManager.AddLoginAsync(user, info);
+            }
+
+            // 4. Sign the user in (Mirroring your local Login method)
+            await loginService.SignInWithTimeoutAsync(user);
+
+            notifyService.Success($"Welcome <b>{displayName}</b>, Microsoft Login successful");
+
+            return LocalRedirect(returnUrl ?? "/Dashboard/Index");
         }
         [HttpGet]
         public async Task<IActionResult> Logout()

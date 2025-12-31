@@ -13,7 +13,7 @@ namespace risk.control.system.Services
 {
     public interface ILoginService
     {
-        Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin);
+        Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin = "");
         Task<IEnumerable<SelectListItem>> GetUserSelectListAsync();
         Task SignInWithTimeoutAsync(ApplicationUser user); // Moved here
         string GetErrorMessage(Microsoft.AspNetCore.Identity.SignInResult result);

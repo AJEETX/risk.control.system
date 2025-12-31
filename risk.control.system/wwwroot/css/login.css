@@ -864,3 +864,10 @@ img.logo {
         opacity: 1;
     }
 }
+.microsoft{
+    height:3em;
+    float:right;
+}
+img.microsoft{
+    height:3em;
+}
