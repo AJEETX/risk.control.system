@@ -1,64 +1,73 @@
 ﻿@{
-    ViewData["Title"] = "Tool testing";
+    ViewData["Title"] = "AI Tool Hub";
     Layout = "~/Views/Shared/_LayoutGuest.cshtml";
 }
 
-<section class="content">
-    <div id="article" class="card shadow-lg border-1 rounded-lg">
-        <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title"><i class="fas fa-tool"></i> Test tools</h3>
+<section class="content py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="font-weight-bold text-dark">Intelligent System Tools</h2>
+            <p class="text-muted">Select a tool below to begin your automated analysis.</p>
         </div>
-        <div class="card-body">
+
+        <div class="row">
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            <div class="row mt-4">
-                <div class="col-md-6 mb-3">
-                    <div class="card h-100 border-light shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="fas fa-user-check fa-3x text-primary mb-3"></i>
-                            <h5 class="card-title">Face Match Comparison</h5>
-                            <p class="card-text text-muted">
-                                Verify identity by comparing two images. This tool uses biometric analysis to determine if the faces in both photos belong to the same person.
-                            </p>
-                            <a class="btn btn-outline-primary" href="/FaceMatch/Index">
-                                Launch Face Match
-                            </a>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 tool-card shadow-sm p-3">
+                    <div class="card-body text-center">
+                        <div class="icon-box bg-soft-primary">
+                            <i class="fas fa-user-check fa-2x text-primary"></i>
                         </div>
+                        <h5 class="card-title font-weight-bold">Face Match</h5>
+                        <p class="card-text text-muted small">
+                            Biometric comparison between two images to verify identity with high precision.
+                        </p>
+                        <a class="btn btn-primary btn-block rounded-pill launch-btn" href="/FaceMatch/Index">
+                            Launch Face Match
+                        </a>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-md-6 mb-3">
-                    <div class="card h-100 border-light shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="fas fa-file-invoice fa-3x text-success mb-3"></i>
-                            <h5 class="card-title">OCR Data Extraction</h5>
-                            <p class="card-text text-muted">
-                                Automatically extract text from ID cards, passports, or documents. Converts visual data into structured digital formats instantly.
-                            </p>
-                            <a class="btn btn-outline-success" href="/Ocr/Index">
-                                Launch OCR Tool
-                            </a>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 tool-card shadow-sm p-3">
+                    <div class="card-body text-center">
+                        <div class="icon-box bg-soft-success">
+                            <i class="fas fa-file-invoice fa-2x text-success"></i>
                         </div>
+                        <h5 class="card-title font-weight-bold">OCR Extraction</h5>
+                        <p class="card-text text-muted small">
+                            Extract structured data from ID cards and documents using optical character recognition.
+                        </p>
+                        <a class="btn btn-success btn-block rounded-pill launch-btn" href="/Ocr/Index">
+                            Launch OCR Tool
+                        </a>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-md-6 mb-3">
-                    <div class="card h-100 border-light shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="fas fa-file-signature fa-3x text-info mb-3"></i>
-                            <h5 class="card-title">AI PDF Summarizer</h5>
-                            <p class="card-text text-muted">
-                                Upload long PDF documents and get an instant AI-generated summary.
-                                Save time by extracting key insights and bullet points from any report.
-                            </p>
-                            <a class="btn btn-outline-info" href="/PdfSummary/Index">
-                                Launch PDF Tool
-                            </a>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 tool-card shadow-sm p-3">
+                    <div class="card-body text-center">
+                        <div class="icon-box bg-soft-info">
+                            <i class="fas fa-file-signature fa-2x text-info"></i>
                         </div>
+                        <h5 class="card-title font-weight-bold">PDF Summarizer</h5>
+                        <p class="card-text text-muted small">
+                            Get instant AI-generated insights and bullet points from lengthy PDF reports.
+                        </p>
+                        <a class="btn btn-info btn-block rounded-pill launch-btn" href="/PdfSummary/Index">
+                            Launch PDF Tool
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script src="~/js/tool/home.js"></script>
+}

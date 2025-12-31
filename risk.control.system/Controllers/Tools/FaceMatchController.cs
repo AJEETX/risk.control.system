@@ -23,18 +23,33 @@ namespace risk.control.system.Controllers.Tools
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> FaceMatch(FaceMatchData data)
+        public async Task<IActionResult> Compare(FaceMatchData data)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid) return BadRequest(ModelState);
+
+                var originalFace = await AgentVerificationHelper.GetBytesFromIFormFile(data.OriginalFaceImage);
+                var secondayFace = await AgentVerificationHelper.GetBytesFromIFormFile(data.MatchFaceImage);
+
+                var faceMatchData = await amazonService.CompareFaceMatch(originalFace, secondayFace);
+
+                // Handle case where no faces are detected in one of the images
+                if (faceMatchData.FaceMatches.Count == 0)
+                {
+                    return Ok(new { match = false, similarity = 0.0 });
+                }
+
+                var result = faceMatchData.FaceMatches.Count >= 1;
+                var similarity = faceMatchData.FaceMatches[0].Similarity;
+
+                return Ok(new { match = result, similarity = similarity });
             }
-            var originalFace = await AgentVerificationHelper.GetBytesFromIFormFile(data.OriginalFaceImage);
-            var secondayFace = await AgentVerificationHelper.GetBytesFromIFormFile(data.MatchFaceImage);
-            var faceMatchData = await amazonService.CompareFaceMatch(originalFace, secondayFace);
-            var result = faceMatchData.FaceMatches.Count >= 1;
-            var similarity = faceMatchData.FaceMatches[0].Similarity;
-            return Ok(new { match = result, similarity = similarity });
+            catch (Exception)
+            {
+                // Log the error (e.g. AWS credentials issues or invalid image formats)
+                return StatusCode(500, new { message = "Biometric service is currently unavailable." });
+            }
         }
     }
 }

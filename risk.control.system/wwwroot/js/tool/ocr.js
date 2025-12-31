@@ -74,7 +74,9 @@ $(document).ready(function () {
         var formData = new FormData(this);
         $("#loader").removeClass("d-none");
         $("#ocrResult").addClass("d-none");
-        $("#btnSubmit").prop("disabled", true);
+        $("#resultActions").addClass("d-none");
+        $("#btnSubmit").prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Processing Document...');
+        dropZone.addClass('scanning');
 
         $.ajax({
             url: '/Ocr/OcrDocument',
@@ -84,13 +86,15 @@ $(document).ready(function () {
             contentType: false,
             success: function (response) {
                 $("#ocrResult").val(response).removeClass("d-none");
+                $("#resultActions").removeClass("d-none");
             },
             error: function (xhr) {
-                alert("Error: " + xhr.responseText);
+                alert("Error: " + (xhr.responseText || "Check file size or format."));
             },
             complete: function () {
                 $("#loader").addClass("d-none");
-                $("#btnSubmit").prop("disabled", false);
+                $("#btnSubmit").prop("disabled", false).html('<i class="fas fa-bolt"></i> Start Extraction');
+                dropZone.removeClass('scanning'); // Stop animation
             }
         });
     });
