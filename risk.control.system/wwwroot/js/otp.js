@@ -204,6 +204,9 @@ $(document).ready(function () {
                             }
                         }
                     });
+                    $('.otp-input').val('');
+                    $('#userEnteredOtp').val('');
+                    $('.otp-input').first().focus();
                     timeLeft = 60; // Increase cooldown for next attempt
                     startTimer();
                 }
@@ -305,9 +308,9 @@ function focusOtp() {
     if (otp) {
         otp.focus();
     }
-    const verifyOtp = document.getElementById("userEnteredOtp");
-    if (verifyOtp) {
-        verifyOtp.focus();
+    const firstOtpBox = document.querySelector(".otp-input");
+    if (firstOtpBox) {
+        firstOtpBox.focus();
     }
 }
 
