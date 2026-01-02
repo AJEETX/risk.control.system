@@ -4,5 +4,6 @@
     {
         public IFormFile OriginalFaceImage { get; set; }
         public IFormFile MatchFaceImage { get; set; }
+        public int RemainingTries { get; set; } = 5;
     }
 }

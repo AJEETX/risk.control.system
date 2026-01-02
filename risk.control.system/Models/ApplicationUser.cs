@@ -12,7 +12,9 @@ namespace risk.control.system.Models
         public bool IsPasswordChangeRequired { get; set; } = true;
         [FileExtensions(Extensions = "jpg,jpeg,png")]
         public string? ProfilePictureUrl { get; set; }
-
+        public int FaceMatchCount { get; set; } = 0;
+        public int OcrCount { get; set; } = 0;
+        public int PdfCount { get; set; } = 0;
         public bool IsSuperAdmin { get; set; } = false;
         public bool IsClientManager { get; set; } = false;
         public bool IsClientAdmin { get; set; } = false;

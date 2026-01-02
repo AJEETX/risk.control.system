@@ -45,8 +45,8 @@
                             <div class="input-box">
 
                                 <div class="input-group-prepend">
-                                    <span class="form-group input-group mb-3 input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code">
-                                        <img id="country-flag" src="~/img/no-map.jpeg" class="flag-icon" data-bs-toggle="tooltip" alt="country flag" />
+                                    <span class="form-group input-group mb-3 input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Flag">
+                                        <img id="country-flag" src="~/img/no-map.jpeg" class="flag-icon" data-bs-toggle="tooltip" alt="country flag" title="country flag" />
                                     </span>
                                 </div>
                                 @* <i class="fa fa-globe left-padd" aria-hidden="true" title="Country code"></i> *@
@@ -58,7 +58,7 @@
                             </div>
                             <div class="input-box">
                                 <i class="fa fa-mobile left-padd" aria-hidden="true"></i>
-                                <input id="MobileNumber" type="text" asp-for="MobileNumber" class="form-control remarks" placeholder="Mobile number e.g. 9823456789" maxlength="10" required />
+                                <input id="MobileNumber" type="text" asp-for="MobileNumber" class="form-control remarks" placeholder="Mobile number e.g. 9823456789" maxlength="10" title="Mobile number" required />
                                 <span asp-validation-for="MobileNumber" class="text-danger"></span>
                             </div>
                             <p class="account">By clicking <strong><span class="fa fa-key" aria-hidden="true"></span> Send OTP</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>

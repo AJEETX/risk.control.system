@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
@@ -13,32 +15,64 @@ namespace risk.control.system.Controllers.Tools
     {
         private readonly IGoogleService googleService;
         private readonly IFileStorageService fileStorageService;
+        private readonly UserManager<ApplicationUser> _userManager; // Add this
 
-        public OcrController(IGoogleService googleService, IFileStorageService fileStorageService)
+        public OcrController(
+            IGoogleService googleService,
+            IFileStorageService fileStorageService,
+            UserManager<ApplicationUser> userManager) // Inject this
         {
             this.googleService = googleService;
             this.fileStorageService = fileStorageService;
+            this._userManager = userManager;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var user = await _userManager.GetUserAsync(User);
+
+            var model = new DocumentOcrData
+            {
+                RemainingTries = 5 - (user?.OcrCount ?? 0)
+            };
+
+            return View(model);
         }
         [HttpPost]
         public async Task<IActionResult> OcrDocument(DocumentOcrData data)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            // 1. Get current user and check limit
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            if (user.OcrCount >= 5)
             {
-                return BadRequest(ModelState);
+                return StatusCode(403, "OCR usage limit reached (5/5).");
             }
+
+            // 2. Perform the OCR Task
             var (file, path) = await fileStorageService.SaveAsync(data.DocumentImage, "tool");
             var ocrData = await googleService.DetectTextAsync(path);
+
             if (ocrData == null || ocrData.Count == 0)
             {
-                return BadRequest("Ocr failed");
+                return BadRequest("Ocr failed to detect text.");
             }
+
+            // 3. Increment the count and save to Database
+            user.OcrCount++;
+            await _userManager.UpdateAsync(user);
+
             var ocrDetail = ocrData.FirstOrDefault();
             var description = ocrDetail != null ? ocrDetail.Description : string.Empty;
-            return Ok(description);
+
+            // 4. Return description (and optionally remaining count)
+            return Ok(new
+            {
+                description = description,
+                remaining = 5 - user.OcrCount // Send remaining count back to JS
+            });
         }
     }
 }

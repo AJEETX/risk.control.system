@@ -2,7 +2,6 @@
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('DocumentImage');
 const previewImg = document.getElementById('previewDoc');
-const dropText = document.getElementById('drop-text');
 
 // 1. Click to trigger file input
 dropZone.addEventListener('click', () => fileInput.click());
@@ -49,7 +48,6 @@ function handleFiles(files) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewImg.src = e.target.result;
-                dropText.innerHTML = `<strong>Selected:</strong> ${file.name}`;
             };
             reader.readAsDataURL(file);
         }
@@ -73,10 +71,8 @@ $(document).ready(function () {
 
         var formData = new FormData(this);
         $("#loader").removeClass("d-none");
-        $("#ocrResult").addClass("d-none");
-        $("#resultActions").addClass("d-none");
         $("#btnSubmit").prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Processing Document...');
-        dropZone.addClass('scanning');
+        dropZone.classList.add('scanning');
 
         $.ajax({
             url: '/Ocr/OcrDocument',
@@ -85,16 +81,46 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                $("#ocrResult").val(response).removeClass("d-none");
-                $("#resultActions").removeClass("d-none");
+                // 1. Set the OCR text
+                $("#ocrResult").val(response.description).removeClass("d-none");
+
+                // 2. Update the numeric count
+                const remaining = response.remaining;
+                $("#remainingCount").text(remaining);
+
+                // 3. Update Badge Visuals (Optional: Change color if low)
+                const badge = $("#usageBadge");
+                if (remaining <= 1) {
+                    badge.removeClass("badge-light").addClass("badge-danger");
+                } else {
+                    badge.removeClass("badge-danger").addClass("badge-light");
+                }
+                // Add this inside your success function
+                $("#usageBadge").fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+                // 4. If limit is hit, disable the submit button immediately
+                if (remaining <= 0) {
+                    $("#btnSubmit").prop("disabled", true).html('<i class="fas fa-lock"></i> Limit Reached');
+                }
             },
             error: function (xhr) {
-                alert("Error: " + (xhr.responseText || "Check file size or format."));
+                if (xhr.status === 403) {
+                    // Specifically handle the limit reached error
+                    $("#btnSubmit").prop("disabled", true).text("Limit Reached");
+                } else {
+                    alert("Error: " + (xhr.responseText || "Check file size or format."));
+                }
             },
             complete: function () {
                 $("#loader").addClass("d-none");
-                $("#btnSubmit").prop("disabled", false).html('<i class="fas fa-bolt"></i> Start Extraction');
-                dropZone.removeClass('scanning'); // Stop animation
+                dropZone.classList.remove('scanning');
+
+                // Only re-enable if the count hasn't hit zero
+                const currentRemaining = parseInt($("#remainingCount").text());
+                if (currentRemaining > 0) {
+                    $("#btnSubmit").prop("disabled", false).html('<i class="fas fa-bolt"></i> Start Extraction');
+                } else {
+                    $("#btnSubmit").prop("disabled", true).html('<i class="fas fa-lock"></i> Limit Reached');
+                }
             }
         });
     });

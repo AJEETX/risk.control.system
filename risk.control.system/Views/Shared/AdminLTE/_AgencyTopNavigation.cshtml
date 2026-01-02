@@ -102,20 +102,20 @@
                     <p class="text-muted user-email">@Model.Email</p>
                     @if (Model.CanChangePassword)
                     {
-                        <div class="text-center profile-section">
+                        <div class="text-center profile-inner-section">
 
                             <a id="back" href="/AgencyUserProfile/Edit?userid=@Model.UserId" class="btn btn-sm btn-outline-warning">
                                 <i class="fas fa-user-edit"></i> Edit Profile
                             </a>
                         </div>
-                        <div class="text-center profile-section">
+                        <div class="text-center profile-inner-section">
                             <a href="/AgencyUserProfile/ChangePassword" class="btn btn-sm btn-outline-secondary">
                                 <i class="fa fa-key"></i> Change Password
                             </a>
                         </div>
                     }
                     <!-- Logout Link -->
-                    <div class="text-center profile-section">
+                        <div class="text-center profile-inner-section">
                         <a class="font-weight-bold btn btn-sm btn-outline-danger"
                            href="#" data-toggle="modal" data-target="#logoutModal">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout

@@ -52,9 +52,19 @@ namespace risk.control.system.Controllers
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Otp");
+
+            var model = new ToolHubViewModel
+            {
+                FaceMatchRemaining = 5 - user.FaceMatchCount,
+                OcrRemaining = 5 - user.OcrCount,
+                PdfRemaining = 5 - user.PdfCount
+            };
+
+            return View(model);
         }
         [AllowAnonymous]
         [HttpGet]

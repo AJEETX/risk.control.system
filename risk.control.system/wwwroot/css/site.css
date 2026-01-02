@@ -2582,6 +2582,10 @@ input#checkall {
     margin-bottom: 5px;
 }
 
+.profile-inner-section {
+    margin-bottom: 5px;
+}
+
 /* Profile image */
 .sidebar-profile {
     width: 60px !important;
@@ -3198,30 +3202,8 @@ img.mobile-capture-map {
     display: none;
 }
 
-/* Validation styles */
-.is-valid {
-    /*border-color: #28a745 !important;*/
-}
-
-.is-invalid {
-    border-color: #dc3545 !important;
-}
-
 .text-orange {
     color: red !important;
-}
-.face-preview-image {
-    /* Define a fixed or relative width */
-    width: 100%;
-    max-width: 400px; /* Limits size on large screens */
-    /* Force a specific shape (Square) even when empty */
-    aspect-ratio: 1 / 1;
-    /* Standardizes how the photo fits the box */
-    object-fit: cover;
-    /* Styling for the 'blank' state */
-    background-color: #f8f9fa; /* Light grey placeholder */
-    display: block !important; /* Overrides 'd-none' if you want it visible while empty */
-    border: 2px dashed #dee2e6;
 }
 
     /* Optional: Add a subtle 'plus' or icon via background when blank */
@@ -3240,7 +3222,7 @@ img.mobile-capture-map {
     background-color: #f4f4f4;
     border: 1px solid #ddd;
 }
-#ocrResult {
+#ocrResult, #summaryResult {
     height: 300px;
     min-height: 300px;
     overflow-y: scroll;
@@ -3250,14 +3232,501 @@ img.mobile-capture-map {
     height: 300px;
     min-height: 300px;
 }
-#drop-zone {
-    cursor: pointer;
-    border-style: dashed !important;
-    transition: 0.3s;
-}
+
 #previewDoc {
     max-height: 200px;
 }
 #previewOriginal, #previewMatch {
     max-height: 150px;
+}
+.otp-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.otp-input {
+    width: 50px;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+    .otp-input:focus {
+        border-color: #28a745; /* Success green to match your button */
+        outline: none;
+        box-shadow: 0 0 8px rgba(40, 167, 69, 0.2);
+    }
+
+.drop-zone--over {
+    border-style: solid;
+    background: #f8f9fa;
+}
+
+.drop-zone__input {
+    display: none;
+}
+
+.ai-summary {
+    white-space: pre-wrap;
+}
+
+.tool-card {
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    border: none;
+    background: #ffffff;
+}
+
+    .tool-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08) !important;
+    }
+
+.icon-box {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+}
+
+.bg-soft-primary {
+    background: #e7f1ff;
+    color: #007bff;
+}
+
+.bg-soft-success {
+    background: #e6f9ed;
+    color: #28a745;
+}
+
+.bg-soft-info {
+    background: #e1faff;
+    color: #17a2b8;
+}
+
+/* Biometric UI styling */
+.face-card, .ocr-card, .summarizer-card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #adb5bd;
+}
+
+/* Custom Soft Badge Styles */
+.badge-soft-primary {
+    background-color: #cfe2ff; /* Deeper blue than the header */
+    color: #084298; /* Dark blue text for contrast */
+    border: 1px solid #b6d4fe;
+}
+
+.badge-soft-danger {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+
+/* Optional: Make the badge feel more modern */
+.usage-badge-custom {
+    padding: 0.5em 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border-radius: 50rem; /* pill shape */
+}
+
+
+/* Custom Soft Badge Styles */
+.badge-soft-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #a3cfbb;
+}
+
+/* Custom Soft Badge for PDF Tool */
+.badge-soft-info {
+    background-color: #cff4fc;
+    color: #055160;
+    border: 1px solid #9eeaf9;
+}
+
+.match-score-badge {
+    font-size: 2rem;
+    font-weight: 800;
+    display: block;
+}
+
+.progress.rounded-pill {
+    height: 10px;
+}
+
+#scoreBar {
+    transition: width 0.1s ease-out, background-color 0.5s ease;
+}
+
+/* Optional: Glow effect when match is successful */
+.progress-bar.bg-success:not(.progress-bar-animated) {
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
+
+.scanning::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #28a745;
+    box-shadow: 0 0 15px 5px rgba(40, 167, 69, 0.5);
+    animation: scan 2s infinite ease-in-out; /* Changed to ease-in-out for smoother bounce */
+    z-index: 10;
+}
+
+/* Define the up and down movement */
+@keyframes scan {
+    0% {
+        top: 0%;
+    }
+
+    50% {
+        top: 100%;
+    }
+
+    100% {
+        top: 0%;
+    }
+}
+
+.std-height textarea {
+    min-height: 250px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    background-color: #f8f9fa;
+}
+
+/* Document Preview Styling */
+
+.drop-zone:hover .pdf-icon-preview {
+    transform: scale(1.1);
+}
+
+@@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.microsoft {
+    height: 3em;
+    float: right;
+}
+
+img.microsoft {
+    height: 3em;
+}
+
+/* FACE-MATCH*/
+/* Container & Card */
+.tool-match-section {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.face-card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Header Styling */
+.tool-card-header {
+    background-color: #bbd4f5; /* Muted Steel Blue */
+    border-bottom: 2px solid #99b8e0;
+    padding: 1rem 1.5rem;
+}
+
+.face-card-title {
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-bottom: 0;
+}
+
+/* Drop Zone & Upload UI */
+.upload-container {
+    margin-bottom: 1rem;
+}
+
+.upload-label {
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.drop-zone {
+    border: 2px dashed #cbd5e1;
+    background-color: #f8fafc;
+    transition: all 0.2s ease-in-out;
+    min-height: 220px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+    .drop-zone:hover {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+    }
+
+.face-preview-image {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* VS Divider */
+.vs-divider-circle {
+    background-color: #ffffff;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #64748b;
+    font-size: 0.85rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Action Button */
+.btn-analyze {
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 2px solid #0056b3;
+}
+
+/* Results Section */
+.result-display-card {
+    background-color: #f1f5f9;
+    border-radius: 10px;
+}
+
+.match-score-text {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #2563eb;
+    line-height: 1;
+}
+
+/* OCR*/
+.header-ocr {
+    background-color: #d1e7dd; /* Soft Success Green */
+    border-bottom: 2px solid #a3cfbb;
+    color: #0f5132;
+    padding: 1rem 1.5rem;
+}
+
+/* Drop Zone Area */
+.ocr-drop-zone {
+    border: 2px dashed #a3cfbb;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+    min-height: 350px; /* Matched to textarea height */
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+    .ocr-drop-zone:hover {
+        background-color: #f0fdf4;
+        border-color: #198754;
+    }
+
+.img-preview-doc {
+    max-width: 180px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Textarea / Result Area */
+.ocr-textarea {
+    height: 350px !important;
+    resize: none;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background-color: #ffffff;
+    font-family: 'Courier New', Courier, monospace; /* Coding style for data */
+    padding: 15px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+    .ocr-textarea:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    }
+
+/* Action Button */
+.btn-ocr-start {
+    padding: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 3px solid #146c43;
+    transition: transform 0.2s;
+}
+
+    .btn-ocr-start:active {
+        transform: scale(0.98);
+    }
+/* Container to hold both the loader and the textarea */
+.ocr-result-wrapper {
+    position: relative;
+}
+
+/* The Overlay Loader */
+.ocr-loader-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9); /* Replaces opacity: 0.9 */
+    border-radius: 12px;
+    z-index: 10;
+}
+/* PDF Summarizer Specifics */
+.summarizer-card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.header-pdf {
+    background-color: #cff4fc; /* Soft Cyan */
+    border-bottom: 2px solid #9eeaf9;
+    color: #055160;
+    padding: 1rem 1.5rem;
+}
+
+/* Enhanced Drop Zone */
+.pdf-drop-zone {
+    border: 2px dashed #9eeaf9;
+    background-color: #f8fafc;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    min-height: 380px;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+    .pdf-drop-zone:hover {
+        background-color: #f0f9ff;
+        border-color: #0dcaf0;
+        transform: translateY(-2px);
+    }
+
+.pdf-icon-preview {
+    width: 80px;
+    height: auto;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+/* Summary Result Box */
+.summary-box-container {
+    position: relative;
+}
+
+.summary-box {
+    height: 380px !important;
+    resize: none;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background-color: #ffffff;
+    padding: 20px;
+    line-height: 1.7;
+    font-size: 0.95rem;
+    color: #334155;
+}
+
+/* Loader Overlay */
+.pdf-loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 10;
+    border-radius: 12px;
+}
+
+/* Pulse Animation for "Generating" text */
+.pulse-loading {
+    animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Main Action Button */
+.btn-generate-summary {
+    padding: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 3px solid #0aa2c0;
+}
+#fileNameDisplay {
+    max-width: 200px;
+}
+/* Drag and Drop Hover State */
+.drop-zone-active {
+    background-color: #f0f9ff !important;
+    border-color: #0dcaf0 !important;
+    transform: scale(1.02);
 }

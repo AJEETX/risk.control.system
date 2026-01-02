@@ -4,8 +4,11 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
+using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -16,12 +19,27 @@ namespace risk.control.system.Controllers.Tools;
 public class PdfSummaryController : Controller
 {
     private readonly ITextAnalyticsService textAnalyticsService;
+    private readonly UserManager<ApplicationUser> _userManager; // Add UserManager
 
-    public PdfSummaryController(ITextAnalyticsService textAnalyticsService)
+    public PdfSummaryController(
+        ITextAnalyticsService textAnalyticsService,
+        UserManager<ApplicationUser> userManager) // Inject UserManager
     {
         this.textAnalyticsService = textAnalyticsService;
+        this._userManager = userManager;
     }
-    public IActionResult Index() => View();
+
+    public async Task<IActionResult> Index()
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        var model = new PdfSummaryViewModel
+        {
+            RemainingTries = 5 - (user?.PdfCount ?? 0)
+        };
+
+        return View(model);
+    }
 
     [HttpPost]
     public async Task<IActionResult> Summarize(IFormFile pdfFile)
@@ -29,6 +47,15 @@ public class PdfSummaryController : Controller
         if (pdfFile == null || pdfFile.Length == 0)
         {
             return BadRequest(new { errorMessage = "Please upload a valid PDF file." });
+        }
+
+        // 1. Get current user and verify limit
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return Unauthorized();
+
+        if (user.PdfCount >= 5)
+        {
+            return StatusCode(403, new { errorMessage = "PDF Summary limit reached (5/5). Try again tomorrow." });
         }
 
         try
@@ -56,10 +83,19 @@ public class PdfSummaryController : Controller
                 return BadRequest(new { errorMessage = "The file content is empty." });
             }
 
+            // 2. Run the AI Service
             var summary = await textAnalyticsService.AbstractiveSummarizeAsync(content);
 
-            // Return JSON for AJAX
-            return Ok(new { summary = summary });
+            // 3. Increment the count in the database
+            user.PdfCount++;
+            await _userManager.UpdateAsync(user);
+
+            // 4. Return summary and current remaining count
+            return Ok(new
+            {
+                summary = summary,
+                remaining = 5 - user.PdfCount
+            });
         }
         catch (Exception ex)
         {

@@ -4,51 +4,75 @@
     ViewData["Title"] = "Document OCR Tool";
     Layout = "~/Views/Shared/_LayoutGuest.cshtml";
 }
-
-<section class="content py-4">
+<section class="content tool-match-section">
     <div id="article" class="card shadow-lg border-0 ocr-card">
-        <div class="card-header bg-dark text-white d-flex align-items-center">
+        <div class="card-header d-flex align-items-center header-ocr">
             <i class="fas fa-file-invoice mr-2"></i>
-            <h5 class="mb-0">OCR Extract</h5>
-        </div>
-        <div class="card-body">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            <h5 class="mb-0 font-weight-bold">OCR Extract</h5>
+
+            <div class="ml-auto ms-auto">
+                <span id="usageBadge" class="badge usage-badge-custom shadow-sm @(Model.RemainingTries <= 1 ? "badge-soft-danger" : "badge-soft-success")">
+                    <i class="fas @(Model.RemainingTries <= 1 ? "fa-exclamation-circle" : "fa-clock") mr-1 small"></i>
+                    <span id="remainingCount">@Model.RemainingTries</span> tries left
+                </span>
             </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        </div>
             <form id="ocrForm" enctype="multipart/form-data">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label font-weight-bold" for="DocumentImage">Step 1: Upload Document</label>
-                        <div id="drop-zone" class="rounded d-flex flex-column align-items-center justify-content-center p-4 bg-light">
+                    <div class="col-md-6 mb-4 text-center">
+                        <label class="h6 font-weight-bold text-secondary mb-3" for="DocumentImage">
+                            <span class="badge badge-success rounded-circle mr-1">1</span> Upload Document
+                        </label>
+                        <div id="drop-zone" class="ocr-drop-zone d-flex flex-column align-items-center justify-content-center p-4">
                             <input id="DocumentImage" asp-for="DocumentImage" type="file" class="d-none" accept="image/*" required />
                             <div class="text-center" id="drop-zone-content">
-                                <img id="previewDoc" src="/img/add-file.png" alt="Preview" class="img-thumbnail mb-2" />
-                                <p class="mb-0 text-muted" id="drop-text">Drag document here or <strong>click to browse</strong></p>
+                                <img id="previewDoc" src="/img/add-file.png" alt="Preview" class="img-preview-doc mb-3" />
+                                <h6 class="text-success font-weight-bold">Select Image</h6>
+                                <p class="small text-muted mb-0">Drag & drop or click to browse</p>
+                                <small class="text-muted italic">(JPG, PNG or TIFF)</small>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6 mb-3 std-height">
-                        <label class="form-label font-weight-bold" for="ocrResult">Step 2: Extracted Text</label>
-                        <div id="loader" class="text-center d-none py-5">
-                            <i class="fas fa-circle-notch fa-spin fa-3x text-success"></i>
-                            <p class="mt-3 font-weight-bold">AI is reading document lines...</p>
-                        </div>
-                        <textarea id="ocrResult" class="form-control shadow-sm" placeholder="The extracted data will appear here after processing..." readonly></textarea>
+                    <div class="col-md-6 mb-4 text-center">
+                        <label class="h6 font-weight-bold text-secondary mb-3" for="ocrResult">
+                            <span class="badge badge-success rounded-circle mr-1">2</span> Extracted Text
+                        </label>
+                        <div class="ocr-result-wrapper">
+                            <div id="loader" class="ocr-loader-overlay d-none">
+                                <i class="fas fa-sync fa-spin fa-3x text-success"></i>
+                                <p class="mt-3 font-weight-bold text-success">AI scanning text...</p>
+                            </div>
 
-                        <div id="resultActions" class="mt-2 d-none text-right">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard()">
-                                <i class="fas fa-copy"></i> Copy Text
-                            </button>
+                            <textarea id="ocrResult" 
+                                      class="form-control shadow-sm ocr-textarea" 
+                                      placeholder="AI will populate this field with extracted data..." 
+                                      readonly>
+                            </textarea>
                         </div>
                     </div>
                 </div>
 
-                <hr />
-
-                <button type="submit" id="btnSubmit" class="btn btn-success btn-lg w-100 shadow-sm rounded-pill">
-                    <i class="fas fa-bolt"></i> Start Extraction
-                </button>
+                <div class="mt-2">
+                    <button type="submit" id="btnSubmit" 
+                            class="btn btn-outline-success btn-lg w-100 shadow rounded-pill btn-ocr-start"
+                            @(Model.RemainingTries <= 0 ? "disabled" : "")>
+                        
+                        @if (Model.RemainingTries <= 0)
+                        {
+                            <i class="fas fa-lock mr-2"></i> <span>Limit Reached</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-microchip mr-2"></i> <span>Process OCR Analysis</span>
+                        }
+                    </button>
+                </div>
             </form>
         </div>
     </div>
