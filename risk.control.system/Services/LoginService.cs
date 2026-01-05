@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
@@ -16,12 +17,17 @@ namespace risk.control.system.Services
         Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin = "");
         Task<IEnumerable<SelectListItem>> GetUserSelectListAsync();
         Task SignInWithTimeoutAsync(ApplicationUser user); // Moved here
-        string GetErrorMessage(Microsoft.AspNetCore.Identity.SignInResult result);
+        string GetErrorMessage(SignInResult result);
+        Task<bool> SendOtpAsync(OtpRequest request);
+        Task<(bool Success, string Message)> ResendOtpAsync(OtpRequest request);
+        Task<(bool Success, string Message)> VerifyAndLoginAsync(string isd, string mobileNumber, string userEnteredOtp);
     }
 
     internal class LoginService : ILoginService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache cache;
+        private readonly ISmsService smsService;
         private readonly IFeatureManager _featureManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration config;
@@ -29,12 +35,16 @@ namespace risk.control.system.Services
 
         public LoginService(
             ApplicationDbContext context,
+            IMemoryCache cache,
+            ISmsService smsService,
             IFeatureManager featureManager,
             UserManager<ApplicationUser> userManager,
             IConfiguration config,
             SignInManager<ApplicationUser> signInManager)
         {
             _context = context;
+            this.cache = cache;
+            this.smsService = smsService;
             _featureManager = featureManager;
             _userManager = userManager;
             this.config = config;
@@ -104,11 +114,92 @@ namespace risk.control.system.Services
             await signInManager.SignInAsync(user, properties);
         }
 
-        public string GetErrorMessage(Microsoft.AspNetCore.Identity.SignInResult result)
+        public string GetErrorMessage(SignInResult result)
         {
             if (result.IsLockedOut) return "User account locked out.";
             if (result.IsNotAllowed) return "User account not allowed. Contact admin.";
             return "Invalid credentials. Contact admin.";
+        }
+
+        public async Task<bool> SendOtpAsync(OtpRequest request)
+        {
+            var result = await InternalSendOtpLogic(request);
+            return result.Success;
+        }
+        public async Task<(bool Success, string Message)> ResendOtpAsync(OtpRequest request)
+        {
+            return await InternalSendOtpLogic(request);
+        }
+        public async Task<(bool Success, string Message)> VerifyAndLoginAsync(string isd, string mobileNumber, string userEnteredOtp)
+        {
+            string cleanIsd = isd.TrimStart('+');
+            string cleanMobile = mobileNumber.TrimStart('0');
+            string cacheKey = $"{cleanIsd}{cleanMobile}";
+
+            if (!cache.TryGetValue(cacheKey, out string correctOtp) || correctOtp != userEnteredOtp?.Trim())
+            {
+                return (false, "The OTP entered is invalid or has expired.");
+            }
+
+            cache.Remove(cacheKey);
+
+            var username = $"{cleanIsd}{cleanMobile}@icheckify.co.in";
+            var user = await _userManager.FindByNameAsync(username);
+
+            if (user == null)
+            {
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == cleanIsd);
+
+                user = new ApplicationUser
+                {
+                    FirstName = "Guest",
+                    LastName = "Guest",
+                    PhoneNumber = cleanMobile,
+                    UserName = username,
+                    Email = username,
+                    CountryId = country?.CountryId ?? 0
+                };
+
+                var result = await _userManager.CreateAsync(user);
+                if (!result.Succeeded)
+                    return (false, result.Errors.FirstOrDefault()?.Description ?? "User creation failed.");
+
+                await _userManager.AddToRoleAsync(user, AppRoles.GUEST.ToString());
+            }
+
+            // 5. Sign In
+            await SignInWithTimeoutAsync(user);
+
+            return (true, "Login successful.");
+        }
+        private async Task<(bool Success, string Message)> InternalSendOtpLogic(OtpRequest request)
+        {
+            string cleanIsd = request.CountryIsd?.TrimStart('+') ?? "";
+            string cleanMobile = request.MobileNumber?.TrimStart('0') ?? "";
+            string cacheKey = $"{cleanIsd}{cleanMobile}";
+
+            // 1. Generate & Cache
+            var otp = new Random().Next(1000, 9999).ToString();
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(5))
+                .SetSize(1);
+            cache.Set(cacheKey, otp, cacheOptions);
+
+            // 2. Database Lookup
+            var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == cleanIsd);
+            if (country == null) return (false, "Invalid country code.");
+
+            // 3. Send SMS
+            var message = $"Hi user {request.CountryIsd} {cleanMobile}\n" +
+                          $"Your code is {otp}\n" +
+                          $"{request.BaseUrl}";
+
+            var response = await smsService.SendSmsAsync(country.Code, cleanIsd + cleanMobile, message);
+
+            if (!string.IsNullOrWhiteSpace(response))
+                return (true, "OTP sent successfully!");
+
+            return (false, "Failed to send SMS.");
         }
     }
 }

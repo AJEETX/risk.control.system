@@ -1,7 +1,7 @@
 ﻿@model OtpLoginModel
 
 @{
-    ViewData["Title"] = "Login: icheckify";
+    ViewData["Title"] = "Tool: icheckify";
     Layout = null;
 }
 <!DOCTYPE html>
@@ -39,7 +39,7 @@
                         Otp Login
                         <sup class="fa fa-info-circle password-info-icon"></sup>
                     </div>
-                    <form id="login-form" asp-action="Otp" method="post">
+                    <form id="login-form" asp-action="Try" method="post">
                         @Html.AntiForgeryToken()
                         <div class="input-boxes">
                             <div class="input-box">

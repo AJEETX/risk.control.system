@@ -45,10 +45,9 @@
                     <form id="login-form" asp-action="VerifyOtp" method="post">
                         @Html.AntiForgeryToken()
                         <div class="input-boxes">
-                            <input type="hidden" name="mobileNumber" value="@Model.MobileNumber" />
-                            <input type="hidden" name="isd" value="@Model.CountryIsd" />
-
-                            <input type="hidden" id="userEnteredOtp" name="userEnteredOtp" required />
+                            <input type="hidden" name="MobileNumber" value="@Model.MobileNumber" />
+                            <input type="hidden" name="CountryIsd" value="@Model.CountryIsd" />
+                            <input type="hidden" id="userEnteredOtp" name="UserEnteredOtp" required />
 
                             <div class="otp-container">
                                 <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
@@ -84,7 +83,7 @@
                     }
                     </div>
                     <div class="error-message try-again">
-                        <div class="text-muted text-sm">Try Again <span class="far fa-hand-point-right" aria-hidden="true"></span> <a href="/Account/Otp" class="login-link"> Click Here</a></div>
+                        <div class="text-muted text-sm">Try Again <span class="far fa-hand-point-right" aria-hidden="true"></span> <a href="/Tool/Try" class="login-link"> Click Here</a></div>
                     </div>
                 </div>
             </div>

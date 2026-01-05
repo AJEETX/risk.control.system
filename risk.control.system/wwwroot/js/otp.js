@@ -182,7 +182,7 @@ $(document).ready(function () {
         const token = $('input[name="__RequestVerificationToken"]').val();
 
         $.ajax({
-            url: '/Account/ResendOtp',
+            url: '/Tool/ResendOtp',
             type: 'POST',
             data: {
                 isd: isd,
