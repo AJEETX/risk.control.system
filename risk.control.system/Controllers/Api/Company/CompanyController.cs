@@ -124,7 +124,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var companyUser = await _context.ClientCompanyApplicationUser
+                var companyUser = await _context.ApplicationUser
                     .FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser == null)
                 {
@@ -155,7 +155,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var companyUser = await _context.ClientCompanyApplicationUser
+                var companyUser = await _context.ApplicationUser
                     .FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser == null)
                 {

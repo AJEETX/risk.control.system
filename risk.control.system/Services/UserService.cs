@@ -55,10 +55,10 @@ namespace risk.control.system.Services
                      .Select(u => u.ActiveUser.Email)? // Select the user email
                      .ToList(); // Exclude users who have logged out
 
-            var vendorUser = context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
 
-            var vendorUsers = context.VendorApplicationUser
+            var vendorUsers = context.ApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.State)
                 .Include(u => u.District)
@@ -136,7 +136,7 @@ namespace risk.control.system.Services
                     Id = u.AgencyUser.Id,
                     Photo = u.AgencyUser.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
                     Path.Combine(webHostEnvironment.ContentRootPath, u.AgencyUser.ProfilePictureUrl)))),
-                    Email = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT) ?
+                    Email = (u.AgencyUser.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.Role != AppRoles.AGENT) ?
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a>" :
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
@@ -149,10 +149,10 @@ namespace risk.control.system.Services
                     Country = u.AgencyUser.Country.Code,
                     Flag = "/flags/" + u.AgencyUser.Country.Code.ToLower() + ".png",
                     Active = u.AgencyUser.Active,
-                    Roles = u.AgencyUser.UserRole != null ? u.AgencyUser.UserRole.GetEnumDisplayName() : "..",
+                    Roles = u.AgencyUser.Role != null ? u.AgencyUser.Role.GetEnumDisplayName() : "..",
                     Count = u.CurrentCaseCount,
-                    Role = u.AgencyUser.UserRole.GetEnumDisplayName(),
-                    AgentOnboarded = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT),
+                    Role = u.AgencyUser.Role.GetEnumDisplayName(),
+                    AgentOnboarded = (u.AgencyUser.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.Role != AppRoles.AGENT),
                     RawEmail = u.AgencyUser.Email,
                     IsUpdated = u.AgencyUser.IsUpdated,
                     LastModified = u.AgencyUser.Updated.GetValueOrDefault(),
@@ -186,7 +186,7 @@ namespace risk.control.system.Services
                      .Select(u => u.ActiveUser.Email)? // Select the user email
                      .ToList(); // Exclude users who have logged out
 
-            var vendorUsers = context.VendorApplicationUser
+            var vendorUsers = context.ApplicationUser
                   .Include(u => u.Country)
                   .Include(u => u.State)
                   .Include(u => u.District)
@@ -239,7 +239,7 @@ namespace risk.control.system.Services
                 {
                     Id = user.Id,
                     Name = user.FirstName + " " + user.LastName,
-                    Email = (user.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(user.MobileUId) || user.UserRole != AgencyRole.AGENT) ?
+                    Email = (user.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(user.MobileUId) || user.Role != AppRoles.AGENT) ?
                     user.Email :
                     user.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     RawEmail = user.Email,
@@ -254,7 +254,7 @@ namespace risk.control.system.Services
                     PincodeName = user.PinCode.Name + " - " + user.PinCode.Code,
                     Country = user.Country.Code,
                     Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
-                    Roles = user.UserRole.GetEnumDisplayName(),
+                    Roles = user.Role.GetEnumDisplayName(),
                     Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
                     UpdatedBy = user.UpdatedBy,
                     OnlineStatus = status,
@@ -289,9 +289,9 @@ namespace risk.control.system.Services
                      .Select(u => u.ActiveUser.Email)? // Select the user email
                      .ToList(); // Exclude users who have logged out
 
-            var companyUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var companyUsers = context.ClientCompanyApplicationUser
+            var companyUsers = context.ApplicationUser
                 .Include(u => u.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
@@ -357,7 +357,7 @@ namespace risk.control.system.Services
                     StateName = user.State.Name,
                     Country = user.Country.Code,
                     Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
-                    Role = user.UserRole.GetEnumDisplayName(),
+                    Role = user.Role.GetEnumDisplayName(),
                     Pincode = user.PinCode.Code,
                     PincodeName = user.PinCode.Name + " - " + user.PinCode.Code,
                     OnlineStatus = status,
@@ -392,9 +392,9 @@ namespace risk.control.system.Services
                      .Select(u => u.ActiveUser.Email)? // Select the user email
                      .ToList(); // Exclude users who have logged out
 
-            var companyUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var companyUsers = context.ClientCompanyApplicationUser
+            var companyUsers = context.ApplicationUser
                 .Include(c => c.PinCode)
                 .Include(u => u.District)
                 .Include(u => u.State)
@@ -460,7 +460,7 @@ namespace risk.control.system.Services
                     StateName = user.State.Name,
                     Country = user.Country.Code,
                     Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
-                    Roles = user.UserRole.GetEnumDisplayName(),
+                    Roles = user.Role.GetEnumDisplayName(),
                     Pincode = user.PinCode.Code,
                     PincodeName = user.PinCode.Name + " - " + user.PinCode.Code,
                     OnlineStatus = status,

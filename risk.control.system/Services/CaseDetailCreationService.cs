@@ -14,7 +14,7 @@ namespace risk.control.system.Services
 {
     public interface ICaseDetailCreationService
     {
-        Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, byte[] model, ORIGIN fileOrFTP);
+        Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ApplicationUser companyUser, byte[] model, ORIGIN fileOrFTP);
     }
     internal class CaseDetailCreationService : ICaseDetailCreationService
     {
@@ -62,7 +62,7 @@ namespace risk.control.system.Services
             }
             return true;
         }
-        public async Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, byte[] model, ORIGIN fileOrFTP)
+        public async Task<UploadResult> AddCaseDetail(UploadCase uploadCase, ApplicationUser companyUser, byte[] model, ORIGIN fileOrFTP)
         {
             var case_errors = new List<UploadError>();
             var caseErrors = new List<string>();

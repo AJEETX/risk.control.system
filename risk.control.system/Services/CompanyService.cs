@@ -93,11 +93,11 @@ namespace risk.control.system.Services
             if (errors.Any())
                 return (false, errors);
 
-            var companyUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser == null)
             {
-                errors[nameof(ClientCompanyApplicationUser.Email)] = "User not found.";
+                errors[nameof(ApplicationUser.Email)] = "User not found.";
                 return (false, errors);
             }
             var company = await context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);

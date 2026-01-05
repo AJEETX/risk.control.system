@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
-            UserManager<ClientCompanyApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             ClientCompany clientCompany, string companyDomain, PinCode pinCode, IFileStorageService fileStorageService)
         {
             //Seed client creator
@@ -24,7 +24,7 @@ namespace risk.control.system.Seeds
             var adminImage = File.ReadAllBytes(adminImagePath);
             var extension = Path.GetExtension(adminImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, companyDomain, "user");
-            var admin = new ClientCompanyApplicationUser()
+            var admin = new ApplicationUser()
             {
                 UserName = adminEmailwithSuffix,
                 Email = adminEmailwithSuffix,
@@ -47,7 +47,6 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 Role = AppRoles.COMPANY_ADMIN,
-                UserRole = CompanyRole.COMPANY_ADMIN,
                 Updated = DateTime.Now,
             };
             if (userManager.Users.All(u => u.Id != admin.Id))
@@ -57,8 +56,6 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(admin, TestingData);
                     await userManager.AddToRoleAsync(admin, AppRoles.COMPANY_ADMIN.ToString());
-                    //var clientAssignerRole = new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString());
-                    //clientAssigner.ApplicationRoles.Add(clientAssignerRole);
                 }
             }
         }

@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers.Mobile
                 return BadRequest("Invalid login attempt.");
             }
 
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == model.Email && !u.Deleted && u.Role == AppRoles.AGENT);
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == model.Email && !u.Deleted && u.Role == AppRoles.AGENT);
             if (vendorUser == null)
             {
                 return BadRequest("Invalid login attempt.");

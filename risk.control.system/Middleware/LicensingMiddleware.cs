@@ -72,7 +72,7 @@ namespace risk.control.system.Middleware
                                                 userRole.Value.Contains(AppRoles.AGENT.ToString());
                         if (isCompanyUser)
                         {
-                            var companyUser = await dbContext.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == user);
+                            var companyUser = await dbContext.ApplicationUser.FirstOrDefaultAsync(u => u.Email == user && u.ClientCompanyId > 0);
                             var company = await dbContext.ClientCompany.FirstOrDefaultAsync(c => companyUser.ClientCompanyId == c.ClientCompanyId);
 
                             if (company == null)

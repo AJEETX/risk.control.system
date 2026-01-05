@@ -1,8 +1,12 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
@@ -23,10 +27,16 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class VendorsController : Controller
     {
+        private AppRoles[] agencyRoles = new[]
+                {
+                    AppRoles.AGENCY_ADMIN,
+                    AppRoles.SUPERVISOR,
+                    AppRoles.AGENT
+                };
         private readonly ApplicationDbContext _context;
         private readonly IAgencyCreateEditService agencyCreateEditService;
         private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
-        private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService service;
         private readonly IFeatureManager featureManager;
@@ -38,7 +48,7 @@ namespace risk.control.system.Controllers
             ApplicationDbContext context,
             IAgencyCreateEditService agencyCreateEditService,
             IAgencyUserCreateEditService agencyUserCreateEditService,
-            UserManager<VendorApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             INotyfService notifyService,
             IInvestigationService service,
             IFeatureManager featureManager,
@@ -90,7 +100,7 @@ namespace risk.control.system.Controllers
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found. Try again.");
@@ -144,7 +154,7 @@ namespace risk.control.system.Controllers
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
@@ -270,7 +280,7 @@ namespace risk.control.system.Controllers
                           (c.SubStatus == approvedStatus ||
                           c.SubStatus == rejectedStatus));
 
-                var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
+                var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
 
                 // HACKY
                 var currentCases = service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
@@ -316,34 +326,54 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"OOPs !!!..Error creating user.", 3, "red", "fa fa-user");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList();
-            AgencyRole? role = null;
+            List<SelectListItem> allRoles = null;
+            AppRoles? role = null;
             var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
             if (vendor == null)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var currentVendorUserCount = await _context.VendorApplicationUser.CountAsync(v => v.VendorId == id);
+            var currentVendorUserCount = await _context.ApplicationUser.CountAsync(v => v.VendorId == id);
             bool status = false;
             if (currentVendorUserCount == 0)
             {
-                role = AgencyRole.AGENCY_ADMIN;
+                role = AppRoles.AGENCY_ADMIN;
                 status = true;
-                allRoles = allRoles.Where(r => r == AgencyRole.AGENCY_ADMIN).ToList();
+                allRoles = agencyRoles
+                .Where(r => r == AppRoles.AGENCY_ADMIN) // Include ADMIN if already taken
+                .Select(r => new SelectListItem
+                {
+                    Value = r.ToString(),
+                    Text = r.GetType()
+                            .GetMember(r.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
+                })
+                .ToList();
             }
             else
             {
-                allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
+                allRoles = agencyRoles
+                .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude ADMIN if already taken
+                .Select(r => new SelectListItem
+                {
+                    Value = r.ToString(),
+                    Text = r.GetType()
+                            .GetMember(r.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
+                })
+                .ToList();
             }
-            var model = new VendorApplicationUser
+            var model = new ApplicationUser
             {
                 Active = status,
                 Country = vendor.Country,
                 CountryId = vendor.CountryId,
                 Vendor = vendor,
-                AgencyRole = allRoles,
-                UserRole = role
+                AvailableRoles = allRoles,
+                Role = role
             };
 
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
@@ -355,23 +385,43 @@ namespace risk.control.system.Controllers
 
             return View(model);
         }
-        private async Task LoadModel(VendorApplicationUser model)
+        private async Task LoadModel(ApplicationUser model)
         {
-            var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList();
-            AgencyRole? role = null;
+            List<SelectListItem> allRoles = null;
+            AppRoles? role = null;
             var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
 
-            var currentVendorUserCount = await _context.VendorApplicationUser.CountAsync(v => v.VendorId == model.VendorId);
+            var currentVendorUserCount = await _context.ApplicationUser.CountAsync(v => v.VendorId == model.VendorId);
             bool status = false;
             if (currentVendorUserCount == 0)
             {
-                role = AgencyRole.AGENCY_ADMIN;
+                role = AppRoles.AGENCY_ADMIN;
                 status = true;
-                allRoles = allRoles.Where(r => r == AgencyRole.AGENCY_ADMIN).ToList();
+                allRoles = agencyRoles
+                .Where(r => r == AppRoles.AGENCY_ADMIN) // Include ADMIN if already taken
+                .Select(r => new SelectListItem
+                {
+                    Value = r.ToString(),
+                    Text = r.GetType()
+                            .GetMember(r.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
+                })
+                .ToList();
             }
             else
             {
-                allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
+                allRoles = agencyRoles
+                .Where(r => r != AppRoles.AGENCY_ADMIN) // Include ADMIN if already taken
+                .Select(r => new SelectListItem
+                {
+                    Value = r.ToString(),
+                    Text = r.GetType()
+                            .GetMember(r.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
+                })
+                .ToList();
             }
             model.Active = status;
             model.Vendor = vendor;
@@ -380,12 +430,12 @@ namespace risk.control.system.Controllers
             model.StateId = model.SelectedStateId;
             model.DistrictId = model.SelectedDistrictId;
             model.PinCodeId = model.SelectedPincodeId;
-            model.AgencyRole = allRoles;
-            model.UserRole = role;
+            model.AvailableRoles = allRoles;
+            model.Role = role;
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(VendorApplicationUser model, string emailSuffix)
+        public async Task<IActionResult> CreateUser(ApplicationUser model, string emailSuffix)
         {
             try
             {
@@ -434,7 +484,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorApplicationUser = _context.VendorApplicationUser
+                var vendorApplicationUser = _context.ApplicationUser
                     .Include(v => v.Country)?
                     .Include(v => v.Vendor)?
                     .FirstOrDefault(v => v.Id == userId);
@@ -465,7 +515,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(string id, VendorApplicationUser model, string editby)
+        public async Task<IActionResult> EditUser(string id, ApplicationUser model, string editby)
         {
             try
             {
@@ -519,7 +569,7 @@ namespace risk.control.system.Controllers
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
+                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
                     notifyService.Error("Error getting User. Try again.");
@@ -565,7 +615,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Email == email);
+                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
@@ -575,7 +625,7 @@ namespace risk.control.system.Controllers
                 model.Updated = DateTime.Now;
                 model.UpdatedBy = currentUserEmail;
                 model.Deleted = true;
-                _context.VendorApplicationUser.Update(model);
+                _context.ApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"User <b>{model.Email}</b> Deleted successfully", 3, "red", "fas fa-user-minus");
                 return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
@@ -614,7 +664,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Create()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = await _context.ClientCompanyApplicationUser.Include(c => c.Country).Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var companyUser = await _context.ApplicationUser.Include(c => c.Country).Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             var vendor = new Vendor { CountryId = companyUser.ClientCompany.CountryId, Country = companyUser.ClientCompany.Country, SelectedCountryId = companyUser.ClientCompany.CountryId.Value };
             return View(vendor);
         }
@@ -814,13 +864,13 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorUser = await _context.VendorApplicationUser.Where(v => v.VendorId == VendorId).ToListAsync();
+                var vendorUser = await _context.ApplicationUser.Where(v => v.VendorId == VendorId).ToListAsync();
                 foreach (var user in vendorUser)
                 {
                     user.Updated = DateTime.Now;
                     user.UpdatedBy = currentUserEmail;
                     user.Deleted = true;
-                    _context.VendorApplicationUser.Update(user);
+                    _context.ApplicationUser.Update(user);
                 }
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = currentUserEmail;

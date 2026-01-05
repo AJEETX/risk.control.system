@@ -25,7 +25,7 @@ namespace risk.control.system.Services
     public class AgencyUserCreateEditService : IAgencyUserCreateEditService
     {
         private readonly IValidateImageService validateImageService;
-        private readonly UserManager<VendorApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService _fileStorage;
         private readonly INotyfService _notify;
@@ -35,7 +35,7 @@ namespace risk.control.system.Services
 
         public AgencyUserCreateEditService(
             IValidateImageService validateImageService,
-            UserManager<VendorApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             ApplicationDbContext context,
             IFileStorageService fileStorage,
             INotyfService notify,
@@ -97,7 +97,7 @@ namespace risk.control.system.Services
                 }
                 return (false, "Error creating user.", errors);
             }
-            await _userManager.AddToRoleAsync(model, model.UserRole.ToString());
+            await _userManager.AddToRoleAsync(model, model.Role.ToString());
 
             await HandleLockAndNotificationsAsync(model, portal_base_url);
 
@@ -153,7 +153,7 @@ namespace risk.control.system.Services
 
             return (true, $"User {user.Email} updated successfully", errors);
         }
-        private async Task SaveProfileImageAsync(VendorApplicationUser model, string suffix)
+        private async Task SaveProfileImageAsync(ApplicationUser model, string suffix)
         {
             var safeFolder = Regex.Replace(suffix, @"[^a-zA-Z0-9\-\.]", "");
 
@@ -162,7 +162,7 @@ namespace risk.control.system.Services
             model.ProfilePictureUrl = path;
             model.ProfilePictureExtension = Path.GetExtension(fileName);
         }
-        private static void PopulateUserEntity(VendorApplicationUser model, string email, string createdBy)
+        private static void PopulateUserEntity(ApplicationUser model, string email, string createdBy)
         {
             model.Email = email;
             model.UserName = email;
@@ -179,10 +179,10 @@ namespace risk.control.system.Services
             model.DistrictId = model.SelectedDistrictId;
             model.StateId = model.SelectedStateId;
             model.CountryId = model.SelectedCountryId;
-            model.Role = model.Role != null ? model.Role : (AppRoles)Enum.Parse(typeof(AppRoles), model.UserRole.ToString());
-            model.IsVendorAdmin = model.UserRole == AgencyRole.AGENCY_ADMIN;
+            model.Role = model.Role != null ? model.Role : (AppRoles)Enum.Parse(typeof(AppRoles), model.Role.ToString());
+            model.IsVendorAdmin = model.Role == AppRoles.AGENCY_ADMIN;
         }
-        private async Task HandleLockAndNotificationsAsync(VendorApplicationUser user, string portal_base_url, bool created = true)
+        private async Task HandleLockAndNotificationsAsync(ApplicationUser user, string portal_base_url, bool created = true)
         {
             await _userManager.SetLockoutEnabledAsync(user, !user.Active);
 
@@ -237,7 +237,7 @@ namespace risk.control.system.Services
                 }
             }
         }
-        private async Task UpdateGeoLocationAsync(VendorApplicationUser user)
+        private async Task UpdateGeoLocationAsync(ApplicationUser user)
         {
             if (user.Role != AppRoles.AGENT)
                 return;
@@ -267,16 +267,16 @@ namespace risk.control.system.Services
             }
 
         }
-        private async Task UpdateUserRolesAsync(VendorApplicationUser user)
+        private async Task UpdateUserRolesAsync(ApplicationUser user)
         {
             var existingRoles = await _userManager.GetRolesAsync(user);
 
             if (existingRoles.Any())
                 await _userManager.RemoveFromRolesAsync(user, existingRoles);
 
-            await _userManager.AddToRoleAsync(user, user.UserRole.ToString());
+            await _userManager.AddToRoleAsync(user, user.Role.ToString());
         }
-        private static void UpdateUserFields(VendorApplicationUser input, VendorApplicationUser user, string updatedBy)
+        private static void UpdateUserFields(ApplicationUser input, ApplicationUser user, string updatedBy)
         {
             user.ProfilePictureUrl = input.ProfilePictureUrl ?? user.ProfilePictureUrl;
             user.ProfilePictureExtension = input.ProfilePictureExtension ?? user.ProfilePictureExtension;
@@ -295,11 +295,8 @@ namespace risk.control.system.Services
             if (!string.IsNullOrWhiteSpace(input.Password))
                 user.Password = input.Password;
 
-            user.UserRole = input.UserRole;
-            user.Role = input.Role ??
-                (AppRoles)Enum.Parse(typeof(AppRoles), input.UserRole.ToString());
-
-            user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
+            user.Role = input.Role;
+            user.IsVendorAdmin = user.Role == AppRoles.AGENCY_ADMIN;
             user.IsUpdated = true;
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = updatedBy;

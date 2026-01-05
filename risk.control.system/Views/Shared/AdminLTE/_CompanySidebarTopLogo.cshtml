@@ -1,26 +1,19 @@
 ﻿@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
+@inject UserManager<ApplicationUser> userManager
 @model ClientCompany
 @if (SignInManager.IsSignedIn(User))
 {
     var roleCode = string.Empty;
-    var user = UserManager.GetUserAsync(User).Result;
+    var user = userManager.GetUserAsync(User).Result;
 
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
 
         <div class="image">
-            @if (user != null)
-            {
-                <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetCompanyUserDocument/@user.Id" alt="user image">
-            }
-            else
-            {
-                <img class="elevation-0 sidebar-profile img-circle" src="@Applicationsettings.NO_USER" alt="user image">
+            <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserProfileImage/@user.Id" alt="profile">
 
-            }
         </div>
         <a class="d-block">
-            <span id="user-firstname"> @UserManager.GetUserAsync(User).Result?.FirstName</span>
+    <span id="user-firstname"> @userManager.GetUserAsync(User).Result?.FirstName</span>
             <span id="user-role"> @if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
             {
                 roleCode = @Applicationsettings.COMPANY_ADMIN.CODE;

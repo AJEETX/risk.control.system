@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
-            UserManager<ClientCompanyApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             ClientCompany clientCompany, PinCode pinCode, string assessorEmailwithSuffix, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
             //Seed client creator
@@ -28,7 +28,7 @@ namespace risk.control.system.Seeds
             }
             var extension = Path.GetExtension(assessorImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(assessorImage, extension, clientCompany.Email, "user");
-            var clientAssessor = new ClientCompanyApplicationUser()
+            var clientAssessor = new ApplicationUser()
             {
                 UserName = assessorEmailwithSuffix,
                 Email = assessorEmailwithSuffix,
@@ -53,7 +53,6 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 Role = AppRoles.ASSESSOR,
-                UserRole = CompanyRole.ASSESSOR,
                 Updated = DateTime.Now,
             };
             if (userManager.Users.All(u => u.Id != clientAssessor.Id))
@@ -63,8 +62,6 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(clientAssessor, TestingData);
                     await userManager.AddToRoleAsync(clientAssessor, AppRoles.ASSESSOR.ToString());
-                    //var clientAssessorRole = new ApplicationRole(AppRoles.ASSESSOR.ToString(), AppRoles.ASSESSOR.ToString());
-                    //clientAssigner.ApplicationRoles.Add(clientAssessorRole);
                 }
             }
         }

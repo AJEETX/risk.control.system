@@ -39,20 +39,23 @@ namespace risk.control.system.Services
     internal class MailService : IMailService
     {
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ILogger<MailService> logger;
         private readonly ISmsService smsService;
-        private readonly UserManager<ClientCompanyApplicationUser> userManager;
-        private readonly UserManager<VendorApplicationUser> userVendorManager;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly UserManager<ApplicationUser> userVendorManager;
         private readonly IFeatureManager featureManager;
 
         public MailService(ApplicationDbContext context,
+            RoleManager<ApplicationRole> roleManager,
             ILogger<MailService> logger,
             ISmsService SmsService,
-            UserManager<ClientCompanyApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             IFeatureManager featureManager,
-            UserManager<VendorApplicationUser> userVendorManager)
+            UserManager<ApplicationUser> userVendorManager)
         {
             this._context = context;
+            this.roleManager = roleManager;
             this.logger = logger;
             smsService = SmsService;
             this.featureManager = featureManager;
@@ -63,9 +66,9 @@ namespace risk.control.system.Services
         {
             try
             {
-                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
 
                 if (file.Completed.GetValueOrDefault())
                 {
@@ -124,9 +127,9 @@ namespace risk.control.system.Services
         {
             try
             {
-                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
 
                 if (file.Completed.GetValueOrDefault())
                 {
@@ -185,14 +188,14 @@ namespace risk.control.system.Services
         {
             try
             {
-                var managerRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
-                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
-                var supervisorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
-                var agencyAdminRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+                var managerRole = await roleManager.FindByIdAsync(AppRoles.MANAGER.ToString());
+                var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var supervisorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
+                var agencyAdminRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
 
-                var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId);
+                var vendorUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId);
 
-                List<VendorApplicationUser> userEmailsToSend = new();
+                List<ApplicationUser> userEmailsToSend = new();
 
                 foreach (var assignedUser in vendorUsers)
                 {
@@ -232,7 +235,7 @@ namespace risk.control.system.Services
                 };
                 _context.Notifications.Add(managerNotification);
 
-                var clientCompanyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var clientCompanyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
@@ -264,12 +267,12 @@ namespace risk.control.system.Services
         {
             try
             {
-                var supervisorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
-                var agencyAdminRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+                var supervisorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
+                var agencyAdminRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
 
-                var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId);
+                var vendorUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId);
 
-                List<VendorApplicationUser> userEmailsToSend = new();
+                List<ApplicationUser> userEmailsToSend = new();
 
                 foreach (var assignedUser in vendorUsers)
                 {
@@ -300,7 +303,7 @@ namespace risk.control.system.Services
                 };
                 _context.Notifications.Add(notification);
 
-                var clientCompanyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var clientCompanyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
@@ -332,9 +335,9 @@ namespace risk.control.system.Services
         {
             try
             {
-                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
 
                 var claimsInvestigations = _context.Investigations
                     .Include(i => i.PolicyDetail)
@@ -377,9 +380,9 @@ namespace risk.control.system.Services
             try
             {
                 var assigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
-                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
 
                 var notification = new StatusNotification
                 {
@@ -414,9 +417,9 @@ namespace risk.control.system.Services
         {
             try
             {
-                var applicationUser = await _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
+                var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
 
                 var notification = new StatusNotification
                 {
@@ -457,12 +460,12 @@ namespace risk.control.system.Services
 
                 var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claim.ClientCompanyId);
 
-                var companyUsers = _context.ClientCompanyApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claim.ClientCompanyId);
+                var companyUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
-                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
-                var vendorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
+                var vendorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
 
-                List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
+                List<ApplicationUser> users = new List<ApplicationUser>();
 
                 foreach (var companyUser in companyUsers)
                 {
@@ -521,9 +524,9 @@ namespace risk.control.system.Services
         {
             try
             {
-                var agentRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+                var agentRole = await roleManager.FindByIdAsync(AppRoles.AGENT.ToString());
 
-                var recepientUser = await _context.VendorApplicationUser.Include(c => c.Country).FirstOrDefaultAsync(c => c.Email == agentEmail);
+                var recepientUser = await _context.ApplicationUser.Include(c => c.Country).FirstOrDefaultAsync(c => c.Email == agentEmail);
 
                 var claimsInvestigation = await _context.Investigations
                     .Include(i => i.Vendor)
@@ -564,16 +567,16 @@ namespace risk.control.system.Services
             var applicationUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             List<string> userEmailsToSend = new();
 
-            var clientCompanyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == applicationUser.Email);
+            var clientCompanyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == applicationUser.Email);
             if (clientCompanyUser == null)
             {
                 userEmailsToSend.Add(userEmail);
             }
             else
             {
-                var managerRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
+                var managerRole = await roleManager.FindByIdAsync(AppRoles.MANAGER.ToString());
 
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+                var companyUsers = _context.ApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
                 foreach (var companyUser in companyUsers)
                 {
@@ -603,15 +606,15 @@ namespace risk.control.system.Services
                 .Include(i => i.PolicyDetail)
                 .Include(i => i.Vendor)
                 .FirstOrDefaultAsync(v => v.Id == claimId);
-                var companyUsers = _context.ClientCompanyApplicationUser
+                var companyUsers = _context.ApplicationUser
                                     .Include(u => u.ClientCompany)
                                     .Include(u => u.Country)
                                     .Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
                 var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var managerRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
-                var creatorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+                var managerRole = await roleManager.FindByIdAsync(AppRoles.MANAGER.ToString());
+                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
 
                 List<ApplicationUser> users = new List<ApplicationUser>();
                 foreach (var user in companyUsers)
@@ -622,8 +625,8 @@ namespace risk.control.system.Services
                         users.Add(user);
                     }
                 }
-                var vendorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
-                var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsInvestigation.VendorId);
+                var vendorRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
+                var vendorUsers = _context.ApplicationUser.Where(u => u.VendorId == claimsInvestigation.VendorId);
 
                 foreach (var agencyUser in vendorUsers)
                 {
@@ -685,11 +688,11 @@ namespace risk.control.system.Services
                .Include(i => i.Vendor)
                .Include(i => i.PolicyDetail)
                .FirstOrDefaultAsync(v => v.Id == claimId);
-                var companyUsers = _context.ClientCompanyApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+                var companyUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var assessorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
+                var assessorRole = await roleManager.FindByIdAsync(AppRoles.ASSESSOR.ToString());
 
-                List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
+                List<ApplicationUser> users = new List<ApplicationUser>();
                 foreach (var user in companyUsers)
                 {
                     var isAssessor = await userManager.IsInRoleAsync(user, assessorRole?.Name);
@@ -735,14 +738,14 @@ namespace risk.control.system.Services
         {
             try
             {
-                var supervisorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
-                var agencyAdminRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+                var supervisorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
+                var agencyAdminRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == senderUserEmail);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == senderUserEmail);
 
-                var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorUser.VendorId);
+                var vendorUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorUser.VendorId);
 
-                List<VendorApplicationUser> users = new List<VendorApplicationUser>();
+                List<ApplicationUser> users = new List<ApplicationUser>();
 
                 foreach (var user in vendorUsers)
                 {
@@ -805,12 +808,12 @@ namespace risk.control.system.Services
                .Include(i => i.PolicyDetail)
                .FirstOrDefaultAsync(v => v.Id == claimId);
 
-                var supervisorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
-                var agencyAdminRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+                var supervisorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
+                var agencyAdminRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
 
-                var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == claimsInvestigation.Vendor.VendorId);
+                var vendorUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.VendorId == claimsInvestigation.Vendor.VendorId);
 
-                List<VendorApplicationUser> userEmailsToSend = new();
+                List<ApplicationUser> userEmailsToSend = new();
 
                 foreach (var assignedUser in vendorUsers)
                 {
@@ -826,7 +829,7 @@ namespace risk.control.system.Services
                     }
                 }
 
-                var clientCompanyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == senderUserEmail);
+                var clientCompanyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
                 var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
@@ -871,11 +874,11 @@ namespace risk.control.system.Services
                 var claimsInvestigation = await _context.Investigations
                    .Include(i => i.PolicyDetail)
                    .FirstOrDefaultAsync(v => v.Id == claimId);
-                var companyUsers = _context.ClientCompanyApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+                var companyUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var assessorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
+                var assessorRole = await roleManager.FindByIdAsync(AppRoles.ASSESSOR.ToString());
 
-                List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
+                List<ApplicationUser> users = new List<ApplicationUser>();
                 foreach (var user in companyUsers)
                 {
                     var isAssessor = await userManager.IsInRoleAsync(user, assessorRole?.Name);
@@ -928,9 +931,9 @@ namespace risk.control.system.Services
 
                 var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claim.ClientCompanyId);
 
-                var users = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId && u.UserRole == AgencyRole.AGENCY_ADMIN || u.UserRole == AgencyRole.SUPERVISOR);
+                var users = _context.ApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId && u.Role == AppRoles.AGENCY_ADMIN || u.Role == AppRoles.SUPERVISOR);
 
-                var vendorRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var vendorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
 
                 var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == vendorId);
                 var vendorNotification = new StatusNotification

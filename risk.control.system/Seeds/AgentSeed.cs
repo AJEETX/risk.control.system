@@ -14,7 +14,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context, string agentEmailwithSuffix,
             IWebHostEnvironment webHostEnvironment, ICustomApiClient customApiCLient,
-            UserManager<VendorApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             Vendor vendor, string pinCode, string photo, string firstName, string lastName, IFileStorageService fileStorageService, string addressLine = "")
         {
 
@@ -31,7 +31,7 @@ namespace risk.control.system.Seeds
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
 
-            var vendorAgent = new VendorApplicationUser()
+            var vendorAgent = new ApplicationUser()
             {
                 UserName = agentEmailwithSuffix,
                 Email = agentEmailwithSuffix,
@@ -55,7 +55,6 @@ namespace risk.control.system.Seeds
                 PinCodeId = pincode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 Role = AppRoles.AGENT,
-                UserRole = AgencyRole.AGENT,
                 Updated = DateTime.Now,
                 AddressMapLocation = url,
                 AddressLatitude = coordinates.Latitude,
@@ -68,8 +67,6 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(vendorAgent, TestingData);
                     await userManager.AddToRoleAsync(vendorAgent, AppRoles.AGENT.ToString());
-                    //var vendorAgentRole = new ApplicationRole(AppRoles.AGENT.ToString(), AppRoles.AGENT.ToString());
-                    //vendorAgent.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
         }

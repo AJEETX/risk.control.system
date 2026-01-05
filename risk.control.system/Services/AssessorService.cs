@@ -27,7 +27,7 @@ namespace risk.control.system.Services
 
         public async Task<List<ClaimsInvestigationResponse>> GetApprovededCases(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(u => u.Email == userEmail);
 
@@ -118,7 +118,7 @@ namespace risk.control.system.Services
 
         public async Task<List<ClaimsInvestigationResponse>> GetInvestigations(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.ClientCompany)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -211,7 +211,7 @@ namespace risk.control.system.Services
 
         public async Task<List<ClaimsInvestigationResponse>> GetReview(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                  .Include(c => c.Country)
                  .FirstOrDefaultAsync(c => c.Email == userEmail);
             var claims = await context.Investigations
@@ -308,7 +308,7 @@ namespace risk.control.system.Services
             }
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                var vendor = context.VendorApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
+                var vendor = context.ApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
                 if (vendor != null && !string.IsNullOrWhiteSpace(vendor.ProfilePictureUrl))
                 {
                     var vendorImagePath = Path.Combine(env.ContentRootPath, vendor.ProfilePictureUrl);
@@ -349,7 +349,7 @@ namespace risk.control.system.Services
 
         public async Task<List<ClaimsInvestigationResponse>> GetRejectedCases(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 

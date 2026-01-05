@@ -172,7 +172,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var companyUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 if (id <= 0)
                 {
@@ -493,7 +493,7 @@ namespace risk.control.system.Controllers.Company
                 var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
                 if (model != null)
                 {
-                    var company = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                    var company = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";

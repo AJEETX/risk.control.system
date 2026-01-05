@@ -52,7 +52,7 @@ internal class AgentIdfyService : IAgentIdfyService
         if (claim?.InvestigationReport == null) return null;
 
         // 1. Resolve Entities
-        var agent = await context.VendorApplicationUser.FirstAsync(u => u.Email == data.Email);
+        var agent = await context.ApplicationUser.FirstAsync(u => u.Email == data.Email);
         var location = claim.InvestigationReport.ReportTemplate.LocationReport
             .First(l => l.LocationName == data.LocationName);
 

@@ -78,7 +78,7 @@ namespace risk.control.system.Controllers.Company
                 int availableCount = 0;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
                 if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
                     var totalClaimsCreated = await context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
@@ -211,7 +211,7 @@ namespace risk.control.system.Controllers.Company
         }
         private async Task LoadDropDowns(PolicyDetailDto model, string userEmail)
         {
-            var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
             ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
@@ -325,7 +325,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreateCase));
                 }
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
@@ -367,7 +367,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var userEmail = HttpContext.User.Identity.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (!ModelState.IsValid)
                 {
@@ -397,7 +397,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Details), new { id = model.InvestigationTaskId });
             }
         }
-        private async Task LoadDropDowns(CustomerDetail model, ClientCompanyApplicationUser currentUser)
+        private async Task LoadDropDowns(CustomerDetail model, ApplicationUser currentUser)
         {
             var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == model.SelectedCountryId);
             model.Country = country;
@@ -438,7 +438,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Details), new { id = id });
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender)).Cast<Gender>(), model.Gender);
@@ -469,7 +469,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (!ModelState.IsValid)
                 {
@@ -511,7 +511,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
@@ -555,7 +555,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (!ModelState.IsValid)
                 {
@@ -585,7 +585,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        private async Task LoadDropDowns(BeneficiaryDetail model, ClientCompanyApplicationUser currentUser)
+        private async Task LoadDropDowns(BeneficiaryDetail model, ApplicationUser currentUser)
         {
             var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == model.SelectedCountryId || c.CountryId == model.CountryId);
             model.Country = country;
@@ -618,7 +618,7 @@ namespace risk.control.system.Controllers.Company
                     .Include(v => v.BeneficiaryRelation)
                     .FirstOrDefaultAsync(v => v.BeneficiaryDetailId == id);
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", model.BeneficiaryRelationId);
@@ -647,7 +647,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Please correct the errors and try again.");
@@ -692,7 +692,7 @@ namespace risk.control.system.Controllers.Company
 
                 var model = await empanelledAgencyService.GetEmpanelledVendors(id);
                 model.FromEditPage = fromEditPage;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 if (vendorId > 0)
                 {
@@ -727,7 +727,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var model = await service.GetCaseDetails(currentUserEmail, id);
                 return View(model);
@@ -773,7 +773,7 @@ namespace risk.control.system.Controllers.Company
                 (c.SubStatus == approvedStatus ||
                 c.SubStatus == rejectedStatus));
 
-                var vendorUserCount = await context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted && c.Role == AppRoles.AGENT);
+                var vendorUserCount = await context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted && c.Role == AppRoles.AGENT);
 
                 // HACKY
                 var currentCases = service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });

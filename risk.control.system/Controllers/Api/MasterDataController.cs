@@ -106,8 +106,8 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-                var vendorAgentIds = await context.Set<VendorApplicationUser>()
-                .Where(v => v.UserRole == AgencyRole.AGENT)
+                var vendorAgentIds = await context.Set<ApplicationUser>()
+                .Where(v => v.Role == AppRoles.AGENT)
                 .Select(v => v.Id)
                 .ToListAsync();
 

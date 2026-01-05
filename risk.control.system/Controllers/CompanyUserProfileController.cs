@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var companyUser = await _context.ClientCompanyApplicationUser
+                var companyUser = await _context.ApplicationUser
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
                     .Include(u => u.State)
@@ -70,13 +70,13 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (userId == null || _context.ClientCompanyApplicationUser == null)
+                if (userId == null)
                 {
                     notifyService.Error("USER NOT FOUND");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
+                var clientCompanyApplicationUser = await _context.ApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
                 if (clientCompanyApplicationUser == null)
                 {
                     notifyService.Error("USER NOT FOUND");
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, ClientCompanyApplicationUser model)
+        public async Task<IActionResult> Edit(long id, ApplicationUser model)
         {
             try
             {
@@ -133,9 +133,9 @@ namespace risk.control.system.Controllers
             }
             return RedirectToAction(nameof(Index), "Dashboard");
         }
-        private async Task LoadModel(ClientCompanyApplicationUser model, string currentUserEmail)
+        private async Task LoadModel(ApplicationUser model, string currentUserEmail)
         {
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
             model.ClientCompany = company;
             model.Country = company.Country;
@@ -158,7 +158,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");

@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
-            UserManager<ClientCompanyApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             ClientCompany clientCompany, PinCode pinCode, string managorEmailwithSuffix, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
             //Seed client creator
@@ -28,7 +28,7 @@ namespace risk.control.system.Seeds
             }
             var extension = Path.GetExtension(managerImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(managerImage, extension, clientCompany.Email, "user");
-            var manager = new ClientCompanyApplicationUser()
+            var manager = new ApplicationUser()
             {
                 UserName = managorEmailwithSuffix,
                 Email = managorEmailwithSuffix,
@@ -51,7 +51,6 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 Role = AppRoles.MANAGER,
-                UserRole = CompanyRole.MANAGER,
                 Updated = DateTime.Now,
             };
             if (userManager.Users.All(u => u.Id != manager.Id))
@@ -61,20 +60,6 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(manager, TestingData);
                     await userManager.AddToRoleAsync(manager, AppRoles.MANAGER.ToString());
-                    //var clientAdminRole = new ApplicationRole(AppRoles.COMPANY_ADMIN.ToString(), AppRoles.COMPANY_ADMIN.ToString());
-                    //clientAdmin.ApplicationRoles.Add(clientAdminRole);
-
-                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.CREATOR.ToString());
-                    //var clientCreatorRole = new ApplicationRole(AppRoles.CREATOR.ToString(), AppRoles.CREATOR.ToString());
-                    //clientAdmin.ApplicationRoles.Add(clientCreatorRole);
-
-                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.Assigner.ToString());
-                    //var clientAssignerRole = new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString());
-                    //clientAdmin.ApplicationRoles.Add(clientAssignerRole);
-
-                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.ASSESSOR.ToString());
-                    //var clientAssessorRole = new ApplicationRole(AppRoles.ASSESSOR.ToString(), AppRoles.ASSESSOR.ToString());
-                    //clientAdmin.ApplicationRoles.Add(clientAssessorRole);
                 }
             }
         }

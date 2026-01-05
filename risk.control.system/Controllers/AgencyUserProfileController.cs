@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = await _context.VendorApplicationUser
+                var vendorUser = await _context.ApplicationUser
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
                     .Include(u => u.State)
@@ -71,13 +71,13 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (userId == null || _context.VendorApplicationUser == null)
+                if (userId == null || _context.ApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorApplicationUser = await _context.VendorApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
+                var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
@@ -106,7 +106,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, VendorApplicationUser model)
+        public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
             try
             {
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser != null)
                 {
                     return View();

@@ -27,6 +27,7 @@ namespace risk.control.system.Controllers.Api
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IAnswerService answerService;
         private readonly IMediaIdfyService mediaIdfyService;
         private readonly IDocumentIdfyService documentIdfyService;
@@ -36,7 +37,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IAgentIdfyService agentIdService;
         private readonly IVendorInvestigationService service;
         private readonly IAmazonApiService compareFaces;
-        private readonly UserManager<VendorApplicationUser> userVendorManager;
+        private readonly UserManager<ApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
         private readonly IFeatureManager featureManager;
         private readonly IBackgroundJobClient backgroundJobClient;
@@ -47,6 +48,7 @@ namespace risk.control.system.Controllers.Api
 
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context,
+            RoleManager<ApplicationRole> roleManager,
             IAnswerService answerService,
             IMediaIdfyService mediaIdfyService,
             IDocumentIdfyService documentIdfyService,
@@ -57,7 +59,7 @@ namespace risk.control.system.Controllers.Api
             IAgentIdfyService agentIdService,
             IVendorInvestigationService service,
             IAmazonApiService compareFaces,
-            UserManager<VendorApplicationUser> userVendorManager,
+            UserManager<ApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
             IAgentService agentService,
             IFeatureManager featureManager,
@@ -67,6 +69,7 @@ namespace risk.control.system.Controllers.Api
             IMailService mailboxService)
         {
             this._context = context;
+            this.roleManager = roleManager;
             this.answerService = answerService;
             this.mediaIdfyService = mediaIdfyService;
             this.documentIdfyService = documentIdfyService;
@@ -160,7 +163,7 @@ namespace risk.control.system.Controllers.Api
             try
             {
                 var normalizedMobile = request.Mobile.TrimStart('+');
-                var userWithUid = await _context.VendorApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
+                var userWithUid = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
                 if (!request.SendSMSForRetry)
                 {
                     if (userWithUid != null)
@@ -168,8 +171,8 @@ namespace risk.control.system.Controllers.Api
                         return BadRequest($"UID {request.Uid} already exists.");
                     }
 
-                    var agentRole = await _context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
-                    var matchingUsers = await _context.VendorApplicationUser.Include(u => u.Country).Where(u => (u.Country.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
+                    var agentRole = await roleManager.FindByIdAsync(AppRoles.AGENT.ToString());
+                    var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (u.Country.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
                     foreach (var user in matchingUsers)
                     {
                         var isAgent = await userVendorManager.IsInRoleAsync(user, agentRole.Name);
@@ -178,7 +181,7 @@ namespace risk.control.system.Controllers.Api
                             user.MobileUId = request.Uid;
                             int pin = RandomNumberGenerator.GetInt32(0, 10000);
                             user.SecretPin = pin.ToString("D4");
-                            _context.VendorApplicationUser.Update(user);
+                            _context.ApplicationUser.Update(user);
                             await _context.SaveChangesAsync();
                             await SendVerificationSmsAsync(user.Country.Code, user.Email, request.Mobile, user.SecretPin);
                             return Ok(new { user.Email, Pin = user.SecretPin });
@@ -222,7 +225,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Uid And/Or Image is empty/null");
                 }
-                var mobileUidExist = await _context.VendorApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
+                var mobileUidExist = await _context.ApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
                 if (mobileUidExist == null)
                 {
                     return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
@@ -263,7 +266,7 @@ namespace risk.control.system.Controllers.Api
         //        {
         //            return BadRequest();
         //        }
-        //        var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
+        //        var mobileUidExist = _context.ApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
         //        if (mobileUidExist == null)
         //        {
         //            return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
@@ -312,7 +315,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Email is empty/null");
                 }
-                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -327,7 +330,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
                 if (vendorUser == null)
                 {
                     return Unauthorized("Invalid User !!!");
@@ -410,7 +413,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Email is empty/null");
                 }
-                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -423,7 +426,7 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
                 if (vendorUser == null)
                 {
                     return Unauthorized("Invalid User !!!");
@@ -486,7 +489,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Invalid caseId And/Or Email is empty/null");
                 }
-                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -522,7 +525,7 @@ namespace risk.control.system.Controllers.Api
                     .Include(c => c.Country)
                     .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
 
                 object locations = null;
                 if (await featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
@@ -599,7 +602,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("Invalid caseId And/Or Email is empty/null");
                 }
-                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
@@ -631,7 +634,7 @@ namespace risk.control.system.Controllers.Api
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
                 {
@@ -681,7 +684,7 @@ namespace risk.control.system.Controllers.Api
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
                 {
@@ -727,7 +730,7 @@ namespace risk.control.system.Controllers.Api
                 if (!supportedExtensions.Contains(extension))
                     return BadRequest("Unsupported media format.");
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
                 {
@@ -798,7 +801,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest("All fields (Email, Remarks, CaseId) are required and must be valid.");
                 }
-                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {

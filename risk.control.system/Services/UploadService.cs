@@ -5,7 +5,7 @@ namespace risk.control.system.Services
 {
     public interface IUploadService
     {
-        Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP);
+        Task<List<UploadResult>> FileUpload(ApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP);
     }
     internal class UploadService : IUploadService
     {
@@ -22,7 +22,7 @@ namespace risk.control.system.Services
             this.uploadProgressService = uploadProgressService;
         }
 
-        public async Task<List<UploadResult>> FileUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP)
+        public async Task<List<UploadResult>> FileUpload(ApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP)
         {
             var uploadedClaims = new List<UploadResult>();
             try

@@ -32,7 +32,7 @@ namespace risk.control.system.Data
         private async Task OnBeforeSaveChanges(string userId)
         {
             var userEmail = userId ?? httpContext?.HttpContext?.User?.Identity.Name;
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             ChangeTracker.DetectChanges();
             var auditEntries = new List<AuditEntry>();
             foreach (var entry in ChangeTracker.Entries())

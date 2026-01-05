@@ -94,13 +94,13 @@
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 settings-dropdown">
                 <!-- Profile Section -->
                 <div class="text-center profile-section">
-                    <img src="/Document/GetCompanyUserDocument/@Model.UserId"
+                    <img src="/Document/GetUserProfileImage/@Model.UserId"
                          class="rounded-circle shadow-sm border sidebar-profile"
                          alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                     <p class="text-muted user-email">@Model.Email</p>
                     @if (Model.CanChangePassword)
                     {
-                        <div class="text-center profile-inner-section">
+                        <div class="text-center profile-inner-section profile">
 
                             <a id="back" href="/CompanyUserProfile/Edit?userid=@Model.UserId" class="btn btn-sm btn-outline-warning">
                                 <i class="fas fa-user-edit"></i> Edit Profile

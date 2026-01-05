@@ -38,7 +38,7 @@
         public static readonly string NO_PHOTO_IMAGE = "/img/no-photo.png";
         public static readonly string NO_AUDIO = "/img/no-audio.png";
         public static readonly string NO_VIDEO = "/img/no-video.png";
-        public static readonly string MARKER_FLAG = "/images/beachflag.png";
+        public static readonly string MARKER_FLAG = "/img/beachflag.png";
 
         public const string ALL_DISTRICT = "All Districts";
         public const string ALL_DISTRICT_CODE = "-1";

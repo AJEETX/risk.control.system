@@ -81,7 +81,7 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            var companyUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
             var timeTaken = endTIme - claim.Created;
@@ -229,7 +229,7 @@ namespace risk.control.system.Services
                     .Include(c => c.BeneficiaryDetail)
                     .FirstOrDefaultAsync(c => c.Id == claimsInvestigationId);
 
-                var agentUser = await context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == vendorAgentEmail);
+                var agentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == vendorAgentEmail);
 
                 string drivingDistance, drivingDuration, drivingMap;
                 float distanceInMeters;
@@ -284,7 +284,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var agent = await context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email.Trim().ToLower() == userEmail.ToLower());
+                var agent = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email.Trim().ToLower() == userEmail.ToLower());
 
                 var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
 
@@ -353,7 +353,7 @@ namespace risk.control.system.Services
 
         public async Task<List<ClaimsInvestigationAgencyResponse>> GetNewCases(string userEmail)
         {
-            var vendorUser = await context.VendorApplicationUser
+            var vendorUser = await context.ApplicationUser
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
@@ -450,7 +450,7 @@ namespace risk.control.system.Services
         }
         public async Task<List<ClaimsInvestigationResponse>> GetOpenCases(string userEmail)
         {
-            var vendorUser = await context.VendorApplicationUser
+            var vendorUser = await context.ApplicationUser
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
             List<InvestigationTask> claims = null;
@@ -565,7 +565,7 @@ namespace risk.control.system.Services
 
         public async Task<List<ClaimsInvestigationAgencyResponse>> GetCompleted(string userEmail, string userClaim)
         {
-            var agencyUser = await context.VendorApplicationUser
+            var agencyUser = await context.ApplicationUser
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
@@ -641,7 +641,7 @@ namespace risk.control.system.Services
         {
 
             // Fetch the vendor user along with the related Vendor and Country info in one query
-            var vendorUser = await context.VendorApplicationUser
+            var vendorUser = await context.ApplicationUser
                 .Include(v => v.Country)
                 .Include(u => u.Vendor)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -822,7 +822,7 @@ namespace risk.control.system.Services
             if (a.SubStatus == allocated2agent)
             {
                 ownerEmail = a.TaskedAgentEmail;
-                var agencyUser = context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail);
+                var agencyUser = context.ApplicationUser.FirstOrDefault(u => u.Email == ownerEmail);
                 if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser.Email))
                 {
                     return agencyUser?.Email;
@@ -851,7 +851,7 @@ namespace risk.control.system.Services
             if (a.SubStatus == allocated2agent)
             {
                 ownerEmail = a.TaskedAgentEmail;
-                var agencyUser = context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail);
+                var agencyUser = context.ApplicationUser.FirstOrDefault(u => u.Email == ownerEmail);
                 if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser?.ProfilePictureUrl))
                 {
                     var agencyUserImagePath = Path.Combine(env.ContentRootPath, agencyUser.ProfilePictureUrl);

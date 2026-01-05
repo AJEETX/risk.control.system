@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers.Company
                 int availableCount = 0;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
                 if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
                     var totalClaimsCreated = await _context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);

@@ -27,7 +27,7 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService fileStorageService;
         private readonly ILogger<VendorApplicationUsersController> logger;
-        private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
@@ -39,7 +39,7 @@ namespace risk.control.system.Controllers
         public VendorApplicationUsersController(ApplicationDbContext context,
             IFileStorageService fileStorageService,
             ILogger<VendorApplicationUsersController> logger,
-            UserManager<VendorApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.District).Include(v => v.PinCode).Include(v => v.State).Include(v => v.Vendor);
+            var applicationDbContext = _context.ApplicationUser.Include(v => v.Country).Include(v => v.District).Include(v => v.PinCode).Include(v => v.State).Include(v => v.Vendor);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -72,14 +72,14 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || id == 0 || _context.VendorApplicationUser == null)
+                if (id == null || id == 0 || _context.ApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var vendorApplicationUser = await _context.VendorApplicationUser
+                var vendorApplicationUser = await _context.ApplicationUser
                     .Include(v => v.Country)
                     .Include(v => v.District)
                     .Include(v => v.PinCode)
@@ -111,14 +111,14 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == 0 || _context.VendorApplicationUser == null)
+                if (id == 0 || _context.ApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
-                var model = new VendorApplicationUser { Country = vendor.Country, Vendor = vendor };
+                var model = new ApplicationUser { Country = vendor.Country, Vendor = vendor };
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
                 var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VendorApplicationUser user, string emailSuffix)
+        public async Task<IActionResult> Create(ApplicationUser user, string emailSuffix)
         {
             try
             {
@@ -217,13 +217,13 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                if (userId == null || _context.VendorApplicationUser == null)
+                if (userId == null || _context.ApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorApplicationUser = await _context.VendorApplicationUser.Include(v => v.Vendor).Include(v => v.Country)?.FirstOrDefaultAsync(v => v.Id == userId);
+                var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Vendor).Include(v => v.Country)?.FirstOrDefaultAsync(v => v.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..User Not found");
@@ -249,7 +249,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
+        public async Task<IActionResult> Edit(string id, ApplicationUser applicationUser)
         {
             try
             {
@@ -334,106 +334,14 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
         }
 
-        public async Task<IActionResult> UserRoles(string userId)
-        {
-            var userRoles = new List<VendorUserRoleViewModel>();
-            VendorApplicationUser user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                notifyService.Error("user not found!");
-                return NotFound();
-            }
-            foreach (var role in roleManager.Roles.Where(r =>
-                r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()) ||
-                r.Name.Contains(AppRoles.SUPERVISOR.ToString()) ||
-                r.Name.Contains(AppRoles.AGENT.ToString())))
-            {
-                var userRoleViewModel = new VendorUserRoleViewModel
-                {
-                    RoleId = role.Id.ToString(),
-                    RoleName = role?.Name
-                };
-                if (await userManager.IsInRoleAsync(user, role?.Name))
-                {
-                    userRoleViewModel.Selected = true;
-                }
-                else
-                {
-                    userRoleViewModel.Selected = false;
-                }
-                userRoles.Add(userRoleViewModel);
-            }
-            var model = new VendorUserRolesViewModel
-            {
-                UserId = userId,
-                VendorId = user.VendorId.Value,
-                UserName = user.UserName,
-                VendorUserRoleViewModel = userRoles
-            };
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = user.VendorId } };
-            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = user.VendorId } };
-            var editPage = new MvcBreadcrumbNode("UserRoles", "VendorApplicationUsers", $"Edit Role") { Parent = usersPage, RouteValues = new { id = user.Id } };
-            ViewData["BreadcrumbNode"] = editPage;
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (string.IsNullOrWhiteSpace(userId))
-                {
-                    notifyService.Error("OOPs !!!..User not found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                if (model == null)
-                {
-                    notifyService.Error("OOPs !!!..Model not found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var user = await userManager.FindByIdAsync(userId);
-                if (user == null)
-                {
-                    return NotFound();
-                }
-                user.SecurityStamp = Guid.NewGuid().ToString();
-                user.Updated = DateTime.Now;
-                user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                var roles = await userManager.GetRolesAsync(user);
-                var result = await userManager.RemoveFromRolesAsync(user, roles);
-                result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
-                    Where(x => x.Selected).Select(y => y.RoleName));
-
-                notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
-                return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = model.VendorId });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
-        }
-
         public async Task<IActionResult> Delete(long? id)
         {
-            if (id == null || _context.VendorApplicationUser == null)
+            if (id == null || _context.ApplicationUser == null)
             {
                 return NotFound();
             }
 
-            var vendorApplicationUser = await _context.VendorApplicationUser
+            var vendorApplicationUser = await _context.ApplicationUser
                 .Include(v => v.Country)
                 .Include(v => v.District)
                 .Include(v => v.PinCode)
@@ -462,7 +370,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(id);
+                var vendorApplicationUser = await _context.ApplicationUser.FindAsync(id);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Error($"Err User delete. Try again", 3);
@@ -470,7 +378,7 @@ namespace risk.control.system.Controllers
                 }
                 vendorApplicationUser.Updated = DateTime.Now;
                 vendorApplicationUser.UpdatedBy = currentUserEmail;
-                _context.VendorApplicationUser.Remove(vendorApplicationUser);
+                _context.ApplicationUser.Remove(vendorApplicationUser);
                 notifyService.Error($"User deleted successfully.", 3);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

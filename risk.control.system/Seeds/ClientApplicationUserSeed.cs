@@ -11,13 +11,13 @@ namespace risk.control.system.Seeds
 {
     public static class ClientApplicationUserSeed
     {
-        public static async Task<ClientCompanyApplicationUser> Seed(ApplicationDbContext context,
+        public static async Task<ApplicationUser> Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
-            UserManager<ClientCompanyApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             ClientCompany clientCompany, IFileStorageService fileStorageService)
         {
-            var company =await context.ClientCompany.FirstOrDefaultAsync(c => c.Email == clientCompany.Email);
-            var pinCode =await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == clientCompany.PinCodeId);
+            var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.Email == clientCompany.Email);
+            var pinCode = await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == clientCompany.PinCodeId);
 
             //Seed client admin
             await CompanyAdminSeed.Seed(context, webHostEnvironment, userManager, clientCompany, company.Email, pinCode, fileStorageService);

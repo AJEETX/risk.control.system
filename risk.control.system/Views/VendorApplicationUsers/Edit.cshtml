@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.VendorApplicationUser
+﻿@model risk.control.system.Models.ApplicationUser
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
@@ -16,7 +16,6 @@
                     <input type="hidden" asp-for="Id" />
                     <div class="col-md-6">
                         <div class="form-group hide-id">
-                            <label asp-for="VendorId" class="control-label"></label>
                             <input asp-for="VendorId" class="form-control remarks" value="@Model.Vendor.VendorId" />
                             <span asp-validation-for="VendorId" class="text-danger"></span>
                         </div>
@@ -42,7 +41,7 @@
                         <div class="form-group">
                             <span class="input-group-label"> Photo:</span>
                             <div class="input-group mb-3">
-                                <img id="createProfileImage" class="form-Image" src="/Document/GetAgencyUserDocument/@Model.Id" alt="Profile" />
+                                <img id="createProfileImage" class="form-Image" src="/Document/GetUserProfileImage/@Model.Id" alt="Profile" />
                                 <i class="fa fa-asterisk asterik-style"></i>
                                 <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" />
                                 <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
@@ -115,7 +114,7 @@
                             <span class="input-group-label"> Status:</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
                                 <div class="input-group-prepend">
                                 </div>

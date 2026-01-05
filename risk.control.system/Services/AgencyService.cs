@@ -1,5 +1,6 @@
 ﻿using System.Net;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
@@ -19,13 +20,19 @@ namespace risk.control.system.Services
     internal class AgencyService : IAgencyService
     {
         private readonly ApplicationDbContext context;
+        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
         private readonly IFileStorageService fileStorageService;
         private readonly IFeatureManager featureManager;
 
-        public AgencyService(ApplicationDbContext context, ISmsService SmsService, IFileStorageService fileStorageService, IFeatureManager featureManager)
+        public AgencyService(ApplicationDbContext context,
+            RoleManager<ApplicationRole> roleManager,
+            ISmsService SmsService,
+            IFileStorageService fileStorageService,
+            IFeatureManager featureManager)
         {
             this.context = context;
+            this.roleManager = roleManager;
             smsService = SmsService;
             this.fileStorageService = fileStorageService;
             this.featureManager = featureManager;
@@ -63,8 +70,8 @@ namespace risk.control.system.Services
 
             context.Add(vendor);
 
-            var managerRole = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
-            var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var managerRole = await roleManager.FindByIdAsync(AppRoles.MANAGER.ToString());
+            var companyUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var notification = new StatusNotification
             {

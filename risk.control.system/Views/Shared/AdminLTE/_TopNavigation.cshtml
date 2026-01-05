@@ -93,17 +93,19 @@
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 settings-dropdown">
                 <!-- Profile Section -->
                 <div class="text-center profile-section">
-                    <img src="/Document/GetUserImage?email=@Model.Email"
+                    <img src="/Document/GetUserProfileImage/@Model.UserId"
                          class="rounded-circle shadow-sm border sidebar-profile"
                          alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                     <p class="text-muted user-email">@Model.Email</p>
-                </div>
 
                 <!-- Logout Link -->
-                <a class="dropdown-item d-flex align-items-center text-danger font-weight-bold btn-outline-danger"
-                   href="#" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                </a>
+                <div class="text-center profile-inner-section">
+                        <a class="font-weight-bold btn btn-sm btn-outline-danger"
+                       href="#" data-toggle="modal" data-target="#logoutModal">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </a>
+                </div>
+                </div>
             </div>
         </li>
 

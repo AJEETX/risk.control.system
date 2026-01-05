@@ -30,8 +30,8 @@
             <input type="hidden" id="timeout" name="timeout" value="@timeout" />
             @if (SignInManager.IsSignedIn(User))
             {
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail && c.ClientCompanyId> 0);
+                var vendorUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail && c.VendorId > 0);
                 ClientCompany company = null!;
                 if (companyUser is not null)
                 {

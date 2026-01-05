@@ -2,6 +2,7 @@
 {
     public class ForgotPassword
     {
+        public long Id { get; set; }
         public string? Email { get; set; }
         public bool Reset { get; set; } = false;
         public string Message { get; set; }

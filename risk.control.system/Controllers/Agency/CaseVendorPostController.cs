@@ -75,7 +75,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendorAgent = await _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Id.ToString() == selectedcase);
+                var vendorAgent = await _context.ApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Id.ToString() == selectedcase);
                 if (vendorAgent == null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
@@ -211,7 +211,7 @@ namespace risk.control.system.Controllers.Agency
 
                 if (success != null)
                 {
-                    var agencyUser = await _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
+                    var agencyUser = await _context.ApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -364,7 +364,7 @@ namespace risk.control.system.Controllers.Agency
 
                 if (claim != null)
                 {
-                    var agencyUser = await _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                    var agencyUser = await _context.ApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";

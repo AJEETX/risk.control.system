@@ -51,7 +51,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
         InvestigationTask claim = await caseService.GetCaseById(data.CaseId);
         if (claim?.InvestigationReport == null) return null;
 
-        var agent = await context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == data.Email);
+        var agent = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == data.Email);
         var locationRecord = claim.InvestigationReport.ReportTemplate.LocationReport
             .FirstOrDefault(l => l.LocationName == data.LocationName);
 

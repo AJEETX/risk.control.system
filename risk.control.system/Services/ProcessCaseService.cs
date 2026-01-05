@@ -117,7 +117,7 @@ namespace risk.control.system.Services
         }
         async Task<List<long>> DoAutoAllocation(List<long> claims, string userEmail, string url = "")
         {
-            var companyUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+            var companyUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
 
             var company = await context.ClientCompany
                     .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
@@ -188,7 +188,7 @@ namespace risk.control.system.Services
         }
         public async Task<string> ProcessAutoSingleAllocation(long claim, string userEmail, string url = "")
         {
-            var companyUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+            var companyUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
 
             var company = await context.ClientCompany
                     .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
@@ -262,7 +262,7 @@ namespace risk.control.system.Services
             var cases2Assign = context.Investigations
                 .Include(c => c.InvestigationTimeline)
                    .Where(v => claims.Contains(v.Id));
-            var currentUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+            var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
             var assigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
 
             foreach (var claimsInvestigation in cases2Assign)
@@ -288,7 +288,7 @@ namespace risk.control.system.Services
             try
             {
                 // Fetch vendor & user details
-                var currentUser = await context.ClientCompanyApplicationUser
+                var currentUser = await context.ApplicationUser
                     .Include(c => c.ClientCompany)
                     .FirstOrDefaultAsync(u => u.Email == userEmail);
 
@@ -363,7 +363,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var currentUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
                 var claimsInvestigation = await context.Investigations
                     .FirstOrDefaultAsync(c => c.Id == claimId);
                 var vendorId = claimsInvestigation.VendorId;
@@ -395,7 +395,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var currentUser = await context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
                 var claimsInvestigation = await context.Investigations
                     .FirstOrDefaultAsync(c => c.Id == claimId);
 
@@ -423,7 +423,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var currentUser = await context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
                 var claimsInvestigation = await context.Investigations
                     .FirstOrDefaultAsync(c => c.Id == claimId);
                 var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
@@ -554,7 +554,7 @@ namespace risk.control.system.Services
             try
             {
 
-                var agencyUser = await context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(s => s.Email == userEmail);
+                var agencyUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(s => s.Email == userEmail);
 
                 var assignedToAgentSubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
                 var claimsCaseToAllocateToVendor = await context.Investigations
@@ -702,7 +702,7 @@ namespace risk.control.system.Services
 
                 backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(claimsInvestigationId, userEmail));
 
-                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
             catch (Exception ex)

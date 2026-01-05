@@ -12,18 +12,9 @@
 
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
 
-        @if (user != null)
-        {
-            <div class="image">
-                <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetAgencyUserDocument/@user.Id" alt="user image">
+       <div class="image">
+                <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserProfileImage/@user.Id" alt="Profile">
             </div>
-        }
-        else
-        {
-            <div class="image">
-                <img class="elevation-0 sidebar-profile img-circle" src="@Applicationsettings.NO_IMAGE">
-            </div>
-        }
         <a  class="d-block">
             @UserManager.GetUserAsync(User).Result?.FirstName.ToLower()
             @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))

@@ -78,7 +78,7 @@ namespace risk.control.system.Services
                 var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
                 claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
-            var companyUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
             var timeTaken = DateTime.Now - claim.Created;
@@ -148,7 +148,7 @@ namespace risk.control.system.Services
                 var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
                 claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
-            var companyUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
             var timeTaken = endTIme - claim.Created;
@@ -236,7 +236,7 @@ namespace risk.control.system.Services
             claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
             var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
             claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-            var companyUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
             var timeTaken = DateTime.Now - claim.Created;
@@ -331,7 +331,7 @@ namespace risk.control.system.Services
         }
         public async Task<object> GetAuto(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
@@ -575,7 +575,7 @@ namespace risk.control.system.Services
         }
         public async Task<object> GetActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.ClientCompany)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
@@ -797,7 +797,7 @@ namespace risk.control.system.Services
             }
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                var vendor = context.VendorApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
+                var vendor = context.ApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
                 if (vendor != null && !string.IsNullOrWhiteSpace(vendor.ProfilePictureUrl))
                 {
                     var vendorImagePath = Path.Combine(webHostEnvironment.ContentRootPath, vendor.ProfilePictureUrl);
@@ -853,7 +853,7 @@ namespace risk.control.system.Services
         }
         public async Task<int> GetAutoCount(string currentUserEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
@@ -881,7 +881,7 @@ namespace risk.control.system.Services
 
         public async Task<(object[], bool)> GetFilesData(string userEmail, bool isManager, int uploadId = 0)
         {
-            var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+            var companyUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
             var totalReadyToAssign = await GetAutoCount(userEmail);
             var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
@@ -928,7 +928,7 @@ namespace risk.control.system.Services
 
         public async Task<(object, bool)> GetFileById(string userEmail, bool isManager, int uploadId)
         {
-            var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+            var companyUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
             var file = await context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
             if (file == null)
             {

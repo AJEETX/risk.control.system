@@ -2203,7 +2203,6 @@ select#PinCodeId {
     width: 10em; /* Set the desired width */
     height: 10.1em; /* Set the desired height */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow around the image */
-    object-fit: cover; /* Ensures the image maintains aspect ratio while filling the area */
     transition: transform 0.3s ease; /* Smooth transition effect on hover */
 }
 
@@ -2585,14 +2584,16 @@ input#checkall {
 .profile-inner-section {
     margin-bottom: 5px;
 }
-
-/* Profile image */
-.sidebar-profile {
-    width: 60px !important;
-    height: 60px !important;
-    object-fit: cover;
-    border: 3px solid #fff;
-}
+    .profile-inner-section a{
+        width:70%;
+    }
+    /* Profile image */
+    .sidebar-profile {
+        width: 60px !important;
+        height: 60px !important;
+        object-fit: cover;
+        border: 3px solid #fff;
+    }
 
 /* Username and email */
 .username {
@@ -3729,4 +3730,7 @@ img.microsoft {
     background-color: #f0f9ff !important;
     border-color: #0dcaf0 !important;
     transform: scale(1.02);
+}
+.profile a{
+    width:70%;
 }

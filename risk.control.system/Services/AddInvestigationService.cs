@@ -47,7 +47,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetail.ContractNumber);
                 var claimsInvestigation = new InvestigationTask
@@ -128,7 +128,7 @@ namespace risk.control.system.Services
                     existingPolicy.PolicyDetail.DocumentPath = relativePath;
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
                 }
-                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, existingPolicy.PolicyDetail.InsuranceType.Value);
                 existingPolicy.ReportTemplate = reportTemplate;
                 existingPolicy.ReportTemplateId = reportTemplate.Id;
@@ -152,7 +152,7 @@ namespace risk.control.system.Services
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                    .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
 
-                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (customerDetail?.ProfileImage is not null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
@@ -204,7 +204,7 @@ namespace risk.control.system.Services
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
 
-                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 if (customerDetail?.ProfileImage is not null)
                 {
@@ -259,7 +259,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
@@ -316,7 +316,7 @@ namespace risk.control.system.Services
                 var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
 
-                var currentUser = await context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (beneficiary?.ProfileImage != null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);

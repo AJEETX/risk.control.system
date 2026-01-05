@@ -16,7 +16,7 @@ namespace risk.control.system.Seeds
 
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
-            UserManager<VendorApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             Vendor vendor, ICustomApiClient customApiCLient, IFileStorageService fileStorageService)
         {
             noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
@@ -34,7 +34,7 @@ namespace risk.control.system.Seeds
             var extension = Path.GetExtension(adminImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, vendor.Email, "user");
 
-            var vendorAdmin = new VendorApplicationUser()
+            var vendorAdmin = new ApplicationUser()
             {
                 UserName = adminEmailwithSuffix,
                 Email = adminEmailwithSuffix,
@@ -56,7 +56,6 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 Role = AppRoles.AGENCY_ADMIN,
-                UserRole = AgencyRole.AGENCY_ADMIN,
                 Updated = DateTime.Now
             };
             if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
@@ -66,16 +65,6 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(vendorAdmin, TestingData);
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.AGENCY_ADMIN.ToString());
-                    //var vendorAdminRole = new ApplicationRole(AppRoles.AGENCY_ADMIN.ToString(), AppRoles.AGENCY_ADMIN.ToString());
-                    //vendorAdmin.ApplicationRoles.Add(vendorAdminRole);
-
-                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.SUPERVISOR.ToString());
-                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.SUPERVISOR.ToString(), AppRoles.SUPERVISOR.ToString());
-                    //vendorAdmin.ApplicationRoles.Add(vendorSuperVisorRole);
-
-                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.AGENT.ToString());
-                    //var vendorAgentRole = new ApplicationRole(AppRoles.AGENT.ToString(), AppRoles.AGENT.ToString());
-                    //vendorAdmin.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
 

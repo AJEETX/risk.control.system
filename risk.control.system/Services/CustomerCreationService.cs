@@ -13,7 +13,7 @@ namespace risk.control.system.Services
 {
     public interface ICustomerCreationService
     {
-        Task<(CustomerDetail, List<UploadError>, List<string>)> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data);
+        Task<(CustomerDetail, List<UploadError>, List<string>)> AddCustomer(ApplicationUser companyUser, UploadCase uploadCase, byte[] data);
     }
     internal class CustomerCreationService : ICustomerCreationService
     {
@@ -42,7 +42,7 @@ namespace risk.control.system.Services
             this.logger = logger;
         }
 
-        public async Task<(CustomerDetail, List<UploadError>, List<string>)> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
+        public async Task<(CustomerDetail, List<UploadError>, List<string>)> AddCustomer(ApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
             var errors = new List<UploadError>();
             var errorCustomer = new List<string>();

@@ -12,7 +12,7 @@ namespace risk.control.system.Services
 {
     public interface IVendorUserService
     {
-        Task<ServiceResult> UpdateUserAsync(string id, VendorApplicationUser model, string updatedBy, string portal_base_url);
+        Task<ServiceResult> UpdateUserAsync(string id, ApplicationUser model, string updatedBy, string portal_base_url);
     }
 
     internal class VendorUserService : IVendorUserService
@@ -20,13 +20,13 @@ namespace risk.control.system.Services
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private readonly UserManager<VendorApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IFileStorageService _fileStorageService;
         private readonly ApplicationDbContext _context;
         private readonly ISmsService _smsService;
 
         public VendorUserService(
-            UserManager<VendorApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             IFileStorageService fileStorageService,
             ApplicationDbContext context,
             ISmsService smsService)
@@ -37,7 +37,7 @@ namespace risk.control.system.Services
             _smsService = smsService;
         }
 
-        public async Task<ServiceResult> UpdateUserAsync(string id, VendorApplicationUser model, string updatedBy, string portal_base_url)
+        public async Task<ServiceResult> UpdateUserAsync(string id, ApplicationUser model, string updatedBy, string portal_base_url)
         {
             var result = new ServiceResult();
 
@@ -81,26 +81,26 @@ namespace risk.control.system.Services
         private static ServiceResult ValidateProfileImage(IFormFile file)
         {
             if (file.Length > MAX_FILE_SIZE)
-                return Error(nameof(VendorApplicationUser.ProfileImage),
+                return Error(nameof(ApplicationUser.ProfileImage),
                     "Document image size exceeds the maximum limit (5MB).");
 
             var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!AllowedExt.Contains(ext))
-                return Error(nameof(VendorApplicationUser.ProfileImage),
+                return Error(nameof(ApplicationUser.ProfileImage),
                     "Invalid document image type.");
 
             if (!AllowedMime.Contains(file.ContentType))
-                return Error(nameof(VendorApplicationUser.ProfileImage),
+                return Error(nameof(ApplicationUser.ProfileImage),
                     "Invalid document image content type.");
 
             if (!ImageSignatureValidator.HasValidSignature(file))
-                return Error(nameof(VendorApplicationUser.ProfileImage),
+                return Error(nameof(ApplicationUser.ProfileImage),
                     "Invalid or corrupted document image.");
 
             return new ServiceResult { Success = true };
         }
 
-        private async Task ProcessProfileImageAsync(VendorApplicationUser model)
+        private async Task ProcessProfileImageAsync(ApplicationUser model)
         {
             var domain = WebUtility.HtmlEncode(model.Email.Split('@')[1]);
             var (fileName, relativePath) = await _fileStorageService.SaveAsync(model.ProfileImage, domain, "user");
@@ -109,7 +109,7 @@ namespace risk.control.system.Services
             model.ProfilePictureExtension = Path.GetExtension(fileName);
         }
 
-        private static void MapUserFields(VendorApplicationUser user, VendorApplicationUser model, string updatedBy)
+        private static void MapUserFields(ApplicationUser user, ApplicationUser model, string updatedBy)
         {
             user.Addressline = WebUtility.HtmlEncode(model.Addressline);
             user.FirstName = WebUtility.HtmlEncode(model.FirstName);
@@ -133,7 +133,7 @@ namespace risk.control.system.Services
                 user.Password = model.Password;
         }
 
-        private async Task SendSmsNotificationAsync(VendorApplicationUser user, string portal_base_url)
+        private async Task SendSmsNotificationAsync(ApplicationUser user, string portal_base_url)
         {
             var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
             if (country == null) return;

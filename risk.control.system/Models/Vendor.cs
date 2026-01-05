@@ -93,7 +93,7 @@ namespace risk.control.system.Models
         public string? AddressLongitude { get; set; }
 
         [Display(Name = "Vendor Users")]
-        public List<VendorApplicationUser>? VendorApplicationUser { get; set; }
+        public List<ApplicationUser>? ApplicationUser { get; set; }
 
         [Display(Name = "Insurer names")]
         public List<ClientCompany>? Clients { get; set; } = new List<ClientCompany>();

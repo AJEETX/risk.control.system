@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Services;
@@ -15,8 +14,6 @@ namespace risk.control.system.Seeds
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var vendorUserManager = scope.ServiceProvider.GetRequiredService<UserManager<VendorApplicationUser>>();
-            var clientUserManager = scope.ServiceProvider.GetRequiredService<UserManager<ClientCompanyApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             var customApiCLient = scope.ServiceProvider.GetRequiredService<ICustomApiClient>();
             var httpAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
@@ -33,15 +30,7 @@ namespace risk.control.system.Seeds
             }
 
             //CREATE ROLES
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.PORTAL_ADMIN.ToString().Substring(0, 2).ToUpper(), AppRoles.PORTAL_ADMIN.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.COMPANY_ADMIN.ToString().Substring(0, 2).ToUpper(), AppRoles.COMPANY_ADMIN.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.AGENCY_ADMIN.ToString().Substring(0, 2).ToUpper(), AppRoles.AGENCY_ADMIN.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.CREATOR.ToString().Substring(0, 2).ToUpper(), AppRoles.CREATOR.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.MANAGER.ToString().Substring(0, 2).ToUpper(), AppRoles.MANAGER.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.ASSESSOR.ToString().Substring(0, 2).ToUpper(), AppRoles.ASSESSOR.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.SUPERVISOR.ToString().Substring(0, 2).ToUpper(), AppRoles.SUPERVISOR.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.AGENT.ToString().Substring(0, 2).ToUpper(), AppRoles.AGENT.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.GUEST.ToString().Substring(0, 2).ToUpper(), AppRoles.GUEST.ToString()));
+            await RoleSeeder.SeedAsync(roleManager);
 
             //PermissionModuleSeed.SeedClaim(context);
 
@@ -49,7 +38,7 @@ namespace risk.control.system.Seeds
 
             await ClientCompanySetupSeed.Seed(context);
 
-            await StartCountryWiseSeed.Seed(context, webHostEnvironment, userManager, vendorUserManager, clientUserManager, roleManager, customApiCLient, httpAccessor, fileStorageService);
+            await StartCountryWiseSeed.Seed(context, webHostEnvironment, userManager, customApiCLient, fileStorageService);
         }
     }
 }

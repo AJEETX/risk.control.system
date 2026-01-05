@@ -49,24 +49,24 @@ namespace risk.control.system.Services
                 return (true, "Admin", true); // IsAdmin = true
             }
             // 2. Company User Logic
-            var companyUser = await _context.ClientCompanyApplicationUser
-                .FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
+            var companyUser = await _context.ApplicationUser
+                .FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted && u.ClientCompanyId > 0);
 
             if (companyUser != null)
             {
                 var companyActive = await _context.ClientCompany.AnyAsync(c =>
-                    c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
+                    c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == CompanyStatus.ACTIVE);
                 return (companyActive && user.Active, companyUser.FirstName, false);
             }
 
             // 3. Vendor User Logic
-            var vendorUser = await _context.VendorApplicationUser
-                .FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted);
+            var vendorUser = await _context.ApplicationUser
+                .FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted && u.VendorId > 0);
 
             if (vendorUser != null)
             {
                 bool vendorActive = await _context.Vendor.AnyAsync(c =>
-                    c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
+                    c.VendorId == vendorUser.VendorId && c.Status == VendorStatus.ACTIVE);
 
                 if (agentLogin != "agent_login" && vendorActive)
                 {

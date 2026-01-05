@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
     {
         private const string companyMapSize = "800x800";
         public static async Task<ClientCompany> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
-                    ICustomApiClient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, SeedInput input, IFileStorageService fileStorageService)
+                    ICustomApiClient customApiCLient, UserManager<ApplicationUser> userManager, SeedInput input, IFileStorageService fileStorageService)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
@@ -88,7 +88,7 @@ namespace risk.control.system.Seeds
 
             await context.SaveChangesAsync(null, false);
 
-            var creator = await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, insurerCompany.Entity, fileStorageService);
+            var creator = await ClientApplicationUserSeed.Seed(context, webHostEnvironment, userManager, insurerCompany.Entity, fileStorageService);
 
             var claimTemplate = ReportTemplateSeed.CLAIM(context, insurer);
             var underwriting = ReportTemplateSeed.UNDERWRITING(context, insurer);

@@ -135,7 +135,7 @@
 
         if (av != "" || av != null) {
             var img = $(this).find("img[id='" + parseInt(av) + "']");
-            img.attr("src", "/images/FilledStar.jpeg").prevAll("img.main-rating").attr("src", "/images/FilledStar.jpeg");
+            img.attr("src", "/img/FilledStar.jpeg").prevAll("img.main-rating").attr("src", "/img/FilledStar.jpeg");
         }
     });
 });

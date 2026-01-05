@@ -13,9 +13,9 @@ namespace risk.control.system.Services
 {
     public interface ICompanyUserService
     {
-        Task<ServiceResult> CreateAsync(ClientCompanyApplicationUser model, string emailSuffix, string performedBy);
+        Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy);
 
-        Task<ServiceResult> UpdateAsync(long id, ClientCompanyApplicationUser model, string performedBy);
+        Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy);
     }
 
     public sealed class CompanyUserService : ICompanyUserService
@@ -24,14 +24,14 @@ namespace risk.control.system.Services
         private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
         private static readonly HashSet<string> AllowedMime = new() { "image/jpeg", "image/png" };
 
-        private readonly UserManager<ClientCompanyApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService _fileStorage;
         private readonly ISmsService _sms;
         private readonly ILogger<CompanyUserService> _logger;
 
         public CompanyUserService(
-            UserManager<ClientCompanyApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             ApplicationDbContext context,
             IFileStorageService fileStorage,
             ISmsService sms,
@@ -43,7 +43,7 @@ namespace risk.control.system.Services
             _sms = sms;
             _logger = logger;
         }
-        public async Task<ServiceResult> CreateAsync(ClientCompanyApplicationUser model, string emailSuffix, string performedBy)
+        public async Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy)
         {
             try
             {
@@ -72,16 +72,18 @@ namespace risk.control.system.Services
                 model.EmailConfirmed = true;
 
                 model.PhoneNumber = model.PhoneNumber.TrimStart('0');
-                model.Role = (AppRoles)Enum.Parse(typeof(AppRoles), model.UserRole.ToString());
-                model.IsClientAdmin = model.UserRole == CompanyRole.COMPANY_ADMIN;
+                model.IsClientAdmin = model.Role == AppRoles.COMPANY_ADMIN;
                 model.Updated = DateTime.Now;
                 model.UpdatedBy = performedBy;
-
+                model.CountryId = model.SelectedCountryId;
+                model.StateId = model.SelectedStateId;
+                model.DistrictId = model.SelectedDistrictId;
+                model.PinCodeId = model.SelectedPincodeId;
                 var createResult = await _userManager.CreateAsync(model, model.Password);
                 if (!createResult.Succeeded)
                     return Fail("Failed to create user.");
 
-                await _userManager.AddToRoleAsync(model, model.UserRole.ToString());
+                await _userManager.AddToRoleAsync(model, model.Role.ToString());
 
                 var country = await _context.Country.FindAsync(model.CountryId);
                 await _sms.DoSendSmsAsync(
@@ -97,7 +99,7 @@ namespace risk.control.system.Services
                 return Fail("Unexpected error while creating user.");
             }
         }
-        public async Task<ServiceResult> UpdateAsync(long id, ClientCompanyApplicationUser model, string performedBy)
+        public async Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy)
         {
             try
             {
@@ -116,12 +118,15 @@ namespace risk.control.system.Services
 
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
+                user.CountryId = model.SelectedCountryId;
+                user.StateId = model.SelectedStateId;
+                user.DistrictId = model.SelectedDistrictId;
+                user.PinCodeId = model.SelectedPincodeId;
                 user.Addressline = model.Addressline;
                 user.PhoneNumber = model.PhoneNumber.TrimStart('0');
 
-                user.UserRole = model.UserRole;
-                user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), model.UserRole.ToString());
-                user.IsClientAdmin = user.UserRole == CompanyRole.COMPANY_ADMIN;
+                user.Role = model.Role;
+                user.IsClientAdmin = user.Role == AppRoles.COMPANY_ADMIN;
 
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = performedBy;
@@ -133,7 +138,7 @@ namespace risk.control.system.Services
 
                 var roles = await _userManager.GetRolesAsync(user);
                 await _userManager.RemoveFromRolesAsync(user, roles);
-                await _userManager.AddToRoleAsync(user, user.UserRole.ToString());
+                await _userManager.AddToRoleAsync(user, user.Role.ToString());
                 if (user.Email != performedBy)
                 {
                     user.Active = model.Active;
@@ -164,14 +169,14 @@ namespace risk.control.system.Services
         {
             if (file == null || file.Length == 0)
             {
-                result.Errors[nameof(ClientCompanyApplicationUser.ProfileImage)] =
+                result.Errors[nameof(ApplicationUser.ProfileImage)] =
                     "Profile image is required.";
                 return false;
             }
 
             if (file.Length > MAX_FILE_SIZE)
             {
-                result.Errors[nameof(ClientCompanyApplicationUser.ProfileImage)] =
+                result.Errors[nameof(ApplicationUser.ProfileImage)] =
                     "Profile image exceeds 5MB.";
                 return false;
             }
@@ -179,28 +184,28 @@ namespace risk.control.system.Services
             var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!AllowedExt.Contains(ext))
             {
-                result.Errors[nameof(ClientCompanyApplicationUser.ProfileImage)] =
+                result.Errors[nameof(ApplicationUser.ProfileImage)] =
                     "Invalid file type.";
                 return false;
             }
 
             if (!AllowedMime.Contains(file.ContentType))
             {
-                result.Errors[nameof(ClientCompanyApplicationUser.ProfileImage)] =
+                result.Errors[nameof(ApplicationUser.ProfileImage)] =
                     "Invalid image content type.";
                 return false;
             }
 
             if (!ImageSignatureValidator.HasValidSignature(file))
             {
-                result.Errors[nameof(ClientCompanyApplicationUser.ProfileImage)] =
+                result.Errors[nameof(ApplicationUser.ProfileImage)] =
                     "Invalid or corrupted image.";
                 return false;
             }
 
             return true;
         }
-        private async Task SetProfileImageAsync(ClientCompanyApplicationUser user, IFormFile file, string domain)
+        private async Task SetProfileImageAsync(ApplicationUser user, IFormFile file, string domain)
         {
             var (fileName, relativePath) = await _fileStorage.SaveAsync(file, domain, "user");
             user.ProfilePictureUrl = relativePath;

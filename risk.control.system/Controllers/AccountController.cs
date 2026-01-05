@@ -2,13 +2,16 @@
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -19,52 +22,47 @@ namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IMemoryCache cache;
+        private readonly Dictionary<string, string> azureRoleMapping;
+        private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly IConfiguration configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILoginService loginService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IConfiguration config;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly INotificationService service;
         private readonly IAccountService accountService;
         private readonly ILogger<AccountController> _logger;
         private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
-        private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
         private readonly string BaseUrl;
 
         public AccountController(
-            IMemoryCache cache,
+            IOptions<AzureAdRoleMapping> azureRoleMapping,
+            RoleManager<ApplicationRole> roleManager,
+            IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
             ILoginService loginService,
             IWebHostEnvironment webHostEnvironment,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration config,
              IHttpContextAccessor httpContextAccessor,
-            INotificationService service,
             IAccountService accountService,
             ILogger<AccountController> logger,
             IFeatureManager featureManager,
             INotyfService notifyService,
-            ISmsService SmsService,
             ApplicationDbContext context)
         {
-            this.cache = cache;
+            this.azureRoleMapping = azureRoleMapping.Value.Roles;
+            this.roleManager = roleManager;
+            this.configuration = configuration;
             _userManager = userManager ?? throw new ArgumentNullException();
             this.loginService = loginService;
             this.webHostEnvironment = webHostEnvironment;
             _signInManager = signInManager ?? throw new ArgumentNullException();
-            this.config = config;
-            this.httpContextAccessor = httpContextAccessor;
-            this.service = service;
             this.accountService = accountService;
             this._context = context;
             _logger = logger;
             this.featureManager = featureManager;
             this.notifyService = notifyService;
-            smsService = SmsService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -231,59 +229,94 @@ namespace risk.control.system.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult AzureLogin(string returnUrl = null)
+        public IActionResult AzureLogin(string returnUrl = "/Dashboard/Index")
         {
-            // Redirect to ExternalLoginCallback once Azure is done
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(
-                OpenIdConnectDefaults.AuthenticationScheme, redirectUrl);
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = redirectUrl
+            };
 
             return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
         }
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/Dashboard/Index")
         {
-            if (remoteError != null)
-                return await PrepareInvalidView(new LoginViewModel(), $"Error from Azure: {remoteError}");
+            var result = await HttpContext.AuthenticateAsync(
+                OpenIdConnectDefaults.AuthenticationScheme);
 
-            // Get the login information back from Azure AD
-            var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-                return RedirectToAction(nameof(Login));
-
-            // Extract the email claim
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email) ??
-                        info.Principal.FindFirstValue(ClaimTypes.Upn);
-
-            if (string.IsNullOrEmpty(email))
-                return await PrepareInvalidView(new LoginViewModel(), "Email claim not received from Azure.");
-
-            // 1. Find the local user
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                return await PrepareInvalidView(new LoginViewModel(), "User not found in local system.");
-
-            // 2. Reuse your existing verification logic
-            var (isAuthorized, displayName, isAdmin) = await loginService.GetUserStatusAsync(user);
-
-            if (!isAuthorized)
-                return await PrepareInvalidView(new LoginViewModel(), "Account inactive or unauthorized.");
-
-            // 3. Link the login if not already linked (Optional but recommended)
-            var userLogins = await _userManager.GetLoginsAsync(user);
-            if (!userLogins.Any(x => x.LoginProvider == info.LoginProvider))
+            if (!result.Succeeded || result.Principal == null)
             {
-                await _userManager.AddLoginAsync(user, info);
+                return RedirectToAction(nameof(Login));
             }
 
-            // 4. Sign the user in (Mirroring your local Login method)
-            await loginService.SignInWithTimeoutAsync(user);
+            var principal = result.Principal;
 
-            notifyService.Success($"Welcome <b>{displayName}</b>, Microsoft Login successful");
+            var email = principal.FindFirstValue(ClaimTypes.Email) ?? principal.FindFirstValue("preferred_username") ?? principal.FindFirstValue(ClaimTypes.Upn);
 
-            return LocalRedirect(returnUrl ?? "/Dashboard/Index");
+            if (string.IsNullOrEmpty(email))
+                return View("Error", "Email not received from Azure");
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                var azureRole = principal.FindFirstValue(ClaimTypes.Role);
+                ClientCompany company = null;
+                Vendor vendor = null;
+                if (RoleGroups.CompanyRoles.Contains(azureRole))
+                {
+                    company = await _context.ClientCompany.FirstOrDefaultAsync(c => !c.Deleted);
+                }
+                if (RoleGroups.AgencyRoles.Contains(azureRole))
+                {
+                    vendor = await _context.Vendor.FirstOrDefaultAsync(c => !c.Deleted);
+                }
+                var countryCode = principal.Claims.First(p => p.Type == "ctry").Value;
+                var pincode = await _context.PinCode.Include(d => d.District).Include(s => s.State).Include(c => c.Country).FirstOrDefaultAsync(p => p.Country.Code == countryCode);
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? "",
+                    LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? "",
+                    PhoneNumber = principal.FindFirstValue(ClaimTypes.MobilePhone) ?? "",
+                    Active = true,
+                    EmailConfirmed = true,
+                    CountryId = pincode.CountryId,
+                    StateId = pincode.StateId,
+                    DistrictId = pincode.DistrictId,
+                    PinCodeId = pincode.PinCodeId,
+                    VendorId = vendor?.VendorId,
+                    ClientCompanyId = company?.ClientCompanyId
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+
+                if (!createResult.Succeeded)
+                {
+                    return View("Error",
+                        string.Join(", ", createResult.Errors.Select(e => e.Description)));
+                }
+                if (!await roleManager.RoleExistsAsync(azureRole))
+                {
+                    await roleManager.CreateAsync(
+                        new ApplicationRole
+                        {
+                            Name = azureRole,
+                            Code = azureRole.Substring(0, 2)
+                        });
+                }
+                await _userManager.AddToRoleAsync(user, azureRole);
+            }
+
+            // ✅ NOW sign into Identity cookie
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return LocalRedirect(returnUrl);
         }
+
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
@@ -305,7 +338,8 @@ namespace risk.control.system.Controllers
             }
             var model = new ChangePasswordViewModel
             {
-                Email = user.Email
+                Email = user.Email,
+                Id = user.Id
             };
             return View(model);
         }

@@ -23,7 +23,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
@@ -38,6 +37,7 @@ using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Middleware;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
 using risk.control.system.Services;
 
@@ -282,24 +282,19 @@ builder.Services.AddHangfireServer(options =>
     options.Queues = new[] { "default", "emails", "critical" };
 });
 
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.CheckConsentNeeded = context => false;
-    options.MinimumSameSitePolicy = SameSiteMode.Lax;
-});
+//builder.Services.Configure<CookiePolicyOptions>(options =>
+//{
+//    options.CheckConsentNeeded = _ => false;
+//    options.MinimumSameSitePolicy = SameSiteMode.None;
+//    options.Secure = CookieSecurePolicy.Always;
+//});
+builder.Services.Configure<AzureAdRoleMapping>(
+    builder.Configuration.GetSection("AzureAdRoleMapping"));
+
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-
-builder.Services.AddIdentityCore<VendorApplicationUser>()
-    .AddRoles<ApplicationRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-builder.Services.AddIdentityCore<ClientCompanyApplicationUser>()
-    .AddRoles<ApplicationRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -308,56 +303,71 @@ builder.Services.Configure<IdentityOptions>(options =>
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
-builder.Services.AddAuthentication(options =>
+// 1️⃣ Create AuthenticationBuilder
+var authBuilder = builder.Services.AddAuthentication(options =>
 {
-    // Use Cookies as the default for the browser/UI
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-})
-// 2. Add Microsoft Entra ID (Azure AD)
-// This handles its own cookie internally but links to the OIDC scheme
-.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-    .EnableTokenAcquisitionToCallDownstreamApi()
-    .AddInMemoryTokenCaches();
+});
 
-// 3. Add JWT Bearer for API calls (if needed)
-builder.Services.AddAuthentication()
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+// 2️⃣ Azure AD (Microsoft Entra ID)
+authBuilder.AddMicrosoftIdentityWebApp(options =>
+{
+    builder.Configuration.Bind("AzureAd", options);
+    //options.SignInScheme = IdentityConstants.ApplicationScheme;
+});
+
+builder.Services.Configure<OpenIdConnectOptions>(
+    OpenIdConnectDefaults.AuthenticationScheme,
+    options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-            ClockSkew = TimeSpan.Zero
-        };
+        options.NonceCookie.SameSite = SameSiteMode.None;
+        options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        options.CorrelationCookie.SameSite = SameSiteMode.None;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
     });
+
+//  3️⃣ JWT Bearer authentication (API)
+authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey =
+            new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 // 4. Configure the Identity Cookie (Do this AFTER AddAuthentication)
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Your custom expiration logic
-    options.Events.OnValidatePrincipal = async context => { /* ... your logic ... */ };
-
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SameSite = SameSiteMode.None; // ✅ REQUIRED
     options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME;
     options.LoginPath = AppCookie.LOGIN_PATH;
     options.LogoutPath = AppCookie.LOGOUT_PATH;
     options.AccessDeniedPath = AppCookie.LOGOUT_PATH;
     options.SlidingExpiration = true;
-    options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
+    options.ExpireTimeSpan =
+        TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
 });
+
 builder.Services.AddAntiforgery(options =>
 {
     options.Cookie.Name = AppCookie.ANTI_FORGERY_COOKIE_NAME; // Set a custom cookie name
     options.Cookie.HttpOnly = true; // Make the cookie HttpOnly
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require secure cookies (only over HTTPS)
-    options.Cookie.SameSite = SameSiteMode.Strict; // Apply a strict SameSite policy
+    options.Cookie.SameSite = SameSiteMode.Lax; // Apply a strict SameSite policy
     options.HeaderName = "X-CSRF-TOKEN"; // Set a custom header name
     options.FormFieldName = "__RequestVerificationToken"; // Set a custom form field name
     options.SuppressXFrameOptionsHeader = false; // Enable the X-Frame-Options header
@@ -394,11 +404,11 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddMvcCore(config =>
-{
-    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-    config.Filters.Add(new AuthorizeFilter(policy));
-});
+//builder.Services.AddMvcCore(config =>
+//{
+//    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+//    config.Filters.Add(new AuthorizeFilter(policy));
+//});
 builder.Services.AddHttpContextAccessor();
 try
 {
@@ -409,8 +419,6 @@ try
     {
         Authorization = new[] { new BasicAuthAuthorizationFilter() }
     });
-    app.UseMiddleware<RequirePasswordChangeMiddleware>();
-    app.UseSwagger();
 
     if (app.Environment.IsDevelopment())
     {
@@ -424,8 +432,6 @@ try
         //app.UseStatusCodePagesWithRedirects("/Home/HTTP?statusCode={0}");
         app.UseHsts();
     }
-
-    app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
 
     app.UseHttpsRedirection();
 
@@ -444,22 +450,23 @@ try
 
     app.UseRouting();
     //app.UseRateLimiter();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    });
-
-    app.UseMiddleware<CookieConsentMiddleware>();
-
-    app.UseMiddleware<WhitelistListMiddleware>();
 
     app.UseCors();
     app.UseCookiePolicy();
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
+    app.UseMiddleware<RequirePasswordChangeMiddleware>();
+    app.UseMiddleware<CookieConsentMiddleware>();
+    app.UseMiddleware<WhitelistListMiddleware>();
     app.UseMiddleware<LicensingMiddleware>();
     app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    });
     app.UseNotyf();
     app.UseFileServer();
 

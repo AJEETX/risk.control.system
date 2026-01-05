@@ -132,7 +132,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    if (row.roles == "GUEST") {
+                    if (row.roles == "GUEST" || row.roles == undefined || row.roles == '' || row.roles == null) {
                     buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
                     else {
