@@ -227,12 +227,11 @@ div .error-message {
 
 .form-content .input-box i {
     position: absolute;
-    color: #6c757d;
-    font-size: 17px;
+    font-size: 25px;
 }
 
 .forms .form-content .text {
-    font-size: 17px;
+    font-size: 25px;
     font-weight: 500;
     color: #333;
 }
@@ -620,7 +619,7 @@ img.logo {
 }
 #country-flag {
     width: 20px; /* Adjust the size of the flag */
-    height: 14px; /* Adjust the size of the flag */
+    height: 20px; /* Adjust the size of the flag */
 }
 .input-group-append-caret {
     display: flex;

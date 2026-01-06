@@ -9,13 +9,13 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        public string Sender { get; set; }
+        public string SenderEmail { get; set; }
         public string Comment { get; set; }
         public CaseNote? ParentCaseNote { get; set; }
         public override string ToString()
         {
             return $"CaseNote Information:\n" +
-            $"- Sender: {Sender}\n" +
+            $"- Sender: {SenderEmail}\n" +
             $"- Comment: {Comment}";
         }
     }

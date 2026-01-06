@@ -10,10 +10,10 @@ namespace risk.control.system.Services
 {
     public interface IVendorInvestigationService
     {
-        Task<List<ClaimsInvestigationAgencyResponse>> GetNewCases(string userEmail);
-        Task<List<ClaimsInvestigationResponse>> GetOpenCases(string userEmail);
-        Task<List<ClaimsInvestigationAgencyResponse>> GetReport(string userEmail);
-        Task<List<ClaimsInvestigationAgencyResponse>> GetCompleted(string userEmail, string userClaim);
+        Task<List<CaseInvestigationAgencyResponse>> GetNewCases(string userEmail);
+        Task<List<CaseInvestigationResponse>> GetOpenCases(string userEmail);
+        Task<List<CaseInvestigationAgencyResponse>> GetReport(string userEmail);
+        Task<List<CaseInvestigationAgencyResponse>> GetCompleted(string userEmail, string userClaim);
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long id);
         Task<CaseInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, long selectedcase);
         Task<InvestigationTask> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, long claimsInvestigationId);
@@ -351,7 +351,7 @@ namespace risk.control.system.Services
             return claim;
         }
 
-        public async Task<List<ClaimsInvestigationAgencyResponse>> GetNewCases(string userEmail)
+        public async Task<List<CaseInvestigationAgencyResponse>> GetNewCases(string userEmail)
         {
             var vendorUser = await context.ApplicationUser
                 .Include(v => v.Country)
@@ -394,7 +394,7 @@ namespace risk.control.system.Services
                 }
             }
 
-            var response = claims.Select(a => new ClaimsInvestigationAgencyResponse
+            var response = claims.Select(a => new CaseInvestigationAgencyResponse
             {
                 Id = a.Id,
                 PolicyId = a.PolicyDetail.ContractNumber,
@@ -448,7 +448,7 @@ namespace risk.control.system.Services
 
             return response;
         }
-        public async Task<List<ClaimsInvestigationResponse>> GetOpenCases(string userEmail)
+        public async Task<List<CaseInvestigationResponse>> GetOpenCases(string userEmail)
         {
             var vendorUser = await context.ApplicationUser
                 .Include(v => v.Country)
@@ -505,7 +505,7 @@ namespace risk.control.system.Services
                              a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)).ToListAsync();
             }
 
-            var response = claims?.Select(a => new ClaimsInvestigationResponse
+            var response = claims?.Select(a => new CaseInvestigationResponse
             {
                 Id = a.Id,
                 AssignedToAgency = a.IsNewSubmittedToAgent,
@@ -563,7 +563,7 @@ namespace risk.control.system.Services
             return response;
         }
 
-        public async Task<List<ClaimsInvestigationAgencyResponse>> GetCompleted(string userEmail, string userClaim)
+        public async Task<List<CaseInvestigationAgencyResponse>> GetCompleted(string userEmail, string userClaim)
         {
             var agencyUser = await context.ApplicationUser
                 .Include(v => v.Country)
@@ -598,7 +598,7 @@ namespace risk.control.system.Services
             }
             var responseData = await claims.ToListAsync();
             var response = responseData
-                .Select(a => new ClaimsInvestigationAgencyResponse
+                .Select(a => new CaseInvestigationAgencyResponse
                 {
                     Id = a.Id,
                     PolicyId = a.PolicyDetail.ContractNumber,
@@ -637,7 +637,7 @@ namespace risk.control.system.Services
                 .ToList();
             return response;
         }
-        public async Task<List<ClaimsInvestigationAgencyResponse>> GetReport(string userEmail)
+        public async Task<List<CaseInvestigationAgencyResponse>> GetReport(string userEmail)
         {
 
             // Fetch the vendor user along with the related Vendor and Country info in one query
@@ -667,7 +667,7 @@ namespace risk.control.system.Services
                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
             var responseData = await cases.ToListAsync();
             var response = responseData.Select(a =>
-                new ClaimsInvestigationAgencyResponse
+                new CaseInvestigationAgencyResponse
                 {
                     Id = a.Id,
                     PolicyId = a.PolicyDetail.ContractNumber,

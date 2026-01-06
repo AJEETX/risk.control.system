@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
@@ -46,6 +47,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
         this.faceMatchService = faceMatchService;
     }
 
+    [HttpPost]
     public async Task<AppiCheckifyResponse> CaptureAgentId(FaceData data)
     {
         InvestigationTask claim = await caseService.GetCaseById(data.CaseId);

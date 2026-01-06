@@ -25,7 +25,10 @@ namespace risk.control.system.Controllers.Tools
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-
+            if (user == null)
+            {
+                return Unauthorized("Unauthorized");
+            }
             var model = new FaceMatchData
             {
                 RemainingTries = 5 - (user?.FaceMatchCount ?? 0)
@@ -42,11 +45,14 @@ namespace risk.control.system.Controllers.Tools
 
                 // 1. Check Usage Limit before calling AWS
                 var user = await _userManager.GetUserAsync(User);
-                if (user == null) return Unauthorized();
+                if (user == null)
+                {
+                    return Unauthorized("Unauthorized");
+                }
 
                 if (user.FaceMatchCount >= 5)
                 {
-                    return StatusCode(403, new { message = "You have reached your daily limit of 5 uses." });
+                    return StatusCode(403, new { message = "Face Match limit reached (5/5)" });
                 }
 
                 // 2. Perform Biometric Comparison

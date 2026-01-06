@@ -20,7 +20,7 @@ namespace risk.control.system.Services
         string GetErrorMessage(SignInResult result);
         Task<bool> SendOtpAsync(OtpRequest request);
         Task<(bool Success, string Message)> ResendOtpAsync(OtpRequest request);
-        Task<(bool Success, string Message)> VerifyAndLoginAsync(string isd, string mobileNumber, string userEnteredOtp);
+        Task<(bool Success, string Message)> VerifyAndLoginAsync(OtpLoginModel request);
     }
 
     internal class LoginService : ILoginService
@@ -130,13 +130,13 @@ namespace risk.control.system.Services
         {
             return await InternalSendOtpLogic(request);
         }
-        public async Task<(bool Success, string Message)> VerifyAndLoginAsync(string isd, string mobileNumber, string userEnteredOtp)
+        public async Task<(bool Success, string Message)> VerifyAndLoginAsync(OtpLoginModel request)
         {
-            string cleanIsd = isd.TrimStart('+');
-            string cleanMobile = mobileNumber.TrimStart('0');
+            string cleanIsd = request.CountryIsd.TrimStart('+');
+            string cleanMobile = request.MobileNumber.TrimStart('0');
             string cacheKey = $"{cleanIsd}{cleanMobile}";
 
-            if (!cache.TryGetValue(cacheKey, out string correctOtp) || correctOtp != userEnteredOtp?.Trim())
+            if (!cache.TryGetValue(cacheKey, out string correctOtp) || correctOtp != request.UserEnteredOtp?.Trim())
             {
                 return (false, "The OTP entered is invalid or has expired.");
             }

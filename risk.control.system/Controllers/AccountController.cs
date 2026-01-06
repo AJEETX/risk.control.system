@@ -273,7 +273,18 @@ namespace risk.control.system.Controllers
                 {
                     vendor = await _context.Vendor.FirstOrDefaultAsync(c => !c.Deleted);
                 }
-                var countryCode = principal.Claims.First(p => p.Type == "ctry").Value;
+                string countryCode = string.Empty;
+                var countryClaim = principal.Claims.FirstOrDefault(p => p.Type == "ctry");
+                if (countryClaim != null)
+                {
+                    countryCode = countryClaim.Value;
+                }
+                countryClaim = principal.Claims.First(p => p.Type == "tenant_ctry");
+                if (countryClaim != null)
+                {
+                    countryCode = countryClaim.Value;
+                }
+                countryCode = principal.Claims.First(p => p.Type == "tenant_ctry").Value;
                 var pincode = await _context.PinCode.Include(d => d.District).Include(s => s.State).Include(c => c.Country).FirstOrDefaultAsync(p => p.Country.Code == countryCode);
                 user = new ApplicationUser
                 {

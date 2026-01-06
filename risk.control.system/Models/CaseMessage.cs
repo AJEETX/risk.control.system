@@ -9,8 +9,10 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        [EmailAddress]
         public string? SenderEmail { get; set; }
         public string? SenderPhone { get; set; }
+        [EmailAddress]
         public string? RecepicientEmail { get; set; }
         public string? RecepicientPhone { get; set; }
         public DateTime? ScheduleTime { get; set; }

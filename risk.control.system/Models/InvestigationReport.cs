@@ -10,12 +10,14 @@ namespace risk.control.system.Models
         public long Id { get; set; }
         public long? ReportTemplateId { get; set; }
         public ReportTemplate? ReportTemplate { get; set; }
+        [EmailAddress]
         public string? AgentEmail { get; set; }
         public DateTime? AgentRemarksUpdated { get; set; }
         public string? AgentRemarks { get; set; }
         public DateTime? AgentRemarksEditUpdated { get; set; }
         public string? AgentRemarksEdit { get; set; }
         public DateTime? SupervisorRemarksUpdated { get; set; }
+        [EmailAddress]
         public string? SupervisorEmail { get; set; }
         public string? SupervisorRemarks { get; set; }
         public byte[]? SupervisorAttachment { get; set; }
@@ -24,6 +26,7 @@ namespace risk.control.system.Models
         public string? SupervisorFileExtension { get; set; }
         public SupervisorRemarkType? SupervisorRemarkType { get; set; }
         public DateTime? AssessorRemarksUpdated { get; set; }
+        [EmailAddress]
         public string? AssessorEmail { get; set; }
         public string? AssessorRemarks { get; set; }
         public AssessorRemarkType? AssessorRemarkType { get; set; }

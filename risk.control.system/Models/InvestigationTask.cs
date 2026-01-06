@@ -34,10 +34,15 @@ namespace risk.control.system.Models
         public bool AiEnabled { get; set; } = false;
         public bool Deleted { get; set; } = false;
         public bool IsQueryCase { get; set; } = false;
+        [EmailAddress]
         public string? AllocatingSupervisordEmail { get; set; }
+        [EmailAddress]
         public string? SubmittingSupervisordEmail { get; set; }
+        [EmailAddress]
         public string? SubmittedAssessordEmail { get; set; }
+        [EmailAddress]
         public string? RequestedAssessordEmail { get; set; }
+        [EmailAddress]
         public string? TaskedAgentEmail { get; set; }
         public DateTime? TaskToAgentTime { get; set; }
         public DateTime? SubmittedToSupervisorTime { get; set; }
@@ -53,8 +58,7 @@ namespace risk.control.system.Models
         public bool IsNewSubmittedToAgent { get; set; } = true;
         public bool IsNewSubmittedToAgency { get; set; } = true;
         public bool IsNewSubmittedToCompany { get; set; } = true;
-        public bool IsNewProcessedByCompany { get; set; } = true;
-        public bool IsNewReviewedByCompany { get; set; } = true;
+
         public int CreatorSla { get; set; } = 5;
         public int AssessorSla { get; set; } = 5;
         public int SupervisorSla { get; set; } = 5;
@@ -69,11 +73,5 @@ namespace risk.control.system.Models
         public string? SelectedAgentDrivingDuration { get; set; } = default!;
         public int? SelectedAgentDrivingDurationInSeconds { get; set; } = default!;
         public ICollection<InvestigationTimeline> InvestigationTimeline { get; set; }
-    }
-
-    public enum CASETYPE
-    {
-        CLAIM,
-        UNDERWRITING
     }
 }

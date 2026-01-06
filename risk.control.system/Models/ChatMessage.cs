@@ -8,6 +8,7 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ChatMessageId { get; set; }
+        [EmailAddress]
         public string FromUserEmail { get; set; }
         public ApplicationUser? FromUser { get; set; }
         public ApplicationUser? ToUser { get; set; }

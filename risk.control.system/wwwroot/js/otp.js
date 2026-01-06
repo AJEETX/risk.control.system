@@ -1,35 +1,35 @@
-﻿$.validator.setDefaults({
-    submitHandler: function (form) {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
+﻿//$.validator.setDefaults({
+//    submitHandler: function (form) {
+//        $("body").addClass("submit-progress-bg");
+//        // Wrap in setTimeout so the UI
+//        // can update the spinners
+//        setTimeout(function () {
+//            $(".submit-progress").removeClass("hidden");
+//        }, 1);
 
-        $('#otp').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Send OTP');
-        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+//        $('#otp').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Send OTP');
+//        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
 
-        $('#otp').attr('disabled', 'disabled');
-        $('#login').attr('disabled', 'disabled');
-        $('#otp').addClass('login-disabled');
-        $('#login').addClass('login-disabled');
-        $('html a').addClass('anchor-disabled');
-        $('.text').addClass('anchor-disabled');
+//        $('#otp').attr('disabled', 'disabled');
+//        $('#login').attr('disabled', 'disabled');
+//        $('#otp').addClass('login-disabled');
+//        $('#login').addClass('login-disabled');
+//        $('html a').addClass('anchor-disabled');
+//        $('.text').addClass('anchor-disabled');
 
-        form.submit();
+//        form.submit();
 
-        $('#login-form').attr('disabled', 'disabled');
+//        $('#login-form').attr('disabled', 'disabled');
 
-        var loginForm = document.getElementById("login-form");
-        if (loginForm) {
-            var nodes = loginForm.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
-            }
-        }
-    }
-});
+//        var loginForm = document.getElementById("login-form");
+//        if (loginForm) {
+//            var nodes = loginForm.getElementsByTagName('*');
+//            for (var i = 0; i < nodes.length; i++) {
+//                nodes[i].disabled = true;
+//            }
+//        }
+//    }
+//});
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -150,10 +150,61 @@ $(document).ready(function () {
 
     let timeLeft = 30;
     let countdown; // Move this variable here so it's accessible everywhere
+    const inputs = $('.otp-input');
+    const hiddenInput = $('#UserEnteredOtp');
+    const loginBtn = $('#login');
     const timerElement = $('#timer');
     const resendBtn = $('#resendBtn');
     const loginForm = $('#login-form');
+    function updateOtpStatus() {
+        let otp = "";
+        inputs.each(function () {
+            otp += $(this).val();
+        });
 
+        hiddenInput.val(otp);
+
+        // Enable button only if all 4 digits are present
+        if (otp.length === 4) {
+            loginBtn.prop('disabled', false);
+            loginBtn.addClass('btn-pulse'); // Optional: add a CSS animation class
+        } else {
+            loginBtn.prop('disabled', true);
+            loginBtn.removeClass('btn-pulse');
+        }
+    }
+
+    inputs.on('input', function (e) {
+        const target = $(e.target);
+        // Allow only numbers
+        target.val(target.val().replace(/[^0-9]/g, ''));
+
+        // Move to next input
+        if (target.val() !== "") {
+            target.next('.otp-input').focus();
+        }
+
+        updateOtpStatus();
+    });
+
+    inputs.on('keydown', function (e) {
+        if (e.key === 'Backspace' && $(this).val() === '') {
+            $(this).prev('.otp-input').focus();
+        }
+    });
+
+    // Handle Paste (important for mobile users)
+    inputs.first().on('paste', function (e) {
+        const data = (e.originalEvent || e).clipboardData.getData('text').trim();
+        if (data.length === 4 && /^\d+$/.test(data)) {
+            const digits = data.split('');
+            inputs.each(function (i) {
+                $(this).val(digits[i]);
+            });
+            updateOtpStatus();
+            inputs.last().focus();
+        }
+    });
     function startTimer() {
         resendBtn.prop('disabled', true);
         // Clear any existing interval before starting a new one
@@ -174,43 +225,40 @@ $(document).ready(function () {
         startTimer();
     }
     loginForm.on('submit', function () {
-        clearInterval(countdown); // This stops the timer immediately
+        // We don't need the "length < 4" check anymore because the button is disabled
+
+        clearInterval(countdown);
+        $("body").addClass("submit-progress-bg");
+        $(".submit-progress").removeClass("hidden");
+
+        $('#login').html('<span class="fas fa-sync fa-spin"></span> Verifying...')
+            .prop('disabled', true); // Prevent double-submit
     });
     $('#resendBtn').click(function () {
-        const isd = $('input[name="isd"]').val();
-        const mobileNumber = $('input[name="mobileNumber"]').val();
+        const CountryIsd = $('input[name="CountryIsd"]').val();
+        const MobileNumber = $('input[name="MobileNumber"]').val();
         const token = $('input[name="__RequestVerificationToken"]').val();
 
         $.ajax({
             url: '/Tool/ResendOtp',
             type: 'POST',
             data: {
-                isd: isd,
-                mobileNumber: mobileNumber,
+                CountryIsd: CountryIsd,
+                MobileNumber: MobileNumber,
                 __RequestVerificationToken: token
             },
             success: function (response) {
                 if (response.success) {
-                    $.alert({
-                        title: 'Otp Send!',
-                        content: response.message,
-                        closeIcon: true,
-                        type: 'green',
-                        icon: 'fas fa-key',
-                        buttons: {
-                            ok: {
-                                text: 'Close',
-                                btnClass: 'btn-default',
-                            }
-                        }
-                    });
+                   
                     $('.otp-input').val('');
-                    $('#userEnteredOtp').val('');
+                    $('#UserEnteredOtp').val('');
                     $('.otp-input').first().focus();
                     timeLeft = 60; // Increase cooldown for next attempt
+                    resendBtn.html('Resend in <span id="timer">' + timeLeft + '</span>s');
                     startTimer();
                 }
                 else {
+                    resendBtn.prop('disabled', false).html('<span class="fa fa-sync"></span> Resend OTP');
                     $.alert({
                         title: 'Otp Error!',
                         content: response.message,
@@ -227,6 +275,7 @@ $(document).ready(function () {
                 }
             },
             error: function () {
+                resendBtn.prop('disabled', false).html('<span class="fa fa-sync"></span> Resend OTP');
                 $.alert({
                     title: 'Otp Error!',
                     content: 'Error resending OTP. Please try again later.',
@@ -243,9 +292,6 @@ $(document).ready(function () {
             }
         });
     });
-
-    const inputs = $('.otp-input');
-    const hiddenInput = $('#userEnteredOtp');
 
     inputs.on('input', function (e) {
         const target = $(e.target);

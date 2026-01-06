@@ -1,6 +1,6 @@
-﻿namespace risk.control.system.Models
+﻿namespace risk.control.system.Models.ViewModel
 {
-    public class ClaimsInvestigationResponse
+    public class CaseInvestigationResponse
     {
         public object Id { get; set; }
         public bool AssignedToAgency { get; set; }
@@ -32,9 +32,7 @@
         public string? Company { get; set; }
         public bool AutoAllocated { get; set; }
         public bool? IsNewAssigned { get; set; }
-        public bool? IsQueryCase { get; set; }
         public string OwnerDetail { get; set; }
-        public string AgencyDeclineComment { get; set; }
         public bool CaseWithPerson { get; set; } = false;
         public string? PersonMapAddressUrl { get; set; }
         public string? Distance { get; set; }

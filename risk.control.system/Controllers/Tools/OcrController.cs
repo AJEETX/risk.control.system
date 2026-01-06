@@ -29,7 +29,10 @@ namespace risk.control.system.Controllers.Tools
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-
+            if (user == null)
+            {
+                return Unauthorized("Unauthorized");
+            }
             var model = new DocumentOcrData
             {
                 RemainingTries = 5 - (user?.OcrCount ?? 0)
@@ -44,7 +47,10 @@ namespace risk.control.system.Controllers.Tools
 
             // 1. Get current user and check limit
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            if (user == null)
+            {
+                return Unauthorized("Unauthorized");
+            }
 
             if (user.OcrCount >= 5)
             {

@@ -58,17 +58,6 @@ namespace risk.control.system.Models
         [Required]
         public long? InvestigationTaskId { get; set; }
         public InvestigationTask? InvestigationTask { get; set; }
-        [NotMapped]
-        public long SelectedPincodeId { get; set; }
-        [NotMapped]
-        public long SelectedDistrictId { get; set; }
-        [NotMapped]
-        public long SelectedStateId { get; set; }
-        [NotMapped]
-        public long SelectedCountryId { get; set; }
-
-        [NotMapped]
-        public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
 
         [Display(Name = "Customer type")]
         public CustomerType? CustomerType { get; set; }
@@ -90,8 +79,6 @@ namespace risk.control.system.Models
         public string? ProfilePictureExtension { get; set; }
 
         [Display(Name = "Image")]
-        [NotMapped]
-        public IFormFile? ProfileImage { get; set; }
 
         public string? Description { get; set; }
         public string? CustomerLocationMap { get; set; }
@@ -100,6 +87,24 @@ namespace risk.control.system.Models
 
         public string? AddressLocationInfo { get; set; }
 
+        #region NOT MAPPED PROPERTIES
+        [Required]
+        [Display(Name = "Photo")]
+        [NotMapped]
+        [FileExtensions(Extensions = "jpg,jpeg,png")]
+        public IFormFile? ProfileImage { get; set; }
+        [NotMapped]
+        public long SelectedPincodeId { get; set; }
+        [NotMapped]
+        public long SelectedDistrictId { get; set; }
+        [NotMapped]
+        public long SelectedStateId { get; set; }
+        [NotMapped]
+        public long SelectedCountryId { get; set; }
+
+        [NotMapped]
+        public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
+        #endregion
         public override string ToString()
         {
             return $"Customer Information:\n" +

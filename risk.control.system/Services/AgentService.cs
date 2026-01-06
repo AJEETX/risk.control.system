@@ -5,6 +5,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
@@ -14,8 +15,8 @@ namespace risk.control.system.Services
 
         Task<ApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false);
         Task<ApplicationUser> GetPin(string agentEmail, string portal_base_url);
-        Task<List<ClaimsInvestigationAgencyResponse>> GetNewCases(string userEmail);
-        Task<List<ClaimsInvestigationAgencyResponse>> GetSubmittedCases(string userEmail);
+        Task<List<CaseInvestigationAgencyResponse>> GetNewCases(string userEmail);
+        Task<List<CaseInvestigationAgencyResponse>> GetSubmittedCases(string userEmail);
     }
 
     internal class AgentService : IAgentService
@@ -54,7 +55,7 @@ namespace risk.control.system.Services
             return null!;
         }
 
-        public async Task<List<ClaimsInvestigationAgencyResponse>> GetNewCases(string userEmail)
+        public async Task<List<CaseInvestigationAgencyResponse>> GetNewCases(string userEmail)
         {
             var vendorUser = await context.ApplicationUser.Include(v => v.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
             var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
@@ -66,7 +67,7 @@ namespace risk.control.system.Services
 
 
             var response = claims
-                   .Select(a => new ClaimsInvestigationAgencyResponse
+                   .Select(a => new CaseInvestigationAgencyResponse
                    {
                        Id = a.Id,
                        PolicyId = a.PolicyDetail.ContractNumber,
@@ -117,7 +118,7 @@ namespace risk.control.system.Services
             return null!;
         }
 
-        public async Task<List<ClaimsInvestigationAgencyResponse>> GetSubmittedCases(string userEmail)
+        public async Task<List<CaseInvestigationAgencyResponse>> GetSubmittedCases(string userEmail)
         {
             var agentUser = await context.ApplicationUser.Include(v => v.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
             var claims = await GetClaims()
@@ -127,7 +128,7 @@ namespace risk.control.system.Services
                     i.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).ToListAsync();
 
             var response = claims
-                   .Select(a => new ClaimsInvestigationAgencyResponse
+                   .Select(a => new CaseInvestigationAgencyResponse
                    {
                        Id = a.Id,
                        PolicyId = a.PolicyDetail.ContractNumber,
