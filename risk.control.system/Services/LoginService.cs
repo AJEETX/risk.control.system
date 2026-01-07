@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +23,12 @@ namespace risk.control.system.Services
         Task<bool> SendOtpAsync(OtpRequest request);
         Task<(bool Success, string Message)> ResendOtpAsync(OtpRequest request);
         Task<(bool Success, string Message)> VerifyAndLoginAsync(OtpLoginModel request);
+        Task<ApplicationUser> CreateOrUpdateExternalUserAsync(ClaimsPrincipal principal);
     }
 
     internal class LoginService : ILoginService
     {
+        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ApplicationDbContext _context;
         private readonly IMemoryCache cache;
         private readonly ISmsService smsService;
@@ -34,6 +38,7 @@ namespace risk.control.system.Services
         private readonly SignInManager<ApplicationUser> signInManager;
 
         public LoginService(
+            RoleManager<ApplicationRole> roleManager,
             ApplicationDbContext context,
             IMemoryCache cache,
             ISmsService smsService,
@@ -42,6 +47,7 @@ namespace risk.control.system.Services
             IConfiguration config,
             SignInManager<ApplicationUser> signInManager)
         {
+            this.roleManager = roleManager;
             _context = context;
             this.cache = cache;
             this.smsService = smsService;
@@ -171,6 +177,86 @@ namespace risk.control.system.Services
             await SignInWithTimeoutAsync(user);
 
             return (true, "Login successful.");
+        }
+        public async Task<ApplicationUser> CreateOrUpdateExternalUserAsync(ClaimsPrincipal principal)
+        {
+            var email = principal.FindFirstValue(ClaimTypes.Email)
+                        ?? principal.FindFirstValue("preferred_username")
+                        ?? principal.FindFirstValue(ClaimTypes.Upn);
+
+            if (string.IsNullOrEmpty(email)) return null;
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user != null) return user;
+
+            // User doesn't exist, start mapping data from claims
+            var azureRole = principal.FindFirstValue(ClaimTypes.Role);
+            var countryCode = ExtractCountryCode(principal);
+
+            // Fetch location data based on country code
+            var pincode = await _context.PinCode
+                .Include(d => d.District).Include(s => s.State).Include(c => c.Country)
+                .FirstOrDefaultAsync(p => p.Country.Code == countryCode);
+
+            if (pincode == null) throw new Exception($"Location configuration missing for country: {countryCode}");
+
+            // Handle Vendor/Company associations
+            ClientCompany company = RoleGroups.CompanyRoles.Contains(azureRole) ? await _context.ClientCompany.FirstOrDefaultAsync(c => !c.Deleted) : null;
+
+            Vendor vendor = RoleGroups.AgencyRoles.Contains(azureRole) ? await _context.Vendor.FirstOrDefaultAsync(v => !v.Deleted) : null;
+
+            var appRole = Enum.TryParse<AppRoles>(azureRole, out var parsedRole) ? parsedRole : AppRoles.GUEST;
+
+            user = new ApplicationUser
+            {
+                UserName = email,
+                Email = email,
+                FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? "",
+                LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? "",
+                PhoneNumber = principal.FindFirstValue(ClaimTypes.MobilePhone) ?? "",
+                Active = true,
+                EmailConfirmed = true,
+                CountryId = pincode.CountryId,
+                StateId = pincode.StateId,
+                DistrictId = pincode.DistrictId,
+                PinCodeId = pincode.PinCodeId,
+                VendorId = vendor?.VendorId,
+                ClientCompanyId = company?.ClientCompanyId,
+                Role = appRole
+            };
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                throw new Exception($"User creation failed: {errors}");
+            }
+
+            await EnsureRoleExistsAndAssign(user, azureRole);
+
+            return user;
+        }
+
+        private string ExtractCountryCode(ClaimsPrincipal principal)
+        {
+            return principal.FindFirstValue("ctry")
+                   ?? principal.FindFirstValue("tenant_ctry")
+                   ?? "IN"; // Default fallback
+        }
+
+        private async Task EnsureRoleExistsAndAssign(ApplicationUser user, string roleName)
+        {
+            if (string.IsNullOrEmpty(roleName)) return;
+
+            if (!await roleManager.RoleExistsAsync(roleName))
+            {
+                await roleManager.CreateAsync(new ApplicationRole
+                {
+                    Name = roleName,
+                    Code = roleName.Length >= 2 ? roleName.Substring(0, 2) : "XX"
+                });
+            }
+            await _userManager.AddToRoleAsync(user, roleName);
         }
         private async Task<(bool Success, string Message)> InternalSendOtpLogic(OtpRequest request)
         {

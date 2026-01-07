@@ -78,7 +78,7 @@ namespace risk.control.system.Middleware
                             if (company == null)
                             {
                                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                                context.Response.Redirect("/page/oops.html");
+                                context.Response.Redirect("/page/error.html");
                                 return;
                             }
                             if (company.LicenseType == LicenseType.Trial && company.ExpiryDate.HasValue && DateTime.Now.Subtract(company.ExpiryDate.Value).Ticks > 0)

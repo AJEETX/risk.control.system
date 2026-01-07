@@ -1,17 +1,12 @@
-﻿using System.Security.Claims;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -22,9 +17,6 @@ namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly Dictionary<string, string> azureRoleMapping;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly IConfiguration configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILoginService loginService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -37,9 +29,6 @@ namespace risk.control.system.Controllers
         private readonly string BaseUrl;
 
         public AccountController(
-            IOptions<AzureAdRoleMapping> azureRoleMapping,
-            RoleManager<ApplicationRole> roleManager,
-            IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
             ILoginService loginService,
             IWebHostEnvironment webHostEnvironment,
@@ -51,9 +40,6 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             ApplicationDbContext context)
         {
-            this.azureRoleMapping = azureRoleMapping.Value.Roles;
-            this.roleManager = roleManager;
-            this.configuration = configuration;
             _userManager = userManager ?? throw new ArgumentNullException();
             this.loginService = loginService;
             this.webHostEnvironment = webHostEnvironment;
@@ -119,26 +105,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> KeepAlive()
-        {
-            if (ModelState.IsValid == false)
-            {
-                return BadRequest(new { message = "Invalid request." });
-            }
-            var userId = _userManager.GetUserId(User);
-            if (userId != null)
-            {
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user != null)
-                {
-                    user.LastActivityDate = DateTime.UtcNow;
-                    await _userManager.UpdateAsync(user);
-                }
-            }
-            return Ok();
-        }
         [HttpGet]
         public async Task StreamTypingUpdates(string email, CancellationToken cancellationToken)
         {
@@ -155,13 +121,13 @@ namespace risk.control.system.Controllers
             }
 
             // Send user details first
-            var passwordModelJson = System.Text.Json.JsonSerializer.Serialize(new
+            var credentialModelJson = System.Text.Json.JsonSerializer.Serialize(new
             {
                 email = user.Email,
                 currentPassword = user.Password
             });
 
-            await Response.WriteAsync($"data: PASSWORD_UPDATE|{passwordModelJson}\n");
+            await Response.WriteAsync($"data: CREDENTIAL|{credentialModelJson}\n");
             await Response.Body.FlushAsync(cancellationToken);
             await Task.Delay(1000, cancellationToken); // Small delay to ensure UI updates first
 
@@ -169,8 +135,8 @@ namespace risk.control.system.Controllers
             var messages = new List<string>
             {
                 $"Welcome ! {user.Email} First time user.",
-                "Please update password to continue.",
-                "Remember password for later."
+                "Please update credential to continue.",
+                "Remember credential for later."
             };
 
             foreach (var message in messages)
@@ -243,91 +209,34 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/Dashboard/Index")
         {
-            var result = await HttpContext.AuthenticateAsync(
-                OpenIdConnectDefaults.AuthenticationScheme);
+            var authResult = await HttpContext.AuthenticateAsync(OpenIdConnectDefaults.AuthenticationScheme);
 
-            if (!result.Succeeded || result.Principal == null)
+            if (!authResult.Succeeded || authResult.Principal == null)
             {
                 return RedirectToAction(nameof(Login));
             }
 
-            var principal = result.Principal;
-
-            var email = principal.FindFirstValue(ClaimTypes.Email) ?? principal.FindFirstValue("preferred_username") ?? principal.FindFirstValue(ClaimTypes.Upn);
-
-            if (string.IsNullOrEmpty(email))
-                return View("Error", "Email not received from Azure");
-
-            var user = await _userManager.FindByEmailAsync(email);
-
-            if (user == null)
+            try
             {
-                var azureRole = principal.FindFirstValue(ClaimTypes.Role);
-                ClientCompany company = null;
-                Vendor vendor = null;
-                if (RoleGroups.CompanyRoles.Contains(azureRole))
-                {
-                    company = await _context.ClientCompany.FirstOrDefaultAsync(c => !c.Deleted);
-                }
-                if (RoleGroups.AgencyRoles.Contains(azureRole))
-                {
-                    vendor = await _context.Vendor.FirstOrDefaultAsync(c => !c.Deleted);
-                }
-                string countryCode = string.Empty;
-                var countryClaim = principal.Claims.FirstOrDefault(p => p.Type == "ctry");
-                if (countryClaim != null)
-                {
-                    countryCode = countryClaim.Value;
-                }
-                countryClaim = principal.Claims.First(p => p.Type == "tenant_ctry");
-                if (countryClaim != null)
-                {
-                    countryCode = countryClaim.Value;
-                }
-                countryCode = principal.Claims.First(p => p.Type == "tenant_ctry").Value;
-                var pincode = await _context.PinCode.Include(d => d.District).Include(s => s.State).Include(c => c.Country).FirstOrDefaultAsync(p => p.Country.Code == countryCode);
-                var appRole = (AppRoles)Enum.Parse(typeof(AppRoles), azureRole);
-                user = new ApplicationUser
-                {
-                    UserName = email,
-                    Email = email,
-                    FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? "",
-                    LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? "",
-                    PhoneNumber = principal.FindFirstValue(ClaimTypes.MobilePhone) ?? "",
-                    Active = true,
-                    EmailConfirmed = true,
-                    CountryId = pincode.CountryId,
-                    StateId = pincode.StateId,
-                    DistrictId = pincode.DistrictId,
-                    PinCodeId = pincode.PinCodeId,
-                    VendorId = vendor?.VendorId,
-                    ClientCompanyId = company?.ClientCompanyId,
-                    Role = appRole
-                };
+                var user = await loginService.CreateOrUpdateExternalUserAsync(authResult.Principal);
 
-                var createResult = await _userManager.CreateAsync(user);
+                if (user == null)
+                    return View("Error", "Email not received from Azure");
 
-                if (!createResult.Succeeded)
-                {
-                    return View("Error",
-                        string.Join(", ", createResult.Errors.Select(e => e.Description)));
-                }
-                if (!await roleManager.RoleExistsAsync(azureRole))
-                {
-                    await roleManager.CreateAsync(
-                        new ApplicationRole
-                        {
-                            Name = azureRole,
-                            Code = azureRole.Substring(0, 2)
-                        });
-                }
-                await _userManager.AddToRoleAsync(user, azureRole);
+                await _signInManager.SignInAsync(user, isPersistent: false);
+
+                return LocalRedirect(returnUrl);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "External login failed for user.");
 
-            // ✅ NOW sign into Identity cookie
-            await _signInManager.SignInAsync(user, isPersistent: false);
-
-            return LocalRedirect(returnUrl);
+                return View("Error", new ErrorViewModel
+                {
+                    Message = ex.Message,
+                    RequestId = HttpContext.TraceIdentifier
+                });
+            }
         }
 
         [HttpGet]

@@ -22,20 +22,14 @@
 
         //WEBSITE SETTINGS
 
-        public const string WEBSITE_SITE_MENU_BRAND = "aby";
-        public const string WEBSITE_COMPANY_MENU_BRAND = "iCheckify";
-        public const string WEBSITE_TITLE = "iCheckify";
         public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
-        public const string WEBSITE_SITE_DESIGNER = "its aby";
         public static readonly string FTP_SITE = "ftp://ftp.drivehq.com/holosync/";
         public static readonly string FTP_SITE_LOG = "its.aby@email.com";
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
         public static readonly string REVERRSE_GEOCODING = "f2a54c0ec9ba4dfdbd450116509c6313";
 
-        public static readonly string DEFAULT_POLICY_IMAGE = "policy-design.png";
         public static readonly string NO_POLICY_IMAGE = "/img/no-policy.jpg";
         public static readonly string POLICY_BLANK_IMAGE = "/img/blank-document.png";
-        public static readonly string NO_PHOTO_IMAGE = "/img/no-photo.png";
         public static readonly string NO_AUDIO = "/img/no-audio.png";
         public static readonly string NO_VIDEO = "/img/no-video.png";
         public static readonly string MARKER_FLAG = "/img/beachflag.png";
@@ -46,34 +40,18 @@
         public const string ALL_PINCODE = "All PinCodes";
         public const string ALL_PINCODE_CODE = "-1";
 
-        //LOGIN
-        public const string WEBSITE_LOGIN = "Log in: iCheckify";
-
-        public const string WEBSITE_SIGNIN = "Sign in";
-
-        // BUTTONS / ACTIONS
-
         public const string BACK = "Back";
         public const string CANCEL = "Cancel";
-        public const string RESET = "Reset";
-        public const string APPROVE = "Approve";
-        public const string SEARCH = "Search";
         public const string CREATE = "Add";
         public const string EDIT = "Edit";
         public const string DELETE = "Delete";
         public const string ALLOCATE = "Allocate";
         public const string VIEW = "View";
         public const string DETAILS = "Details";
-        public const string VERIFY_LOCATIONS = "Locations to verify";
 
         // LABELS / ACTIONS
         public const string CLIENT_COMPANIY_PROFILE = "Company Profile";
 
-        public const string CLIENT_COMPANIES = "Company";
-        public const string CLIENT_COMPANY = "Company";
-        public const string COUNTRY = "Country";
-        public const string DISTRICT = "District";
-        public const string CASE_STATUS = "Case status";
         public const string SERVICE = "Service";
         public const string SERVICES = "Services";
         public const string VERIFY_LOCATION = "Verify location";
@@ -98,7 +76,6 @@
         public const string EMPANELLED_VENDORS = "Empanelled Agency";
         public const string DEPANELLED_VENDORS = "Depanelled Agency";
         public const string MANAGE_VENDOR = "Manage Agency";
-        public const string MANAGE_CLIENT_COMPANY = "Manage client company";
         public const string CASE_PROFILE = "Case Profile";
         public const string VERIFICTION_LOCATIONS = "Locations to verify";
         public const string EMPANEL = "Go to Empanel Vendors";
@@ -109,15 +86,6 @@
         public const string SUBMIT_REPORT = "Submit Report";
         public const string CREATE_SELECTED_CASES = "Create selected cases";
 
-        public const string MANAGE_COMPANY_VENDOR = "Manage company Agency";
-        public const string MANAGE_VENDOR_PROFILE = "Manage Agency Profile";
-        public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Allocate to Agency";
-        public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "ALLOCATE";
-        public const string SELECT_CASE_INVESTIGATE = "Investigate";
-        public const string SELECT_CASE_REPORT = "Verify report";
-        public const string SUBMIT_CASE_INVESTIGATE = "Submit";
-        public const string SUBMIT_CASE_TO_COMPANY = "Submit to company";
-        public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Assign to agent";
         public const string AGENTS = "Agents";
         public const string SELECT_CASE_TO_START = "Select Claim case to Verify";
         public const string AVAILABLE_VENDORS = "Available Agency";
