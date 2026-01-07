@@ -59,7 +59,7 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(clientCreator, TestingData);
-                    await userManager.AddToRoleAsync(clientCreator, AppRoles.CREATOR.ToString());
+                    await userManager.AddToRoleAsync(clientCreator, CREATOR.DISPLAY_NAME);
                 }
             }
             return clientCreator;

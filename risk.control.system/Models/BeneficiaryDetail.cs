@@ -66,10 +66,8 @@ namespace risk.control.system.Models
         public InvestigationTask? InvestigationTask { get; set; }
 
         #region NOT MAPPED PROPERTIES
-        [Required]
-        [Display(Name = "Photo")]
         [NotMapped]
-        [FileExtensions(Extensions = "jpg,jpeg,png")]
+        [Required]
         public IFormFile? ProfileImage { get; set; }
         [NotMapped]
         public long SelectedPincodeId { get; set; }
@@ -79,8 +77,6 @@ namespace risk.control.system.Models
         public long SelectedStateId { get; set; }
         [NotMapped]
         public long SelectedCountryId { get; set; }
-        [NotMapped]
-        public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
         #endregion
         public override string ToString()
         {

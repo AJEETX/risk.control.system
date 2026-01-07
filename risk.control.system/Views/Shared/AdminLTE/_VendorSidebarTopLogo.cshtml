@@ -17,19 +17,19 @@
             </div>
         <a  class="d-block">
             @UserManager.GetUserAsync(User).Result?.FirstName.ToLower()
-            @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
+            @if (User.IsInRole(AGENCY_ADMIN.DISPLAY_NAME))
             {
-                roleCode = @Applicationsettings.AGENCY_ADMIN.CODE;
+                roleCode = @AGENCY_ADMIN.CODE;
                 <span class="badge badge-info">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.SUPERVISOR.ToString()))
+            else if (User.IsInRole(SUPERVISOR.DISPLAY_NAME))
             {
-                roleCode = @Applicationsettings.SUPERVISOR.CODE;
+                roleCode = @SUPERVISOR.CODE;
                 <span class="badge badge-dark">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.AGENT.ToString()))
+            else if (User.IsInRole(AGENT.DISPLAY_NAME))
             {
-                roleCode = @Applicationsettings.AGENT.CODE;
+                roleCode = @AGENT.CODE;
                 <span class="badge badge-dark">@roleCode</span>
             }
         </a>

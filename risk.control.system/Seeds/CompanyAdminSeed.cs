@@ -17,7 +17,7 @@ namespace risk.control.system.Seeds
             ClientCompany clientCompany, string companyDomain, PinCode pinCode, IFileStorageService fileStorageService)
         {
             //Seed client creator
-            string adminEmailwithSuffix = Applicationsettings.COMPANY_ADMIN.CODE + "@" + companyDomain;
+            string adminEmailwithSuffix = COMPANY_ADMIN.CODE + "@" + companyDomain;
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE));
 
@@ -55,7 +55,7 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(admin, TestingData);
-                    await userManager.AddToRoleAsync(admin, AppRoles.COMPANY_ADMIN.ToString());
+                    await userManager.AddToRoleAsync(admin, COMPANY_ADMIN.DISPLAY_NAME);
                 }
             }
         }

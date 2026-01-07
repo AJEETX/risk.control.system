@@ -20,8 +20,6 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
@@ -240,7 +238,7 @@ namespace risk.control.system.Controllers
 
                 foreach (var user in usersInCompany)
                 {
-                    if (await userManager.IsInRoleAsync(user, AppRoles.MANAGER.ToString()))
+                    if (await userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME))
                     {
                         isManagerTaken = true;
                         break;
@@ -280,7 +278,7 @@ namespace risk.control.system.Controllers
 
             foreach (var user in usersInCompany)
             {
-                if (await userManager.IsInRoleAsync(user, AppRoles.MANAGER.ToString()))
+                if (await userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME))
                 {
                     isManagerTaken = true;
                     break;
@@ -321,7 +319,7 @@ namespace risk.control.system.Controllers
                     await LoadModel(model, userEmail);
                     return View(model);
                 }
-                var result = await companyUserService.CreateAsync(model, emailSuffix, userEmail);
+                var result = await companyUserService.CreateAsync(model, emailSuffix, userEmail, portal_base_url);
 
                 if (!result.Success)
                 {
@@ -373,7 +371,7 @@ namespace risk.control.system.Controllers
 
                 foreach (var user in usersInCompany)
                 {
-                    if (await userManager.IsInRoleAsync(user, AppRoles.MANAGER.ToString()))
+                    if (await userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME))
                     {
                         isManagerTaken = true;
                         break;
@@ -418,7 +416,7 @@ namespace risk.control.system.Controllers
                     await LoadModel(model, userEmail);
                     return View(model);
                 }
-                var result = await companyUserService.UpdateAsync(id, model, User.Identity?.Name);
+                var result = await companyUserService.UpdateAsync(id, model, User.Identity?.Name, portal_base_url);
 
                 if (!result.Success)
                 {

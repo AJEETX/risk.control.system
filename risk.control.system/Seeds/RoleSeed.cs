@@ -11,15 +11,15 @@ namespace risk.control.system.Seeds
         {
             string[] roles =
             {
-            AppRoles.PORTAL_ADMIN.ToString(),
-            AppRoles.COMPANY_ADMIN.ToString(),
-            AppRoles.CREATOR.ToString(),
-            AppRoles.ASSESSOR.ToString(),
-            AppRoles.MANAGER.ToString(),
-            AppRoles.AGENCY_ADMIN.ToString(),
-            AppRoles.SUPERVISOR.ToString(),
-            AppRoles.AGENT.ToString(),
-            AppRoles.GUEST.ToString()
+            PORTAL_ADMIN.DISPLAY_NAME,
+            COMPANY_ADMIN.DISPLAY_NAME,
+            CREATOR.DISPLAY_NAME,
+            ASSESSOR.DISPLAY_NAME,
+            MANAGER.DISPLAY_NAME,
+            AGENCY_ADMIN.DISPLAY_NAME,
+            SUPERVISOR.DISPLAY_NAME,
+            AGENT.DISPLAY_NAME,
+                GUEST.DISPLAY_NAME
         };
 
             foreach (var role in roles)

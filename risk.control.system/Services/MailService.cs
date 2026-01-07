@@ -68,7 +68,7 @@ namespace risk.control.system.Services
             {
                 var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
+                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
 
                 if (file.Completed.GetValueOrDefault())
                 {
@@ -129,7 +129,7 @@ namespace risk.control.system.Services
             {
                 var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
+                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
 
                 if (file.Completed.GetValueOrDefault())
                 {
@@ -188,10 +188,10 @@ namespace risk.control.system.Services
         {
             try
             {
-                var managerRole = await roleManager.FindByIdAsync(AppRoles.MANAGER.ToString());
+                var managerRole = await roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
                 var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
-                var supervisorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
-                var agencyAdminRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
+                var supervisorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
 
                 var vendorUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId);
 
@@ -267,8 +267,8 @@ namespace risk.control.system.Services
         {
             try
             {
-                var supervisorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
-                var agencyAdminRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
+                var supervisorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
 
                 var vendorUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId);
 
@@ -337,7 +337,7 @@ namespace risk.control.system.Services
             {
                 var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
+                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
 
                 var claimsInvestigations = _context.Investigations
                     .Include(i => i.PolicyDetail)
@@ -382,7 +382,7 @@ namespace risk.control.system.Services
                 var assigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
                 var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
+                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
 
                 var notification = new StatusNotification
                 {
@@ -419,7 +419,7 @@ namespace risk.control.system.Services
             {
                 var applicationUser = await _context.ApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
-                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
+                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
 
                 var notification = new StatusNotification
                 {
@@ -462,8 +462,8 @@ namespace risk.control.system.Services
 
                 var companyUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
-                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
-                var vendorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
+                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var vendorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
 
                 List<ApplicationUser> users = new List<ApplicationUser>();
 
@@ -524,7 +524,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                var agentRole = await roleManager.FindByIdAsync(AppRoles.AGENT.ToString());
+                var agentRole = await roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
                 var recepientUser = await _context.ApplicationUser.Include(c => c.Country).FirstOrDefaultAsync(c => c.Email == agentEmail);
 
@@ -574,7 +574,7 @@ namespace risk.control.system.Services
             }
             else
             {
-                var managerRole = await roleManager.FindByIdAsync(AppRoles.MANAGER.ToString());
+                var managerRole = await roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
 
                 var companyUsers = _context.ApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
@@ -613,8 +613,8 @@ namespace risk.control.system.Services
 
                 var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var managerRole = await roleManager.FindByIdAsync(AppRoles.MANAGER.ToString());
-                var creatorRole = await roleManager.FindByIdAsync(AppRoles.CREATOR.ToString());
+                var managerRole = await roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
+                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
 
                 List<ApplicationUser> users = new List<ApplicationUser>();
                 foreach (var user in companyUsers)
@@ -625,7 +625,7 @@ namespace risk.control.system.Services
                         users.Add(user);
                     }
                 }
-                var vendorRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
+                var vendorRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 var vendorUsers = _context.ApplicationUser.Where(u => u.VendorId == claimsInvestigation.VendorId);
 
                 foreach (var agencyUser in vendorUsers)
@@ -690,7 +690,7 @@ namespace risk.control.system.Services
                .FirstOrDefaultAsync(v => v.Id == claimId);
                 var companyUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var assessorRole = await roleManager.FindByIdAsync(AppRoles.ASSESSOR.ToString());
+                var assessorRole = await roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
 
                 List<ApplicationUser> users = new List<ApplicationUser>();
                 foreach (var user in companyUsers)
@@ -738,8 +738,8 @@ namespace risk.control.system.Services
         {
             try
             {
-                var supervisorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
-                var agencyAdminRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
+                var supervisorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
 
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == senderUserEmail);
 
@@ -808,8 +808,8 @@ namespace risk.control.system.Services
                .Include(i => i.PolicyDetail)
                .FirstOrDefaultAsync(v => v.Id == claimId);
 
-                var supervisorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
-                var agencyAdminRole = await roleManager.FindByIdAsync(AppRoles.AGENCY_ADMIN.ToString());
+                var supervisorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
 
                 var vendorUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.VendorId == claimsInvestigation.Vendor.VendorId);
 
@@ -876,7 +876,7 @@ namespace risk.control.system.Services
                    .FirstOrDefaultAsync(v => v.Id == claimId);
                 var companyUsers = _context.ApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var assessorRole = await roleManager.FindByIdAsync(AppRoles.ASSESSOR.ToString());
+                var assessorRole = await roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
 
                 List<ApplicationUser> users = new List<ApplicationUser>();
                 foreach (var user in companyUsers)
@@ -933,7 +933,7 @@ namespace risk.control.system.Services
 
                 var users = _context.ApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId && u.Role == AppRoles.AGENCY_ADMIN || u.Role == AppRoles.SUPERVISOR);
 
-                var vendorRole = await roleManager.FindByIdAsync(AppRoles.SUPERVISOR.ToString());
+                var vendorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
 
                 var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == vendorId);
                 var vendorNotification = new StatusNotification

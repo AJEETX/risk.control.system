@@ -60,7 +60,7 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(vendorSupervisor, TestingData);
-                    await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.SUPERVISOR.ToString());
+                    await userManager.AddToRoleAsync(vendorSupervisor, SUPERVISOR.DISPLAY_NAME);
                 }
             }
         }

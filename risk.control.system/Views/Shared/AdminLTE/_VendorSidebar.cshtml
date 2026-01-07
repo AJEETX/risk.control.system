@@ -41,17 +41,17 @@
 
                 <partial name="AdminLTE/_VendorSidebarDashboard" />
 
-                @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()) || User.IsInRole(AppRoles.SUPERVISOR.ToString()))
+                @if (User.IsInRole(AGENCY_ADMIN.DISPLAY_NAME) || User.IsInRole(SUPERVISOR.DISPLAY_NAME))
                 {
                     <partial name="AdminLTE/_VendorSidebarInvestigation" />
 
                 }
-                @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
+                @if (User.IsInRole(AGENCY_ADMIN.DISPLAY_NAME))
                 {
                     <partial name="AdminLTE/_VendorSidebarAdmin" />
                 }
 
-                @if (User.IsInRole(AppRoles.AGENT.ToString()))
+                @if (User.IsInRole(AGENT.DISPLAY_NAME))
                     {
                     <partial name="AdminLTE/_VendorSidebarAgent" />
 

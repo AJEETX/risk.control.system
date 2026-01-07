@@ -13,9 +13,9 @@ namespace risk.control.system.Services
 {
     public interface ICompanyUserService
     {
-        Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy);
+        Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy, string portal_base_url);
 
-        Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy);
+        Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy, string portal_base_url);
     }
 
     public sealed class CompanyUserService : ICompanyUserService
@@ -43,7 +43,7 @@ namespace risk.control.system.Services
             _sms = sms;
             _logger = logger;
         }
-        public async Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy)
+        public async Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy, string portal_base_url)
         {
             try
             {
@@ -58,11 +58,10 @@ namespace risk.control.system.Services
                 if (!ValidateProfileImage(model.ProfileImage, result))
                     return result;
 
-                var fullEmail =
-                    $"{model.Email.Trim().ToLower(CultureInfo.InvariantCulture)}@{emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture)}";
+                var fullEmail = $"{model.Email.Trim().ToLower(CultureInfo.InvariantCulture)}@{emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture)}";
 
                 if (await _userManager.Users.AnyAsync(u => u.Email == fullEmail && !u.Deleted))
-                    return Fail("User already exists.");
+                    return Fail($"User <b>{fullEmail}</b> already exists.");
 
                 await SetProfileImageAsync(model, model.ProfileImage, emailSuffix);
 
@@ -81,17 +80,14 @@ namespace risk.control.system.Services
                 model.PinCodeId = model.SelectedPincodeId;
                 var createResult = await _userManager.CreateAsync(model, model.Password);
                 if (!createResult.Succeeded)
-                    return Fail("Failed to create user.");
+                    return Fail($"Failed to create user <b>{fullEmail}</b>.");
 
                 await _userManager.AddToRoleAsync(model, model.Role.ToString());
 
                 var country = await _context.Country.FindAsync(model.CountryId);
-                await _sms.DoSendSmsAsync(
-                    country.Code,
-                    country.ISDCode + model.PhoneNumber,
-                    $"User created\nEmail: {model.Email}");
+                await _sms.DoSendSmsAsync(country.Code, country.ISDCode + model.PhoneNumber, $"User created\nEmail: {model.Email} \n \r {portal_base_url}");
 
-                return Success("User created successfully.");
+                return Success($"User <b>{model.Email} </b>created successfully.");
             }
             catch (Exception ex)
             {
@@ -99,7 +95,7 @@ namespace risk.control.system.Services
                 return Fail("Unexpected error while creating user.");
             }
         }
-        public async Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy)
+        public async Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy, string portal_base_url)
         {
             try
             {
@@ -134,7 +130,7 @@ namespace risk.control.system.Services
 
                 var updateResult = await _userManager.UpdateAsync(user);
                 if (!updateResult.Succeeded)
-                    return Fail("Failed to update user.");
+                    return Fail($"Failed to update user <b>{user.Email}</b>.");
 
                 var roles = await _userManager.GetRolesAsync(user);
                 await _userManager.RemoveFromRolesAsync(user, roles);
@@ -153,8 +149,10 @@ namespace risk.control.system.Services
                         await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
                     }
                 }
+                var country = await _context.Country.FindAsync(user.CountryId);
+                await _sms.DoSendSmsAsync(country.Code, country.ISDCode + model.PhoneNumber, $"User edited\nEmail: {model.Email} \n \r {portal_base_url}");
 
-                return Success("User updated successfully.");
+                return Success($"User <b>{user.Email}</b> updated successfully.");
             }
             catch (Exception ex)
             {

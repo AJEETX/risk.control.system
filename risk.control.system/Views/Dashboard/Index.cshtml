@@ -15,45 +15,45 @@
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            @if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()))
+            @if (userRole.Value.Contains(PORTAL_ADMIN.DISPLAY_NAME))
             {
                 <partial name="_PortalAdmin" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()))
+            else if (userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME))
             {
                 <partial name="_CompanyAdmin" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()))
+            else if (userRole.Value.Contains(AGENCY_ADMIN.DISPLAY_NAME))
             {
                 <partial name="_AgencyAdmin" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
+            else if (userRole.Value.Contains(MANAGER.DISPLAY_NAME))
             {
                 <partial name="_Manager" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
+            else if (userRole.Value.Contains(CREATOR.DISPLAY_NAME))
             {
                 <partial name="_Creator" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
+            else if (userRole.Value.Contains(ASSESSOR.DISPLAY_NAME))
             {
                 <partial name="_Assessor" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
+            else if (userRole.Value.Contains(SUPERVISOR.DISPLAY_NAME))
             {
                 <partial name="_Supervisor" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
+            else if (userRole.Value.Contains(AGENT.DISPLAY_NAME))
             {
                 <partial name="_Agent" model="@Model" />
             }
         </div>
     </div>
 </section>
-@if (userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()) || 
-   userRole.Value.Contains(AppRoles.CREATOR.ToString()) ||
-    userRole.Value.Contains(AppRoles.ASSESSOR.ToString()) ||
-    userRole.Value.Contains(AppRoles.MANAGER.ToString())
+@if (userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME) || 
+   userRole.Value.Contains(CREATOR.DISPLAY_NAME) ||
+    userRole.Value.Contains(ASSESSOR.DISPLAY_NAME) ||
+    userRole.Value.Contains(MANAGER.DISPLAY_NAME)
 )
 {
     @section Scripts {

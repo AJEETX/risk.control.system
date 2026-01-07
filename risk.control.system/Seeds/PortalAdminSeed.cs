@@ -65,7 +65,7 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(portalAdmin, TestingData);
-                    await userManager.AddToRoleAsync(portalAdmin, AppRoles.PORTAL_ADMIN.ToString());
+                    await userManager.AddToRoleAsync(portalAdmin, PORTAL_ADMIN.DISPLAY_NAME);
                 }
 
                 ////////PERMISSIONS TO MODULES

@@ -2,7 +2,7 @@
 @using risk.control.system.Models;
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.MANAGER.ToString()))
+    if (User.IsInRole(MANAGER.DISPLAY_NAME))
     {
         <li class="nav-item">
 

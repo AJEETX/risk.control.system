@@ -14,25 +14,25 @@
         </div>
         <a class="d-block">
     <span id="user-firstname"> @userManager.GetUserAsync(User).Result?.FirstName</span>
-            <span id="user-role"> @if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
+            <span id="user-role"> @if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME))
             {
-                roleCode = @Applicationsettings.COMPANY_ADMIN.CODE;
+                roleCode = @COMPANY_ADMIN.CODE;
                 <span class="badge badge-warning">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.CREATOR.ToString()))
+            else if (User.IsInRole(CREATOR.DISPLAY_NAME))
             {
-                roleCode = @Applicationsettings.CREATOR.CODE;
+                roleCode = @CREATOR.CODE;
                 <span class="badge badge-primary">@roleCode</span>
             }
            
-            else if (User.IsInRole(AppRoles.ASSESSOR.ToString()))
+            else if (User.IsInRole(ASSESSOR.DISPLAY_NAME))
             {
-                roleCode = @Applicationsettings.ASSESSOR.CODE;
+                roleCode = @ASSESSOR.CODE;
                 <span class="badge badge-secondary">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.MANAGER.ToString()))
+            else if (User.IsInRole(MANAGER.DISPLAY_NAME))
             {
-                roleCode = @Applicationsettings.MANAGER.CODE;
+                roleCode = @MANAGER.CODE;
                 <span class="badge badge-secondary">@roleCode</span>
             }
             </span>

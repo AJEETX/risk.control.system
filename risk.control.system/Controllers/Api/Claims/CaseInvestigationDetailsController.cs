@@ -9,8 +9,6 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Claims

@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Services;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Agency
 {

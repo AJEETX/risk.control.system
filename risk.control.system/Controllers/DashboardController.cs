@@ -14,8 +14,6 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
@@ -54,44 +52,44 @@ namespace risk.control.system.Controllers
                 }
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
-                if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
+                if (userRole.Value.Contains(CREATOR.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetCreatorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
-                else if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()))
+                else if (userRole.Value.Contains(PORTAL_ADMIN.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetSuperAdminCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
-                else if (userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()))
+                else if (userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetCompanyAdminCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
-                else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
+                else if (userRole.Value.Contains(ASSESSOR.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetAssessorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
 
-                else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
+                else if (userRole.Value.Contains(MANAGER.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetManagerCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
-                else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
+                else if (userRole.Value.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Value.Contains(SUPERVISOR.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetSupervisorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
-                else if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
+                else if (userRole.Value.Contains(AGENT.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetAgentCount(currentUserEmail, userRole.Value);
                     return View(model);
@@ -120,16 +118,16 @@ namespace risk.control.system.Controllers
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             if (userRole != null)
             {
-                if (userRole.Value.Contains(AppRoles.MANAGER.ToString())
-                                || userRole.Value.Contains(AppRoles.ASSESSOR.ToString())
-                                || userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString())
-                                || userRole.Value.Contains(AppRoles.CREATOR.ToString())
+                if (userRole.Value.Contains(MANAGER.DISPLAY_NAME)
+                                || userRole.Value.Contains(ASSESSOR.DISPLAY_NAME)
+                                || userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME)
+                                || userRole.Value.Contains(CREATOR.DISPLAY_NAME)
                                 )
                 {
                     Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgencyClaimStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
-                else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
+                else if (userRole.Value.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Value.Contains(SUPERVISOR.DISPLAY_NAME))
                 {
                     Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgentCaseStatus(userEmail);
                     return new JsonResult(monthlyExpense);
@@ -145,16 +143,16 @@ namespace risk.control.system.Controllers
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             if (userRole != null)
             {
-                if (userRole.Value.Contains(AppRoles.MANAGER.ToString())
-                                || userRole.Value.Contains(AppRoles.ASSESSOR.ToString())
-                                || userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString())
-                                || userRole.Value.Contains(AppRoles.CREATOR.ToString())
+                if (userRole.Value.Contains(MANAGER.DISPLAY_NAME)
+                                || userRole.Value.Contains(ASSESSOR.DISPLAY_NAME)
+                                || userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME)
+                                || userRole.Value.Contains(CREATOR.DISPLAY_NAME)
                                 )
                 {
                     Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgencyUnderwritingStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
-                else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
+                else if (userRole.Value.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Value.Contains(SUPERVISOR.DISPLAY_NAME))
                 {
                     Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgentCaseStatus(userEmail);
                     return new JsonResult(monthlyExpense);

@@ -2,12 +2,11 @@
 @using risk.control.system.Models;
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()) || User.IsInRole(AppRoles.MANAGER.ToString()))
+    if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME) || User.IsInRole(MANAGER.DISPLAY_NAME))
     {
         <partial name="AdminLTE/_CompanySidebarAdminManageCompany" />
         <partial name="AdminLTE/_CompanySidebarAdminManageAgency" />
         <partial name="AdminLTE/_CompanySidebarAdminManageCompanySettings" />
-        // <partial name="AdminLTE/_CompanySidebarAdminManageReportTemplate" />
         <partial name="AdminLTE/_CompanySidebarAdminManageGeneralSetup" />
     }
 }

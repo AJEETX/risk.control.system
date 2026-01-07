@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using risk.control.system.AppConstant;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.web.MVC.Controllers

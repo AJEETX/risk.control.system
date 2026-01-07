@@ -2,21 +2,21 @@
 @using risk.control.system.Models;
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.CREATOR.ToString()))
+    if (User.IsInRole(CREATOR.DISPLAY_NAME))
     {
         <partial name="AdminLTE/_CompanySidebarCaseCreator" model="@Model" />
 
     }
-    else if (User.IsInRole(AppRoles.ASSESSOR.ToString()))
+    else if (User.IsInRole(ASSESSOR.DISPLAY_NAME))
     {
         <partial name="AdminLTE/_CompanySidebarClaimsAssessor" />
     }
-    else if (User.IsInRole(AppRoles.MANAGER.ToString()))
+    else if (User.IsInRole(MANAGER.DISPLAY_NAME))
     {
         <partial name="AdminLTE/_CompanySidebarClaimsManager" model="@Model" />
     }
 
-    else if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
+    else if (User.IsInRole(PORTAL_ADMIN.DISPLAY_NAME))
     {
         <li class="nav-item">
             <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">

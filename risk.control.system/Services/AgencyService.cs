@@ -70,7 +70,7 @@ namespace risk.control.system.Services
 
             context.Add(vendor);
 
-            var managerRole = await roleManager.FindByIdAsync(AppRoles.MANAGER.ToString());
+            var managerRole = await roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
             var companyUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var notification = new StatusNotification

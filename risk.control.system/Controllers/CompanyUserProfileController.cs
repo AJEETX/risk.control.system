@@ -4,14 +4,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
@@ -110,7 +109,7 @@ namespace risk.control.system.Controllers
                     await LoadModel(model, userEmail);
                     return View(model);
                 }
-                var result = await companyUserService.UpdateAsync(id, model, User.Identity?.Name);
+                var result = await companyUserService.UpdateAsync(id, model, User.Identity?.Name, portal_base_url);
 
                 if (!result.Success)
                 {

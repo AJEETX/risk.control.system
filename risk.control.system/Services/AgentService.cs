@@ -45,7 +45,7 @@ namespace risk.control.system.Services
 
         public async Task<ApplicationUser> GetAgent(string mobile, bool sendSMS = false)
         {
-            var agentRole = await roleManager.FindByIdAsync(AppRoles.AGENT.ToString());
+            var agentRole = await roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
             var user2Onboard = await context.ApplicationUser.FirstOrDefaultAsync(u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
 
@@ -108,7 +108,7 @@ namespace risk.control.system.Services
 
         public async Task<ApplicationUser> GetPin(string agentEmail, string portal_base_url)
         {
-            var agentRole = await roleManager.FindByIdAsync(AppRoles.AGENT.ToString());
+            var agentRole = await roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
             var user2Onboard = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == agentEmail);
 
@@ -165,7 +165,7 @@ namespace risk.control.system.Services
 
         public async Task<ApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false)
         {
-            var agentRole = await roleManager.FindByIdAsync(AppRoles.AGENT.ToString());
+            var agentRole = await roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
             var user2Onboards = context.ApplicationUser.Include(c => c.Country).Where(
                 u => u.Country.ISDCode + u.PhoneNumber.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));

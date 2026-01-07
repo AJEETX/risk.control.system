@@ -286,6 +286,7 @@ namespace risk.control.system.Controllers
                 }
                 countryCode = principal.Claims.First(p => p.Type == "tenant_ctry").Value;
                 var pincode = await _context.PinCode.Include(d => d.District).Include(s => s.State).Include(c => c.Country).FirstOrDefaultAsync(p => p.Country.Code == countryCode);
+                var appRole = (AppRoles)Enum.Parse(typeof(AppRoles), azureRole);
                 user = new ApplicationUser
                 {
                     UserName = email,
@@ -300,7 +301,8 @@ namespace risk.control.system.Controllers
                     DistrictId = pincode.DistrictId,
                     PinCodeId = pincode.PinCodeId,
                     VendorId = vendor?.VendorId,
-                    ClientCompanyId = company?.ClientCompanyId
+                    ClientCompanyId = company?.ClientCompanyId,
+                    Role = appRole
                 };
 
                 var createResult = await _userManager.CreateAsync(user);

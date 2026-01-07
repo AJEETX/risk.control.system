@@ -102,7 +102,7 @@
                 @if (Model.Role == AppRoles.AGENCY_ADMIN)
                 {
                     <select class="form-control remarks" disabled>
-                        <option value="@AppRoles.AGENCY_ADMIN" selected>@AppRoles.AGENCY_ADMIN</option>
+                        <option value="@AppRoles.AGENCY_ADMIN" selected>@AGENCY_ADMIN.DISPLAY_NAME</option>
                     </select>
                     <input type="hidden" name="Role" value="@AppRoles.AGENCY_ADMIN" />
                 }

@@ -54,7 +54,7 @@ namespace risk.control.system.Services
         public async Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin)
         {
             // 1. Admin Logic
-            if (await _userManager.IsInRoleAsync(user, AppRoles.PORTAL_ADMIN.ToString()))
+            if (await _userManager.IsInRoleAsync(user, PORTAL_ADMIN.DISPLAY_NAME))
             {
                 return (true, "Admin", true); // IsAdmin = true
             }
@@ -164,7 +164,7 @@ namespace risk.control.system.Services
                 if (!result.Succeeded)
                     return (false, result.Errors.FirstOrDefault()?.Description ?? "User creation failed.");
 
-                await _userManager.AddToRoleAsync(user, AppRoles.GUEST.ToString());
+                await _userManager.AddToRoleAsync(user, GUEST.DISPLAY_NAME);
             }
 
             // 5. Sign In

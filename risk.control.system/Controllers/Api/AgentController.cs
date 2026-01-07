@@ -17,8 +17,6 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
@@ -171,7 +169,7 @@ namespace risk.control.system.Controllers.Api
                         return BadRequest($"UID {request.Uid} already exists.");
                     }
 
-                    var agentRole = await roleManager.FindByIdAsync(AppRoles.AGENT.ToString());
+                    var agentRole = await roleManager.FindByNameAsync(AppRoles.AGENT.ToString());
                     var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (u.Country.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
                     foreach (var user in matchingUsers)
                     {

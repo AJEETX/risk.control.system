@@ -179,7 +179,6 @@ namespace risk.control.system.Services
             model.DistrictId = model.SelectedDistrictId;
             model.StateId = model.SelectedStateId;
             model.CountryId = model.SelectedCountryId;
-            model.Role = model.Role != null ? model.Role : (AppRoles)Enum.Parse(typeof(AppRoles), model.Role.ToString());
             model.IsVendorAdmin = model.Role == AppRoles.AGENCY_ADMIN;
         }
         private async Task HandleLockAndNotificationsAsync(ApplicationUser user, string portal_base_url, bool created = true)

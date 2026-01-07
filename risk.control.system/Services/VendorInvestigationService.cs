@@ -454,7 +454,7 @@ namespace risk.control.system.Services
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
             List<InvestigationTask> claims = null;
-            if (vendorUser.Role.ToString() == AppRoles.SUPERVISOR.ToString())
+            if (vendorUser.Role.ToString() == SUPERVISOR.DISPLAY_NAME)
             {
                 claims = await context.Investigations
                 .Include(a => a.ClientCompany)
@@ -591,7 +591,7 @@ namespace risk.control.system.Services
                 .ThenInclude(p => p.State)
                 .Where(a => a.VendorId == agencyUser.VendorId && a.Status == finishedStatus && (a.SubStatus == approvedStatus || a.SubStatus == rejectedStatus));
 
-            if (agencyUser.Role.ToString() == AppRoles.SUPERVISOR.ToString())
+            if (agencyUser.Role.ToString() == SUPERVISOR.DISPLAY_NAME)
             {
                 claims = claims
                     .Where(a => a.SubmittedAssessordEmail == userEmail);
