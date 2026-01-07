@@ -1988,9 +1988,6 @@ select#PinCodeId {
     color: #28a745; /* Green */
 }
 
-.flag-icon {
-    margin-right: 5px;
-}
 .country-code-text{
     font-family:fantasy;
 }
@@ -2631,14 +2628,6 @@ input#checkall {
 /* Labels */
 .info-label {
     color: #555;
-}
-
-/* Flag icon */
-.flag-icon {
-    width: 22px;
-    height: 16px;
-    object-fit: cover;
-    border-radius: 3px;
 }
 
 /* Hover effects */
@@ -3733,4 +3722,107 @@ img.microsoft {
 }
 .profile a{
     width:70%;
+}
+
+/* Navbar Styling */
+.navbar-custom {
+    padding: 0.5rem 1.5rem;
+}
+
+.nav-icon-lg {
+    font-size: 1.15rem;
+    color: #5f6368;
+}
+
+/* Dropdown Essentials */
+.dropdown-menu {
+    border-radius: 12px !important;
+    margin-top: 10px !important;
+}
+
+/* Info Dropdown */
+.info-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+}
+
+    .info-row i, .flag-icon {
+        width: 25px;
+        margin-right: 15px;
+        text-align: center;
+    }
+
+.flag-icon {
+    width: 20px;
+    border-radius: 2px;
+    margin-right: 5px;
+    height: 16px;
+    object-fit: cover;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+}
+
+    .info-content small {
+        text-transform: uppercase;
+        font-size: 0.65rem;
+        color: #888;
+        letter-spacing: 0.5px;
+    }
+
+    .info-content span {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+/* Notification Badge */
+.notification-badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    font-size: 0.6rem;
+    padding: 0.35em 0.5em;
+}
+
+/* Profile Icon in Navbar */
+.nav-profile-img {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #eee;
+    transition: transform 0.2s;
+}
+
+    .nav-profile-img:hover {
+        transform: scale(1.05);
+    }
+
+/* Settings/Profile Dropdown */
+.profile-dropdown {
+    width: 240px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.profile-header {
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+.profile-img-lg {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.profile-dropdown .dropdown-item {
+    padding: 12px 20px;
+    font-size: 0.9rem;
 }

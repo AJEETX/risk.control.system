@@ -24,7 +24,6 @@ namespace risk.control.system.Models
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = string.Empty;
 
-        [EmailAddress]
         public string Email { get; set; } = string.Empty;
         public string? Branch { get; set; } = string.Empty;
         public string Addressline { get; set; } = string.Empty;

@@ -20,7 +20,6 @@ namespace risk.control.system.Models
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = default!;
 
-        [EmailAddress]
         public string Email { get; set; } = default!;
         public string? Branch { get; set; } = default!;
         public string Addressline { get; set; } = default!;
