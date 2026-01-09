@@ -1,40 +1,36 @@
-﻿@inject SignInManager<ApplicationUser> SignInManager
+﻿@using System.Security.Claims
+@inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> userManager
 @model ClientCompany
+
 @if (SignInManager.IsSignedIn(User))
 {
-    var roleCode = string.Empty;
-    var user = userManager.GetUserAsync(User).Result;
+    var user = await userManager.GetUserAsync(User);
+    var firstName = user?.FirstName ?? "User";
 
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-
         <div class="image">
             <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserProfileImage/@user.Id" alt="profile">
-
         </div>
         <a class="d-block">
-    <span id="user-firstname"> @userManager.GetUserAsync(User).Result?.FirstName</span>
-            <span id="user-role"> @if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME))
-            {
-                roleCode = @COMPANY_ADMIN.CODE;
-                <span class="badge badge-warning">@roleCode</span>
-            }
-            else if (User.IsInRole(CREATOR.DISPLAY_NAME))
-            {
-                roleCode = @CREATOR.CODE;
-                <span class="badge badge-primary">@roleCode</span>
-            }
-           
-            else if (User.IsInRole(ASSESSOR.DISPLAY_NAME))
-            {
-                roleCode = @ASSESSOR.CODE;
-                <span class="badge badge-secondary">@roleCode</span>
-            }
-            else if (User.IsInRole(MANAGER.DISPLAY_NAME))
-            {
-                roleCode = @MANAGER.CODE;
-                <span class="badge badge-secondary">@roleCode</span>
-            }
+            <span id="user-firstname">@firstName</span>
+            <span id="user-role">
+                @if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME))
+                {
+                    <span class="badge badge-warning">@COMPANY_ADMIN.CODE</span>
+                }
+                else if (User.IsInRole(CREATOR.DISPLAY_NAME))
+                {
+                    <span class="badge badge-primary">@CREATOR.CODE</span>
+                }
+                else if (User.IsInRole(ASSESSOR.DISPLAY_NAME))
+                {
+                    <span class="badge badge-secondary">@ASSESSOR.CODE</span>
+                }
+                else if (User.IsInRole(MANAGER.DISPLAY_NAME))
+                {
+                    <span class="badge badge-secondary">@MANAGER.CODE</span>
+                }
             </span>
         </a>
     </div>

@@ -180,23 +180,27 @@ namespace risk.control.system.Services
         }
         public async Task<ApplicationUser> CreateOrUpdateExternalUserAsync(ClaimsPrincipal principal)
         {
-            var email = principal.FindFirstValue(ClaimTypes.Email)
-                        ?? principal.FindFirstValue("preferred_username")
-                        ?? principal.FindFirstValue(ClaimTypes.Upn);
+            var email = principal.FindFirstValue(ClaimTypes.Email) ?? principal.FindFirstValue("preferred_username") ?? principal.FindFirstValue(ClaimTypes.Upn);
 
             if (string.IsNullOrEmpty(email)) return null;
+            var azureRole = principal.FindFirstValue(ClaimTypes.Role) ?? principal.FindFirstValue("roles");
 
             var user = await _userManager.FindByEmailAsync(email);
-            if (user != null) return user;
-
-            // User doesn't exist, start mapping data from claims
-            var azureRole = principal.FindFirstValue(ClaimTypes.Role);
+            if (user != null)
+            {
+                var currentRoles = await _userManager.GetRolesAsync(user);
+                if (!string.IsNullOrEmpty(azureRole) && !currentRoles.Contains(azureRole))
+                {
+                    // Optional: Remove old roles and add the new one
+                    await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                    await EnsureRoleExistsAndAssign(user, azureRole);
+                }
+                return user;
+            }
             var countryCode = ExtractCountryCode(principal);
 
             // Fetch location data based on country code
-            var pincode = await _context.PinCode
-                .Include(d => d.District).Include(s => s.State).Include(c => c.Country)
-                .FirstOrDefaultAsync(p => p.Country.Code == countryCode);
+            var pincode = await _context.PinCode.Include(d => d.District).Include(s => s.State).Include(c => c.Country).FirstOrDefaultAsync(p => p.Country.Code == countryCode);
 
             if (pincode == null) throw new Exception($"Location configuration missing for country: {countryCode}");
 

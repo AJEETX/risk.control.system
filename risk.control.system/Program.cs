@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -16,7 +17,6 @@ using AspNetCoreHero.ToastNotification.Extensions;
 using Hangfire;
 using Hangfire.MemoryStorage;
 
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
@@ -282,12 +282,6 @@ builder.Services.AddHangfireServer(options =>
     options.Queues = new[] { "default", "emails", "critical" };
 });
 
-//builder.Services.Configure<CookiePolicyOptions>(options =>
-//{
-//    options.CheckConsentNeeded = _ => false;
-//    options.MinimumSameSitePolicy = SameSiteMode.None;
-//    options.Secure = CookieSecurePolicy.Always;
-//});
 builder.Services.Configure<AzureAdRoleMapping>(
     builder.Configuration.GetSection("AzureAdRoleMapping"));
 
@@ -303,19 +297,42 @@ builder.Services.Configure<IdentityOptions>(options =>
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
-// 1️⃣ Create AuthenticationBuilder
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => false;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always;
+});
 var authBuilder = builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    // Change these from CookieAuthenticationDefaults to IdentityConstants
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
     options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
 });
-
-// 2️⃣ Azure AD (Microsoft Entra ID)
 authBuilder.AddMicrosoftIdentityWebApp(options =>
 {
     builder.Configuration.Bind("AzureAd", options);
-    //options.SignInScheme = IdentityConstants.ApplicationScheme;
+    options.SignInScheme = IdentityConstants.ApplicationScheme;
+    options.SaveTokens = true;
+    options.Events = new OpenIdConnectEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            // This is where you can perform custom logic after a successful login
+            var email = context.Principal.FindFirstValue(ClaimTypes.Email) ?? context.Principal.FindFirstValue("preferred_username");
+            await Task.CompletedTask;
+        },
+        OnRemoteFailure = context =>
+        {
+            if (context.Failure != null && context.Failure.Message.Contains("Correlation failed"))
+            {
+                context.Response.Redirect("/Account/AzureLogin");
+                context.HandleResponse();
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.Configure<OpenIdConnectOptions>(
@@ -404,16 +421,11 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-//builder.Services.AddMvcCore(config =>
-//{
-//    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-//    config.Filters.Add(new AuthorizeFilter(policy));
-//});
+
 builder.Services.AddHttpContextAccessor();
 try
 {
     var app = builder.Build();
-
 
     app.UseHangfireDashboard("/hangfire", new DashboardOptions
     {
@@ -422,14 +434,11 @@ try
 
     if (app.Environment.IsDevelopment())
     {
-        // Show detailed error page for devs
         app.UseDeveloperExceptionPage();
     }
     else
     {
-        // Redirect to custom error page in production
         app.UseExceptionHandler("/Home/Error");
-        //app.UseStatusCodePagesWithRedirects("/Home/HTTP?statusCode={0}");
         app.UseHsts();
     }
 
@@ -449,8 +458,6 @@ try
     });
 
     app.UseRouting();
-    //app.UseRateLimiter();
-
     app.UseCors();
     app.UseCookiePolicy();
     app.UseAuthentication();

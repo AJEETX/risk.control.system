@@ -1,37 +1,33 @@
-﻿@using Microsoft.EntityFrameworkCore;
-@using risk.control.system.Helpers;
-@using risk.control.system.Models;
+﻿@using System.Security.Claims
 @inject SignInManager<ApplicationUser> SignInManager
-@inject ApplicationDbContext context
-@inject UserManager<ApplicationUser> UserManager
+@inject UserManager<ApplicationUser> userManager
 @model Vendor
+
 @if (SignInManager.IsSignedIn(User))
 {
-    var roleCode = string.Empty;
-    var user = UserManager.GetUserAsync(User).Result;
+    var user = await userManager.GetUserAsync(User);
+    var firstName = user?.FirstName ?? "User";
 
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-
-       <div class="image">
-                <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserProfileImage/@user.Id" alt="Profile">
-            </div>
-        <a  class="d-block">
-            @UserManager.GetUserAsync(User).Result?.FirstName.ToLower()
-            @if (User.IsInRole(AGENCY_ADMIN.DISPLAY_NAME))
-            {
-                roleCode = @AGENCY_ADMIN.CODE;
-                <span class="badge badge-info">@roleCode</span>
-            }
-            else if (User.IsInRole(SUPERVISOR.DISPLAY_NAME))
-            {
-                roleCode = @SUPERVISOR.CODE;
-                <span class="badge badge-dark">@roleCode</span>
-            }
-            else if (User.IsInRole(AGENT.DISPLAY_NAME))
-            {
-                roleCode = @AGENT.CODE;
-                <span class="badge badge-dark">@roleCode</span>
-            }
+        <div class="image">
+            <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserProfileImage/@user.Id" alt="Profile">
+        </div>
+        <a class="d-block">
+            <span id="user-firstname">@firstName</span>
+            <span id="user-role">
+                @if (User.IsInRole(AGENCY_ADMIN.DISPLAY_NAME))
+                {
+                    <span class="badge badge-info">@AGENCY_ADMIN.CODE</span>
+                }
+                else if (User.IsInRole(SUPERVISOR.DISPLAY_NAME))
+                {
+                    <span class="badge badge-dark">@SUPERVISOR.DISPLAY_NAME</span>
+                }
+                else if (User.IsInRole(AGENT.DISPLAY_NAME))
+                {
+                    <span class="badge badge-dark">@AGENT.CODE</span>
+                }
+            </span>
         </a>
     </div>
 }
