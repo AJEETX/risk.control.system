@@ -226,7 +226,10 @@ $(document).ready(function () {
     }
     loginForm.on('submit', function () {
         // We don't need the "length < 4" check anymore because the button is disabled
-
+        var nodes = loginForm.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
         clearInterval(countdown);
         $("body").addClass("submit-progress-bg");
         $(".submit-progress").removeClass("hidden");

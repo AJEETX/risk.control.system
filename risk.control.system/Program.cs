@@ -17,6 +17,7 @@ using AspNetCoreHero.ToastNotification.Extensions;
 using Hangfire;
 using Hangfire.MemoryStorage;
 
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +28,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
 using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -37,7 +37,6 @@ using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Middleware;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
 using risk.control.system.Services;
 
@@ -91,15 +90,15 @@ builder.Logging.AddProvider(new CsvLoggerProvider(logDirectory, LogLevel.Error))
 //builder.Services.AddTransient<CaseApproved>();
 //builder.Services.AddTransient<CaseRejected>();
 
-//builder.Services.AddCors(opt =>
-//{
-//    opt.AddDefaultPolicy(builder =>
-//    {
-//        builder.AllowAnyOrigin()
-//        .AllowAnyHeader()
-//            .AllowAnyMethod();
-//    });
-//});
+builder.Services.AddCors(opt =>
+{
+    opt.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+        .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
@@ -250,20 +249,6 @@ AWSConfigs.LoggingConfig.LogTo = LoggingOptions.Console;
 AWSConfigs.LoggingConfig.LogMetrics = true;
 AWSConfigs.LoggingConfig.LogResponses = ResponseLoggingOption.Always;
 
-
-// Add services to the container.
-builder.Services.AddControllersWithViews()
-    .AddMicrosoftIdentityUI()
-    .AddRazorRuntimeCompilation()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-    })
-    .AddNewtonsoftJson(options =>
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-);
-
-//builder.Services.AddSignalR();
 builder.Services.AddNotyf(config =>
 {
     config.DurationInSeconds = 2;
@@ -282,13 +267,19 @@ builder.Services.AddHangfireServer(options =>
     options.Queues = new[] { "default", "emails", "critical" };
 });
 
-builder.Services.Configure<AzureAdRoleMapping>(
-    builder.Configuration.GetSection("AzureAdRoleMapping"));
-
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+builder.Services.AddControllersWithViews()
+    .AddRazorRuntimeCompilation()
+    // Stick to one serializer if possible. Newtonsoft is more feature-rich for complex loops.
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+    });
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -303,10 +294,15 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     options.MinimumSameSitePolicy = SameSiteMode.None;
     options.Secure = CookieSecurePolicy.Always;
 });
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    // Increase the limit to 32KB to handle the 7-chunk cookie
+    serverOptions.Limits.MaxRequestHeadersTotalSize = 32768;
+});
 var authBuilder = builder.Services.AddAuthentication(options =>
 {
-    // Change these from CookieAuthenticationDefaults to IdentityConstants
     options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
     options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
     options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
 });
@@ -314,13 +310,43 @@ authBuilder.AddMicrosoftIdentityWebApp(options =>
 {
     builder.Configuration.Bind("AzureAd", options);
     options.SignInScheme = IdentityConstants.ApplicationScheme;
-    options.SaveTokens = true;
+    options.SaveTokens = false;
     options.Events = new OpenIdConnectEvents
     {
+        OnRedirectToIdentityProvider = context =>
+        {
+            // Check if the request is an AJAX/XHR call
+            if (context.Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                context.Request.Headers["Accept"].ToString().Contains("application/json"))
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.HandleResponse(); // Stop the 302 redirect
+            }
+            return Task.CompletedTask;
+        },
         OnTokenValidated = async context =>
         {
-            // This is where you can perform custom logic after a successful login
-            var email = context.Principal.FindFirstValue(ClaimTypes.Email) ?? context.Principal.FindFirstValue("preferred_username");
+            var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
+            if (claimsIdentity != null)
+            {
+                // Get the unique ID from Azure
+                var userId = context.Principal.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier")
+                             ?? context.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // ESSENTIAL: Identity needs this to trust the cookie
+                if (context.Principal.HasClaim(c => c.Type == ClaimTypes.NameIdentifier))
+                {
+                    // You can add custom logic here to link to your local DB user
+                }
+
+                // Remove the 'junk' to keep cookie small (your existing code)
+                var claimsToRemove = new[] { "amr", "aio", "uti", "rh", "xms_tcdt" };
+                foreach (var claimType in claimsToRemove)
+                {
+                    var claim = claimsIdentity.FindFirst(claimType);
+                    if (claim != null) claimsIdentity.RemoveClaim(claim);
+                }
+            }
             await Task.CompletedTask;
         },
         OnRemoteFailure = context =>
@@ -335,15 +361,24 @@ authBuilder.AddMicrosoftIdentityWebApp(options =>
     };
 });
 
-builder.Services.Configure<OpenIdConnectOptions>(
-    OpenIdConnectDefaults.AuthenticationScheme,
-    options =>
+builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
-        options.NonceCookie.SameSite = SameSiteMode.None;
-        options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+        // Instead of CookieManager, we configure the individual cookies to be 'Essential'
+        // and pinned to the root path to prevent multiple versions from appearing.
+        options.NonceCookie.Path = "/";
+        options.CorrelationCookie.Path = "/";
 
+        options.NonceCookie.SameSite = SameSiteMode.None;
         options.CorrelationCookie.SameSite = SameSiteMode.None;
+
+        options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        options.NonceCookie.IsEssential = true;
+        options.CorrelationCookie.IsEssential = true;
+
+        // This helps prevent the '4x cookie' build-up by timing them out quickly
+        options.RemoteAuthenticationTimeout = TimeSpan.FromMinutes(2);
     });
 
 //  3️⃣ JWT Bearer authentication (API)
@@ -367,6 +402,7 @@ authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 // 4. Configure the Identity Cookie (Do this AFTER AddAuthentication)
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.Path = "/";
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.None; // ✅ REQUIRED
@@ -374,9 +410,22 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = AppCookie.LOGIN_PATH;
     options.LogoutPath = AppCookie.LOGOUT_PATH;
     options.AccessDeniedPath = AppCookie.LOGOUT_PATH;
+    options.CookieManager = new ChunkingCookieManager();
     options.SlidingExpiration = true;
-    options.ExpireTimeSpan =
-        TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
+    options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
+    // This tells Identity to use the same logic for OIDC users
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api") || context.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            context.Response.StatusCode = 401;
+        }
+        else
+        {
+            context.Response.Redirect(context.RedirectUri);
+        }
+        return Task.CompletedTask;
+    };
 });
 
 builder.Services.AddAntiforgery(options =>
@@ -384,7 +433,7 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.Name = AppCookie.ANTI_FORGERY_COOKIE_NAME; // Set a custom cookie name
     options.Cookie.HttpOnly = true; // Make the cookie HttpOnly
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require secure cookies (only over HTTPS)
-    options.Cookie.SameSite = SameSiteMode.Lax; // Apply a strict SameSite policy
+    options.Cookie.SameSite = SameSiteMode.None;
     options.HeaderName = "X-CSRF-TOKEN"; // Set a custom header name
     options.FormFieldName = "__RequestVerificationToken"; // Set a custom form field name
     options.SuppressXFrameOptionsHeader = false; // Enable the X-Frame-Options header
@@ -467,7 +516,7 @@ try
     app.UseMiddleware<CookieConsentMiddleware>();
     app.UseMiddleware<WhitelistListMiddleware>();
     app.UseMiddleware<LicensingMiddleware>();
-    app.UseMiddleware<UpdateUserLastActivityMiddleware>();
+    //app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
     app.UseSwagger();
     app.UseSwaggerUI(options =>

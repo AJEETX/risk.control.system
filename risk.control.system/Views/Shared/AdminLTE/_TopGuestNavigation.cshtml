@@ -6,61 +6,52 @@
         <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"> &nbsp;</i></a>
         </li>
-        @* <li class="nav-item d-none d-sm-inline-block">
-            <a href="/" class="nav-link">Home</a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link">Contact</a>
-        </li> *@
     </ul>
-
-    <!-- SEARCH FORM -->
-    @* <form class="form-inline ml-3">
-        <div class="input-group input-group-sm">
-            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-            <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-        </div>
-    </form> *@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Info">
-                <i class="fa fa-info-circle i-blue"></i>
+            <a class="nav-link dropdown-toggle info-toggle-btn" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Info">
+                <i class="fa fa-info-circle"></i>
             </a>
 
-            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 info-dropdown">
+            <div class="dropdown-menu dropdown-menu-right custom-info-menu shadow-sm">
                 @{
-                    var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
+                    var img = "/flags/" + Model?.CountryCode?.ToLower() + ".png";
                 }
 
-                <!-- Country -->
-                <div class="dropdown-item d-flex align-items-center info-item">
-                    <img src="@img" class="flag-icon mr-2" />
-                    <span class="info-label">Country:</span>
-                    <span class="ml-auto font-weight-bold text-primary">@Model?.Country</span>
+                <div class="dropdown-item info-row">
+                    <div class="info-icon-wrapper">
+                        <img src="@img" class="flag-icon" alt="Flag" />
+                    </div>
+                    <div class="info-content">
+                        <small class="info-label">Country</small>
+                        <span class="info-value">@Model?.Country</span>
+                    </div>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
-                <!-- Currency -->
-                <div class="dropdown-item d-flex align-items-center info-item">
-                    <i class="fa fa-money mr-2 text-success"></i>
-                    <span class="info-label">Currency:</span>
-                    <span class="ml-auto font-weight-bold text-success">@Model?.CurrencyName</span>
+                <div class="dropdown-item info-row">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-money-bill-wave text-success"></i>
+                    </div>
+                    <div class="info-content">
+                        <small class="info-label">Currency</small>
+                        <span class="info-value">@Model?.CurrencyName</span>
+                    </div>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
-                <!-- ISD Code -->
-                <div class="dropdown-item d-flex align-items-center info-item">
-                    <i class="fa fa-phone mr-2 text-dangez"></i>
-                    <span class="info-label">ISD Code:</span>
-                    <span class="ml-auto font-weight-bold text-dangez">@Model?.IsdCode</span>
+                <div class="dropdown-item info-row">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-phone-alt text-primary"></i>
+                    </div>
+                    <div class="info-content">
+                        <small class="info-label">ISD Code</small>
+                        <span class="info-value">@Model?.IsdCode</span>
+                    </div>
                 </div>
             </div>
         </li>

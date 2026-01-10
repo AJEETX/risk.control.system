@@ -37,46 +37,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-let internetPopup = null;
-
-function checkInternetConnection() {
-    if (!navigator.onLine) {
-
-        // If popup already exists, do not open another
-        if (internetPopup) return;
-
-        internetPopup = $.confirm({
-            title: 'No Internet Connection',
-            content: 'It looks like your internet connection is down. Please check and try again.',
-            type: 'red',
-            closeIcon: false,
-            buttons: {
-                tryAgain: {
-                    text: 'Retry',
-                    action: function () {
-                        internetPopup = null; // reset before retry
-                        checkInternetConnection();
-                        return false; // keep dialog open if still offline
-                    }
-                },
-                close: function () {
-                    internetPopup = null;
-                }
-            },
-            onDestroy: function () {
-                internetPopup = null;
-            }
-        });
-    }
-    else {
-        // If connection is back, close popup automatically
-        if (internetPopup) {
-            internetPopup.close();
-            internetPopup = null;
-        }
-    }
-}
-
 function checkFormCompletion(formSelector, create = false) {
     let isFormComplete = true;
 
@@ -134,8 +94,6 @@ function checkFormCompletion(formSelector, create = false) {
     // Enable or disable the submit button
     $(formSelector).find('button[type="submit"]').prop('disabled', !isFormComplete);
 }
-
-// Function to validate file input types
 function validateFileInput(inputElement, allowedExtensions) {
     var MaxSizeInBytes = 5242880;
     if (!inputElement.files || !inputElement.files[0]) {
@@ -185,8 +143,6 @@ function validateFileInput(inputElement, allowedExtensions) {
     }
     return true;
 }
-
-// Generic input validation function
 function validateInput(selector, regex) {
     $(selector).on('input', function () {
         const value = $(this).val();
@@ -197,7 +153,6 @@ function validateInput(selector, regex) {
 function openForm() {
     document.getElementById("myForm").removeClass("hidden-section");
 }
-
 function closeForm() {
     document.getElementById("myForm").addClass("hidden-section");
 }
@@ -427,29 +382,18 @@ function loadNotifications(keepOpen = false) {
         }
     });
 }
-
-/* ===============================
-   SANITIZATION HELPERS (SAFE)
-   =============================== */
-
-// Allow letters, numbers, spaces, punctuation
 function sanitizeText(str) {
     if (!str) return "";
     return String(str).replace(/[<>]/g, ""); // Remove tags entirely
 }
-
-// Allow only safe date characters
 function sanitizeDate(str) {
     if (!str) return "";
     return String(str).replace(/[^0-9A-Za-z:\-\/\s]/g, "");
 }
-
-// Allow only valid CSS class characters
 function sanitizeCssClass(str) {
     if (!str) return "";
     return String(str).replace(/[^a-zA-Z0-9\-\s]/g, "");
 }
-
 function clearAllNotifications() {
     var token = $('input[name="__RequestVerificationToken"]').val();
     $.ajax({
@@ -674,8 +618,6 @@ $(document).ready(function () {
     });
 
 });
-
-// Function to disable all interactive elements
 function disableAllInteractiveElements() {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI can update the spinners
@@ -699,7 +641,6 @@ function checkIfAllChecked(elements) {
     var totalCheckedElements = elements.filter(":checked").length;
     return (totalElmentCount == totalCheckedElements)
 }
-
 function checkIfAnyChecked(elements) {
     var hasAnyCheckboxChecked = false;
 
@@ -710,7 +651,6 @@ function checkIfAnyChecked(elements) {
     });
     return hasAnyCheckboxChecked;
 }
-
 function toggleChecked(status) {
     $("#checkboxes input").each(function () {
         // Set the checked status of each to match the
@@ -727,9 +667,47 @@ window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
 
 fetchIpInfo();
 
-// Load notifications on page load WITHOUT keeping it open
 loadNotifications(false);
 
+
+let internetPopup = null;
+function checkInternetConnection() {
+    if (!navigator.onLine) {
+
+        // If popup already exists, do not open another
+        if (internetPopup) return;
+
+        internetPopup = $.confirm({
+            title: 'No Internet Connection',
+            content: 'It looks like your internet connection is down. Please check and try again.',
+            type: 'red',
+            closeIcon: false,
+            buttons: {
+                tryAgain: {
+                    text: 'Retry',
+                    action: function () {
+                        internetPopup = null; // reset before retry
+                        checkInternetConnection();
+                        return false; // keep dialog open if still offline
+                    }
+                },
+                close: function () {
+                    internetPopup = null;
+                }
+            },
+            onDestroy: function () {
+                internetPopup = null;
+            }
+        });
+    }
+    else {
+        // If connection is back, close popup automatically
+        if (internetPopup) {
+            internetPopup.close();
+            internetPopup = null;
+        }
+    }
+}
 window.addEventListener('online', function () {
     internetPopupOpen = false;
     $('.jconfirm').remove();
