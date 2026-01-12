@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="forms">
-            <a target="_blank" href="https://hostedscan.com"><img id="hostedscan" src="https://hostedscan.com/hostedscan-badge-light.svg" alt="HostedScan" /></a>
+            <a target="_blank" href="https://hostedscan.com"><img id="hostedscan" src="~/img/hostedscan.png" alt="HostedScan" /></a>
             <div class="form-content">
 
                 <div class="login-form">
@@ -49,7 +49,8 @@
                                         <img id="country-flag" src="~/img/beachflag.png" class="flag-icon" data-bs-toggle="tooltip" alt="country flag" title="country flag" />
                                     </span>
                                 </div>
-                                <input type="text" id="CountryIsd" name="CountryIsd" asp-for="CountryIsd" title="Country ISD code" class="form-control remarks country-isdcode auto-dropdown" required placeholder="Country ISD code" autocomplete="off">
+                                <input type="text" id="CountryIsdDisplay" title="Country ISD code" class="form-control remarks country-isdcode auto-dropdown" required placeholder="Country ISD code" autocomplete="off">
+                                <input type="hidden" id="ActualIsdValue" name="CountryIsd" asp-for="CountryIsd">
                                 <span asp-validation-for="CountryIsd" class="text-danger"></span>
                                 <div class="input-group-append-caret">
                                     <span class="input-group-text"><i class="fas fa-caret-down"></i></span>

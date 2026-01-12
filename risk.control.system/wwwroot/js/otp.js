@@ -1,35 +1,35 @@
-﻿//$.validator.setDefaults({
-//    submitHandler: function (form) {
-//        $("body").addClass("submit-progress-bg");
-//        // Wrap in setTimeout so the UI
-//        // can update the spinners
-//        setTimeout(function () {
-//            $(".submit-progress").removeClass("hidden");
-//        }, 1);
+﻿$.validator.setDefaults({
+    submitHandler: function (form) {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
 
-//        $('#otp').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Send OTP');
-//        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+        $('#otp').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Send OTP');
+        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
 
-//        $('#otp').attr('disabled', 'disabled');
-//        $('#login').attr('disabled', 'disabled');
-//        $('#otp').addClass('login-disabled');
-//        $('#login').addClass('login-disabled');
-//        $('html a').addClass('anchor-disabled');
-//        $('.text').addClass('anchor-disabled');
+        $('#otp').attr('disabled', 'disabled');
+        $('#login').attr('disabled', 'disabled');
+        $('#otp').addClass('login-disabled');
+        $('#login').addClass('login-disabled');
+        $('html a').addClass('anchor-disabled');
+        $('.text').addClass('anchor-disabled');
 
-//        form.submit();
+        form.submit();
 
-//        $('#login-form').attr('disabled', 'disabled');
+        $('#login-form').attr('disabled', 'disabled');
 
-//        var loginForm = document.getElementById("login-form");
-//        if (loginForm) {
-//            var nodes = loginForm.getElementsByTagName('*');
-//            for (var i = 0; i < nodes.length; i++) {
-//                nodes[i].disabled = true;
-//            }
-//        }
-//    }
-//});
+        var loginForm = document.getElementById("login-form");
+        if (loginForm) {
+            var nodes = loginForm.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
+        }
+    }
+});
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -74,7 +74,7 @@ $(document).ready(function () {
    
     $("#login-form").validate();
    
-    $("#CountryIsd").autocomplete({
+    $("#CountryIsdDisplay").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
             $.ajax({
@@ -106,9 +106,9 @@ $(document).ready(function () {
         autoFocus: true, // Automatically highlight the first item in the list
         select: function (event, ui) {
             // Set the selected value to the input field
-            $(this).val('+' + ui.item.value);
+            $("#CountryIsdDisplay").val(ui.item.label);
             // Optionally, set the CountryId in a hidden input or elsewhere if needed
-            $("#CountryIsd").val(ui.item.value);
+            $("#ActualIsdValue").val(ui.item.value);
 
             // Set the flag image based on the selected country
             $("#country-flag").attr("src", ui.item.flag); // Update the flag image source
@@ -124,7 +124,7 @@ $(document).ready(function () {
             // If the value doesn't match any of the autocomplete suggestions, clear the input
             if (!ui.item) {
                 $(this).val(''); // Optionally clear the input field
-                $("#country-flag").attr("src", "/img/no-map.jpeg"); // Reset flag image to default
+                $("#country-flag").attr("src", "/img/beachflag.png"); // Reset flag image to default
             }
         },
         messages: {
@@ -136,7 +136,7 @@ $(document).ready(function () {
     });
 
     // Trigger autocomplete on focus for country code field
-    $("#CountryIsd").on("focus", function () {
+    $("#CountryIsdDisplay").on("focus", function () {
         const countryCodeValue = $(this).val();
         // If the field is empty, trigger autocomplete
         if (!countryCodeValue.trim()) {
@@ -225,11 +225,6 @@ $(document).ready(function () {
         startTimer();
     }
     loginForm.on('submit', function () {
-        // We don't need the "length < 4" check anymore because the button is disabled
-        var nodes = loginForm.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
         clearInterval(countdown);
         $("body").addClass("submit-progress-bg");
         $(".submit-progress").removeClass("hidden");
@@ -353,7 +348,7 @@ function validateNumber(selector, regex) {
     });
 }
 function focusOtp() {
-    const otp = document.getElementById("CountryIsd");
+    const otp = document.getElementById("CountryIsdDisplay");
     if (otp) {
         otp.focus();
     }

@@ -419,7 +419,7 @@ img.logo {
 }
 
 #hostedscan {
-    height: 30px;
+    height: 50px;
     width: auto;
 }
 
@@ -872,4 +872,6 @@ img.logo {
 img.microsoft{
     height:3em;
     margin-top:-1em;
+    border:1px solid #ccc;
+    border-radius:5px;
 }

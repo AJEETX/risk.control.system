@@ -12,11 +12,13 @@ using Amazon.Textract;
 using Amazon.TranscribeService;
 
 using AspNetCoreHero.ToastNotification;
+using AspNetCoreHero.ToastNotification.Abstractions;
 using AspNetCoreHero.ToastNotification.Extensions;
 
 using Hangfire;
 using Hangfire.MemoryStorage;
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -24,10 +26,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
-using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -151,6 +154,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<IAzureAdService, AzureAdService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IMediaIdfyService, MediaIdfyService>();
@@ -272,7 +276,14 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
-builder.Services.AddControllersWithViews()
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+
+    options.Filters.Add(new AuthorizeFilter(policy));
+})
     .AddRazorRuntimeCompilation()
     // Stick to one serializer if possible. Newtonsoft is more feature-rich for complex loops.
     .AddNewtonsoftJson(options =>
@@ -304,62 +315,73 @@ var authBuilder = builder.Services.AddAuthentication(options =>
     options.DefaultScheme = IdentityConstants.ApplicationScheme;
     options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
     options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
-    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
 });
-authBuilder.AddMicrosoftIdentityWebApp(options =>
+authBuilder.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-    builder.Configuration.Bind("AzureAd", options);
     options.SignInScheme = IdentityConstants.ApplicationScheme;
+
+    options.ClientId = builder.Configuration["AzureAd:ClientId"];
+    options.ClientSecret = builder.Configuration["AzureAd:ClientSecret"];
+
+    options.Authority =
+        $"https://login.microsoftonline.com/{builder.Configuration["AzureAd:TenantId"]}/v2.0";
+
+    options.ResponseType = OpenIdConnectResponseType.Code;
+
     options.SaveTokens = false;
+    options.GetClaimsFromUserInfoEndpoint = true;
+
+    options.Scope.Clear();
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("email");
+    options.Scope.Add("User.Read");        // 🔴 REQUIRED
+    options.Scope.Add("User.Read.All");    // 🔴 REQUIRED (admin)
+    options.Scope.Add("Directory.Read.All"); // optional
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        NameClaimType = ClaimTypes.Email
+    };
     options.Events = new OpenIdConnectEvents
     {
-        OnRedirectToIdentityProvider = context =>
-        {
-            // Check if the request is an AJAX/XHR call
-            if (context.Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
-                context.Request.Headers["Accept"].ToString().Contains("application/json"))
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                context.HandleResponse(); // Stop the 302 redirect
-            }
-            return Task.CompletedTask;
-        },
         OnTokenValidated = async context =>
         {
             var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
             if (claimsIdentity != null)
             {
-                // Get the unique ID from Azure
-                var userId = context.Principal.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier")
-                             ?? context.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                // ESSENTIAL: Identity needs this to trust the cookie
-                if (context.Principal.HasClaim(c => c.Type == ClaimTypes.NameIdentifier))
+                var azureAdService = context.HttpContext.RequestServices.GetRequiredService<IAzureAdService>();
+                var notifyService = context.HttpContext.RequestServices.GetRequiredService<INotyfService>();
+                var email = await azureAdService.ValidateAzureSignIn(context);
+                if (string.IsNullOrWhiteSpace(email))
                 {
-                    // You can add custom logic here to link to your local DB user
+                    context.Response.Redirect("/Account/Login");
+                    context.HandleResponse();
+                    notifyService.Error($"Azure AD Login error");
+                    return;
                 }
-
-                // Remove the 'junk' to keep cookie small (your existing code)
-                var claimsToRemove = new[] { "amr", "aio", "uti", "rh", "xms_tcdt" };
-                foreach (var claimType in claimsToRemove)
+                else
                 {
-                    var claim = claimsIdentity.FindFirst(claimType);
-                    if (claim != null) claimsIdentity.RemoveClaim(claim);
+                    notifyService.Success($"Welcome <b>{email}</b>, Login successful");
+                    context.HandleResponse();
+                    context.Response.Redirect("/Dashboard/Index");
                 }
             }
+
             await Task.CompletedTask;
         },
         OnRemoteFailure = context =>
         {
             if (context.Failure != null && context.Failure.Message.Contains("Correlation failed"))
             {
-                context.Response.Redirect("/Account/AzureLogin");
+                context.Response.Redirect("/Account/Login");
                 context.HandleResponse();
             }
             return Task.CompletedTask;
         }
     };
 });
+
 
 builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
@@ -378,7 +400,7 @@ builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.Authentic
         options.CorrelationCookie.IsEssential = true;
 
         // This helps prevent the '4x cookie' build-up by timing them out quickly
-        options.RemoteAuthenticationTimeout = TimeSpan.FromMinutes(2);
+        options.RemoteAuthenticationTimeout = TimeSpan.FromMinutes(1);
     });
 
 //  3️⃣ JWT Bearer authentication (API)
@@ -416,7 +438,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     // This tells Identity to use the same logic for OIDC users
     options.Events.OnRedirectToLogin = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/api") || context.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (context.Request.Path.StartsWithSegments("/api"))
         {
             context.Response.StatusCode = 401;
         }
@@ -425,6 +447,32 @@ builder.Services.ConfigureApplicationCookie(options =>
             context.Response.Redirect(context.RedirectUri);
         }
         return Task.CompletedTask;
+    };
+    options.Events = new CookieAuthenticationEvents
+    {
+        OnRedirectToAccessDenied = context =>
+        {
+            // Treat AccessDenied same as Login after idle
+            context.Response.Redirect(options.LoginPath);
+            return Task.CompletedTask;
+        },
+        OnSignedIn = context =>
+        {
+            var userName = context.Principal.Identity.Name;
+            var cookie = context.HttpContext.User.Claims;
+            Console.WriteLine($"✅ Identity {userName} cookie issued");
+            return Task.CompletedTask;
+        },
+        OnValidatePrincipal = context =>
+        {
+            Console.WriteLine("🔍 Identity cookie validated");
+            return Task.CompletedTask;
+        },
+        OnRedirectToLogin = context =>
+        {
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -515,7 +563,7 @@ try
     app.UseMiddleware<RequirePasswordChangeMiddleware>();
     app.UseMiddleware<CookieConsentMiddleware>();
     app.UseMiddleware<WhitelistListMiddleware>();
-    app.UseMiddleware<LicensingMiddleware>();
+    //app.UseMiddleware<LicensingMiddleware>();
     //app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
     app.UseSwagger();
@@ -527,6 +575,17 @@ try
     app.UseFileServer();
 
     app.UseRateLimiter();
+    app.Use(async (context, next) =>
+    {
+        await next();
+
+        if (context.Response.StatusCode == 401 &&
+            !context.User.Identity.IsAuthenticated)
+        {
+            await context.ChallengeAsync();
+        }
+    });
+
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Dashboard}/{action=Index}/{id?}")

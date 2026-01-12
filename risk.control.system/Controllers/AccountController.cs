@@ -195,49 +195,45 @@ namespace risk.control.system.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult AzureLogin(string returnUrl = "/Dashboard/Index")
+        public IActionResult AzureLogin(string returnUrl = "/")
         {
-            var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { returnUrl });
-            var properties = new AuthenticationProperties
-            {
-                RedirectUri = redirectUrl
-            };
-
-            return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
+            return Challenge(
+                new AuthenticationProperties { RedirectUri = returnUrl },
+                OpenIdConnectDefaults.AuthenticationScheme);
         }
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/Dashboard/Index")
-        {
-            var authResult = await HttpContext.AuthenticateAsync(OpenIdConnectDefaults.AuthenticationScheme);
+        //[HttpGet]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/")
+        //{
+        //    var authResult = await HttpContext.AuthenticateAsync(OpenIdConnectDefaults.AuthenticationScheme);
 
-            if (!authResult.Succeeded || authResult.Principal == null)
-            {
-                return RedirectToAction(nameof(Login));
-            }
+        //    if (!authResult.Succeeded || authResult.Principal == null)
+        //    {
+        //        return RedirectToAction(nameof(Login));
+        //    }
 
-            try
-            {
-                var user = await loginService.CreateOrUpdateExternalUserAsync(authResult.Principal);
+        //    try
+        //    {
+        //        var user = await loginService.CreateOrUpdateExternalUserAsync(authResult.Principal);
 
-                if (user == null)
-                    return View("Error", "Email not received from Azure");
+        //        if (user == null)
+        //            return View("Error", "Email not received from Azure");
 
-                await _signInManager.SignInAsync(user, isPersistent: false);
+        //        await _signInManager.SignInAsync(user, isPersistent: false);
 
-                return LocalRedirect(returnUrl);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "External login failed for user.");
+        //        return LocalRedirect(returnUrl);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "External login failed for user.");
 
-                return View("Error", new ErrorViewModel
-                {
-                    Message = ex.Message,
-                    RequestId = HttpContext.TraceIdentifier
-                });
-            }
-        }
+        //        return View("Error", new ErrorViewModel
+        //        {
+        //            Message = ex.Message,
+        //            RequestId = HttpContext.TraceIdentifier
+        //        });
+        //    }
+        //}
 
         [HttpGet]
         public async Task<IActionResult> Logout()
