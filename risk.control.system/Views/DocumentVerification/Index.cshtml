@@ -1,0 +1,133 @@
+﻿@model ImageAnalysisViewModel
+
+@{
+    ViewData["Title"] = "Document Forensic Analysis";
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+}
+
+<section class="content  tool-match-section">
+    <div id="article" class="card shadow-lg border-0 summarizer-card">
+        
+        @* 1. Header with integrated Usage Badge *@
+        <div class="card-header d-flex align-items-center doc-card-header">
+            <i class="fas fa-microscope mr-2"></i>
+            <h5 class="mb-0 font-weight-bold">DocuCheck Forensics</h5>
+
+            <div class="ml-auto ms-auto">
+                <span id="usageBadge"
+                      class="badge usage-badge-custom shadow-sm @(Model.RemainingTries <= 1 ? "badge-soft-danger" : "badge-soft-warning")">
+                    <i class="fas @(Model.RemainingTries <= 1 ? "fa-exclamation-circle" : "fa-clock") mr-1 small"></i>
+                    <span id="remainingCount">@Model.RemainingTries</span> tries left
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw text-warning"></i>
+            </div>
+        
+            @* 2. Upload Section (Mirroring PDF Summarizer Layout) *@
+            <form asp-action="Upload" method="post" enctype="multipart/form-data" id="analysisForm">
+                <div class="row">
+                    @* Left Side: Drop Zone *@
+                    <div class="col-md-6 mb-4 text-center">
+                        <label class="h6 font-weight-bold text-warning mb-3" for="drop-zone">
+                            <span class="badge badge-warning rounded-circle mr-1 text-white">1</span> Select Image
+                        </label>
+                        <div id="drop-zone" class="pdf-drop-zone d-flex flex-column align-items-center justify-content-center p-4 @(Model.RemainingTries <= 0 ? "disabled-zone" : "")">
+                            <input id="fileInput" name="file" type="file" class="d-none" accept="image/jpeg, image/png" required @(Model.RemainingTries <= 0 ? "disabled" : "") />
+                            
+                            <div class="text-center">
+                                <i class="fas fa-file-image fa-4x text-warning mb-3" id="previewIcon"></i>
+                                <h6 class="text-warning font-weight-bold">Drop Image Here</h6>
+                                <p class="small text-muted mb-0">JPEG or PNG up to 10MB</p>
+                                
+                                <div id="fileNameDisplay" class="badge badge-light p-2 mt-3 d-none text-truncate border"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Right Side: Report/Info Box *@
+                    <div class="col-md-6 mb-4 text-center">
+                        <label class="h6 font-weight-bold text-secondary mb-3">
+                            <span class="badge badge-warning rounded-circle mr-1 text-white">2</span> Analysis Methodology
+                        </label>
+
+                        <div class="summary-box-container text-left p-3 border rounded shadow-sm bg-light">
+                            <h6 class="font-weight-bold text-dark small"><i class="fas fa-search-plus mr-2"></i> Error Level Analysis (ELA)</h6>
+                            <p class="small text-muted">Our AI resaves the image at a known compression rate to identify pixel inconsistencies. Genuine areas show uniform noise; altered pixels react differently, appearing as "hotspots."</p>
+                            
+                            <h6 class="font-weight-bold text-dark small mt-3"><i class="fas fa-fingerprint mr-2"></i> Metadata Sanitization</h6>
+                            <p class="small text-muted">Checks for signatures from Adobe Photoshop, GIMP, or Canva that indicate post-capture modifications.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <button type="submit" id="analyzeBtn" 
+                            class="btn btn-outline-warning btn-lg w-100 shadow rounded-pill btn-document-summary"
+                            @(Model.RemainingTries <= 0 ? "disabled" : "")>
+                        @if (Model.RemainingTries <= 0)
+                        {
+                            <i class="fas fa-lock mr-2"></i> <span>Limit Reached</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-magic mr-2"></i> <span>Run Forensic Audit</span>
+                        }
+                    </button>
+                </div>
+            </form>
+
+            @* 3. Forensic Results Section (Comparison Slider) *@
+            @if (!string.IsNullOrEmpty(Model.ElaImageUrl))
+            {
+                <hr class="my-5" />
+                <div class="row g-4 animate__animated animate__fadeIn" id="results-section">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow rounded-4 overflow-hidden">
+                            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                                <span class="small fw-bold">FORENSIC COMPARATOR</span>
+                                <span class="badge badge-pill badge-primary">ELA 95%</span>
+                            </div>
+                            <div class="analysis-stage bg-black" >
+                                <div class="comparison-slider" id="slider-container">
+                                    <img src="@Model.OriginalImageUrl" class="w-100 h-100 img-contain" alt="original" />
+                                    <div class="img-overlay" id="ela-overlay">
+                                        <img src="@Model.ElaImageUrl" class="w-100 h-100" alt="processed" />
+                                    </div>
+                                    <div class="slider-handle" id="handle">
+                                        <div class="handle-circle"><i class="fas fa-arrows-alt-h"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow rounded-4 h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="font-weight-bold mb-3">Integrity Verdict</h6>
+
+                                <div class="p-3 mb-3 rounded border-left border-width-4 @(Model.MetadataFlagged ? "border-danger bg-soft-danger" : "border-success bg-soft-success")">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas @(Model.MetadataFlagged ? "fa-exclamation-triangle text-danger" : "fa-check-circle text-success") fa-2x mr-3"></i>
+                                        <div>
+                                            <div class="small text-uppercase font-weight-bold opacity-50">Metadata</div>
+                                            <div class="font-weight-bold">@(Model.MetadataFlagged ? "Tamper Detected" : "Clear / Original")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/tool/doc-verification.js"></script>
+}

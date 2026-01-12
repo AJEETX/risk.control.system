@@ -16,6 +16,7 @@ namespace risk.control.system.Models
         public int FaceMatchCount { get; set; } = 0;
         public int OcrCount { get; set; } = 0;
         public int PdfCount { get; set; } = 0;
+        public int DocumentAnalysisCount { get; set; } = 0;
         public bool IsSuperAdmin { get; set; } = false;
         public bool IsClientManager { get; set; } = false;
         public bool IsClientAdmin { get; set; } = false;

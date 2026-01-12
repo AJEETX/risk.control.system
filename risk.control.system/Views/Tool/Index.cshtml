@@ -99,6 +99,36 @@
                         {
                             <button class="btn btn-secondary btn-block rounded-pill disabled" disabled>Limit Reached</button>
                         }
+                    
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 tool-card shadow-sm p-3 border border-warning @(Model.DocumentAnalysisRemaining <= 0 ? "bg-light" : "")">
+                    <div class="card-body text-center">
+                        <div class="icon-box bg-soft-warning mb-2">
+                            <i class="fas fa-microscope fa-2x text-warning"></i>
+                        </div>
+                        <h5 class="card-title font-weight-bold">Tamper Detection</h5>
+
+                        <span class="badge @(Model.DocumentAnalysisRemaining > 0 ? "badge-warning" : "badge-danger") mb-3">
+                            @Model.DocumentAnalysisRemaining tries left
+                        </span>
+
+                        <p class="card-text text-muted small">Analyze images for digital tampering using ELA forensics.</p>
+
+                        @if (Model.DocumentAnalysisRemaining > 0)
+                        {
+                            <a class="btn btn-warning btn-block rounded-pill launch-btn text-white"
+                               href="/DocumentVerification/Index">
+                                Launch Analysis
+                            </a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary btn-block rounded-pill disabled" disabled>Limit Reached</button>
+                        }
                     </div>
                 </div>
             </div>

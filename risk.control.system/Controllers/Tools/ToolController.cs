@@ -50,7 +50,8 @@ namespace risk.control.system.Controllers.Tools
             {
                 FaceMatchRemaining = 5 - user.FaceMatchCount,
                 OcrRemaining = 5 - user.OcrCount,
-                PdfRemaining = 5 - user.PdfCount
+                PdfRemaining = 5 - user.PdfCount,
+                DocumentAnalysisRemaining = 5 - user.DocumentAnalysisCount
             };
 
             return View(model);

@@ -3654,6 +3654,8 @@ img.microsoft {
 /* Summary Result Box */
 .summary-box-container {
     position: relative;
+    height: 200px;
+    overflow-y: auto;
 }
 
 .summary-box {
@@ -3825,4 +3827,165 @@ img.microsoft {
 .profile-dropdown .dropdown-item {
     padding: 12px 20px;
     font-size: 0.9rem;
+}
+
+/* Document Tamper */
+
+.badge-soft-warning {
+    background-color: #f0deb5;
+    color: #055160;
+    border: 1px solid #ebcf91;
+}
+.doc-card-header {
+    background-color: #ffc107; /* Muted Steel Blue */
+    border-bottom: 2px solid #99b8e0;
+    padding: 1rem 1.5rem;
+}
+
+
+#document-edit-width {
+    max-width: 500px;
+}
+.comparison-slider {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    border: 2px solid #333;
+}
+
+    /* The images must overlay perfectly */
+    .comparison-slider img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+    }
+
+/* The "After" (ELA) image sits on top with a clip-path */
+.img-overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: black; /* ELA maps are usually dark */
+    clip-path: inset(0 0 0 50%); /* Start half-way */
+}
+
+    .slider-handle::after {
+        content: "↔";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        background: #007bff;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+/* Analysis Container */
+.analysis-stage {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* Modern Slider Handle */
+.slider-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: #00d4ff;
+    z-index: 10;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+}
+
+.handle-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* Metadata Badge Styling */
+.metadata {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+.metric-card {
+    background: #f8f9fa;
+    border-left: 4px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+    .metric-card.flagged {
+        border-left-color: #dc3545;
+        background: #fff5f5;
+    }
+#slider-container {
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+    cursor: col-resize;
+}
+img.img-contain {
+    object-fit: contain;
+}
+#ela-overlay {
+    clip-path: inset(0 0 0 50%);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+    #ela-overlay img {
+        object-fit: contain;
+        background: black;
+    }
+
+.bg-soft-warning {
+    background-color: rgba(255, 193, 7, 0.15);
+    padding: 15px;
+    border-radius: 50%;
+}
+#handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: #007bff;
+    z-index: 5;
+}
+.btn-document-summary {
+    padding: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 3px solid #ffc107;
 }
