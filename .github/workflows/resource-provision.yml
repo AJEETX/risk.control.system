@@ -1,0 +1,79 @@
+﻿name: provision infrastructure
+on:
+  workflow_call:  
+      inputs:
+          resource_group:
+            required: true
+            type: string
+          location:
+            required: true
+            type: string
+          app_service_plan:
+            required: true
+            type: string
+          app_service_name:
+            required: true
+            type: string
+
+jobs:
+  # ---------------------------------------------------
+  # 0️⃣ Provision Azure Infrastructure
+  # ---------------------------------------------------
+  infra-provision:
+    name: Provision Azure Infrastructure
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      RESOURCE_GROUP: ${{ inputs.resource_group }}
+      LOCATION: ${{ inputs.resource_group }}
+      APP_SERVICE_PLAN: ${{ inputs.app_service_plan }}
+      WEB_APP_NAME: ${{ inputs.app_service_name }}
+
+    steps:
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4161986A32194927BC9CAF47B055C536 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_895BF37D67394E7389401B5514E601DA }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8D4789783E64430BB6F38C3DA522554B }}
+
+      - name: Create Resource Group
+        run: |
+          az group create \
+            --name $RESOURCE_GROUP \
+            --location $LOCATION
+
+      - name: Create App Service Plan
+        run: |
+          az appservice plan create \
+            --name $APP_SERVICE_PLAN \
+            --resource-group $RESOURCE_GROUP \
+            --location $LOCATION \
+            --sku F1 \
+            --is-linux false
+
+      - name: Create Web App (.NET 8)
+        run: |
+          az webapp create \
+            --name $WEB_APP_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --plan $APP_SERVICE_PLAN \
+            --runtime "DOTNET|8.0"
+
+      - name: Configure App Settings
+        run: |
+          az webapp config appsettings set \
+            --resource-group $RESOURCE_GROUP \
+            --name $WEB_APP_NAME \
+            --settings \
+              ASPNETCORE_ENVIRONMENT=Production
+
+      - name: Summary
+        run: |
+          echo "## Azure Infrastructure Ready" >> $GITHUB_STEP_SUMMARY
+          echo "- Resource Group: $RESOURCE_GROUP" >> $GITHUB_STEP_SUMMARY
+          echo "- App Service: $WEB_APP_NAME" >> $GITHUB_STEP_SUMMARY
