@@ -132,10 +132,14 @@ namespace risk.control.system.Services
             message += $"{passwordString}\n";
             message += $"{BaseUrl}";
             await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
+            var profileImageByte =await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl));
+
             return new ForgotPasswordResult
             {
+                Id = user.Id,
                 CountryCode = user.Country.Code,
-                ProfilePicture = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)) ?? new byte[] { }
+                ProfileImage = $"data:image/*;base64,{Convert.ToBase64String(profileImageByte)}",
+                ProfilePicture = profileImageByte ?? new byte[] { }
             };
         }
     }
