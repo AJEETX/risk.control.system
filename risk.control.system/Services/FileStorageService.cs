@@ -15,7 +15,7 @@
     }
     internal class FileStorageService : IFileStorageService
     {
-        private const string RootFolder = "Files";
+        private const string RootFolder = "Document";
         private readonly IWebHostEnvironment env;
         public FileStorageService(IWebHostEnvironment env)
         {
