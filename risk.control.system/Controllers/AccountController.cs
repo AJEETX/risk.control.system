@@ -290,23 +290,34 @@ namespace risk.control.system.Controllers
                 model = await CreateDefaultForgotPasswordModel(input?.Email);
                 return View(model);
             }
-            var smsResult = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
-
-            if (smsResult == null)
+            try
             {
-                model = await CreateDefaultForgotPasswordModel(input?.Email);
-                return View(model);
+                var smsResult = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
+
+                if (smsResult == null)
+                {
+                    model = await CreateDefaultForgotPasswordModel(input?.Email);
+                    return View(model);
+                }
+                var successModel = new ForgotPassword
+                {
+                    Id = smsResult.Id,
+                    Email = input.Email,
+                    Message = $"{input.CountryId} (0) {input.Mobile}",
+                    Flag = $"/flags/{smsResult.CountryCode}.png",
+                    ProfilePicture = smsResult.ProfilePicture,
+                    Reset = true,
+                    ProfileImage = smsResult.ProfileImage
+                };
+
+                return View(successModel);
             }
-            var successModel = new ForgotPassword
+            catch (Exception ex)
             {
-                Email = input.Email,
-                Message = $"{input.CountryId} (0) {input.Mobile}",
-                Flag = $"/flags/{smsResult.CountryCode}.png",
-                ProfilePicture = smsResult.ProfilePicture,
-                Reset = true
-            };
-
-            return View(successModel);
+                _logger.LogError(ex, "Error in Forgot Password");
+                throw;
+            }
+            
         }
         private async Task<IActionResult> PrepareInvalidView(LoginViewModel model, string error)
         {

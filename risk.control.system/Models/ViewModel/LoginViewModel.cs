@@ -37,8 +37,10 @@ namespace risk.control.system.Models.ViewModel
     }
     public class ForgotPasswordResult
     {
+        public long? Id { get; set; }
         public string CountryCode { get; set; }
         public byte[] ProfilePicture { get; set; }
+        public string ProfileImage { get; set; }
     }
     public class OtpLoginModel
     {
