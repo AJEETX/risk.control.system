@@ -32,7 +32,7 @@ using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
@@ -489,7 +489,6 @@ builder.Services.AddAntiforgery(options =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.OperationFilter<AddRequiredHeaderParameter>();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
         Name = "Authorization",

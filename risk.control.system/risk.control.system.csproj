@@ -56,10 +56,6 @@
     <PackageReference Include="Gehtsoft.PDFFlowLib" Version="3.0.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.1" />
-    <PackageReference Include="System.Text.Json" Version="10.0.1" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="WorkflowCore" Version="3.17.0" />
   </ItemGroup>
 

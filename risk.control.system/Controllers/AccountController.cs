@@ -153,10 +153,20 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
             var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
-            return View(new LoginViewModel { SetPassword = setPassword });
+            if (!string.IsNullOrEmpty(returnUrl) && !Url.IsLocalUrl(returnUrl))
+            {
+                returnUrl = "/";
+            }
+
+            return View(new LoginViewModel
+            {
+                SetPassword = setPassword,
+                ReturnUrl = returnUrl ?? "/"
+            });
+
         }
 
         [HttpPost]
@@ -189,8 +199,12 @@ namespace risk.control.system.Controllers
 
             await loginService.SignInWithTimeoutAsync(user);
 
+            if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+            {
+                notifyService.Success($"Welcome back <b>{displayName}</b>");
+                return LocalRedirect(model.ReturnUrl ?? "/");
+            }
             notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
-
             return RedirectToAction("Index", "Dashboard");
         }
         [HttpGet]
@@ -201,48 +215,16 @@ namespace risk.control.system.Controllers
                 new AuthenticationProperties { RedirectUri = returnUrl },
                 OpenIdConnectDefaults.AuthenticationScheme);
         }
-        //[HttpGet]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/")
-        //{
-        //    var authResult = await HttpContext.AuthenticateAsync(OpenIdConnectDefaults.AuthenticationScheme);
-
-        //    if (!authResult.Succeeded || authResult.Principal == null)
-        //    {
-        //        return RedirectToAction(nameof(Login));
-        //    }
-
-        //    try
-        //    {
-        //        var user = await loginService.CreateOrUpdateExternalUserAsync(authResult.Principal);
-
-        //        if (user == null)
-        //            return View("Error", "Email not received from Azure");
-
-        //        await _signInManager.SignInAsync(user, isPersistent: false);
-
-        //        return LocalRedirect(returnUrl);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "External login failed for user.");
-
-        //        return View("Error", new ErrorViewModel
-        //        {
-        //            Message = ex.Message,
-        //            RequestId = HttpContext.TraceIdentifier
-        //        });
-        //    }
-        //}
 
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            var user = await _signInManager.UserManager.GetUserAsync(User);
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(Login));
+
+            return RedirectToAction("Login", "Account", new { returnUrl = "/" });
         }
+
         [HttpGet]
         public async Task<IActionResult> ChangePassword(string email)
         {
