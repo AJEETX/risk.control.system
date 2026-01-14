@@ -1,0 +1,85 @@
+﻿@model OtpLoginModel
+@{
+    ViewData["Title"] = "Tool: icheckify";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>icheckify: Tool</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/css/jquery-ui.css">
+    <link rel="stylesheet" href="~/css/jquery-confirm.min.css">
+    <link rel="stylesheet" href="~/css/login.css">
+    <link rel="stylesheet" href="~/css/cookie.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="submit-progress hidden">
+        <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+    </div>
+    <div class="container">
+        <div class="cover">
+            <div class="front">
+                <img src="~/img/icheckify-cover.gif" alt="icheckify" />
+            </div>
+        </div>
+        <div class="forms">
+            <a target="_blank" href="https://hostedscan.com"><img id="hostedscan" src="~/img/hostedscan.png" alt="HostedScan" /></a>
+            <div class="form-content">
+
+                <div class="login-form">
+                    <img class="otp-logo" src="/img/iCheckifyLogo.png" alt="logo" />™️
+
+                    <div id="title" class="title" title="Enter your mobile to receive an OTP">
+                        Otp Login
+                        <sup class="fa fa-info-circle password-info-icon"></sup>
+                    </div>
+                    <form id="login-form" asp-controller="Tool" asp-action="Try" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="input-boxes">
+                            <div class="input-box">
+
+                                <div class="input-group-prepend">
+                                    <span class="form-group input-group mb-3 input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Flag">
+                                        <img id="country-flag" src="~/img/beachflag.png" class="flag-icon" data-bs-toggle="tooltip" alt="country flag" title="country flag" />
+                                    </span>
+                                </div>
+                                <input type="text" id="CountryIsdDisplay" title="Country ISD code" class="form-control remarks country-isdcode auto-dropdown" required placeholder="Country ISD code" autocomplete="off">
+                                <input type="hidden" id="ActualIsdValue" name="CountryIsd" asp-for="CountryIsd">
+                                <span asp-validation-for="CountryIsd" class="text-danger"></span>
+                                <div class="input-group-append-caret">
+                                    <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
+                                </div>
+                            </div>
+                            <div class="input-box">
+                                <i class="fa fa-mobile left-padd" aria-hidden="true"></i>
+                                <input id="MobileNumber" type="text" asp-for="MobileNumber" class="form-control remarks" placeholder="Mobile # e.g. 9823456789" maxlength="10" title="Mobile #" required />
+                                <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                            </div>
+                            <p class="account">By clicking <strong><span class="fa fa-key" aria-hidden="true"></span> Send OTP</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
+                            <div class="button input-box">
+                                <button id="otp" type="submit" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Send OTP</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <partial name="_TnC" />
+        </div>
+    </div>
+</body>
+<script src="~/js/jquery-3.7.1.js"></script>
+<script src="~/js/jquery-ui.js"></script>
+<script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+@{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+<script src="~/js/jqueryconfirm/dist/jquery-confirm.min.js"></script>
+<script src="~/js/otp.js"></script>
+    @await Component.InvokeAsync("Notyf")
+</html>

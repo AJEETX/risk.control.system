@@ -29,33 +29,34 @@
                 }
             },
             {
-                data: 'oldValues',
-                render: function (data) {
+                data: 'oldValues', // or newValues
+                render: function (data, type, row) {
+
                     if (!data) return '';
 
-                    // try parse JSON
                     let display = '';
+
                     try {
-                        let obj = JSON.parse(data);
-                        // convert to "key: value" pairs without {}
+                        const obj = typeof data === 'string' ? JSON.parse(data) : data;
+
                         display = Object.entries(obj)
                             .map(([k, v]) => `${k}: ${v}`)
                             .join(', ');
                     } catch {
-                        display = data;
+                        display = data.toString();
                     }
 
-                    let encoded = $('<div/>').text(display).html();
+                    const encoded = $('<div/>').text(display).html();
 
-                    return data.length > 50
-                        ? `<div title="${encoded}"><small>${data.substring(0, 50)}...</small></div>`
+                    return display.length > 50
+                        ? `<div title="${encoded}"><small>${encoded.substring(0, 50)}...</small></div>`
                         : `<small>${encoded}</small>`;
                 }
             },
             {
                 data: 'newValues',
                 render: function (data) {
-                    if (!data) return '';
+                    if (!data || data == undefined) return '';
 
                     // try parse JSON
                     let display = '';

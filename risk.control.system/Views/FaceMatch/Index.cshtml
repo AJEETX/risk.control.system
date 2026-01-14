@@ -1,0 +1,95 @@
+﻿@model FaceMatchData
+
+@{
+    ViewData["Title"] = "Face Match Tool";
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+}
+<section class="content tool-match-section">
+    <div id="article" class="card shadow-lg border-0 face-card">
+        <div class="card-header d-flex align-items-center tool-card-header">
+            <i class="fas fa-user-check mr-2 text-primary"></i>
+            <h5 class="mb-0 font-weight-bold">Face Match </h5>
+
+            <div class="ml-auto ms-auto">
+                <span id="usageBadge" class="badge usage-badge-custom shadow-sm @(Model.RemainingTries <= 1 ? "badge-soft-danger" : "badge-soft-primary")">
+                    <i class="fas @(Model.RemainingTries <= 1 ? "fa-exclamation-circle" : "fa-clock") mr-1 small"></i>
+                    <span id="remainingCount">@Model.RemainingTries</span> tries left
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+
+            <form id="faceMatchForm" enctype="multipart/form-data">
+                <div class="row align-items-center justify-content-center">
+
+                    <div class="col-md-5">
+                        <div class="upload-container text-center">
+                            <label class="upload-label" for="OriginalFaceImage"><span class="badge badge-primary rounded-circle mr-1">1</span> Source Photo</label>
+                            <div id="drop-zone-original" class="drop-zone d-flex flex-column align-items-center justify-content-center p-4">
+                                <input id="OriginalFaceImage" asp-for="OriginalFaceImage" type="file" class="d-none" accept="image/*" required />
+                                <img id="previewOriginal" src="/img/user.png" alt="Source" class="face-preview-image mb-3" />
+                                <p class="small text-primary font-weight-bold mb-0">Click to Upload</p>
+                                <small class="text-muted">ID Photo</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 d-flex justify-content-center my-4">
+                        <div class="vs-divider-circle rounded-circle">VS</div>
+                    </div>
+
+                    <div class="col-md-5">
+                        <div class="upload-container text-center">
+                            <label class="upload-label" for="MatchFaceImage"><span class="badge badge-primary rounded-circle mr-1">2</span>Target Photo</label>
+                            <div id="drop-zone-match" class="drop-zone d-flex flex-column align-items-center justify-content-center p-4">
+                                <input id="MatchFaceImage" asp-for="MatchFaceImage" type="file" class="d-none" accept="image/*" required />
+                                <img id="previewMatch" src="/img/user.png" alt="Target" class="face-preview-image mb-3" />
+                                <p class="small text-primary font-weight-bold mb-0">Click to Upload</p>
+                                <small class="text-muted">Live Selfie</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" id="btnSubmit"
+                            class="btn btn-outline-primary btn-lg w-100 shadow rounded-pill btn-analyze"
+                            @(Model.RemainingTries <= 0 ? "disabled" : "")>
+
+                        <span id="btnText">
+                            <i class="fas @(Model.RemainingTries <= 0 ? "fa-lock" : "fas fa-barcode") mr-2"></i>
+                            @(Model.RemainingTries <= 0 ? "Limit Reached" : "Run Face Match Analysis")
+                        </span>
+                        <span id="btnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
+                </div>
+            </form>
+
+            <div id="resultContainer" class="mt-5 d-none">
+                <div class="card border-0 result-display-card">
+                    <div class="card-body p-4 text-center">
+                        <h6 class="text-uppercase text-muted font-weight-bold mb-4">Verification Score</h6>
+                        <div id="resultStatus" class="mb-3"></div>
+
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <span id="matchPercentage" class="match-score-text">0%</span>
+                                <div class="progress rounded-pill mt-3 shadow-sm">
+                                    <div id="scoreBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/tool/facematch.js"></script>
+}

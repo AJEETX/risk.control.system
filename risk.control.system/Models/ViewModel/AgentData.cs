@@ -1,9 +1,12 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace risk.control.system.Models.ViewModel
 {
     public class AgentData
     {
         public long Id { get; set; }
         public string Photo { get; set; }
+        [EmailAddress]
         public string Email { get; set; }
         public string Name { get; set; }
         public string Phone { get; set; }

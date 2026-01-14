@@ -28,9 +28,9 @@ namespace risk.control.system.Controllers
     public class CompanyUserController : Controller
     {
         public List<UsersViewModel> UserList;
-        private readonly UserManager<ClientCompanyApplicationUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IFileStorageService fileStorageService;
-        private readonly IPasswordHasher<ClientCompanyApplicationUser> passwordHasher;
+        private readonly IPasswordHasher<ApplicationUser> passwordHasher;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
@@ -40,9 +40,9 @@ namespace risk.control.system.Controllers
         private readonly ILogger<CompanyUserController> logger;
         private string portal_base_url = string.Empty;
 
-        public CompanyUserController(UserManager<ClientCompanyApplicationUser> userManager,
+        public CompanyUserController(UserManager<ApplicationUser> userManager,
             IFileStorageService fileStorageService,
-            IPasswordHasher<ClientCompanyApplicationUser> passwordHasher,
+            IPasswordHasher<ApplicationUser> passwordHasher,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             ISmsService SmsService,
@@ -85,249 +85,20 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(long? id)
-        {
-            if (id == null || id <= 0)
-            {
-                notifyService.Error("OOPs !!!..User Not Found");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
-            var clientApplicationUser = await _context.ClientCompanyApplicationUser
-                .Include(v => v.Country)
-                .Include(v => v.District)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.ClientCompany)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (clientApplicationUser == null)
-            {
-                notifyService.Error("OOPs !!!..User Not Found");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
-            return View(clientApplicationUser);
-        }
-
-        // GET: ClientCompanyApplicationUser/Create
-        [Breadcrumb("Add New", FromAction = "Index")]
-        public async Task<IActionResult> Create(long id)
-        {
-            var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == id);
-            var model = new ClientCompanyApplicationUser { Country = company.Country, CountryId = company.CountryId, ClientCompany = company };
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-
-            var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
-            var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
-            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = id } };
-            var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Create", "CompanyUser", $"Add User") { Parent = createPage };
-            ViewData["BreadcrumbNode"] = editPage;
-
-            return View(model);
-        }
-
-        // POST: ClientCompanyApplicationUser/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClientCompanyApplicationUser user, string emailSuffix)
-        {
-            if (string.IsNullOrWhiteSpace(emailSuffix))
-            {
-                notifyService.Error("Email suffix is required!");
-                return View(user);
-            }
-            emailSuffix = WebUtility.HtmlEncode(emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture));
-            user.Email = WebUtility.HtmlEncode(user.Email?.Trim().ToLower(CultureInfo.InvariantCulture));
-
-            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
-            if (user.ProfileImage != null && user.ProfileImage.Length > 0)
-            {
-                var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
-                user.ProfilePictureUrl = relativePath;
-                user.ProfilePictureExtension = Path.GetExtension(fileName);
-            }
-            //DEMO
-            user.Active = true;
-            user.Password = Applicationsettings.TestingData;
-            user.Email = userFullEmail;
-            user.EmailConfirmed = true;
-            user.UserName = userFullEmail;
-            user.PhoneNumber = WebUtility.HtmlEncode(user.PhoneNumber.TrimStart('0'));
-            user.FirstName = WebUtility.HtmlEncode(user.FirstName);
-            user.LastName = WebUtility.HtmlEncode(user.LastName);
-            user.Addressline = WebUtility.HtmlEncode(user.Addressline);
-            user.PinCodeId = user.SelectedPincodeId;
-            user.DistrictId = user.SelectedDistrictId;
-            user.StateId = user.SelectedStateId;
-            user.CountryId = user.SelectedCountryId;
-
-            user.Updated = DateTime.Now;
-            user.UpdatedBy = HttpContext.User?.Identity?.Name;
-            user.Id = 0;
-            user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
-            IdentityResult result = await userManager.CreateAsync(user, user.Password);
-
-            if (result.Succeeded)
-            {
-                await userManager.AddToRoleAsync(user, user.UserRole.ToString());
-                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Company account created. \nDomain : " + user.Email + "\n" + portal_base_url);
-                notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-
-                return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
-            }
-            else
-            {
-                notifyService.Error("Error to create user!");
-                foreach (IdentityError error in result.Errors)
-                    ModelState.AddModelError("", error.Description);
-            }
-            //GetCountryStateEdit(user);
-            notifyService.Error($"Err User create.", 3);
-            return View(user);
-        }
-
-        // GET: ClientCompanyApplicationUser/Edit/5
-        [Breadcrumb("Edit ")]
-        public async Task<IActionResult> Edit(long? userId)
-        {
-            if (userId == null || userId <= 0)
-            {
-                notifyService.Error("Company not found");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
-            var user = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(v => v.Id == userId);
-            if (user == null)
-            {
-                notifyService.Error("Company not found");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
-            var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
-            var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
-            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = user.ClientCompany.ClientCompanyId } };
-            var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = user.ClientCompany.ClientCompanyId } };
-            var editPage = new MvcBreadcrumbNode("Edit", "CompanyUser", $"Edit User") { Parent = createPage };
-            ViewData["BreadcrumbNode"] = editPage;
-            user.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(nameof(FeatureFlags.FIRST_LOGIN_CONFIRMATION)) ? !user.IsPasswordChangeRequired : true;
-            return View(user);
-        }
-
-        // POST: ClientCompanyApplicationUser/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, ClientCompanyApplicationUser applicationUser)
-        {
-            try
-            {
-                var user = await userManager.FindByIdAsync(id.ToString());
-                if (user == null)
-                {
-                    notifyService.Error("user not found!");
-                    return NotFound();
-                }
-                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
-                {
-                    var domain = applicationUser.Email.Split('@')[1];
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, domain, "user");
-                    user.ProfilePictureUrl = relativePath;
-                    user.ProfilePictureExtension = Path.GetExtension(fileName);
-                }
-                user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
-                user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                user.FirstName = applicationUser?.FirstName;
-                user.LastName = applicationUser?.LastName;
-                if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                {
-                    user.Password = applicationUser.Password;
-                }
-                user.Addressline = applicationUser.Addressline;
-                user.Active = applicationUser.Active;
-                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
-                user.CountryId = applicationUser.SelectedCountryId;
-                user.StateId = applicationUser.SelectedStateId;
-                user.DistrictId = applicationUser.SelectedDistrictId;
-                user.PinCodeId = applicationUser.SelectedPincodeId;
-
-                user.Updated = DateTime.Now;
-                user.Comments = applicationUser.Comments;
-                user.UserRole = applicationUser.UserRole;
-                user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
-                user.PhoneNumber = applicationUser.PhoneNumber;
-                user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                user.SecurityStamp = DateTime.Now.ToString();
-                var result = await userManager.UpdateAsync(user);
-                if (!result.Succeeded)
-                {
-                    notifyService.Error("Error occurred.");
-                    return NotFound();
-                }
-                var roles = await userManager.GetRolesAsync(user);
-                var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                await userManager.AddToRoleAsync(user, user.UserRole.ToString());
-                notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
-                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Company account edited. \nDomain : " + user.Email + "\n" + portal_base_url);
-
-                return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred.");
-            }
-            notifyService.Error("OOPS !!!..Contact Admin");
-            return RedirectToAction(nameof(Index), "Dashboard");
-        }
-
-        // GET: VendorApplicationUsers/Delete/5
-        [Breadcrumb("Delete")]
-        public async Task<IActionResult> Delete(long? id)
-        {
-            if (id == null || id <= 0)
-            {
-                notifyService.Error("OOPs !!!..User Not Found");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
-            var vendorApplicationUser = await _context.VendorApplicationUser
-                .Include(v => v.Country)
-                .Include(v => v.District)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.Vendor)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (vendorApplicationUser == null)
-            {
-                notifyService.Error("OOPs !!!..User Not Found");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
-            return View(vendorApplicationUser);
-        }
-
-        // POST: VendorApplicationUsers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (id <= 0)
             {
-                return Problem("Entity set 'ApplicationDbContext.VendorApplicationUser'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.ApplicationUser'  is null.");
             }
-            var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(id);
+            var clientCompanyApplicationUser = await _context.ApplicationUser.FindAsync(id);
             if (clientCompanyApplicationUser != null)
             {
                 clientCompanyApplicationUser.Updated = DateTime.Now;
                 clientCompanyApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.ClientCompanyApplicationUser.Remove(clientCompanyApplicationUser);
+                _context.ApplicationUser.Remove(clientCompanyApplicationUser);
             }
 
             await _context.SaveChangesAsync();

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 using risk.control.system.AppConstant;
 
@@ -12,7 +13,10 @@ namespace risk.control.system.Models
         public bool IsPasswordChangeRequired { get; set; } = true;
         [FileExtensions(Extensions = "jpg,jpeg,png")]
         public string? ProfilePictureUrl { get; set; }
-
+        public int FaceMatchCount { get; set; } = 0;
+        public int OcrCount { get; set; } = 0;
+        public int PdfCount { get; set; } = 0;
+        public int DocumentAnalysisCount { get; set; } = 0;
         public bool IsSuperAdmin { get; set; } = false;
         public bool IsClientManager { get; set; } = false;
         public bool IsClientAdmin { get; set; } = false;
@@ -74,13 +78,21 @@ namespace risk.control.system.Models
         public string? MobileUId { get; set; }
 
         public AppRoles? Role { get; set; }
+
+        // ───── Business Ownership ─────
+        public long? ClientCompanyId { get; set; }
+        public ClientCompany? ClientCompany { get; set; }
+
+        public long? VendorId { get; set; }
+        public Vendor? Vendor { get; set; }
+
         public DateTime? LastActivityDate { get; set; }
         public bool HasClaims { get; set; } = false;
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
         public string? AddressMapLocation { get; set; }
         public bool IsUpdated { get; set; } = true;
-
+        public string? Comments { get; set; } = default!;
         [NotMapped]
         public long SelectedPincodeId { get; set; }
         [NotMapped]
@@ -89,6 +101,9 @@ namespace risk.control.system.Models
         public long SelectedStateId { get; set; }
         [NotMapped]
         public long SelectedCountryId { get; set; }
+
+        [NotMapped]
+        public List<SelectListItem> AvailableRoles { get; set; } = new List<SelectListItem>();
 
         public override string ToString()
         {
@@ -105,29 +120,14 @@ namespace risk.control.system.Models
                 $"- Updated By: {UpdatedBy}\n" +
                 $"- Active: {Active}\n" +
                 $"- Deleted: {Deleted}\n" +
-                $"- Role: {Role}\n" +
                 $"- Last Activity Date: {LastActivityDate}\n" +
                 $"- Has Claims: {HasClaims}";
         }
-
     }
 
     public class ApplicationRole : IdentityRole<long>
     {
-        public ApplicationRole()
-        {
-        }
-
-        public ApplicationRole(string code, string name)
-        {
-            Name = name;
-            Code = code;
-        }
-
         [StringLength(20)]
         public string Code { get; set; }
-
-        public long? ApplicationUserId { get; set; }
-        public ApplicationUser? ApplicationUser { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.ClientCompanyApplicationUser
+﻿@model risk.control.system.Models.ApplicationUser
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
@@ -43,40 +43,32 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="input-group-label"> Profile Photo:</label>
+                                        <label class="input-group-label" for="ProfileImage"> Profile Photo:</label>
                                         <div class="input-group mb-3">
-
-                                            @if (Model?.ProfilePictureUrl is not null)
-                                            {
-                                                <img id="ProfileImage" class="form-Image" src="/Document/GetCompanyUserDocument/@Model.Id">
-                                            }
-                                            else
-                                            {
-                                                <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_USER">
-                                            }
+                                            <img id="ProfileImage" class="form-Image" src="/Document/GetUserProfileImage/@Model.Id" alt="Profile">
 
                                             <i class="fa fa-asterisk asterik-style"></i>
                                             <input asp-for="ProfileImage" class="form-control remarks" type="file"  />
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="input-group-label"> First Name:</label>
+                                        <label class="input-group-label" for="FirstName"> First Name:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20" />
+                                            <input id="FirstName" type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20" />
                                             <span asp-validation-for="FirstName" class="text-danger"></span>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="input-group-label"> Last Name:</label>
+                                        <label class="input-group-label" for="LastName"> Last Name:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text" > <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
+                                            <input id="LastName" type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
                                             <span asp-validation-for="LastName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -89,7 +81,7 @@
                                                     var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                                                 }
                                                 <span class="input-group-text country-code-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                                                    <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                                                    <img src="@imgPath" class="flag-icon" data-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                                                 </span>
                                             </div>
                                             <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g. 9876543210)" data-bs-toggle="tooltip" />
@@ -97,15 +89,15 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="input-group-label"> Role:</label>
+                                        <label class="input-group-label" for="Role"> Role:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="Html.GetEnumSelectList<CompanyRole>()">
+                                            <select id="Role" required asp-for="@Model.Role" class="form-control remarks" asp-items="Html.GetEnumSelectList<AppRoles>()">
                                                 <option value="">--- SELECT ---</option>
                                             </select>
-                                            <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
+                                            <span asp-validation-for="@Model.Role" class="text-danger"></span>
                                         </div>
                                     </div>
                                     
@@ -114,25 +106,25 @@
                                     <partial name="_Address" model="@Model" />
 
                                     <div class="form-group">
-                                        <label class="input-group-label"> Address:</label>
+                                        <label class="input-group-label" for="Addressline"> Address:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control remarks" required placeholder="Street Address..." maxlength="70" />
+                                            <input id="Addressline" type="text" asp-for="Addressline" class="form-control remarks" required placeholder="Street Address..." maxlength="70" />
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="input-group-label"> Note:</label>
+                                        <label class="input-group-label" for="Comments"> Note:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
+                                                <span class="input-group-text" ><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="70" />
+                                            <input id="Comments" type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="70" />
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="input-group-label"> Status:</label>
+                                        <label class="input-group-label" for="Active"> Status:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -140,7 +132,7 @@
                                             <div class="input-group-prepend">
                                             </div>
                                             <span class="checkbox">
-                                                <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                <input id="Active" asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                             </span>
                                         </div>
                                     </div>

@@ -28,44 +28,51 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        <li class="nav-item dropdown top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Info">
-                <i class="fa fa-info-circle i-blue"></i>
+        <li class="nav-item dropdown info-dropdown-wrapper">
+            <a class="nav-link dropdown-toggle info-toggle-btn" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-info-circle"></i>
             </a>
 
-            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 info-dropdown">
+            <div class="dropdown-menu dropdown-menu-right custom-info-menu shadow-sm">
                 @{
-                    var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
+                    var img = "/flags/" + Model?.CountryCode?.ToLower() + ".png";
                 }
 
-                <!-- Country -->
-                <div class="dropdown-item d-flex align-items-center info-item">
-                    <img src="@img" class="flag-icon mr-2" />
-                    <span class="info-label">Country:</span>
-                    <span class="ml-auto font-weight-bold text-primary">@Model?.Country</span>
+                <div class="dropdown-item info-row">
+                    <div class="info-icon-wrapper">
+                        <img src="@img" class="flag-icon" alt="Flag" />
+                    </div>
+                    <div class="info-content">
+                        <small class="info-label">Country</small>
+                        <span class="info-value">@Model?.Country</span>
+                    </div>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
-                <!-- Currency -->
-                <div class="dropdown-item d-flex align-items-center info-item">
-                    <i class="fa fa-money mr-2 text-success"></i>
-                    <span class="info-label">Currency:</span>
-                    <span class="ml-auto font-weight-bold text-success">@Model?.CurrencyName</span>
+                <div class="dropdown-item info-row">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-money-bill-wave text-success"></i>
+                    </div>
+                    <div class="info-content">
+                        <small class="info-label">Currency</small>
+                        <span class="info-value">@Model?.CurrencyName</span>
+                    </div>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
-                <!-- ISD Code -->
-                <div class="dropdown-item d-flex align-items-center info-item">
-                    <i class="fa fa-phone mr-2 text-dangez"></i>
-                    <span class="info-label">ISD Code:</span>
-                    <span class="ml-auto font-weight-bold text-dangez">@Model?.IsdCode</span>
+                <div class="dropdown-item info-row">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-phone-alt text-primary"></i>
+                    </div>
+                    <div class="info-content">
+                        <small class="info-label">ISD Code</small>
+                        <span class="info-value">@Model?.IsdCode</span>
+                    </div>
                 </div>
             </div>
         </li>
-
-
 
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown top-nav-logout-border">
@@ -93,17 +100,19 @@
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 settings-dropdown">
                 <!-- Profile Section -->
                 <div class="text-center profile-section">
-                    <img src="/Document/GetUserImage?email=@Model.Email"
+                    <img src="/Document/GetUserProfileImage/@Model.UserId"
                          class="rounded-circle shadow-sm border sidebar-profile"
                          alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                     <p class="text-muted user-email">@Model.Email</p>
-                </div>
 
                 <!-- Logout Link -->
-                <a class="dropdown-item d-flex align-items-center text-danger font-weight-bold btn-outline-danger"
-                   href="#" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                </a>
+                <div class="text-center profile-inner-section">
+                        <a class="font-weight-bold btn btn-sm btn-outline-danger"
+                       href="#" data-toggle="modal" data-target="#logoutModal">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </a>
+                </div>
+                </div>
             </div>
         </li>
 

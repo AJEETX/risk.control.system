@@ -1,7 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,14 +21,10 @@ namespace risk.control.system.Controllers
         private readonly ILoginService loginService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IConfiguration config;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly INotificationService service;
         private readonly IAccountService accountService;
         private readonly ILogger<AccountController> _logger;
         private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
-        private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
         private readonly string BaseUrl;
 
@@ -37,29 +33,22 @@ namespace risk.control.system.Controllers
             ILoginService loginService,
             IWebHostEnvironment webHostEnvironment,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration config,
              IHttpContextAccessor httpContextAccessor,
-            INotificationService service,
             IAccountService accountService,
             ILogger<AccountController> logger,
             IFeatureManager featureManager,
             INotyfService notifyService,
-            ISmsService SmsService,
             ApplicationDbContext context)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
             this.loginService = loginService;
             this.webHostEnvironment = webHostEnvironment;
             _signInManager = signInManager ?? throw new ArgumentNullException();
-            this.config = config;
-            this.httpContextAccessor = httpContextAccessor;
-            this.service = service;
             this.accountService = accountService;
             this._context = context;
             _logger = logger;
             this.featureManager = featureManager;
             this.notifyService = notifyService;
-            smsService = SmsService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -116,26 +105,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> KeepAlive()
-        {
-            if (ModelState.IsValid == false)
-            {
-                return BadRequest(new { message = "Invalid request." });
-            }
-            var userId = _userManager.GetUserId(User);
-            if (userId != null)
-            {
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user != null)
-                {
-                    user.LastActivityDate = DateTime.UtcNow;
-                    await _userManager.UpdateAsync(user);
-                }
-            }
-            return Ok();
-        }
         [HttpGet]
         public async Task StreamTypingUpdates(string email, CancellationToken cancellationToken)
         {
@@ -152,13 +121,13 @@ namespace risk.control.system.Controllers
             }
 
             // Send user details first
-            var passwordModelJson = System.Text.Json.JsonSerializer.Serialize(new
+            var credentialModelJson = System.Text.Json.JsonSerializer.Serialize(new
             {
                 email = user.Email,
                 currentPassword = user.Password
             });
 
-            await Response.WriteAsync($"data: PASSWORD_UPDATE|{passwordModelJson}\n");
+            await Response.WriteAsync($"data: CREDENTIAL|{credentialModelJson}\n");
             await Response.Body.FlushAsync(cancellationToken);
             await Task.Delay(1000, cancellationToken); // Small delay to ensure UI updates first
 
@@ -166,8 +135,8 @@ namespace risk.control.system.Controllers
             var messages = new List<string>
             {
                 $"Welcome ! {user.Email} First time user.",
-                "Please update password to continue.",
-                "Remember password for later."
+                "Please update credential to continue.",
+                "Remember credential for later."
             };
 
             foreach (var message in messages)
@@ -184,14 +153,10 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null)
+        public async Task<IActionResult> Login()
         {
-            var timer = DateTime.Now;
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await _signInManager.SignOutAsync();
             var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
-            return View(new LoginViewModel { SetPassword = setPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN), ReturnUrl = returnUrl });
+            return View(new LoginViewModel { SetPassword = setPassword });
         }
 
         [HttpPost]
@@ -226,18 +191,58 @@ namespace risk.control.system.Controllers
 
             notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
 
-            return Url.IsLocalUrl(model.ReturnUrl) ? Redirect(model.ReturnUrl) : RedirectToAction("Index", "Dashboard");
+            return RedirectToAction("Index", "Dashboard");
         }
-
-        private async Task<IActionResult> PrepareInvalidView(LoginViewModel model, string error)
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AzureLogin(string returnUrl = "/")
         {
-            model.LoginError = error;
-            ModelState.AddModelError(string.Empty, error);
-            model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            ViewData["Users"] = await loginService.GetUserSelectListAsync();
-            return View(model);
+            return Challenge(
+                new AuthenticationProperties { RedirectUri = returnUrl },
+                OpenIdConnectDefaults.AuthenticationScheme);
         }
+        //[HttpGet]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/")
+        //{
+        //    var authResult = await HttpContext.AuthenticateAsync(OpenIdConnectDefaults.AuthenticationScheme);
 
+        //    if (!authResult.Succeeded || authResult.Principal == null)
+        //    {
+        //        return RedirectToAction(nameof(Login));
+        //    }
+
+        //    try
+        //    {
+        //        var user = await loginService.CreateOrUpdateExternalUserAsync(authResult.Principal);
+
+        //        if (user == null)
+        //            return View("Error", "Email not received from Azure");
+
+        //        await _signInManager.SignInAsync(user, isPersistent: false);
+
+        //        return LocalRedirect(returnUrl);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "External login failed for user.");
+
+        //        return View("Error", new ErrorViewModel
+        //        {
+        //            Message = ex.Message,
+        //            RequestId = HttpContext.TraceIdentifier
+        //        });
+        //    }
+        //}
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out.");
+            return RedirectToAction(nameof(Login));
+        }
         [HttpGet]
         public async Task<IActionResult> ChangePassword(string email)
         {
@@ -251,7 +256,8 @@ namespace risk.control.system.Controllers
             }
             var model = new ChangePasswordViewModel
             {
-                Email = user.Email
+                Email = user.Email,
+                Id = user.Id
             };
             return View(model);
         }
@@ -302,24 +308,44 @@ namespace risk.control.system.Controllers
                 model = await CreateDefaultForgotPasswordModel(input?.Email);
                 return View(model);
             }
-            var smsResult = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
-
-            if (smsResult == null)
+            try
             {
-                model = await CreateDefaultForgotPasswordModel(input?.Email);
-                return View(model);
+                var smsResult = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
+
+                if (smsResult == null)
+                {
+                    model = await CreateDefaultForgotPasswordModel(input?.Email);
+                    return View(model);
+                }
+                var successModel = new ForgotPassword
+                {
+                    Id = smsResult.Id,
+                    Email = input.Email,
+                    Message = $"{input.CountryId} (0) {input.Mobile}",
+                    Flag = $"/flags/{smsResult.CountryCode}.png",
+                    ProfilePicture = smsResult.ProfilePicture,
+                    Reset = true,
+                    ProfileImage = smsResult.ProfileImage
+                };
+
+                return View(successModel);
             }
-            var successModel = new ForgotPassword
+            catch (Exception ex)
             {
-                Email = input.Email,
-                Message = $"{input.CountryId} (0) {input.Mobile}",
-                Flag = $"/flags/{smsResult.CountryCode}.png",
-                ProfilePicture = smsResult.ProfilePicture,
-                Reset = true
-            };
-
-            return View(successModel);
+                _logger.LogError(ex, "Error in Forgot Password");
+                throw;
+            }
+            
         }
+        private async Task<IActionResult> PrepareInvalidView(LoginViewModel model, string error)
+        {
+            model.LoginError = error;
+            ModelState.AddModelError(string.Empty, error);
+            model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            ViewData["Users"] = await loginService.GetUserSelectListAsync();
+            return View(model);
+        }
+
         private async Task<ForgotPassword> CreateDefaultForgotPasswordModel(string email)
         {
             var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
@@ -339,24 +365,6 @@ namespace risk.control.system.Controllers
                 ProfilePicture = profilePicture,
                 Email = email
             };
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Logout()
-        {
-            var user = await _signInManager.UserManager.GetUserAsync(User);
-            var userSessionAlive = new UserSessionAlive
-            {
-                Updated = DateTime.Now,
-                ActiveUser = user,
-                CurrentPage = "Logging-Out",
-                LoggedOut = true
-            };
-            _context.UserSessionAlive.Add(userSessionAlive);
-            await _context.SaveChangesAsync(null, false);
-            await _signInManager.SignOutAsync();
-            _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(AccountController.Login), "Account");
         }
     }
 }

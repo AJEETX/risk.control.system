@@ -13,7 +13,7 @@ namespace risk.control.system.Services
 {
     public interface IBeneficiaryCreationService
     {
-        Task<(BeneficiaryDetail, List<UploadError>, List<string>)> AddBeneficiary(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data);
+        Task<(BeneficiaryDetail, List<UploadError>, List<string>)> AddBeneficiary(ApplicationUser companyUser, UploadCase uploadCase, byte[] data);
     }
     internal class BeneficiaryCreationService : IBeneficiaryCreationService
     {
@@ -42,7 +42,7 @@ namespace risk.control.system.Services
             this.logger = logger;
         }
 
-        public async Task<(BeneficiaryDetail, List<UploadError>, List<string>)> AddBeneficiary(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
+        public async Task<(BeneficiaryDetail, List<UploadError>, List<string>)> AddBeneficiary(ApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
             var errors = new List<UploadError>();
             var errorBeneficiary = new List<string>();

@@ -1,10 +1,12 @@
-﻿using Gehtsoft.PDFFlow.Builder;
+﻿using System.Globalization;
+
+using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Models.Shared;
 using Gehtsoft.PDFFlow.UserUtils;
 using Gehtsoft.PDFFlow.Utils;
+
 using risk.control.system.Models.ViewModel;
-using System.Globalization;
 
 namespace risk.control.system.Helpers
 {
@@ -75,7 +77,7 @@ namespace risk.control.system.Helpers
                 .AddColumnPercentToTable("", 25).AddColumnPercent("", 75);
             var rowBuilder = tableBuilder.AddRow();
             var cellBuilder = rowBuilder.AddCell();
-            cellBuilder.AddImage(Path.Combine(imgPath, "images", "sbil.png"),
+            cellBuilder.AddImage(Path.Combine(imgPath, "img", "sbil.png"),
                 XSize.FromHeight(80));
             cellBuilder = rowBuilder.AddCell()
                 .SetVerticalAlignment(VerticalAlignment.Center)

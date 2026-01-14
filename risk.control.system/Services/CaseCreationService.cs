@@ -5,7 +5,7 @@ namespace risk.control.system.Services
 {
     public interface ICaseCreationService
     {
-        Task<UploadResult> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] model, ORIGIN fileOrFTP);
+        Task<UploadResult> FileUpload(ApplicationUser companyUser, UploadCase uploadCase, byte[] model, ORIGIN fileOrFTP);
     }
     internal class CaseCreationService : ICaseCreationService
     {
@@ -19,7 +19,7 @@ namespace risk.control.system.Services
             this.logger = logger;
         }
 
-        public async Task<UploadResult> FileUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] model, ORIGIN fileOrFTP)
+        public async Task<UploadResult> FileUpload(ApplicationUser companyUser, UploadCase uploadCase, byte[] model, ORIGIN fileOrFTP)
         {
             try
             {

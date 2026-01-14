@@ -6,14 +6,15 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
     public interface IManagerService
     {
         Task<object> GetActiveCases(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
-        Task<List<ClaimsInvestigationResponse>> GetApprovedCases(string userEmail);
-        Task<List<ClaimsInvestigationResponse>> GetRejectedCases(string userEmail);
+        Task<List<CaseInvestigationResponse>> GetApprovedCases(string userEmail);
+        Task<List<CaseInvestigationResponse>> GetRejectedCases(string userEmail);
     }
     internal class ManagerService : IManagerService
     {
@@ -27,7 +28,7 @@ namespace risk.control.system.Services
         }
         public async Task<object> GetActiveCases(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.ClientCompany)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
@@ -279,7 +280,7 @@ namespace risk.control.system.Services
             }
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                var vendor = context.VendorApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
+                var vendor = context.ApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
                 if (vendor != null && !string.IsNullOrWhiteSpace(vendor.ProfilePictureUrl))
                 {
                     var vendorImagePath = Path.Combine(env.ContentRootPath, vendor.ProfilePictureUrl);
@@ -334,10 +335,10 @@ namespace risk.control.system.Services
             return string.Empty;
         }
 
-        public async Task<List<ClaimsInvestigationResponse>> GetApprovedCases(string userEmail)
+        public async Task<List<CaseInvestigationResponse>> GetApprovedCases(string userEmail)
         {
 
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(u => u.Email == userEmail);
 
@@ -371,7 +372,7 @@ namespace risk.control.system.Services
                             (i.SubStatus == approvedStatus) &&
                             i.Status == finishStatus).ToListAsync();
 
-            var response = claims.Select(a => new ClaimsInvestigationResponse
+            var response = claims.Select(a => new CaseInvestigationResponse
             {
                 Id = a.Id,
                 AutoAllocated = a.IsAutoAllocated,
@@ -456,9 +457,9 @@ namespace risk.control.system.Services
             return canDownload;
         }
 
-        public async Task<List<ClaimsInvestigationResponse>> GetRejectedCases(string userEmail)
+        public async Task<List<CaseInvestigationResponse>> GetRejectedCases(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
@@ -490,7 +491,7 @@ namespace risk.control.system.Services
                             (i.SubStatus == rejectedStatus) &&
                             i.Status == finishStatus).ToListAsync();
 
-            var response = claims.Select(a => new ClaimsInvestigationResponse
+            var response = claims.Select(a => new CaseInvestigationResponse
             {
                 Id = a.Id,
                 AutoAllocated = a.IsAutoAllocated,

@@ -59,26 +59,26 @@ namespace risk.control.system.Middleware
                         context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                         return;
                     }
-                    var adminUser = userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString());
+                    var adminUser = userRole.Value.Contains(PORTAL_ADMIN.DISPLAY_NAME);
                     if (!adminUser)
                     {
-                        var isCompanyUser = userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()) ||
-                                                userRole.Value.Contains(AppRoles.CREATOR.ToString()) ||
-                                                userRole.Value.Contains(AppRoles.MANAGER.ToString()) ||
-                                                userRole.Value.Contains(AppRoles.ASSESSOR.ToString());
+                        var isCompanyUser = userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME) ||
+                                                userRole.Value.Contains(CREATOR.DISPLAY_NAME) ||
+                                                userRole.Value.Contains(MANAGER.DISPLAY_NAME) ||
+                                                userRole.Value.Contains(ASSESSOR.DISPLAY_NAME);
 
-                        var isAgencyUser = userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString())
-                                                || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()) ||
-                                                userRole.Value.Contains(AppRoles.AGENT.ToString());
+                        var isAgencyUser = userRole.Value.Contains(AGENCY_ADMIN.DISPLAY_NAME)
+                                                || userRole.Value.Contains(SUPERVISOR.DISPLAY_NAME) ||
+                                                userRole.Value.Contains(AGENT.DISPLAY_NAME);
                         if (isCompanyUser)
                         {
-                            var companyUser = await dbContext.ClientCompanyApplicationUser.FirstOrDefaultAsync(u => u.Email == user);
+                            var companyUser = await dbContext.ApplicationUser.FirstOrDefaultAsync(u => u.Email == user && u.ClientCompanyId > 0);
                             var company = await dbContext.ClientCompany.FirstOrDefaultAsync(c => companyUser.ClientCompanyId == c.ClientCompanyId);
 
                             if (company == null)
                             {
                                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                                context.Response.Redirect("/page/oops.html");
+                                context.Response.Redirect("/page/error.html");
                                 return;
                             }
                             if (company.LicenseType == LicenseType.Trial && company.ExpiryDate.HasValue && DateTime.Now.Subtract(company.ExpiryDate.Value).Ticks > 0)

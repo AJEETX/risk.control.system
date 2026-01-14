@@ -28,13 +28,23 @@ namespace risk.control.system.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.Request.Path.StartsWithSegments("/css") || context.Request.Path.StartsWithSegments("/js") || context.Request.Path.StartsWithSegments("/images"))
+            // 🔴 FIRST: Completely bypass Azure AD endpoints
+            if (context.Request.Path.StartsWithSegments("/signin-oidc") ||
+                context.Request.Path.StartsWithSegments("/Account/AzureLogin"))
             {
-                context.Response.Headers["Cache-Control"] = "public,max-age=2592000"; // 30 days
+                await _next(context);
+                return;
+            }
+
+            // Static files caching
+            if (context.Request.Path.StartsWithSegments("/css") ||
+                context.Request.Path.StartsWithSegments("/js") ||
+                context.Request.Path.StartsWithSegments("/img"))
+            {
+                context.Response.Headers["Cache-Control"] = "public,max-age=2592000";
             }
             else
             {
-                // Sensitive pages / API
                 context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate";
                 context.Response.Headers["Pragma"] = "no-cache";
                 context.Response.Headers["Expires"] = "0";
@@ -48,62 +58,60 @@ namespace risk.control.system.Middleware
             context.Response.Headers.Remove("X-Generator");
             context.Response.Headers.Remove("Server");
 
-            // Security Headers
+            // Security headers
             context.Response.Headers["X-Frame-Options"] = "DENY";
             context.Response.Headers["X-Permitted-Cross-Domain-Policies"] = "none";
             context.Response.Headers["X-Xss-Protection"] = "1; mode=block";
             context.Response.Headers["X-Content-Type-Options"] = "nosniff";
             context.Response.Headers["Referrer-Policy"] = "no-referrer";
-
-            // Browser isolation protection (fixes Spectre + Fetch warnings)
-            //context.Response.Headers["Cross-Origin-Opener-Policy"] = "same-origin";
-            //context.Response.Headers["Cross-Origin-Embedder-Policy"] = "require-corp";
-
-            // Permissions Policy
             context.Response.Headers["Permissions-Policy"] = "geolocation=(self)";
-            var nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-            context.Items["CSP-Nonce"] = nonce;
-            // ---- FIXED CSP (no wildcards, no trailing slashes) ----
+
+            // CSP (SAFE)
             context.Response.Headers["Content-Security-Policy"] =
                 "default-src 'self';" +
-                "connect-src 'self' https://maps.googleapis.com https://ifsc.razorpay.com;" +
-                $"script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
-                //$"script-src 'self' 'nonce-{nonce}' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
+                "connect-src 'self' https://maps.googleapis.com https://ifsc.razorpay.com https://login.microsoftonline.com/*;" +
+                "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
                 "style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com;" +
                 "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com;" +
                 "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com;" +
-                "frame-src 'none';" +
+                "frame-src 'self' https://login.microsoftonline.com/*;" +
                 "media-src 'self' data:;" +
                 "object-src 'none';" +
-                "form-action 'self';" +
+                "form-action 'self' https://login.microsoftonline.com/*;" +
                 "frame-ancestors 'none';" +
                 "upgrade-insecure-requests;";
+
             try
             {
+                // Swagger bypass
                 if (context.Request.Path.StartsWithSegments("/swagger"))
                 {
                     await _next(context);
                     return;
                 }
-                var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-                var token = ExtractJwtToken(context);
-                var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
 
-                if (!string.IsNullOrEmpty(token) && !(await tokenService.ValidateJwtToken(dbContext, context, token)))
+                // JWT validation (API only)
+                var token = ExtractJwtToken(context);
+                if (!string.IsNullOrEmpty(token))
                 {
-                    _logger.LogWarning("Invalid JWT token.");
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await context.Response.WriteAsync("Invalid or expired JWT token.");
-                    return;
+                    var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
+                    if (!await tokenService.ValidateJwtToken(dbContext, context, token))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        await context.Response.WriteAsync("Invalid or expired JWT token.");
+                        return;
+                    }
                 }
-                await _next(context).ConfigureAwait(false);
+
+                await _next(context);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred.");
-                return;
+                _logger.LogError(ex, "SecurityMiddleware error");
+                throw;
             }
         }
+
         private string ExtractJwtToken(HttpContext context)
         {
             var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();

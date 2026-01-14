@@ -1,0 +1,105 @@
+﻿@model OtpLoginModel
+@{
+    ViewData["Title"] = "Verify otp";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>icheckify: OTP login</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/css/jquery-ui.css">
+    <link rel="stylesheet" href="~/css/jquery-confirm.min.css">
+    <link rel="stylesheet" href="~/css/login.css">
+    <link rel="stylesheet" href="~/css/cookie.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="submit-progress hidden">
+        <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+    </div>
+    <div class="container">
+        <div class="cover">
+            <div class="front">
+                <img src="~/img/icheckify-cover.gif" alt="icheckify" />
+            </div>
+        </div>
+        <div class="forms">
+            <a target="_blank" href="https://hostedscan.com"><img id="hostedscan" src="https://hostedscan.com/hostedscan-badge-light.svg" alt="HostedScan" /></a>
+            <div class="form-content">
+
+                <div class="login-form">
+                    <img class="otp-logo" src="/img/iCheckifyLogo.png" alt="logo" />™️
+
+                    <div id="title" class="title" title="Enter OTP">
+                        Verify OTP
+                        <sup class="fa fa-info-circle password-info-icon"></sup>
+                    </div>
+                    <div class="error-message">Code sent to <strong>@Model.CountryIsd @Model.MobileNumber</strong></div>
+
+                    <form id="login-form" asp-action="VerifyOtp" asp-controller="Tool" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="input-boxes">
+                            <input type="hidden" name="MobileNumber" value="@Model.MobileNumber" />
+                            <input type="hidden" name="CountryIsd" value="@Model.CountryIsd" />
+                            <input type="hidden" id="UserEnteredOtp" name="UserEnteredOtp" required />
+
+                            <div class="otp-container">
+                                <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
+                                <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
+                                <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
+                                <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
+                            </div>
+
+                            <div class="button input-box">
+                                <button id="login" type="submit" class="btn btn-success btn-block" disabled>
+                                    <span class="fa fa-key" aria-hidden="true"></span> Login
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="error-message">
+
+                        @if (Model?.LoginError != null)
+                        {
+                            <p class="account">
+                                <a class="error"> @Model?.LoginError</a>
+                            </p>
+                        }
+                        else
+                        {
+                            <div id="resendSection" class="account">
+                                <p id="resendStatus" class="text-muted small">
+                                    Didn't get the code? <button id="resendBtn" type="button" class="btn btn-warning btn-block" disabled>
+                                        Resend in <span id="timer">30</span>s
+                                    </button>
+                                </p>
+                            </div>
+                        }
+                        
+                    </div>
+                    <div class="error-message try-again">
+                        <div class="text-muted text-sm">
+                            Try Again <span class="far fa-hand-point-right"></span>
+                            <a asp-action="Try" asp-controller="Tool" class="login-link"> Click Here</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="~/js/jquery-3.7.1.js"></script>
+<script src="~/js/jquery-ui.js"></script>
+<script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+@{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+<script src="~/js/jqueryconfirm/dist/jquery-confirm.min.js"></script>
+<script src="~/js/otp.js"></script>
+    @await Component.InvokeAsync("Notyf")
+</html>

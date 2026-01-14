@@ -22,23 +22,17 @@
 
         //WEBSITE SETTINGS
 
-        public const string WEBSITE_SITE_MENU_BRAND = "aby";
-        public const string WEBSITE_COMPANY_MENU_BRAND = "iCheckify";
-        public const string WEBSITE_TITLE = "iCheckify";
         public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
-        public const string WEBSITE_SITE_DESIGNER = "its aby";
         public static readonly string FTP_SITE = "ftp://ftp.drivehq.com/holosync/";
         public static readonly string FTP_SITE_LOG = "its.aby@email.com";
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
         public static readonly string REVERRSE_GEOCODING = "f2a54c0ec9ba4dfdbd450116509c6313";
 
-        public static readonly string DEFAULT_POLICY_IMAGE = "policy-design.png";
         public static readonly string NO_POLICY_IMAGE = "/img/no-policy.jpg";
         public static readonly string POLICY_BLANK_IMAGE = "/img/blank-document.png";
-        public static readonly string NO_PHOTO_IMAGE = "/img/no-photo.png";
         public static readonly string NO_AUDIO = "/img/no-audio.png";
         public static readonly string NO_VIDEO = "/img/no-video.png";
-        public static readonly string MARKER_FLAG = "/images/beachflag.png";
+        public static readonly string MARKER_FLAG = "/img/beachflag.png";
 
         public const string ALL_DISTRICT = "All Districts";
         public const string ALL_DISTRICT_CODE = "-1";
@@ -46,34 +40,18 @@
         public const string ALL_PINCODE = "All PinCodes";
         public const string ALL_PINCODE_CODE = "-1";
 
-        //LOGIN
-        public const string WEBSITE_LOGIN = "Log in: iCheckify";
-
-        public const string WEBSITE_SIGNIN = "Sign in";
-
-        // BUTTONS / ACTIONS
-
         public const string BACK = "Back";
         public const string CANCEL = "Cancel";
-        public const string RESET = "Reset";
-        public const string APPROVE = "Approve";
-        public const string SEARCH = "Search";
         public const string CREATE = "Add";
         public const string EDIT = "Edit";
         public const string DELETE = "Delete";
         public const string ALLOCATE = "Allocate";
         public const string VIEW = "View";
         public const string DETAILS = "Details";
-        public const string VERIFY_LOCATIONS = "Locations to verify";
 
         // LABELS / ACTIONS
         public const string CLIENT_COMPANIY_PROFILE = "Company Profile";
 
-        public const string CLIENT_COMPANIES = "Company";
-        public const string CLIENT_COMPANY = "Company";
-        public const string COUNTRY = "Country";
-        public const string DISTRICT = "District";
-        public const string CASE_STATUS = "Case status";
         public const string SERVICE = "Service";
         public const string SERVICES = "Services";
         public const string VERIFY_LOCATION = "Verify location";
@@ -98,7 +76,6 @@
         public const string EMPANELLED_VENDORS = "Empanelled Agency";
         public const string DEPANELLED_VENDORS = "Depanelled Agency";
         public const string MANAGE_VENDOR = "Manage Agency";
-        public const string MANAGE_CLIENT_COMPANY = "Manage client company";
         public const string CASE_PROFILE = "Case Profile";
         public const string VERIFICTION_LOCATIONS = "Locations to verify";
         public const string EMPANEL = "Go to Empanel Vendors";
@@ -109,15 +86,6 @@
         public const string SUBMIT_REPORT = "Submit Report";
         public const string CREATE_SELECTED_CASES = "Create selected cases";
 
-        public const string MANAGE_COMPANY_VENDOR = "Manage company Agency";
-        public const string MANAGE_VENDOR_PROFILE = "Manage Agency Profile";
-        public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Allocate to Agency";
-        public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "ALLOCATE";
-        public const string SELECT_CASE_INVESTIGATE = "Investigate";
-        public const string SELECT_CASE_REPORT = "Verify report";
-        public const string SUBMIT_CASE_INVESTIGATE = "Submit";
-        public const string SUBMIT_CASE_TO_COMPANY = "Submit to company";
-        public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Assign to agent";
         public const string AGENTS = "Agents";
         public const string SELECT_CASE_TO_START = "Select Claim case to Verify";
         public const string AVAILABLE_VENDORS = "Available Agency";
@@ -240,128 +208,5 @@
         public const string NO_MAP = "/img/no-map.jpeg";
         public const string MAP_MARKER = "/img/map-marker-icon.png";
 
-        public static class PORTAL_ADMIN
-        {
-            public const string DISPLAY_NAME = "PORTAL_ADMIN";
-            public const string CODE = "admin";
-            public const string USERNAME = "admin@icheckify.co.in";
-            public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Simmy";
-            public const string LAST_NAME = "Collins";
-            public const string PROFILE_IMAGE = "/img/portal-admin.jpeg";
-        }
-
-        public static class COMPANY_ADMIN
-        {
-            public const string DISPLAY_NAME = "COMPANY_ADMIN";
-            public const string CODE = "admin";
-            public const string FIRST_NAME = "Andy";
-            public const string LAST_NAME = "Murrey";
-            public const string PROFILE_IMAGE = "/img/company-admin.jpeg";
-        }
-
-        public static class CREATOR
-        {
-            public const string DISPLAY_NAME = "CREATOR";
-            public const string CODE = "creator";
-            public const string USERNAME = "creator@" + CANARADOMAIN;
-            public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Creaty";
-            public const string LAST_NAME = "Cremorne";
-            public const string PROFILE_IMAGE = "/img/creator.jpeg";
-        }
-
-        public static class ASSIGNER
-        {
-            public const string DISPLAY_NAME = "ASSIGNER";
-            public const string CODE = "assigner";
-            public const string USERNAME = "assigner@" + CANARADOMAIN;
-            public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Jesse";
-            public const string LAST_NAME = "Trantor";
-            public const string PROFILE_IMAGE = "/img/assigner.jpeg";
-        }
-
-        public static class ASSESSOR
-        {
-            public const string DISPLAY_NAME = "ASSESSOR";
-            public const string CODE = "assessor";
-            public const string USERNAME = "assessor@" + CANARADOMAIN;
-            public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Assessy";
-            public const string LAST_NAME = "Patrick";
-            public const string PROFILE_IMAGE = "/img/assessor.jpeg";
-        }
-
-        public static class MANAGER
-        {
-            public const string DISPLAY_NAME = "MANAGER";
-            public const string CODE = "manager";
-            public const string USERNAME = "manager@" + CANARADOMAIN;
-            public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Peter";
-            public const string LAST_NAME = "Mathew";
-            public const string PROFILE_IMAGE = "/img/assigner.jpeg";
-        }
-
-        public static class AGENCY_ADMIN
-        {
-            public const string DISPLAY_NAME = "AGENCY_ADMIN";
-            public const string CODE = "admin";
-            public const string USERNAME = "admin";
-            public const string FIRST_NAME = "Mathew";
-            public const string LAST_NAME = "George";
-            public const string PROFILE_IMAGE = "/img/agency-admin.jpeg";
-        }
-
-        public static class SUPERVISOR
-        {
-            public const string DISPLAY_NAME = "SUPERVISOR";
-            public const string CODE = "supervisor";
-            public const string USERNAME = "supervisor";
-            public const string FIRST_NAME = "Adam";
-            public const string LAST_NAME = "Victor";
-            public const string PROFILE_IMAGE = "/img/supervisor.jpeg";
-        }
-
-        public static class AGENT
-        {
-            public const string DISPLAY_NAME = "AGENT";
-            public const string CODE = "agent";
-            public const string USERNAME = "agent";
-            public const string FIRST_NAME = "Denny";
-            public const string LAST_NAME = "Travolta";
-            public const string PROFILE_IMAGE = "/img/agent.jpeg";
-        }
-
-        public static class AGENTZ
-        {
-            public const string DISPLAY_NAME = "AGENT";
-            public const string CODE = "agentz";
-            public const string USERNAME = "agentz";
-            public const string FIRST_NAME = "Zenny";
-            public const string LAST_NAME = "Tobbs";
-            public const string PROFILE_IMAGE = "/img/assigner.jpeg";
-        }
-
-        public static class AGENTX
-        {
-            public const string DISPLAY_NAME = "AGENT";
-            public const string CODE = "agentx";
-            public const string USERNAME = "agentx";
-            public const string FIRST_NAME = "Xavier";
-            public const string LAST_NAME = "Piccasso";
-            public const string PROFILE_IMAGE = "/img/creator.jpeg";
-        }
-
-        public static class AGENTY
-        {
-            public const string DISPLAY_NAME = "AGENT";
-            public const string CODE = "agenty";
-            public const string USERNAME = "agenty";
-            public const string FIRST_NAME = "Jason";
-            public const string LAST_NAME = "Trantor";
-            public const string PROFILE_IMAGE = "/img/company-admin.jpeg";
-        }
     }
 }

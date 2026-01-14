@@ -27,25 +27,15 @@
         <input type="checkbox" id="flip">
         <div class="cover">
             <div class="front">
-                <img src="~/images/front.gif" alt="verify">
-                @* <div class="text">
-                    <span class="text-2">Simple verification process</span>
-                </div> *@
+                <img src="~/img/front.gif" alt="verify">
             </div>
-            @* <div class="back">
-                <img class="backImg" src="~/images/investigation.png" alt="verify">
-                <div class="text">
-                    <span class="text-1">Complete miles of journey <br> with one step</span>
-                    <span class="text-2">Let's get started</span>
-                </div>
-            </div> *@
         </div>
         <div class="forms">
             <a href="https://hostedscan.com"><img id="hostedscan" src="https://hostedscan.com/hostedscan-badge-light.svg" alt="HostedScan | An automated vulnerability scanner" /></a>
 
             <div class="form-content">
                 <div class="login-form">
-                    <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
+                    <img class="login-logo" src="/img/iCheckifyLogo.png" alt="logo"/>™️
                     
                     <div class="title">Login</div>
                     @Html.AntiForgeryToken()
@@ -79,7 +69,7 @@
                     <div id="ipAddress" class="info-item"><span class="info-title">IP Address: </span><a href="/page/ip.html"> <span class="info-data">Loading...</span></a></div>
                 </div>
                 <div class="signup-form">
-                    <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
+                    <img class="login-logo" src="/img/iCheckifyLogo.png" alt="logo" />™️
 
                     <div class="title">Forgot Password</div>
                     @Html.AntiForgeryToken()

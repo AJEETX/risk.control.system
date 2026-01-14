@@ -11,9 +11,7 @@ namespace risk.control.system.Seeds
 {
     public static class CreatorSeed
     {
-        public static async Task<ClientCompanyApplicationUser> Seed(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
-            UserManager<ClientCompanyApplicationUser> userManager,
+        public static async Task<ApplicationUser> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager,
             ClientCompany clientCompany, PinCode pinCode, string creatorEmailwithSuffix, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
             //Seed client creator
@@ -29,7 +27,7 @@ namespace risk.control.system.Seeds
             }
             var extension = Path.GetExtension(creatorImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(creatorImage, extension, clientCompany.Email, "user");
-            var clientCreator = new ClientCompanyApplicationUser()
+            var clientCreator = new ApplicationUser()
             {
                 UserName = creatorEmailwithSuffix,
                 Email = creatorEmailwithSuffix,
@@ -53,7 +51,6 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 Role = AppRoles.CREATOR,
-                UserRole = CompanyRole.CREATOR,
                 Updated = DateTime.Now,
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))
@@ -62,9 +59,7 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(clientCreator, TestingData);
-                    await userManager.AddToRoleAsync(clientCreator, AppRoles.CREATOR.ToString());
-                    //var clientCreatorRole = new ApplicationRole(AppRoles.CREATOR.ToString(), AppRoles.CREATOR.ToString());
-                    //clientCreator.ApplicationRoles.Add(clientCreatorRole);
+                    await userManager.AddToRoleAsync(clientCreator, CREATOR.DISPLAY_NAME);
                 }
             }
             return clientCreator;

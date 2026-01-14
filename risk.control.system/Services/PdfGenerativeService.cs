@@ -68,7 +68,7 @@ namespace risk.control.system.Services
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == investigation.ReportTemplateId);
             var vendor = context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation.VendorId);
-            var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var currentUser = context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == policy.InvestigationServiceTypeId);
             if (investigationServiced == null)
             {

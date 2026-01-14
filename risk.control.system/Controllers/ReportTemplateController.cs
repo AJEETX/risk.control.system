@@ -13,6 +13,8 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.AppConstant;
+
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("General Setup")]
@@ -39,22 +41,6 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Report Template", FromAction = "Index")]
         public IActionResult Profile()
         {
-            //var currentUserEmail = HttpContext.User?.Identity?.Name;
-            //var companyUser = context.ClientCompanyApplicationUser
-            //    .Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
-
-            //var templates = await context.ReportTemplates
-            //    .Include(r => r.LocationReport)
-            //        .ThenInclude(l => l.FaceIds)
-            //    .Include(r => r.LocationReport)
-            //        .ThenInclude(l => l.DocumentIds)
-            //         .Include(r => r.LocationReport)
-            //        .ThenInclude(l => l.MediaReports)
-            //    .Include(r => r.LocationReport)
-            //        .ThenInclude(l => l.Questions)
-            //        .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system")
-            //    .ToListAsync();
-
             return View();
         }
         [HttpPost]
@@ -71,7 +57,7 @@ namespace risk.control.system.Controllers
             int skip = start != null ? Convert.ToInt32(start) : 0;
 
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = context.ClientCompanyApplicationUser
+            var companyUser = context.ApplicationUser
                 .Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var query = context.ReportTemplates
                     .Include(r => r.LocationReport)

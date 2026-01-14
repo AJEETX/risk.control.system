@@ -52,7 +52,7 @@ namespace risk.control.system.Services
         {
             var vendorCaseCount = new Dictionary<string, int>();
 
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             List<Vendor> existingVendors = await _context.Vendor.ToListAsync();
 
@@ -105,7 +105,7 @@ namespace risk.control.system.Services
         {
             var vendorCaseCount = new Dictionary<string, int>();
 
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var existingVendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
 
@@ -120,7 +120,7 @@ namespace risk.control.system.Services
 
             var agentCaseCount = new Dictionary<string, int>();
 
-            var vendorUsers = _context.VendorApplicationUser.Where(u =>
+            var vendorUsers = _context.ApplicationUser.Where(u =>
             u.VendorId == existingVendor.VendorId && !u.IsVendorAdmin);
 
             foreach (var vendorNonAdminUser in vendorUsers)
@@ -151,8 +151,8 @@ namespace risk.control.system.Services
         public async Task<Dictionary<string, (int count1, int count2)>> CalculateCaseChart(string userEmail)
         {
             Dictionary<string, (int count1, int count2)> dictMonthlySum = new Dictionary<string, (int count1, int count2)>();
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
             var startDate = new DateTime(DateTime.Now.Year, 1, 1);
             var months = Enumerable.Range(0, 11)
                                    .Select(startDate.AddMonths)
@@ -238,8 +238,8 @@ namespace risk.control.system.Services
 
         public async Task<Dictionary<string, (int count1, int count2)>> CalculateMonthlyCaseStatus(string userEmail)
         {
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             Dictionary<string, (int count1, int count2)> dictWeeklyCases = new Dictionary<string, (int count1, int count2)>();
             if (companyUser != null)
@@ -315,8 +315,8 @@ namespace risk.control.system.Services
             var dictWeeklyCases = new Dictionary<string, List<int>>();
             var result = new List<TatDetail>();
             int totalStatusChanged = 0;
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
             if (companyUser != null)
             {
                 var tdetail = _context.Investigations
@@ -406,8 +406,8 @@ namespace risk.control.system.Services
                     .Include(i => i.PolicyDetail)
                      .Where(d => d.Created > DateTime.Now.AddDays(-28) && !d.Deleted);
 
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser != null)
             {
@@ -492,8 +492,8 @@ namespace risk.control.system.Services
                      .Where(d => d.Created > DateTime.Now.AddDays(-28) && !d.Deleted && d.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                      (d.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY && d.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY));
 
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser != null)
             {

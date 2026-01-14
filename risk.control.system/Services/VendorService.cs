@@ -16,8 +16,8 @@ namespace risk.control.system.Services
     public interface IVendorService
     {
         Task<object[]> AllAgencies();
-        Task<object[]> GetEmpanelledVendorsAsync(ClientCompanyApplicationUser companyUser);
-        Task<object[]> GetEmpanelledAgency(ClientCompanyApplicationUser companyUser, long caseId);
+        Task<object[]> GetEmpanelledVendorsAsync(ApplicationUser companyUser);
+        Task<object[]> GetEmpanelledAgency(ApplicationUser companyUser, long caseId);
         Task<object[]> GetAvailableVendors(string userEmail);
         Task<List<AgencyServiceResponse>> GetAgencyService(long id);
         Task<List<AgencyServiceResponse>> AllServices(string userEmail);
@@ -45,7 +45,7 @@ namespace risk.control.system.Services
             this.customApiClient = customApiClient;
         }
 
-        public async Task<object[]> GetEmpanelledVendorsAsync(ClientCompanyApplicationUser companyUser)
+        public async Task<object[]> GetEmpanelledVendorsAsync(ApplicationUser companyUser)
         {
             var statuses = GetValidStatuses();
 
@@ -92,7 +92,7 @@ namespace risk.control.system.Services
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.ratings)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyId);
 
-        private object MapVendor(Vendor u, ClientCompanyApplicationUser companyUser, List<InvestigationTask> claimsCases)
+        private object MapVendor(Vendor u, ApplicationUser companyUser, List<InvestigationTask> claimsCases)
         {
             return new
             {
@@ -120,7 +120,7 @@ namespace risk.control.system.Services
             };
         }
 
-        private string GetDomain(Vendor u, ClientCompanyApplicationUser user) =>
+        private string GetDomain(Vendor u, ApplicationUser user) =>
             user.Role == AppRoles.COMPANY_ADMIN
                 ? $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>"
                 : u.Email;
@@ -142,7 +142,7 @@ namespace risk.control.system.Services
                 vendor.IsUpdated = false;
         }
 
-        public async Task<object[]> GetEmpanelledAgency(ClientCompanyApplicationUser companyUser, long caseId)
+        public async Task<object[]> GetEmpanelledAgency(ApplicationUser companyUser, long caseId)
         {
             var claimsCases = await _context.Investigations.Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue && GetValidStatuses().Contains(c.SubStatus)).ToListAsync();
 
@@ -240,14 +240,14 @@ namespace risk.control.system.Services
 
         public async Task<object[]> GetAvailableVendors(string userEmail)
         {
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
             var company = _context.ClientCompany
                 .Include(c => c.EmpanelledVendors)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var availableVendors = _context.Vendor
                 .Where(v => !company.EmpanelledVendors.Contains(v) && !v.Deleted && v.CountryId == company.CountryId)
-                .Include(v => v.VendorApplicationUser)
+                .Include(v => v.ApplicationUser)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
@@ -276,8 +276,8 @@ namespace risk.control.system.Services
                     UpdateBy = u.UpdatedBy,
                     CanOnboard = u.Status == VendorStatus.ACTIVE &&
                         u.VendorInvestigationServiceTypes != null &&
-                        u.VendorApplicationUser != null &&
-                        u.VendorApplicationUser.Count > 0 &&
+                        u.ApplicationUser != null &&
+                        u.ApplicationUser.Count > 0 &&
                         u.VendorInvestigationServiceTypes.Count > 0,
                     VendorName = u.Email,
                     IsUpdated = u.IsUpdated,
@@ -384,7 +384,7 @@ namespace risk.control.system.Services
 
         public async Task<List<AgencyServiceResponse>> AllServices(string userEmail)
         {
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var vendor = await _context.Vendor
                 .Include(i => i.VendorInvestigationServiceTypes)
@@ -438,13 +438,13 @@ namespace risk.control.system.Services
 
         public async Task<ConcurrentBag<AgentData>> GetAgentWithCases(string userEmail, long id)
         {
-            var vendorUser = await _context.VendorApplicationUser
+            var vendorUser = await _context.ApplicationUser
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
             var onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
 
-            var vendorAgentsQuery = _context.VendorApplicationUser
+            var vendorAgentsQuery = _context.ApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.State)
                 .Include(u => u.District)
@@ -492,10 +492,10 @@ namespace risk.control.system.Services
 
                 // Get map data asynchronously
                 var (distance, distanceInMetre, duration, durationInSec, map) = await customApiClient.GetMap(
-                    agent.AddressLatitude,
-                    agent.AddressLongitude,
-                    LocationLatitude,
-                    LocationLongitude);
+                    double.Parse(agent.AddressLatitude),
+                    double.Parse(agent.AddressLongitude),
+                    double.Parse(LocationLatitude),
+                    double.Parse(LocationLongitude));
 
                 var mapDetails = $"Driving distance: {distance}; Duration: {duration}";
 
@@ -503,25 +503,25 @@ namespace risk.control.system.Services
                 {
                     Id = agent.Id,
                     Photo = string.IsNullOrWhiteSpace(agent.ProfilePictureUrl)
-                        ? noUserImagefilePath
-                        : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(env.ContentRootPath, agent.ProfilePictureUrl)))),
-                    Email = agent.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(agent.MobileUId)
-                        ? $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a>"
-                        : $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a><span title='Onboarding incomplete !!!' data-toggle='tooltip'><i class='fa fa-asterisk asterik-style'></i></span>",
+                       ? noUserImagefilePath
+                       : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
+                   Path.Combine(env.ContentRootPath, agent.ProfilePictureUrl)))),
+                    Email = agent.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(agent.MobileUId)
+                       ? $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a>"
+                       : $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a><span title='Onboarding incomplete !!!' data-toggle='tooltip'><i class='fa fa-asterisk asterik-style'></i></span>",
                     Name = $"{agent.FirstName} {agent.LastName}",
                     Phone = $"(+{agent.Country.ISDCode}) {agent.PhoneNumber}",
                     Addressline = $"{agent.Addressline}, {agent.District.Name}, {agent.State.Code}, {agent.Country.Code}",
                     Country = agent.Country.Code,
                     Flag = $"/flags/{agent.Country.Code.ToLower()}.png",
                     Active = agent.Active,
-                    Roles = agent.UserRole != null
-                        ? $"<span class='badge badge-light'>{agent.UserRole.GetEnumDisplayName()}</span>"
-                        : "<span class='badge badge-light'>...</span>",
+                    Roles = agent.Role != null
+                       ? $"<span class='badge badge-light'>{agent.Role.GetEnumDisplayName()}</span>"
+                       : "<span class='badge badge-light'>...</span>",
                     Count = claimCount,
                     UpdateBy = agent.UpdatedBy,
-                    Role = agent.UserRole.GetEnumDisplayName(),
-                    AgentOnboarded = agent.UserRole != AgencyRole.AGENT || !string.IsNullOrWhiteSpace(agent.MobileUId),
+                    Role = agent.Role.GetEnumDisplayName(),
+                    AgentOnboarded = agent.Role != AppRoles.AGENT || !string.IsNullOrWhiteSpace(agent.MobileUId),
                     RawEmail = agent.Email,
                     PersonMapAddressUrl = string.Format(map, "300", "300"),
                     MapDetails = mapDetails,
@@ -531,11 +531,12 @@ namespace risk.control.system.Services
                     Duration = duration,
                     DurationInSeconds = durationInSec,
                     AddressLocationInfo = claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                        ? claim.CustomerDetail.AddressLocationInfo
-                        : claim.BeneficiaryDetail.AddressLocationInfo
+                       ? claim.CustomerDetail.AddressLocationInfo
+                       : claim.BeneficiaryDetail.AddressLocationInfo
                 };
 
                 agentList.Add(agentInfo);
+
             }));
             return agentList;
         }

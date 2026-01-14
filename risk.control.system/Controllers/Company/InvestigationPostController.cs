@@ -17,6 +17,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -172,7 +173,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var companyUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 if (id <= 0)
                 {
@@ -197,7 +198,7 @@ namespace risk.control.system.Controllers.Company
             {
                 logger.LogError(ex, "Error deleting case");
                 notifyService.Error("Error deleting case. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return Json(new { success = false, message = "Error deleting case. Try again." });
             }
         }
 
@@ -493,7 +494,7 @@ namespace risk.control.system.Controllers.Company
                 var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
                 if (model != null)
                 {
-                    var company = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                    var company = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";

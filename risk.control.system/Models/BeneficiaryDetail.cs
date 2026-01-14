@@ -9,7 +9,7 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long BeneficiaryDetailId { get; set; }
 
-        [Display(Name = "Beneficiary name")]
+        [Display(Name = "Beneficiary Name")]
         public string Name { get; set; }
 
         [Display(Name = "Relation")]
@@ -28,10 +28,6 @@ namespace risk.control.system.Models
         public string? ImagePath { get; set; }
 
         public string? ProfilePictureExtension { get; set; }
-
-        [Display(Name = "Photo")]
-        [NotMapped]
-        public IFormFile? ProfileImage { get; set; }
 
         [Display(Name = "Date of birth")]
         [DataType(DataType.Date)]
@@ -60,19 +56,6 @@ namespace risk.control.system.Models
 
         [Display(Name = "Address")]
         public string Addressline { get; set; }
-
-
-        [NotMapped]
-        public long SelectedPincodeId { get; set; }
-        [NotMapped]
-        public long SelectedDistrictId { get; set; }
-        [NotMapped]
-        public long SelectedStateId { get; set; }
-        [NotMapped]
-        public long SelectedCountryId { get; set; }
-
-        [NotMapped]
-        public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
         public string? BeneficiaryLocationMap { get; set; }
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }
@@ -82,6 +65,19 @@ namespace risk.control.system.Models
         public long? InvestigationTaskId { get; set; }
         public InvestigationTask? InvestigationTask { get; set; }
 
+        #region NOT MAPPED PROPERTIES
+        [NotMapped]
+        [Required]
+        public IFormFile? ProfileImage { get; set; }
+        [NotMapped]
+        public long SelectedPincodeId { get; set; }
+        [NotMapped]
+        public long SelectedDistrictId { get; set; }
+        [NotMapped]
+        public long SelectedStateId { get; set; }
+        [NotMapped]
+        public long SelectedCountryId { get; set; }
+        #endregion
         public override string ToString()
         {
             return $"Beneficiary Information:\n" +

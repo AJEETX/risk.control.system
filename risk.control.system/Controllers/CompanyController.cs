@@ -1,6 +1,10 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,27 +20,38 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class CompanyController : Controller
     {
+        private AppRoles[] companyRoles = new[]
+                {
+                    AppRoles.COMPANY_ADMIN,
+                    AppRoles.CREATOR,
+                    AppRoles.MANAGER,
+                    AppRoles.ASSESSOR
+                };
+        private AppRoles[] agencyRoles = new[]
+                {
+                    AppRoles.AGENCY_ADMIN,
+                    AppRoles.SUPERVISOR,
+                    AppRoles.AGENT
+                };
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly ICompanyService companyService;
         private readonly IVendorServiceTypeManager vendorServiceTypeManager;
         private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
         private readonly IAgencyCreateEditService agencyCreateEditService;
         private readonly ICompanyUserService companyUserService;
-        private readonly ISmsService smsService;
         private readonly IFeatureManager featureManager;
         private readonly IInvestigationService service;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ILogger<CompanyController> logger;
         private readonly string portal_base_url;
         public CompanyController(ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
             ICompanyService companyService,
             IVendorServiceTypeManager vendorServiceTypeManager,
             IAgencyUserCreateEditService agencyUserCreateEditService,
@@ -50,6 +65,7 @@ namespace risk.control.system.Controllers
             ISmsService SmsService)
         {
             this._context = context;
+            this.userManager = userManager;
             this.companyService = companyService;
             this.vendorServiceTypeManager = vendorServiceTypeManager;
             this.agencyUserCreateEditService = agencyUserCreateEditService;
@@ -57,9 +73,7 @@ namespace risk.control.system.Controllers
             this.companyUserService = companyUserService;
             this.notifyService = notifyService;
             this.featureManager = featureManager;
-            smsService = SmsService;
             this.service = service;
-            this.httpContextAccessor = httpContextAccessor;
             this.logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -79,7 +93,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
@@ -115,7 +129,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
@@ -207,7 +221,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
@@ -219,19 +233,32 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var existingUsers = _context.ClientCompanyApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
-                var isManagerTaken = existingUsers.Any(u => u.UserRole == CompanyRole.MANAGER);
-                var availableRoles = Enum.GetValues(typeof(CompanyRole))
-                    .Cast<CompanyRole>()
-                    .Where(role => role != CompanyRole.COMPANY_ADMIN && (isManagerTaken ? role != CompanyRole.MANAGER : true))
-                    .Select(role => new SelectListItem
+                var usersInCompany = _context.ApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                bool isManagerTaken = false;
+
+                foreach (var user in usersInCompany)
+                {
+                    if (await userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME))
                     {
-                        Value = role.ToString(),
-                        Text = role.ToString()
+                        isManagerTaken = true;
+                        break;
+                    }
+                }
+
+                var availableRoles = companyRoles
+                    .Where(r => r != AppRoles.COMPANY_ADMIN && r != AppRoles.MANAGER || !isManagerTaken) // Exclude MANAGER if already taken
+                    .Select(r => new SelectListItem
+                    {
+                        Value = r.ToString(),
+                        Text = r.GetType()
+                                .GetMember(r.ToString())
+                                .First()
+                                .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
                     })
                     .ToList();
 
-                var model = new ClientCompanyApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId, AvailableRoles = availableRoles };
+
+                var model = new ApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId, AvailableRoles = availableRoles };
                 return View(model);
             }
             catch (Exception ex)
@@ -242,19 +269,31 @@ namespace risk.control.system.Controllers
             }
 
         }
-        private async Task LoadModel(ClientCompanyApplicationUser model, string currentUserEmail)
+        private async Task LoadModel(ApplicationUser model, string currentUserEmail)
         {
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
-            var existingUsers = _context.ClientCompanyApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
-            var isManagerTaken = await existingUsers.AnyAsync(u => u.UserRole == CompanyRole.MANAGER);
-            var availableRoles = Enum.GetValues(typeof(CompanyRole))
-                .Cast<CompanyRole>()
-                .Where(role => role != CompanyRole.COMPANY_ADMIN && (isManagerTaken ? role != CompanyRole.MANAGER : true))
-                .Select(role => new SelectListItem
+            var usersInCompany = _context.ApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+            bool isManagerTaken = false;
+
+            foreach (var user in usersInCompany)
+            {
+                if (await userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME))
                 {
-                    Value = role.ToString(),
-                    Text = role.ToString()
+                    isManagerTaken = true;
+                    break;
+                }
+            }
+
+            var availableRoles = companyRoles
+                .Where(r => r != AppRoles.COMPANY_ADMIN && r != AppRoles.MANAGER || !isManagerTaken) // Exclude MANAGER if already taken
+                .Select(r => new SelectListItem
+                {
+                    Value = r.ToString(),
+                    Text = r.GetType()
+                            .GetMember(r.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
                 })
                 .ToList();
 
@@ -269,7 +308,7 @@ namespace risk.control.system.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(ClientCompanyApplicationUser model, string emailSuffix)
+        public async Task<IActionResult> CreateUser(ApplicationUser model, string emailSuffix)
         {
             try
             {
@@ -280,7 +319,7 @@ namespace risk.control.system.Controllers
                     await LoadModel(model, userEmail);
                     return View(model);
                 }
-                var result = await companyUserService.CreateAsync(model, emailSuffix, userEmail);
+                var result = await companyUserService.CreateAsync(model, emailSuffix, userEmail, portal_base_url);
 
                 if (!result.Success)
                 {
@@ -311,13 +350,13 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                if (userId == null || _context.ClientCompanyApplicationUser == null)
+                if (userId == null || _context.ApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Users));
                 }
 
-                var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser
+                var clientCompanyApplicationUser = await _context.ApplicationUser
                     .Include(u => u.Country).
                     Include(u => u.ClientCompany)
                     .FirstOrDefaultAsync(c => c.Id == userId);
@@ -327,15 +366,27 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Users));
                 }
-                var existingUsers = _context.ClientCompanyApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId && c.Id != clientCompanyApplicationUser.Id);
-                var isManagerTaken = existingUsers.Any(u => u.UserRole == CompanyRole.MANAGER);
-                var availableRoles = Enum.GetValues(typeof(CompanyRole))
-                    .Cast<CompanyRole>()
-                    .Where(role => role != CompanyRole.COMPANY_ADMIN && (isManagerTaken ? role != CompanyRole.MANAGER : true))
-                    .Select(role => new SelectListItem
+                var usersInCompany = _context.ApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId && c.Id != clientCompanyApplicationUser.Id);
+                bool isManagerTaken = false;
+
+                foreach (var user in usersInCompany)
+                {
+                    if (await userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME))
                     {
-                        Value = role.ToString(),
-                        Text = role.ToString()
+                        isManagerTaken = true;
+                        break;
+                    }
+                }
+
+                var availableRoles = companyRoles
+                    .Where(r => r != AppRoles.COMPANY_ADMIN && r != AppRoles.MANAGER || !isManagerTaken) // Exclude MANAGER if already taken
+                    .Select(r => new SelectListItem
+                    {
+                        Value = r.ToString(),
+                        Text = r.GetType()
+                                .GetMember(r.ToString())
+                                .First()
+                                .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
                     })
                     .ToList();
 
@@ -353,7 +404,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(long id, ClientCompanyApplicationUser model)
+        public async Task<IActionResult> EditUser(long id, ApplicationUser model)
         {
             try
             {
@@ -365,7 +416,7 @@ namespace risk.control.system.Controllers
                     await LoadModel(model, userEmail);
                     return View(model);
                 }
-                var result = await companyUserService.UpdateAsync(id, model, User.Identity?.Name);
+                var result = await companyUserService.UpdateAsync(id, model, User.Identity?.Name, portal_base_url);
 
                 if (!result.Success)
                 {
@@ -400,7 +451,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Users));
                 }
 
-                var model = await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
+                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
                     .FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
@@ -426,7 +477,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var model = await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
+                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
                     .FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
@@ -437,7 +488,7 @@ namespace risk.control.system.Controllers
                 model.Updated = DateTime.Now;
                 model.UpdatedBy = currentUserEmail;
                 model.Deleted = true;
-                _context.ClientCompanyApplicationUser.Update(model);
+                _context.ApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"User <b>{model.Email}</b> deleted successfully", 3, "orange", "fas fa-user-minus");
                 return RedirectToAction(nameof(CompanyController.Users), "Company");
@@ -492,7 +543,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
+                var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
@@ -618,7 +669,17 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Error creating user");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>().Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
+            var availableRoles = agencyRoles
+                .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
+                .Select(r => new SelectListItem
+                {
+                    Value = r.ToString(),
+                    Text = r.GetType()
+                            .GetMember(r.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
+                })
+                .ToList();
             var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
             if (vendor == null)
             {
@@ -626,7 +687,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(AgencyDetail), "Company", new { id = id });
             }
 
-            var model = new VendorApplicationUser { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles, };
+            var model = new ApplicationUser { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AvailableRoles = availableRoles, };
 
             var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
             var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
@@ -639,7 +700,7 @@ namespace risk.control.system.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateAgencyUser(VendorApplicationUser model, string emailSuffix)
+        public async Task<IActionResult> CreateAgencyUser(ApplicationUser model, string emailSuffix)
         {
             try
             {
@@ -675,17 +736,27 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(AgencyUsers), "Company", new { id = model.VendorId });
         }
 
-        private async Task LoadModel(VendorApplicationUser model)
+        private async Task LoadModel(ApplicationUser model)
         {
             var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
-            var nonAdminRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>().Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
+            var availableRoles = agencyRoles
+                .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
+                .Select(r => new SelectListItem
+                {
+                    Value = r.ToString(),
+                    Text = r.GetType()
+                            .GetMember(r.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
+                })
+                .ToList();
             model.Country = vendor.Country;
             model.CountryId = vendor.CountryId;
             model.StateId = model.SelectedStateId;
             model.DistrictId = model.SelectedDistrictId;
             model.PinCodeId = model.SelectedPincodeId;
             model.Vendor = vendor;
-            model.AgencyRole = nonAdminRoles;
+            model.AvailableRoles = availableRoles;
         }
 
         [Breadcrumb(" Edit User", FromAction = "AgencyUsers")]
@@ -699,7 +770,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorApplicationUser = await _context.VendorApplicationUser.Include(u => u.Vendor).Include(v => v.Country).FirstOrDefaultAsync(v => v.Id == userId);
+                var vendorApplicationUser = await _context.ApplicationUser.Include(u => u.Vendor).Include(v => v.Country).FirstOrDefaultAsync(v => v.Id == userId);
 
                 if (vendorApplicationUser == null)
                 {
@@ -726,7 +797,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditAgencyUser(string id, VendorApplicationUser model, string editby)
+        public async Task<IActionResult> EditAgencyUser(string id, ApplicationUser model, string editby)
         {
             try
             {
@@ -779,7 +850,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
+                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.Case Not Found.Try Again");
@@ -826,7 +897,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Email == email);
+                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
@@ -836,7 +907,7 @@ namespace risk.control.system.Controllers
                 model.Updated = DateTime.Now;
                 model.UpdatedBy = currentUserEmail;
                 model.Deleted = true;
-                _context.VendorApplicationUser.Update(model);
+                _context.ApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"User <b>{model.Email}</b> deleted successfully", 3, "orange", "fas fa-user-minus");
                 return RedirectToAction(nameof(AgencyUsers), "Company", new { id = vendorId });
@@ -932,7 +1003,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
@@ -997,7 +1068,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
@@ -1075,7 +1146,7 @@ namespace risk.control.system.Controllers
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
@@ -1128,7 +1199,7 @@ namespace risk.control.system.Controllers
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");

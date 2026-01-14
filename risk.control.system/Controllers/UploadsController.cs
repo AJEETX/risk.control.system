@@ -11,12 +11,16 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.AppConstant;
+
 namespace risk.control.system.Controllers
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class UploadsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAnswerService answerService;
+        private readonly IMediaIdfyService mediaIdfyService;
         private readonly INotyfService notifyService;
         private readonly IClaimsAgentService agentService;
         private readonly IAgentIdfyService agentIdService;
@@ -24,6 +28,8 @@ namespace risk.control.system.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public UploadsController(ApplicationDbContext context,
+            IAnswerService answerService,
+            IMediaIdfyService mediaIdfyService,
             INotyfService notifyService,
             IClaimsAgentService agentService,
             IAgentIdfyService agentIdService,
@@ -31,6 +37,8 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this.answerService = answerService;
+            this.mediaIdfyService = mediaIdfyService;
             this.notifyService = notifyService;
             this.agentService = agentService;
             this.agentIdService = agentIdService;
@@ -178,7 +186,7 @@ namespace risk.control.system.Controllers
                 Image = Image,
                 LocationLatLong = locationLongLat
             };
-            var response = await agentIdService.CaptureMedia(data);
+            var response = await mediaIdfyService.CaptureMedia(data);
             return Json(new
             {
                 success = true,
@@ -205,7 +213,7 @@ namespace risk.control.system.Controllers
                 // e.g. return View(model);
                 return BadRequest("Some answers are missing.");
             }
-            var submitted = await agentIdService.CaptureAnswers(locationName, CaseId, Questions);
+            var submitted = await answerService.CaptureAnswers(locationName, CaseId, Questions);
 
             if (submitted)
             {

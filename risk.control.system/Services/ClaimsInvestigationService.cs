@@ -26,7 +26,7 @@ namespace risk.control.system.Services
             claim.CaseNotes.Add(new CaseNote
             {
                 Comment = notes,
-                Sender = userEmail,
+                SenderEmail = userEmail,
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
                 UpdatedBy = userEmail

@@ -15,7 +15,6 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             UserManager<ApplicationUser> userManager,
-            RoleManager<ApplicationRole> roleManager,
             string pinCodeCode,
             IFileStorageService fileStorageService)
         {
@@ -66,32 +65,13 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(portalAdmin, TestingData);
-                    await userManager.AddToRoleAsync(portalAdmin, AppRoles.PORTAL_ADMIN.ToString());
-
-                    //var portalAdminRole = new ApplicationRole(AppRoles.PORTALADMIN.ToString(), AppRoles.PORTALADMIN.ToString());
-                    //portalAdmin.ApplicationRoles.Add(portalAdminRole);
-
-                    //await userManager.AddToRoleAsync(portalAdmin, AppRoles.COMPANY_ADMIN.ToString());
-                    ////var clientAdminRole = new ApplicationRole(AppRoles.COMPANY_ADMIN.ToString(), AppRoles.COMPANY_ADMIN.ToString());
-                    ////portalAdmin.ApplicationRoles.Add(clientAdminRole);
-                    //await userManager.AddToRoleAsync(portalAdmin, AppRoles.CREATOR.ToString());
-                    ////context.ApplicationRole.Add(new ApplicationRole(AppRoles.CREATOR.ToString(), AppRoles.CREATOR.ToString()));
-                    //await userManager.AddToRoleAsync(portalAdmin, AppRoles.Assigner.ToString());
-                    ////context.ApplicationRole.Add(new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString()));
-                    //await userManager.AddToRoleAsync(portalAdmin, AppRoles.ASSESSOR.ToString());
-                    ////context.ApplicationRole.Add(new ApplicationRole(AppRoles.ASSESSOR.ToString(), AppRoles.ASSESSOR.ToString()));
-                    //await userManager.AddToRoleAsync(portalAdmin, AppRoles.AGENCY_ADMIN.ToString());
-                    ////context.ApplicationRole.Add(new ApplicationRole(AppRoles.AGENCY_ADMIN.ToString(), AppRoles.AGENCY_ADMIN.ToString()));
-                    //await userManager.AddToRoleAsync(portalAdmin, AppRoles.SUPERVISOR.ToString());
-                    ////context.ApplicationRole.Add(new ApplicationRole(AppRoles.SUPERVISOR.ToString(), AppRoles.SUPERVISOR.ToString()));
-                    //await userManager.AddToRoleAsync(portalAdmin, AppRoles.AGENT.ToString());
-                    //context.ApplicationRole.Add(new ApplicationRole(AppRoles.AGENT.ToString(), AppRoles.AGENT.ToString()));
+                    await userManager.AddToRoleAsync(portalAdmin, PORTAL_ADMIN.DISPLAY_NAME);
                 }
 
                 ////////PERMISSIONS TO MODULES
 
-                var adminRole = await roleManager.FindByNameAsync(AppRoles.PORTAL_ADMIN.ToString()) ?? default!;
-                var allClaims = await roleManager.GetClaimsAsync(adminRole);
+                //var adminRole = await roleManager.FindByNameAsync(AppRoles.PORTAL_ADMIN.ToString()) ?? default!;
+                //var allClaims = await roleManager.GetClaimsAsync(adminRole);
 
                 //ADD PERMISSIONS
 

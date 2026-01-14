@@ -69,7 +69,7 @@
                 "mRender": function (data, type, row) {
                     var img = '';
                     for (var i = 1; i <= 5; i++) {
-                        img += '<img id="' + i + '" src="/images/StarFade.gif" class="rating" vendorId="' + row.id + '"/>';
+                        img += '<img id="' + i + '" src="/img/StarFade.gif" class="rating" vendorId="' + row.id + '"/>';
                     }
 
                     // Add the rate count badge

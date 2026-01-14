@@ -2,13 +2,15 @@
 @using risk.control.system.Models;
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.MANAGER.ToString()))
+    if (User.IsInRole(MANAGER.DISPLAY_NAME))
     {
         <li class="nav-item">
 
-            <a is-active-page asp-action="Agencies" class="navlink-border nav-link  @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("Company","") 
- @Url.MakeActiveClass("VendorUser","") 
-@Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
+            <a is-active-page asp-action="Agencies" class="navlink-border nav-link  
+                @Url.MakeActiveClass("Vendors","") 
+                @Url.MakeActiveClass("Company","") 
+                @Url.MakeActiveClass("VendorService","") 
+                @Url.MakeActiveClass("VendorApplicationUsers","")">
                 <i class="nav-icon fas fa-shield-alt"></i>
                 <p class="sidebar-menu-header-label">
                     MANAGE AGENCY(s)
@@ -19,11 +21,17 @@
 
         <li class="nav-item">
             <a is-active-page asp-controller="Vendors" asp-action="EmpanelledVendors" class="actual-link nav-link
-                            @Url.MakeActiveClass("Vendors","EmpanelledVendors")
-                        @Url.MakeActiveClass("Company","AgencyDetail") @Url.MakeActiveClass("Company","EditAgency") 
-    @Url.MakeActiveClass("Company","Service") @Url.MakeActiveClass("Company","EditService") @Url.MakeActiveClass("Company","CreateService") @Url.MakeActiveClass("Company","DeleteService")
-@Url.MakeActiveClass("Company","AgencyUsers") @Url.MakeActiveClass("Company","CreateAgencyUser") @Url.MakeActiveClass("Company","EditAgencyUser") 
-    @Url.MakeActiveClass("Company","DeleteAgencyUser")">
+                @Url.MakeActiveClass("Vendors","EmpanelledVendors")
+                @Url.MakeActiveClass("Company","AgencyDetail") 
+                @Url.MakeActiveClass("Company","EditAgency") 
+                @Url.MakeActiveClass("Company","Service") 
+                @Url.MakeActiveClass("Company","EditService") 
+                @Url.MakeActiveClass("Company","CreateService") 
+                @Url.MakeActiveClass("Company","DeleteService")
+                @Url.MakeActiveClass("Company","AgencyUsers") 
+                @Url.MakeActiveClass("Company","CreateAgencyUser") 
+                @Url.MakeActiveClass("Company","EditAgencyUser") 
+                @Url.MakeActiveClass("Company","DeleteAgencyUser")">
                 <i class="nav-icon fas fa-handshake"></i>
                 <p>
                     Empanelled Agencies
@@ -32,10 +40,15 @@
         </li>
         <li class="nav-item">
             <a is-active-page asp-controller="Vendors" asp-action="AvailableVendors" class="actual-link nav-link @Url.MakeActiveClass("Vendors","AvailableVendors")
-                          @Url.MakeActiveClass("Vendors","Details")  @Url.MakeActiveClass("Vendors","Edit") @Url.MakeActiveClass("Vendors","Delete")
-                        @Url.MakeActiveClass("Vendors","Service") @Url.MakeActiveClass("VendorService","")
-                                @Url.MakeActiveClass("Vendors","Users") @Url.MakeActiveClass("Vendors","CreateUser") @Url.MakeActiveClass("Vendors","EditUser")  @Url.MakeActiveClass("Vendors","DeleteUser")
-                        @Url.MakeActiveClass("VendorApplicationUsers","")">
+                @Url.MakeActiveClass("Vendors","Details")  
+                @Url.MakeActiveClass("Vendors","Edit") 
+                @Url.MakeActiveClass("Vendors","Delete")
+                @Url.MakeActiveClass("Vendors","Service") 
+                @Url.MakeActiveClass("VendorService","")
+                @Url.MakeActiveClass("Vendors","Users") 
+                @Url.MakeActiveClass("Vendors","CreateUser") 
+                @Url.MakeActiveClass("Vendors","EditUser")  
+                @Url.MakeActiveClass("Vendors","DeleteUser")">
                 <i class="nav-icon fas fa-hand-pointer"></i>
                 <p>
                     Available Agencies

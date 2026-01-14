@@ -16,6 +16,7 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
+using risk.control.system.AppConstant;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 namespace risk.control.system.Controllers
@@ -32,7 +33,7 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ICustomApiClient customApiCLient;
         private readonly ISmsService smsService;
-        private readonly UserManager<ClientCompanyApplicationUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
         public ClientCompanyController(
             ILogger<ClientCompanyController> logger,
@@ -42,7 +43,7 @@ namespace risk.control.system.Controllers
             RoleManager<ApplicationRole> roleManager,
             ICustomApiClient customApiCLient,
             ISmsService SmsService,
-            UserManager<ClientCompanyApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager)
         {
             this.logger = logger;
             _context = context;
@@ -165,13 +166,13 @@ namespace risk.control.system.Controllers
                 clientCompany.Deleted = true;
                 _context.ClientCompany.Update(clientCompany);
 
-                var companyUsers = await _context.ClientCompanyApplicationUser.Where(c => c.ClientCompanyId == ClientCompanyId).ToListAsync();
+                var companyUsers = await _context.ApplicationUser.Where(c => c.ClientCompanyId == ClientCompanyId).ToListAsync();
                 foreach (var companyUser in companyUsers)
                 {
                     companyUser.Deleted = true;
                     companyUser.Updated = DateTime.Now;
                     companyUser.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    _context.ClientCompanyApplicationUser.Update(companyUser);
+                    _context.ApplicationUser.Update(companyUser);
                 }
                 await _context.SaveChangesAsync();
 

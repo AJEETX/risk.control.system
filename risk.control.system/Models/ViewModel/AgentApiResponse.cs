@@ -1,4 +1,6 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace risk.control.system.Models.ViewModel
 {
     public class PanVerifyResponse
     {
@@ -109,6 +111,7 @@
 
     public class SubmitData
     {
+        [EmailAddress]
         public string Email { get; set; }
         public long CaseId { get; set; }
         public string Remarks { get; set; }
@@ -117,6 +120,7 @@
     public class FaceData
     {
         public IFormFile? Image { get; set; }
+        [EmailAddress]
         public string Email { get; set; }
         public long CaseId { get; set; }
         public string? LocationName { get; set; }
@@ -128,6 +132,7 @@
     public class DocumentData
     {
         public IFormFile? Image { get; set; }
+        [EmailAddress]
         public string Email { get; set; }
         public long CaseId { get; set; }
         public string? LocationName { get; set; }
@@ -141,6 +146,7 @@
         public byte[] Mediabytes { get; set; }
         public string? Name { get; set; }
         public string? ClaimId { get; set; }
+        [EmailAddress]
         public string Email { get; set; }
         public string LongLat { get; set; }
     }

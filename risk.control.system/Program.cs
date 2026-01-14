@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -11,13 +12,16 @@ using Amazon.Textract;
 using Amazon.TranscribeService;
 
 using AspNetCoreHero.ToastNotification;
+using AspNetCoreHero.ToastNotification.Abstractions;
 using AspNetCoreHero.ToastNotification.Extensions;
 
 using Hangfire;
 using Hangfire.MemoryStorage;
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -26,6 +30,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -44,6 +49,10 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 1024; // Arbitrary units
+});
 builder.Services.AddHsts(options =>
 {
     options.MaxAge = TimeSpan.FromDays(365);       // 1 year
@@ -84,15 +93,15 @@ builder.Logging.AddProvider(new CsvLoggerProvider(logDirectory, LogLevel.Error))
 //builder.Services.AddTransient<CaseApproved>();
 //builder.Services.AddTransient<CaseRejected>();
 
-//builder.Services.AddCors(opt =>
-//{
-//    opt.AddDefaultPolicy(builder =>
-//    {
-//        builder.AllowAnyOrigin()
-//        .AllowAnyHeader()
-//            .AllowAnyMethod();
-//    });
-//});
+builder.Services.AddCors(opt =>
+{
+    opt.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+        .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
@@ -130,7 +139,7 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: partitionKey,
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 50,               // ⬅ max requests
+                PermitLimit = 500,               // ⬅ max requests
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0,
                 AutoReplenishment = true
@@ -144,7 +153,13 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
-
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IAzureAdService, AzureAdService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<IAnswerService, AnswerService>();
+builder.Services.AddScoped<IMediaIdfyService, MediaIdfyService>();
+builder.Services.AddScoped<IDocumentIdfyService, DocumentIdfyService>();
+builder.Services.AddScoped<IAgentFaceIdfyService, AgentFaceIdfyService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IVendorUserService, VendorUserService>();
 builder.Services.AddScoped<ICompanyUserService, CompanyUserService>();
@@ -200,7 +215,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICustomApiClient, CustomApiClient>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
 builder.Services.AddScoped<IClaimsAgentService, ClaimsAgentService>();
-builder.Services.AddScoped<ICompareFaces, CompareFaces>();
+builder.Services.AddScoped<IAmazonApiService, AmazonApiService>();
 builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<INumberSequenceService, NumberSequenceService>();
@@ -213,8 +228,9 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IFtpService, FtpService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
-builder.Services.AddScoped<IGoogleApi, GoogleApi>();
+builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
+builder.Services.AddScoped<ITextAnalyticsService, TextAnalyticsService>();
 
 builder.Services.AddScoped<IHttpClientService, HttpClientService>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
@@ -237,19 +253,6 @@ AWSConfigs.LoggingConfig.LogTo = LoggingOptions.Console;
 AWSConfigs.LoggingConfig.LogMetrics = true;
 AWSConfigs.LoggingConfig.LogResponses = ResponseLoggingOption.Always;
 
-
-// Add services to the container.
-builder.Services.AddControllersWithViews()
-    .AddRazorRuntimeCompilation()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-    })
-    .AddNewtonsoftJson(options =>
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-);
-
-//builder.Services.AddSignalR();
 builder.Services.AddNotyf(config =>
 {
     config.DurationInSeconds = 2;
@@ -268,24 +271,26 @@ builder.Services.AddHangfireServer(options =>
     options.Queues = new[] { "default", "emails", "critical" };
 });
 
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.CheckConsentNeeded = context => false;
-    options.MinimumSameSitePolicy = SameSiteMode.Strict;
-});
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
-builder.Services.AddIdentityCore<VendorApplicationUser>()
-    .AddRoles<ApplicationRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-builder.Services.AddIdentityCore<ClientCompanyApplicationUser>()
-    .AddRoles<ApplicationRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+
+    options.Filters.Add(new AuthorizeFilter(policy));
+})
+    .AddRazorRuntimeCompilation()
+    // Stick to one serializer if possible. Newtonsoft is more feature-rich for complex loops.
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+    });
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -294,84 +299,189 @@ builder.Services.Configure<IdentityOptions>(options =>
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => false;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always;
+});
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    // Increase the limit to 32KB to handle the 7-chunk cookie
+    serverOptions.Limits.MaxRequestHeadersTotalSize = 32768;
+});
+var authBuilder = builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+});
+authBuilder.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+{
+    options.SignInScheme = IdentityConstants.ApplicationScheme;
 
+    options.ClientId = builder.Configuration["AzureAd:ClientId"];
+    options.ClientSecret = builder.Configuration["AzureAd:ClientSecret"];
+
+    options.Authority =
+        $"https://login.microsoftonline.com/{builder.Configuration["AzureAd:TenantId"]}/v2.0";
+
+    options.ResponseType = OpenIdConnectResponseType.Code;
+
+    options.SaveTokens = false;
+    options.GetClaimsFromUserInfoEndpoint = true;
+
+    options.Scope.Clear();
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("email");
+    options.Scope.Add("User.Read");        // 🔴 REQUIRED
+    options.Scope.Add("User.Read.All");    // 🔴 REQUIRED (admin)
+    options.Scope.Add("Directory.Read.All"); // optional
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        NameClaimType = ClaimTypes.Email
+    };
+    options.Events = new OpenIdConnectEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
+            if (claimsIdentity != null)
+            {
+                var azureAdService = context.HttpContext.RequestServices.GetRequiredService<IAzureAdService>();
+                var notifyService = context.HttpContext.RequestServices.GetRequiredService<INotyfService>();
+                var email = await azureAdService.ValidateAzureSignIn(context);
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    context.Response.Redirect("/Account/Login");
+                    context.HandleResponse();
+                    notifyService.Error($"Azure AD Login error");
+                    return;
+                }
+                else
+                {
+                    notifyService.Success($"Welcome <b>{email}</b>, Login successful");
+                    context.HandleResponse();
+                    context.Response.Redirect("/Dashboard/Index");
+                }
+            }
+
+            await Task.CompletedTask;
+        },
+        OnRemoteFailure = context =>
+        {
+            if (context.Failure != null && context.Failure.Message.Contains("Correlation failed"))
+            {
+                context.Response.Redirect("/Account/Login");
+                context.HandleResponse();
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
+
+
+builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+    {
+        // Instead of CookieManager, we configure the individual cookies to be 'Essential'
+        // and pinned to the root path to prevent multiple versions from appearing.
+        options.NonceCookie.Path = "/";
+        options.CorrelationCookie.Path = "/";
+
+        options.NonceCookie.SameSite = SameSiteMode.None;
+        options.CorrelationCookie.SameSite = SameSiteMode.None;
+
+        options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        options.NonceCookie.IsEssential = true;
+        options.CorrelationCookie.IsEssential = true;
+
+        // This helps prevent the '4x cookie' build-up by timing them out quickly
+        options.RemoteAuthenticationTimeout = TimeSpan.FromMinutes(1);
+    });
+
+//  3️⃣ JWT Bearer authentication (API)
+authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey =
+            new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+// 4. Configure the Identity Cookie (Do this AFTER AddAuthentication)
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.Events.OnValidatePrincipal = async context =>
+    options.Cookie.Path = "/";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.None; // ✅ REQUIRED
+    options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME;
+    options.LoginPath = AppCookie.LOGIN_PATH;
+    options.LogoutPath = AppCookie.LOGOUT_PATH;
+    options.AccessDeniedPath = AppCookie.LOGOUT_PATH;
+    options.CookieManager = new ChunkingCookieManager();
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
+    // This tells Identity to use the same logic for OIDC users
+    options.Events.OnRedirectToLogin = context =>
     {
-        var userPrincipal = context.Principal;
-
-        // Check if the cookie is close to expiring
-        var now = DateTimeOffset.UtcNow;
-        var issuedUtc = context.Properties.IssuedUtc;
-        var expiresUtc = context.Properties.ExpiresUtc;
-
-        var sessionTimeout = double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]);
-        var renewalThreshold = sessionTimeout * 0.9; // Renew when 90% of the session timeout has passed.
-
-        if (expiresUtc.HasValue && now > expiresUtc.Value.AddSeconds(-renewalThreshold))
+        if (context.Request.Path.StartsWithSegments("/api"))
         {
-            context.Properties.ExpiresUtc = now.AddSeconds(sessionTimeout);
-            context.ShouldRenew = true;
+            context.Response.StatusCode = 401;
         }
-
-        await Task.CompletedTask;
+        else
+        {
+            context.Response.Redirect(context.RedirectUri);
+        }
+        return Task.CompletedTask;
     };
-    //options.EventsType = typeof(CustomCookieAuthenticationEvents);
-    // General cookie settings
-    options.Cookie.HttpOnly = true; // Ensures the cookie cannot be accessed via JavaScript (enhances security).
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensures the cookie is sent only over HTTPS.
-    options.Cookie.SameSite = SameSiteMode.Strict; // Prevents the cookie from being sent in cross-site requests (CSRF protection).
-    options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME; // Custom name for the authentication cookie.
-    options.Cookie.Path = "/"; // Specifies the cookie path.
-    options.Cookie.IsEssential = true; // Ensures the cookie is marked as essential, bypassing consent if required.
-    // Authentication-specific settings
-    options.LoginPath = AppCookie.LOGIN_PATH; // Redirect to this path if the user is not authenticated.
-    options.LogoutPath = AppCookie.LOGOUT_PATH; // Redirect to this path after logout.
-    options.AccessDeniedPath = AppCookie.LOGOUT_PATH; // Redirect here if the user lacks the required permissions.
-
-    // Expiration settings
-    options.SlidingExpiration = true; // Renews the cookie expiration time on every valid request.
-    options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"])); // Sets the lifetime of the cookie.
-}).AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie()
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    options.Events = new CookieAuthenticationEvents
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        OnRedirectToAccessDenied = context =>
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-            ),
-            ClockSkew = TimeSpan.Zero // Reduce delay tolerance for token expiration.
-        };
-
-        // Optional: Add token validation events for custom behavior.
-        options.Events = new JwtBearerEvents
+            // Treat AccessDenied same as Login after idle
+            context.Response.Redirect(options.LoginPath);
+            return Task.CompletedTask;
+        },
+        OnSignedIn = context =>
         {
-            OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
-            {
-                Console.WriteLine("Token validated successfully.");
-                return Task.CompletedTask;
-            }
-        };
-    });
+            var userName = context.Principal.Identity.Name;
+            var cookie = context.HttpContext.User.Claims;
+            Console.WriteLine($"✅ Identity {userName} cookie issued");
+            return Task.CompletedTask;
+        },
+        OnValidatePrincipal = context =>
+        {
+            Console.WriteLine("🔍 Identity cookie validated");
+            return Task.CompletedTask;
+        },
+        OnRedirectToLogin = context =>
+        {
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        }
+    };
+});
 
 builder.Services.AddAntiforgery(options =>
 {
     options.Cookie.Name = AppCookie.ANTI_FORGERY_COOKIE_NAME; // Set a custom cookie name
     options.Cookie.HttpOnly = true; // Make the cookie HttpOnly
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require secure cookies (only over HTTPS)
-    options.Cookie.SameSite = SameSiteMode.Strict; // Apply a strict SameSite policy
+    options.Cookie.SameSite = SameSiteMode.None;
     options.HeaderName = "X-CSRF-TOKEN"; // Set a custom header name
     options.FormFieldName = "__RequestVerificationToken"; // Set a custom form field name
     options.SuppressXFrameOptionsHeader = false; // Enable the X-Frame-Options header
@@ -408,38 +518,26 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddMvcCore(config =>
-{
-    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-    config.Filters.Add(new AuthorizeFilter(policy));
-});
+
 builder.Services.AddHttpContextAccessor();
 try
 {
     var app = builder.Build();
 
-
     app.UseHangfireDashboard("/hangfire", new DashboardOptions
     {
         Authorization = new[] { new BasicAuthAuthorizationFilter() }
     });
-    app.UseMiddleware<RequirePasswordChangeMiddleware>();
-    app.UseSwagger();
 
     if (app.Environment.IsDevelopment())
     {
-        // Show detailed error page for devs
         app.UseDeveloperExceptionPage();
     }
     else
     {
-        // Redirect to custom error page in production
         app.UseExceptionHandler("/Home/Error");
-        //app.UseStatusCodePagesWithRedirects("/Home/HTTP?statusCode={0}");
         app.UseHsts();
     }
-
-    app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
 
     app.UseHttpsRedirection();
 
@@ -457,27 +555,37 @@ try
     });
 
     app.UseRouting();
-    //app.UseRateLimiter();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    });
-
-    app.UseMiddleware<CookieConsentMiddleware>();
-
-    app.UseMiddleware<WhitelistListMiddleware>();
-
     app.UseCors();
     app.UseCookiePolicy();
     app.UseAuthentication();
     app.UseAuthorization();
-    app.UseMiddleware<LicensingMiddleware>();
-    app.UseMiddleware<UpdateUserLastActivityMiddleware>();
+    app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
+    app.UseMiddleware<RequirePasswordChangeMiddleware>();
+    app.UseMiddleware<CookieConsentMiddleware>();
+    app.UseMiddleware<WhitelistListMiddleware>();
+    //app.UseMiddleware<LicensingMiddleware>();
+    //app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    });
     app.UseNotyf();
     app.UseFileServer();
 
     app.UseRateLimiter();
+    app.Use(async (context, next) =>
+    {
+        await next();
+
+        if (context.Response.StatusCode == 401 &&
+            !context.User.Identity.IsAuthenticated)
+        {
+            await context.ChallengeAsync();
+        }
+    });
+
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Dashboard}/{action=Index}/{id?}")

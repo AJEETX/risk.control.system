@@ -49,6 +49,7 @@ namespace risk.control.system.Models
         public ReportTemplate? ReportTemplate { get; set; }
         public string? LocationName { get; set; }
         public string? Status { get; set; }
+        [EmailAddress]
         public string? AgentEmail { get; set; }
         public long? AgentIdReportId { get; set; }
         public AgentIdReport? AgentIdReport { get; set; } = new AgentIdReport

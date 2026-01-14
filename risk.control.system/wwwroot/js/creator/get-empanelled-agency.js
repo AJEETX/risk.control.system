@@ -62,7 +62,7 @@
                 "mRender": function (data, type, row) {
                     var img = '';
                     for (var i = 1; i <= 5; i++) {
-                        img += '<img id="' + i + '" src="/images/StarFade.gif" class="rating" vendorId="' + row.id + '"/>';
+                        img += '<img id="' + i + '" src="/img/StarFade.gif" class="rating" vendorId="' + row.id + '"/>';
                     }
 
                     // Add the rate count badge
@@ -223,11 +223,11 @@
                 stars.each(function (index) {
                     var star = $(this);
                     if (index < Math.floor(av)) {  // Fully filled stars
-                        star.attr("src", "/images/FilledStar.jpeg");
+                        star.attr("src", "/img/FilledStar.jpeg");
                     } else if (index === Math.floor(av) && av % 1 !== 0) {  // Handle half-filled stars
-                        star.attr("src", "/images/HalfStar.jpeg");  // You need a half-star image
+                        star.attr("src", "/imgHalfStar.jpeg");  // You need a half-star image
                     } else {
-                        star.attr("src", "/images/StarFade.gif");  // Faded stars
+                        star.attr("src", "/img/StarFade.gif");  // Faded stars
                     }
                 });
             }
@@ -326,7 +326,7 @@
         var av = $(this).find("span.avr").text();
         if (av != "" || av != null) {
             var img = $(this).find("img[id='" + parseInt(av) + "']");
-            img.attr("src", "/images/FilledStar.jpeg").prevAll("img.rating").attr("src", "/images/FilledStar.jpeg");
+            img.attr("src", "/img/FilledStar.jpeg").prevAll("img.rating").attr("src", "/img/FilledStar.jpeg");
         }
     });
 
@@ -402,11 +402,11 @@
 
 });
 function giveRating(img, image) {
-    img.attr("src", "/Images/" + image).prevAll("img.rating").attr("src", "/Images/" + image);
+    img.attr("src", "/img/" + image).prevAll("img.rating").attr("src", "/img/" + image);
 } function refilRating(img1) {
     var rt = $(img1).closest('tr').find("span.avr").text();
     var img = $(img1).closest('tr').find("img[id='" + parseInt(rt) + "']");
-    img.attr("src", "/images/FilledStar.jpeg").prevAll("img.rating").attr("src", "/images/FilledStar.jpeg");
+    img.attr("src", "/img/FilledStar.jpeg").prevAll("img.rating").attr("src", "/img/FilledStar.jpeg");
 }
 
 function getdetails(id) {

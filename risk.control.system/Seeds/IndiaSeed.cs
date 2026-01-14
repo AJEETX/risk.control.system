@@ -9,9 +9,8 @@ namespace risk.control.system.Seeds
 {
     public static class IndiaSeed
     {
-        public static async Task<string> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, UserManager<VendorApplicationUser> vendorUserManager,
-            UserManager<ClientCompanyApplicationUser> clientUserManager, RoleManager<ApplicationRole> roleManager, ICustomApiClient customApiCLient, IHttpContextAccessor httpAccessor,
-            List<Country> countries, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
+        public static async Task<string> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager,
+            ICustomApiClient customApiCLient, List<Country> countries, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
             string COUNTRY_CODE = "IN";
             string PINCODE = "122003";
@@ -61,7 +60,7 @@ namespace risk.control.system.Seeds
 
             foreach (var agency in agencies)
             {
-                var vendor = await AgencySeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency, servicesTypes, fileStorageService);
+                var vendor = await AgencySeed.Seed(context, webHostEnvironment, customApiCLient, userManager, agency, servicesTypes, fileStorageService);
                 vendors.Add(vendor);
             }
 
@@ -81,7 +80,7 @@ namespace risk.control.system.Seeds
             var companies = new List<SeedInput> { insurer };
             foreach (var company in companies)
             {
-                _ = await Insurer.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company, fileStorageService);
+                _ = await Insurer.Seed(context, vendors, webHostEnvironment, customApiCLient, userManager, company, fileStorageService);
             }
             await context.SaveChangesAsync(null, false);
             var pincode = indiaPincodes.FirstOrDefault(p => p.Code == PINCODE);

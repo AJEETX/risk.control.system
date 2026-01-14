@@ -1,4 +1,4 @@
-$(document).ready(function () {
+﻿$(document).ready(function () {
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/User/AllUsers',
@@ -132,7 +132,12 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + ' href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-user-minus"></i> Edit</a>&nbsp;'
+                    if (row.roles == "GUEST" || row.roles == undefined || row.roles == '' || row.roles == null) {
+                    buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
+                    }
+                    else {
+                        buttons += '<a id=edit' + row.id + ' href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-user-minus"></i> Edit</a>&nbsp;'
+                    }
                     return buttons;
                 }
             },
@@ -182,6 +187,76 @@ $(document).ready(function () {
             html: true
         });
     });
+    $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+
+        var id = $(this).attr('id').replace('details', '');
+        var url = '/User/Delete/' + id; // Replace with your actual API URL
+
+        $.confirm({
+            title: 'Confirm Deletion',
+            content: 'Are you sure you want to delete this case?',
+            type: 'red',
+            icon: 'fas fa-trash',
+            buttons: {
+                confirm: {
+                    text: 'Yes, delete it',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
+
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                                id: id
+                            },
+                            success: function (response) {
+                                // Show success message
+                                $.alert({
+                                    title: 'Deleted!',
+                                    content: response.message,
+                                    closeIcon: true,
+                                    type: 'red',
+                                    icon: 'fas fa-trash',
+                                    buttons: {
+                                        ok: {
+                                            text: 'Close',
+                                            btnClass: 'btn-default',
+                                        }
+                                    }
+                                });
+
+                                // Reload the DataTable
+                                $('#customerTable').DataTable().ajax.reload(null, false); // false = don't reset paging
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Delete failed:", xhr.responseText);
+                                $.alert({
+                                    title: 'Error!',
+                                    content: 'Failed to delete the case.',
+                                    type: 'red'
+                                });
+                            },
+                            complete: function () {
+                                $spinner.addClass("hidden");
+                                // ✅ Re-enable button and restore text
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
+                            }
+                        });
+                    }
+                },
+                cancel: function () {
+                    // Do nothing
+                }
+            }
+        });
+    });
+
 });
 
 function getColorClass(color) {

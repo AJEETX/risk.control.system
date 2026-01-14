@@ -5,45 +5,49 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
     public interface IAgentService
     {
-        Task<VendorApplicationUser> GetAgent(string mobile, bool sendSMS = false);
+        Task<ApplicationUser> GetAgent(string mobile, bool sendSMS = false);
 
-        Task<VendorApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false);
-        Task<VendorApplicationUser> GetPin(string agentEmail, string portal_base_url);
-        Task<List<ClaimsInvestigationAgencyResponse>> GetNewCases(string userEmail);
-        Task<List<ClaimsInvestigationAgencyResponse>> GetSubmittedCases(string userEmail);
+        Task<ApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false);
+        Task<ApplicationUser> GetPin(string agentEmail, string portal_base_url);
+        Task<List<CaseInvestigationAgencyResponse>> GetNewCases(string userEmail);
+        Task<List<CaseInvestigationAgencyResponse>> GetSubmittedCases(string userEmail);
     }
 
     internal class AgentService : IAgentService
     {
         private readonly ApplicationDbContext context;
+        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment env;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ISmsService smsService;
-        private readonly UserManager<VendorApplicationUser> userVendorManager;
+        private readonly UserManager<ApplicationUser> userVendorManager;
 
         public AgentService(ApplicationDbContext context,
+            RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment env,
              IHttpContextAccessor httpContextAccessor,
              ISmsService smsService,
-            UserManager<VendorApplicationUser> userVendorManager)
+            UserManager<ApplicationUser> userVendorManager)
         {
             this.context = context;
+            this.roleManager = roleManager;
             this.env = env;
             this.httpContextAccessor = httpContextAccessor;
             this.smsService = smsService;
             this.userVendorManager = userVendorManager;
         }
 
-        public async Task<VendorApplicationUser> GetAgent(string mobile, bool sendSMS = false)
+        public async Task<ApplicationUser> GetAgent(string mobile, bool sendSMS = false)
         {
-            var agentRole = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+            var agentRole = await roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
-            var user2Onboard = await context.VendorApplicationUser.FirstOrDefaultAsync(u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
+            var user2Onboard = await context.ApplicationUser.FirstOrDefaultAsync(u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
 
             var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
             if (isAgent)
@@ -51,9 +55,9 @@ namespace risk.control.system.Services
             return null!;
         }
 
-        public async Task<List<ClaimsInvestigationAgencyResponse>> GetNewCases(string userEmail)
+        public async Task<List<CaseInvestigationAgencyResponse>> GetNewCases(string userEmail)
         {
-            var vendorUser = await context.VendorApplicationUser.Include(v => v.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await context.ApplicationUser.Include(v => v.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
             var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
             var claims = await GetClaims()
                     .Where(i => i.VendorId == vendorUser.VendorId &&
@@ -63,7 +67,7 @@ namespace risk.control.system.Services
 
 
             var response = claims
-                   .Select(a => new ClaimsInvestigationAgencyResponse
+                   .Select(a => new CaseInvestigationAgencyResponse
                    {
                        Id = a.Id,
                        PolicyId = a.PolicyDetail.ContractNumber,
@@ -102,11 +106,11 @@ namespace risk.control.system.Services
             return response;
         }
 
-        public async Task<VendorApplicationUser> GetPin(string agentEmail, string portal_base_url)
+        public async Task<ApplicationUser> GetPin(string agentEmail, string portal_base_url)
         {
-            var agentRole = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+            var agentRole = await roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
-            var user2Onboard = await context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == agentEmail);
+            var user2Onboard = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == agentEmail);
 
             var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
             if (isAgent)
@@ -114,9 +118,9 @@ namespace risk.control.system.Services
             return null!;
         }
 
-        public async Task<List<ClaimsInvestigationAgencyResponse>> GetSubmittedCases(string userEmail)
+        public async Task<List<CaseInvestigationAgencyResponse>> GetSubmittedCases(string userEmail)
         {
-            var agentUser = await context.VendorApplicationUser.Include(v => v.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var agentUser = await context.ApplicationUser.Include(v => v.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
             var claims = await GetClaims()
                     .Where(i => i.VendorId == agentUser.VendorId &&
                     i.TaskedAgentEmail == userEmail &&
@@ -124,7 +128,7 @@ namespace risk.control.system.Services
                     i.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).ToListAsync();
 
             var response = claims
-                   .Select(a => new ClaimsInvestigationAgencyResponse
+                   .Select(a => new CaseInvestigationAgencyResponse
                    {
                        Id = a.Id,
                        PolicyId = a.PolicyDetail.ContractNumber,
@@ -159,11 +163,11 @@ namespace risk.control.system.Services
             return response;
         }
 
-        public async Task<VendorApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false)
+        public async Task<ApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false)
         {
-            var agentRole = await context.ApplicationRole.FirstOrDefaultAsync(r => r.Name.Contains(AppRoles.AGENT.ToString()));
+            var agentRole = await roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
-            var user2Onboards = context.VendorApplicationUser.Include(c => c.Country).Where(
+            var user2Onboards = context.ApplicationUser.Include(c => c.Country).Where(
                 u => u.Country.ISDCode + u.PhoneNumber.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));
 
             foreach (var user2Onboard in user2Onboards)
@@ -173,7 +177,7 @@ namespace risk.control.system.Services
                 {
                     user2Onboard.MobileUId = string.Empty;
                     user2Onboard.SecretPin = string.Empty;
-                    context.VendorApplicationUser.Update(user2Onboard);
+                    context.ApplicationUser.Update(user2Onboard);
                     context.SaveChanges();
 
                     if (sendSMS)

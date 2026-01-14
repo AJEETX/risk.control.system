@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.VendorApplicationUser
+﻿@model risk.control.system.Models.ApplicationUser
 
 @{
     ViewData["Title"] = Applicationsettings.DELETE;
@@ -20,14 +20,7 @@
                                 Profile photo
                             </dt>
                             <dd class="col-sm-5">
-                                @if (Model?.ProfilePictureUrl is not null)
-                                {
-                                    <img id="ProfileImage" class="form-Image" src="/Document/GetAgencyUserDocument/@Model?.Id">
-                                }
-                                else
-                                {
-                                    <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                }
+                                <img id="ProfileImage" class="form-Image" src="/Document/GetUserProfileImage/@Model?.Id" alt="Profile" />
                             </dd>
                             <dt class="col-sm-5">
                                 @Html.DisplayNameFor(model => model.FirstName)
@@ -64,10 +57,10 @@
                     <div class="col-md-6">
                         <dl class="row">
                             <dt class="col-sm-5">
-                                @Html.DisplayNameFor(model => model.UserRole)
+                                @Html.DisplayNameFor(model => model.Role)
                             </dt>
                             <dd class="col-sm-5">
-                                @Html.DisplayFor(model => model.UserRole)
+                                @Html.DisplayFor(model => model.Role)
                             </dd>
                             <dt class="col-sm-5">
                                 @Html.DisplayNameFor(model => model.Addressline)

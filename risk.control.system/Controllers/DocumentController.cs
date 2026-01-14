@@ -7,6 +7,7 @@ using risk.control.system.Data;
 using SmartBreadcrumbs.Attributes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -160,44 +161,19 @@ namespace risk.control.system.Controllers.Company
 
             return File(fileBytes, contentType);
         }
-        public async Task<IActionResult> GetCompanyUserDocument(long id)
-        {
-            var companyUser = await context.ClientCompanyApplicationUser
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (companyUser.ProfilePictureUrl == null)
-                return NotFound();
-
-            var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, companyUser.ProfilePictureUrl);
-
-            if (!System.IO.File.Exists(fullPath))
-                return NotFound();
-
-            var ext = Path.GetExtension(fullPath).ToLowerInvariant();
-            var contentType = ext switch
-            {
-                ".jpg" => "image/jpeg",
-                ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                _ => "application/octet-stream"
-            };
-
-            var fileBytes = System.IO.File.ReadAllBytes(fullPath);
-
-            return File(fileBytes, contentType);
-        }
-        public async Task<IActionResult> GetAgencyUserDocument(long id)
+        public async Task<IActionResult> GetUserProfileImage(long id)
         {
             var user = await context.ApplicationUser
                 .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (user.ProfilePictureUrl == null)
-                return NotFound();
-
-            var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl);
-
-            if (!System.IO.File.Exists(fullPath))
-                return NotFound();
+            string fullPath = string.Empty;
+            if (user.ProfilePictureUrl != null)
+            {
+                fullPath = Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl);
+            }
+            else
+            {
+                fullPath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
+            }
 
             var ext = Path.GetExtension(fullPath).ToLowerInvariant();
             var contentType = ext switch
@@ -212,6 +188,7 @@ namespace risk.control.system.Controllers.Company
 
             return File(fileBytes, contentType);
         }
+
         public async Task<IActionResult> GetAgentDocument(long id)
         {
             var agent = await context.AgentIdReport
@@ -324,33 +301,6 @@ namespace risk.control.system.Controllers.Company
             var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
 
             return File(stream, contentType);  // StreamResult, does NOT load entire file
-        }
-
-        public async Task<IActionResult> GetUserImage(string email)
-        {
-            var companyUser = await context.ApplicationUser
-                .FirstOrDefaultAsync(x => x.Email == email);
-
-            if (companyUser.ProfilePictureUrl == null)
-                return NotFound();
-
-            var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, companyUser.ProfilePictureUrl);
-
-            if (!System.IO.File.Exists(fullPath))
-                return NotFound();
-
-            var ext = Path.GetExtension(fullPath).ToLowerInvariant();
-            var contentType = ext switch
-            {
-                ".jpg" => "image/jpeg",
-                ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                _ => "application/octet-stream"
-            };
-
-            var fileBytes = System.IO.File.ReadAllBytes(fullPath);
-
-            return File(fileBytes, contentType);
         }
     }
 }

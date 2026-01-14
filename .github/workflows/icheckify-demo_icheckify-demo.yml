@@ -13,15 +13,33 @@ permissions:
 
 env:
   APP_SERVICE_NAME: "icheckify-demo"
+  RESOURCE_GROUP: rg-icheckify-demo
+  LOCATION: australiaeast
+  APP_SERVICE_PLAN: asp-icheckify-demo
 
 jobs:
 
+  # ---------------------------------------------------
+  # 1️⃣ Infra Provision Setup
+  # ---------------------------------------------------
+  # provision:
+  #   uses: ./.github/workflows/resource-provision.yml
+  #   secrets: inherit
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   with:
+  #       resource-group: ${{ env.RESOURCE_GROUP }}
+  #       location: ${{ env.LOCATION }}
+  #       app-service-plan: ${{ env.APP_SERVICE_PLAN }}
+  #       app-service-name: ${{ env.APP_SERVICE_NAME }}
   # ---------------------------------------------------
   # 1️⃣ Code Scan Job
   # ---------------------------------------------------
   code-scan:
     uses: ./.github/workflows/code-scan.yml
     secrets: inherit
+    # needs: provision
 
   # ---------------------------------------------------
   # 2️⃣   Build  .Net Core Application Job

@@ -57,12 +57,6 @@ namespace risk.control.system.Models
         public CaseEnabler? CaseEnabler { get; set; }
 
         [Display(Name = "Case Document")]
-        [NotMapped]
-        [Required]
-        [FileExtensions(Extensions = "jpg,jpeg,png")]
-        public IFormFile? Document { get; set; }
-
-        [Display(Name = "Case Document")]
         public string? DocumentImageExtension { get; set; }
         public string? DocumentPath { get; set; }
         public byte[]? DocumentImage { get; set; } = default!;
@@ -70,7 +64,14 @@ namespace risk.control.system.Models
         [Display(Name = "Case remarks")]
         [StringLength(500)]
         public string? Comments { get; set; }
+        [Display(Name = "Case Document")]
 
+        #region NOT MAPPED PROPERTIES
+        [NotMapped]
+        [Required]
+        [FileExtensions(Extensions = "jpg,jpeg,png")]
+        public IFormFile? Document { get; set; }
+        #endregion
         public override string ToString()
         {
             return $"Case Information:\n" +

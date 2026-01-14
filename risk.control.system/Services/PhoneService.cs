@@ -32,13 +32,16 @@ namespace risk.control.system.Services
 
             // Add more as needed
         };
-        private static readonly HttpClient _httpClient = new();
+        private readonly IHttpClientFactory httpClientFactory;
 
         // Ideally move these to configuration or secrets manager
         private const string ApiHost = "phonenumbervalidatefree.p.rapidapi.com";
         private static string ApiKey = Environment.GetEnvironmentVariable("PHONE_API");
         private const string BaseUrl = $"https://{ApiHost}/ts_PhoneNumberValidateTest.jsp";
-
+        public PhoneService(IHttpClientFactory httpClientFactory)
+        {
+            this.httpClientFactory = httpClientFactory;
+        }
         public async Task<PhoneNumberInfo?> ValidateAsync(string mobileNumber)
         {
             if (string.IsNullOrWhiteSpace(mobileNumber))
@@ -58,7 +61,8 @@ namespace risk.control.system.Services
 
             try
             {
-                using var response = await _httpClient.SendAsync(request);
+                var httpClient = httpClientFactory.CreateClient();
+                using var response = await httpClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();
 
                 var body = await response.Content.ReadAsStringAsync();

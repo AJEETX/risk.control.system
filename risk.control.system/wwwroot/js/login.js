@@ -67,13 +67,14 @@ document.addEventListener("DOMContentLoaded", function () {
             termsModal.classList.add('show');
         });
     });
-
-    // Close the modal when clicking the close button
-    closeTermsButton.addEventListener('click', function () {
-        termsModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
-        termsModal.classList.remove('show'); // Remove the 'show' class to hide the modal
-    });
-
+    if (closeTermsButton) {
+        // Close the modal when clicking the close button
+        closeTermsButton.addEventListener('click', function () {
+            termsModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
+            termsModal.classList.remove('show'); // Remove the 'show' class to hide the modal
+        });
+    }
+    
     // Optionally, you can close the modal if clicked outside the modal content
     window.addEventListener('click', function (e) {
         if (e.target === termsModal) {
@@ -82,29 +83,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-
-    // Add event listeners to all elements with class `toggle-password-visibility`
-    const toggleButtons = document.querySelectorAll('.toggle-password-visibility');
-
-    toggleButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            // Get the target input field ID from the `data-target` attribute
-            const passwordFieldId = button.getAttribute('data-target');
-            const passwordField = document.getElementById(passwordFieldId);
-            const eyeIcon = button.querySelector('i');
-
-            // Toggle password visibility
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                eyeIcon.classList.remove("fa-eye-slash");
-                eyeIcon.classList.add("fa-eye");
-            } else {
-                passwordField.type = "password";
-                eyeIcon.classList.remove("fa-eye");
-                eyeIcon.classList.add("fa-eye-slash");
-            }
-        });
-    });
 });
 
 $(document).ready(function () {
@@ -264,4 +242,19 @@ function onlyDigits(el) {
 }
 window.onload = function () {
     focusLogin();
+}
+
+let timeLeft = 300;
+const timerElem = document.getElementById('timer');
+const resendBtn = document.getElementById('resendBtn');
+if (timerElem) {
+    const countdown = setInterval(() => {
+        timeLeft--;
+        timerElem.innerText = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            resendBtn.innerText = "Resend OTP";
+            resendBtn.disabled = false;
+        }
+    }, 1000);
 }

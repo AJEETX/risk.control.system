@@ -15,8 +15,6 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers.Company
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
@@ -50,15 +48,15 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
+                if (userRole.Value.Contains(CREATOR.DISPLAY_NAME))
                 {
                     return RedirectToAction("Uploads");
                 }
-                else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
+                else if (userRole.Value.Contains(ASSESSOR.DISPLAY_NAME))
                 {
                     return RedirectToAction("Assessor");
                 }
-                else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
+                else if (userRole.Value.Contains(MANAGER.DISPLAY_NAME))
                 {
                     return RedirectToAction("Manager");
                 }
@@ -84,7 +82,7 @@ namespace risk.control.system.Controllers.Company
                 int availableCount = 0;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
                 if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
                     var totalClaimsCreated = await _context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);

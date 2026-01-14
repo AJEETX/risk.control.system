@@ -13,6 +13,7 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Controllers
 {
@@ -49,7 +50,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = await _context.VendorApplicationUser
+                var vendorUser = await _context.ApplicationUser
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
                     .Include(u => u.State)
@@ -71,13 +72,13 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (userId == null || _context.VendorApplicationUser == null)
+                if (userId == null || _context.ApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorApplicationUser = await _context.VendorApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
+                var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
@@ -106,7 +107,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, VendorApplicationUser model)
+        public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
             try
             {
@@ -134,14 +135,13 @@ namespace risk.control.system.Controllers
                     return View(model);
                 }
                 notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
-                return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
             }
+            return RedirectToAction(nameof(Index), "Dashboard");
         }
 
         [HttpGet]
@@ -151,7 +151,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser != null)
                 {
                     return View();
@@ -200,7 +200,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("Password Change Succees")]
-        public async Task<IActionResult> ChangePasswordConfirmation()
+        public IActionResult ChangePasswordConfirmation()
         {
             notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
             return View();

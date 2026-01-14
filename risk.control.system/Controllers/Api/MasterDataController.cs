@@ -106,8 +106,8 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-                var vendorAgentIds = await context.Set<VendorApplicationUser>()
-                .Where(v => v.UserRole == AgencyRole.AGENT)
+                var vendorAgentIds = await context.Set<ApplicationUser>()
+                .Where(v => v.Role == AppRoles.AGENT)
                 .Select(v => v.Id)
                 .ToListAsync();
 
@@ -618,6 +618,47 @@ namespace risk.control.system.Controllers.Api
                             Flag = "/flags/" + c.Code.ToLower() + ".png",
                             CountryId = $"{c.Code.ToString()}",
                             Label = $"+{c.ISDCode.ToString()} {c.Name}"
+                        })?
+                        .ToList();
+                return Ok(countries);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting isd code");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        [AllowAnonymous]
+        [HttpGet("GetIsdCode")]
+        public IActionResult GetIsdCode(string term = "")
+        {
+            try
+            {
+                var allCountries = context.Country.ToList();
+
+                if (string.IsNullOrEmpty(term))
+                    return Ok(allCountries
+                        .OrderBy(x => x.Name)
+                     //.Take(10)
+                     .Select(c => new
+                     {
+                         IsdCode = $"+{c.ISDCode.ToString()}",
+                         Flag = "/flags/" + c.Code.ToLower() + ".png",
+                         CountryId = $"{c.Code.ToString()}",
+                         Label = $"+{c.ISDCode.ToString()} ( {c.Name} )"
+                     })?
+                        .ToList());
+
+                var countries = allCountries
+                        .Where(c => c.Name.StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.ISDCode.ToString().StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.Code.StartsWith(term, StringComparison.OrdinalIgnoreCase))
+                        .OrderBy(x => x.Name)
+                        //.Take(10)
+                        .Select(c => new
+                        {
+                            IsdCode = $"+{c.ISDCode.ToString()}",
+                            Flag = "/flags/" + c.Code.ToLower() + ".png",
+                            CountryId = $"{c.Code.ToString()}",
+                            Label = $"+{c.ISDCode.ToString()} ( {c.Name} )"
                         })?
                         .ToList();
                 return Ok(countries);

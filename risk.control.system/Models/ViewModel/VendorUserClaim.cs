@@ -2,7 +2,7 @@
 {
     public class VendorUserClaim
     {
-        public VendorApplicationUser AgencyUser { get; set; }
+        public ApplicationUser AgencyUser { get; set; }
         public int CurrentCaseCount { get; set; }
     }
 }

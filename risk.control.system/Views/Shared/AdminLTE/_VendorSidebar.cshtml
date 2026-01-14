@@ -5,7 +5,7 @@
 @model Vendor
 <aside class="main-sidebar elevation-2 sidebar-light-primary">
     <!-- Brand Logo -->
-    <a href="/" class="brand-link">
+    <a class="brand-link">
         <div>
             @if (Model?.DocumentUrl is not null)
             {
@@ -41,17 +41,17 @@
 
                 <partial name="AdminLTE/_VendorSidebarDashboard" />
 
-                @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()) || User.IsInRole(AppRoles.SUPERVISOR.ToString()))
+                @if (User.IsInRole(AGENCY_ADMIN.DISPLAY_NAME) || User.IsInRole(SUPERVISOR.DISPLAY_NAME))
                 {
                     <partial name="AdminLTE/_VendorSidebarInvestigation" />
 
                 }
-                @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
+                @if (User.IsInRole(AGENCY_ADMIN.DISPLAY_NAME))
                 {
                     <partial name="AdminLTE/_VendorSidebarAdmin" />
                 }
 
-                @if (User.IsInRole(AppRoles.AGENT.ToString()))
+                @if (User.IsInRole(AGENT.DISPLAY_NAME))
                     {
                     <partial name="AdminLTE/_VendorSidebarAgent" />
 

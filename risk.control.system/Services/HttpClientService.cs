@@ -31,7 +31,7 @@ namespace risk.control.system.Services
 
     internal class HttpClientService : IHttpClientService
     {
-        private static HttpClient httpClient = new HttpClient();
+        private readonly IHttpClientFactory httpClientFactory;
         private readonly ILogger<HttpClientService> logger;
         private readonly IWebHostEnvironment env;
         private readonly IAmazonTranscribeService _amazonTranscribeService;
@@ -39,12 +39,14 @@ namespace risk.control.system.Services
         private readonly IMediaDataService mediaDataService;
 
         public HttpClientService(
+            IHttpClientFactory httpClientFactory,
             ILogger<HttpClientService> logger,
             IWebHostEnvironment env,
             IAmazonTranscribeService amazonTranscribeService,
             IAmazonS3 s3Client,
             IMediaDataService mediaDataService)
         {
+            this.httpClientFactory = httpClientFactory;
             this.logger = logger;
             this.env = env;
             _amazonTranscribeService = amazonTranscribeService;
@@ -61,6 +63,7 @@ namespace risk.control.system.Services
             };
             try
             {
+                var httpClient = httpClientFactory.CreateClient();
                 using (var response = await httpClient.SendAsync(request))
                 {
                     response.EnsureSuccessStatusCode();
@@ -96,6 +99,8 @@ namespace risk.control.system.Services
                     }
                 }
             };
+            var httpClient = httpClientFactory.CreateClient();
+
             using (var response = await httpClient.SendAsync(request))
             {
                 response.EnsureSuccessStatusCode();
@@ -121,6 +126,7 @@ namespace risk.control.system.Services
                     { "x-rapidapi-host", "passport-verification.p.rapidapi.com" },
                 },
             };
+            var httpClient = httpClientFactory.CreateClient();
             using (var response = await httpClient.SendAsync(request))
             {
                 response.EnsureSuccessStatusCode();
@@ -170,6 +176,7 @@ namespace risk.control.system.Services
             };
             try
             {
+                var httpClient = httpClientFactory.CreateClient();
                 using (var response = await httpClient.SendAsync(request))
                 {
                     response.EnsureSuccessStatusCode();
@@ -296,6 +303,7 @@ namespace risk.control.system.Services
                     }
                 }
             };
+            var httpClient = httpClientFactory.CreateClient();
             using (var response = await httpClient.SendAsync(request))
             {
                 response.EnsureSuccessStatusCode();

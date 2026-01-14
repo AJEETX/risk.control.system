@@ -25,11 +25,11 @@
         // Update stars to reflect the hover rating
         $('#agency-rating img.rating').each(function (index) {
             if (index < rating) {
-                $(this).attr('src', '/images/FilledStar.jpeg');
+                $(this).attr('src', '/img/FilledStar.jpeg');
             } else if (index === rating && av % 1 !== 0) {
-                $(this).attr('src', '/images/HalfStar.jpeg');
+                $(this).attr('src', '/img/HalfStar.jpeg');
             } else {
-                $(this).attr('src', '/images/StarFade.gif');
+                $(this).attr('src', '/img/StarFade.gif');
             }
         });
     }).on('mouseleave', 'img.rating', function () {
@@ -40,11 +40,11 @@
         var av = parseFloat($('.avr').text());
         $('#agency-rating img.rating').each(function (index) {
             if (index < Math.floor(av)) {
-                $(this).attr("src", "/images/FilledStar.jpeg");
+                $(this).attr("src", "/img/FilledStar.jpeg");
             } else if (index === Math.floor(av) && av % 1 !== 0) {
-                $(this).attr("src", "/images/HalfStar.jpeg");
+                $(this).attr("src", "/img/HalfStar.jpeg");
             } else {
-                $(this).attr("src", "/images/StarFade.gif");
+                $(this).attr("src", "/img/StarFade.gif");
             }
         });
     });
@@ -65,7 +65,7 @@
     function highlightStars(rating) {
         $('#agency-rating img.rating').each(function () {
             var currentStar = parseInt($(this).attr('id'));
-            $(this).attr("src", currentStar <= rating ? "/images/FilledStar.jpeg" : "/images/StarFade.gif");
+            $(this).attr("src", currentStar <= rating ? "/img/FilledStar.jpeg" : "/img/StarFade.gif");
         });
     }
 
@@ -73,7 +73,7 @@
         var avgRating = parseFloat(container.find("span.avr").text()) || 0;
         $('#agency-rating img.rating').each(function () {
             var currentStar = parseInt($(this).attr('id'));
-            $(this).attr("src", currentStar <= avgRating ? "/images/FilledStar.jpeg" : "/images/StarFade.gif");
+            $(this).attr("src", currentStar <= avgRating ? "/img/FilledStar.jpeg" : "/img/StarFade.gif");
         });
 
         var av = parseFloat($('.avr').text()); // Get the average rating from the page
@@ -86,11 +86,11 @@
                 var star = $(this);
 
                 if (index < Math.floor(av)) {  // Fully filled stars
-                    star.attr("src", "/images/FilledStar.jpeg");
+                    star.attr("src", "/img/FilledStar.jpeg");
                 } else if (index === Math.floor(av) && av % 1 !== 0) {  // Handle half-filled stars
-                    star.attr("src", "/images/HalfStar.jpeg");  // You need a half-star image
+                    star.attr("src", "/img/HalfStar.jpeg");  // You need a half-star image
                 } else {
-                    star.attr("src", "/images/StarFade.gif");  // Faded stars
+                    star.attr("src", "/img/StarFade.gif");  // Faded stars
                 }
             });
         }

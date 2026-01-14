@@ -4,6 +4,8 @@ namespace risk.control.system.Models.ViewModel
 {
     public class ChangePasswordViewModel
     {
+        public long Id { get; set; }
+        [EmailAddress]
         public string? Email { get; set; }
         [DataType(DataType.Password)]
         [Display(Name = "Current password")]

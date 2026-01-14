@@ -4,15 +4,16 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
     public interface IAssessorService
     {
-        Task<List<ClaimsInvestigationResponse>> GetInvestigations(string userEmail);
-        Task<List<ClaimsInvestigationResponse>> GetReview(string userEmail);
-        Task<List<ClaimsInvestigationResponse>> GetApprovededCases(string userEmail);
-        Task<List<ClaimsInvestigationResponse>> GetRejectedCases(string userEmail);
+        Task<List<CaseInvestigationResponse>> GetInvestigations(string userEmail);
+        Task<List<CaseInvestigationResponse>> GetReview(string userEmail);
+        Task<List<CaseInvestigationResponse>> GetApprovededCases(string userEmail);
+        Task<List<CaseInvestigationResponse>> GetRejectedCases(string userEmail);
     }
     public class AssessorService : IAssessorService
     {
@@ -25,9 +26,9 @@ namespace risk.control.system.Services
             this.env = env;
         }
 
-        public async Task<List<ClaimsInvestigationResponse>> GetApprovededCases(string userEmail)
+        public async Task<List<CaseInvestigationResponse>> GetApprovededCases(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(u => u.Email == userEmail);
 
@@ -71,7 +72,7 @@ namespace risk.control.system.Services
                             i.SubmittedAssessordEmail == userEmail).ToListAsync();
 
             var response = claims
-                .Select(a => new ClaimsInvestigationResponse
+                .Select(a => new CaseInvestigationResponse
                 {
                     Id = a.Id,
                     AutoAllocated = a.IsAutoAllocated,
@@ -116,9 +117,9 @@ namespace risk.control.system.Services
             return response;
         }
 
-        public async Task<List<ClaimsInvestigationResponse>> GetInvestigations(string userEmail)
+        public async Task<List<CaseInvestigationResponse>> GetInvestigations(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.ClientCompany)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -152,7 +153,7 @@ namespace risk.control.system.Services
 
             // Prepare the response
             var response = claims
-                .Select(a => new ClaimsInvestigationResponse
+                .Select(a => new CaseInvestigationResponse
                 {
                     Id = a.Id,
                     AutoAllocated = a.IsAutoAllocated,
@@ -209,9 +210,9 @@ namespace risk.control.system.Services
             return response;
         }
 
-        public async Task<List<ClaimsInvestigationResponse>> GetReview(string userEmail)
+        public async Task<List<CaseInvestigationResponse>> GetReview(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                  .Include(c => c.Country)
                  .FirstOrDefaultAsync(c => c.Email == userEmail);
             var claims = await context.Investigations
@@ -242,7 +243,7 @@ namespace risk.control.system.Services
                 .ToListAsync();
 
             var response = claims
-                .Select(a => new ClaimsInvestigationResponse
+                .Select(a => new CaseInvestigationResponse
                 {
                     Id = a.Id,
                     AutoAllocated = a.IsAutoAllocated,
@@ -308,7 +309,7 @@ namespace risk.control.system.Services
             }
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                var vendor = context.VendorApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
+                var vendor = context.ApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
                 if (vendor != null && !string.IsNullOrWhiteSpace(vendor.ProfilePictureUrl))
                 {
                     var vendorImagePath = Path.Combine(env.ContentRootPath, vendor.ProfilePictureUrl);
@@ -347,9 +348,9 @@ namespace risk.control.system.Services
             return canDownload;
         }
 
-        public async Task<List<ClaimsInvestigationResponse>> GetRejectedCases(string userEmail)
+        public async Task<List<CaseInvestigationResponse>> GetRejectedCases(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser
+            var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
@@ -388,7 +389,7 @@ namespace risk.control.system.Services
 
 
             var response = claims
-                .Select(a => new ClaimsInvestigationResponse
+                .Select(a => new CaseInvestigationResponse
                 {
                     Id = a.Id,
                     AutoAllocated = a.IsAutoAllocated,

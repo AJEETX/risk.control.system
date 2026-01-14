@@ -33,7 +33,7 @@ namespace risk.control.system.Services
 
         public async Task<InvestigationCreateModel> Create(string userEmail)
         {
-            var companyUser = await context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
             var claim = new InvestigationTask
             {
                 ClientCompany = companyUser.ClientCompany

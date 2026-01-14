@@ -9,8 +9,6 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Claims
@@ -123,7 +121,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             try
             {
-                var isAgencyUser = await _context.VendorApplicationUser.AnyAsync(u => u.Email == userEmail);
+                var isAgencyUser = await _context.ApplicationUser.AnyAsync(u => u.Email == userEmail);
 
                 var customer = await _context.CustomerDetail
                     .Include(c => c.Country)
@@ -509,7 +507,7 @@ namespace risk.control.system.Controllers.Api.Claims
             try
             {
                 var currentUserEmail = HttpContext.User.Identity.Name;
-                var agent = await _context.VendorApplicationUser.FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == currentUserEmail);
                 var claim = caseService.GetCasesWithDetail()
                     .FirstOrDefault(c => c.Id == caseId);
                 var docReport = await _context.MediaReport.FirstOrDefaultAsync(l => l.Id == docId);

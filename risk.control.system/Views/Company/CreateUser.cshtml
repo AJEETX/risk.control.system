@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.ClientCompanyApplicationUser
+﻿@model risk.control.system.Models.ApplicationUser
 
 @{
     ViewData["Title"] = Applicationsettings.CREATE;
@@ -127,15 +127,15 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="input-group-label" for="UserRole"> Role:</label>
+                            <label class="input-group-label" for="Role"> Role:</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <select id="UserRole" required asp-for="@Model.UserRole" class="form-control remarks" asp-items="@Model.AvailableRoles">
+                                <select id="Role" required asp-for="Role" class="form-control remarks" asp-items="@Model.AvailableRoles">
                                     <option value="">--- SELECT ---</option>
                                 </select>
-                                <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
+                                <span asp-validation-for="Role" class="text-danger"></span>
                             </div>
                         </div>
                         <partial name="_Address" model="@Model" />

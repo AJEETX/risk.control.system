@@ -1,17 +1,19 @@
 ﻿@model LoginViewModel
 <div class="login-form">
-    <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
+    <img class="login-logo" src="/img/iCheckifyLogo.png" alt="logo"/>™️
 
     <div id="title" class="title" title="Login">
         Login
-        <sup class="fa fa-info-circle password-info-icon"></sup>
+        <sup class="fa fa-info-circle password-info-icon"></sup> 
+        <a  class="microsoft" href="/Account/AzureLogin">
+            <img src="~/img/microsoft-icon.png" class="microsoft mr-2" alt="microsoft" />
+        </a>
     </div>
+    
     <form id="login-form" asp-controller="Account" method="post">
         @Html.AntiForgeryToken()
         <input name="agent_login" title="agent_login" type="text" id="agent_login" value="">
-
         <div class="input-boxes">
-
             <div class="input-box autocomplete-wrapper">
                 <i class="fas fa-envelope left-padd"></i>
                 <input asp-for=Email id="email" type="email" title="Email" class="form-control remarks auto-dropdown"
@@ -32,14 +34,7 @@
                     <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" autocomplete="off" required />
                 
                 }
-                <!-- Eye Icon for Toggling Password Visibility -->
-                @* <div class="password-toggle remarks">
-                    <span class="input-group-text toggle-password-visibility" data-target="Password">
-                        <i id="eyeIconCurrent" class="fa fa-eye-slash"></i>
-                    </span>
-                </div> *@
             </div>
-
             <p class="account">By clicking <strong><span class="fa fa-key" aria-hidden="true"></span> Login</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
             <div class="button input-box">
                 <button data-testid="logintest" id="login" type="submit" value="Login" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
@@ -47,8 +42,8 @@
             <div class="text-muted text-sm">Forgot Password? <span class="far fa-hand-point-right" aria-hidden="true"></span> <label for="flip" class="login-link"> Click Here</label></div>
         </div>
     </form>
+    
     <div class="error-message">
-
         @if (Model?.LoginError != null)
         {
             <p class="account">

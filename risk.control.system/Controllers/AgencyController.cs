@@ -1,4 +1,7 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +25,12 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class AgencyController : Controller
     {
+        private AppRoles[] agencyRoles = new[]
+                {
+                    AppRoles.AGENCY_ADMIN,
+                    AppRoles.SUPERVISOR,
+                    AppRoles.AGENT
+                };
         private readonly ApplicationDbContext _context;
         private readonly IVendorServiceTypeManager vendorServiceTypeManager;
         private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
@@ -68,7 +77,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 var vendor = await _context.Vendor
                     .Include(v => v.ratings)
@@ -101,7 +110,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (vendorUser == null)
                 {
                     notifyService.Error("User Not found !!!..Contact Admin");
@@ -172,7 +181,7 @@ namespace risk.control.system.Controllers
             model.PinCodeId = model.SelectedPincodeId;
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             if (vendorUser.IsVendorAdmin)
             {
                 model.SelectedByCompany = true;
@@ -195,7 +204,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (vendorUser == null)
                 {
                     notifyService.Error("User Not found !!!..Contact Admin");
@@ -207,14 +216,23 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(AgencyController.Profile), "Agency");
                 }
-                var roles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>().Where(role => role != AgencyRole.AGENCY_ADMIN)?.ToList();
-
-                var model = new VendorApplicationUser
+                var availableRoles = agencyRoles
+                .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
+                .Select(r => new SelectListItem
+                {
+                    Value = r.ToString(),
+                    Text = r.GetType()
+                            .GetMember(r.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
+                })
+                .ToList();
+                var model = new ApplicationUser
                 {
                     Country = vendor.Country,
                     CountryId = vendor.CountryId,
                     Vendor = vendor,
-                    AgencyRole = roles
+                    AvailableRoles = availableRoles
                 };
                 return View(model);
             }
@@ -226,9 +244,19 @@ namespace risk.control.system.Controllers
             }
         }
 
-        private async Task LoadModel(VendorApplicationUser model)
+        private async Task LoadModel(ApplicationUser model)
         {
-            var roles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>().Where(role => role != AgencyRole.AGENCY_ADMIN)?.ToList();
+            var availableRoles = agencyRoles
+                .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
+                .Select(r => new SelectListItem
+                {
+                    Value = r.ToString(),
+                    Text = r.GetType()
+                            .GetMember(r.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
+                })
+                .ToList();
             var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
             model.Country = vendor.Country;
             model.CountryId = vendor.CountryId;
@@ -236,11 +264,11 @@ namespace risk.control.system.Controllers
             model.StateId = model.SelectedStateId;
             model.DistrictId = model.SelectedDistrictId;
             model.PinCodeId = model.SelectedPincodeId;
-            model.AgencyRole = roles;
+            model.AvailableRoles = availableRoles;
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(VendorApplicationUser model, string emailSuffix, string vendorId)
+        public async Task<IActionResult> CreateUser(ApplicationUser model, string emailSuffix, string vendorId)
         {
             try
             {
@@ -286,7 +314,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
 
-                var user = await _context.VendorApplicationUser.Include(u => u.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Id == userId);
+                var user = await _context.ApplicationUser.Include(u => u.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Id == userId);
                 if (user == null)
                 {
                     notifyService.Error("User not found!!!..Contact Admin");
@@ -306,7 +334,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(string id, VendorApplicationUser model)
+        public async Task<IActionResult> EditUser(string id, ApplicationUser model)
         {
             try
             {
@@ -351,7 +379,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS!!!.Invalid Data.Try Again");
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
-                var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
+                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.User Not Found.Try Again");
@@ -390,7 +418,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("User Not Found!!!..Try again");
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
-                var model = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == email);
+                var model = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("User Not Found!!!..Try again");
@@ -400,7 +428,7 @@ namespace risk.control.system.Controllers
                 model.Updated = DateTime.Now;
                 model.UpdatedBy = currentUserEmail;
                 model.Deleted = true;
-                _context.VendorApplicationUser.Update(model);
+                _context.ApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"User <b> {model.Email}</b> deleted successfully", 3, "red", "fas fa-user-minus");
                 return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -426,7 +454,7 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (vendorUser is null)
                 {
                     notifyService.Error("User Not Found!!!..Try again");
@@ -494,7 +522,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await _context.VendorApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.Country)
@@ -553,7 +581,7 @@ namespace risk.control.system.Controllers
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await _context.VendorApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType

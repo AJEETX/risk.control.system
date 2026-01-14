@@ -227,12 +227,11 @@ div .error-message {
 
 .form-content .input-box i {
     position: absolute;
-    color: #6c757d;
-    font-size: 17px;
+    font-size: 25px;
 }
 
 .forms .form-content .text {
-    font-size: 17px;
+    font-size: 25px;
     font-weight: 500;
     color: #333;
 }
@@ -268,7 +267,6 @@ div .error-message {
         transition: all 0.4s ease;
         width: 100%;
         height: 2.5rem;
-        ;
     }
 
     .forms .form-content .button input:hover {
@@ -312,11 +310,14 @@ input:focus {
     }
 
 .forms .form-content .login-text,
-.forms .form-content .sign-up-text {
+.forms .form-content .sign-up-text, .try-again {
     text-align: center;
     margin-top: 25px;
 }
-
+.try-again {
+    text-align: center;
+    margin-top: 25px;
+}
 .forms .form-content label.login-link {
     color: rgba(0, 0, 238);
 }
@@ -418,14 +419,29 @@ img.logo {
 }
 
 #hostedscan {
-    height: 30px;
+    height: 50px;
     width: auto;
 }
 
 .login-logo {
     height: 40px;
 }
-
+.otp-logo {
+    height: 40px;
+}
+.otp-title{
+    margin-top:20px;
+}
+.forms .form-content .otp-title {
+    position: relative;
+    font-size: 24px;
+    font-weight: 500;
+    color: #333;
+}
+.form-content .input-box input..country-isdcode {
+    padding: 1em;
+    padding-left: 3em;
+}
 .submit-progress {
     position: fixed;
     height: 10em;
@@ -603,7 +619,7 @@ img.logo {
 }
 #country-flag {
     width: 20px; /* Adjust the size of the flag */
-    height: 14px; /* Adjust the size of the flag */
+    height: 20px; /* Adjust the size of the flag */
 }
 .input-group-append-caret {
     display: flex;
@@ -613,4 +629,249 @@ img.logo {
 .ui-menu-item {
     font-size: .9em; /* Adjust the size as needed */
     font-family: Arial, Helvetica, sans-serif;
+}
+.otp-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.otp-input {
+    width: 50px;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+    .otp-input:focus {
+        border-color: #28a745; /* Success green to match your button */
+        outline: none;
+        box-shadow: 0 0 8px rgba(40, 167, 69, 0.2);
+    }
+#drop-zone {
+    max-width: 100%;
+    height: 200px;
+    min-height: 200px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    color: #cccccc;
+    border: 4px dashed #009578;
+    border-radius: 10px;
+    border-style: dashed !important;
+    transition: background 0.3s;
+}
+
+.drop-zone--over {
+    border-style: solid;
+    background: #f8f9fa;
+}
+
+.drop-zone__input {
+    display: none;
+}
+.ai-summary {
+    white-space: pre-wrap;
+}
+.tool-card {
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    border: none;
+    background: #ffffff;
+}
+
+    .tool-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08) !important;
+    }
+
+.icon-box {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+}
+
+.bg-soft-primary {
+    background: #e7f1ff;
+    color: #007bff;
+}
+
+.bg-soft-success {
+    background: #e6f9ed;
+    color: #28a745;
+}
+
+.bg-soft-info {
+    background: #e1faff;
+    color: #17a2b8;
+}
+
+/* Biometric UI styling */
+.face-card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+    .drop-zone:hover {
+        border-color: #007bff !important;
+        background: #f0f7ff !important;
+    }
+
+.vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #adb5bd;
+}
+
+.face-preview-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.match-score-badge {
+    font-size: 2rem;
+    font-weight: 800;
+    display: block;
+}
+.progress.rounded-pill {
+    height: 10px;
+}
+#scoreBar {
+    transition: width 0.1s ease-out, background-color 0.5s ease;
+}
+
+/* Optional: Glow effect when match is successful */
+.progress-bar.bg-success:not(.progress-bar-animated) {
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
+
+.ocr-card {
+    border-radius: 15px;
+}
+
+/* Document Preview Styling */
+.document-preview-image {
+    max-height: 300px;
+    width: auto;
+    object-fit: contain;
+    transition: filter 0.3s ease;
+}
+
+/* Scanning Animation */
+.scanning::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #28a745;
+    box-shadow: 0 0 15px 5px rgba(40, 167, 69, 0.5);
+    animation: scan 2s infinite linear;
+    z-index: 10;
+}
+
+@@keyframes scan {
+    0% {
+        top: 0%;
+    }
+
+    100% {
+        top: 100%;
+    }
+}
+
+.std-height textarea {
+    min-height: 250px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    background-color: #f8f9fa;
+}
+
+.summarizer-card {
+    border-radius: 15px;
+    border: none;
+}
+
+.drop-zone {
+    transition: all 0.3s ease-in-out;
+    border: 2px dashed #17a2b8 !important;
+    min-height: 220px;
+    cursor: pointer;
+}
+
+    .drop-zone:hover {
+        background: #f0fbff !important;
+        border-color: #007bff !important;
+    }
+
+/* Document Preview Styling */
+.pdf-icon-preview {
+    width: 80px;
+    transition: transform 0.2s;
+}
+
+.drop-zone:hover .pdf-icon-preview {
+    transform: scale(1.1);
+}
+
+/* Summary Result Box */
+.summary-box {
+    background-color: #ffffff;
+    border: 1px solid #e3e6f0;
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 300px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #4e73df;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Pulse effect for loading */
+.pulse-loading {
+    animation: pulse 2s infinite;
+}
+
+@@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+.microsoft{
+    height:3em;
+    float:right;
+}
+img.microsoft{
+    height:3em;
+    margin-top:-1em;
+    border:1px solid #ccc;
+    border-radius:5px;
 }

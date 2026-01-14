@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.ClientCompanyApplicationUser
+﻿@model risk.control.system.Models.ApplicationUser
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
     var email = Model.ClientCompany.Email;
@@ -23,7 +23,7 @@
                         
                         <div class="form-group text-center">
                             <div class="profile-img-container">
-                                <img id="document-Image" class="form-Image img-circle" src="/Document/GetCompanyUserDocument/@Model?.Id" title="User Photo" alt="User" data-bs-toggle="tooltip" />
+                                <img id="document-Image" class="form-Image img-circle" src="/Document/GetUserProfileImage/@Model?.Id" title="User Photo" alt="User" data-bs-toggle="tooltip" />
                             </div>
                             <label for="createImageInput" class="control-label">User Photo<i class="fa fa-asterisk asterik-style-logo"></i></label>
                             <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
@@ -102,19 +102,19 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                @if (Model.UserRole == CompanyRole.COMPANY_ADMIN)
+                                @if (Model.Role == AppRoles.COMPANY_ADMIN)
                                 {
-                                    <select readonly asp-for="@Model.UserRole" class="form-control remarks">
-                                        <option value="@CompanyRole.COMPANY_ADMIN">@CompanyRole.COMPANY_ADMIN</option>
+                                    <select readonly asp-for="@Model.Role" class="form-control remarks">
+                                        <option value="@AppRoles.COMPANY_ADMIN">@COMPANY_ADMIN.DISPLAY_NAME</option>
                                     </select>
                                 }
                                 else
                                 {
-                                    <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="@Model.AvailableRoles">
+                                    <select required asp-for="@Model.Role" class="form-control remarks" asp-items="@Model.AvailableRoles">
                                         <option value="">--- SELECT ---</option>
                                     </select>
                                 }
-                                <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
+                                <span asp-validation-for="@Model.Role" class="text-danger"></span>
                             </div>
                         </div>
                         <partial name="_Address" model="@Model" />
@@ -137,7 +137,7 @@
                                 <input id="Comments" type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="70" />
                             </div>
                         </div>
-                        @if (Model.UserRole == CompanyRole.COMPANY_ADMIN)
+                        @if (Model.Role == AppRoles.COMPANY_ADMIN)
                         {
                             <input asp-for="Active" type="hidden" value="true">
                         }

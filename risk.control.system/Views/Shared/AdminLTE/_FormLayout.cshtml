@@ -22,8 +22,8 @@
         @if (SignInManager.IsSignedIn(User))
         {
             var userEmail = User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             if (companyUser is not null)
             {

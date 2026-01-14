@@ -10,10 +10,14 @@ namespace risk.control.system.Services
     internal class ClaimsAgentService : IClaimsAgentService
     {
         private readonly IAgentIdfyService agentIdService;
+        private readonly IAgentFaceIdfyService agentFaceIdfyService;
+        private readonly IDocumentIdfyService documentIdfyService;
 
-        public ClaimsAgentService(IAgentIdfyService agentIdService)
+        public ClaimsAgentService(IAgentIdfyService agentIdService, IAgentFaceIdfyService agentFaceIdfyService, IDocumentIdfyService documentIdfyService)
         {
             this.agentIdService = agentIdService;
+            this.agentFaceIdfyService = agentFaceIdfyService;
+            this.documentIdfyService = documentIdfyService;
         }
         public async Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long docId, string latitude, string longitude, IFormFile Image)
         {
@@ -28,7 +32,7 @@ namespace risk.control.system.Services
                 Image = Image,
                 LocationLatLong = locationLongLat
             };
-            var result = await agentIdService.CaptureDocumentId(data);
+            var result = await documentIdfyService.CaptureDocumentId(data);
             return result;
         }
 
@@ -47,7 +51,7 @@ namespace risk.control.system.Services
             };
             if (isAgent)
             {
-                var result = await agentIdService.CaptureAgentId(data);
+                var result = await agentFaceIdfyService.CaptureAgentId(data);
                 return result;
             }
             else
@@ -55,7 +59,6 @@ namespace risk.control.system.Services
                 var result = await agentIdService.CaptureFaceId(data);
                 return result;
             }
-
         }
     }
 }

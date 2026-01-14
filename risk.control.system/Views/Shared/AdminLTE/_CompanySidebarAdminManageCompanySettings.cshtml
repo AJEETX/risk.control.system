@@ -1,6 +1,6 @@
 ﻿@using risk.control.system.Helpers;
 @{
-    if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
+    if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME))
     {
         <li class="nav-item">
             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Audit", "")
@@ -16,49 +16,6 @@
                 </p>
             </a>
         </li>
-        // <li class="nav-item">
-        //     <a is-active-page asp-controller="LineOfBusiness" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("LineOfBusiness","")">
-        //         <i class="fas fa-business-time nav-icon"></i>
-        //         <p>
-        //             @Applicationsettings.LINE_OF_BUSINESS
-        //         </p>
-        //     </a>
-        // </li>
-        // <li class="nav-item">
-        //     <a is-active-page asp-controller="InvestigationServiceTypes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationServiceTypes","")">
-        //         <i class="fas fa-tools nav-icon"></i>
-        //         <p>
-        //             @Applicationsettings.INVESTIGATION_SERVICE
-        //         </p>
-        //     </a>
-        // </li>
-        // @if (System.Diagnostics.Debugger.IsAttached)
-        // {
-        // <li class="nav-item">
-        //     <a is-active-page asp-controller="AnnualIncome" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("AnnualIncome", "")">
-        //         <i class="fas fa-money nav-icon"></i>
-        //         <p>
-        //             Income Type
-        //         </p>
-        //     </a>
-        // </li>
-        // <li class="nav-item">
-        //     <a is-active-page asp-controller="OccupationType" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("OccupationType", "")">
-        //         <i class="fas fa-business-time nav-icon"></i>
-        //         <p>
-        //             Occupation Type
-        //         </p>
-        //     </a>
-        // </li>
-        // <li class="nav-item">
-        //     <a is-active-page asp-controller="EducationType" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("EducationType", "")">
-        //         <i class="fas fa-graduation-cap nav-icon"></i>
-        //         <p>
-        //             Education Type
-        //         </p>
-        //     </a>
-        // </li>
-        // }
         
         <li class="nav-item">
             <a is-active-page asp-controller="CaseEnabler" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler","")">
@@ -80,7 +37,7 @@
             <a is-active-page asp-controller="BeneficiaryRelation" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("BeneficiaryRelation","")">
                 <i class="fas fa-user-tie nav-icon"></i>
                 <p>
-                    @Applicationsettings.BENEFICIARY
+                    Beneficiary Relation
                 </p>
             </a>
         </li>

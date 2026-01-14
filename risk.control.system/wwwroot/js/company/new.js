@@ -471,12 +471,12 @@
                 title: "ASSIGN<sub>auto</sub> !",
                 content: "Please select Case(s) to Assign<sub>auto</sub>",
                 icon: 'fas fa-random fa-sync',
-                type: 'red',
+                type: 'orange',
                 closeIcon: true,
                 buttons: {
                     cancel: {
                         text: "OK",
-                        btnClass: 'btn-danger'
+                        btnClass: 'btn-warning'
                     }
                 }
             });
