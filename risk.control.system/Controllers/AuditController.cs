@@ -119,7 +119,7 @@ namespace risk.control.system.Controllers
                 p.TableName,
                 p.Type,
                 DateTime = p.DateTime.ToString("dd-MMM-yyyy HH:mm"),
-                p.OldValues,
+                OldValues = p.OldValues ?? "",
                 p.NewValues
             }).ToList();
 
