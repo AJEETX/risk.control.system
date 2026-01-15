@@ -47,6 +47,7 @@ using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache(options =>
@@ -154,6 +155,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<IInvestigationReportPdfService, InvestigationReportPdfService>();
 builder.Services.AddScoped<IAzureAdService, AzureAdService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
@@ -556,6 +558,12 @@ try
     app.UseRouting();
     app.UseCors();
     app.UseCookiePolicy();
+
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    });
     app.UseAuthentication();
     app.UseAuthorization();
     app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
@@ -565,11 +573,7 @@ try
     //app.UseMiddleware<LicensingMiddleware>();
     //app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    });
+    
     app.UseNotyf();
     app.UseFileServer();
 
