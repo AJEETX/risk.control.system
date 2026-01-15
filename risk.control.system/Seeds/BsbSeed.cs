@@ -6,8 +6,8 @@ namespace risk.control.system.Seeds
 {
     public static class BsbSeed
     {
-        private static string filePath = @"BSB.csv";
-        private static string lookupFilePath = @"BSB2Name.csv";
+        private static string filePath = @"Files/BSB.csv";
+        private static string lookupFilePath = @"Files/BSB2Name.csv";
 
         public static async Task LoadBsbData(ApplicationDbContext context)
         {
