@@ -23,6 +23,8 @@ namespace risk.control.system.Controllers.Mobile
     {
         private readonly ITokenService tokenService;
         private readonly UserManager<Models.ApplicationUser> _userManager;
+        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly IPhoneService phoneService;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IFeatureManager featureManager;
@@ -30,6 +32,8 @@ namespace risk.control.system.Controllers.Mobile
         private readonly ApplicationDbContext _context;
         private readonly string baseUrl;
         public SecureController(UserManager<Models.ApplicationUser> userManager,
+            IWebHostEnvironment webHostEnvironment,
+            IPdfGenerativeService generateService,
             IPhoneService phoneService,
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
@@ -39,6 +43,8 @@ namespace risk.control.system.Controllers.Mobile
             ITokenService tokenService)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
+            this.webHostEnvironment = webHostEnvironment;
+            this.pdfGenerativeService = generateService;
             this.phoneService = phoneService;
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this._context = context;
@@ -212,27 +218,49 @@ namespace risk.control.system.Controllers.Mobile
             return Ok(result);
         }
 
-        //[AllowAnonymous]
-        //[HttpGet("pdf")]
-        //public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
-        //{
-        //    try
-        //    {
-        //        var reportFilename = await pdfGenerativeService.Generate(id, currentUserEmail);
+        [AllowAnonymous]
+        [HttpGet("pdf")]
+        public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
+        {
+            try
+            {
+                var reportPathTask = await pdfGenerativeService.GeneratePdf(id, currentUserEmail);
 
-        //        var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
-        //        var memory = new MemoryStream();
-        //        using var stream = new FileStream(ReportFilePath, FileMode.Open);
-        //        await stream.CopyToAsync(memory);
-        //        memory.Position = 0;
-        //        //notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
-        //        return File(memory, "application/pdf", reportFilename);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error processing case report");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
+                var reportFilename = "report" + reportPathTask.Id + ".pdf";
+
+                var memory = new MemoryStream();
+                using var stream = new FileStream(reportPathTask.InvestigationReport.PdfReportFilePath, FileMode.Open);
+                await stream.CopyToAsync(memory);
+                memory.Position = 0;
+                return File(memory, "application/pdf", reportFilename);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("old-pdf")]
+        public async Task<IActionResult> OldPdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
+        {
+            try
+            {
+                var reportFilename = await pdfGenerativeService.Generate(id, currentUserEmail);
+
+                var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
+                var memory = new MemoryStream();
+                using var stream = new FileStream(ReportFilePath, FileMode.Open);
+                await stream.CopyToAsync(memory);
+                memory.Position = 0;
+                return File(memory, "application/pdf", reportFilename);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, "Internal server error");
+            }
+        }
     }
 }
