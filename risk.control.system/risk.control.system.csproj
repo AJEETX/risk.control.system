@@ -62,31 +62,31 @@
 
 
   <ItemGroup>
-    <None Update="au_postcodes.csv">
+    <None Update="Files\au_postcodes.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="BSB.csv">
+    <None Update="Files\BSB.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="BSB2Name.csv">
+    <None Update="Files\BSB2Name.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="countries.csv">
+    <None Update="Files\countries.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="currency.csv">
+    <None Update="Files\currency.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="indian_states.csv">
+    <None Update="Files\lang-currency.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="india_pincode.csv">
+    <None Update="Files\indian_states.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="india_pincode_full.csv">
+    <None Update="Files\india_pincode.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="lang-currency.csv">
+    <None Update="Files\india_pincode_full.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
