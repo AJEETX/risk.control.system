@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.RateLimiting;
 
 using Amazon;
+using Amazon.Polly;
 using Amazon.Rekognition;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -32,7 +33,7 @@ using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
@@ -155,6 +156,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<ISpeech2TextService, Speech2TextService>();
+builder.Services.AddScoped<IText2SpeechService, Text2SpeechService>();
 builder.Services.AddScoped<IInvestigationReportPdfService, InvestigationReportPdfService>();
 builder.Services.AddScoped<IAzureAdService, AzureAdService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
@@ -250,6 +253,7 @@ builder.Services.AddAWSService<IAmazonTranscribeService>();
 builder.Services.AddAWSService<IAmazonS3>();
 builder.Services.AddAWSService<IAmazonRekognition>();
 builder.Services.AddAWSService<IAmazonTextract>();
+builder.Services.AddAWSService<IAmazonPolly>();
 
 AWSConfigs.LoggingConfig.LogTo = LoggingOptions.Console;
 AWSConfigs.LoggingConfig.LogMetrics = true;
@@ -491,7 +495,7 @@ builder.Services.AddAntiforgery(options =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.OperationFilter<AddRequiredHeaderParameter>();
+    //c.OperationFilter<AddRequiredHeaderParameter>();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
         Name = "Authorization",

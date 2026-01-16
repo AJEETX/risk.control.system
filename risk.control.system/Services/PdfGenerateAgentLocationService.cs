@@ -85,11 +85,11 @@ namespace risk.control.system.Services
                     .AddColumnPercentToTable("Match", 5);
 
                 var rowBuilder = tableBuilder.AddRow();
-                if (loc.AgentIdReport.Image != null)
+                if (loc.AgentIdReport.FilePath != null)
                 {
                     try
                     {
-                        var pngBytes = ImageConverterToPng.ConvertToPng(loc.AgentIdReport.Image, loc.AgentIdReport.ImageExtension);
+                        var pngBytes = ImageConverterToPng.ConvertToPngFromUrl(webHostEnvironment, loc.AgentIdReport.FilePath);
                         rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes)
                       .SetWidth(100);
                     }
