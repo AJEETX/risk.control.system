@@ -105,7 +105,7 @@ namespace risk.control.system.Services
 
             var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
 
-            return "reportFilename";
+            return reportFilename;
         }
 
         [AutomaticRetry(Attempts = 0)]

@@ -1,6 +1,10 @@
-﻿using SixLabors.ImageSharp;
+﻿using Amazon.Rekognition.Model;
+
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
+
+using Image = SixLabors.ImageSharp.Image;
 namespace risk.control.system.Helpers
 {
     public static class ImageConverterToPng
@@ -15,8 +19,7 @@ namespace risk.control.system.Helpers
             try
             {
                 using var inputStream = new MemoryStream(imageBytes);
-                using var image = Image.Load(inputStream); // Auto-detects format
-                                                           // Resize image proportionally if larger than max dimensions
+                using var image = Image.Load(inputStream); 
                 if (image.Width > maxWidth || image.Height > maxHeight)
                 {
                     image.Mutate(x => x.Resize(new ResizeOptions
@@ -28,18 +31,6 @@ namespace risk.control.system.Helpers
 
                 using var outputStream = new MemoryStream();
 
-                //onlyExtension = onlyExtension?.Trim().ToLower().Replace(".", "") ?? "png";
-
-                //if (onlyExtension == "jpg" || onlyExtension == "jpeg")
-                //{
-                //    image.SaveAsPng(outputStream);
-                //}
-                //else
-                //{
-                //    image.SaveAsPng(outputStream);
-                //}
-
-                //outputStream.Seek(0, SeekOrigin.Begin);
                 var pngEncoder = new PngEncoder
                 {
                     CompressionLevel = PngCompressionLevel.BestCompression,
@@ -58,6 +49,38 @@ namespace risk.control.system.Helpers
             {
                 throw new InvalidOperationException("Failed to convert image to the specified format.", ex);
             }
+        }
+
+        public static byte[] ConvertToPngFromUrl(IWebHostEnvironment webHostEnvironment, string imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                throw new ArgumentException("Input image URL is null or empty.", nameof(imageUrl));
+            try
+            {
+                var imageBytes = File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, imageUrl));
+                return ResizeCropToPng(imageBytes);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to download or convert image from URL.", ex);
+            }
+        }
+        
+        public static byte[] ResizeCropToPng(byte[] imageBytes,  int width = 150, int height = 150)
+        {
+            using var image = Image.Load(imageBytes);
+
+            image.Mutate(x => x.Resize(new ResizeOptions
+            {
+                Mode = ResizeMode.Crop,   // fills and crops
+                Size = new Size(width, height),
+                Position = AnchorPositionMode.Center
+            }));
+
+            using var ms = new MemoryStream();
+            image.Save(ms, new PngEncoder());
+
+            return ms.ToArray();
         }
 
     }

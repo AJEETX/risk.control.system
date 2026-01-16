@@ -79,11 +79,11 @@ namespace risk.control.system.Services
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(face.ReportName).SetFont(FNT9);
 
-                    if (face.Image != null)
+                    if (face.FilePath != null)
                     {
                         try
                         {
-                            var pngBytes = ImageConverterToPng.ConvertToPng(face.Image, face.ImageExtension);
+                            var pngBytes = ImageConverterToPng.ConvertToPngFromUrl(webHostEnvironment, face.FilePath);
                             rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
                         }
                         catch (Exception ex)
