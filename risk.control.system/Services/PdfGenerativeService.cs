@@ -13,7 +13,7 @@ namespace risk.control.system.Services
     public interface IPdfGenerativeService
     {
         Task<string> Generate(long investigationTaskId, string userEmail);
-        Task<InvestigationTask> GeneratePdf(long investigationTaskId, string userEmail);
+        //Task<InvestigationTask> GeneratePdf(long investigationTaskId, string userEmail);
 
     }
     internal class PdfGenerativeService : IPdfGenerativeService
@@ -108,42 +108,43 @@ namespace risk.control.system.Services
             return reportFilename;
         }
 
-        [AutomaticRetry(Attempts = 0)]
-        public async Task<InvestigationTask> GeneratePdf(long taskId, string userEmail)
-        {
-            try
-            {
-                var task = context.Investigations
-                   .Include(x => x.PolicyDetail)
-                   .Include(x => x.CustomerDetail)
-                   .Include(x => x.BeneficiaryDetail)
-                   .Include(x => x.ClientCompany)
-                   .Include(x => x.Vendor)
-                   .Include(x => x.InvestigationReport)
-                   .First(x => x.Id == taskId);
+        //QUESTPDF
+        //[AutomaticRetry(Attempts = 0)]
+        //public async Task<InvestigationTask> GeneratePdf(long taskId, string userEmail)
+        //{
+        //    try
+        //    {
+        //        var task = context.Investigations
+        //           .Include(x => x.PolicyDetail)
+        //           .Include(x => x.CustomerDetail)
+        //           .Include(x => x.BeneficiaryDetail)
+        //           .Include(x => x.ClientCompany)
+        //           .Include(x => x.Vendor)
+        //           .Include(x => x.InvestigationReport)
+        //           .First(x => x.Id == taskId);
 
-                var investigationReport = await context.ReportTemplates
-                   .Include(r => r.LocationReport)
-                      .ThenInclude(l => l.AgentIdReport)
-                  .Include(r => r.LocationReport)
-                      .ThenInclude(l => l.FaceIds)
-                  .Include(r => r.LocationReport)
-                      .ThenInclude(l => l.DocumentIds)
-                  .Include(r => r.LocationReport)
-                      .ThenInclude(l => l.Questions)
-                      .FirstOrDefaultAsync(q => q.Id == task.ReportTemplateId);
+        //        var investigationReport = await context.ReportTemplates
+        //           .Include(r => r.LocationReport)
+        //              .ThenInclude(l => l.AgentIdReport)
+        //          .Include(r => r.LocationReport)
+        //              .ThenInclude(l => l.FaceIds)
+        //          .Include(r => r.LocationReport)
+        //              .ThenInclude(l => l.DocumentIds)
+        //          .Include(r => r.LocationReport)
+        //              .ThenInclude(l => l.Questions)
+        //              .FirstOrDefaultAsync(q => q.Id == task.ReportTemplateId);
 
-                var savedTask = generateReport.SaveReport(task, investigationReport);
-                context.Investigations.Update(savedTask);
-                await context.SaveChangesAsync();
-                return savedTask;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error generating PDF for Task ID {taskId}: {ex.Message}");
-                throw;
-            }
+        //        var savedTask = generateReport.SaveReport(task, investigationReport);
+        //        context.Investigations.Update(savedTask);
+        //        await context.SaveChangesAsync();
+        //        return savedTask;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error generating PDF for Task ID {taskId}: {ex.Message}");
+        //        throw;
+        //    }
            
-        }
+        //}
     }
 }

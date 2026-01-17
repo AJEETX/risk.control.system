@@ -186,8 +186,7 @@ namespace risk.control.system.Controllers.Mobile
         {
             var username = User.FindFirst(ClaimTypes.Name)?.Value;
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
-            var latlong = User.FindFirst(ClaimTypes.StreetAddress)?.Value;
-            var message = $"This endpoint is secured with JWT, for username : {username}, role: {role}, latLong: {latlong}";
+            var message = $"This endpoint is secured with JWT, for username : {username}, role: {role}";
             return Ok(new { message });
         }
 
@@ -218,31 +217,31 @@ namespace risk.control.system.Controllers.Mobile
             return Ok(result);
         }
 
+        //[AllowAnonymous]
+        //[HttpGet("pdf-quest")]
+        //public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
+        //{
+        //    try
+        //    {
+        //        var reportPathTask = await pdfGenerativeService.GeneratePdf(id, currentUserEmail);
+
+        //        var reportFilename = "report" + reportPathTask.Id + ".pdf";
+
+        //        var memory = new MemoryStream();
+        //        using var stream = new FileStream(reportPathTask.InvestigationReport.PdfReportFilePath, FileMode.Open);
+        //        await stream.CopyToAsync(memory);
+        //        memory.Position = 0;
+        //        return File(memory, "application/pdf", reportFilename);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.StackTrace);
+        //        return StatusCode(500, "Internal server error");
+        //    }
+        //}
+
         [AllowAnonymous]
         [HttpGet("pdf")]
-        public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
-        {
-            try
-            {
-                var reportPathTask = await pdfGenerativeService.GeneratePdf(id, currentUserEmail);
-
-                var reportFilename = "report" + reportPathTask.Id + ".pdf";
-
-                var memory = new MemoryStream();
-                using var stream = new FileStream(reportPathTask.InvestigationReport.PdfReportFilePath, FileMode.Open);
-                await stream.CopyToAsync(memory);
-                memory.Position = 0;
-                return File(memory, "application/pdf", reportFilename);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpGet("old-pdf")]
         public async Task<IActionResult> OldPdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
         {
             try
