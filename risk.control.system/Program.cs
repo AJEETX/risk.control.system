@@ -48,7 +48,7 @@ using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
-QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+//QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache(options =>
@@ -504,6 +504,12 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = @"JWT Authorization header. \r\n\r\n Enter the token in the text input below.",
     });
+
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
+
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
@@ -587,7 +593,10 @@ try
         await next();
 
         if (context.Response.StatusCode == 401 &&
-            !context.User.Identity.IsAuthenticated)
+            !context.User.Identity.IsAuthenticated &&
+        !context.Request.Path.StartsWithSegments("/api") &&
+        !context.Request.Headers.ContainsKey("Authorization"))
+
         {
             await context.ChallengeAsync();
         }
