@@ -48,7 +48,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = false,
                 IsVendorAdmin = true,
                 Addressline = vendor.Addressline,
-                PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                PhoneNumber =string.Equals(pinCode.Country.Code, "au" , StringComparison.OrdinalIgnoreCase)? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 Vendor = vendor,
                 CountryId = pinCode.CountryId,
                 DistrictId = pinCode?.DistrictId ?? default!,

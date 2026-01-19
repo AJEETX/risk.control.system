@@ -9,7 +9,7 @@ using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
 {
-    public class AgencySeed
+    public static class AgencySeed
     {
         private const string vendorMapSize = "800x800";
         public static async Task<Vendor> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
@@ -23,7 +23,7 @@ namespace risk.control.system.Seeds
 
             var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State.Code).LastOrDefaultAsync(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
 
-            var states = context.State.Include(s => s.Country).Where(s => s.Country.Code == input.COUNTRY).ToList();
+            var states =await context.State.Include(s => s.Country).Where(s => s.Country.Code == input.COUNTRY).ToListAsync();
 
             var address = input.ADDRESSLINE + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
             var addressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
@@ -31,11 +31,11 @@ namespace risk.control.system.Seeds
             var addressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
             string agencyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
-            var agencyImage = File.ReadAllBytes(agencyImagePath);
+            var agencyImage =await File.ReadAllBytesAsync(agencyImagePath);
 
             if (agencyImage == null)
             {
-                agencyImage = File.ReadAllBytes(noCompanyImagePath);
+                agencyImage =await File.ReadAllBytesAsync(noCompanyImagePath);
             }
             var extension = Path.GetExtension(agencyImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(agencyImage, extension, input.DOMAIN);

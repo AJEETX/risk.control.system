@@ -5,7 +5,7 @@ using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Helpers
 {
-    public class MediaIdfyHelper
+    public static class MediaIdfyHelper
     {
         public static void UpdateMediaMetadata(MediaReport media, string path, string name, string lat, string lon)
         {

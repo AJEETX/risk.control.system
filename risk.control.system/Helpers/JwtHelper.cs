@@ -5,7 +5,7 @@ using System.Text;
 
 namespace risk.control.system.Helpers
 {
-    public class JwtHelper
+    public static class JwtHelper
     {
         /// <summary>
         /// Returns a Jwt Token from basic input parameters
@@ -17,13 +17,7 @@ namespace risk.control.system.Helpers
         /// <param name="expiration"></param>
         /// <param name="additionalClaims"></param>
         /// <returns></returns>
-        public static JwtSecurityToken GetJwtToken(
-            string username,
-            string uniqueKey,
-            string issuer,
-            string audience,
-            TimeSpan expiration,
-            Claim[] additionalClaims = null)
+        public static JwtSecurityToken GetJwtToken(string username, string uniqueKey, string issuer, string audience, TimeSpan expiration, Claim[]? additionalClaims = null)
         {
             var claims = new[]
             {
@@ -60,13 +54,7 @@ namespace risk.control.system.Helpers
         /// <param name="expiration"></param>
         /// <param name="additionalClaims"></param>
         /// <returns></returns>
-        public static string GetJwtTokenString(
-            string username,
-            string uniqueKey,
-            string issuer,
-            string audience,
-            TimeSpan expiration,
-            Claim[] additionalClaims = null)
+        public static string GetJwtTokenString(string username, string uniqueKey, string issuer, string audience, TimeSpan expiration, Claim[]? additionalClaims = null)
         {
             var token = GetJwtToken(username, uniqueKey, issuer, audience, expiration, additionalClaims);
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -1,16 +1,16 @@
 ﻿namespace risk.control.system.AppConstant
 {
-    public class CONSTANTS
+    public static class CONSTANTS
     {
         public const string COUNTRY_AU = "au";
         public const string COUNTRY_IN = "in";
-        public class CASE_STATUS
+        public static class CASE_STATUS
         {
             public const string INITIATED = "INITIATED";
             public const string INPROGRESS = "INPROGRESS";
             public const string FINISHED = "FINISHED";
 
-            public class CASE_SUBSTATUS
+            public static class CASE_SUBSTATUS
             {
                 public const string UPLOAD_IN_PROGRESS = "PENDING";
                 public const string UPLOAD_COMPLETED = "UPLOADED";
@@ -35,7 +35,7 @@
         public const string UNDERWRITING = "underwriting";
         public const string CLAIM = "claim";
 
-        public class LOCATIONS
+        public static class LOCATIONS
         {
             public const string EMPLOYMENT_ADDRESS = "EMPLOYMENT";
             public const string CHEMIST_ADDRESS = "CHEMIST";
