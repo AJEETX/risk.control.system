@@ -5,7 +5,7 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Seeds
 {
-    public class ReportTemplateSeed
+    public static class ReportTemplateSeed
     {
         public static ReportTemplate UNDERWRITING(ApplicationDbContext context, ClientCompany company)
         {

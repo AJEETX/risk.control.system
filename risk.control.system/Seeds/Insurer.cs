@@ -9,7 +9,7 @@ using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
 {
-    public class Insurer
+    public static class Insurer
     {
         private const string companyMapSize = "800x800";
         public static async Task<ClientCompany> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,

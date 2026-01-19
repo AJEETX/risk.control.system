@@ -2,7 +2,7 @@
 
 namespace risk.control.system.Helpers
 {
-    public class LocationDetail
+    public static class LocationDetail
     {
         public static string GetAddress(bool claimType, CustomerDetail a, BeneficiaryDetail location)
         {

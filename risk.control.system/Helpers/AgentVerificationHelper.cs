@@ -3,7 +3,7 @@ using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Helpers
 {
-    public class AgentVerificationHelper
+    public static class AgentVerificationHelper
     {
         public static async Task<byte[]> GetBytesFromIFormFile(IFormFile file)
         {

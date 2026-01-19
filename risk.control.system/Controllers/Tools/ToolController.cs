@@ -64,6 +64,12 @@ namespace risk.control.system.Controllers.Tools
         {
             return View();
         }
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Error()
+        {
+            return View();
+        }
 
         [HttpPost]
         [AllowAnonymous]

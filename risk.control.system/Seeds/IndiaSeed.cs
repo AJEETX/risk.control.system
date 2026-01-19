@@ -18,9 +18,9 @@ namespace risk.control.system.Seeds
             var indiaPincodes = await PinCodeStateSeed.CsvRead_IndiaAsync();
             var indianStates = indiaPincodes
                 .Where(s =>
-                s.StateName.ToLower() == "haryana"
+                string.Equals( s.StateName, "haryana", StringComparison.OrdinalIgnoreCase)
                 ||
-                s.StateName.ToLower() == "delhi"
+                string.Equals(s.StateName, "delhi", StringComparison.OrdinalIgnoreCase)
                 //||
                 //s.StateCode.ToLower() == "up"
                 )
