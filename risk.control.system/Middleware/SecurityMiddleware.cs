@@ -1,6 +1,6 @@
 ﻿using Microsoft.FeatureManagement;
 
-using risk.control.system.Data;
+using risk.control.system.Models;
 using risk.control.system.Services;
 
 namespace risk.control.system.Middleware

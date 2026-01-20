@@ -63,31 +63,31 @@
 
 
   <ItemGroup>
-    <None Update="Files\au_postcodes.csv">
+    <None Update="Seeds\Files\au_postcodes.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Files\BSB.csv">
+    <None Update="Seeds\Files\BSB.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Files\BSB2Name.csv">
+    <None Update="Seeds\Files\BSB2Name.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Files\countries.csv">
+    <None Update="Seeds\Files\countries.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Files\currency.csv">
+    <None Update="Seeds\Files\currency.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Files\lang-currency.csv">
+    <None Update="Seeds\Files\lang-currency.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Files\indian_states.csv">
+    <None Update="Seeds\Files\indian_states.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Files\india_pincode.csv">
+    <None Update="Seeds\Files\india_pincode.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Files\india_pincode_full.csv">
+    <None Update="Seeds\Files\india_pincode_full.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

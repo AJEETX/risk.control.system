@@ -9,7 +9,7 @@ namespace risk.control.system.Services
     {
         Task<(string Latitude, string Longitude)> GetCoordinatesFromAddressAsync(string address);
         Task<string> GetAddressFromLatLong(double latitude, double longitude);
-        Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong, string startLbl = "S", string endLbl = "E", string mapHeight = "300", string mapWidth = "200", string startColor = "red", string endColor = "green");
+        Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong, string startLbl = "Start", string endLbl = "End", string mapHeight = "300", string mapWidth = "200", string startColor = "red", string endColor = "green");
     }
     internal class CustomApiClient : ICustomApiClient
     {
@@ -98,7 +98,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong, string startLbl = "S", string endLbl = "E", string mapHeight = "300", string mapWidth = "200", string startColor = "red", string endColor = "green")
+        public async Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong, string startLbl = "Start", string endLbl = "End", string mapHeight = "300", string mapWidth = "200", string startColor = "red", string endColor = "green")
         {
             try
             {

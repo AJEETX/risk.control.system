@@ -1,5 +1,4 @@
-﻿using risk.control.system.Data;
-using risk.control.system.Helpers;
+﻿using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 using static risk.control.system.Helpers.Permissions;

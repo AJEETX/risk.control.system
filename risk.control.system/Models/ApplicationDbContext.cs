@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
-namespace risk.control.system.Data
+namespace risk.control.system.Models
 {
     public class ApplicationDbContext : AuditableIdentityContext
     {

@@ -11,7 +11,6 @@ using Hangfire;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
-using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 

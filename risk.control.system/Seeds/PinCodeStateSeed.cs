@@ -1,7 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -11,12 +9,12 @@ namespace risk.control.system.Seeds
     {
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private static readonly Regex officeSuffixRegex = new(@"[\s\(\[]*B[\.\s]*O[\)\]]*$", RegexOptions.IgnoreCase);
-        private static string currenciesFilePath = @"Files/lang-currency.csv";
-        private static string currenciesNameFilePath = @"Files/currency.csv";
-        private static string countriesFilePath = @"Files/countries.csv";
-        private static string au_stateWisePincodeFilePath = @"Files/au_postcodes.csv";
-        private static string all_india_pincodes = @"Files/india_pincode_full.csv";
-        private static string indian_states = @"Files/indian_states.csv";
+        private static string currenciesFilePath = @"Seeds/Files/lang-currency.csv";
+        private static string currenciesNameFilePath = @"Seeds/Files/currency.csv";
+        private static string countriesFilePath = @"Seeds/Files/countries.csv";
+        private static string au_stateWisePincodeFilePath = @"Seeds/Files/au_postcodes.csv";
+        private static string all_india_pincodes = @"Seeds/Files/india_pincode_full.csv";
+        private static string indian_states = @"Seeds/Files/indian_states.csv";
         private static string NO_DATA = " NO - DATA ";
         private static List<Currency> currencies = new List<Currency>();
         private static List<Currency> currenciesName = new List<Currency>();
@@ -214,7 +212,7 @@ namespace risk.control.system.Seeds
 
         private static async Task<List<StateModel>> LoadStates(string filePath)
         {
-            var lines =await File.ReadAllLinesAsync(filePath);
+            var lines = await File.ReadAllLinesAsync(filePath);
             var states = new List<StateModel>();
 
             // Skip header
@@ -238,7 +236,7 @@ namespace risk.control.system.Seeds
         }
         public static async Task<List<PinCodeState>> CsvRead_IndiaAsync()
         {
-            var states =await LoadStates(indian_states);
+            var states = await LoadStates(indian_states);
             var pincodes = new List<PinCodeState>();
             var lines = await File.ReadAllLinesAsync(all_india_pincodes);
             foreach (var line in lines.Skip(1))

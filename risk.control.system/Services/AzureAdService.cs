@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 

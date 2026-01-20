@@ -4,19 +4,19 @@ namespace risk.control.system.Helpers
 {
     public static class LocationDetail
     {
-        public static string GetAddress(bool claimType, CustomerDetail a, BeneficiaryDetail location)
+        public static string GetAddress(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             if (claimType)
             {
-                if (a is null)
+                if (customer is null)
                     return string.Empty;
-                return a.Addressline + " " + a.District?.Name + " " + a.State?.Name + " " + a.Country?.Name + " " + a.PinCode?.Code;
+                return customer.Addressline + " " + customer.District?.Name + " " + customer.State?.Name + " " + customer.Country?.Name + " " + customer.PinCode?.Code;
             }
             else
             {
-                if (location is null)
+                if (beneficiary is null)
                     return string.Empty;
-                return location.Addressline + " " + location.District.Name + " " + location.State.Name + " " + location.Country.Name + " " + location.PinCode.Code;
+                return beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code;
             }
         }
     }
