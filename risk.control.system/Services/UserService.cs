@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -542,32 +541,34 @@ namespace risk.control.system.Services
                     statusName = $"Online now";
                     statusIcon = "fas fa-circle";
                 }
-
+                var flag = user.Country == null ? "/flags/in.png" : "/flags/" + user.Country?.Code.ToLower() + ".png";
+                var photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(await File.ReadAllBytesAsync(
+                    Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl))));
+                var logVerified = !await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) || !user.IsPasswordChangeRequired;
                 var activeUser = new UserDetailResponse
                 {
                     Id = user.Id,
                     Name = user.FirstName + " " + user.LastName,
-                    Email = "<a href=/User/Edit?userId=" + user.Id + ">" + user.Email + "</a>",
+                    Email = "<a>" + user.Email + "</a>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country?.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
+                    Photo = photo,
                     Active = user.Active,
-                    Addressline = user.Addressline,
-                    District = user.District?.Name,
-                    State = user.State?.Code,
-                    Country = user.Country?.Code,
-                    Flag = user.Country == null ? "/flags/in.png" : "/flags/" + user.Country?.Code.ToLower() + ".png",
+                    Addressline = user?.Addressline ?? "--",
+                    District = user?.District?.Name ?? "--",
+                    State = user?.State?.Code ?? "--",
+                    Country = user?.Country?.Code ?? "--",
+                    Flag = flag,
                     Roles = string.Join(",", GetUserRoles(user).Result),
-                    Pincode = user.PinCode?.Code,
+                    Pincode = user?.PinCode?.Code ?? "--",
                     OnlineStatus = status,
                     Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
                     UpdatedBy = user.UpdatedBy,
                     OnlineStatusName = statusName,
                     OnlineStatusIcon = statusIcon,
                     IsUpdated = user.IsUpdated,
-                    LastModified = user.Updated.GetValueOrDefault(),
-                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !user.IsPasswordChangeRequired : true
+                    LastModified = user.Updated ??= DateTime.Now,
+                    LoginVerified = logVerified
                 };
                 activeUsersDetails.Add(activeUser);
             }

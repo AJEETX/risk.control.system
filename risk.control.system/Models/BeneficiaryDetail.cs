@@ -67,7 +67,6 @@ namespace risk.control.system.Models
 
         #region NOT MAPPED PROPERTIES
         [NotMapped]
-        [Required]
         public IFormFile? ProfileImage { get; set; }
         [NotMapped]
         public long SelectedPincodeId { get; set; }

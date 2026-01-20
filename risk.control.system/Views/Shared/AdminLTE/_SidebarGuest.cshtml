@@ -64,6 +64,20 @@
                         <p>Document Analysis</p>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Text2Speech" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Text2Speech", "")">
+                        <i class="nav-icon fas fa-volume-up text-secondary"></i>
+                        <p>Text to Speech</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Speech2Text" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Speech2Text", "")">
+                        <i class="nav-icon fas fa-microphone-alt text-dark"></i>
+                        <p>Speech to Text</p>
+                    </a>
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

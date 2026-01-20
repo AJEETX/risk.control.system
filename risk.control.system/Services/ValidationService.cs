@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-using risk.control.system.Data;
+using risk.control.system.AppConstant;
 using risk.control.system.Models;
 
 namespace risk.control.system.Services
@@ -37,15 +37,15 @@ namespace risk.control.system.Services
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = config["Jwt:Issuer"],
                     ValidAudience = config["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Data"])),
                     ClockSkew = TimeSpan.Zero
                 };
 
                 tokenHandler.ValidateToken(token, validationParameters, out _);
                 var userEmail = tokenHandler.ReadJwtToken(token).Claims.First(claim => claim.Type == ClaimTypes.Name).Value;
-                var userLocation = tokenHandler.ReadJwtToken(token).Claims.First(claim => claim.Type == ClaimTypes.StreetAddress).Value;
-
-                var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Email == userEmail);
+                var userRole = tokenHandler.ReadJwtToken(token).Claims.First(claim => claim.Type == ClaimTypes.Role).Value;
+                var appRole =(AppRoles) Enum.Parse(typeof(AppRoles), userRole);
+                var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Email == userEmail && a.Role == appRole);
                 var userSessionAlive = new UserSessionAlive
                 {
                     Updated = DateTime.Now,

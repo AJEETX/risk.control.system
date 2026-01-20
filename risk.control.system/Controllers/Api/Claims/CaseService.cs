@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
-using risk.control.system.Data;
 using risk.control.system.Models;
 
 namespace risk.control.system.Controllers.Api.Claims

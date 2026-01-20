@@ -1,6 +1,6 @@
 ﻿using Microsoft.FeatureManagement;
 
-using risk.control.system.Data;
+using risk.control.system.Models;
 using risk.control.system.Services;
 
 namespace risk.control.system.Middleware
@@ -29,7 +29,7 @@ namespace risk.control.system.Middleware
         public async Task Invoke(HttpContext context)
         {
             // 🔴 FIRST: Completely bypass Azure AD endpoints
-            if (context.Request.Path.StartsWithSegments("/signin-oidc") ||
+            if (context.Request.Path.StartsWithSegments("/signin-oidc") || context.Request.Path.StartsWithSegments("/swagger") ||
                 context.Request.Path.StartsWithSegments("/Account/AzureLogin"))
             {
                 await _next(context);
@@ -83,13 +83,6 @@ namespace risk.control.system.Middleware
 
             try
             {
-                // Swagger bypass
-                if (context.Request.Path.StartsWithSegments("/swagger"))
-                {
-                    await _next(context);
-                    return;
-                }
-
                 // JWT validation (API only)
                 var token = ExtractJwtToken(context);
                 if (!string.IsNullOrEmpty(token))

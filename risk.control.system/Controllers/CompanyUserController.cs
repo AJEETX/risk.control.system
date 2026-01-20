@@ -1,25 +1,17 @@
-﻿using System.Globalization;
-using System.Net;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Data;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
@@ -27,7 +19,6 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
     public class CompanyUserController : Controller
     {
-        public List<UsersViewModel> UserList;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IFileStorageService fileStorageService;
         private readonly IPasswordHasher<ApplicationUser> passwordHasher;
@@ -61,7 +52,6 @@ namespace risk.control.system.Controllers
             this.featureManager = featureManager;
             this.logger = logger;
             this._context = context;
-            UserList = new List<UsersViewModel>();
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -71,18 +61,13 @@ namespace risk.control.system.Controllers
         {
             var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == id);
 
-            var model = new CompanyUsersViewModel
-            {
-                Company = company,
-                Users = UserList
-            };
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
             var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage };
             ViewData["BreadcrumbNode"] = editPage;
 
-            return View(model);
+            return View(company);
         }
 
         [HttpPost, ActionName("Delete")]

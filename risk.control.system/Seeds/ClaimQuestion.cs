@@ -2,7 +2,7 @@
 
 namespace risk.control.system.Seeds
 {
-    public class ClaimQuestion
+    public static class ClaimQuestion
     {
         public static List<Question> QuestionsCLAIM_LA_ADDRESS()
         {

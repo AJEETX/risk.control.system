@@ -1,6 +1,6 @@
 ﻿namespace risk.control.system.AppConstant
 {
-    public class AppCookie
+    public static class AppCookie
     {
         public const string AUTH_COOKIE_NAME = "iCheckify.Auth";
         public const string LOGIN_PATH = "/Account/Login";

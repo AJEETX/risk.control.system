@@ -1,13 +1,12 @@
 ﻿using System.Text;
 
-using risk.control.system.Data;
 using risk.control.system.Models;
 namespace risk.control.system.Seeds
 {
     public static class BsbSeed
     {
-        private static string filePath = @"BSB.csv";
-        private static string lookupFilePath = @"BSB2Name.csv";
+        private static string filePath = @"Seeds/Files/BSB.csv";
+        private static string lookupFilePath = @"Seeds/Files/BSB2Name.csv";
 
         public static async Task LoadBsbData(ApplicationDbContext context)
         {

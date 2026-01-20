@@ -1,8 +1,9 @@
-﻿using Hangfire;
+﻿using System.Composition;
+
+using Hangfire;
 
 using Microsoft.EntityFrameworkCore;
 
-using risk.control.system.Data;
 using risk.control.system.Models;
 
 
@@ -10,22 +11,26 @@ namespace risk.control.system.Services
 {
     public interface IPdfGenerativeService
     {
-        Task<string> Generate(long investigationTaskId, string userEmail = "assessor@insurer.com");
+        Task<string> Generate(long investigationTaskId, string userEmail);
+        //Task<InvestigationTask> GeneratePdf(long investigationTaskId, string userEmail);
+
     }
     internal class PdfGenerativeService : IPdfGenerativeService
     {
 
         private readonly ApplicationDbContext context;
         private readonly IPdfGenerateDetailService pdfGenerate;
+        private readonly IInvestigationReportPdfService generateReport;
 
-        public PdfGenerativeService(ApplicationDbContext context, IPdfGenerateDetailService pdfGenerate)
+        public PdfGenerativeService(ApplicationDbContext context, IPdfGenerateDetailService pdfGenerate, IInvestigationReportPdfService generateReport)
         {
             this.context = context;
             this.pdfGenerate = pdfGenerate;
+            this.generateReport = generateReport;
         }
 
         [AutomaticRetry(Attempts = 0)]
-        public async Task<string> Generate(long investigationTaskId, string userEmail = "assessor@insurer.com")
+        public async Task<string> Generate(long investigationTaskId, string userEmail)
         {
             var investigation = context.Investigations
                     .Include(c => c.CustomerDetail)
@@ -67,6 +72,7 @@ namespace risk.control.system.Services
                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == investigation.ReportTemplateId);
+
             var vendor = context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation.VendorId);
             var currentUser = context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == policy.InvestigationServiceTypeId);
@@ -95,9 +101,49 @@ namespace risk.control.system.Services
 
             context.VendorInvoice.Add(invoice);
             await context.SaveChangesAsync(null, false);
-            //var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
 
-            return "reportFilename";
+            var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
+
+            return reportFilename;
         }
+
+        //QUESTPDF
+        //[AutomaticRetry(Attempts = 0)]
+        //public async Task<InvestigationTask> GeneratePdf(long taskId, string userEmail)
+        //{
+        //    try
+        //    {
+        //        var task = context.Investigations
+        //           .Include(x => x.PolicyDetail)
+        //           .Include(x => x.CustomerDetail)
+        //           .Include(x => x.BeneficiaryDetail)
+        //           .Include(x => x.ClientCompany)
+        //           .Include(x => x.Vendor)
+        //           .Include(x => x.InvestigationReport)
+        //           .First(x => x.Id == taskId);
+
+        //        var investigationReport = await context.ReportTemplates
+        //           .Include(r => r.LocationReport)
+        //              .ThenInclude(l => l.AgentIdReport)
+        //          .Include(r => r.LocationReport)
+        //              .ThenInclude(l => l.FaceIds)
+        //          .Include(r => r.LocationReport)
+        //              .ThenInclude(l => l.DocumentIds)
+        //          .Include(r => r.LocationReport)
+        //              .ThenInclude(l => l.Questions)
+        //              .FirstOrDefaultAsync(q => q.Id == task.ReportTemplateId);
+
+        //        var savedTask = generateReport.SaveReport(task, investigationReport);
+        //        context.Investigations.Update(savedTask);
+        //        await context.SaveChangesAsync();
+        //        return savedTask;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error generating PDF for Task ID {taskId}: {ex.Message}");
+        //        throw;
+        //    }
+           
+        //}
     }
 }

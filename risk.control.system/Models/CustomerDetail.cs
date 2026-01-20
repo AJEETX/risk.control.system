@@ -74,11 +74,8 @@ namespace risk.control.system.Models
         [Display(Name = "Education")]
         public Education? Education { get; set; }
 
-        public byte[]? ProfilePicture { get; set; }
         public string? ImagePath { get; set; }
         public string? ProfilePictureExtension { get; set; }
-
-        [Display(Name = "Image")]
 
         public string? Description { get; set; }
         public string? CustomerLocationMap { get; set; }
@@ -89,7 +86,6 @@ namespace risk.control.system.Models
 
         #region NOT MAPPED PROPERTIES
         [NotMapped]
-        [Required]
         public IFormFile? ProfileImage { get; set; }
         [NotMapped]
         public long SelectedPincodeId { get; set; }

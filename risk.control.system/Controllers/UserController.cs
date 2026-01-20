@@ -8,14 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
@@ -27,7 +24,6 @@ namespace risk.control.system.Controllers
         private readonly IFileStorageService fileStorageService;
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
-        public List<UsersViewModel> UserList;
         private readonly ApplicationDbContext context;
         private readonly IFeatureManager featureManager;
 
@@ -45,7 +41,6 @@ namespace risk.control.system.Controllers
             smsService = SmsService;
             this.featureManager = featureManager;
             this.context = context;
-            UserList = new List<UsersViewModel>();
         }
 
         public IActionResult Index()

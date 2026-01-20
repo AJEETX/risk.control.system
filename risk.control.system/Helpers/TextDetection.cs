@@ -3,7 +3,7 @@ using Amazon.Textract.Model;
 
 namespace risk.control.system.Helpers;
 
-public class TextDetection
+public static class TextDetection
 {
     public static async Task<List<Block>> ExtractTextDataAsync(byte[] bytes)
     {

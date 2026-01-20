@@ -2,7 +2,7 @@
 
 namespace risk.control.system.Seeds
 {
-    public class UnderwritingQuestion
+    public static class UnderwritingQuestion
     {
         public static List<Question> QuestionsUNDERWRITING_LA_ADDRESS()
         {

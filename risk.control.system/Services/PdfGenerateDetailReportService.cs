@@ -60,19 +60,11 @@ namespace risk.control.system.Services
         }
         public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true)
         {
-
-            //var concertTable = section.AddTable();
             var paragraph = section.AddParagraph();
 
             try
             {
-                //var rowBuilder = concertTable.AddRow();
-                //var cellBuilder = rowBuilder.AddCell();
-                //cellBuilder.SetPadding(2, 2, 2, 0);
-                //cellBuilder.AddImage("");
-                var imageByte = System.IO.File.ReadAllBytes(Path.Combine(env.ContentRootPath, investigation.Vendor.DocumentUrl));
-                var pngBytes = ImageConverterToPng.ConvertToPng(imageByte, investigation.Vendor.DocumentImageExtension);
-
+                var pngBytes = ImageConverterToPng.ConvertToPngFromUrl(env, investigation.Vendor.DocumentImageExtension);
 
                 paragraph.AddInlineImage(pngBytes)
                      .SetWidth(150); // optional small space between image and text
@@ -82,9 +74,6 @@ namespace risk.control.system.Services
                 paragraph.AddText("Invalid image");
                 Console.WriteLine("Image conversion error: " + ex.Message);
             }
-
-            // Add the image inline (before the text)
-
 
             paragraph.AddText($" {investigation.Vendor.Email} : Investigation detail")
                      .SetFontSize(18)
