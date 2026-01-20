@@ -8,7 +8,7 @@ namespace risk.control.system.Services
 {
     public interface IAddInvestigationService
     {
-        Task<InvestigationTask> CreateCase(string userEmail, CreateCaseViewModel claimsInvestigation);
+        Task<InvestigationTask> CreateCase(string userEmail, CreateCaseViewModel model);
         Task<InvestigationTask> EditCase(string userEmail, EditPolicyDto dto);
         Task<bool> CreateCustomer(string userEmail, CustomerDetail customerDetail);
         Task<bool> EditCustomer(string userEmail, CustomerDetail customerDetail);
@@ -49,7 +49,7 @@ namespace risk.control.system.Services
                 var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetail.ContractNumber);
-                var claimsInvestigation = new InvestigationTask
+                var caseTask = new InvestigationTask
                 {
                     PolicyDetail = new PolicyDetail
                     {
@@ -65,31 +65,31 @@ namespace risk.control.system.Services
                     }
                 };
 
-                claimsInvestigation.PolicyDetail.DocumentPath = relativePath;
-                claimsInvestigation.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
+                caseTask.PolicyDetail.DocumentPath = relativePath;
+                caseTask.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
 
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, claimsInvestigation.PolicyDetail.InsuranceType.Value);
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, caseTask.PolicyDetail.InsuranceType.Value);
 
-                claimsInvestigation.IsNew = true;
-                claimsInvestigation.CreatedUser = userEmail;
-                claimsInvestigation.CaseOwner = userEmail;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.ORIGIN = ORIGIN.USER;
-                claimsInvestigation.UpdatedBy = userEmail;
-                claimsInvestigation.Status = CONSTANTS.CASE_STATUS.INITIATED;
-                claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR;
-                claimsInvestigation.CreatorSla = currentUser.ClientCompany.CreatorSla;
-                claimsInvestigation.ClientCompany = currentUser.ClientCompany;
-                claimsInvestigation.ClientCompanyId = currentUser.ClientCompanyId;
-                claimsInvestigation.ReportTemplate = reportTemplate;
-                claimsInvestigation.ReportTemplateId = reportTemplate.Id;
-                var aaddedClaimId = context.Investigations.Add(claimsInvestigation);
+                caseTask.IsNew = true;
+                caseTask.CreatedUser = userEmail;
+                caseTask.CaseOwner = userEmail;
+                caseTask.Updated = DateTime.Now;
+                caseTask.ORIGIN = ORIGIN.USER;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.Status = CONSTANTS.CASE_STATUS.INITIATED;
+                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR;
+                caseTask.CreatorSla = currentUser.ClientCompany.CreatorSla;
+                caseTask.ClientCompany = currentUser.ClientCompany;
+                caseTask.ClientCompanyId = currentUser.ClientCompanyId;
+                caseTask.ReportTemplate = reportTemplate;
+                caseTask.ReportTemplateId = reportTemplate.Id;
+                var aaddedClaimId = context.Investigations.Add(caseTask);
                 await numberService.SaveNumberSequence("PX");
                 var saved = await context.SaveChangesAsync() > 0;
 
-                await timelineService.UpdateTaskStatus(claimsInvestigation.Id, userEmail);
+                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                return saved ? claimsInvestigation : null;
+                return saved ? caseTask : null;
             }
             catch (Exception ex)
             {
@@ -148,20 +148,20 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
+                var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
                    .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
 
                 var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (customerDetail?.ProfileImage is not null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
                     customerDetail.ProfilePictureExtension = Path.GetExtension(fileName);
                     customerDetail.ImagePath = relativePath;
                 }
-                claimsInvestigation.IsNew = true;
-                claimsInvestigation.UpdatedBy = userEmail;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.ORIGIN = ORIGIN.USER;
+                caseTask.IsNew = true;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.Updated = DateTime.Now;
+                caseTask.ORIGIN = ORIGIN.USER;
 
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
@@ -187,7 +187,7 @@ namespace risk.control.system.Services
 
                 var addedClaim = context.CustomerDetail.Add(customerDetail);
 
-                context.Investigations.Update(claimsInvestigation);
+                context.Investigations.Update(caseTask);
                 return await context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
@@ -200,14 +200,14 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
+                var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
 
                 var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 if (customerDetail?.ProfileImage is not null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
                     customerDetail.ProfilePictureExtension = Path.GetExtension(fileName);
                     customerDetail.ImagePath = relativePath;
                 }
@@ -216,10 +216,10 @@ namespace risk.control.system.Services
                     var existingCustomer = await context.CustomerDetail.AsNoTracking().FirstOrDefaultAsync(c => c.InvestigationTaskId == customerDetail.InvestigationTaskId);
                     customerDetail.ImagePath = existingCustomer.ImagePath;
                 }
-                claimsInvestigation.IsNew = true;
-                claimsInvestigation.UpdatedBy = userEmail;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.ORIGIN = ORIGIN.USER;
+                caseTask.IsNew = true;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.Updated = DateTime.Now;
+                caseTask.ORIGIN = ORIGIN.USER;
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
 
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
@@ -244,7 +244,7 @@ namespace risk.control.system.Services
 
                 context.CustomerDetail.Attach(customerDetail);
                 context.Entry(customerDetail).State = EntityState.Modified;
-                context.Investigations.Update(claimsInvestigation);
+                context.Investigations.Update(caseTask);
                 // Save changes to the database
                 return await context.SaveChangesAsync() > 0;
             }
@@ -260,22 +260,22 @@ namespace risk.control.system.Services
             {
                 var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-                var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
+                var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
                 if (beneficiary?.ProfileImage != null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
                 }
 
                 beneficiary.Updated = DateTime.Now;
                 beneficiary.UpdatedBy = userEmail;
-                claimsInvestigation.IsNew = true;
-                claimsInvestigation.UpdatedBy = userEmail;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.IsReady2Assign = true;
-                claimsInvestigation.ORIGIN = ORIGIN.USER;
+                caseTask.IsNew = true;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.Updated = DateTime.Now;
+                caseTask.IsReady2Assign = true;
+                caseTask.ORIGIN = ORIGIN.USER;
                 beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
@@ -299,7 +299,7 @@ namespace risk.control.system.Services
                 beneficiary.Longitude = latlong.Longitude;
                 context.BeneficiaryDetail.Add(beneficiary);
 
-                context.Investigations.Update(claimsInvestigation);
+                context.Investigations.Update(caseTask);
                 return await context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
@@ -312,13 +312,13 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claimsInvestigation = await context.Investigations.Include(c => c.PolicyDetail)
+                var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
 
                 var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (beneficiary?.ProfileImage != null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", claimsInvestigation.PolicyDetail.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
                 }
@@ -331,12 +331,12 @@ namespace risk.control.system.Services
                     }
                 }
 
-                claimsInvestigation.IsNew = true;
-                claimsInvestigation.UpdatedBy = userEmail;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.ORIGIN = ORIGIN.USER;
-                claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
-                claimsInvestigation.IsReady2Assign = true;
+                caseTask.IsNew = true;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.Updated = DateTime.Now;
+                caseTask.ORIGIN = ORIGIN.USER;
+                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
+                caseTask.IsReady2Assign = true;
                 beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
@@ -361,7 +361,7 @@ namespace risk.control.system.Services
 
                 context.BeneficiaryDetail.Attach(beneficiary);
                 context.Entry(beneficiary).State = EntityState.Modified;
-                context.Investigations.Update(claimsInvestigation);
+                context.Investigations.Update(caseTask);
                 return await context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)

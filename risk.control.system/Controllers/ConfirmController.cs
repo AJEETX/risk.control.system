@@ -12,9 +12,9 @@ namespace risk.control.system.Controllers
     public class ConfirmController : Controller
     {
         private readonly INotificationService notificationService;
-        private readonly IClaimsInvestigationService claimsInvestigationService;
+        private readonly ICaseInvestigationService claimsInvestigationService;
 
-        public ConfirmController(INotificationService notificationService, IClaimsInvestigationService claimsInvestigationService)
+        public ConfirmController(INotificationService notificationService, ICaseInvestigationService claimsInvestigationService)
         {
             this.notificationService = notificationService;
             this.claimsInvestigationService = claimsInvestigationService;

@@ -11,23 +11,23 @@ namespace risk.control.system.Services
 {
     public interface IProcessCaseService
     {
-        Task<int> UpdateCaseAllocationStatus(string userEmail, List<long> claimsInvestigations);
+        Task<int> UpdateCaseAllocationStatus(string userEmail, List<long> caseIds);
         Task BackgroundAutoAllocation(List<long> claims, string userEmail, string url = "");
-        Task<List<long>> BackgroundUploadAutoAllocation(List<long> claimIds, string userEmail, string url = "");
+        Task<List<long>> BackgroundUploadAutoAllocation(List<long> caseIds, string userEmail, string url = "");
 
-        Task<string> ProcessAutoSingleAllocation(long claim, string userEmail, string url = "");
-        Task<(string, string)> AllocateToVendor(string userEmail, long claimsInvestigationId, long vendorId, bool autoAllocated = true);
-        Task<Vendor> WithdrawCase(string userEmail, CaseTransactionModel model, long claimId);
-        Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long claimId);
-        Task<Vendor> WithdrawCaseFromAgent(string userEmail, CaseTransactionModel model, long claimId);
+        Task<string> ProcessAutoSingleAllocation(long caseId, string userEmail, string url = "");
+        Task<(string, string)> AllocateToVendor(string userEmail, long caseId, long vendorId, bool autoAllocated = true);
+        Task<Vendor> WithdrawCase(string userEmail, CaseTransactionModel model, long caseId);
+        Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId);
+        Task<Vendor> WithdrawCaseFromAgent(string userEmail, CaseTransactionModel model, long caseId);
 
-        Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long claimId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile messageDocument);
-        Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long claimsInvestigationId, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "");
+        Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile document);
+        Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseId, SupervisorRemarkType reportUpdateStatus, IFormFile? document = null, string editRemarks = "");
 
-        Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType reportUpdateStatus, string reportAiSummary);
-        Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long claimId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile messageDocument);
+        Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType reportUpdateStatus, string reportAiSummary);
+        Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile document);
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
-        Task<bool> SubmitNotes(string userEmail, long claimId, string notes);
+        Task<bool> SubmitNotes(string userEmail, long caseId, string notes);
     }
     internal class ProcessCaseService : IProcessCaseService
     {
@@ -54,13 +54,13 @@ namespace risk.control.system.Services
         }
 
         [AutomaticRetry(Attempts = 0)]
-        public async Task<List<long>> BackgroundUploadAutoAllocation(List<long> claimIds, string userEmail, string url = "")
+        public async Task<List<long>> BackgroundUploadAutoAllocation(List<long> caseIds, string userEmail, string url = "")
         {
-            var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail, url); // Run all tasks in parallel
+            var autoAllocatedCases = await DoAutoAllocation(caseIds, userEmail, url); // Run all tasks in parallel
 
-            var notAutoAllocated = claimIds.Except(autoAllocatedCases)?.ToList();
+            var notAutoAllocated = caseIds.Except(autoAllocatedCases)?.ToList();
 
-            if (claimIds.Count > autoAllocatedCases.Count)
+            if (caseIds.Count > autoAllocatedCases.Count)
             {
                 await AssignToAssigner(userEmail, notAutoAllocated, url);
 
@@ -69,16 +69,16 @@ namespace risk.control.system.Services
 
             return (autoAllocatedCases);
         }
-        public async Task<int> UpdateCaseAllocationStatus(string userEmail, List<long> claimsInvestigations)
+        public async Task<int> UpdateCaseAllocationStatus(string userEmail, List<long> caseIds)
         {
             try
             {
-                if (claimsInvestigations == null || !claimsInvestigations.Any())
+                if (caseIds == null || !caseIds.Any())
                     return 0; // No cases to update
 
                 // Fetch all matching cases in one query
                 var cases = await context.Investigations
-                    .Where(v => claimsInvestigations.Contains(v.Id))
+                    .Where(v => caseIds.Contains(v.Id))
                     .ToListAsync();
 
                 if (!cases.Any())
@@ -101,13 +101,13 @@ namespace risk.control.system.Services
             }
         }
         [AutomaticRetry(Attempts = 0)]
-        public async Task BackgroundAutoAllocation(List<long> claimIds, string userEmail, string url = "")
+        public async Task BackgroundAutoAllocation(List<long> caseIds, string userEmail, string url = "")
         {
-            var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail, url); // Run all tasks in parallel
+            var autoAllocatedCases = await DoAutoAllocation(caseIds, userEmail, url); // Run all tasks in parallel
 
-            var notAutoAllocated = claimIds.Except(autoAllocatedCases)?.ToList();
+            var notAutoAllocated = caseIds.Except(autoAllocatedCases)?.ToList();
 
-            if (claimIds.Count > autoAllocatedCases.Count)
+            if (caseIds.Count > autoAllocatedCases.Count)
             {
                 await AssignToAssigner(userEmail, notAutoAllocated, url);
 
@@ -126,7 +126,7 @@ namespace risk.control.system.Services
             var claimTasks = claims.Select(async claim =>
             {
                 // 1. Fetch Claim Details & Pincode in Parallel
-                var claimsInvestigation = await context.Investigations
+                var caseTask = await context.Investigations
                     .AsNoTracking()
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
@@ -135,11 +135,11 @@ namespace risk.control.system.Services
                         .ThenInclude(c => c.PinCode)
                     .FirstOrDefaultAsync(c => c.Id == claim);
 
-                if (claimsInvestigation == null || !claimsInvestigation.IsValidCaseData()) return 0; // Handle missing claim
+                if (caseTask == null || !caseTask.IsValidCaseData()) return 0; // Handle missing claim
 
-                string pinCode2Verify = claimsInvestigation.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
-                    ? claimsInvestigation.CustomerDetail?.PinCode?.Code
-                    : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
+                string pinCode2Verify = caseTask.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
+                    ? caseTask.CustomerDetail?.PinCode?.Code
+                    : caseTask.BeneficiaryDetail?.PinCode?.Code;
 
                 var pincodeDistrictState = await context.PinCode
                     .AsNoTracking()
@@ -150,8 +150,8 @@ namespace risk.control.system.Services
                 // 2. Find Vendors Using LINQ
                 var distinctVendorIds = company.EmpanelledVendors
                     .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
-                        serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                        serviceType.InsuranceType == claimsInvestigation.PolicyDetail.InsuranceType &&
+                        serviceType.InvestigationServiceTypeId == caseTask.PolicyDetail.InvestigationServiceTypeId &&
+                        serviceType.InsuranceType == caseTask.PolicyDetail.InsuranceType &&
                         (serviceType.StateId == pincodeDistrictState.StateId &&
                          (serviceType.SelectedDistrictIds?.Contains(-1) == true
                          || serviceType.SelectedDistrictIds.Contains(pincodeDistrictState.DistrictId.Value)))
@@ -170,14 +170,14 @@ namespace risk.control.system.Services
                 var selectedVendorId = vendorsWithCaseLoad.FirstOrDefault();
                 if (selectedVendorId == null) return 0; // No vendors available
 
-                var (policy, status) = await AllocateToVendor(userEmail, claimsInvestigation.Id, selectedVendorId.VendorId);
+                var (policy, status) = await AllocateToVendor(userEmail, caseTask.Id, selectedVendorId.VendorId);
 
                 if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
                 {
                     return 0;
                 }
                 var jobId = backgroundJobClient.Enqueue(() =>
-                    mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.Id, selectedVendorId.VendorId, url));
+                    mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId.VendorId, url));
 
                 return claim; // Return allocated claim
             });
@@ -185,7 +185,7 @@ namespace risk.control.system.Services
             var results = await Task.WhenAll(claimTasks); // Run all tasks in parallel
             return results.Where(r => r != null && r != 0).ToList(); // Remove nulls and return allocated claims
         }
-        public async Task<string> ProcessAutoSingleAllocation(long claim, string userEmail, string url = "")
+        public async Task<string> ProcessAutoSingleAllocation(long caseId, string userEmail, string url = "")
         {
             var companyUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
 
@@ -196,18 +196,18 @@ namespace risk.control.system.Services
                     .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             // 1. Fetch Claim Details & Pincode in Parallel
-            var claimsInvestigation = await context.Investigations
+            var caseTask = await context.Investigations
                 .AsNoTracking()
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
                 .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.PinCode)
-            .FirstOrDefaultAsync(c => c.Id == claim);
+            .FirstOrDefaultAsync(c => c.Id == caseId);
 
-            string pinCode2Verify = claimsInvestigation.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
-                ? claimsInvestigation.CustomerDetail?.PinCode?.Code
-                : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
+            string pinCode2Verify = caseTask.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
+                ? caseTask.CustomerDetail?.PinCode?.Code
+                : caseTask.BeneficiaryDetail?.PinCode?.Code;
 
             var pincodeDistrictState = await context.PinCode
                 .AsNoTracking()
@@ -218,8 +218,8 @@ namespace risk.control.system.Services
             // 2. Find Vendors Using LINQ
             var distinctVendorIds = company.EmpanelledVendors
                 .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
-                    serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                    serviceType.InsuranceType == claimsInvestigation.PolicyDetail.InsuranceType &&
+                    serviceType.InvestigationServiceTypeId == caseTask.PolicyDetail.InvestigationServiceTypeId &&
+                    serviceType.InsuranceType == caseTask.PolicyDetail.InsuranceType &&
                     (serviceType.StateId == pincodeDistrictState.StateId &&
                       (serviceType.SelectedDistrictIds?.Contains(-1) == true
                          || serviceType.SelectedDistrictIds.Contains(pincodeDistrictState.DistrictId.Value)))
@@ -238,19 +238,19 @@ namespace risk.control.system.Services
             var selectedVendorId = vendorsWithCaseLoad.FirstOrDefault();
             if (selectedVendorId == null) return null; // No vendors available
 
-            var (policy, status) = await AllocateToVendor(userEmail, claimsInvestigation.Id, selectedVendorId.VendorId);
+            var (policy, status) = await AllocateToVendor(userEmail, caseTask.Id, selectedVendorId.VendorId);
 
             if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
             {
-                await AssignToAssigner(userEmail, new List<long> { claim });
-                await mailboxService.NotifyClaimAssignmentToAssigner(userEmail, new List<long> { claim }, url);
+                await AssignToAssigner(userEmail, new List<long> { caseId });
+                await mailboxService.NotifyClaimAssignmentToAssigner(userEmail, new List<long> { caseId }, url);
                 return null;
             }
 
             // 4. Send Notification
-            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.Id, selectedVendorId.VendorId, url));
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId.VendorId, url));
 
-            return claimsInvestigation.PolicyDetail.ContractNumber; // Return allocated claim
+            return caseTask.PolicyDetail.ContractNumber; // Return allocated claim
         }
         public async Task AssignToAssigner(string userEmail, List<long> claims, string url = "")
         {
@@ -264,16 +264,16 @@ namespace risk.control.system.Services
             var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
             var assigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
 
-            foreach (var claimsInvestigation in cases2Assign)
+            foreach (var case2Assign in cases2Assign)
             {
-                claimsInvestigation.CaseOwner = currentUser.Email;
-                claimsInvestigation.IsNew = true;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.UpdatedBy = currentUser.Email;
-                claimsInvestigation.AssignedToAgency = false;
-                claimsInvestigation.IsReady2Assign = claimsInvestigation.IsValidCaseData() ? true : false;
-                claimsInvestigation.VendorId = null;
-                claimsInvestigation.SubStatus = assigned;
+                case2Assign.CaseOwner = currentUser.Email;
+                case2Assign.IsNew = true;
+                case2Assign.Updated = DateTime.Now;
+                case2Assign.UpdatedBy = currentUser.Email;
+                case2Assign.AssignedToAgency = false;
+                case2Assign.IsReady2Assign = case2Assign.IsValidCaseData() ? true : false;
+                case2Assign.VendorId = null;
+                case2Assign.SubStatus = assigned;
             }
             context.Investigations.UpdateRange(cases2Assign);
             await context.SaveChangesAsync(null, false);
@@ -282,7 +282,7 @@ namespace risk.control.system.Services
 
             await Task.WhenAll(autoAllocatedTasks);
         }
-        public async Task<(string, string)> AllocateToVendor(string userEmail, long claimsInvestigationId, long vendorId, bool autoAllocated = true)
+        public async Task<(string, string)> AllocateToVendor(string userEmail, long caseId, long vendorId, bool autoAllocated = true)
         {
             try
             {
@@ -292,7 +292,7 @@ namespace risk.control.system.Services
                     .FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 // Fetch case
-                var claimsCase = await context.Investigations
+                var caseTask = await context.Investigations
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.ReportTemplate)
                     .ThenInclude(c => c.LocationReport)
@@ -303,34 +303,34 @@ namespace risk.control.system.Services
                     .Include(c => c.ReportTemplate)
                     .ThenInclude(c => c.LocationReport)
                     .ThenInclude(c => c.Questions)
-                    .FirstOrDefaultAsync(v => v.Id == claimsInvestigationId);
+                    .FirstOrDefaultAsync(v => v.Id == caseId);
 
                 var vendor = await context.Vendor.FindAsync(vendorId);
 
                 // Update case details
-                claimsCase.IsAutoAllocated = autoAllocated;
-                claimsCase.IsNew = true;
-                claimsCase.IsNewAssignedToAgency = true;
-                claimsCase.AssignedToAgency = true;
-                claimsCase.Updated = DateTime.Now;
-                claimsCase.AllocatedToAgencyTime = DateTime.Now;
-                claimsCase.UpdatedBy = currentUser.Email;
-                claimsCase.AiEnabled = currentUser.ClientCompany.AiEnabled;
-                claimsCase.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
-                claimsCase.Status = CONSTANTS.CASE_STATUS.INPROGRESS;
-                claimsCase.VendorId = vendorId;
-                claimsCase.CaseOwner = vendor.Email;
-                claimsCase.CreatorSla = currentUser.ClientCompany.CreatorSla;
-                claimsCase.AssessorSla = currentUser.ClientCompany.AssessorSla;
-                claimsCase.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
-                claimsCase.AgentSla = currentUser.ClientCompany.AgentSla;
-                claimsCase.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
+                caseTask.IsAutoAllocated = autoAllocated;
+                caseTask.IsNew = true;
+                caseTask.IsNewAssignedToAgency = true;
+                caseTask.AssignedToAgency = true;
+                caseTask.Updated = DateTime.Now;
+                caseTask.AllocatedToAgencyTime = DateTime.Now;
+                caseTask.UpdatedBy = currentUser.Email;
+                caseTask.AiEnabled = currentUser.ClientCompany.AiEnabled;
+                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
+                caseTask.Status = CONSTANTS.CASE_STATUS.INPROGRESS;
+                caseTask.VendorId = vendorId;
+                caseTask.CaseOwner = vendor.Email;
+                caseTask.CreatorSla = currentUser.ClientCompany.CreatorSla;
+                caseTask.AssessorSla = currentUser.ClientCompany.AssessorSla;
+                caseTask.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
+                caseTask.AgentSla = currentUser.ClientCompany.AgentSla;
+                caseTask.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
 
                 //REPORT TEMPLATE
                 var investigationReport = new InvestigationReport
                 {
-                    ReportTemplateId = claimsCase.ReportTemplateId,
-                    ReportTemplate = claimsCase.ReportTemplate, // Optional
+                    ReportTemplateId = caseTask.ReportTemplateId,
+                    ReportTemplate = caseTask.ReportTemplate, // Optional
                 };
 
                 // Save InvestigationReport
@@ -338,17 +338,17 @@ namespace risk.control.system.Services
                 await context.SaveChangesAsync(null, false);
 
                 // Link the InvestigationReport back to the InvestigationTask
-                claimsCase.InvestigationReportId = investigationReport.Id;
-                claimsCase.InvestigationReport = investigationReport;
+                caseTask.InvestigationReportId = investigationReport.Id;
+                caseTask.InvestigationReport = investigationReport;
 
 
-                context.Investigations.Update(claimsCase);
+                context.Investigations.Update(caseTask);
                 // Save changes
                 await context.SaveChangesAsync(null, false);
 
-                await timelineService.UpdateTaskStatus(claimsCase.Id, currentUser.Email);
+                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
 
-                return (claimsCase.PolicyDetail.ContractNumber, claimsCase.SubStatus);
+                return (caseTask.PolicyDetail.ContractNumber, caseTask.SubStatus);
 
             }
 
@@ -358,28 +358,28 @@ namespace risk.control.system.Services
                 throw;
             }
         }
-        public async Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long claimId)
+        public async Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId)
         {
             try
             {
                 var currentUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
-                var claimsInvestigation = await context.Investigations
-                    .FirstOrDefaultAsync(c => c.Id == claimId);
-                var vendorId = claimsInvestigation.VendorId;
-                var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
+                var caseTask = await context.Investigations
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
+                var vendorId = caseTask.VendorId;
+                var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
 
-                claimsInvestigation.IsNew = true;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.UpdatedBy = currentUser.Email;
-                claimsInvestigation.AssignedToAgency = false;
-                claimsInvestigation.CaseOwner = company.Email;
-                claimsInvestigation.VendorId = null;
-                claimsInvestigation.Vendor = null;
-                claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY;
-                context.Investigations.Update(claimsInvestigation);
+                caseTask.IsNew = true;
+                caseTask.Updated = DateTime.Now;
+                caseTask.UpdatedBy = currentUser.Email;
+                caseTask.AssignedToAgency = false;
+                caseTask.CaseOwner = company.Email;
+                caseTask.VendorId = null;
+                caseTask.Vendor = null;
+                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY;
+                context.Investigations.Update(caseTask);
                 var rows = await context.SaveChangesAsync(null, false) > 0;
 
-                await timelineService.UpdateTaskStatus(claimsInvestigation.Id, currentUser.Email);
+                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
 
                 return rows ? (company, vendorId.GetValueOrDefault()) : (null, 0);
             }
@@ -390,24 +390,24 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<Vendor> WithdrawCaseFromAgent(string userEmail, CaseTransactionModel model, long claimId)
+        public async Task<Vendor> WithdrawCaseFromAgent(string userEmail, CaseTransactionModel model, long caseId)
         {
             try
             {
                 var currentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var claimsInvestigation = await context.Investigations
-                    .FirstOrDefaultAsync(c => c.Id == claimId);
+                var caseTask = await context.Investigations
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                claimsInvestigation.IsNewAssignedToAgency = true;
-                claimsInvestigation.CaseOwner = currentUser.Vendor.Email;
-                claimsInvestigation.TaskedAgentEmail = null;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.UpdatedBy = currentUser.Email;
-                claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
-                context.Investigations.Update(claimsInvestigation);
+                caseTask.IsNewAssignedToAgency = true;
+                caseTask.CaseOwner = currentUser.Vendor.Email;
+                caseTask.TaskedAgentEmail = null;
+                caseTask.Updated = DateTime.Now;
+                caseTask.UpdatedBy = currentUser.Email;
+                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
+                context.Investigations.Update(caseTask);
                 var rows = await context.SaveChangesAsync(null, false);
 
-                await timelineService.UpdateTaskStatus(claimsInvestigation.Id, currentUser.Email);
+                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
 
                 return currentUser.Vendor;
             }
@@ -418,28 +418,28 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<Vendor> WithdrawCase(string userEmail, CaseTransactionModel model, long claimId)
+        public async Task<Vendor> WithdrawCase(string userEmail, CaseTransactionModel model, long caseId)
         {
             try
             {
                 var currentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var claimsInvestigation = await context.Investigations
-                    .FirstOrDefaultAsync(c => c.Id == claimId);
-                var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
-                claimsInvestigation.CaseOwner = company.Email;
-                claimsInvestigation.IsAutoAllocated = false;
-                claimsInvestigation.IsNew = true;
-                claimsInvestigation.IsNewAssignedToAgency = true;
-                claimsInvestigation.IsNewSubmittedToAgent = true;
-                claimsInvestigation.Updated = DateTime.Now;
-                claimsInvestigation.UpdatedBy = currentUser.Email;
-                claimsInvestigation.AssignedToAgency = false;
-                claimsInvestigation.VendorId = null;
-                claimsInvestigation.Vendor = null;
-                claimsInvestigation.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY;
-                context.Investigations.Update(claimsInvestigation);
+                var caseTask = await context.Investigations
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
+                var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
+                caseTask.CaseOwner = company.Email;
+                caseTask.IsAutoAllocated = false;
+                caseTask.IsNew = true;
+                caseTask.IsNewAssignedToAgency = true;
+                caseTask.IsNewSubmittedToAgent = true;
+                caseTask.Updated = DateTime.Now;
+                caseTask.UpdatedBy = currentUser.Email;
+                caseTask.AssignedToAgency = false;
+                caseTask.VendorId = null;
+                caseTask.Vendor = null;
+                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY;
+                context.Investigations.Update(caseTask);
                 var rows = await context.SaveChangesAsync(null, false);
-                await timelineService.UpdateTaskStatus(claimsInvestigation.Id, currentUser.Email);
+                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
                 return currentUser.Vendor;
             }
             catch (Exception ex)
@@ -478,24 +478,24 @@ namespace risk.control.system.Services
                 .ToList();
         }
 
-        public async Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long claimsInvestigationId, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
+        public async Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseId, SupervisorRemarkType reportUpdateStatus, IFormFile? document = null, string editRemarks = "")
         {
             if (reportUpdateStatus == SupervisorRemarkType.OK)
             {
-                return await ApproveAgentReport(userEmail, claimsInvestigationId, supervisorRemarks, reportUpdateStatus, claimDocument, editRemarks);
+                return await ApproveAgentReport(userEmail, caseId, supervisorRemarks, reportUpdateStatus, document, editRemarks);
             }
             else
             {
                 //PUT th case back in review list :: Assign back to Agent
-                return await ReAllocateToVendorAgent(userEmail, claimsInvestigationId, supervisorRemarks, reportUpdateStatus);
+                return await ReAllocateToVendorAgent(userEmail, caseId, supervisorRemarks, reportUpdateStatus);
             }
         }
 
-        private async Task<InvestigationTask> ApproveAgentReport(string userEmail, long claimsInvestigationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
+        private async Task<InvestigationTask> ApproveAgentReport(string userEmail, long claimsInvestigationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? document = null, string editRemarks = "")
         {
             try
             {
-                var claim = await context.Investigations
+                var caseTask = await context.Investigations
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationReport)
                 .Include(c => c.Vendor)
@@ -503,15 +503,15 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(c => c.Id == claimsInvestigationId);
 
                 var submitted2Assessor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR;
-                claim.SubmittingSupervisordEmail = userEmail;
-                claim.SubmittedToAssessorTime = DateTime.Now;
-                claim.AssignedToAgency = false;
-                claim.Updated = DateTime.Now;
-                claim.UpdatedBy = userEmail;
-                claim.SubStatus = submitted2Assessor;
-                claim.CaseOwner = claim.ClientCompany.Email;
-                claim.SubmittedToAssessorTime = DateTime.Now;
-                var report = claim.InvestigationReport;
+                caseTask.SubmittingSupervisordEmail = userEmail;
+                caseTask.SubmittedToAssessorTime = DateTime.Now;
+                caseTask.AssignedToAgency = false;
+                caseTask.Updated = DateTime.Now;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.SubStatus = submitted2Assessor;
+                caseTask.CaseOwner = caseTask.ClientCompany.Email;
+                caseTask.SubmittedToAssessorTime = DateTime.Now;
+                var report = caseTask.InvestigationReport;
                 var edited = report.AgentRemarks.Trim() != editRemarks.Trim();
                 if (edited)
                 {
@@ -524,22 +524,22 @@ namespace risk.control.system.Services
                 report.SupervisorRemarksUpdated = DateTime.Now;
                 report.SupervisorEmail = userEmail;
 
-                if (claimDocument is not null)
+                if (document is not null)
                 {
                     using var dataStream = new MemoryStream();
-                    claimDocument.CopyTo(dataStream);
+                    document.CopyTo(dataStream);
                     report.SupervisorAttachment = dataStream.ToArray();
-                    report.SupervisorFileName = Path.GetFileName(claimDocument.FileName);
-                    report.SupervisorFileExtension = Path.GetExtension(claimDocument.FileName);
-                    report.SupervisorFileType = claimDocument.ContentType;
+                    report.SupervisorFileName = Path.GetFileName(document.FileName);
+                    report.SupervisorFileExtension = Path.GetExtension(document.FileName);
+                    report.SupervisorFileType = document.ContentType;
                 }
 
-                context.Investigations.Update(claim);
+                context.Investigations.Update(caseTask);
                 var rowsAffected = await context.SaveChangesAsync(null, false) > 0;
 
-                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                return rowsAffected ? claim : null;
+                return rowsAffected ? caseTask : null;
             }
             catch (Exception ex)
             {
@@ -548,7 +548,7 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task<InvestigationTask> ReAllocateToVendorAgent(string userEmail, long claimsInvestigationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
+        private async Task<InvestigationTask> ReAllocateToVendorAgent(string userEmail, long caseId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
         {
             try
             {
@@ -556,27 +556,27 @@ namespace risk.control.system.Services
                 var agencyUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(s => s.Email == userEmail);
 
                 var assignedToAgentSubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
-                var claimsCaseToAllocateToVendor = await context.Investigations
+                var caseToAllocateToVendor = await context.Investigations
                     .Include(c => c.InvestigationReport)
                     .Include(c => c.PolicyDetail)
                     .Include(p => p.ClientCompany)
-                    .FirstOrDefaultAsync(v => v.Id == claimsInvestigationId);
+                    .FirstOrDefaultAsync(v => v.Id == caseId);
 
                 //var report = claimsCaseToAllocateToVendor.InvestigationReport;
                 //report.SupervisorRemarkType = reportUpdateStatus;
                 //report.SupervisorRemarks = supervisorRemarks;
-                claimsCaseToAllocateToVendor.CaseOwner = agencyUser.Email;
-                claimsCaseToAllocateToVendor.TaskedAgentEmail = agencyUser.Email;
-                claimsCaseToAllocateToVendor.Updated = DateTime.Now;
-                claimsCaseToAllocateToVendor.UpdatedBy = userEmail;
-                claimsCaseToAllocateToVendor.SubStatus = assignedToAgentSubStatus;
-                claimsCaseToAllocateToVendor.TaskToAgentTime = DateTime.Now;
-                context.Investigations.Update(claimsCaseToAllocateToVendor);
+                caseToAllocateToVendor.CaseOwner = agencyUser.Email;
+                caseToAllocateToVendor.TaskedAgentEmail = agencyUser.Email;
+                caseToAllocateToVendor.Updated = DateTime.Now;
+                caseToAllocateToVendor.UpdatedBy = userEmail;
+                caseToAllocateToVendor.SubStatus = assignedToAgentSubStatus;
+                caseToAllocateToVendor.TaskToAgentTime = DateTime.Now;
+                context.Investigations.Update(caseToAllocateToVendor);
 
                 var rowsAffected = await context.SaveChangesAsync(null, false) > 0;
 
-                await timelineService.UpdateTaskStatus(claimsCaseToAllocateToVendor.Id, userEmail);
-                return rowsAffected ? claimsCaseToAllocateToVendor : null;
+                await timelineService.UpdateTaskStatus(caseToAllocateToVendor.Id, userEmail);
+                return rowsAffected ? caseToAllocateToVendor : null;
 
             }
             catch (Exception ex)
@@ -586,11 +586,11 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long claimId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile messageDocument)
+        public async Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile document)
         {
             try
             {
-                var claim = await context.Investigations
+                var caseTask = await context.Investigations
                 .Include(c => c.PolicyDetail)
                 .Include(p => p.ClientCompany)
                 .Include(c => c.InvestigationReport)
@@ -598,35 +598,35 @@ namespace risk.control.system.Services
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.EnquiryRequests)
                 .Include(c => c.Vendor)
-                .FirstOrDefaultAsync(c => c.Id == claimId);
+                .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 var replyByAgency = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR;
-                claim.CaseOwner = claim.ClientCompany.Email;
-                claim.SubStatus = replyByAgency;
-                claim.UpdatedBy = userEmail;
-                claim.AssignedToAgency = false;
-                claim.EnquiryReplyByAssessorTime = DateTime.Now;
-                claim.SubmittedToAssessorTime = DateTime.Now;
-                var enquiryRequest = claim.InvestigationReport.EnquiryRequest;
+                caseTask.CaseOwner = caseTask.ClientCompany.Email;
+                caseTask.SubStatus = replyByAgency;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.AssignedToAgency = false;
+                caseTask.EnquiryReplyByAssessorTime = DateTime.Now;
+                caseTask.SubmittedToAssessorTime = DateTime.Now;
+                var enquiryRequest = caseTask.InvestigationReport.EnquiryRequest;
                 enquiryRequest.DescriptiveAnswer = request.DescriptiveAnswer;
 
                 enquiryRequest.Updated = DateTime.Now;
                 enquiryRequest.UpdatedBy = userEmail;
 
-                if (messageDocument != null)
+                if (document != null)
                 {
                     using var ms = new MemoryStream();
-                    messageDocument.CopyTo(ms);
+                    document.CopyTo(ms);
                     enquiryRequest.AnswerImageAttachment = ms.ToArray();
-                    enquiryRequest.AnswerImageFileName = Path.GetFileName(messageDocument.FileName);
-                    enquiryRequest.AnswerImageFileExtension = Path.GetExtension(messageDocument.FileName);
-                    enquiryRequest.AnswerImageFileType = messageDocument.ContentType;
+                    enquiryRequest.AnswerImageFileName = Path.GetFileName(document.FileName);
+                    enquiryRequest.AnswerImageFileExtension = Path.GetExtension(document.FileName);
+                    enquiryRequest.AnswerImageFileType = document.ContentType;
                 }
 
                 context.QueryRequest.Update(enquiryRequest);
                 foreach (var enquiry in requests)
                 {
-                    var dbEnquiry = claim.InvestigationReport.EnquiryRequests
+                    var dbEnquiry = caseTask.InvestigationReport.EnquiryRequests
                         .FirstOrDefault(e => e.QueryRequestId == enquiry.QueryRequestId);
 
                     if (dbEnquiry != null)
@@ -637,11 +637,11 @@ namespace risk.control.system.Services
                     }
                 }
 
-                context.Investigations.Update(claim);
+                context.Investigations.Update(caseTask);
                 var rowsUpdated = await context.SaveChangesAsync(null, false) > 0;
-                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                return rowsUpdated ? claim : null;
+                return rowsUpdated ? caseTask : null;
             }
             catch (Exception ex)
             {
@@ -650,16 +650,16 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType reportUpdateStatus, string reportAiSummary)
+        public async Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType reportUpdateStatus, string reportAiSummary)
         {
             if (reportUpdateStatus == AssessorRemarkType.OK)
             {
-                return await ApproveCaseReport(userEmail, assessorRemarks, claimsInvestigationId, reportUpdateStatus, reportAiSummary);
+                return await ApproveCaseReport(userEmail, assessorRemarks, caseId, reportUpdateStatus, reportAiSummary);
             }
             else if (reportUpdateStatus == AssessorRemarkType.REJECT)
             {
                 //PUT th case back in review list :: Assign back to Agent
-                return await RejectCaseReport(userEmail, assessorRemarks, claimsInvestigationId, reportUpdateStatus, reportAiSummary);
+                return await RejectCaseReport(userEmail, assessorRemarks, caseId, reportUpdateStatus, reportAiSummary);
             }
             else
             {
@@ -667,42 +667,42 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task<(ClientCompany, string)> RejectCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
+        private async Task<(ClientCompany, string)> RejectCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var rejected = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
             var finished = CONSTANTS.CASE_STATUS.FINISHED;
 
             try
             {
-                var claim = await context.Investigations
+                var caseTask = await context.Investigations
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .Include(r => r.InvestigationReport)
-                .FirstOrDefaultAsync(c => c.Id == claimsInvestigationId);
+                .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                claim.InvestigationReport.AiSummary = reportAiSummary;
-                claim.InvestigationReport.AssessorRemarkType = assessorRemarkType;
-                claim.InvestigationReport.AssessorRemarks = assessorRemarks;
-                claim.InvestigationReport.AssessorRemarksUpdated = DateTime.Now;
-                claim.InvestigationReport.AssessorEmail = userEmail;
+                caseTask.InvestigationReport.AiSummary = reportAiSummary;
+                caseTask.InvestigationReport.AssessorRemarkType = assessorRemarkType;
+                caseTask.InvestigationReport.AssessorRemarks = assessorRemarks;
+                caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.Now;
+                caseTask.InvestigationReport.AssessorEmail = userEmail;
 
-                claim.Status = finished;
-                claim.SubStatus = rejected;
-                claim.Updated = DateTime.Now;
-                claim.UpdatedBy = userEmail;
-                claim.ProcessedByAssessorTime = DateTime.Now;
-                claim.SubmittedAssessordEmail = userEmail;
-                claim.CaseOwner = claim.ClientCompany.Email;
-                context.Investigations.Update(claim);
+                caseTask.Status = finished;
+                caseTask.SubStatus = rejected;
+                caseTask.Updated = DateTime.Now;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.ProcessedByAssessorTime = DateTime.Now;
+                caseTask.SubmittedAssessordEmail = userEmail;
+                caseTask.CaseOwner = caseTask.ClientCompany.Email;
+                context.Investigations.Update(caseTask);
 
                 var saveCount = await context.SaveChangesAsync(null, false);
 
-                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(claimsInvestigationId, userEmail));
+                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(caseId, userEmail));
 
                 var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-                return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
+                return saveCount > 0 ? (currentUser.ClientCompany, caseTask.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
             catch (Exception ex)
             {
@@ -711,42 +711,41 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task<(ClientCompany, string)> ApproveCaseReport(string userEmail, string assessorRemarks, long claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
+        private async Task<(ClientCompany, string)> ApproveCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
-
             try
             {
                 var approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
                 var finished = CONSTANTS.CASE_STATUS.FINISHED;
 
-                var claim = await context.Investigations
+                var caseTask = await context.Investigations
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .Include(r => r.InvestigationReport)
-                .FirstOrDefaultAsync(c => c.Id == claimsInvestigationId);
+                .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                claim.InvestigationReport.AiSummary = reportAiSummary;
-                claim.InvestigationReport.AssessorRemarkType = assessorRemarkType;
-                claim.InvestigationReport.AssessorRemarks = assessorRemarks;
-                claim.InvestigationReport.AssessorRemarksUpdated = DateTime.Now;
-                claim.InvestigationReport.AssessorEmail = userEmail;
+                caseTask.InvestigationReport.AiSummary = reportAiSummary;
+                caseTask.InvestigationReport.AssessorRemarkType = assessorRemarkType;
+                caseTask.InvestigationReport.AssessorRemarks = assessorRemarks;
+                caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.Now;
+                caseTask.InvestigationReport.AssessorEmail = userEmail;
 
-                claim.Status = finished;
-                claim.SubStatus = approved;
-                claim.Updated = DateTime.Now;
-                claim.UpdatedBy = userEmail;
-                claim.CaseOwner = claim.ClientCompany.Email;
-                claim.ProcessedByAssessorTime = DateTime.Now;
-                claim.SubmittedAssessordEmail = userEmail;
-                context.Investigations.Update(claim);
+                caseTask.Status = finished;
+                caseTask.SubStatus = approved;
+                caseTask.Updated = DateTime.Now;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.CaseOwner = caseTask.ClientCompany.Email;
+                caseTask.ProcessedByAssessorTime = DateTime.Now;
+                caseTask.SubmittedAssessordEmail = userEmail;
+                context.Investigations.Update(caseTask);
 
                 var saveCount = await context.SaveChangesAsync(null, false);
 
-                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(claimsInvestigationId, userEmail));
+                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(caseId, userEmail));
 
-                return saveCount > 0 ? (claim.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
+                return saveCount > 0 ? (caseTask.ClientCompany, caseTask.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
             catch (Exception ex)
             {
@@ -755,52 +754,51 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long claimId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile messageDocument)
+        public async Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile document)
         {
-
             try
             {
-                var claim = await context.Investigations
+                var caseTask = await context.Investigations
                 .Include(c => c.Vendor)
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.EnquiryRequest)
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.EnquiryRequests)
                 .Include(c => c.Vendor)
-                .FirstOrDefaultAsync(c => c.Id == claimId);
+                .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 var requestedByAssessor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
 
-                claim.SubStatus = requestedByAssessor;
-                claim.UpdatedBy = userEmail;
-                claim.CaseOwner = claim.Vendor.Email;
-                claim.RequestedAssessordEmail = userEmail;
-                claim.AssignedToAgency = true;
-                claim.IsQueryCase = true;
-                if (messageDocument != null)
+                caseTask.SubStatus = requestedByAssessor;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.CaseOwner = caseTask.Vendor.Email;
+                caseTask.RequestedAssessordEmail = userEmail;
+                caseTask.AssignedToAgency = true;
+                caseTask.IsQueryCase = true;
+                if (document != null)
                 {
                     using var ms = new MemoryStream();
-                    messageDocument.CopyTo(ms);
+                    document.CopyTo(ms);
                     request.QuestionImageAttachment = ms.ToArray();
-                    request.QuestionImageFileName = Path.GetFileName(messageDocument.FileName);
-                    request.QuestionImageFileExtension = Path.GetExtension(messageDocument.FileName);
-                    request.QuestionImageFileType = messageDocument.ContentType;
+                    request.QuestionImageFileName = Path.GetFileName(document.FileName);
+                    request.QuestionImageFileExtension = Path.GetExtension(document.FileName);
+                    request.QuestionImageFileType = document.ContentType;
                 }
-                claim.InvestigationReport.EnquiryRequest = request;
-                claim.InvestigationReport.EnquiryRequests = requests;
-                claim.InvestigationReport.Updated = DateTime.Now;
-                claim.InvestigationReport.UpdatedBy = userEmail;
-                claim.InvestigationReport.EnquiryRequest.Updated = DateTime.Now;
-                claim.InvestigationReport.EnquiryRequest.UpdatedBy = userEmail;
-                claim.EnquiredByAssessorTime = DateTime.Now;
+                caseTask.InvestigationReport.EnquiryRequest = request;
+                caseTask.InvestigationReport.EnquiryRequests = requests;
+                caseTask.InvestigationReport.Updated = DateTime.Now;
+                caseTask.InvestigationReport.UpdatedBy = userEmail;
+                caseTask.InvestigationReport.EnquiryRequest.Updated = DateTime.Now;
+                caseTask.InvestigationReport.EnquiryRequest.UpdatedBy = userEmail;
+                caseTask.EnquiredByAssessorTime = DateTime.Now;
                 context.QueryRequest.Update(request);
-                context.Investigations.Update(claim);
+                context.Investigations.Update(caseTask);
 
                 var saved = await context.SaveChangesAsync(null, false) > 0;
 
-                await timelineService.UpdateTaskStatus(claim.Id, userEmail);
+                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                return saved ? claim : null;
+                return saved ? caseTask : null;
             }
             catch (Exception ex)
             {
@@ -809,12 +807,12 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<bool> SubmitNotes(string userEmail, long claimId, string notes)
+        public async Task<bool> SubmitNotes(string userEmail, long caseId, string notes)
         {
-            var claim = await context.Investigations
+            var caseTask = await context.Investigations
                .Include(c => c.CaseNotes)
-               .FirstOrDefaultAsync(c => c.Id == claimId);
-            claim.CaseNotes.Add(new CaseNote
+               .FirstOrDefaultAsync(c => c.Id == caseId);
+            caseTask.CaseNotes.Add(new CaseNote
             {
                 Comment = notes,
                 SenderEmail = userEmail,
@@ -822,7 +820,7 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now,
                 UpdatedBy = userEmail
             });
-            context.Investigations.Update(claim);
+            context.Investigations.Update(caseTask);
             return await context.SaveChangesAsync(null, false) > 0;
         }
     }

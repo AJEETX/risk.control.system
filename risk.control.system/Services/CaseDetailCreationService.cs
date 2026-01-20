@@ -230,7 +230,7 @@ namespace risk.control.system.Services
                     UpdatedBy = companyUser.Email
                 };
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(companyUser.ClientCompanyId.Value, caseType);
-                var claim = new InvestigationTask
+                var caseTask = new InvestigationTask
                 {
                     CreatedUser = companyUser.Email,
                     Status = CONSTANTS.CASE_STATUS.INITIATED,
@@ -248,18 +248,18 @@ namespace risk.control.system.Services
                     ReportTemplateId = reportTemplate.Id,
                     ReportTemplate = reportTemplate
                 };
-                claim.PolicyDetail = policyDetail;
-                claim.CustomerDetail = customer;
-                claim.BeneficiaryDetail = beneficiary;
-                claim.IsReady2Assign = claim.IsValidCaseData();
+                caseTask.PolicyDetail = policyDetail;
+                caseTask.CustomerDetail = customer;
+                caseTask.BeneficiaryDetail = beneficiary;
+                caseTask.IsReady2Assign = caseTask.IsValidCaseData();
                 case_errors.AddRange(customer_errors);
                 case_errors.AddRange(beneficiary_errors);
 
-                return new UploadResult { InvestigationTask = claim, ErrorDetail = case_errors, Errors = caseErrors };
+                return new UploadResult { InvestigationTask = caseTask, ErrorDetail = case_errors, Errors = caseErrors };
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error creating Case Detail");
                 return new UploadResult { InvestigationTask = null, ErrorDetail = case_errors, Errors = caseErrors };
             }
         }

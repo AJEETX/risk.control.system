@@ -24,7 +24,6 @@ namespace risk.control.system.Permission
             if (permissionss.Any())
             {
                 context.Succeed(requirement);
-                return;
             }
         }
     }

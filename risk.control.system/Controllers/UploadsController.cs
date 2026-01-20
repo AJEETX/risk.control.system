@@ -20,7 +20,7 @@ namespace risk.control.system.Controllers
         private readonly IAnswerService answerService;
         private readonly IMediaIdfyService mediaIdfyService;
         private readonly INotyfService notifyService;
-        private readonly IClaimsAgentService agentService;
+        private readonly ICaseAgentService agentService;
         private readonly IAgentIdfyService agentIdService;
         private readonly ILogger<UploadsController> logger;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -29,7 +29,7 @@ namespace risk.control.system.Controllers
             IAnswerService answerService,
             IMediaIdfyService mediaIdfyService,
             INotyfService notifyService,
-            IClaimsAgentService agentService,
+            ICaseAgentService agentService,
             IAgentIdfyService agentIdService,
             ILogger<UploadsController> logger,
             IWebHostEnvironment webHostEnvironment)

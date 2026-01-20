@@ -195,7 +195,7 @@ namespace risk.control.system.Controllers
             {
                 existingRating.Rate = rating;
                 _context.Ratings.Update(existingRating);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Json("You rated again " + rating.ToString() + " star(s)");
             }
 
@@ -206,7 +206,7 @@ namespace risk.control.system.Controllers
             rt.VendorId = mid;
             rt.UserEmail = currentUserEmail;
             _context.Ratings.Add(rt);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return Json("You rated this " + rating.ToString() + " star(s)");
         }
 
@@ -238,7 +238,7 @@ namespace risk.control.system.Controllers
                 _context.Ratings.Add(newRating);
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             // Calculate new average rating
             var ratings = _context.Ratings.Where(r => r.VendorId == vendorId);
