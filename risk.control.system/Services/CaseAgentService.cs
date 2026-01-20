@@ -2,18 +2,18 @@
 
 namespace risk.control.system.Services
 {
-    public interface IClaimsAgentService
+    public interface ICaseAgentService
     {
         Task<AppiCheckifyResponse> PostAgentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long faceId, string latitude, string longitude, bool isAgent, IFormFile Image);
         Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long docId, string latitude, string longitude, IFormFile Image);
     }
-    internal class ClaimsAgentService : IClaimsAgentService
+    internal class CaseAgentService : ICaseAgentService
     {
         private readonly IAgentIdfyService agentIdService;
         private readonly IAgentFaceIdfyService agentFaceIdfyService;
         private readonly IDocumentIdfyService documentIdfyService;
 
-        public ClaimsAgentService(IAgentIdfyService agentIdService, IAgentFaceIdfyService agentFaceIdfyService, IDocumentIdfyService documentIdfyService)
+        public CaseAgentService(IAgentIdfyService agentIdService, IAgentFaceIdfyService agentFaceIdfyService, IDocumentIdfyService documentIdfyService)
         {
             this.agentIdService = agentIdService;
             this.agentFaceIdfyService = agentFaceIdfyService;
@@ -51,13 +51,11 @@ namespace risk.control.system.Services
             };
             if (isAgent)
             {
-                var result = await agentFaceIdfyService.CaptureAgentId(data);
-                return result;
+                return await agentFaceIdfyService.CaptureAgentId(data);
             }
             else
             {
-                var result = await agentIdService.CaptureFaceId(data);
-                return result;
+                return await agentIdService.CaptureFaceId(data);
             }
         }
     }

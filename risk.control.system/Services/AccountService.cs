@@ -42,6 +42,10 @@ namespace risk.control.system.Services
         }
         public async Task<ServiceResult> ChangePasswordAsync(ChangePasswordViewModel model, ClaimsPrincipal userPrincipal, bool isAuthenticated, string portal_base_url)
         {
+            if (userPrincipal == null) 
+            {
+                throw new ArgumentNullException(nameof(userPrincipal));
+            }
             var result = new ServiceResult();
 
             if (!isAuthenticated)
@@ -115,12 +119,16 @@ namespace risk.control.system.Services
 
         public async Task<ForgotPasswordResult> ForgotPassword(string useremail, string mobile, string countryCode)
         {
+            if(string.IsNullOrEmpty(useremail) || string.IsNullOrEmpty(mobile) || string.IsNullOrEmpty(countryCode))
+            {
+                return null!;
+            }
             //CHECK AND VALIDATE EMAIL PASSWORD
             var resetPhone = countryCode.TrimStart('+') + mobile.Trim().ToString();
             var user = await context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country.ISDCode.ToString(), u.PhoneNumber) == resetPhone);
             if (user == null)
             {
-                return null;
+                return null!;
             }
             var passwordString = $"Your password is: {user.Password}";
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();

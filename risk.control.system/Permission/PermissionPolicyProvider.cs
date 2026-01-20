@@ -1,38 +1,44 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+
 using risk.control.system.AppConstant;
 
 namespace risk.control.system.Permission
 {
     internal class PermissionPolicyProvider : IAuthorizationPolicyProvider
     {
-        public DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
+        // Use the interface rather than the concrete implementation for better abstraction
+        private readonly DefaultAuthorizationPolicyProvider _fallbackPolicyProvider;
 
         public PermissionPolicyProvider(IOptions<AuthorizationOptions> options)
         {
-            // There can only be one policy provider in ASP.NET Core.
-            // We only handle permissions related policies, for the rest
-            /// we will use the default provider.
-            FallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
+            _fallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
         }
 
-        public Task<AuthorizationPolicy> GetDefaultPolicyAsync() => FallbackPolicyProvider.GetDefaultPolicyAsync();
+        public Task<AuthorizationPolicy> GetDefaultPolicyAsync() =>
+            _fallbackPolicyProvider.GetDefaultPolicyAsync();
 
-        // Dynamically creates a policy with a requirement that contains the permission.
-        // The policy name must match the permission that is needed.
-        public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
+        public Task<AuthorizationPolicy> GetFallbackPolicyAsync() =>
+            _fallbackPolicyProvider.GetFallbackPolicyAsync();
+
+        public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
         {
+            // 1. Add a null check for safety
+            if (string.IsNullOrEmpty(policyName))
+            {
+                return _fallbackPolicyProvider.GetPolicyAsync(policyName);
+            }
+
+            // 2. Custom permission logic
             if (policyName.StartsWith(Applicationsettings.PERMISSION, StringComparison.OrdinalIgnoreCase))
             {
                 var policy = new AuthorizationPolicyBuilder();
                 policy.AddRequirements(new PermissionRequirement(policyName));
-                return Task.FromResult(policy.Build());
+                return Task.FromResult<AuthorizationPolicy?>(policy.Build());
             }
 
-            // Policy is not for permissions, try the default provider.
-            return FallbackPolicyProvider.GetPolicyAsync(policyName);
+            // 3. Fallback to default behavior
+            return _fallbackPolicyProvider.GetPolicyAsync(policyName);
         }
-
-        public Task<AuthorizationPolicy> GetFallbackPolicyAsync() => FallbackPolicyProvider.GetDefaultPolicyAsync();
     }
 }

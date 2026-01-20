@@ -29,7 +29,7 @@ namespace risk.control.system.Services
 
         public async Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false)
         {
-            var claim = await _context.Investigations
+            var caseTask = await _context.Investigations
                 .Include(c => c.ClientCompany)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.PolicyDetail)
@@ -59,18 +59,18 @@ namespace risk.control.system.Services
                 .Include(c => c.CaseNotes)
                 .Include(t => t.InvestigationReport)
                 .FirstOrDefaultAsync(c => c.Id == selectedcase);
-            if (claim is null)
+            if (caseTask is null)
             {
                 return null;
             }
-            var customerContactMasked = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
-            claim.CustomerDetail.PhoneNumber = customerContactMasked;
+            var customerContactMasked = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.CustomerDetail.PhoneNumber = customerContactMasked;
 
-            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            var beneficairyContactMasked = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
 
-            claim.BeneficiaryDetail.PhoneNumber = beneficairyContactMasked;
+            caseTask.BeneficiaryDetail.PhoneNumber = beneficairyContactMasked;
 
-            claim.InvestigationReport.AgentEmail = userEmail;
+            caseTask.InvestigationReport.AgentEmail = userEmail;
 
             var templates = await _context.ReportTemplates
                 .Include(r => r.LocationReport)
@@ -83,24 +83,24 @@ namespace risk.control.system.Services
                    .ThenInclude(l => l.DocumentIds)
                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
-                   .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+                   .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
 
-            claim.InvestigationReport.ReportTemplate = templates;
-            _context.Investigations.Update(claim);
+            caseTask.InvestigationReport.ReportTemplate = templates;
+            _context.Investigations.Update(caseTask);
             var rows = await _context.SaveChangesAsync(null, false);
 
             var model = new CaseInvestigationVendorsModel
             {
-                InvestigationReport = claim.InvestigationReport,
-                Location = claim.BeneficiaryDetail,
-                ClaimsInvestigation = claim
+                InvestigationReport = caseTask.InvestigationReport,
+                Location = caseTask.BeneficiaryDetail,
+                ClaimsInvestigation = caseTask
             };
             return model;
         }
 
         public async Task<CaseTransactionModel> GetInvestigatedForAgent(string currentUserEmail, long id)
         {
-            var claim = await _context.Investigations
+            var caseTask = await _context.Investigations
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -132,12 +132,12 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (claim is null) return null;
+            if (caseTask is null) return null;
 
             var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-            var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
-            var timeTaken = endTIme - claim.Created;
+            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
+            var timeTaken = endTIme - caseTask.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
               $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
@@ -145,7 +145,7 @@ namespace risk.control.system.Services
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = await _context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var invoice = await _context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
             var templates = await _context.ReportTemplates
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
@@ -157,9 +157,9 @@ namespace risk.control.system.Services
                   .ThenInclude(l => l.DocumentIds)
               .Include(r => r.LocationReport)
                   .ThenInclude(l => l.Questions)
-                  .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+                  .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
 
-            claim.InvestigationReport.ReportTemplate = templates;
+            caseTask.InvestigationReport.ReportTemplate = templates;
 
             var tracker = _context.PdfDownloadTracker
                           .FirstOrDefault(t => t.ReportId == id && t.UserEmail == currentUserEmail);
@@ -171,22 +171,22 @@ namespace risk.control.system.Services
 
             var model = new CaseTransactionModel
             {
-                ClaimsInvestigation = claim,
-                CaseIsValidToAssign = claim.IsValidCaseData(),
-                Location = claim.BeneficiaryDetail,
-                Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                ClaimsInvestigation = caseTask,
+                CaseIsValidToAssign = caseTask.IsValidCaseData(),
+                Location = caseTask.BeneficiaryDetail,
+                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
-                Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
             };
 
             return model;
         }
         public async Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
-            var claim = await _context.Investigations
+            var caseTask = await _context.Investigations
                .Include(c => c.InvestigationTimeline)
                .Include(c => c.InvestigationReport)
                .ThenInclude(c => c.EnquiryRequest)
@@ -222,7 +222,7 @@ namespace risk.control.system.Services
                .Include(c => c.CaseNotes)
                .Include(c => c.CaseMessages)
                .FirstOrDefaultAsync(c => c.Id == selectedcase);
-            if (claim is null) return null;
+            if (caseTask is null) return null;
 
             var beneficiaryDetails = await _context.BeneficiaryDetail
                 .Include(c => c.PinCode)
@@ -230,14 +230,14 @@ namespace risk.control.system.Services
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
-                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claim.BeneficiaryDetail.BeneficiaryDetailId);
+                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == caseTask.BeneficiaryDetail.BeneficiaryDetailId);
 
-            var customerContactMasked = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
-            claim.CustomerDetail.PhoneNumber = customerContactMasked;
+            var customerContactMasked = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.CustomerDetail.PhoneNumber = customerContactMasked;
 
-            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            var beneficairyContactMasked = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
 
-            claim.BeneficiaryDetail.PhoneNumber = beneficairyContactMasked;
+            caseTask.BeneficiaryDetail.PhoneNumber = beneficairyContactMasked;
 
             beneficiaryDetails.PhoneNumber = beneficairyContactMasked;
 
@@ -252,16 +252,16 @@ namespace risk.control.system.Services
                    .ThenInclude(l => l.DocumentIds)
                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
-                   .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+                   .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
 
-            claim.InvestigationReport.ReportTemplate = caseReportTemplate;
+            caseTask.InvestigationReport.ReportTemplate = caseReportTemplate;
 
             return (new CaseInvestigationVendorsModel
             {
-                InvestigationReport = claim.InvestigationReport,
+                InvestigationReport = caseTask.InvestigationReport,
                 Location = beneficiaryDetails,
-                ClaimsInvestigation = claim,
-                Address = claim.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured"
+                ClaimsInvestigation = caseTask,
+                Address = caseTask.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured"
             });
         }
     }

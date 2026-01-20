@@ -33,7 +33,7 @@ namespace risk.control.system.Services
         public async Task<InvestigationCreateModel> Create(string userEmail)
         {
             var companyUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
-            var claim = new InvestigationTask
+            var caseTask = new InvestigationTask
             {
                 ClientCompany = companyUser.ClientCompany
             };
@@ -53,7 +53,7 @@ namespace risk.control.system.Services
             }
             var model = new InvestigationCreateModel
             {
-                InvestigationTask = claim,
+                InvestigationTask = caseTask,
                 AllowedToCreate = userCanCreate,
                 AutoAllocation = companyUser.ClientCompany.AutoAllocation,
                 BeneficiaryDetail = new BeneficiaryDetail { },
@@ -158,30 +158,30 @@ namespace risk.control.system.Services
 
         public async Task<EditPolicyDto> GetEditPolicyDetail(long id)
         {
-            var claimsInvestigation = await context.Investigations
+            var caseTask = await context.Investigations
                     .Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(i => i.Id == id);
 
-            if (claimsInvestigation == null)
+            if (caseTask == null)
             {
                 return null;
             }
             var model = new EditPolicyDto
             {
-                Id = claimsInvestigation.Id,
+                Id = caseTask.Id,
                 PolicyDetail = new PolicyDetailDto
                 {
-                    ContractNumber = claimsInvestigation.PolicyDetail.ContractNumber,
-                    InsuranceType = claimsInvestigation.PolicyDetail.InsuranceType,
-                    InvestigationServiceTypeId = claimsInvestigation.PolicyDetail.InvestigationServiceTypeId,
-                    CaseEnablerId = claimsInvestigation.PolicyDetail.CaseEnablerId,
-                    SumAssuredValue = claimsInvestigation.PolicyDetail.SumAssuredValue,
-                    ContractIssueDate = claimsInvestigation.PolicyDetail.ContractIssueDate,
-                    DateOfIncident = claimsInvestigation.PolicyDetail.DateOfIncident,
-                    CostCentreId = claimsInvestigation.PolicyDetail.CostCentreId,
-                    CauseOfLoss = claimsInvestigation.PolicyDetail.CauseOfLoss,
+                    ContractNumber = caseTask.PolicyDetail.ContractNumber,
+                    InsuranceType = caseTask.PolicyDetail.InsuranceType,
+                    InvestigationServiceTypeId = caseTask.PolicyDetail.InvestigationServiceTypeId,
+                    CaseEnablerId = caseTask.PolicyDetail.CaseEnablerId,
+                    SumAssuredValue = caseTask.PolicyDetail.SumAssuredValue,
+                    ContractIssueDate = caseTask.PolicyDetail.ContractIssueDate,
+                    DateOfIncident = caseTask.PolicyDetail.DateOfIncident,
+                    CostCentreId = caseTask.PolicyDetail.CostCentreId,
+                    CauseOfLoss = caseTask.PolicyDetail.CauseOfLoss,
                 },
-                ExistingDocumentPath = claimsInvestigation.PolicyDetail.DocumentPath
+                ExistingDocumentPath = caseTask.PolicyDetail.DocumentPath
             };
             return model;
         }

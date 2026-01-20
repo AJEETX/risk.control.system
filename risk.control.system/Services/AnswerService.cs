@@ -27,16 +27,21 @@ internal class AnswerService : IAnswerService
 
     public async Task<bool> CaptureAnswers(string locationName, long caseId, List<QuestionTemplate> Questions)
     {
+        if(string.IsNullOrEmpty(locationName) || caseId <= 0 || Questions == null || Questions.Count == 0)
+            return false;
         try
         {
-            var claim = await caseService.GetCaseByIdForQuestions(caseId);
-
-            var location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == locationName);
-
+            var caseTask = await caseService.GetCaseByIdForQuestions(caseId);
+            if(caseTask == null)
+                return false;
+            var location = caseTask.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == locationName);
+            if(location == null)
+                return false;
             var locationTemplate = await context.LocationReport
                 .Include(l => l.Questions)
                 .FirstOrDefaultAsync(l => l.Id == location.Id);
-
+            if(locationTemplate == null)
+                return false;
             locationTemplate.Questions.RemoveAll(q => true);
             foreach (var q in Questions)
             {

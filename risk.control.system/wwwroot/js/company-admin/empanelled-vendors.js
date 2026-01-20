@@ -244,12 +244,12 @@
                 content: "Please select agency to depanel?",
                 icon: 'fas fa-exclamation-triangle',
     
-                type: 'red',
+                type: 'orange',
                 closeIcon: true,
                 buttons: {
                     cancel: {
                         text: "SELECT",
-                        btnClass: 'btn-danger'
+                        btnClass: 'btn-warning'
                     }
                 }
             });
