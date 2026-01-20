@@ -133,7 +133,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IText2SpeechService, Text2SpeechService>();
         services.AddScoped<IInvestigationReportPdfService, InvestigationReportPdfService>();
         services.AddScoped<IAzureAdService, AzureAdService>();
-        services.AddScoped<IOtpService, OtpService>();
         services.AddScoped<IAnswerService, AnswerService>();
         services.AddScoped<IMediaIdfyService, MediaIdfyService>();
         services.AddScoped<IDocumentIdfyService, DocumentIdfyService>();
@@ -192,14 +191,14 @@ public static class BusinessServiceExtension
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICustomApiClient, CustomApiClient>();
         services.AddScoped<IAgencyService, AgencyService>();
-        services.AddScoped<IClaimsAgentService, ClaimsAgentService>();
+        services.AddScoped<ICaseAgentService, CaseAgentService>();
         services.AddScoped<IAmazonApiService, AmazonApiService>();
         services.AddScoped<ISmsService, SmsService>();
         services.AddScoped<IInvoiceService, InvoiceService>();
         services.AddScoped<INumberSequenceService, NumberSequenceService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IAgentService, AgentService>();
-        services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
+        services.AddScoped<ICaseInvestigationService, CaseInvestigationService>();
         services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
         services.AddScoped<ICaseService, CaseService>();
         services.AddScoped<IAccountService, AccountService>();

@@ -4,25 +4,25 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Services
 {
-    public interface IClaimsInvestigationService
+    public interface ICaseInvestigationService
     {
         Task<bool> SubmitNotes(string userEmail, long claimId, string notes);
     }
 
-    internal class ClaimsInvestigationService : IClaimsInvestigationService
+    internal class CaseInvestigationService : ICaseInvestigationService
     {
         private readonly ApplicationDbContext _context;
 
-        public ClaimsInvestigationService(ApplicationDbContext context)
+        public CaseInvestigationService(ApplicationDbContext context)
         {
             this._context = context;
         }
         public async Task<bool> SubmitNotes(string userEmail, long claimId, string notes)
         {
-            var claim = await _context.Investigations
+            var caseTask = await _context.Investigations
                .Include(c => c.CaseNotes)
                .FirstOrDefaultAsync(c => c.Id == claimId);
-            claim.CaseNotes.Add(new CaseNote
+            caseTask.CaseNotes.Add(new CaseNote
             {
                 Comment = notes,
                 SenderEmail = userEmail,
@@ -30,7 +30,7 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now,
                 UpdatedBy = userEmail
             });
-            _context.Investigations.Update(claim);
+            _context.Investigations.Update(caseTask);
             return await _context.SaveChangesAsync() > 0;
         }
     }

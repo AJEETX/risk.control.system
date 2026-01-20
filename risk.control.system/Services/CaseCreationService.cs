@@ -28,13 +28,13 @@ namespace risk.control.system.Services
                     logger.LogCritical($"Either company User and/or Upload case is null or No case saved");
                     return null;
                 }
-                var claimUploaded = await caseDetailCreationService.AddCaseDetail(uploadCase, companyUser, model, fileOrFTP);
-                if (claimUploaded == null)
+                var casesUploaded = await caseDetailCreationService.AddCaseDetail(uploadCase, companyUser, model, fileOrFTP);
+                if (casesUploaded == null)
                 {
                     logger.LogCritical($"Upload case(s) is null.");
                     return null;
                 }
-                return claimUploaded;
+                return casesUploaded;
             }
             catch (Exception ex)
             {

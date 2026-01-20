@@ -48,7 +48,7 @@ namespace risk.control.system.Services
         {
             var statuses = GetValidStatuses();
 
-            var claimsCases = await GetClaimsAsync(statuses);
+            var claimsCases = await GetCasesAsync(statuses);
 
             var company = await GetCompanyAsync(companyUser.ClientCompanyId.Value);
             if (company == null) return Array.Empty<object>();
@@ -74,7 +74,7 @@ namespace risk.control.system.Services
             CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
             };
 
-        private async Task<List<InvestigationTask>> GetClaimsAsync(string[] statuses) =>
+        private async Task<List<InvestigationTask>> GetCasesAsync(string[] statuses) =>
             await _context.Investigations
                 .Where(c => c.AssignedToAgency &&
                             !c.Deleted &&
@@ -91,7 +91,7 @@ namespace risk.control.system.Services
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.ratings)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyId);
 
-        private object MapVendor(Vendor u, ApplicationUser companyUser, List<InvestigationTask> claimsCases)
+        private object MapVendor(Vendor u, ApplicationUser companyUser, List<InvestigationTask> caseTasks)
         {
             return new
             {
@@ -110,7 +110,7 @@ namespace risk.control.system.Services
                 Flag = $"/flags/{u.Country.Code.ToLower()}.png",
                 Updated = (u.Updated ?? u.Created).ToString("dd-MM-yyyy"),
                 UpdateBy = u.UpdatedBy,
-                CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
+                CaseCount = caseTasks.Count(c => c.VendorId == u.VendorId),
                 RateCount = u.RateCount,
                 RateTotal = u.RateTotal,
                 RawAddress = $"{u.Addressline}, {u.District.Name}, {u.State.Code}, {u.Country.Code}",
