@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Data;
 using risk.control.system.Models;
 
 namespace risk.control.system.Services

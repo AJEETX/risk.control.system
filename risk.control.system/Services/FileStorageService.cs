@@ -2,15 +2,8 @@
 {
     public interface IFileStorageService
     {
-        Task<(string FileName, string RelativePath)> SaveAsync(IFormFile file, string category,              // Policy, Agency, Company
-        string? subFolder = null,     // optional deeper folder
-         string? subSubFolder = null,
-        string[]? allowedTypes = null);
-
-        Task<(string FileName, string RelativePath)> SaveAsync(byte[] data, string extension, string category,              // Policy, Agency, Company
-            string? subFolder = null,
-             string? subSubFolder = null,
-            string[]? allowedExtensions = null);
+        Task<(string FileName, string RelativePath)> SaveAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null, string[]? allowedTypes = null);
+        Task<(string FileName, string RelativePath)> SaveAsync(byte[] data, string extension, string category, string? subFolder = null, string? subSubFolder = null, string[]? allowedExtensions = null);
         Task<(string FileName, string RelativePath)> SaveMediaAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null);
     }
     internal class FileStorageService : IFileStorageService

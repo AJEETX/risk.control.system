@@ -1,12 +1,11 @@
 ﻿@using risk.control.system.AppConstant;
-@using risk.control.system.Models.ViewModel;
-@model CompanyUsersViewModel
+@model ClientCompany
 
 @{
     ViewData["Title"] = @Applicationsettings.USER;
 }
 <section class="content">
-    <input id="companyId" type="hidden" asp-for="Company.ClientCompanyId" />
+    <input id="companyId" type="hidden" asp-for="ClientCompanyId" />
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title"><i class="fas fa-user-friends"></i>  Users</h3>
@@ -41,11 +40,11 @@
                     <div class="col-md-12">
                         <div class="form-group">
 
-                            <a id="back" asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.Company.ClientCompanyId" class="btn btn-outline-secondary">
+                            <a id="back" asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.ClientCompanyId" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left"></i>
                                 Back
                             </a>
-                            <a class="btn btn-success" asp-controller="CompanyUser" asp-action="Create" asp-route-id="@Model.Company.ClientCompanyId"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
+                            <a class="btn btn-success" asp-controller="CompanyUser" asp-action="Create" asp-route-id="@Model.ClientCompanyId"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
 
                         </div>
                     </div>

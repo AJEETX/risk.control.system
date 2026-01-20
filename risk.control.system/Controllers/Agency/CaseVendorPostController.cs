@@ -11,13 +11,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Agency
 {
@@ -27,7 +24,6 @@ namespace risk.control.system.Controllers.Agency
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        public List<UsersViewModel> UserList;
         private readonly IProcessCaseService processCaseService;
         private readonly IVendorInvestigationService vendorInvestigationService;
         private readonly INotyfService notifyService;
@@ -55,7 +51,6 @@ namespace risk.control.system.Controllers.Agency
             this.backgroundJobClient = backgroundJobClient;
             this.httpContextAccessor = httpContextAccessor;
             _context = context;
-            UserList = new List<UsersViewModel>();
         }
 
         [HttpPost]

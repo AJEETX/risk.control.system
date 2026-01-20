@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Controllers.Api.Claims;
-using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -79,7 +78,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
             var faceTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(fileName));
             var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon), "A", "X", "300", "300", "green", "red");
+            var mapTask = customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon), "Start", "End", "300", "300", "green", "red");
 
             await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask);
 

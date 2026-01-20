@@ -2,7 +2,6 @@
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Utils;
 
-using risk.control.system.Data;
 using risk.control.system.Models;
 
 using SixLabors.ImageSharp;

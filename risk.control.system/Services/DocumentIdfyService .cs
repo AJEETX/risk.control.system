@@ -3,7 +3,6 @@
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Controllers.Api.Claims;
-using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -73,7 +72,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
             // 2. Parallel Service Calls (OCR, Address, and Mapping)
             var googleTask = googleApi.DetectTextAsync(doc.FilePath);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon), "A", "X", "300", "300", "green", "red");
+            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon), "Start", "End", "300", "300", "green", "red");
 
             await Task.WhenAll(googleTask, addressTask, mapTask);
 

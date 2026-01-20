@@ -1,11 +1,7 @@
 ﻿using System.Net.Http.Headers;
 
-using Amazon;
 using Amazon.S3;
-using Amazon.S3.Model;
-using Amazon.S3.Transfer;
 using Amazon.TranscribeService;
-using Amazon.TranscribeService.Model;
 
 using Newtonsoft.Json;
 
@@ -26,7 +22,6 @@ namespace risk.control.system.Services
 
         Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes, string url, string key, string host);
 
-        Task<AudioTranscript> TranscribeAsync(long locationId, string reportName, string bucketName, string fileName, string filePath);
     }
 
     internal class HttpClientService : IHttpClientService
@@ -193,86 +188,6 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<AudioTranscript> TranscribeAsync(long locationId, string reportName, string bucketName, string fileName, string filePath)
-        {
-            try
-            {
-                await UploadS3Async(bucketName, fileName, filePath);
-
-                var mediaFileUri = $"https://{bucketName}.s3.{RegionEndpoint.APSoutheast2.SystemName}.amazonaws.com/{fileName}";
-
-                var jobRequest = new StartTranscriptionJobRequest
-                {
-                    TranscriptionJobName = $"audio2text-{DateTime.UtcNow:yyyyMMddHHmmss}",
-                    LanguageCode = "en-US",
-                    MediaFormat = "mp3",
-                    Media = new Media { MediaFileUri = mediaFileUri },
-                    OutputBucketName = bucketName
-                };
-
-                var jobResponse = await _amazonTranscribeService.StartTranscriptionJobAsync(jobRequest);
-                Console.WriteLine($"Transcription job started: {jobResponse.HttpStatusCode}");
-
-                // Polling until completion
-                GetTranscriptionJobResponse jobResponseCompleted;
-                do
-                {
-                    await Task.Delay(5000);
-                    jobResponseCompleted = await _amazonTranscribeService.GetTranscriptionJobAsync(
-                        new GetTranscriptionJobRequest { TranscriptionJobName = jobRequest.TranscriptionJobName });
-
-                    Console.WriteLine($"Job status: {jobResponseCompleted.TranscriptionJob.TranscriptionJobStatus}");
-
-                } while (jobResponseCompleted.TranscriptionJob.TranscriptionJobStatus == TranscriptionJobStatus.IN_PROGRESS);
-
-                if (jobResponseCompleted.TranscriptionJob.TranscriptionJobStatus == TranscriptionJobStatus.COMPLETED)
-                {
-                    Console.WriteLine("Transcription completed.");
-                    var getObjectRequest = new GetObjectRequest
-                    {
-                        BucketName = bucketName,
-                        Key = $"{jobRequest.TranscriptionJobName}.json"
-                    };
-
-                    using var response = await s3Client.GetObjectAsync(getObjectRequest);
-                    using var reader = new StreamReader(response.ResponseStream);
-                    string transcriptionText = await reader.ReadToEndAsync();
-
-                    await mediaDataService.SaveTranscript(locationId, reportName, transcriptionText);
-                    return JsonConvert.DeserializeObject<AudioTranscript>(transcriptionText);
-                }
-
-                Console.WriteLine("Transcription failed or cancelled.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-            return null;
-        }
-
-        public async Task UploadS3Async(string bucketName, string fileName, string filePath)
-        {
-            try
-            {
-                await CreateBucketAsync(bucketName);
-                var regionResponse = await s3Client.GetBucketLocationAsync(bucketName);
-
-                var transferUtility = new TransferUtility(s3Client);
-                await transferUtility.UploadAsync(filePath, bucketName, fileName);
-
-                Console.WriteLine("File uploaded successfully");
-            }
-            catch (AmazonS3Exception s3Ex)
-            {
-                Console.WriteLine($"S3 Error: {s3Ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"General Error: {ex.Message}");
-            }
-        }
-
         private async Task<string> StartVerifyPassport(string passport, string date_of_birth)
         {
             var content = new
@@ -312,44 +227,6 @@ namespace risk.control.system.Services
                 var requestId = JsonConvert.DeserializeObject<List<PassportResult>>(body).FirstOrDefault()?.request_id;
                 return requestId;
             }
-        }
-
-        private async Task CreateBucketAsync(string bucketName)
-        {
-            // Check if bucket already exists
-            if (await DoesBucketExistAsync(bucketName))
-            {
-                Console.WriteLine($"Bucket '{bucketName}' already exists.");
-                return;
-            }
-            try
-            {
-                var putBucketRequest = new PutBucketRequest
-                {
-                    BucketName = bucketName,
-                    UseClientRegion = true // Automatically uses the region of the client
-                };
-                var response = await s3Client.PutBucketAsync(putBucketRequest);
-                Console.WriteLine($"Bucket created with HTTP status code: {response.HttpStatusCode}");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred");
-            }
-        }
-
-        private async Task<bool> DoesBucketExistAsync(string bucketName)
-        {
-            try
-            {
-                return await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(s3Client, bucketName);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred");
-                return false;
-            }
-            //return await s3Client.DoesS3BucketExistAsync(bucketName);
         }
     }
 }

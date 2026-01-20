@@ -2,9 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-using risk.control.system.Models;
-
-namespace risk.control.system.Data
+namespace risk.control.system.Models
 {
     public abstract class AuditableIdentityContext : IdentityDbContext<ApplicationUser, ApplicationRole, long>
     {
@@ -13,7 +11,7 @@ namespace risk.control.system.Data
 
         public AuditableIdentityContext(DbContextOptions options, IHttpContextAccessor context, IServiceProvider services) : base(options)
         {
-            this.httpContext = context;
+            httpContext = context;
             this.services = services;
         }
         protected ApplicationDbContext _context => services.GetRequiredService<ApplicationDbContext>();
