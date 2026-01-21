@@ -287,8 +287,8 @@ namespace risk.control.system.Services
 
                 var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
 
-                var caseTask = GetCases().Include(c => c.InvestigationReport)
-                    .FirstOrDefault(c => c.Id == caseId);
+                var caseTask =await GetCases().Include(c => c.InvestigationReport)
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 caseTask.Updated = DateTime.Now;
                 caseTask.UpdatedBy = agent.Email;
@@ -356,7 +356,6 @@ namespace risk.control.system.Services
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            // Filter claims early and minimize loading
             var caseTasks = await context.Investigations
                 .Include(a => a.ClientCompany)
                 .Include(c => c.PolicyDetail)
@@ -435,9 +434,9 @@ namespace risk.control.system.Services
             var idsToMarkViewed = response.Where(x => x.IsNewAssigned.GetValueOrDefault()).Select(x => x.Id).ToList();
             if (idsToMarkViewed.Any())
             {
-                var entitiesToUpdate = context.Investigations
+                var entitiesToUpdate =await context.Investigations
                     .Where(x => idsToMarkViewed.Contains(x.Id))
-                    .ToList();
+                    .ToListAsync();
 
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNewAssignedToAgency = false;
@@ -542,9 +541,9 @@ namespace risk.control.system.Services
             var idsToMarkViewed = response.Where(x => x.IsNewAssigned.GetValueOrDefault()).Select(x => x.Id).ToList();
             if (idsToMarkViewed.Any())
             {
-                var entitiesToUpdate = context.Investigations
+                var entitiesToUpdate =await context.Investigations
                     .Where(x => idsToMarkViewed.Contains(x.Id))
-                    .ToList();
+                    .ToListAsync();
 
                 foreach (var entity in entitiesToUpdate)
                     if (entity.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
@@ -706,9 +705,9 @@ namespace risk.control.system.Services
             var idsToMarkViewed = response.Where(x => x.IsNewAssigned.GetValueOrDefault()).Select(x => x.Id).ToList();
             if (idsToMarkViewed.Any())
             {
-                var entitiesToUpdate = context.Investigations
+                var entitiesToUpdate =await context.Investigations
                     .Where(x => idsToMarkViewed.Contains(x.Id))
-                    .ToList();
+                    .ToListAsync();
 
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNewSubmittedToAgency = false;
