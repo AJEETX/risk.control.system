@@ -35,7 +35,7 @@ namespace risk.control.system.Services
 
         public async Task<CaseTransactionModel> GetCaseDetails(string currentUserEmail, long id)
         {
-            var claim = await context.Investigations
+            var caseTask = await context.Investigations
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
@@ -67,20 +67,20 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (claim.CustomerDetail != null)
+            if (caseTask.CustomerDetail != null)
             {
-                var maskedCustomerContact = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
-                claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
+                var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+                caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
             }
-            if (claim.BeneficiaryDetail != null)
+            if (caseTask.BeneficiaryDetail != null)
             {
-                var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-                claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
+                var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+                caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
             var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
-            var timeTaken = DateTime.Now - claim.Created;
+            var timeTaken = DateTime.Now - caseTask.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
               $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
@@ -89,20 +89,20 @@ namespace risk.control.system.Services
             : "-";
             var model = new CaseTransactionModel
             {
-                ClaimsInvestigation = claim,
-                CaseIsValidToAssign = claim.IsValidCaseData(),
-                Location = claim.BeneficiaryDetail,
-                Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                ClaimsInvestigation = caseTask,
+                CaseIsValidToAssign = caseTask.IsValidCaseData(),
+                Location = caseTask.BeneficiaryDetail,
+                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 AutoAllocation = companyUser.ClientCompany.AutoAllocation,
                 TimeTaken = totalTimeTaken,
-                Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
             };
 
             return model;
         }
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
         {
-            var claim = await context.Investigations
+            var caseTask = await context.Investigations
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -137,20 +137,20 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (claim.CustomerDetail != null)
+            if (caseTask.CustomerDetail != null)
             {
-                var maskedCustomerContact = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
-                claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
+                var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+                caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
             }
-            if (claim.BeneficiaryDetail != null)
+            if (caseTask.BeneficiaryDetail != null)
             {
-                var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-                claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
+                var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+                caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
             var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-            var endTIme = claim.Status == CONSTANTS.CASE_STATUS.FINISHED ? claim.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
-            var timeTaken = endTIme - claim.Created;
+            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
+            var timeTaken = endTIme - caseTask.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
               $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
@@ -158,7 +158,7 @@ namespace risk.control.system.Services
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
             var templates = await context.ReportTemplates
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
@@ -170,9 +170,9 @@ namespace risk.control.system.Services
                   .ThenInclude(l => l.DocumentIds)
               .Include(r => r.LocationReport)
                   .ThenInclude(l => l.Questions)
-                  .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+                  .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
 
-            claim.InvestigationReport.ReportTemplate = templates;
+            caseTask.InvestigationReport.ReportTemplate = templates;
 
             var tracker = await context.PdfDownloadTracker
                           .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
@@ -184,22 +184,22 @@ namespace risk.control.system.Services
 
             var model = new CaseTransactionModel
             {
-                ClaimsInvestigation = claim,
-                CaseIsValidToAssign = claim.IsValidCaseData(),
-                Location = claim.BeneficiaryDetail,
-                Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                ClaimsInvestigation = caseTask,
+                CaseIsValidToAssign = caseTask.IsValidCaseData(),
+                Location = caseTask.BeneficiaryDetail,
+                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
-                Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
             };
 
             return model;
         }
         public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
         {
-            var claim = await context.Investigations
+            var caseTask = await context.Investigations
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -231,14 +231,14 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            var maskedCustomerContact = new string('*', claim.CustomerDetail.PhoneNumber.ToString().Length - 4) + claim.CustomerDetail.PhoneNumber.ToString().Substring(claim.CustomerDetail.PhoneNumber.ToString().Length - 4);
-            claim.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + claim.BeneficiaryDetail.PhoneNumber.ToString().Substring(claim.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-            claim.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
+            var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var lastHistory = claim.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
-            var timeTaken = DateTime.Now - claim.Created;
+            var timeTaken = DateTime.Now - caseTask.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
               $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
@@ -246,7 +246,7 @@ namespace risk.control.system.Services
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == claim.InvestigationReportId);
+            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
             var templates = await context.ReportTemplates
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
@@ -258,9 +258,9 @@ namespace risk.control.system.Services
                   .ThenInclude(l => l.DocumentIds)
               .Include(r => r.LocationReport)
                   .ThenInclude(l => l.Questions)
-                  .FirstOrDefaultAsync(q => q.Id == claim.ReportTemplateId);
+                  .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
 
-            claim.InvestigationReport.ReportTemplate = templates;
+            caseTask.InvestigationReport.ReportTemplate = templates;
 
             var tracker = await context.PdfDownloadTracker
                           .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
@@ -286,15 +286,15 @@ namespace risk.control.system.Services
             context.SaveChanges();
             var model = new CaseTransactionModel
             {
-                ClaimsInvestigation = claim,
-                CaseIsValidToAssign = claim.IsValidCaseData(),
-                Location = claim.BeneficiaryDetail,
-                Assigned = claim.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                ClaimsInvestigation = caseTask,
+                CaseIsValidToAssign = caseTask.IsValidCaseData(),
+                Location = caseTask.BeneficiaryDetail,
+                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
-                Withdrawable = (claim.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
             };
 
             return model;
@@ -449,69 +449,50 @@ namespace risk.control.system.Services
             // Apply Sorting AFTER Data Transformation
             if (!string.IsNullOrEmpty(orderDir))
             {
-                switch (orderColumn)
+                bool isAsc = string.Equals(orderDir, "asc", StringComparison.OrdinalIgnoreCase);
+                transformedData = orderColumn switch
                 {
-                    case 1: // Sort by Policy Number
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.PolicyId)
-                            : transformedData.OrderByDescending(a => a.PolicyId);
-                        break;
-
-                    case 2: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.Amount)
-                            : transformedData.OrderByDescending(a => a.Amount);
-                        break;
-
-                    case 3: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.PincodeCode)
-                            : transformedData.OrderByDescending(a => a.PincodeCode);
-                        break;
-
-                    case 6: // Sort by Customer Full Name
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.CustomerFullName)
-                            : transformedData.OrderByDescending(a => a.CustomerFullName);
-                        break;
-
-                    case 8: // Sort by Beneficiary Full Name
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.BeneficiaryFullName)
-                            : transformedData.OrderByDescending(a => a.BeneficiaryFullName);
-                        break;
-
-
-                    case 9: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.ServiceType)
-                            : transformedData.OrderByDescending(a => a.ServiceType);
-                        break;
-
-                    case 10: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.Location)
-                            : transformedData.OrderByDescending(a => a.Location);
-                        break;
-
-                    case 11: // Sort by Created Date
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
-                            : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null));
-                        break;
-
-                    case 12: // Sort by TimeElapsed
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.TimeElapsed)
-                            : transformedData.OrderByDescending(a => a.TimeElapsed);
-                        break;
-
-                    default: // Default Sorting (if needed)
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.TimeElapsed)
-                            : transformedData.OrderByDescending(a => a.TimeElapsed);
-                        break;
-                }
+                    // Sort by Policy Number
+                    1 => isAsc
+                                                ? transformedData.OrderBy(a => a.PolicyId)
+                                                : transformedData.OrderByDescending(a => a.PolicyId),
+                    // Sort by Amount (Ensure proper sorting of numeric values)
+                    2 => isAsc
+                                                ? transformedData.OrderBy(a => a.Amount)
+                                                : transformedData.OrderByDescending(a => a.Amount),
+                    // Sort by Amount (Ensure proper sorting of numeric values)
+                    3 => isAsc
+                                                ? transformedData.OrderBy(a => a.PincodeCode)
+                                                : transformedData.OrderByDescending(a => a.PincodeCode),
+                    // Sort by Customer Full Name
+                    6 => isAsc
+                                                ? transformedData.OrderBy(a => a.CustomerFullName)
+                                                : transformedData.OrderByDescending(a => a.CustomerFullName),
+                    // Sort by Beneficiary Full Name
+                    8 => isAsc
+                                                ? transformedData.OrderBy(a => a.BeneficiaryFullName)
+                                                : transformedData.OrderByDescending(a => a.BeneficiaryFullName),
+                    // Sort by Status
+                    9 => isAsc
+                                                ? transformedData.OrderBy(a => a.ServiceType)
+                                                : transformedData.OrderByDescending(a => a.ServiceType),
+                    // Sort by Status
+                    10 => isAsc
+                                                ? transformedData.OrderBy(a => a.Location)
+                                                : transformedData.OrderByDescending(a => a.Location),
+                    // Sort by Created Date
+                    11 => isAsc
+                                                ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
+                                                : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null)),
+                    // Sort by TimeElapsed
+                    12 => isAsc
+                                                ? transformedData.OrderBy(a => a.TimeElapsed)
+                                                : transformedData.OrderByDescending(a => a.TimeElapsed),
+                    // Default Sorting (if needed)
+                    _ => isAsc
+                                                ? transformedData.OrderBy(a => a.TimeElapsed)
+                                                : transformedData.OrderByDescending(a => a.TimeElapsed),
+                };
             }
             // Apply Pagination
             var pagedData = transformedData.Skip(start).Take(length).ToList();
@@ -521,9 +502,9 @@ namespace risk.control.system.Services
 
             if (idsToMarkViewed.Any())
             {
-                var entitiesToUpdate = context.Investigations
+                var entitiesToUpdate =await context.Investigations
                     .Where(x => idsToMarkViewed.Contains(x.Id))
-                    .ToList();
+                    .ToListAsync();
 
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNew = false;
@@ -688,63 +669,42 @@ namespace risk.control.system.Services
             // Apply Sorting AFTER Data Transformation
             if (!string.IsNullOrEmpty(orderDir))
             {
-                switch (orderColumn)
+                bool isAsc = string.Equals(orderDir, "asc", StringComparison.OrdinalIgnoreCase);
+                transformedData = orderColumn switch
                 {
-                    case 0: // Sort by Policy Number
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.PolicyId)
-                            : transformedData.OrderByDescending(a => a.PolicyId);
-                        break;
-
-                    case 1: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.Amount)
-                            : transformedData.OrderByDescending(a => a.Amount);
-                        break;
-
-                    case 6: // Sort by Customer Full Name
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.CustomerFullName)
-                            : transformedData.OrderByDescending(a => a.CustomerFullName);
-                        break;
-
-                    case 8: // Sort by Beneficiary Full Name
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.BeneficiaryFullName)
-                            : transformedData.OrderByDescending(a => a.BeneficiaryFullName);
-                        break;
-
-
-                    case 9: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.ServiceType)
-                            : transformedData.OrderByDescending(a => a.ServiceType);
-                        break;
-
-                    case 10: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.SubStatus)
-                            : transformedData.OrderByDescending(a => a.SubStatus);
-                        break;
-
-                    case 11: // Sort by Created Date
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
-                            : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null));
-                        break;
-
-                    case 13: // Sort by TimeElapsed
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.TimeElapsed)
-                            : transformedData.OrderByDescending(a => a.TimeElapsed);
-                        break;
-
-                    default: // Default Sorting (if needed)
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.TimeElapsed)
-                            : transformedData.OrderByDescending(a => a.TimeElapsed);
-                        break;
-                }
+                    // Sort by Policy Number
+                    0 => isAsc
+                                                ? transformedData.OrderBy(a => a.PolicyId)
+                                                : transformedData.OrderByDescending(a => a.PolicyId),
+                    // Sort by Amount (Ensure proper sorting of numeric values)
+                    1 => isAsc
+                                                ? transformedData.OrderBy(a => a.Amount)
+                                                : transformedData.OrderByDescending(a => a.Amount),
+                    // Sort by Customer Full Name
+                    6 => isAsc
+                                                ? transformedData.OrderBy(a => a.CustomerFullName)
+                                                : transformedData.OrderByDescending(a => a.CustomerFullName),
+                    // Sort by Beneficiary Full Name
+                    8 => isAsc
+                                                ? transformedData.OrderBy(a => a.BeneficiaryFullName)
+                                                : transformedData.OrderByDescending(a => a.BeneficiaryFullName),
+                    // Sort by Status
+                    9 => isAsc
+                                                ? transformedData.OrderBy(a => a.ServiceType)
+                                                : transformedData.OrderByDescending(a => a.ServiceType),
+                    // Sort by Status
+                    10 => isAsc
+                                                ? transformedData.OrderBy(a => a.SubStatus)
+                                                : transformedData.OrderByDescending(a => a.SubStatus),
+                    // Sort by Created Date
+                    11 => isAsc
+                                                ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
+                                                : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null)),
+                    // Default Sorting (if needed)
+                    _ => isAsc
+                                                ? transformedData.OrderBy(a => a.TimeElapsed)
+                                                : transformedData.OrderByDescending(a => a.TimeElapsed),
+                };
             }
 
             // Apply Pagination
@@ -755,31 +715,27 @@ namespace risk.control.system.Services
 
             if (idsToMarkViewed.Any())
             {
-                var entitiesToUpdate = context.Investigations
+                var entitiesToUpdate =await context.Investigations
                     .Where(x => idsToMarkViewed.Contains(x.Id))
-                    .ToList();
+                    .ToListAsync();
 
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNew = false;
 
                 await context.SaveChangesAsync(); // mark as viewed
             }
-            var response = new
+
+            return new
             {
-                draw = draw,
+                draw,
                 recordsTotal = totalRecords,
-                recordsFiltered = recordsFiltered,
+                recordsFiltered,
                 data = pagedData
             };
-
-            return response;
 
         }
         private byte[] GetOwnerImage(InvestigationTask a)
         {
-            string ownerEmail = string.Empty;
-            string ownerDomain = string.Empty;
-            string profileImage = string.Empty;
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
             var noDataimage = File.ReadAllBytes(noDataImagefilePath);
 
@@ -800,8 +756,7 @@ namespace risk.control.system.Services
                 if (vendor != null && !string.IsNullOrWhiteSpace(vendor.ProfilePictureUrl))
                 {
                     var vendorImagePath = Path.Combine(webHostEnvironment.ContentRootPath, vendor.ProfilePictureUrl);
-                    var vendorImage = System.IO.File.ReadAllBytes(vendorImagePath);
-                    return vendorImage;
+                    return File.ReadAllBytes(vendorImagePath);
                 }
             }
             else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
@@ -816,33 +771,32 @@ namespace risk.control.system.Services
                 if (company != null && !string.IsNullOrWhiteSpace(company.DocumentUrl))
                 {
                     var companyImagePath = Path.Combine(webHostEnvironment.ContentRootPath, company.DocumentUrl);
-                    var companyImage = System.IO.File.ReadAllBytes(companyImagePath);
-                    return companyImage;
+                    return File.ReadAllBytes(companyImagePath);
                 }
             }
             return noDataimage;
         }
-        private string GetOwner(InvestigationTask a)
+        private string GetOwner(InvestigationTask caseTask)
         {
-            if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
+            if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
             {
-                return a.Vendor.Email;
+                return caseTask.Vendor.Email;
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                return a.TaskedAgentEmail;
+                return caseTask.TaskedAgentEmail;
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
                 )
             {
-                var company = context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId);
+                var company = context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (company != null)
                 {
                     return company.Email;
@@ -852,9 +806,7 @@ namespace risk.control.system.Services
         }
         public async Task<int> GetAutoCount(string currentUserEmail)
         {
-            var companyUser = await context.ApplicationUser
-                .Include(c => c.Country)
-                .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.Include(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
             if (companyUser == null)
                 return 0;
@@ -870,12 +822,9 @@ namespace risk.control.system.Services
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
                 };
 
-            var query = context.Investigations
-                .Where(a => !a.Deleted &&
-                    a.ClientCompanyId == companyUser.ClientCompanyId && subStatuses.Contains(a.SubStatus));
+            var query = context.Investigations.Where(a => !a.Deleted &&a.ClientCompanyId == companyUser.ClientCompanyId && subStatuses.Contains(a.SubStatus));
 
-            int totalRecords = query.Count(); // Get total count before pagination
-            return totalRecords;
+            return query.Count(); // Get total count before pagination
         }
 
         public async Task<(object[], bool)> GetFilesData(string userEmail, bool isManager, int uploadId = 0)
@@ -894,7 +843,7 @@ namespace risk.control.system.Services
                 }
                 if (file.ClaimsId != null && file.ClaimsId.Count > 0)
                 {
-                    totalReadyToAssign = totalReadyToAssign + file.ClaimsId.Count;
+                    totalReadyToAssign += file.ClaimsId.Count;
                 }
             }
 

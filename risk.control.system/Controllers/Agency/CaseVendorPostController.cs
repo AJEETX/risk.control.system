@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers.Agency
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, baseUrl));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, baseUrl));
 
                 notifyService.Custom($"Case <b>#{claim.PolicyDetail.ContractNumber}</b> Tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
@@ -127,7 +127,7 @@ namespace risk.control.system.Controllers.Agency
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId, baseUrl));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportSubmitToVendorSupervisor(currentUserEmail, claimId, baseUrl));
 
                 notifyService.Custom($"Case <b> #{contract}</b> report submitted", 3, "green", "far fa-file-powerpoint");
 
@@ -212,7 +212,7 @@ namespace risk.control.system.Controllers.Agency
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, baseUrl));
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportSubmitToCompany(userEmail, claimId, baseUrl));
 
                     notifyService.Custom($"Case <b> #{success.PolicyDetail.ContractNumber}</b>  Report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }
@@ -256,7 +256,7 @@ namespace risk.control.system.Controllers.Agency
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId, baseUrl));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseWithdrawlToCompany(userEmail, claimId, agency.VendorId, baseUrl));
 
                 notifyService.Custom($"Case <b> #{policyNumber}</b> Declined successfully", 3, "red", "far fa-file-powerpoint");
 
@@ -296,7 +296,7 @@ namespace risk.control.system.Controllers.Agency
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlFromAgent(userEmail, claimId, agency.VendorId, baseUrl));
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseWithdrawlFromAgent(userEmail, claimId, agency.VendorId, baseUrl));
 
                 notifyService.Custom($"Case <b> #{policyNumber}</b> Withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
 

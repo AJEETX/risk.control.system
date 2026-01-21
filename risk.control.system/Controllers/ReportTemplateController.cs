@@ -44,6 +44,10 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> GetReportTemplates(string insuranceType)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data." });
+            }
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -55,8 +59,7 @@ namespace risk.control.system.Controllers
             int skip = start != null ? Convert.ToInt32(start) : 0;
 
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = context.ApplicationUser
-                .Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var companyUser = context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
             var query = context.ReportTemplates
                     .Include(r => r.LocationReport)
                         .ThenInclude(l => l.FaceIds)
@@ -189,6 +192,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CloneDetails(long templateId)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data." });
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -214,6 +221,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Activate(long id)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data." });
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -239,6 +250,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteTemplate(long id)
         {
+           if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data." });
+            }
             try
             {
                 var template = await context.ReportTemplates.FindAsync(id);
@@ -274,7 +289,10 @@ namespace risk.control.system.Controllers
         [HttpGet]
         public async Task<IActionResult> GetQuestionDetails(long questionId)
         {
-            // Retrieve the question from the database using the questionId
+            if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data." });
+            }
             var question = await context.Questions.FirstOrDefaultAsync(q => q.Id == questionId);
 
             if (question == null)
@@ -291,6 +309,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddQuestion(long locationId, string? optionsInput, bool isRequired, string newQuestionText, string newQuestionType)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data." });
+            }
             try
             {
                 var location = await context.LocationReport.Include(q => q.Questions).FirstOrDefaultAsync(q => q.Id == locationId);
@@ -323,6 +345,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteQuestion(long id, long locationId)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data." });
+            }
             try
             {
                 var question = await context.Questions.FirstOrDefaultAsync(q => q.Id == id);
@@ -354,6 +380,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteLocation(long id, bool locationDeletable = true)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data." });
+            }
             try
             {
                 if (!locationDeletable)
@@ -395,6 +425,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveLocation([FromBody] SaveLocationDto model)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data." });
+            }
             try
             {
                 var location = await context.LocationReport

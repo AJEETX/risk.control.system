@@ -65,7 +65,7 @@ namespace risk.control.system.Services
                 await AssignToAssigner(userEmail, notAutoAllocated, url);
 
             }
-            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
 
             return (autoAllocatedCases);
         }
@@ -112,7 +112,7 @@ namespace risk.control.system.Services
                 await AssignToAssigner(userEmail, notAutoAllocated, url);
 
             }
-            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
         }
         async Task<List<long>> DoAutoAllocation(List<long> claims, string userEmail, string url = "")
         {
@@ -177,7 +177,7 @@ namespace risk.control.system.Services
                     return 0;
                 }
                 var jobId = backgroundJobClient.Enqueue(() =>
-                    mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId.VendorId, url));
+                    mailboxService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId.VendorId, url));
 
                 return claim; // Return allocated claim
             });
@@ -243,12 +243,12 @@ namespace risk.control.system.Services
             if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
             {
                 await AssignToAssigner(userEmail, new List<long> { caseId });
-                await mailboxService.NotifyClaimAssignmentToAssigner(userEmail, new List<long> { caseId }, url);
+                await mailboxService.NotifyCaseAssignmentToAssigner(userEmail, new List<long> { caseId }, url);
                 return null;
             }
 
             // 4. Send Notification
-            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId.VendorId, url));
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId.VendorId, url));
 
             return caseTask.PolicyDetail.ContractNumber; // Return allocated claim
         }

@@ -111,13 +111,13 @@ namespace risk.control.system.Controllers.Api
                 .ToListAsync();
 
                 IQueryable<ApplicationUser> query = context.ApplicationUser
-                    .Where(a => !a.Deleted && a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower() &&
+                    .Where(a => !a.Deleted && a.Email != PORTAL_ADMIN.EMAIL &&
                                 !vendorAgentIds.Contains(a.Id));
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {
-                    string loweredSearch = search.Trim().ToLower();
-                    query = query.Where(a => a.Email.ToLower().StartsWith(loweredSearch));
+                    string loweredSearch = search.Trim();
+                    query = query.Where(a => a.Email.StartsWith(loweredSearch));
                 }
 
                 var userEmails = await query
