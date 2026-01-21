@@ -25,8 +25,8 @@ namespace risk.control.system.Services
 
     internal class VendorService : IVendorService
     {
-        private readonly string noUserImagefilePath = string.Empty;
-        private readonly string noDataImagefilePath = string.Empty;
+        private readonly string noUserImagefilePath;
+        private readonly string noDataImagefilePath;
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment env;
         private readonly IFeatureManager featureManager;
@@ -119,7 +119,7 @@ namespace risk.control.system.Services
             };
         }
 
-        private string GetDomain(Vendor u, ApplicationUser user) =>
+        private static string GetDomain(Vendor u, ApplicationUser user) =>
             user.Role == AppRoles.COMPANY_ADMIN
                 ? $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>"
                 : u.Email;
@@ -162,10 +162,10 @@ namespace risk.control.system.Services
             {
                 return null!;
             }
-            var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE).OrderBy(u => u.Name).Select(u => new
+            var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE).OrderBy(u => u.Name).Select(async  u => new
             {
                 Id = u.VendorId,
-                Document = u.DocumentUrl != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                Document = u.DocumentUrl != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(
                     Path.Combine(env.ContentRootPath, u.DocumentUrl)))) : Applicationsettings.NO_IMAGE,
                 Domain = u.Email,
                 Name = u.Name,
@@ -184,20 +184,20 @@ namespace risk.control.system.Services
                 RawAddress = $"{u.Addressline}, {u.District.Name}, {u.State.Code}, {u.Country.Code}",
                 IsUpdated = u.IsUpdated,
                 LastModified = u.Updated,
-                HasService = GetPinCodeAndServiceForTheCase(caseId, u.VendorId),
+                HasService =(await GetPinCodeAndServiceForTheCase(caseId, u.VendorId)),
             }).ToArray();
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync(null, false);
             return result;
         }
 
-        private bool GetPinCodeAndServiceForTheCase(long claimId, long vendorId)
+        private async Task<bool> GetPinCodeAndServiceForTheCase(long caseId, long vendorId)
         {
-            var selectedCase = _context.Investigations
+            var selectedCase =await _context.Investigations
                 .Include(p => p.PolicyDetail)
                 .Include(p => p.CustomerDetail)
                 .Include(p => p.BeneficiaryDetail)
-                .FirstOrDefault(c => c.Id == claimId);
+                .FirstOrDefaultAsync(c => c.Id == caseId);
 
             var serviceType = selectedCase.PolicyDetail.InvestigationServiceTypeId;
 
@@ -218,9 +218,9 @@ namespace risk.control.system.Services
                 districtId = selectedCase.BeneficiaryDetail.DistrictId;
             }
 
-            var vendor = _context.Vendor
+            var vendor =await _context.Vendor
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .FirstOrDefault(v => v.VendorId == vendorId);
+                .FirstOrDefaultAsync(v => v.VendorId == vendorId);
 
             var hasService = vendor?.VendorInvestigationServiceTypes
                 .Any(v => v.InvestigationServiceTypeId == serviceType &&
@@ -240,9 +240,9 @@ namespace risk.control.system.Services
         public async Task<object[]> GetAvailableVendors(string userEmail)
         {
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var company = _context.ClientCompany
+            var company =await _context.ClientCompany
                 .Include(c => c.EmpanelledVendors)
-                .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var availableVendors = _context.Vendor
                 .Where(v => !company.EmpanelledVendors.Contains(v) && !v.Deleted && v.CountryId == company.CountryId)
@@ -290,7 +290,7 @@ namespace risk.control.system.Services
 
         public async Task<List<AgencyServiceResponse>> GetAgencyService(long id)
         {
-            var vendor = _context.Vendor
+            var vendor =await _context.Vendor
                 .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
                  .Include(i => i.VendorInvestigationServiceTypes)
@@ -302,7 +302,7 @@ namespace risk.control.system.Services
                 .ThenInclude(i => i.InvestigationServiceType)
                 .Include(i => i.State)
                 .Include(i => i.VendorInvestigationServiceTypes)
-                .FirstOrDefault(a => a.VendorId == id);
+                .FirstOrDefaultAsync(a => a.VendorId == id);
 
             var services = vendor.VendorInvestigationServiceTypes?
                .OrderBy(s => s.InvestigationServiceType.Name);
@@ -341,97 +341,148 @@ namespace risk.control.system.Services
 
         public async Task<object[]> AllAgencies()
         {
-            var allAgencies = _context.Vendor
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.District)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .Where(v => !v.Deleted);
+            var agencyData = await _context.Vendor
+         .Include(v => v.Country)
+         .Include(v => v.District)
+         .Include(v => v.State)
+         .Include(v => v.PinCode)
+         .Where(v => !v.Deleted)
+         .OrderBy(a => a.Name)
+         .Select(u => new {
+             u.VendorId,
+             u.DocumentUrl,
+             u.Email,
+             u.Name,
+             u.Code,
+             ISDCode = u.Country.ISDCode,
+             u.PhoneNumber,
+             u.Addressline,
+             DistrictName = u.District.Name,
+             StateCode = u.State.Code,
+             CountryCode = u.Country.Code,
+             PinCodeValue = u.PinCode.Code,
+             u.Status,
+             u.Updated,
+             u.Created,
+             u.UpdatedBy,
+             u.IsUpdated
+         })
+         .ToListAsync();
 
-            var agencies = allAgencies.
-                OrderBy(a => a.Name);
+            var result = agencyData.Select(u =>
+            {
+                string documentBase64 = noDataImagefilePath;
+                if (!string.IsNullOrWhiteSpace(u.DocumentUrl))
+                {
+                    var fullPath = Path.Combine(env.ContentRootPath, u.DocumentUrl);
+                    if (File.Exists(fullPath))
+                    {
+                        // Note: Consider caching these bytes if files are accessed frequently
+                        documentBase64 = $"data:image/*;base64,{Convert.ToBase64String(File.ReadAllBytes(fullPath))}";
+                    }
+                }
 
-            var result = agencies?.Select(u =>
-                new
+                return new
                 {
                     Id = u.VendorId,
-                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? noDataImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(env.ContentRootPath, u.DocumentUrl)))),
-                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
-                    Name = u.Name,
-                    Code = u.Code,
-                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
-                    Address = u.Addressline + ", " + u.District.Name + ", " + u.State.Code,
-                    Country = u.Country.Code,
-                    Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
-                    Pincode = u.PinCode.Code,
-                    Status = "<span class='badge badge-light'>" + u.Status.GetEnumDisplayName() + "</span>",
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdatedBy = u.UpdatedBy,
+                    Document = documentBase64,
+                    Domain = $"<a href='/Vendors/Details?id={u.VendorId}'>{u.Email}</a>",
+                    u.Name,
+                    u.Code,
+                    Phone = $"(+{u.ISDCode}) {u.PhoneNumber}",
+                    Address = $"{u.Addressline}, {u.DistrictName}, {u.StateCode}",
+                    Country = u.CountryCode,
+                    Flag = $"/flags/{u.CountryCode.ToLower()}.png",
+                    Pincode = u.PinCodeValue,
+                    Status = $"<span class='badge badge-light'>{u.Status.GetEnumDisplayName()}</span>",
+                    Updated = (u.Updated ?? u.Created).ToString("dd-MM-yyyy"),
+                    u.UpdatedBy,
                     VendorName = u.Email,
                     RawStatus = u.Status.GetEnumDisplayName(),
-                    IsUpdated = u.IsUpdated,
+                    u.IsUpdated,
                     LastModified = u.Updated
-                })?.ToArray();
+                };
+            }).ToArray();
 
-            allAgencies?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync(null, false);
+            // 3. Batch Update (EF Core 7+) - This is much faster than loading all into memory
+            await _context.Vendor
+                .Where(v => !v.Deleted)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(v => v.IsUpdated, false));
 
             return result;
         }
 
         public async Task<List<AgencyServiceResponse>> AllServices(string userEmail)
         {
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            // 1. Get VendorId with a lightweight query
+            var vendorUser = await _context.ApplicationUser
+                .Where(c => c.Email == userEmail)
+                .Select(c => new { c.VendorId })
+                .FirstOrDefaultAsync();
 
-            var vendor = await _context.Vendor
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                 .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.State)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.Country)
-                .Include(i => i.District)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.InvestigationServiceType)
-                .Include(i => i.State)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .FirstOrDefaultAsync(a => a.VendorId == vendorUser.VendorId && !a.Deleted);
+            if (vendorUser == null) return new List<AgencyServiceResponse>();
 
-            var services = vendor.VendorInvestigationServiceTypes?
-                .OrderBy(s => s.InvestigationServiceType.Name);
-            var serviceResponse = new List<AgencyServiceResponse>();
-            foreach (var service in services)
+            // 2. Fetch services and required data in one go
+            var servicesData = await _context.VendorInvestigationServiceType
+                .Include(s => s.InvestigationServiceType)
+                .Include(s => s.State)
+                .Include(s => s.Country)
+                .Where(s => s.VendorId == vendorUser.VendorId && !s.Vendor.Deleted)
+                .OrderBy(s => s.InvestigationServiceType.Name)
+                .ToListAsync();
+
+            // 3. Pre-fetch all distinct District IDs needed to avoid N+1 queries
+            var allNeededDistrictIds = servicesData
+                .Where(s => s.SelectedDistrictIds != null && !s.SelectedDistrictIds.Contains(-1))
+                .SelectMany(s => s.SelectedDistrictIds)
+                .Distinct()
+                .ToList();
+
+            var districtDict = await _context.District
+                .Where(d => allNeededDistrictIds.Contains(d.DistrictId))
+                .ToDictionaryAsync(d => d.DistrictId, d => d.Name);
+
+            // 4. Map to Response
+            var serviceResponse = servicesData.Select(service =>
             {
-                bool isAllDistrict = service.SelectedDistrictIds?.Contains(-1) == true; // how to set this value in case all districts selected
-                string pincodes = $"{ALL_PINCODE}";
-                string rawPincodes = $"{ALL_PINCODE}";
+                bool isAllDistrict = service.SelectedDistrictIds?.Contains(-1) == true;
 
-                serviceResponse.Add(new AgencyServiceResponse
+                // Resolve district names from our local dictionary instead of the database
+                var districtNames = isAllDistrict
+                    ? ALL_DISTRICT
+                    : string.Join(", ", service.SelectedDistrictIds?
+                        .Select(id => districtDict.TryGetValue(id, out var name) ? name : null)
+                        .Where(n => n != null) ?? Enumerable.Empty<string>());
+
+                var culture = Extensions.GetCultureByCountry(service.Country.Code.ToUpper());
+
+                return new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
                     Id = service.VendorInvestigationServiceTypeId,
                     CaseType = service.InsuranceType.GetEnumDisplayName(),
                     ServiceType = service.InvestigationServiceType.Name,
-                    District = isAllDistrict ? ALL_DISTRICT : string.Join(", ", _context.District.Where(d => service.SelectedDistrictIds.Contains(d.DistrictId)).Select(s => s.Name)),
+                    District = districtNames,
                     StateCode = service.State.Code,
                     State = service.State.Name,
                     CountryCode = service.Country.Code,
                     Country = service.Country.Name,
-                    Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
-                    Pincodes = pincodes,
-                    RawPincodes = rawPincodes,
-                    Rate = string.Format(Extensions.GetCultureByCountry(service.Country.Code.ToUpper()), "{0:c}", service.Price),
+                    Flag = $"/flags/{service.Country.Code.ToLower()}.png",
+                    Pincodes = ALL_PINCODE,
+                    RawPincodes = ALL_PINCODE,
+                    Rate = string.Format(culture, "{0:c}", service.Price),
                     UpdatedBy = service.UpdatedBy,
-                    Updated = service.Updated.HasValue ? service.Updated.Value.ToString("dd-MM-yyyy") : service.Created.ToString("dd-MM-yyyy"),
+                    Updated = (service.Updated ?? service.Created).ToString("dd-MM-yyyy"),
                     IsUpdated = service.IsUpdated,
                     LastModified = service.Updated
-                });
-            }
+                };
+            }).ToList();
 
-            vendor.VendorInvestigationServiceTypes?.ToList().ForEach(i => i.IsUpdated = false);
-            await _context.SaveChangesAsync(null, false);
+            // 5. High-performance batch update for the flag
+            await _context.VendorInvestigationServiceType
+                .Where(s => s.VendorId == vendorUser.VendorId)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(s => s.IsUpdated, false));
+
             return serviceResponse;
         }
 
@@ -462,21 +513,32 @@ namespace risk.control.system.Services
 
             var result = await dashboardService.CalculateAgentCaseStatus(userEmail);  // Assume this is async
 
-            var claim = await _context.Investigations
+            var caseTask = await _context.Investigations
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
                 .Include(c => c.BeneficiaryDetail)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            string LocationLatitude = claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                ? claim.CustomerDetail.Latitude
-                : claim.BeneficiaryDetail.Latitude;
+            string LocationLatitude;
+            if (caseTask.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+            {
+                LocationLatitude = caseTask.CustomerDetail.Latitude;
+            }
+            else
+            {
+                LocationLatitude = caseTask.BeneficiaryDetail.Latitude;
+            }
 
-            string LocationLongitude = claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                ? claim.CustomerDetail.Longitude
-                : claim.BeneficiaryDetail.Longitude;
-
-            // Use Parallel.ForEach to run agent processing in parallel
+            string LocationLongitude;
+            if (caseTask.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+            {
+                LocationLongitude = caseTask.CustomerDetail.Longitude;
+            }
+            else
+            {
+                LocationLongitude = caseTask.BeneficiaryDetail.Longitude;
+            }
+                
             var agentList = new ConcurrentBag<AgentData>(); // Using a thread-safe collection
 
             await Task.WhenAll(vendorAgents.Select(async agent =>
@@ -529,9 +591,9 @@ namespace risk.control.system.Services
                     DistanceInMetres = distanceInMetre,
                     Duration = duration,
                     DurationInSeconds = durationInSec,
-                    AddressLocationInfo = claim.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                       ? claim.CustomerDetail.AddressLocationInfo
-                       : claim.BeneficiaryDetail.AddressLocationInfo
+                    AddressLocationInfo = caseTask.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
+                       ? caseTask.CustomerDetail.AddressLocationInfo
+                       : caseTask.BeneficiaryDetail.AddressLocationInfo
                 };
 
                 agentList.Add(agentInfo);

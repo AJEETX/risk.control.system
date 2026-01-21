@@ -60,7 +60,7 @@ namespace risk.control.system.Services
                     a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR ||
                     a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR));
 
-            int totalRecords = query.Count(); // Get total count before pagination
+            int totalRecords =await query.CountAsync(); // Get total count before pagination
 
             // Search filtering
             if (!string.IsNullOrEmpty(search))
@@ -87,7 +87,7 @@ namespace risk.control.system.Services
             }
 
             var data = query.AsEnumerable();
-            int recordsFiltered = query.Count();
+            int recordsFiltered =await query.CountAsync();
 
             var transformedData = data.Select(a => new
             {
@@ -139,69 +139,50 @@ namespace risk.control.system.Services
             // Apply Sorting AFTER Data Transformation
             if (!string.IsNullOrEmpty(orderDir))
             {
-                switch (orderColumn)
+                bool isAsc = string.Equals(orderDir, "asc", StringComparison.OrdinalIgnoreCase);
+                transformedData = orderColumn switch
                 {
-                    case 1: // Sort by Policy Number
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.PolicyId)
-                            : transformedData.OrderByDescending(a => a.PolicyId);
-                        break;
-
-                    case 2: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.Amount)
-                            : transformedData.OrderByDescending(a => a.Amount);
-                        break;
-
-                    case 3: // Sort by Amount (Ensure proper sorting of numeric values)
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.PincodeCode)
-                            : transformedData.OrderByDescending(a => a.PincodeCode);
-                        break;
-
-                    case 6: // Sort by Customer Full Name
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.CustomerFullName)
-                            : transformedData.OrderByDescending(a => a.CustomerFullName);
-                        break;
-
-                    case 8: // Sort by Beneficiary Full Name
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.BeneficiaryFullName)
-                            : transformedData.OrderByDescending(a => a.BeneficiaryFullName);
-                        break;
-
-
-                    case 9: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.ServiceType)
-                            : transformedData.OrderByDescending(a => a.ServiceType);
-                        break;
-
-                    case 10: // Sort by Status
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.Location)
-                            : transformedData.OrderByDescending(a => a.Location);
-                        break;
-
-                    case 11: // Sort by Created Date
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
-                            : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null));
-                        break;
-
-                    case 12: // Sort by TimeElapsed
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.TimeElapsed)
-                            : transformedData.OrderByDescending(a => a.TimeElapsed);
-                        break;
-
-                    default: // Default Sorting (if needed)
-                        transformedData = orderDir.ToLower() == "asc"
-                            ? transformedData.OrderBy(a => a.TimeElapsed)
-                            : transformedData.OrderByDescending(a => a.TimeElapsed);
-                        break;
-                }
+                    // Sort by Policy Number
+                    1 => isAsc
+                                                ? transformedData.OrderBy(a => a.PolicyId)
+                                                : transformedData.OrderByDescending(a => a.PolicyId),
+                    // Sort by Amount (Ensure proper sorting of numeric values)
+                    2 => isAsc
+                                                ? transformedData.OrderBy(a => a.Amount)
+                                                : transformedData.OrderByDescending(a => a.Amount),
+                    // Sort by Amount (Ensure proper sorting of numeric values)
+                    3 => isAsc
+                                                ? transformedData.OrderBy(a => a.PincodeCode)
+                                                : transformedData.OrderByDescending(a => a.PincodeCode),
+                    // Sort by Customer Full Name
+                    6 => isAsc
+                                                ? transformedData.OrderBy(a => a.CustomerFullName)
+                                                : transformedData.OrderByDescending(a => a.CustomerFullName),
+                    // Sort by Beneficiary Full Name
+                    8 => isAsc
+                                                ? transformedData.OrderBy(a => a.BeneficiaryFullName)
+                                                : transformedData.OrderByDescending(a => a.BeneficiaryFullName),
+                    // Sort by Status
+                    9 => isAsc
+                                                ? transformedData.OrderBy(a => a.ServiceType)
+                                                : transformedData.OrderByDescending(a => a.ServiceType),
+                    // Sort by Status
+                    10 => isAsc
+                                                ? transformedData.OrderBy(a => a.Location)
+                                                : transformedData.OrderByDescending(a => a.Location),
+                    // Sort by Created Date
+                    11 => isAsc
+                                                ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
+                                                : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null)),
+                    // Sort by TimeElapsed
+                    12 => isAsc
+                                                ? transformedData.OrderBy(a => a.TimeElapsed)
+                                                : transformedData.OrderByDescending(a => a.TimeElapsed),
+                    // Default Sorting (if needed)
+                    _ => isAsc 
+                                                ? transformedData.OrderBy(a => a.TimeElapsed)
+                                                : transformedData.OrderByDescending(a => a.TimeElapsed),
+                };
             }
             // Apply Pagination
             var pagedData = transformedData.Skip(start).Take(length).ToList();
@@ -210,9 +191,9 @@ namespace risk.control.system.Services
 
             if (idsToMarkViewed.Any())
             {
-                var entitiesToUpdate = context.Investigations
+                var entitiesToUpdate =await context.Investigations
                     .Where(x => idsToMarkViewed.Contains(x.Id))
-                    .ToList();
+                    .ToListAsync();
 
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNewAssignedToManager = false;
@@ -229,103 +210,100 @@ namespace risk.control.system.Services
 
             return response;
         }
-        private static string GetManagerActiveTimePending(InvestigationTask a)
+        private static string GetManagerActiveTimePending(InvestigationTask caseTask)
         {
-            if (a.CreatorSla == 0)
+            if (caseTask.CreatorSla == 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} days since created!\"></i>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} days since created!\"></i>");
             }
-            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= caseTask.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
 
-            else if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
-            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+            else if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= caseTask.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
 
-            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours < 24 &&
-                DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours > 0)
+            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours < 24 &&
+                DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours} hr </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours} hr </span>");
             }
-            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes > 0)
+            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes} min </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Minutes} min </span>");
             }
-            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Seconds > 0)
+            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Seconds} sec </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
-        private byte[] GetOwnerImage(InvestigationTask a)
+        private byte[] GetOwnerImage(InvestigationTask caseTask)
         {
-            string ownerEmail = string.Empty;
-            string ownerDomain = string.Empty;
-            string profileImage = string.Empty;
             var noDataImagefilePath = Path.Combine(env.WebRootPath, "img", "no-photo.jpg");
             var noDataimage = File.ReadAllBytes(noDataImagefilePath);
 
-            if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
+            if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
             {
-                var agent = context.Vendor.FirstOrDefault(u => u.VendorId == a.VendorId);
+                var agent = context.Vendor.FirstOrDefault(u => u.VendorId == caseTask.VendorId);
                 if (agent != null && !string.IsNullOrWhiteSpace(agent.DocumentUrl))
                 {
                     var agentImagePath = Path.Combine(env.ContentRootPath, agent.DocumentUrl);
-                    var agentProfile = System.IO.File.ReadAllBytes(agentImagePath);
+                    var agentProfile = File.ReadAllBytes(agentImagePath);
                     return agentProfile;
                 }
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                var vendor = context.ApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
+                var vendor = context.ApplicationUser.FirstOrDefault(v => v.Email == caseTask.TaskedAgentEmail);
                 if (vendor != null && !string.IsNullOrWhiteSpace(vendor.ProfilePictureUrl))
                 {
                     var vendorImagePath = Path.Combine(env.ContentRootPath, vendor.ProfilePictureUrl);
-                    var vendorImage = System.IO.File.ReadAllBytes(vendorImagePath);
+                    var vendorImage = File.ReadAllBytes(vendorImagePath);
                     return vendorImage;
                 }
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
                 )
             {
-                var company = context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId);
+                var company = context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (company != null && !string.IsNullOrWhiteSpace(company.DocumentUrl))
                 {
                     var companyImagePath = Path.Combine(env.ContentRootPath, company.DocumentUrl);
-                    var companyImage = System.IO.File.ReadAllBytes(companyImagePath);
+                    var companyImage = File.ReadAllBytes(companyImagePath);
                     return companyImage;
                 }
             }
             return noDataimage;
         }
-        private string GetOwner(InvestigationTask a)
+        private string GetOwner(InvestigationTask caseTask)
         {
-            if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
+            if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
             {
-                return a.Vendor.Email;
+                return caseTask.Vendor.Email;
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                return a.TaskedAgentEmail;
+                return caseTask.TaskedAgentEmail;
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
                 )
             {
-                var company = context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId);
+                var company = context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (company != null)
                 {
                     return company.Email;
@@ -340,14 +318,11 @@ namespace risk.control.system.Services
             var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(u => u.Email == userEmail);
-
-
-            // Fetching the statuses once
             var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
 
             var finishStatus = CONSTANTS.CASE_STATUS.FINISHED;
 
-            var claims = await context.Investigations
+            var caseTasks = await context.Investigations
                 .Include(i => i.Vendor)
                 .Include(i => i.PolicyDetail)
                 .ThenInclude(i => i.InvestigationServiceType)
@@ -371,7 +346,7 @@ namespace risk.control.system.Services
                             (i.SubStatus == approvedStatus) &&
                             i.Status == finishStatus).ToListAsync();
 
-            var response = claims.Select(a => new CaseInvestigationResponse
+            var response = caseTasks.Select(a => new CaseInvestigationResponse
             {
                 Id = a.Id,
                 AutoAllocated = a.IsAutoAllocated,
@@ -382,11 +357,11 @@ namespace risk.control.system.Services
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 Document = a.PolicyDetail?.DocumentPath != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, a.PolicyDetail.DocumentPath)))) :
                 Applicationsettings.NO_POLICY_IMAGE,
                 Customer = a.CustomerDetail?.ImagePath != null
-                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, a.CustomerDetail?.ImagePath))))
                         : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ??
@@ -399,13 +374,13 @@ namespace risk.control.system.Services
                 Created = a.Created.ToString("dd-MM-yyyy"),
                 timePending = GetManagerTimeCompleted(a),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, a.BeneficiaryDetail?.ImagePath)))) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i></span>" :
                     a.BeneficiaryDetail.Name,
                 Agency = a.Vendor?.Name,
-                OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, a.Vendor.DocumentUrl)))),
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
                 PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
@@ -415,32 +390,32 @@ namespace risk.control.system.Services
             }).ToList();
             return response;
         }
-        private static string GetManagerTimeCompleted(InvestigationTask a)
+        private static string GetManagerTimeCompleted(InvestigationTask caseTask)
         {
-            if (a.CreatorSla == 0)
+            if (caseTask.CreatorSla == 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} days since created!\"></i>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Days} days since created!\"></i>");
             }
-            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Days >= caseTask.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span>");
 
-            else if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span>");
-            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span>");
+            else if (DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Days >= caseTask.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span>");
 
-            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Hours < 24 &&
-                DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Hours > 0)
+            if (DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Hours < 24 &&
+                DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Hours} hr </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Hours} hr </span>");
             }
-            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Minutes > 0)
+            if (DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Minutes} min </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Minutes} min </span>");
             }
-            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Seconds > 0)
+            if (DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Seconds} sec </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.ProcessedByAssessorTime.GetValueOrDefault()).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
@@ -501,11 +476,11 @@ namespace risk.control.system.Services
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
                 Document = a.PolicyDetail?.DocumentPath != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, a.PolicyDetail.DocumentPath)))) :
                 Applicationsettings.NO_POLICY_IMAGE,
                 Customer = a.CustomerDetail?.ImagePath != null
-                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, a.CustomerDetail?.ImagePath))))
                         : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.Name ??
@@ -518,12 +493,12 @@ namespace risk.control.system.Services
                 Created = a.Created.ToString("dd-MM-yyyy"),
                 timePending = GetManagerTimeCompleted(a),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ImagePath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, a.BeneficiaryDetail?.ImagePath)))) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" :
                     a.BeneficiaryDetail.Name,
-                OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, a.Vendor.DocumentUrl)))),
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
