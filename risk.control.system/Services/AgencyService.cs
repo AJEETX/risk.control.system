@@ -76,9 +76,9 @@ namespace risk.control.system.Services
             {
                 Role = managerRole,
                 Company = companyUser.ClientCompany,
-                Symbol = "far fa-hand-point-right i-orangered",
-                Message = $"Agency {vendor.Email} created",
-                Status = "",
+                Symbol = "far fa-hand-point-right i-green",
+                Message = $"Agency {vendor.Email}",
+                Status = "Created",
                 NotifierUserEmail = userEmail
             };
             context.Notifications.Add(notification);
