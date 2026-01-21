@@ -18,7 +18,6 @@ namespace risk.control.system.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILoginService loginService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IAccountService accountService;
         private readonly ILogger<AccountController> _logger;
@@ -30,7 +29,6 @@ namespace risk.control.system.Controllers
         public AccountController(
             UserManager<ApplicationUser> userManager,
             ILoginService loginService,
-            IWebHostEnvironment webHostEnvironment,
             SignInManager<ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             IAccountService accountService,
@@ -41,7 +39,6 @@ namespace risk.control.system.Controllers
         {
             _userManager = userManager ?? throw new ArgumentNullException();
             this.loginService = loginService;
-            this.webHostEnvironment = webHostEnvironment;
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.accountService = accountService;
             this._context = context;
@@ -59,7 +56,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (ModelState.IsValid == false)
+                if (!ModelState.IsValid)
                 {
                     return BadRequest(new { message = "Invalid request." });
                 }
@@ -214,7 +211,7 @@ namespace risk.control.system.Controllers
                 new AuthenticationProperties { RedirectUri = returnUrl },
                 OpenIdConnectDefaults.AuthenticationScheme);
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
@@ -282,11 +279,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Forgot(ForgotPasswordViewModel input)
         {
-            ForgotPassword model = null;
-
+            ForgotPassword model;
             if (!ModelState.IsValid)
             {
-                model = await CreateDefaultForgotPasswordModel(input?.Email);
+                model = await accountService.CreateDefaultForgotPasswordModel(input?.Email);
                 return View(model);
             }
             try
@@ -295,7 +291,7 @@ namespace risk.control.system.Controllers
 
                 if (smsResult == null)
                 {
-                    model = await CreateDefaultForgotPasswordModel(input?.Email);
+                    model = await accountService.CreateDefaultForgotPasswordModel(input?.Email);
                     return View(model);
                 }
                 var successModel = new ForgotPassword
@@ -325,27 +321,6 @@ namespace risk.control.system.Controllers
             model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
             ViewData["Users"] = await loginService.GetUserSelectListAsync();
             return View(model);
-        }
-
-        private async Task<ForgotPassword> CreateDefaultForgotPasswordModel(string email)
-        {
-            var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
-
-            byte[] profilePicture = Array.Empty<byte>();
-
-            if (System.IO.File.Exists(imagePath))
-            {
-                profilePicture = await System.IO.File.ReadAllBytesAsync(imagePath);
-            }
-
-            return new ForgotPassword
-            {
-                Message = "Incorrect details. Try Again",
-                Reset = false,
-                Flag = "/img/no-map.jpeg",
-                ProfilePicture = profilePicture,
-                Email = email
-            };
         }
     }
 }

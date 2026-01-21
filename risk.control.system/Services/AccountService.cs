@@ -13,7 +13,7 @@ namespace risk.control.system.Services
     {
         Task<ForgotPasswordResult> ForgotPassword(string useremail, string mobile, string countryCode);
         Task<ServiceResult> ChangePasswordAsync(ChangePasswordViewModel model, ClaimsPrincipal userPrincipal, bool isAuthenticated, string portal_base_url);
-
+        Task<ForgotPassword> CreateDefaultForgotPasswordModel(string email);
     }
 
     internal class AccountService : IAccountService
@@ -147,6 +147,26 @@ namespace risk.control.system.Services
                 CountryCode = user.Country.Code,
                 ProfileImage = $"data:image/*;base64,{Convert.ToBase64String(profileImageByte)}",
                 ProfilePicture = profileImageByte ?? new byte[] { }
+            };
+        }
+        public async Task<ForgotPassword> CreateDefaultForgotPasswordModel(string email)
+        {
+            var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
+
+            byte[] profilePicture = Array.Empty<byte>();
+
+            if (File.Exists(imagePath))
+            {
+                profilePicture = await File.ReadAllBytesAsync(imagePath);
+            }
+
+            return new ForgotPassword
+            {
+                Message = "Incorrect details. Try Again",
+                Reset = false,
+                Flag = "/img/no-map.jpeg",
+                ProfilePicture = profilePicture,
+                Email = email
             };
         }
     }
