@@ -24,7 +24,6 @@ namespace risk.control.system.Services
 
     internal class LoginService : ILoginService
     {
-        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ApplicationDbContext _context;
         private readonly IMemoryCache cache;
         private readonly ISmsService smsService;
@@ -34,7 +33,6 @@ namespace risk.control.system.Services
         private readonly SignInManager<ApplicationUser> signInManager;
 
         public LoginService(
-            RoleManager<ApplicationRole> roleManager,
             ApplicationDbContext context,
             IMemoryCache cache,
             ISmsService smsService,
@@ -43,7 +41,6 @@ namespace risk.control.system.Services
             IConfiguration config,
             SignInManager<ApplicationUser> signInManager)
         {
-            this.roleManager = roleManager;
             _context = context;
             this.cache = cache;
             this.smsService = smsService;
@@ -53,7 +50,7 @@ namespace risk.control.system.Services
             this.signInManager = signInManager;
         }
 
-        public async Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin)
+        public async Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin ="")
         {
             // 1. Admin Logic
             if (await _userManager.IsInRoleAsync(user, PORTAL_ADMIN.DISPLAY_NAME))

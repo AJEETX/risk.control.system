@@ -310,7 +310,7 @@ namespace risk.control.system.Controllers.Company
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendorAndManager(currentUserEmail, policy, caseId, selectedcase, baseUrl));
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAllocationToVendorAndManager(currentUserEmail, policy, caseId, selectedcase, baseUrl));
 
                 notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
@@ -376,7 +376,7 @@ namespace risk.control.system.Controllers.Company
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
                 //await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
 
                 notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "orange", "far fa-file-powerpoint");
@@ -418,7 +418,7 @@ namespace risk.control.system.Controllers.Company
                     var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
 
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportProcess(currentUserEmail, claimId, baseUrl));
                     if (reportUpdateStatus == AssessorRemarkType.OK)
                     {
                         notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");

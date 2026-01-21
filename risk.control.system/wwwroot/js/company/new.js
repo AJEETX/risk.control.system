@@ -601,12 +601,14 @@
                     $('#customerTableAuto').DataTable().ajax.reload(null, false);
                     $('#checkall').prop('checked', false);
 
-                } else {
+                }
+                else {
                     $.alert({
                         title: "Error!",
                         content: response.message || "Failed to delete cases.",
                         type: 'red'
                     });
+                    $("#customerTableAuto").DataTable().ajax.reload(null, false);
                 }
             },
             error: function (err) {
@@ -615,6 +617,7 @@
                     content: "Something went wrong. Please try again.",
                     type: 'red'
                 });
+                $("#customerTableAuto").DataTable().ajax.reload(null, false);
             }
         });
     }

@@ -251,7 +251,7 @@ namespace risk.control.system.Seeds
                     var pincode = parts[1].Trim();
                     var district = parts[2].Trim().ToUpper();
                     var stateName = parts[3].Trim().ToUpper();
-                    var stateCode = states.FirstOrDefault(s => s.StateName.ToLower() == stateName.ToLower())?.StateCode;
+                    var stateCode = states.FirstOrDefault(s => string.Equals(s.StateName, stateName, StringComparison.OrdinalIgnoreCase))?.StateCode;
                     pincodes.Add(new PinCodeState
                     {
                         Name = officeName.Replace("B.O", "").Replace("BO", "").Replace("SO", "").Replace("S.O", "").Replace("S.O.", ""),
