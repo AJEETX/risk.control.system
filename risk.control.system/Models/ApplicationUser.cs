@@ -23,12 +23,7 @@ namespace risk.control.system.Models
         public bool IsClientManager { get; set; } = false;
         public bool IsClientAdmin { get; set; } = false;
         public bool IsVendorAdmin { get; set; } = false;
-        public byte[]? ProfilePicture { get; set; }
         public string? ProfilePictureExtension { get; set; }
-
-        [Display(Name = "Image")]
-        [NotMapped]
-        public IFormFile? ProfileImage { get; set; }
 
         [Required]
         [Display(Name = "First name")]
@@ -95,6 +90,9 @@ namespace risk.control.system.Models
         public string? AddressMapLocation { get; set; }
         public bool IsUpdated { get; set; } = true;
         public string? Comments { get; set; } = default!;
+        [Display(Name = "Image")]
+        [NotMapped]
+        public IFormFile? ProfileImage { get; set; }
         [NotMapped]
         public long SelectedPincodeId { get; set; }
         [NotMapped]

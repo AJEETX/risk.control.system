@@ -3055,13 +3055,22 @@ th.col-match {
 .upload-success {
     border: 2px solid forestgreen;
     cursor:text;
-    width:75px;
+    width:100px;
     margin-right: 2px;
+    display:inline-block;
+}
+.upload-err {
+    border: 2px solid red;
+    cursor: text;
+    width: 100px;
+    margin-right: 7px;
+    display: inline-block;
 }
 .upload-progress {
-    width: 75px;
+    width: 100px;
     margin-right: 25px;
     padding-left: 30px;
+    display: inline-block;
 }
 img.mobile-capture-info {
     padding: .1rem;

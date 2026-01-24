@@ -21,7 +21,6 @@ namespace risk.control.system.Controllers
         private readonly IMediaIdfyService mediaIdfyService;
         private readonly INotyfService notifyService;
         private readonly ICaseAgentService agentService;
-        private readonly IAgentIdfyService agentIdService;
         private readonly ILogger<UploadsController> logger;
         private readonly IWebHostEnvironment webHostEnvironment;
 
@@ -30,7 +29,6 @@ namespace risk.control.system.Controllers
             IMediaIdfyService mediaIdfyService,
             INotyfService notifyService,
             ICaseAgentService agentService,
-            IAgentIdfyService agentIdService,
             ILogger<UploadsController> logger,
             IWebHostEnvironment webHostEnvironment)
         {
@@ -39,7 +37,6 @@ namespace risk.control.system.Controllers
             this.mediaIdfyService = mediaIdfyService;
             this.notifyService = notifyService;
             this.agentService = agentService;
-            this.agentIdService = agentIdService;
             this.logger = logger;
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -51,6 +48,11 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> DownloadLog(long id)
         {
+            if(!ModelState.IsValid)
+            {
+                notifyService.Error("OOPs !!!.. Download error");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             try
             {
                 var file = await _context.FilesOnFileSystem
@@ -86,6 +88,11 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> DownloadErrorLog(long id)
         {
+            if (!ModelState.IsValid)
+            {
+                notifyService.Error("OOPs !!!.. Download error");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             try
             {
                 var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(x => x.Id == id);
@@ -110,7 +117,14 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteLog(int id)
         {
-            var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == id);
+            if (!ModelState.IsValid)
+            {
+                notifyService.Error("OOPs !!!.. Download error");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var companyUser = await _context.ApplicationUser.Include(u=>u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+            var file = await _context.FilesOnFileSystem.Include(c=>c.CaseIds).FirstOrDefaultAsync(f => f.Id == id);
             if (file == null)
             {
                 return NotFound(new { success = false, message = "File not found." });
@@ -122,9 +136,10 @@ namespace risk.control.system.Controllers
                 {
                     System.IO.File.Delete(file.FilePath); // Delete the file from storage
                 }
-                file.Deleted = true; // Mark as deleted in the database
-                _context.FilesOnFileSystem.Update(file); // Remove from database
-                _context.SaveChanges();
+                file.Deleted = true;
+                companyUser.ClientCompany.TotalCreatedClaimAllowed += file.CaseIds.Count;
+                _context.FilesOnFileSystem.Update(file); 
+                await _context.SaveChangesAsync();
 
                 return Ok(new { success = true, message = "File deleted successfully." });
             }
@@ -139,6 +154,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadFaceImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image, bool isAgent = false)
         {
+            if (!ModelState.IsValid)
+            {
+                notifyService.Error("OOPs !!!.. Download error");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             var currentUserEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
             {
@@ -152,6 +172,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
         {
+            if (!ModelState.IsValid)
+            {
+                notifyService.Error("OOPs !!!.. Download error");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             var currentUserEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
             {
@@ -165,6 +190,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadMediaFile(long caseId, IFormFile Image, string latitude, string longitude, string reportName, string locationName)
         {
+            if (!ModelState.IsValid)
+            {
+                notifyService.Error("OOPs !!!.. Download error");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             if (Image == null || Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
             var currentUserEmail = HttpContext.User.Identity.Name;
@@ -197,6 +227,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitLocationAnswers(string locationName, long CaseId, List<QuestionTemplate> Questions)
         {
+            if (!ModelState.IsValid)
+            {
+                notifyService.Error("OOPs !!!.. Download error");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             foreach (var question in Questions)
             {
                 if (question.IsRequired && string.IsNullOrEmpty(question.AnswerText))

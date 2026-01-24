@@ -9,9 +9,7 @@ namespace risk.control.system.Models
         public long Id { get; set; }
         public bool Selected { get; set; } = false;
         public string? ReportName { get; set; }
-        public string? IdName { get; set; }
         public string? FilePath { get; set; }
-        public byte[]? Image { get; set; }
         public string? ImageExtension { get; set; }
         public string? LocationInfo { get; set; } = "No Location Info...";
         public string? LocationMapUrl { get; set; }

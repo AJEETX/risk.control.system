@@ -74,29 +74,30 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 bool userCanCreate = true;
+                bool hasClaim = true;
                 int availableCount = 0;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).Include(u=>u.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var fileIdentifier = companyUser.Country.Code.ToLower();
+
                 if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
+                    var totalReadyToAssign = await service.GetAutoCount(currentUserEmail);
+                    hasClaim = totalReadyToAssign > 0;
+                    userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
                     var totalClaimsCreated = await context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
                     availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated;
-                    if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    if (!userCanCreate)
                     {
-                        userCanCreate = false;
-                        notifyService.Information($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                        notifyService.Warning($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                    }
+                    else
+                    {
+                        notifyService.Information($"Limit available = <b>{availableCount}</b>");
                     }
                 }
-                var totalReadyToAssign = await service.GetAutoCount(currentUserEmail);
-                var hasClaim = totalReadyToAssign > 0;
-                var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
-                userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
-
-                if (!userCanCreate)
-                {
-                    notifyService.Custom($"MAX Assign Case limit = <b>{companyUser.ClientCompany.TotalToAssignMaxAllowed}</b> reached", 5, "#dc3545", "fa fa-upload");
-                }
+                
                 return View(new CreateClaims
                 {
                     BulkUpload = companyUser.ClientCompany.BulkUpload,

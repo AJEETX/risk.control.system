@@ -1,6 +1,8 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace risk.control.system.Models.ViewModel
 {
-    public abstract class FileModel
+    public class FileModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -14,8 +16,7 @@
         public string? Message { get; set; } = "Upload In progress";
         public byte[]? ErrorByteData { get; set; }
         public int RecordCount { get; set; } = 0;
-        public List<long>? CaseIds { get; set; } = new();
-        public List<string>? ClaimsId { get; set; } = new();
+        public List<CaseListModel>? CaseIds { get; set; } = new();
         public CREATEDBY AutoOrManual { get; set; } = CREATEDBY.MANUAL;
         public ORIGIN FileOrFtp { get; set; } = ORIGIN.FILE;
         public string UploadedBy { get; set; }
@@ -25,5 +26,15 @@
         public int UserSequenceNumber { get; set; } // Company-specific sequence number
         public bool Deleted { get; set; } = false;
         public bool DirectAssign { get; set; } = false;
+    }
+    public class CaseListModel
+    {
+        [Key] // Add this
+        public int Id { get; set; }
+
+        public long CaseId { get; set; }
+
+        // Foreign key back to the file
+        public int FileModelId { get; set; }
     }
 }

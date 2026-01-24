@@ -55,19 +55,19 @@ namespace risk.control.system.Helpers
                 return location.Addressline + "," + location.District.Name + ", " + location.State.Name + ", " + location.PinCode.Code;
             }
         }
-        public static string GetPincodeCode(bool claimType, CustomerDetail cdetail, BeneficiaryDetail location)
+        public static int GetPincodeCode(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             if (claimType)
             {
-                if (cdetail is null)
-                    return "...";
-                return cdetail.PinCode.Code;
+                if (customer is null)
+                    return 0;
+                return customer.PinCode.Code;
             }
             else
             {
-                if (location is null)
-                    return "...";
-                return location.PinCode.Code;
+                if (beneficiary is null)
+                    return 0;
+                return beneficiary.PinCode.Code;
             }
         }
 

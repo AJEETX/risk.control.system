@@ -6,13 +6,11 @@ namespace risk.control.system.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<WhitelistListMiddleware> _logger;
-        private readonly IFeatureManager featureManager;
         private readonly IConfiguration config;
-        public WhitelistListMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger, IFeatureManager featureManager, IConfiguration config)
+        public WhitelistListMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger, IConfiguration config)
         {
             _next = next;
             _logger = logger;
-            this.featureManager = featureManager;
             this.config = config;
         }
 

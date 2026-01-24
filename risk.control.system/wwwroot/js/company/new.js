@@ -140,9 +140,12 @@
             },
             {
                 "sDefaultContent": "<i class='fa-map-marker' data-toggle='tooltip' title='No address'></i>",
-                "data": "pincode",
+                "data": "pincodeCode",
                 "mRender": function (data, type, row) {
-                    if (row.pincodeName != '...') {
+                    if (row.pincodeCode === 0) {
+                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
+                    }
+                    else {
                         const formattedUrl = row.personMapAddressUrl
                             .replace("{0}", "400")
                             .replace("{1}", "400");
@@ -150,16 +153,13 @@
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
                             <img src="${formattedUrl}"
-                                 title="${row.pincodeName}"
+                                 title="${row.pincodeCode}"
                                  class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
                                  data-bs-toggle="tooltip"
                                  data-bs-placement="top"
                                  data-img='${formattedUrl}'
-                                 data-title='Addresss: ${row.pincodeName}' />
+                                 data-title='Addresss: ${row.pincodeCode}' />
                         </div>`;
-                    }
-                    else {
-                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
                     }
                 }
             },

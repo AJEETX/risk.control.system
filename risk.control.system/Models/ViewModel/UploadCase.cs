@@ -77,8 +77,8 @@ public class UploadCase
     public string CustomerDistrictName { get; set; }
     [Required]
     [Display(Name = "Customer Pincode")]
-    [StringLength(6, MinimumLength = 6, ErrorMessage = "Pincode must be 6 digits")]
-    public string CustomerPincode { get; set; }
+    [Range(100000, 999999, ErrorMessage = "Pincode must be a 6-digit number")]
+    public int CustomerPincode { get; set; }
 
     [Required]
     [Display(Name = "Beneficiary Name")]
@@ -109,8 +109,9 @@ public class UploadCase
     [Required]
     [Display(Name = "Beneficiary District Name")]
     public string BeneficiaryDistrictName { get; set; }
+    
     [Required]
     [Display(Name = "Beneficiary Pincode")]
-    [StringLength(6, MinimumLength = 6, ErrorMessage = "Pincode must be 6 digits")]
-    public string BeneficiaryPincode { get; set; }
+    [Range(100000, 999999, ErrorMessage = "Pincode must be a 6-digit number")]
+    public int BeneficiaryPincode { get; set; }
 }

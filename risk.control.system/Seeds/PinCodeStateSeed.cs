@@ -185,10 +185,11 @@ namespace risk.control.system.Seeds
                         {
                             var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
                             var rowData = output.Split(',').ToList();
+                            var pinCode = rowData[0].Trim();
 
-                            var pincodeState = new PinCodeState
+                            var pincodeWithState = new PinCodeState
                             {
-                                Code = rowData[0]?.Trim() ?? NO_DATA,
+                                Code =int.Parse(pinCode),
                                 Name = rowData[1]?.Trim() ?? NO_DATA,
                                 District = rowData[1]?.Trim() ?? NO_DATA,
                                 StateName = rowData[2]?.Trim() ?? NO_DATA,
@@ -196,8 +197,8 @@ namespace risk.control.system.Seeds
                                 Latitude = rowData[4]?.Trim() ?? NO_DATA,
                                 Longitude = rowData[5]?.Trim() ?? NO_DATA,
                             };
-                            var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
-                            pincodes.Add(pincodeState);
+                            var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeWithState.Code);
+                            pincodes.Add(pincodeWithState);
                             rowCount++;
                             if (maxCount > 0 && rowCount >= maxCount)
                             {
@@ -248,7 +249,7 @@ namespace risk.control.system.Seeds
                 {
                     var officeName = officeSuffixRegex.Replace(parts[0].Trim(), "").Trim('"');
 
-                    var pincode = parts[1].Trim();
+                    var pincode =int.Parse( parts[1].Trim());
                     var district = parts[2].Trim().ToUpper();
                     var stateName = parts[3].Trim().ToUpper();
                     var stateCode = states.FirstOrDefault(s => string.Equals(s.StateName, stateName, StringComparison.OrdinalIgnoreCase))?.StateCode;
