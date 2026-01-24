@@ -20,7 +20,7 @@ namespace risk.control.system.Controllers.Company
     [Breadcrumb(" Cases")]
     public class CaseUploadController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
         private readonly IInvestigationService service;
         private readonly ILogger<CaseUploadController> logger;
         private readonly INotyfService notifyService;
@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers.Company
             ILogger<CaseUploadController> logger,
             INotyfService notifyService)
         {
-            _context = context;
+            this.context = context;
             this.service = service;
             this.logger = logger;
             this.notifyService = notifyService;
@@ -78,40 +78,40 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 bool userCanCreate = true;
+                bool hasClaim = true;
                 int availableCount = 0;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).Include(u=>u.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var fileIdentifier = companyUser.Country.Code.ToLower();
+
                 if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
-                    var totalClaimsCreated = await _context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                    var totalReadyToAssign = await service.GetAutoCount(currentUserEmail);
+                    hasClaim = totalReadyToAssign > 0;
+                    userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
+                    var totalClaimsCreated = await context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
                     availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated;
-                    if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    
+                    if(uploadId == 0)
                     {
-                        userCanCreate = false;
-                        notifyService.Information($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                        if (!userCanCreate)
+                        {
+                            notifyService.Warning($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                        }
+                        else
+                        {
+                            notifyService.Information($"Limit available = <b>{availableCount}</b>");
+                        }
                     }
                 }
-                var totalReadyToAssign = await service.GetAutoCount(currentUserEmail);
-                var hasClaim = totalReadyToAssign > 0;
-                var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
-                var hasFileUploads = _context.FilesOnFileSystem.Any();
-                var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
-                userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
 
-                if (!userCanCreate)
-                {
-                    notifyService.Custom($"MAX Assign Case limit = <b>{companyUser.ClientCompany.TotalToAssignMaxAllowed}</b> reached", 5, "#dc3545", "fa fa-upload");
-                }
                 return View(new CreateClaims
                 {
                     BulkUpload = companyUser.ClientCompany.BulkUpload,
                     UserCanCreate = userCanCreate,
                     HasClaims = hasClaim,
                     FileSampleIdentifier = fileIdentifier,
-                    UploadId = uploadId,
-                    HasFileUploads = hasFileUploads,
-                    IsManager = isManager,
                     AutoAllocation = companyUser.ClientCompany.AutoAllocation
                 });
             }

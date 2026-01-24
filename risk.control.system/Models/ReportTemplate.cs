@@ -46,12 +46,10 @@ namespace risk.control.system.Models
         [NotMapped]
         public string Address { get; set; } = "Life-Assured";
         public long? ReportTemplateId { get; set; }
-        public ReportTemplate? ReportTemplate { get; set; }
         public string? LocationName { get; set; }
         public string? Status { get; set; }
         [EmailAddress]
         public string? AgentEmail { get; set; }
-        public long? AgentIdReportId { get; set; }
         public AgentIdReport? AgentIdReport { get; set; } = new AgentIdReport
         {
             Selected = true,
@@ -174,7 +172,6 @@ namespace risk.control.system.Models
         public string? Name { get; set; }
         public InsuranceType InsuranceType { get; set; } = InsuranceType.CLAIM;
         public long? ReportTemplateId { get; set; }
-        public ReportTemplate? ReportTemplate { get; set; }
         public List<FaceIdCreateViewModel>? FaceIds { get; set; } = new();
         public List<DocumentIdCreateViewModel>? DocumentIds { get; set; } = new();
         public QuestionFormViewModel? Questions { get; set; } = new();

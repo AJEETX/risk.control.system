@@ -14,7 +14,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             UserManager<ApplicationUser> userManager,
-            string pinCodeCode,
+            int pinCodeCode,
             IFileStorageService fileStorageService)
         {
 

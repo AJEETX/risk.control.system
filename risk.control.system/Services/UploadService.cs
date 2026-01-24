@@ -9,17 +9,14 @@ namespace risk.control.system.Services
     }
     internal class UploadService : IUploadService
     {
-        private readonly IProgressService uploadProgressService;
         private readonly ICaseCreationService _caseCreationService;
         private readonly ILogger<UploadService> logger;
 
         public UploadService(ICaseCreationService caseCreationService,
-            ILogger<UploadService> logger,
-            IProgressService uploadProgressService)
+            ILogger<UploadService> logger)
         {
             _caseCreationService = caseCreationService;
             this.logger = logger;
-            this.uploadProgressService = uploadProgressService;
         }
 
         public async Task<List<UploadResult>> FileUpload(ApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP)
@@ -37,12 +34,9 @@ namespace risk.control.system.Services
                     var claimUploaded = await _caseCreationService.FileUpload(companyUser, row, model, fileOrFTP);
                     if (claimUploaded == null)
                     {
-                        return null;
+                        return null!;
                     }
                     uploadedClaims.Add(claimUploaded);
-                    //int progress = (int)(((uploadedRecordsCount + 1) / (double)totalCount) * 100);
-                    //uploadProgressService.UpdateProgress(model.Id, progress);
-                    //uploadedRecordsCount++;
                 }
                 return uploadedClaims;
             }

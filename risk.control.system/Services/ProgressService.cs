@@ -4,15 +4,11 @@ namespace risk.control.system.Services
 {
     public interface IProgressService
     {
-        void UpdateProgress(int jobId, int progress);
-        void UpdateAssignmentProgress(string jobId, int progress);
         int GetProgress(int jobId);
         int GetAssignmentProgress(string jobId);
 
-        void AddUploadJob(string userEmail, string jobId);
-        void AddAssignmentJob(string userEmail, string jobId);
+        void AddAssignmentJob(string jobId, string userEmail);
         List<string> GetUploadJobIds(string userEmail);
-        List<string> GetAssignmentJobIds(string userEmail);
     }
     internal class ProgressService : IProgressService
     {
@@ -30,16 +26,6 @@ namespace risk.control.system.Services
             return new List<string>(); // Return an empty list if no jobs exist
         }
 
-        public void AddUploadJob(string jobId, string userEmail)
-        {
-            uploadJobIds.AddOrUpdate(userEmail,
-                new List<string> { jobId },  // If user does not exist, create new list
-                (key, existingJobs) =>
-                {
-                    existingJobs.Add(jobId);  // If user exists, add job to their list
-                    return existingJobs;
-                });
-        }
         public void AddAssignmentJob(string jobId, string userEmail)
         {
             assignmentJobIds.AddOrUpdate(userEmail,
@@ -49,24 +35,6 @@ namespace risk.control.system.Services
                     existingJobs.Add(jobId);  // If user exists, add job to their list
                     return existingJobs;
                 });
-        }
-
-        public List<string> GetAssignmentJobIds(string userEmail)
-        {
-            if (assignmentJobIds.TryGetValue(userEmail, out var jobs))
-            {
-                return jobs;
-            }
-            return new List<string>(); // Return an empty list if no jobs exist
-        }
-
-        public void UpdateAssignmentProgress(string jobId, int progress)
-        {
-            jobAssignmentProgress[jobId] = progress;
-        }
-        public void UpdateProgress(int jobId, int progress)
-        {
-            jobProgress[jobId] = progress;
         }
 
         public int GetAssignmentProgress(string jobId)

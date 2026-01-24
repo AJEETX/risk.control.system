@@ -128,6 +128,9 @@ public static class BusinessServiceExtension
             options.KnownProxies.Clear();
         });
         services.AddHttpClient();
+        services.AddScoped<IUploadFileStatusService, UploadFileStatusService>();
+        services.AddScoped<ICsvFileReaderService, CsvFileReaderService>();
+        services.AddScoped<IUploadFileService, UploadFileService>();
         services.AddScoped<IImageAnalysisService, ImageAnalysisService>();
         services.AddScoped<ISpeech2TextService, Speech2TextService>();
         services.AddScoped<IText2SpeechService, Text2SpeechService>();

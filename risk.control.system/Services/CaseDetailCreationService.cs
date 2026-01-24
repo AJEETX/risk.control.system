@@ -50,12 +50,12 @@ namespace risk.control.system.Services
                 string.IsNullOrWhiteSpace(uploadCase.CustomerDob) ||
                 string.IsNullOrWhiteSpace(uploadCase.CustomerContact) ||
                 string.IsNullOrWhiteSpace(uploadCase.CustomerAddressLine) ||
-                string.IsNullOrWhiteSpace(uploadCase.CustomerPincode) ||
+                uploadCase.CustomerPincode == null || uploadCase.CustomerPincode <=0 ||
                 string.IsNullOrWhiteSpace(uploadCase.BeneficiaryName) ||
                 string.IsNullOrWhiteSpace(uploadCase.BeneficiaryDob) ||
                 string.IsNullOrWhiteSpace(uploadCase.BeneficiaryContact) ||
                 string.IsNullOrWhiteSpace(uploadCase.BeneficiaryAddressLine) ||
-                string.IsNullOrWhiteSpace(uploadCase.BeneficiaryPincode))
+                uploadCase.BeneficiaryPincode == null || uploadCase.BeneficiaryPincode <= 0)
             {
                 return false;
             }
@@ -84,8 +84,8 @@ namespace risk.control.system.Services
 
                 if (string.IsNullOrWhiteSpace(uploadCase.ServiceType))
                 {
-                    case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.ServiceType)} :null/empty]", Error = "null/empty" });
-                    caseErrors.Add($"[{nameof(uploadCase.ServiceType)}=null/empty]");
+                    case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.ServiceType)} :null/empty]", Error = $"{EmptyNull}" });
+                    caseErrors.Add($"[{nameof(uploadCase.ServiceType)}={EmptyNull}]");
                 }
                 var servicetype = string.IsNullOrWhiteSpace(uploadCase.ServiceType)
                     ? await context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == caseType)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
@@ -109,7 +109,7 @@ namespace risk.control.system.Services
                 bool isIssueDateValid = false, isIncidentDateValid = false;
 
                 // Validate IssueDate
-                if (!string.IsNullOrWhiteSpace(uploadCase.IssueDate) && DateTime.TryParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out issueDate))
+                if (!string.IsNullOrWhiteSpace(uploadCase.IssueDate) && DateTime.TryParseExact(uploadCase.IssueDate, CONSTANTS.ValidDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out issueDate))
                 {
                     if (issueDate > DateTime.Today)
                     {
@@ -123,19 +123,19 @@ namespace risk.control.system.Services
                     else
                     {
                         isIssueDateValid = true;
-                        uploadCase.IssueDate = issueDate.ToString("dd-MM-yyyy");
+                        uploadCase.IssueDate = issueDate.ToString(CONSTANTS.ValidDateFormat);
                     }
                 }
                 else
                 {
                     issueDate = DateTime.Now;
-                    uploadCase.IssueDate = issueDate.ToString("dd-MM-yyyy");
+                    uploadCase.IssueDate = issueDate.ToString(CONSTANTS.ValidDateFormat);
                     case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.IssueDate)}: {uploadCase.IssueDate} Invalid]", Error = $"Invalid issue date {uploadCase.IssueDate}" });
                     caseErrors.Add($"[{nameof(uploadCase.IssueDate)}=`{uploadCase.IssueDate}` null/invalid]");
                 }
 
                 // Validate IncidentDate
-                if (!string.IsNullOrWhiteSpace(uploadCase.IncidentDate) && DateTime.TryParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateOfIncident))
+                if (!string.IsNullOrWhiteSpace(uploadCase.IncidentDate) && DateTime.TryParseExact(uploadCase.IncidentDate, CONSTANTS.ValidDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateOfIncident))
                 {
                     if (dateOfIncident > DateTime.Today)
                     {
@@ -149,15 +149,15 @@ namespace risk.control.system.Services
                     else
                     {
                         isIncidentDateValid = true;
-                        uploadCase.IncidentDate = dateOfIncident.ToString("dd-MM-yyyy");
+                        uploadCase.IncidentDate = dateOfIncident.ToString(CONSTANTS.ValidDateFormat);
                     }
                 }
                 else
                 {
                     dateOfIncident = DateTime.Now;
-                    uploadCase.IncidentDate = dateOfIncident.ToString("dd-MM-yyyy");
+                    uploadCase.IncidentDate = dateOfIncident.ToString(CONSTANTS.ValidDateFormat);
                     case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.IncidentDate)}: {uploadCase.IncidentDate} Invalid]", Error = $"Invalid incident date {uploadCase.IncidentDate}" });
-                    caseErrors.Add($"[{nameof(uploadCase.IncidentDate)}=`{uploadCase.IncidentDate}` null/invalid]");
+                    caseErrors.Add($"[{nameof(uploadCase.IncidentDate)}=`{uploadCase.IncidentDate}` {EmptyNull}]");
                 }
 
                 // Check chronological order
@@ -173,8 +173,8 @@ namespace risk.control.system.Services
 
                 if (string.IsNullOrWhiteSpace(uploadCase.Reason))
                 {
-                    case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.Reason)} : null/empty]", Error = $"null/empty" });
-                    caseErrors.Add($"[{nameof(uploadCase.Reason)}=null/empty]");
+                    case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.Reason)} : {EmptyNull}]", Error = $"{EmptyNull}" });
+                    caseErrors.Add($"[{nameof(uploadCase.Reason)}={EmptyNull}]");
                 }
                 var caseEnabler = string.IsNullOrWhiteSpace(uploadCase.Reason) ?
                     await context.CaseEnabler.FirstOrDefaultAsync() :
@@ -184,14 +184,14 @@ namespace risk.control.system.Services
 
                 if (string.IsNullOrWhiteSpace(uploadCase.Department))
                 {
-                    case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.Department)} : null/empty]", Error = $"null/empty" });
-                    caseErrors.Add($"[{nameof(uploadCase.Department)}=null/empty]");
+                    case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.Department)} : {EmptyNull}]", Error = $"{EmptyNull}" });
+                    caseErrors.Add($"[{nameof(uploadCase.Department)}={EmptyNull}]");
                 }
 
                 if (string.IsNullOrWhiteSpace(uploadCase.Cause))
                 {
-                    case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.Cause)} : null/empty]", Error = $"null/empty" });
-                    caseErrors.Add($"[{nameof(uploadCase.Cause)}=null/empty]");
+                    case_errors.Add(new UploadError { UploadData = $"[{nameof(uploadCase.Cause)} : {EmptyNull}]", Error = $"{EmptyNull}" });
+                    caseErrors.Add($"[{nameof(uploadCase.Cause)}={EmptyNull}]");
                 }
 
                 var department = string.IsNullOrWhiteSpace(uploadCase.Department) ?
@@ -204,8 +204,8 @@ namespace risk.control.system.Services
                 string filePath = string.Empty;
                 if (savedNewImage == null)
                 {
-                    case_errors.Add(new UploadError { UploadData = "[Policy Image: null/not found]", Error = "null/not found" });
-                    caseErrors.Add($"[Policy Image=`{POLICY_IMAGE}`  null/not found]");
+                    case_errors.Add(new UploadError { UploadData = "[Policy Image: null/not found]", Error = $"{NullInvalid}" });
+                    caseErrors.Add($"[Policy Image=`{POLICY_IMAGE}`  {NullInvalid}]");
                 }
                 else
                 {
@@ -216,10 +216,10 @@ namespace risk.control.system.Services
                 {
                     ContractNumber = uploadCase.CaseId,
                     SumAssuredValue = Convert.ToDecimal(uploadCase.Amount),
-                    ContractIssueDate = DateTime.ParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
+                    ContractIssueDate = DateTime.ParseExact(uploadCase.IssueDate, CONSTANTS.ValidDateFormat, CultureInfo.InvariantCulture),
                     //ClaimType = (ClaimType.DEATH)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
                     InvestigationServiceTypeId = servicetype.InvestigationServiceTypeId,
-                    DateOfIncident = DateTime.ParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
+                    DateOfIncident = DateTime.ParseExact(uploadCase.IncidentDate, CONSTANTS.ValidDateFormat, CultureInfo.InvariantCulture),
                     CauseOfLoss = !string.IsNullOrWhiteSpace(uploadCase.Cause?.Trim()) ? uploadCase.Cause.Trim() : "UNKNOWN",
                     CaseEnablerId = caseEnabler.CaseEnablerId,
                     CostCentreId = department.CostCentreId,

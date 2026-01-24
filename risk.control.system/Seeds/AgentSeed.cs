@@ -14,7 +14,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, string agentEmailwithSuffix,
             IWebHostEnvironment webHostEnvironment, ICustomApiClient customApiCLient,
             UserManager<ApplicationUser> userManager,
-            Vendor vendor, string pinCode, string photo, string firstName, string lastName, IFileStorageService fileStorageService, string addressLine = "")
+            Vendor vendor, int pinCode, string photo, string firstName, string lastName, IFileStorageService fileStorageService, string addressLine = "")
         {
 
             string agentImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));

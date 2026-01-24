@@ -503,7 +503,7 @@ namespace risk.control.system.Controllers.Api
                     pincodesQuery = context.PinCode
                         .Where(x => x.CountryId == countryId &&
                         (x.Name.ToLower().Contains(nameFilter.ToLower()) ||
-                        x.Code.ToLower().Contains(nameFilter.ToLower()))
+                        x.Code.ToString().Contains(nameFilter.ToLower()))
                         );
                 }
                 else
@@ -511,7 +511,7 @@ namespace risk.control.system.Controllers.Api
                     // Search pincodes that match either name or pincode
                     pincodesQuery = context.PinCode
                         .Where(x => x.CountryId == countryId &&
-                        x.Code.ToLower().Contains(pincodeFilter.ToLower())
+                        x.Code.ToString().Contains(pincodeFilter.ToLower())
                         );
                 }
 

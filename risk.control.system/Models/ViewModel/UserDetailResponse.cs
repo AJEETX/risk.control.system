@@ -18,7 +18,7 @@
         public string? Flag { get; set; }
         public string Roles { get; set; }
         public string? Role { get; set; }
-        public string? Pincode { get; set; }
+        public int? Pincode { get; set; }
         public string? PincodeName { get; set; }
         public string? Updated { get; set; }
         public string? UpdatedBy { get; set; }

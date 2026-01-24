@@ -8,11 +8,11 @@ namespace risk.control.system.Seeds
 {
     public static class AustraliaSeed
     {
-        public static async Task<string> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager,
+        public static async Task<int> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager,
             ICustomApiClient customApiCLient,List<Country> countries, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
             string COUNTRY_CODE = "AU";
-            string PINCODE = "3131";
+            int PINCODE = 3131;
             var au = countries.FirstOrDefault(c => c.Code == COUNTRY_CODE);
             var auPincodes = await PinCodeStateSeed.CsvRead_Au(0);
             var auStates = auPincodes.Where(s =>

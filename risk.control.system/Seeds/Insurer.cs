@@ -57,7 +57,7 @@ namespace risk.control.system.Seeds
                 Email = input.DOMAIN,
                 DocumentUrl = relativePath,
                 PhoneNumber = input.PHONE,
-                ExpiryDate = DateTime.Now.AddDays(5),
+                ExpiryDate = DateTime.Now.AddDays(10),
                 EmpanelledVendors = vendors,
                 Status = CompanyStatus.ACTIVE,
                 AutoAllocation = globalSettings.AutoAllocation,

@@ -13,7 +13,7 @@ namespace risk.control.system.Models
         public string Name { get; set; } = default!;
 
         [Display(Name = "PinCode")]
-        public string Code { get; set; } = default!;
+        public int Code { get; set; } = default!;
 
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }

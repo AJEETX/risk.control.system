@@ -7,7 +7,7 @@ namespace risk.control.system.Seeds
 {
     public static class StartCountryWiseSeed
     {
-        static string randomPinCode = string.Empty;
+        static int randomPinCode;
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, ICustomApiClient customApiCLient, IFileStorageService fileStorageService)
         {
             var globalSetting = new GlobalSettings
