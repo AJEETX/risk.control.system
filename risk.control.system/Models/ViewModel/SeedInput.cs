@@ -9,7 +9,7 @@
         public string IFSC { get; set; }
         public string BANK { get; set; }
         public string COUNTRY { get; set; }
-        public string PINCODE { get; set; }
+        public int PINCODE { get; set; }
         public string PHOTO { get; set; }
         public string PHONE { get; set; }
     }

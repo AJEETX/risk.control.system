@@ -113,8 +113,7 @@
                         <span class="custom-message-badge i-blue" title="${data}" data-toggle="tooltip">
                             <small><strong> ${data}</strong></small>
                         </span>`;
-                    } else {
-                        if (row.status == 'Error') {
+                    } else if (row.status == 'Error') {
                             return `
                         <span class="custom-message-badge i-red" title="${data}" data-toggle="tooltip">
                             <small><strong> ${data}</strong></small>
@@ -125,7 +124,6 @@
                             <small><strong> ${data}</strong></small>
                         </span>`;
                         }
-                    }
                 }
             },
             {
@@ -134,13 +132,18 @@
                 "render": function (data, type, row) {
                     var img = '';
                     var title = row.directAssign ? "Assigned" : "Uploaded";
-                    if (row.hasError) {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger' title='Download Error file' data-bs-toggle='tooltip'><i class='fa fa-download'></i> Error File</a> &nbsp;`;
+                    if (row.status == 'Error' && row.recordCount == 0) {
+                        img += `<div class='btn-xs upload-err' title='Limit exceeded' data-bs-toggle='tooltip'> <i class='fas fa-times-circle i-orangered'></i> Limit exceed</div>`;
                     }
+                    else if (row.hasError) {
+                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger' title='Download Error file' data-bs-toggle='tooltip'> <i class='fa fa-download'></i> Error File</a>`;
+                    }
+                    
                     else if (!row.hasError && row.status == 'Completed') {
-                        img += `<span class='btn btn-xs i-green upload-success' title='${title} Successfully' data-bs-toggle='tooltip'><i class='fa fa-check'></i> ${title} </span> `;
-                    } else {
-                        img += `<span class='upload-progress' title='Action in-progress' data-bs-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </span> &nbsp;`;
+                        img += `<div class='btn btn-xs i-green upload-success' title='${title} Successfully' data-bs-toggle='tooltip'><i class='fa fa-check'></i> ${title} </div> `;
+                    } 
+                    else if (row.status == 'Processing'){
+                        img += `<div class='upload-progress' title='Action in-progress' data-bs-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </div>`;
                     }
 
                     img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file" data-bs-toggle="tooltip"><i class="nav-icon fa fa-download"></i> Download</a> ';
@@ -254,7 +257,7 @@
                     var popType = updatedRowData.data.result.directAssign ? 'red' : 'blue';  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
                     var title = updatedRowData.data.result.directAssign ? "Assign" : "Upload";
                     var btnClass = updatedRowData.data.result.directAssign ? 'btn-danger' : 'btn-info';
-                    if (updatedRowData.data.result.status === 'Error') {
+                    if (updatedRowData.data.result.status === 'Error' || updatedRowData.data.result.status === "Completed") {
                         console.log("Status is Completed, stopping polling and updating row.");
                         clearInterval(pollingTimer); // Stop polling
                         updateProcessingRow(uploadId, updatedRowData.data.result); // Update the row with completed data
@@ -264,12 +267,12 @@
                         console.log("Status is still Processing, continuing to poll...");
                     }
 
-                    // If status is Completed, stop polling and update the row
-                    else if (updatedRowData.data.result.status === "Completed") {
-                        console.log("Status is Completed, stopping polling and updating row.");
-                        clearInterval(pollingTimer); // Stop polling
-                        updateProcessingRow(uploadId, updatedRowData.data.result); // Update the row with completed data
-                    }
+                    //// If status is Completed, stop polling and update the row
+                    //else if (updatedRowData.data.result.status === "Completed") {
+                    //    console.log("Status is Completed, stopping polling and updating row.");
+                    //    clearInterval(pollingTimer); // Stop polling
+                    //    updateProcessingRow(uploadId, updatedRowData.data.result); // Update the row with completed data
+                    //}
                 },
                 error: function (err) {
                     console.error('Error fetching file data:', err);

@@ -22,7 +22,7 @@ namespace risk.control.system.Models.ViewModel
         public string RawEmail { get; set; }
         public string? PersonMapAddressUrl { get; set; }
         public string? MapDetails { get; set; }
-        public string PinCode { get; set; }
+        public int PinCode { get; set; }
         public string Distance { get; set; }
         public float DistanceInMetres { get; set; }
         public string Duration { get; set; }

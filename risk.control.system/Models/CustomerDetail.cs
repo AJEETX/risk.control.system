@@ -57,10 +57,6 @@ namespace risk.control.system.Models
         public District? District { get; set; }
         [Required]
         public long? InvestigationTaskId { get; set; }
-        public InvestigationTask? InvestigationTask { get; set; }
-
-        [Display(Name = "Customer type")]
-        public CustomerType? CustomerType { get; set; }
 
         [Required]
         [Display(Name = "Annual Income")]

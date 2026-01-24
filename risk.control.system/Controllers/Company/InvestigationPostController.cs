@@ -8,13 +8,11 @@ using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
 
 namespace risk.control.system.Controllers.Company
@@ -22,54 +20,43 @@ namespace risk.control.system.Controllers.Company
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class InvestigationPostController : Controller
     {
-        private const string CLAIMS = "claims";
+        private readonly string baseUrl;
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly ApplicationDbContext _context;
-        private readonly IPhoneService phoneService;
-        private readonly IFeatureManager featureManager;
-        private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly ICustomApiClient customApiCLient;
+        private readonly IUploadFileService uploadFileService;
         private readonly IProcessCaseService processCaseService;
         private readonly IMailService mailboxService;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
-        private readonly IInvestigationService service;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IProgressService progressService;
         private readonly ILogger<InvestigationPostController> logger;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public InvestigationPostController(ApplicationDbContext context,
-            IPhoneService phoneService,
-            IFeatureManager featureManager,
-            IEmpanelledAgencyService empanelledAgencyService,
-            ICustomApiClient customApiCLient,
+            IUploadFileService uploadFileService,
             IProcessCaseService processCaseService,
             IMailService mailboxService,
             IFtpService ftpService,
             INotyfService notifyService,
-            IInvestigationService service,
             IHttpContextAccessor httpContextAccessor,
             IProgressService progressService,
             ILogger<InvestigationPostController> logger,
             IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
-            this.phoneService = phoneService;
-            this.featureManager = featureManager;
-            this.empanelledAgencyService = empanelledAgencyService;
-            this.customApiCLient = customApiCLient;
+            this.uploadFileService = uploadFileService;
             this.processCaseService = processCaseService;
             this.mailboxService = mailboxService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
-            this.service = service;
-            this.httpContextAccessor = httpContextAccessor;
             this.progressService = progressService;
             this.logger = logger;
             this.backgroundJobClient = backgroundJobClient;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -94,13 +81,10 @@ namespace risk.control.system.Controllers.Company
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+                
 
-                var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, CREATEDBY.AUTO, model.UploadAndAssign);
+                var uploadId = await uploadFileService.UploadFile(currentUserEmail, postedFile, CREATEDBY.AUTO, model.UploadAndAssign);
                 var jobId = backgroundJobClient.Enqueue(() => ftpService.StartFileUpload(currentUserEmail, uploadId, baseUrl, model.UploadAndAssign));
-                progressService.AddUploadJob(jobId, currentUserEmail);
                 if (!model.UploadAndAssign)
                 {
                     notifyService.Custom($"Upload in progress ", 3, "#17A2B8", "fa fa-upload");
@@ -154,6 +138,10 @@ namespace risk.control.system.Controllers.Company
 
         public IActionResult GetJobProgress(int jobId)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { progress = 0 });
+            }
             int progress = progressService.GetProgress(jobId);
             return Json(new { progress });
         }
@@ -168,6 +156,10 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAutoConfirmed(long id)
         {
+            if(!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid request." });
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -232,6 +224,9 @@ namespace risk.control.system.Controllers.Company
                     claimsInvestigation.Deleted = true;
                     _context.Investigations.Update(claimsInvestigation);
                 }
+                var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                companyUser.ClientCompany.TotalCreatedClaimAllowed += request.claims.Count;
+
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true });
@@ -258,9 +253,6 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
                 // AUTO ALLOCATION COUNT
                 var distinctClaims = claims.Distinct().ToList();
@@ -306,10 +298,6 @@ namespace risk.control.system.Controllers.Company
 
                 var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == selectedcase);
 
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-
                 var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAllocationToVendorAndManager(currentUserEmail, policy, caseId, selectedcase, baseUrl));
 
                 notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
@@ -336,9 +324,6 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.New), "Investigation");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
                 var allocatedCaseNumber = await processCaseService.ProcessAutoSingleAllocation(claims, currentUserEmail, baseUrl);
                 if (string.IsNullOrWhiteSpace(allocatedCaseNumber))
@@ -372,12 +357,8 @@ namespace risk.control.system.Controllers.Company
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var (company, vendorId) = await processCaseService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
-                //await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
 
                 notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "orange", "far fa-file-powerpoint");
 
@@ -412,11 +393,6 @@ namespace risk.control.system.Controllers.Company
                     reportAiSummary = WebUtility.HtmlEncode(reportAiSummary);
 
                     var (company, contract) = await processCaseService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
-
-                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-
 
                     backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportProcess(currentUserEmail, claimId, baseUrl));
                     if (reportUpdateStatus == AssessorRemarkType.OK)
@@ -493,9 +469,6 @@ namespace risk.control.system.Controllers.Company
                 if (model != null)
                 {
                     var company = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
                     backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId, baseUrl));
 
@@ -543,9 +516,6 @@ namespace risk.control.system.Controllers.Company
                 return StatusCode(500);
             }
         }
-        public class DeleteRequestModel
-        {
-            public List<long> claims { get; set; }
-        }
+        
     }
 }

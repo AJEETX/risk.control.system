@@ -12,7 +12,7 @@ namespace risk.control.system.Services
     public interface IManagerService
     {
         Task<object> GetActiveCases(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
-        Task<List<CaseInvestigationResponse>> GetApprovedCases(string userEmail);
+        Task<List<CaseInvestigationResponse>> GetApprovedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
         Task<List<CaseInvestigationResponse>> GetRejectedCases(string userEmail);
     }
     internal class ManagerService : IManagerService
@@ -73,7 +73,7 @@ namespace risk.control.system.Services
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
-                    a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
+                    a.CustomerDetail.PinCode.Code.ToString().Contains(search) ||
                     a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.Addressline.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
@@ -312,9 +312,8 @@ namespace risk.control.system.Services
             return string.Empty;
         }
 
-        public async Task<List<CaseInvestigationResponse>> GetApprovedCases(string userEmail)
+        public async Task<List<CaseInvestigationResponse>> GetApprovedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-
             var companyUser = await context.ApplicationUser
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(u => u.Email == userEmail);

@@ -11,9 +11,9 @@ namespace risk.control.system.Services
     }
     internal class CaseImageCreationService : ICaseImageCreationService
     {
-        private readonly ILogger<CaseDetailCreationService> logger;
+        private readonly ILogger<CaseImageCreationService> logger;
 
-        public CaseImageCreationService(ILogger<CaseDetailCreationService> logger)
+        public CaseImageCreationService(ILogger<CaseImageCreationService> logger)
         {
             this.logger = logger;
         }
@@ -22,7 +22,7 @@ namespace risk.control.system.Services
         {
             if (string.IsNullOrWhiteSpace(subfolderName) || string.IsNullOrWhiteSpace(filename))
             {
-                return null;
+                return null!;
             }
             List<(string FileName, byte[] ImageData)> images = new List<(string, byte[])>();
 

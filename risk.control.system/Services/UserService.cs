@@ -560,7 +560,7 @@ namespace risk.control.system.Services
                     Country = user?.Country?.Code ?? "--",
                     Flag = flag,
                     Roles = string.Join(",", GetUserRoles(user).Result),
-                    Pincode = user?.PinCode?.Code ?? "--",
+                    Pincode = user?.PinCode?.Code ?? 0,
                     OnlineStatus = status,
                     Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
                     UpdatedBy = user.UpdatedBy,

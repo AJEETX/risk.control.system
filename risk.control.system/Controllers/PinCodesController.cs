@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers
                    .Replace("_", "[_]")
                    .Replace("[", "[[]");
                 query = query.Where(p =>
-                    EF.Functions.Like(p.Code, $"%{search}%") ||
+                    EF.Functions.Like(p.Code.ToString(), $"%{search}%") ||
                     EF.Functions.Like(p.Name, $"%{search}%") ||
                     EF.Functions.Like(p.District.Name, $"%{search}%") ||
                     EF.Functions.Like(p.State.Name, $"%{search}%") ||
@@ -241,12 +241,17 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id < 1)
+                if (!ModelState.IsValid)
                 {
                     notifyService.Error("Pincode Null!");
                     return RedirectToAction(nameof(Profile));
                 }
                 var existingPincode = await _context.PinCode.FindAsync(id);
+                if(existingPincode == null)
+                {
+                    notifyService.Error("Pincode not found!");
+                    return RedirectToAction(nameof(Profile));
+                }
                 existingPincode.Code = pinCode.Code;
                 existingPincode.Name = pinCode.Name;
                 existingPincode.Updated = DateTime.Now;
@@ -278,7 +283,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (id < 1)
+            if (!ModelState.IsValid)
             {
                 return Json(new { success = true, message = "Pincode not found!" });
             }

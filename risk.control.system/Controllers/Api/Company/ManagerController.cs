@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AngleSharp.Css.Values;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
@@ -46,7 +48,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
         }
         [HttpGet("GetApprovedCases")]
-        public async Task<IActionResult> GetApprovedCases()
+        public async Task<IActionResult> GetApprovedCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -56,7 +58,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var response = await managerService.GetApprovedCases(userEmail);
+                var response = await managerService.GetApprovedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }

@@ -12,11 +12,6 @@ namespace risk.control.system.Models
         [Display(Name = "Insurer name")]
         public string Name { get; set; } = default!;
 
-        [Display(Name = "Insurer code")]
-        public string? Code { get; set; } = default!;
-
-        public string? Description { get; set; } = default!;
-
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = default!;
 
@@ -44,16 +39,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
-        [NotMapped]
-        public IFormFile? Document { get; set; }
-        [NotMapped]
-        public long SelectedPincodeId { get; set; }
-        [NotMapped]
-        public long SelectedDistrictId { get; set; }
-        [NotMapped]
-        public long SelectedStateId { get; set; }
-        [NotMapped]
-        public long SelectedCountryId { get; set; }
+        
         public string? BankName { get; set; } = default!;
 
         [Display(Name = "Bank Account Number")]
@@ -71,8 +57,6 @@ namespace risk.control.system.Models
 
         public string? DocumentUrl { get; set; } = default!;
 
-        [Display(Name = "Document url")]
-        public byte[]? DocumentImage { get; set; } = default!;
         public string? DocumentImageExtension { get; set; } = default!;
         public string? AddressMapLocation { get; set; }
         public string? AddressLatitude { get; set; }
@@ -93,14 +77,13 @@ namespace risk.control.system.Models
         public bool CanChangePassword { get; set; } = false;
         public bool BulkUpload { get; set; } = false;
         public string WhitelistIpAddress { get; set; } = "::1;202.7.251.53";
-        //public string? WhitelistIpAddressRange { get; set; } = default!;
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
 
         [DataType(DataType.DateTime)]
         public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(10);
-        [Range(10, 50)]
-        public int TotalCreatedClaimAllowed { get; set; } = 50;
-        public int TotalToAssignMaxAllowed { get; set; } = 50;
+        [Range(1, 50)]
+        public int TotalCreatedClaimAllowed { get; set; } = 10;
+        public int TotalToAssignMaxAllowed { get; set; } = 10;
         public bool Deleted { get; set; } = false;
         public bool HasClaims { get; set; } = false;
         public bool AiEnabled { get; set; } = false;
@@ -112,6 +95,16 @@ namespace risk.control.system.Models
         public bool UpdateAgentAnswer { get; set; } = true;
 
         public bool HasSampleData { get; set; } = true;
+        [NotMapped]
+        public IFormFile? Document { get; set; }
+        [NotMapped]
+        public long SelectedPincodeId { get; set; }
+        [NotMapped]
+        public long SelectedDistrictId { get; set; }
+        [NotMapped]
+        public long SelectedStateId { get; set; }
+        [NotMapped]
+        public long SelectedCountryId { get; set; }
         public override string ToString()
         {
             return $"Insurance Company Information:\n" +

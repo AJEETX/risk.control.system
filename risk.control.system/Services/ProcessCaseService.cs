@@ -137,7 +137,7 @@ namespace risk.control.system.Services
 
                 if (caseTask == null || !caseTask.IsValidCaseData()) return 0; // Handle missing claim
 
-                string pinCode2Verify = caseTask.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
+                var pinCode2Verify = caseTask.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
                     ? caseTask.CustomerDetail?.PinCode?.Code
                     : caseTask.BeneficiaryDetail?.PinCode?.Code;
 
@@ -205,7 +205,7 @@ namespace risk.control.system.Services
                     .ThenInclude(c => c.PinCode)
             .FirstOrDefaultAsync(c => c.Id == caseId);
 
-            string pinCode2Verify = caseTask.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
+            var pinCode2Verify = caseTask.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING
                 ? caseTask.CustomerDetail?.PinCode?.Code
                 : caseTask.BeneficiaryDetail?.PinCode?.Code;
 
