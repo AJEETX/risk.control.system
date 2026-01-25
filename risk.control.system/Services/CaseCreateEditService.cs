@@ -83,10 +83,10 @@ namespace risk.control.system.Services
             };
             return new CreateCaseViewModel
             {
-                PolicyDetail = new PolicyDetailDto
+                PolicyDetailDto = new PolicyDetailDto
                 {
                     ContractNumber = policy.ContractNumber,
-                    InsuranceType = policy.InsuranceType,
+                    InsuranceType = policy.InsuranceType.Value,
                     InvestigationServiceTypeId = policy.InvestigationServiceTypeId,
                     CaseEnablerId = policy.CaseEnablerId,
                     SumAssuredValue = policy.SumAssuredValue,
@@ -103,12 +103,12 @@ namespace risk.control.system.Services
 
             validateImageService.ValidateImage(model.Document, errors);
 
-            ValidateDates(model.PolicyDetail, errors);
+            ValidateDates(model.PolicyDetailDto, errors);
 
             if (errors.Any())
                 return (false, null, null, errors);
 
-            Sanitize(model.PolicyDetail);
+            Sanitize(model.PolicyDetailDto);
 
             var caseDetail = await _addInvestigationService.CreateCase(userEmail, model);
             return caseDetail == null
@@ -143,12 +143,12 @@ namespace risk.control.system.Services
             {
                 validateImageService.ValidateImage(model.Document, errors);
             }
-            ValidateDates(model.PolicyDetail, errors);
+            ValidateDates(model.PolicyDetailDto, errors);
 
             if (errors.Any())
                 return (false, null, errors);
 
-            Sanitize(model.PolicyDetail);
+            Sanitize(model.PolicyDetailDto);
 
             var caseDetail = await _addInvestigationService.EditCase(userEmail, model);
             return caseDetail == null
@@ -169,10 +169,10 @@ namespace risk.control.system.Services
             var model = new EditPolicyDto
             {
                 Id = caseTask.Id,
-                PolicyDetail = new PolicyDetailDto
+                PolicyDetailDto = new PolicyDetailDto
                 {
                     ContractNumber = caseTask.PolicyDetail.ContractNumber,
-                    InsuranceType = caseTask.PolicyDetail.InsuranceType,
+                    InsuranceType = caseTask.PolicyDetail.InsuranceType.Value,
                     InvestigationServiceTypeId = caseTask.PolicyDetail.InvestigationServiceTypeId,
                     CaseEnablerId = caseTask.PolicyDetail.CaseEnablerId,
                     SumAssuredValue = caseTask.PolicyDetail.SumAssuredValue,

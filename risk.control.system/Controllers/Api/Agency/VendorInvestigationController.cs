@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 

@@ -137,7 +137,6 @@ namespace risk.control.system.Controllers
                     System.IO.File.Delete(file.FilePath); // Delete the file from storage
                 }
                 file.Deleted = true;
-                companyUser.ClientCompany.TotalCreatedClaimAllowed += file.CaseIds.Count;
                 _context.FilesOnFileSystem.Update(file); 
                 await _context.SaveChangesAsync();
 

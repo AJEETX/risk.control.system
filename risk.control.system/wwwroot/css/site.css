@@ -3059,16 +3059,22 @@ th.col-match {
     margin-right: 2px;
     display:inline-block;
 }
-.upload-err {
+.upload-exceed {
     border: 2px solid red;
     cursor: text;
     width: 100px;
     margin-right: 7px;
     display: inline-block;
 }
+.upload-err {
+    border: 2px solid red;
+    width: 100px;
+    margin-right: 7px;
+    display: inline-block;
+}
 .upload-progress {
     width: 100px;
-    margin-right: 25px;
+    margin-right: 7px;
     padding-left: 30px;
     display: inline-block;
 }

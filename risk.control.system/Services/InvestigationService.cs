@@ -337,10 +337,11 @@ namespace risk.control.system.Services
 
             // 2. Base Query (Keep as IQueryable)
             var query = context.Investigations.Where(a => !a.Deleted && a.ClientCompanyId == companyUser.ClientCompanyId && a.CreatedUser == currentUserEmail);
+            
+            int totalRecords = await query.CountAsync();
 
             query = query.Where(a => CONSTANTS.CreatedAndDraftStatuses.Contains(a.SubStatus));
 
-            int totalRecords = await query.CountAsync();
 
             // Search filtering
             if (!string.IsNullOrEmpty(search))
@@ -366,8 +367,34 @@ namespace risk.control.system.Services
             {
                 query = query.Where(c => c.PolicyDetail.InsuranceType == Enum.Parse<InsuranceType>(caseType));  // Assuming CaseType is the field in your data model
             }
-           
 
+            // 4. Apply Sorting (In SQL)
+            bool isAsc = string.Equals(orderDir, "asc", StringComparison.OrdinalIgnoreCase);
+            query = orderColumn switch
+            {
+                1 => isAsc ? query.OrderBy(a => a.PolicyDetail.ContractNumber) : query.OrderByDescending(a => a.PolicyDetail.ContractNumber),
+                2 => isAsc ? query.OrderBy(a => (double)a.PolicyDetail.SumAssuredValue) : query.OrderByDescending(a => (double)a.PolicyDetail.SumAssuredValue),
+                3 => isAsc
+                    ? query.OrderBy(a =>
+                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
+                            ? a.CustomerDetail.PinCode.Code
+                            : a.BeneficiaryDetail.PinCode.Code)
+                    : query.OrderByDescending(a =>
+                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
+                            ? a.CustomerDetail.PinCode.Code
+                            : a.BeneficiaryDetail.PinCode.Code),
+                4 => isAsc ? query.OrderBy(a => a.ClientCompany.Name) : query.OrderByDescending(a => a.ClientCompany.Name),
+                5 => isAsc ? query.OrderBy(a => a.PolicyDetail.InsuranceType) : query.OrderByDescending(a => a.PolicyDetail.InsuranceType),
+                6 => isAsc ? query.OrderBy(a => a.CustomerDetail.Name) : query.OrderByDescending(a => a.CustomerDetail.Name),
+                7 => isAsc ? query.OrderBy(a => a.Status) : query.OrderByDescending(a => a.Status),
+                8 => isAsc ? query.OrderBy(a => a.BeneficiaryDetail.Name) : query.OrderByDescending(a => a.BeneficiaryDetail.Name),
+                9 => isAsc ? query.OrderBy(a => a.PolicyDetail.InvestigationServiceType.Name) : query.OrderByDescending(a => a.PolicyDetail.InvestigationServiceType.Name),
+                10 => isAsc ? query.OrderBy(a => a.ORIGIN) : query.OrderByDescending(a => a.ORIGIN),
+                11 => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created),
+                12 => isAsc ? query.OrderBy(a => a.Updated) : query.OrderByDescending(a => a.Updated),
+                // Default fallback (Usually ID or Created Date)
+                _ => isAsc ? query.OrderByDescending(a => a.Id) : query.OrderBy(a => a.Id)
+            };
             // 5. Paginate and Project (Only fetch what you need)
             var pagedRawData = await query
                 .Include(i => i.Vendor)
@@ -393,26 +420,7 @@ namespace risk.control.system.Services
                 .Take(length)
                 .ToListAsync();
             int recordsFiltered = await query.CountAsync();
-
-            // 4. Apply Sorting (In SQL)
-            bool isAsc = string.Equals(orderDir, "asc", StringComparison.OrdinalIgnoreCase);
-            query = orderColumn switch
-            {
-                1 => isAsc ? query.OrderBy(a => a.PolicyDetail.ContractNumber) : query.OrderByDescending(a => a.PolicyDetail.ContractNumber),
-                2 => isAsc ? query.OrderBy(a => (double)a.PolicyDetail.SumAssuredValue) : query.OrderByDescending(a => (double)a.PolicyDetail.SumAssuredValue),
-                3 => isAsc ? query.OrderBy(a => a.CustomerDetail.PinCode.Code) : query.OrderByDescending(a => a.CustomerDetail.PinCode.Code),
-                4 => isAsc ? query.OrderBy(a => a.ClientCompany.Name) : query.OrderByDescending(a => a.ClientCompany.Name),
-                5 => isAsc ? query.OrderBy(a => a.PolicyDetail.InsuranceType) : query.OrderByDescending(a => a.PolicyDetail.InsuranceType),
-                6 => isAsc ? query.OrderBy(a => a.CustomerDetail.Name) : query.OrderByDescending(a => a.CustomerDetail.Name),
-                7 => isAsc ? query.OrderBy(a => a.Status) : query.OrderByDescending(a => a.Status),
-                8 => isAsc ? query.OrderBy(a => a.BeneficiaryDetail.Name) : query.OrderByDescending(a => a.BeneficiaryDetail.Name),
-                9 => isAsc ? query.OrderBy(a => a.PolicyDetail.InvestigationServiceType.Name) : query.OrderByDescending(a => a.PolicyDetail.InvestigationServiceType.Name),
-                10 => isAsc ? query.OrderBy(a => a.ORIGIN) : query.OrderByDescending(a => a.ORIGIN),
-                11 => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created),
-                12 => isAsc ? query.OrderBy(a => a.Updated) : query.OrderByDescending(a => a.Updated),
-                // Default fallback (Usually ID or Created Date)
-                _ => isAsc ? query.OrderByDescending(a => a.Id) : query.OrderBy(a => a.Id)
-            };
+            
 
             var finalDataTasks = pagedRawData.Select(async a =>
             {
@@ -617,6 +625,15 @@ namespace risk.control.system.Services
             {
                 0 => isAsc ? query.OrderBy(a => a.PolicyDetail.ContractNumber) : query.OrderByDescending(a => a.PolicyDetail.ContractNumber),
                 1 => isAsc ? query.OrderBy(a => (double)a.PolicyDetail.SumAssuredValue) : query.OrderByDescending(a => (double)a.PolicyDetail.SumAssuredValue),
+                3 => isAsc
+                    ? query.OrderBy(a =>
+                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
+                            ? a.CustomerDetail.PinCode.Code
+                            : a.BeneficiaryDetail.PinCode.Code)
+                    : query.OrderByDescending(a =>
+                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
+                            ? a.CustomerDetail.PinCode.Code
+                            : a.BeneficiaryDetail.PinCode.Code),
                 6 => isAsc ? query.OrderBy(a => a.CustomerDetail.Name) : query.OrderByDescending(a => a.CustomerDetail.Name),
                 8 => isAsc ? query.OrderBy(a => a.BeneficiaryDetail.Name) : query.OrderByDescending(a => a.BeneficiaryDetail.Name),
                 9 => isAsc ? query.OrderBy(a => $"{a.PolicyDetail.InsuranceType.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})") : query.OrderByDescending(a => $"{a.PolicyDetail.InsuranceType.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})"),

@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred");
+                logger.LogError(ex, "Error occurred to Print Pdf for {CaseId} by {UserName}", id, HttpContext.User.Identity.Name);
                 notifyService.Error("Error occurred. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

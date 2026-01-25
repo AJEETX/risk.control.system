@@ -36,7 +36,6 @@ namespace risk.control.system.Controllers
         private readonly IAgencyCreateEditService agencyCreateEditService;
         private readonly INotyfService notifyService;
         private readonly IFeatureManager featureManager;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ILogger<AgencyController> logger;
         private string portal_base_url = string.Empty;
 
@@ -56,7 +55,6 @@ namespace risk.control.system.Controllers
             this.agencyCreateEditService = agencyCreateEditService;
             this.notifyService = notifyService;
             this.featureManager = featureManager;
-            this.httpContextAccessor = httpContextAccessor;
             this.logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -96,7 +94,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency");
+                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!...Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -129,7 +127,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Profile));
             }
@@ -165,7 +163,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Editing Agency");
+                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error Editing Agency. Try again.");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }
@@ -237,7 +235,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating user.");
+                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error creating user. Try again.");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }
@@ -296,7 +294,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Creating User. Try again.");
+                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error Creating User. Try again.");
             }
             return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -325,7 +323,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating User.");
+                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
             }
             notifyService.Error("OOPs !!!.Error creating User. Try again");
             return RedirectToAction(nameof(AgencyController.CreateUser), "Agency");
@@ -362,7 +360,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing User.");
+                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error editing User. Try again.");
             }
             return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -398,7 +396,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting user.");
+                logger.LogError(ex, "Error getting {UserId} for {UserName}", userId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS!!!..Error deleting user. Try again");
                 return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
@@ -434,7 +432,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting user.");
+                logger.LogError(ex, "Error deleting {UserName}", email);
                 notifyService.Error("OOPS!!!..Error deleting user. Try again");
                 return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
@@ -477,7 +475,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating service");
+                logger.LogError(ex, "Error creating service for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("Error creating service.Try again.");
                 return RedirectToAction(nameof(AgencyController.Service), "Agency");
             }
@@ -504,7 +502,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating service");
+                logger.LogError(ex, "Error creating service for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("Error creating service. Try again.");
             }
             return RedirectToAction(nameof(Service), "Agency");
@@ -536,7 +534,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing service");
+                logger.LogError(ex, "Error editing {SserviceId} for {UserName}",id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Custom($"Error editing service. Try again", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -562,7 +560,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing service.");
+                logger.LogError(ex, "Error editing {ServiceId} for {UserName}", vendorInvestigationServiceTypeId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-truck");
             }
             return RedirectToAction(nameof(Service), "Agency");
@@ -600,7 +598,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting service.");
+                logger.LogError(ex, "Error getting {ServiceId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error($"Error deleting service. Try again");
                 return RedirectToAction(nameof(Service), "Agency");
             }
@@ -634,7 +632,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting service.");
+                logger.LogError(ex, "Error deleting {ServiceId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error($"Error deleting service. Try again");
                 return RedirectToAction(nameof(Service), "Agency");
             }
@@ -668,7 +666,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.StackTrace);
+                logger.LogError(ex, "Error getting {ServiceId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("Service Not Found.");
                 return RedirectToAction(nameof(Service));
             }

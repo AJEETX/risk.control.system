@@ -5,7 +5,7 @@ namespace risk.control.system.Models.ViewModel
     public class CreateCaseViewModel
     {
         [Required]
-        public PolicyDetailDto PolicyDetail { get; set; } = new();
+        public PolicyDetailDto PolicyDetailDto { get; set; } = new();
 
         [Required]
         [Display(Name = "Case Document")]
@@ -16,7 +16,7 @@ namespace risk.control.system.Models.ViewModel
     {
         public long Id { get; set; }   // InvestigationTask Id
 
-        public PolicyDetailDto PolicyDetail { get; set; }
+        public required PolicyDetailDto PolicyDetailDto { get; set; }
 
         // Only used if user uploads a new file
         public IFormFile? Document { get; set; }
@@ -32,7 +32,7 @@ namespace risk.control.system.Models.ViewModel
         [Display(Name = "Case number")]
         public string ContractNumber { get; set; } = string.Empty;
 
-        public InsuranceType? InsuranceType { get; set; } = Models.InsuranceType.CLAIM;
+        public InsuranceType InsuranceType { get; set; } = InsuranceType.CLAIM;
 
         [Required]
         [Display(Name = "Investigation type")]

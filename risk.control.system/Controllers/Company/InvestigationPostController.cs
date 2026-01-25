@@ -28,9 +28,8 @@ namespace risk.control.system.Controllers.Company
         private readonly IUploadFileService uploadFileService;
         private readonly IProcessCaseService processCaseService;
         private readonly IMailService mailboxService;
-        private readonly IFtpService ftpService;
+        private readonly IFileService ftpService;
         private readonly INotyfService notifyService;
-        private readonly IProgressService progressService;
         private readonly ILogger<InvestigationPostController> logger;
         private readonly IBackgroundJobClient backgroundJobClient;
 
@@ -38,10 +37,9 @@ namespace risk.control.system.Controllers.Company
             IUploadFileService uploadFileService,
             IProcessCaseService processCaseService,
             IMailService mailboxService,
-            IFtpService ftpService,
+            IFileService ftpService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
-            IProgressService progressService,
             ILogger<InvestigationPostController> logger,
             IBackgroundJobClient backgroundJobClient)
         {
@@ -51,7 +49,6 @@ namespace risk.control.system.Controllers.Company
             this.mailboxService = mailboxService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
-            this.progressService = progressService;
             this.logger = logger;
             this.backgroundJobClient = backgroundJobClient;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
@@ -81,17 +78,15 @@ namespace risk.control.system.Controllers.Company
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                
-
                 var uploadId = await uploadFileService.UploadFile(currentUserEmail, postedFile, CREATEDBY.AUTO, model.UploadAndAssign);
                 var jobId = backgroundJobClient.Enqueue(() => ftpService.StartFileUpload(currentUserEmail, uploadId, baseUrl, model.UploadAndAssign));
                 if (!model.UploadAndAssign)
                 {
-                    notifyService.Custom($"Upload in progress ", 3, "#17A2B8", "fa fa-upload");
+                    notifyService.Custom($"Upload...", 3, "#17A2B8", "fa fa-upload");
                 }
                 else
                 {
-                    notifyService.Custom($"Direct Assign in progress ", 5, "#dc3545", "fa fa-upload");
+                    notifyService.Custom($"Assign...", 5, "#dc3545", "fa fa-upload");
 
                 }
 
@@ -106,51 +101,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        [HttpGet]
-        public IActionResult GetJobStatus()
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var jobIds = progressService.GetUploadJobIds(currentUserEmail);
-
-            if (jobIds == null || jobIds.Count == 0)
-            {
-                return Json(new { jobId = "", status = "Not Found" });
-            }
-
-            using (var connection = JobStorage.Current.GetConnection())
-            {
-                foreach (var jobId in jobIds)
-                {
-                    var state = connection.GetStateData(jobId);
-                    string jobStatus = state?.Name ?? "Not Found";
-
-                    // Return first active job (Processing or Enqueued)
-                    if (jobStatus == "Processing" || jobStatus == "Enqueued")
-                    {
-                        return Json(new { jobId, status = jobStatus });
-                    }
-                }
-            }
-
-            // If no active jobs are found, return the last completed job
-            return Json(new { jobId = jobIds.Last(), status = "Completed or Failed" });
-        }
-
-        public IActionResult GetJobProgress(int jobId)
-        {
-            if(!ModelState.IsValid)
-            {
-                return Json(new { progress = 0 });
-            }
-            int progress = progressService.GetProgress(jobId);
-            return Json(new { progress });
-        }
-
-        public IActionResult GetAssignmentProgress(string jobId)
-        {
-            int progress = progressService.GetAssignmentProgress(jobId);
-            return Json(new { progress });
-        }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -225,7 +175,6 @@ namespace risk.control.system.Controllers.Company
                     _context.Investigations.Update(claimsInvestigation);
                 }
                 var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-                companyUser.ClientCompany.TotalCreatedClaimAllowed += request.claims.Count;
 
                 await _context.SaveChangesAsync();
 
@@ -263,7 +212,6 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(InvestigationController.New), "Investigation");
                 }
                 var jobId = backgroundJobClient.Enqueue(() => processCaseService.BackgroundAutoAllocation(distinctClaims, currentUserEmail, baseUrl));
-                progressService.AddAssignmentJob(jobId, currentUserEmail);
                 notifyService.Custom($"Assignment of <b> {distinctClaims.Count}</b> Case(s) started", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CaseActiveController.Active), "CaseActive", new { jobId });
             }

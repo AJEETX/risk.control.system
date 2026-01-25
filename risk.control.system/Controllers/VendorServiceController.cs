@@ -1,17 +1,15 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
-using risk.control.system.AppConstant;
-
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
@@ -74,7 +72,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting agency service");
+                logger.LogError(ex, "Error getting agency {ServiceId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -100,7 +98,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting agency service");
+                logger.LogError(ex, "Error getting {AgencyId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -127,7 +125,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating service");
+                logger.LogError(ex, "Error creating service for {AgencyId} by {UserName}", VendorId, User.Identity.Name);
                 notifyService.Error("Error creating service. Try again.");
             }
             return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = service.VendorId });
@@ -167,7 +165,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting agency service.");
+                logger.LogError(ex, "Error getting service for {ServiceId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -193,7 +191,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing service.");
+                logger.LogError(ex, "Error editing service for {ServiceId} by {UserName}", VendorInvestigationServiceTypeId, User.Identity.Name);
                 notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-truck");
             }
             return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = service.VendorId });
@@ -236,7 +234,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting agency service");
+                logger.LogError(ex, "Error getting service for {ServiceId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -270,7 +268,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting agency service");
+                logger.LogError(ex, "Error deleting service for {ServiceId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error deleting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

@@ -1,17 +1,16 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
-
+﻿using Amazon.Rekognition.Model;
+using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
-
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.AppConstant;
 
 namespace risk.control.system.Controllers
 {
@@ -97,7 +96,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error getting {UserId} for {UserName}", userId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -136,7 +135,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error editing {UserId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
             }
             return RedirectToAction(nameof(Index), "Dashboard");
@@ -157,7 +156,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -190,7 +189,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while changing password");
+                logger.LogError(ex, "Error for changing password by {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
