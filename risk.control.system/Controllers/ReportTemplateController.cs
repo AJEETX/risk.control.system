@@ -211,7 +211,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Issue cloning Report");
+                logger.LogError(ex, "Issue cloning {TemplateId} by {UserName}",templateId, HttpContext.User?.Identity?.Name);
                 notifyService.Error($"Issue cloning Report. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
@@ -241,7 +241,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Report activation failed.");
+                logger.LogError(ex, "Report activation failed for {TemplateId} by {UserName}.",id, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Report activation failed! Try again" });
             }
         }
@@ -281,7 +281,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception to delete Template");
+                logger.LogError(ex, "Exception to delete for {TemplateId} by {UserName}.", id, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Exception to delete Template" });
             }
         }
@@ -336,7 +336,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Add Question Error.");
+                logger.LogError(ex, "Add Question Error for {LocationId} by {UserName}.", locationId, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Add Question Error." });
             }
         }
@@ -371,7 +371,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Question Delete");
+                logger.LogError(ex, "Error Question Delete for {QueationId} {LocationId} by {UserName}.",id, locationId, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Error Question Delete." });
             }
         }
@@ -416,7 +416,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Location Delete.");
+                logger.LogError(ex, "Error Location Delete for {LocationId} by {UserName}.",id, HttpContext.User.Identity.Name);
                 return Json(new { success = false, message = "Error Location Delete." });
             }
         }
@@ -486,7 +486,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Location Save.");
+                logger.LogError(ex, "Error Location Ssave for {LocationId} by {UserName}.", model.LocationId, HttpContext.User.Identity.Name);
                 return Json(new { success = false, message = "Error Location Save." });
             }
         }
@@ -576,6 +576,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, "Error Location Clone for {ReportTemplateId} {LocationId} by {UserName}.", reportTemplateId, locationId, HttpContext.User.Identity.Name);
                 return Json(new { success = false, message = ex.Message });
             }
         }

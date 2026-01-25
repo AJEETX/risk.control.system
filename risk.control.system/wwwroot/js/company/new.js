@@ -32,7 +32,7 @@
     });
     var table = $("#customerTableAuto").DataTable({
         ajax: {
-            url: window.location.origin + '/api/Investigation/GetAuto',
+            url: '/api/Investigation/GetAuto',
             type: 'GET',
             dataType: 'json',
             dataSrc: function (json) {
@@ -510,9 +510,8 @@
 
                             var article = document.getElementById("article");
                             if (article) {
-                                var nodes = article.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+                                for (var i = 0; i < (article.getElementsByTagName('*')).length; i++) {
+                                    (article.getElementsByTagName('*'))[i].disabled = true;
                                 }
                             }
                         }
@@ -752,30 +751,6 @@
     });
 });
 
-function checkUploadJobStatus() {
-    $.ajax({
-        url: '/CreatorPost/GetJobStatus',
-        type: 'GET',
-        success: function (response) {
-            console.log("Job Status:", response.status);
-
-            if (response.status === "Processing" || response.status === "Enqueued") {
-                setTimeout(function () {
-                    checkUploadJobStatus();
-                }, 2000); // Check every 5 seconds
-            } else if (response.status === "Completed") {
-                console.log("Job Completed:", response.status);
-                $('#refreshTable').click(); // Refresh the table after completion
-            }
-            else {
-                console.error("Errored job status:", response.status);
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error checking job status:", error);
-        }
-    });
-}
 function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI

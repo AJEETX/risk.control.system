@@ -152,7 +152,7 @@ namespace risk.control.system.Controllers.Company
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var model = await createCreateEditService.AddCasePolicy(userEmail);
-                    await LoadDropDowns(model.PolicyDetail, userEmail);
+                    await LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
                 }
                 else
@@ -185,7 +185,7 @@ namespace risk.control.system.Controllers.Company
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Please correct the errors");
-                    await LoadDropDowns(model.PolicyDetail, userEmail);
+                    await LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
                 }
                 var result = await createCreateEditService.CreateAsync(userEmail, model);
@@ -196,7 +196,7 @@ namespace risk.control.system.Controllers.Company
                         ModelState.AddModelError(error.Key, error.Value);
 
                     notifyService.Error("Please fix validation errors");
-                    await LoadDropDowns(model.PolicyDetail, userEmail);
+                    await LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
                 }
                 notifyService.Success($"Policy #{result.CaseId} created successfully");
@@ -259,7 +259,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreateCase));
                 }
                 var userEmail = HttpContext.User?.Identity?.Name;
-                await LoadDropDowns(model.PolicyDetail, userEmail);
+                await LoadDropDowns(model.PolicyDetailDto, userEmail);
 
                 var claimsPage = new MvcBreadcrumbNode("New", "Investigation", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("New", "Investigation", "Assign") { Parent = claimsPage, };
@@ -289,7 +289,7 @@ namespace risk.control.system.Controllers.Company
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Please correct the errors");
-                    await LoadDropDowns(model.PolicyDetail, userEmail);
+                    await LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
                 }
                 var result = await createCreateEditService.EditAsync(userEmail, model);
@@ -300,7 +300,7 @@ namespace risk.control.system.Controllers.Company
                         ModelState.AddModelError(error.Key, error.Value);
 
                     notifyService.Error("Please fix validation errors");
-                    await LoadDropDowns(model.PolicyDetail, userEmail);
+                    await LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
                 }
                 notifyService.Custom($"Policy <b>#{result.CaseId}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");

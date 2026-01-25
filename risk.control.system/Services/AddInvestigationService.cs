@@ -48,20 +48,20 @@ namespace risk.control.system.Services
             {
                 var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-                var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetail.ContractNumber);
+                var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetailDto.ContractNumber);
                 var caseTask = new InvestigationTask
                 {
                     PolicyDetail = new PolicyDetail
                     {
-                        ContractNumber = model.PolicyDetail.ContractNumber,
-                        InsuranceType = model.PolicyDetail.InsuranceType,
-                        InvestigationServiceTypeId = model.PolicyDetail.InvestigationServiceTypeId,
-                        CaseEnablerId = model.PolicyDetail.CaseEnablerId,
-                        SumAssuredValue = model.PolicyDetail.SumAssuredValue,
-                        ContractIssueDate = model.PolicyDetail.ContractIssueDate,
-                        DateOfIncident = model.PolicyDetail.DateOfIncident,
-                        CauseOfLoss = model.PolicyDetail.CauseOfLoss,
-                        CostCentreId = model.PolicyDetail.CostCentreId,
+                        ContractNumber = model.PolicyDetailDto.ContractNumber,
+                        InsuranceType = model.PolicyDetailDto.InsuranceType,
+                        InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId,
+                        CaseEnablerId = model.PolicyDetailDto.CaseEnablerId,
+                        SumAssuredValue = model.PolicyDetailDto.SumAssuredValue,
+                        ContractIssueDate = model.PolicyDetailDto.ContractIssueDate,
+                        DateOfIncident = model.PolicyDetailDto.DateOfIncident,
+                        CauseOfLoss = model.PolicyDetailDto.CauseOfLoss,
+                        CostCentreId = model.PolicyDetailDto.CostCentreId,
                     }
                 };
 
@@ -106,15 +106,15 @@ namespace risk.control.system.Services
                     .Include(c => c.ClientCompany)
                         .FirstOrDefaultAsync(c => c.Id == dto.Id);
 
-                existingPolicy.PolicyDetail.ContractNumber = dto.PolicyDetail.ContractNumber;
-                existingPolicy.PolicyDetail.InsuranceType = dto.PolicyDetail.InsuranceType;
-                existingPolicy.PolicyDetail.InvestigationServiceTypeId = dto.PolicyDetail.InvestigationServiceTypeId;
-                existingPolicy.PolicyDetail.CaseEnablerId = dto.PolicyDetail.CaseEnablerId;
-                existingPolicy.PolicyDetail.SumAssuredValue = dto.PolicyDetail.SumAssuredValue;
-                existingPolicy.PolicyDetail.ContractIssueDate = dto.PolicyDetail.ContractIssueDate;
-                existingPolicy.PolicyDetail.DateOfIncident = dto.PolicyDetail.DateOfIncident;
-                existingPolicy.PolicyDetail.CauseOfLoss = dto.PolicyDetail.CauseOfLoss;
-                existingPolicy.PolicyDetail.CostCentreId = dto.PolicyDetail.CostCentreId;
+                existingPolicy.PolicyDetail.ContractNumber = dto.PolicyDetailDto.ContractNumber;
+                existingPolicy.PolicyDetail.InsuranceType = dto.PolicyDetailDto.InsuranceType;
+                existingPolicy.PolicyDetail.InvestigationServiceTypeId = dto.PolicyDetailDto.InvestigationServiceTypeId;
+                existingPolicy.PolicyDetail.CaseEnablerId = dto.PolicyDetailDto.CaseEnablerId;
+                existingPolicy.PolicyDetail.SumAssuredValue = dto.PolicyDetailDto.SumAssuredValue;
+                existingPolicy.PolicyDetail.ContractIssueDate = dto.PolicyDetailDto.ContractIssueDate;
+                existingPolicy.PolicyDetail.DateOfIncident = dto.PolicyDetailDto.DateOfIncident;
+                existingPolicy.PolicyDetail.CauseOfLoss = dto.PolicyDetailDto.CauseOfLoss;
+                existingPolicy.PolicyDetail.CostCentreId = dto.PolicyDetailDto.CostCentreId;
 
                 existingPolicy.IsNew = true;
                 existingPolicy.Updated = DateTime.Now;
@@ -122,7 +122,7 @@ namespace risk.control.system.Services
                 existingPolicy.ORIGIN = ORIGIN.USER;
                 if (dto.Document is not null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(dto.Document, "Case", dto.PolicyDetail.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(dto.Document, "Case", dto.PolicyDetailDto.ContractNumber);
 
                     existingPolicy.PolicyDetail.DocumentPath = relativePath;
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);

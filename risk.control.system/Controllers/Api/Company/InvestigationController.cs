@@ -126,7 +126,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting uploaded case by {uploadId} for user {UserEmail}", uploadId, userEmail);
+                logger.LogError(ex, "Error getting uploaded case by {UploadId} for user {UserEmail}", uploadId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

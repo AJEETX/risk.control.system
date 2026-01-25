@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting case detail for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting case detail {PolicyId} for user {UserEmail}",id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting case notes for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting case notes for {ClaimId} for user {UserEmail}", claimId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -152,7 +152,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting customer for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting {CustomerId} for user {UserEmail}",id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -195,7 +195,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting beneficiary for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting {BeneficiaryId} for user {UserEmail}",id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -235,7 +235,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting customer address map for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting {CustomerId} address map for user {UserEmail}",id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -275,7 +275,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting beneficiary address map for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting {BeneficiaryId} address map for user {UserEmail}",id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -347,7 +347,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting agent detail for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting {CaseId} and {FaceId} for user {UserEmail}", caseId, faceId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -419,7 +419,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting face detail for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting {CaseId} and {FaceId} for user {UserEmail}", caseId, faceId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -490,7 +490,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting document detail for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting {CaseId} and {DocumentId} for user {UserEmail}", caseId, docId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -563,7 +563,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting media detail for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting {CaseId} and {MediaId} for user {UserEmail}", caseId, docId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

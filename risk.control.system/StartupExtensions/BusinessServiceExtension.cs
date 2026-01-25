@@ -128,6 +128,15 @@ public static class BusinessServiceExtension
             options.KnownProxies.Clear();
         });
         services.AddHttpClient();
+        services.AddScoped<IPolicyProcessor, PolicyProcessor>();
+        services.AddScoped<IVerifierProcessor, VerifierProcessor>();
+        services.AddScoped<ICustomerValidator, CustomerValidator>();
+        services.AddScoped<IUploadFileDataProcessor, UploadFileDataProcessor>();
+        services.AddScoped<IExtractorService, ExtractorService>();
+        services.AddScoped<IBeneficiaryValidator, BeneficiaryValidator>();
+        services.AddScoped<ILicenseService, LicenseService>();
+        services.AddScoped<IUploadFileInitiator, UploadFileInitiator>();
+        services.AddScoped<IFileUploadProcessor, FileUploadProcessor>();
         services.AddScoped<IUploadFileStatusService, UploadFileStatusService>();
         services.AddScoped<ICsvFileReaderService, CsvFileReaderService>();
         services.AddScoped<IUploadFileService, UploadFileService>();
@@ -182,7 +191,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IProcessCaseService, ProcessCaseService>();
         services.AddScoped<IInvestigationService, InvestigationService>();
         services.AddScoped<IHangfireJobService, HangfireJobService>();
-        services.AddScoped<IProgressService, ProgressService>();
         services.AddScoped<ICaseCreationService, CaseCreationService>();
         services.AddScoped<ICaseDetailCreationService, CaseDetailCreationService>();
         services.AddScoped<ICustomerCreationService, CustomerCreationService>();
@@ -205,7 +213,7 @@ public static class BusinessServiceExtension
         services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
         services.AddScoped<ICaseService, CaseService>();
         services.AddScoped<IAccountService, AccountService>();
-        services.AddScoped<IFtpService, FtpService>();
+        services.AddScoped<IFileService, FileService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IFaceMatchService, FaceMatchService>();
         services.AddScoped<IGoogleService, GoogleService>();

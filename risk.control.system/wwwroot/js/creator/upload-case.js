@@ -132,11 +132,11 @@
                 "render": function (data, type, row) {
                     var img = '';
                     var title = row.directAssign ? "Assigned" : "Uploaded";
-                    if (row.status == 'Error' && row.recordCount == 0) {
-                        img += `<div class='btn-xs upload-err' title='Limit exceeded' data-bs-toggle='tooltip'> <i class='fas fa-times-circle i-orangered'></i> Limit exceed</div>`;
+                    if (row.status == 'Error' && row.recordCount == 0 && row.message != "Error uploading the file") {
+                        img += `<div class='btn-xs upload-exceed' title='Limit exceeded' data-bs-toggle='tooltip'> <i class='fas fa-times-circle i-orangered'></i> Limit exceed</div>`;
                     }
-                    else if (row.hasError) {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger' title='Download Error file' data-bs-toggle='tooltip'> <i class='fa fa-download'></i> Error File</a>`;
+                    else if (row.hasError && row.message == "Error uploading the file") {
+                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger upload-err' title='Download Error file' data-bs-toggle='tooltip'> <i class='fa fa-download'></i> Error File</a>`;
                     }
                     
                     else if (!row.hasError && row.status == 'Completed') {

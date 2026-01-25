@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {UserName}.", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {UserName}.", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {SelectedCase} for {UserName}.", selectedcase, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -132,7 +132,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {SelectedCase} for {UserName}.", selectedcase, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -174,7 +174,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {SelectedCase} for {UserName}.", selectedcase, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -215,7 +215,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -243,7 +243,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -285,7 +285,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -342,7 +342,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -373,7 +373,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
@@ -114,7 +115,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {UserName}.", agentEmail);
                 return BadRequest($"Agent does not exist or Error");
             }
         }
@@ -140,7 +141,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {Mobile}.", mobile);
                 return BadRequest($"mobile number and/or Agent does not exist");
             }
         }
@@ -195,7 +196,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {Mobile}.",request.Mobile);
                 return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
@@ -248,7 +249,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {Uid}.", request.Uid);
                 return BadRequest("face matcherror " + ex.StackTrace);
             }
         }
@@ -395,8 +396,8 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                return StatusCode(500, ex.StackTrace);
+                logger.LogError(ex, "Error occurred for {Agent}.", email);
+                return StatusCode(500, $"Error occurred for {email}");
             }
         }
 
@@ -470,7 +471,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {Email}.", email);
                 return StatusCode(500);
             }
         }
@@ -583,7 +584,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
                 return StatusCode(500);
             }
         }
@@ -610,7 +611,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
                 return StatusCode(500);
             }
         }
@@ -660,7 +661,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {Email}.", data.Email);
                 return StatusCode(500);
             }
         }
@@ -700,7 +701,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {Email}.", data.Email);
                 return StatusCode(500);
             }
         }
@@ -746,7 +747,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {Email}.", data.Email);
                 return StatusCode(500);
             }
         }
@@ -778,7 +779,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {CaseId} for {Email}.",caseId, email);
                 return StatusCode(500);
             }
         }
@@ -819,7 +820,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for {Email}.", data.Email);
                 return StatusCode(500);
             }
         }

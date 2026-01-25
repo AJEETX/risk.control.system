@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in KeepSessionAlive");
+                _logger.LogError(ex, "Error in KeepSessionAlive for {UserName}", User.Identity.Name ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
             }
         }
@@ -172,36 +172,40 @@ namespace risk.control.system.Controllers
         {
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
                 return await PrepareInvalidView(model, "Bad Request.");
-
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-
-            if (!result.Succeeded)
-                return await PrepareInvalidView(model, loginService.GetErrorMessage(result));
-
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-                return await PrepareInvalidView(model, "User can't login.");
-            var (isAuthorized, displayName, isAdmin) = await loginService.GetUserStatusAsync(user, agent_login);
-
-            if (!isAuthorized)
-                return await PrepareInvalidView(model, "Account inactive or unauthorized.");
-
-            bool forceChangeEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
-
-            if (!isAdmin && forceChangeEnabled && user.IsPasswordChangeRequired)
+            try
             {
-                return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+
+                if (!result.Succeeded)
+                    return await PrepareInvalidView(model, loginService.GetErrorMessage(result));
+
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                    return await PrepareInvalidView(model, "User can't login.");
+                var (isAuthorized, displayName, isAdmin) = await loginService.GetUserStatusAsync(user, agent_login);
+
+                if (!isAuthorized)
+                    return await PrepareInvalidView(model, "Account inactive or unauthorized.");
+
+                bool forceChangeEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+
+                if (!isAdmin && forceChangeEnabled && user.IsPasswordChangeRequired)
+                {
+                    return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
+                }
+
+                await loginService.SignInWithTimeoutAsync(user);
+
+                notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
+
+                return RedirectToAction("Index", "Dashboard");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in KeepSessionAlive for {UserName}", User.Identity.Name ?? "Anonymous");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
             }
 
-            await loginService.SignInWithTimeoutAsync(user);
-
-            if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-            {
-                notifyService.Success($"Welcome back <b>{displayName}</b>");
-                return LocalRedirect(model.ReturnUrl ?? "/");
-            }
-            notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
-            return RedirectToAction("Index", "Dashboard");
         }
         [HttpGet]
         [AllowAnonymous]
@@ -269,7 +273,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while changing password");
+                _logger.LogError(ex, "Error occurred while changing password for {UserName}", User.Identity.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Login));
             }
@@ -309,7 +313,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in Forgot Password");
+                _logger.LogError(ex, "Error in Forgot Password for {UserName}", input?.Email ?? "Anonymous"); ;
                 throw;
             }
             

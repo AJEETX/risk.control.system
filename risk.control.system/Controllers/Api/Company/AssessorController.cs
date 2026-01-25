@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting review for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting review for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting approved cases for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting approved cases for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting rejected cases for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting rejected cases for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

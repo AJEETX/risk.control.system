@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting companies for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error getting companies for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -109,7 +109,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail ?? "Anonymous");
                 return null;
             }
         }
@@ -136,7 +136,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -188,7 +188,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting available agencies for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error getting available agencies for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting agency services for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error getting agency services for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

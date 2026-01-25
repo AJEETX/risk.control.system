@@ -18,6 +18,7 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace risk.control.system.Controllers
 {
@@ -114,7 +115,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Company.");
+                logger.LogError(ex, "Error getting Company for {UserName}.", HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting Company. Try again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -150,7 +151,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Company.");
+                logger.LogError(ex, "Error getting Company for {UserName}.", HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting Company. Try again");
                 return RedirectToAction(nameof(CompanyProfile));
             }
@@ -184,7 +185,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing Company.");
+                logger.LogError(ex, "Error editing {CompanyId} for {UserName}.",model.ClientCompanyId, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error editing Company. Try again.");
                 return RedirectToAction(nameof(CompanyProfile));
             }
@@ -262,7 +263,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating user.");
+                logger.LogError(ex, "Error creating user for {UserName}.", HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error creating user. Try again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -336,7 +337,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating user.");
+                logger.LogError(ex, "Error creating user for {UserName}.", HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error creating user. Try again");
             }
             return RedirectToAction(nameof(CompanyController.Users), "Company");
@@ -395,7 +396,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing user.");
+                logger.LogError(ex, "Error editing {UserId} for {UserName}.",userId, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error editing user. Try again");
             }
             return RedirectToAction(nameof(CompanyController.Users), "Company");
@@ -433,7 +434,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error to create Company user.");
+                logger.LogError(ex, "Error editing {UserId} for {UserName}.", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error($"Error to create Company user. Try again.", 3);
             }
             return RedirectToAction(nameof(CompanyController.Users), "Company");
@@ -462,7 +463,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting user.");
+                logger.LogError(ex, "Error getting {UserId} for {UserName}.", userId, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting user. Try again");
                 return RedirectToAction(nameof(Users));
             }
@@ -494,7 +495,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting user.");
+                logger.LogError(ex, "Error deleting {UserId} for {UserName}.", email, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting user. Try again");
                 return RedirectToAction(nameof(Users));
             }
@@ -565,7 +566,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency.");
+                logger.LogError(ex, "Error getting {AgencyId} for {UserName}.", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting Agency. Try again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -598,7 +599,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Agency Not Found.");
+                logger.LogError(ex, "Error getting {AgencyId} for {UserName}.", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Agency Not Found. Try again.");
                 return RedirectToAction("EmpanelledVendors", "Vendors");
             }
@@ -641,7 +642,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing agency.");
+                logger.LogError(ex, "Error editing {AgencyId} for {UserName}.", vendorId, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error editing agency. Try again.");
             }
             return RedirectToAction(nameof(AgencyDetail), "Company", new { id = vendorId });
@@ -729,7 +730,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Creating User. Try again.");
+                logger.LogError(ex, "Error Creating AgencyUser by {UserName}.",HttpContext.User?.Identity?.Name);
                 notifyService.Error("OOPS !!!..Error Creating User. Try again.");
             }
             return RedirectToAction(nameof(AgencyUsers), "Company", new { id = model.VendorId });
@@ -788,7 +789,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting user.");
+                logger.LogError(ex, "Error getting {AgencyId} by {UserName}.",userId, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting user. Try again");
                 return RedirectToAction(nameof(AgencyUsers));
             }
@@ -825,7 +826,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing User. Try again.");
+                logger.LogError(ex, "Error editing {AgencyId} by {UserName}.", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("OOPS !!!..Error editing User. Try again.");
             }
             if (editby == "company")
@@ -877,7 +878,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting user.");
+                logger.LogError(ex, "Error getting {AgencyId} by {UserName}.", userId, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting user. Try again");
                 return RedirectToAction(nameof(AgencyUsers));
             }
@@ -913,7 +914,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting user.");
+                logger.LogError(ex, "Error deleting {AgencyUser} by {UserName}.", email, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error deleting user. Try again");
                 return RedirectToAction(nameof(AgencyUsers));
             }
@@ -959,7 +960,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred");
+                logger.LogError(ex, "Error occurred creating Service for {AgencyId} by {UserName}",id, HttpContext.User.Identity.Name);
                 notifyService.Error("Error occurred. Try again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -985,7 +986,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating agency service.");
+                logger.LogError(ex, "Error occurred creating Service for {AgencyId} by {UserName}", VendorId, HttpContext.User.Identity.Name);
                 notifyService.Error("Error creating agency service. Try again.");
             }
             return RedirectToAction(nameof(CompanyController.Service), "Company", new { id = service.VendorId });
@@ -1024,7 +1025,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred");
+                logger.LogError(ex, "Error occurred getting Service for {ServiceId} by {UserName}", id, HttpContext.User.Identity.Name);
                 notifyService.Error("Error occurred. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -1050,7 +1051,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing agency service.");
+                logger.LogError(ex, "Error occurred editing Service for {ServiceId} by {UserName}", VendorInvestigationServiceTypeId, HttpContext.User.Identity.Name);
                 notifyService.Error("Error editing agency service. Try again.");
             }
             return RedirectToAction(nameof(CompanyController.Service), "Company", new { id = service.VendorId });
@@ -1092,8 +1093,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting agency service");
-                notifyService.Error("Error deleting agency service. Try again.");
+                logger.LogError(ex, "Error getting agency {ServiceId} by {UserName}", id, HttpContext.User?.Identity?.Name);
+                notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -1126,7 +1127,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting agency service");
+                logger.LogError(ex, "Error deleting agency {ServiceId} by {UserName}", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error deleting agency service. Try again.");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -1267,7 +1268,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting agency)");
+                logger.LogError(ex, "Error getting {AgencyId} by {UserName}",id, HttpContext.User.Identity.Name);
                 notifyService.Error("Error getting agency. Try again");
                 return RedirectToAction(nameof(AvailableVendors));
             }
@@ -1306,7 +1307,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting agency)");
+                logger.LogError(ex, "Error getting {AgencyId} by {UserName}", id, HttpContext.User.Identity.Name);
                 notifyService.Error("Error getting agency. Try again");
                 return RedirectToAction(nameof(EmpanelledVendors));
             }
