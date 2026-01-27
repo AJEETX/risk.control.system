@@ -1,13 +1,9 @@
-﻿using System.Text;
-
-using Hangfire;
+﻿using Hangfire;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace risk.control.system.Services
 {
@@ -55,7 +51,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred");
+                logger.LogError(ex, "Error occurred for {UploadId} for {UserEmail}", uploadId, userEmail);
             }
         }
     }

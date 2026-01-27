@@ -128,6 +128,7 @@ public static class BusinessServiceExtension
             options.KnownProxies.Clear();
         });
         services.AddHttpClient();
+        services.AddScoped<IInvestigationDetailService, InvestigationDetailService>();
         services.AddScoped<IPolicyProcessor, PolicyProcessor>();
         services.AddScoped<IVerifierProcessor, VerifierProcessor>();
         services.AddScoped<ICustomerValidator, CustomerValidator>();

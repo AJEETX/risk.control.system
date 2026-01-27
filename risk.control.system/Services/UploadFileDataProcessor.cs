@@ -60,7 +60,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error processing uploaded file");
+                logger.LogError(ex, "Error processing uploaded file for {UserEmail}", companyUser.Email);
             }
             
         }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models.ViewModel
 {
@@ -20,8 +21,10 @@ namespace risk.control.system.Models.ViewModel
         public CREATEDBY AutoOrManual { get; set; } = CREATEDBY.MANUAL;
         public ORIGIN FileOrFtp { get; set; } = ORIGIN.FILE;
         public string UploadedBy { get; set; }
-        public DateTime? CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
         public DateTime? CompletedOn { get; set; }
+        public int TimeTakenSeconds { get; set; } = 1;
+
         public int CompanySequenceNumber { get; set; } // Company-specific sequence number
         public int UserSequenceNumber { get; set; } // Company-specific sequence number
         public bool Deleted { get; set; } = false;

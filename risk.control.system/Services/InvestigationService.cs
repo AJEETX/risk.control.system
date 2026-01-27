@@ -14,11 +14,7 @@ namespace risk.control.system.Services
         Task<int> GetAutoCount(string currentUserEmail);
         Task<object> GetAuto(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
         Task<object> GetActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
-        Task<CaseTransactionModel> GetCaseDetails(string currentUserEmail, long id);
-        List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
-        Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
-        Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id);
-        Task<(object[], bool)> GetFilesData(string userEmail, bool isManager, int uploadId = 0);
+        Task<FilesDataResponse> GetFilesData(string userEmail, bool isManager, int draw, int start, int length, int orderColumn, string orderDir, int uploadId = 0, string searchTerm = null);
         Task<(object, bool)> GetFileById(string userEmail, bool isManager, int uploadId);
     }
     internal class InvestigationService : IInvestigationService
@@ -33,317 +29,18 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<CaseTransactionModel> GetCaseDetails(string currentUserEmail, long id)
-        {
-            var caseTask = await context.Investigations
-                .Include(c => c.CaseMessages)
-                .Include(c => c.CaseNotes)
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.InvestigationTimeline)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.Vendor)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (caseTask.CustomerDetail != null)
-            {
-                var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
-                caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            }
-            if (caseTask.BeneficiaryDetail != null)
-            {
-                var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-                caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-            }
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-
-            var timeTaken = DateTime.Now - caseTask.Created;
-            var totalTimeTaken = timeTaken != TimeSpan.Zero
-                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
-              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
-              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
-              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
-            : "-";
-            var model = new CaseTransactionModel
-            {
-                ClaimsInvestigation = caseTask,
-                CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Location = caseTask.BeneficiaryDetail,
-                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = companyUser.ClientCompany.AutoAllocation,
-                TimeTaken = totalTimeTaken,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
-            };
-
-            return model;
-        }
-        public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
-        {
-            var caseTask = await context.Investigations
-                .Include(c => c.CaseMessages)
-                .Include(c => c.CaseNotes)
-                .Include(c => c.InvestigationReport)
-                .Include(c => c.InvestigationTimeline)
-                .Include(c => c.InvestigationReport.EnquiryRequest)
-                .Include(c => c.InvestigationReport.EnquiryRequests)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.Vendor)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (caseTask.CustomerDetail != null)
-            {
-                var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
-                caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            }
-            if (caseTask.BeneficiaryDetail != null)
-            {
-                var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-                caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-            }
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
-            var timeTaken = endTIme - caseTask.Created;
-            var totalTimeTaken = timeTaken != TimeSpan.Zero
-                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
-              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
-              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
-              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
-            : "-";
-
-            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
-            var templates = await context.ReportTemplates
-               .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.AgentIdReport)
-              .Include(r => r.LocationReport)
-               .ThenInclude(l => l.MediaReports)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.FaceIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.DocumentIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.Questions)
-                  .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
-
-            caseTask.InvestigationReport.ReportTemplate = templates;
-
-            var tracker = await context.PdfDownloadTracker
-                          .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
-            bool canDownload = true;
-            if (tracker != null)
-            {
-                canDownload = tracker.DownloadCount <= 3;
-            }
-
-            var model = new CaseTransactionModel
-            {
-                ClaimsInvestigation = caseTask,
-                CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Location = caseTask.BeneficiaryDetail,
-                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
-                TimeTaken = totalTimeTaken,
-                VendorInvoice = invoice,
-                CanDownload = canDownload,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
-            };
-
-            return model;
-        }
-        public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
-        {
-            var caseTask = await context.Investigations
-                .Include(c => c.CaseMessages)
-                .Include(c => c.CaseNotes)
-                .Include(c => c.InvestigationReport)
-                .Include(c => c.InvestigationTimeline)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.Vendor)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-
-            var timeTaken = DateTime.Now - caseTask.Created;
-            var totalTimeTaken = timeTaken != TimeSpan.Zero
-                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
-              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
-              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
-              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
-            : "-";
-
-            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
-            var templates = await context.ReportTemplates
-               .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.AgentIdReport)
-              .Include(r => r.LocationReport)
-               .ThenInclude(l => l.MediaReports)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.FaceIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.DocumentIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.Questions)
-                  .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
-
-            caseTask.InvestigationReport.ReportTemplate = templates;
-
-            var tracker = await context.PdfDownloadTracker
-                          .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
-            bool canDownload = true;
-            if (tracker != null)
-            {
-                canDownload = tracker.DownloadCount <= 3;
-                tracker.DownloadCount++;
-                tracker.LastDownloaded = DateTime.UtcNow;
-                context.PdfDownloadTracker.Update(tracker);
-            }
-            else
-            {
-                tracker = new PdfDownloadTracker
-                {
-                    ReportId = id,
-                    UserEmail = currentUserEmail,
-                    DownloadCount = 1,
-                    LastDownloaded = DateTime.UtcNow
-                };
-                context.PdfDownloadTracker.Add(tracker);
-            }
-            context.SaveChanges();
-            var model = new CaseTransactionModel
-            {
-                ClaimsInvestigation = caseTask,
-                CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Location = caseTask.BeneficiaryDetail,
-                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
-                TimeTaken = totalTimeTaken,
-                VendorInvoice = invoice,
-                CanDownload = canDownload,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
-            };
-
-            return model;
-        }
-        public List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors)
-        {
-            // Get relevant status IDs in one query
-            var relevantStatuses = new[]
-                {
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
-                }; // Improves lookup performance
-
-            // Fetch cases that match the criteria
-            var vendorCaseCount = context.Investigations
-                .Where(c => !c.Deleted &&
-                            c.VendorId.HasValue &&
-                            c.AssignedToAgency &&
-                            relevantStatuses.Contains(c.SubStatus))
-                .GroupBy(c => c.VendorId.Value)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            // Create the list of VendorIdWithCases
-            return existingVendors
-                .Select(vendorId => new VendorIdWithCases
-                {
-                    VendorId = vendorId,
-                    CaseCount = vendorCaseCount.GetValueOrDefault(vendorId, 0)
-                })
-                .ToList();
-        }
         public async Task<object> GetAuto(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            // 1. Minimal User Context Fetch
             var companyUser = await context.ApplicationUser.Include(c=>c.Country).Include(c=>c.ClientCompany)
                 .Where(c => c.Email == currentUserEmail)
                 .FirstOrDefaultAsync();
 
-            // 2. Base Query (Keep as IQueryable)
             var query = context.Investigations.Where(a => !a.Deleted && a.ClientCompanyId == companyUser.ClientCompanyId && a.CreatedUser == currentUserEmail);
             
-            int totalRecords = await query.CountAsync();
-
             query = query.Where(a => CONSTANTS.CreatedAndDraftStatuses.Contains(a.SubStatus));
-
-
-            // Search filtering
+            
+            int totalRecords = await query.CountAsync();
+            
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.ToLower(CultureInfo.InvariantCulture);
@@ -557,41 +254,9 @@ namespace risk.control.system.Services
                 .Include(u => u.ClientCompany)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             
-            var subStatus = new[]
-            {
-                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS,
-                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
-                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR,
-                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR,
-                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
-                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
-                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
-                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
-            };
-            var query = context.Investigations
-                .Include(i => i.Vendor)
-                .Include(i => i.PolicyDetail)
-                .ThenInclude(i => i.InvestigationServiceType)
-                .Include(i => i.CustomerDetail)
-                .ThenInclude(i => i.PinCode)
-                .Include(i => i.CustomerDetail)
-                .ThenInclude(i => i.District)
-                .Include(i => i.CustomerDetail)
-                .ThenInclude(i => i.State)
-                .Include(i => i.CustomerDetail)
-                .ThenInclude(i => i.Country)
-                .Include(i => i.BeneficiaryDetail)
-                .ThenInclude(i => i.PinCode)
-                .Include(i => i.BeneficiaryDetail)
-                .ThenInclude(i => i.District)
-                .Include(i => i.BeneficiaryDetail)
-                .ThenInclude(i => i.State)
-                .Include(i => i.BeneficiaryDetail)
-                .ThenInclude(i => i.Country)
-                .Where(a => !a.Deleted && a.CreatedUser == currentUserEmail);
+            var query = context.Investigations.Where(a => !a.Deleted && a.CreatedUser == currentUserEmail);
 
-            query = query.Where(q => q.Status == CONSTANTS.CASE_STATUS.INPROGRESS && !subStatus.Contains(q.SubStatus));
+            query = query.Where(q => q.Status == CONSTANTS.CASE_STATUS.INPROGRESS && !CONSTANTS.ActiveSubStatuses.Contains(q.SubStatus));
             
             int totalRecords = query.Count(); // Get total count before pagination
             // Search filtering
@@ -642,11 +307,29 @@ namespace risk.control.system.Services
                 _ =>  isAsc ? query.OrderBy(a => a.Updated) : query.OrderByDescending(a => a.Updated)
                 };
 
-            var pagedList = await query.Skip(start).Take(length).ToListAsync();
+            var pagedList = await query
+                .Include(i => i.Vendor)
+                .Include(i => i.PolicyDetail)
+                .ThenInclude(i => i.InvestigationServiceType)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.PinCode)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.District)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.State)
+                .Include(i => i.CustomerDetail)
+                .ThenInclude(i => i.Country)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.PinCode)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.District)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.State)
+                .Include(i => i.BeneficiaryDetail)
+                .ThenInclude(i => i.Country)
+                .Skip(start).Take(length).ToListAsync();
 
             // 6. Transform & Async File I/O
-            var culture = Extensions.GetCultureByCountry(companyUser.Country.Code);
-
             var finalTasks = pagedList.Select(async a => {
                 var isUW = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
 
@@ -810,9 +493,11 @@ namespace risk.control.system.Services
             return await query.CountAsync(); // Get total count before pagination
         }
 
-        public async Task<(object[], bool)> GetFilesData(string userEmail, bool isManager, int uploadId = 0)
+        public async Task<FilesDataResponse> GetFilesData(string userEmail,bool isManager,int draw,int start,int length,int orderColumn,string orderDir, int uploadId = 0, string searchTerm = null)
         {
             var companyUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+            
+            var query = context.FilesOnFileSystem.AsNoTracking().Where(f => f.CompanyId == companyUser.ClientCompanyId && !f.Deleted);
 
             var totalReadyToAssign = await GetAutoCount(userEmail);
             var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
@@ -822,7 +507,7 @@ namespace risk.control.system.Services
                 var file = await context.FilesOnFileSystem.Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
                 if (file == null)
                 {
-                    return (null, false);
+                    return (null!);
                 }
                 if (file.CaseIds != null && file.CaseIds.Count > 0)
                 {
@@ -830,15 +515,85 @@ namespace risk.control.system.Services
                 }
             }
 
-            var files = await context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && ((f.UploadedBy == userEmail && !f.Deleted) || (isManager && !f.Deleted))).ToListAsync();
-            var result = files.OrderBy(o => o.CreatedOn).Select(file => new
+            if (!isManager)
+                query = query.Where(f => f.UploadedBy == userEmail);
+
+            int recordsTotal = await query.CountAsync();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                query = query.Where(f =>
+                    f.UserSequenceNumber.ToString().Contains(searchTerm) ||
+                    f.CompanySequenceNumber.ToString().Contains(searchTerm) ||
+                    f.Name.ToLower().Contains(searchTerm) ||
+                    f.Description.ToLower().Contains(searchTerm) ||
+                    f.Status.ToLower().Contains(searchTerm) ||
+                    f.Message.ToLower().Contains(searchTerm) ||
+                    f.UploadedBy.ToLower().Contains(searchTerm));
+            }
+
+            int recordsFiltered = await query.CountAsync();
+            bool asc = orderDir == "asc";
+
+            // ✅ ONLY SQL-SAFE SORTING
+            query = orderColumn switch
+            {
+                1 => asc ? query.OrderBy(f => f.UserSequenceNumber)
+                         : query.OrderByDescending(f => f.UserSequenceNumber),
+
+                2 => asc ? query.OrderBy(f => f.Status)
+                         : query.OrderByDescending(f => f.Status),
+
+                3 => asc ? query.OrderBy(f => f.Name)
+                        : query.OrderByDescending(f => f.Name),
+
+                6 => asc ? query.OrderBy(f => f.CreatedOn)
+                         : query.OrderByDescending(f => f.CreatedOn),
+
+                7 => asc
+                        ? query.OrderBy(f => f.TimeTakenSeconds)
+                        : query.OrderByDescending(f => f.TimeTakenSeconds),
+
+                8 => asc ? query.OrderBy(f => f.DirectAssign)
+                         : query.OrderByDescending(f => f.DirectAssign),
+
+                9 => asc ? query.OrderBy(f => f.Message)
+                        : query.OrderByDescending(f => f.Message),
+
+                _ => query.OrderByDescending(f => f.CreatedOn)
+            };
+            var page = await query
+                .Skip(start)
+                .Take(length)
+                .Select(f => new
+                {
+                    f.Id,
+                    f.Name,
+                    f.Description,
+                    f.FileType,
+                    f.CreatedOn,
+                    f.UploadedBy,
+                    f.Status,
+                    f.Message,
+                    f.Icon,
+                    f.RecordCount,
+                    f.Completed,
+                    f.DirectAssign,
+                    f.CompanySequenceNumber,
+                    f.UserSequenceNumber,
+                    f.CompletedOn,
+                    f.ErrorByteData,
+                    f.TimeTakenSeconds
+                }).ToListAsync();
+
+            var data = page.Select(file => new
             {
                 file.Id,
                 SequenceNumber = isManager ? file.CompanySequenceNumber : file.UserSequenceNumber,
                 file.Name,
                 file.Description,
                 file.FileType,
-                CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm:ss"),
+                CreatedOn = file.CreatedOn.ToString("dd-MMM-yyyy HH:mm:ss"),
                 file.UploadedBy,
                 Status = file.Status,
                 file.Message,
@@ -849,13 +604,18 @@ namespace risk.control.system.Services
                 file.Completed,
                 file.DirectAssign,
                 hasError = (file.CompletedOn != null && file.ErrorByteData != null) ? true : false,
-                errorLog = (file.CompletedOn != null && file.ErrorByteData != null) ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "<i class='fas fa-sync fa-spin i-grey'></i>",
                 UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
-                TimeTaken = file.CompletedOn != null ?
-                $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ?
-                1 : Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
+                file.TimeTakenSeconds,
+                TimeTaken = file.TimeTakenSeconds > 0 ? $" {file.TimeTakenSeconds} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
             }).ToList();
-            return (result.ToArray(), maxAssignReadyAllowedByCompany >= totalReadyToAssign);
+            return new FilesDataResponse
+            {
+                Draw = draw,
+                RecordsTotal = recordsTotal,
+                RecordsFiltered = recordsFiltered,
+                MaxAssignReadyAllowed = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalReadyToAssign,
+                Data = data
+            };
         }
 
         public async Task<(object, bool)> GetFileById(string userEmail, bool isManager, int uploadId)
@@ -877,7 +637,7 @@ namespace risk.control.system.Services
                 file.Name,
                 file.Description,
                 file.FileType,
-                CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm:ss"),
+                CreatedOn = file.CreatedOn.ToString("dd-MMM-yyyy HH:mm:ss"),
                 file.UploadedBy,
                 Status = file.Status,
                 file.Completed,
@@ -887,10 +647,9 @@ namespace risk.control.system.Services
                 file.RecordCount,
                 file.DirectAssign,
                 hasError = (file.CompletedOn != null && file.ErrorByteData != null) ? true : false,
-                errorLog = (file.CompletedOn != null && file.ErrorByteData != null) ? $"<a href='/Uploads/DownloadErrorLog/{file.Id}' class='btn-xs btn-danger'><i class='fa fa-download'></i> </a>" : "<i class='fas fa-sync fa-spin i-grey'></i>",
                 UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
-                TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
-                Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
+                file.TimeTakenSeconds,
+                TimeTaken = file.TimeTakenSeconds > 0 ? $" {file.TimeTakenSeconds} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
             };//<i class='fas fa-sync fa-spin'></i>
             return (new { result }, maxAssignReadyAllowedByCompany >= totalForAssign);
         }

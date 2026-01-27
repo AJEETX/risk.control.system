@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.AppConstant;
 
@@ -74,7 +72,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("GetFilesData/{uploadId?}")]
-        public async Task<IActionResult> GetFilesData(int uploadId = 0)
+        public async Task<IActionResult> GetFilesData(int draw, int start, int length, int orderColumn, string orderDir, int uploadId = 0, string searchTerm = null)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -85,11 +83,14 @@ namespace risk.control.system.Controllers.Api.Company
             try
             {
                 var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
-                var result = await service.GetFilesData(userEmail, isManager, uploadId);
+                var result = await service.GetFilesData(userEmail, isManager, draw,start, length,orderColumn, orderDir, uploadId, searchTerm);
                 return Ok(new
                 {
-                    data = result.Item1,
-                    maxAssignReadyAllowed = result.Item2
+                    draw = result.Draw,
+                    recordsTotal = result.RecordsTotal,
+                    recordsFiltered = result.RecordsFiltered,
+                    maxAssignReadyAllowed = result.MaxAssignReadyAllowed,
+                    data = result.Data
                 });
             }
             catch (Exception ex)
@@ -97,7 +98,6 @@ namespace risk.control.system.Controllers.Api.Company
                 logger.LogError(ex, "Error getting uploaded cases for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
-
         }
 
         [HttpGet("GetFileById/{uploadId}")]

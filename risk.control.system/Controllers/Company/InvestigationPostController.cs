@@ -82,11 +82,11 @@ namespace risk.control.system.Controllers.Company
                 var jobId = backgroundJobClient.Enqueue(() => ftpService.StartFileUpload(currentUserEmail, uploadId, baseUrl, model.UploadAndAssign));
                 if (!model.UploadAndAssign)
                 {
-                    notifyService.Custom($"Upload...", 3, "#17A2B8", "fa fa-upload");
+                    notifyService.Custom($"Uploading ...", 3, "#17A2B8", "fa fa-upload");
                 }
                 else
                 {
-                    notifyService.Custom($"Assign...", 5, "#dc3545", "fa fa-upload");
+                    notifyService.Custom($"Assigning ...", 5, "#dc3545", "fa fa-upload");
 
                 }
 

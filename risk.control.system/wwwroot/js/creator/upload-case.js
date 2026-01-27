@@ -15,6 +15,16 @@
         "ajax": {
             "url": `/api/Investigation/GetFilesData/${uploadId}`,
             "type": "GET",
+            data: function (d) {
+                return {
+                    draw: d.draw,
+                    start: d.start,
+                    length: d.length,
+                    orderColumn: d.order[0].column ?? 0,
+                    orderDir: d.order[0].dir ?? "asc",
+                    searchValue: d.search?.value ?? ""  
+                };
+            },
             "dataSrc": function (json) {
                 if (uploadId > 0 && !json.maxAssignReadyAllowed) {
                     $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", true);
@@ -34,6 +44,11 @@
                         }
                     });
                 }
+                if (!json.isManager) {
+                    table.column(5).visible(false); // hide uploadedBy
+                }
+                console.log(json.data[0]);
+
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -42,10 +57,17 @@
                 if (xhr.status === 401 || xhr.status === 403) {
                     window.location.href = '/Account/Login'; // Or session timeout handler
                 }
+                else if (xhr.status === 500) {
+                    window.location.href = '/CaseUpload/Uploads'; // Or session timeout handler
+                }
             }
         },
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
+        serverSide: true,
+        deferRender: true,  
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -56,7 +78,6 @@
             { "data": "sequenceNumber" },
             {
                 "data": "icon",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<i class="' + data + '" data-bs-toggle="tooltip"></i>';
                 }
@@ -69,6 +90,7 @@
             },
             {
                 "data": "fileType",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
                 }
@@ -82,18 +104,17 @@
             {
                 "data": "createdOn",
                 "mRender": function (data, type, row) {
-                    return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
+                    return '<i title="' + data + '" data-bs-toggle="tooltip"><small><strong>' + data + '</strong></small></i>';
                 }
             },
             {
-                "data": "timeTaken",
+                "data": "timeTakenSeconds",
                 "mRender": function (data, type, row) {
-                    return '<i>' + data + '</i>';
+                    return '<i>' + row.timeTaken + '</i>';
                 }
             },
             {
                 "data": "uploadedType",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     var title = row.directAssign ? "Assigned" : "Uploaded";
                     return `
@@ -104,8 +125,6 @@
             },
             {
                 data: "message",
-                "bSortable": false,
-                orderable: false,
                 render: function (data, type, row) {
                     if (!data) return "";
                     if (row.completed) {
@@ -146,13 +165,12 @@
                         img += `<div class='upload-progress' title='Action in-progress' data-bs-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </div>`;
                     }
 
-                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file" data-bs-toggle="tooltip"><i class="nav-icon fa fa-download"></i> Download</a> ';
+                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary upload-download" title="Download upload file" data-bs-toggle="tooltip"><i class="nav-icon fa fa-download"></i> Download</a> ';
 
-                    img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete" data-bs-toggle="tooltip"><i class="fas fa-trash"></i> Delete </button>';
+                    img += '<button class="btn-xs btn-danger upload-delete" data-id="' + row.id + '" title="Delete" data-bs-toggle="tooltip"><i class="fas fa-trash"></i> Delete </button>';
                     return img;
                 }
-            },
-            { "data": "isManager", "bVisible": false }
+            }
         ],
         "order": [[1, "desc"]],  // ✅ Sort by 'createdOn' (index 5) in descending order
         "columnDefs": [
@@ -217,7 +235,7 @@
             var api = this.api();
 
             // ✅ Correct index for `isManager` column is `9`
-            var isManager = api.column(9).data().toArray().every(function (value) {
+            var isManager = api.column(8).data().toArray().every(function (value) {
                 return value === true;
             });
 
@@ -293,17 +311,15 @@
         }
     }
 
-    table.on('xhr.dt', function () {
-        $('#refreshIcon').removeClass('fa-spin');
-    });
-    // Enable tooltips
-    table.on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({
-            animated: 'fade',
-            placement: 'top',
-            html: true
-        });
-    });
+   
+    //// Enable tooltips
+    //table.on('draw.dt', function () {
+    //    $('[data-toggle="tooltip"]').tooltip({
+    //        animated: 'fade',
+    //        placement: 'top',
+    //        html: true
+    //    });
+    //});
 
     // Delete file with jConfirm
     $('#customerTableAuto tbody').on('click', '.delete-file', function () {
@@ -373,6 +389,12 @@
         }
         table.ajax.reload(null, false);
     });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
+    $('#customerTableAuto tbody').hide();
+    $('#customerTableAuto tbody').fadeIn(2000);
 
     $('#uploadAssignCheckbox').on('change', function () {
         let isChecked = $(this).is(':checked');
@@ -485,9 +507,9 @@
                                 disableAllInteractiveElements();
                                 // Customize the button text before the submission
                                 if (isChecked) {
-                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Assign...');
+                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Assigning ...');
                                 } else {
-                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Upload...');
+                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Uploading ...');
                                 }
                                 $(formId).submit();
 

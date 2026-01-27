@@ -5,9 +5,6 @@
     font-family: Tahoma;
 }
 
-/*html{
-    min-width:420px;
-}*/
 a.navbar-brand {
     white-space: normal;
     text-align: center;
@@ -17,9 +14,6 @@ a.navbar-brand {
 /* Provide sufficient contrast against white background */
 a {
     color: #0366d6;
-}
-
-.upload {
 }
 
 .btn-primary {
@@ -3076,6 +3070,11 @@ th.col-match {
     width: 100px;
     margin-right: 7px;
     padding-left: 30px;
+    display: inline-block;
+}
+.upload-download, .upload-delete {
+    width: 100px;
+    margin-right: 2px;
     display: inline-block;
 }
 img.mobile-capture-info {

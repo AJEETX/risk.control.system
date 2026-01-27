@@ -5,29 +5,29 @@ namespace risk.control.system.Helpers
 {
     public static class ClaimsInvestigationExtension
     {
-        public static string GetPincode(bool claimType, CustomerDetail cdetail, BeneficiaryDetail location)
+        public static string GetPincode(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             if (claimType)
             {
-                if (cdetail is null)
+                if (customer is null)
                     return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
-                return string.Join("", "<span class='badge badge-light'>" + cdetail.PinCode.Code + "</span>");
+                return string.Join("", "<span class='badge badge-light'>" + customer.PinCode.Code + "</span>");
             }
             else
             {
-                if (location is null)
+                if (beneficiary is null)
                     return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
-                return string.Join("", "<span class='badge badge-light'>" + location.PinCode.Code + "</span>");
+                return string.Join("", "<span class='badge badge-light'>" + beneficiary.PinCode.Code + "</span>");
             }
         }
 
-        public static string GetPersonPhoto(bool claimType, CustomerDetail cdetail, BeneficiaryDetail beneficiary)
+        public static string GetPersonPhoto(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             if (claimType)
             {
-                if (cdetail is not null)
+                if (customer is not null)
                 {
-                    return (cdetail.ImagePath);
+                    return (customer.ImagePath);
                 }
             }
             else
@@ -40,19 +40,19 @@ namespace risk.control.system.Helpers
             return Applicationsettings.NO_USER;
         }
 
-        public static string GetPincodeName(bool claimType, CustomerDetail cdetail, BeneficiaryDetail location)
+        public static string GetPincodeName(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             if (claimType)
             {
-                if (cdetail is null)
+                if (customer is null)
                     return "...";
-                return cdetail.Addressline + "," + cdetail.District?.Name + ", " + cdetail.State.Name + ", " + cdetail.PinCode.Code;
+                return customer.Addressline + "," + customer.District?.Name + ", " + customer.State.Name + ", " + customer.PinCode.Code;
             }
             else
             {
-                if (location is null)
+                if (beneficiary is null)
                     return "...";
-                return location.Addressline + "," + location.District.Name + ", " + location.State.Name + ", " + location.PinCode.Code;
+                return beneficiary.Addressline + "," + beneficiary.District.Name + ", " + beneficiary.State.Name + ", " + beneficiary.PinCode.Code;
             }
         }
         public static int GetPincodeCode(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)

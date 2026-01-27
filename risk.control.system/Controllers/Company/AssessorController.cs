@@ -20,13 +20,13 @@ namespace risk.control.system.Controllers.Company
         private readonly INotyfService notifyService;
         private readonly ICaseVendorService caseVendorService;
         private readonly IInvoiceService invoiceService;
-        private readonly IInvestigationService investigationService;
+        private readonly IInvestigationDetailService investigationService;
         private readonly ILogger<AssessorController> logger;
 
         public AssessorController(INotyfService notifyService,
             ICaseVendorService caseVendorService,
             IInvoiceService invoiceService,
-            IInvestigationService investigationService,
+            IInvestigationDetailService investigationService,
             ILogger<AssessorController> logger)
         {
             this.notifyService = notifyService;

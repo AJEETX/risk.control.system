@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("GetNewCases")]
-        public async Task<IActionResult> GetNewCases()
+        public async Task<IActionResult> GetNewCases(int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -38,7 +38,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var response = await vendorInvestigationService.GetNewCases(userEmail);
+                var response = await vendorInvestigationService.GetNewCases(userEmail,draw, start,length,search,orderColumn,orderDir);
                 return Ok(response);
             }
             catch (Exception ex)

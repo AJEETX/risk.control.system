@@ -15,11 +15,11 @@ namespace risk.control.system.Controllers
     {
         private readonly INotyfService notifyService;
         private readonly ILogger<ReportController> logger;
-        private readonly IInvestigationService investigationService;
+        private readonly IInvestigationDetailService investigationService;
 
         public ReportController(INotyfService notifyService,
             ILogger<ReportController> logger,
-            IInvestigationService investigationService
+            IInvestigationDetailService investigationService
             )
         {
             this.notifyService = notifyService;

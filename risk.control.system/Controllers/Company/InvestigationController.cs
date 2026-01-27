@@ -29,6 +29,7 @@ namespace risk.control.system.Controllers.Company
         private readonly ApplicationDbContext context;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService service;
+        private readonly IInvestigationDetailService investigationDetailService;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
 
         public InvestigationController(ILogger<InvestigationController> logger,
@@ -38,6 +39,7 @@ namespace risk.control.system.Controllers.Company
             ApplicationDbContext context,
             INotyfService notifyService,
             IInvestigationService service,
+            IInvestigationDetailService investigationDetailService,
             IEmpanelledAgencyService empanelledAgencyService)
         {
             this.logger = logger;
@@ -47,6 +49,7 @@ namespace risk.control.system.Controllers.Company
             this.context = context;
             this.notifyService = notifyService;
             this.service = service;
+            this.investigationDetailService = investigationDetailService;
             this.empanelledAgencyService = empanelledAgencyService;
         }
         public IActionResult Index()
@@ -729,7 +732,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                var model = await service.GetCaseDetails(currentUserEmail, id);
+                var model = await investigationDetailService.GetCaseDetails(currentUserEmail, id);
                 return View(model);
             }
             catch (Exception ex)
@@ -776,7 +779,7 @@ namespace risk.control.system.Controllers.Company
                 var vendorUserCount = await context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted && c.Role == AppRoles.AGENT);
 
                 // HACKY
-                var currentCases = service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
+                var currentCases = investigationDetailService.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
                 vendor.SelectedCountryId = vendorUserCount;
                 vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
                 vendor.SelectedDistrictId = vendorAllCasesCount;
