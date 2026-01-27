@@ -35,6 +35,8 @@ namespace risk.control.system.Services
             fileData.RecordCount = claims.Count;
             fileData.CaseIds = claims.Select(c => new CaseListModel { CaseId = c.Id }).ToList();
             fileData.CompletedOn = DateTime.Now;
+            var timeTaken = DateTime.Now.Subtract(fileData.CreatedOn).Seconds;
+            fileData.TimeTakenSeconds = timeTaken == 0 ? 1 : timeTaken;
             context.FilesOnFileSystem.Update(fileData);
             context.SaveChanges();
         }
@@ -52,6 +54,8 @@ namespace risk.control.system.Services
             fileData.RecordCount = claims.Count;
             fileData.CaseIds = claims.Select(c => new CaseListModel { CaseId = c.Id }).ToList();
             fileData.CompletedOn = DateTime.Now;
+            var timeTaken = DateTime.Now.Subtract(fileData.CreatedOn).Seconds;
+            fileData.TimeTakenSeconds = timeTaken == 0 ? 1 : timeTaken;
             context.FilesOnFileSystem.Update(fileData);
             context.SaveChanges();
         }
@@ -66,6 +70,8 @@ namespace risk.control.system.Services
             fileData.DirectAssign = uploadAndAssign;
             fileData.CompletedOn = DateTime.Now;
             fileData.CaseIds = claimsIds?.Select(c => new CaseListModel { CaseId = c }).ToList();
+            var timeTaken = DateTime.Now.Subtract(fileData.CreatedOn).Seconds;
+            fileData.TimeTakenSeconds = timeTaken == 0 ? 1 : timeTaken;
             context.FilesOnFileSystem.Update(fileData);
             context.SaveChanges();
         }

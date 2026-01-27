@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers
         private readonly IAgencyCreateEditService agencyCreateEditService;
         private readonly ICompanyUserService companyUserService;
         private readonly IFeatureManager featureManager;
-        private readonly IInvestigationService service;
+        private readonly IInvestigationDetailService service;
         private readonly ILogger<CompanyController> logger;
         private readonly string portal_base_url;
         public CompanyController(ApplicationDbContext context,
@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers
             ICompanyUserService companyUserService,
             INotyfService notifyService,
             IFeatureManager featureManager,
-            IInvestigationService service,
+            IInvestigationDetailService service,
              IHttpContextAccessor httpContextAccessor,
             ILogger<CompanyController> logger,
             ISmsService SmsService)

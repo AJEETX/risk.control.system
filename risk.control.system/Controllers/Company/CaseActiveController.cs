@@ -28,18 +28,21 @@ namespace risk.control.system.Controllers.Company
         private readonly ILogger<CaseActiveController> logger;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IInvestigationService investigationService;
+        private readonly IInvestigationDetailService investigationDetailService;
 
         public CaseActiveController(ApplicationDbContext context,
             INotyfService notifyService,
             ILogger<CaseActiveController> logger,
             IEmpanelledAgencyService empanelledAgencyService,
-            IInvestigationService investigationService)
+            IInvestigationService investigationService,
+            IInvestigationDetailService investigationDetailService)
         {
             _context = context;
             this.notifyService = notifyService;
             this.logger = logger;
             this.empanelledAgencyService = empanelledAgencyService;
             this.investigationService = investigationService;
+            this.investigationDetailService = investigationDetailService;
         }
 
         public IActionResult Index()
@@ -126,7 +129,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigationService.GetCaseDetails(currentUserEmail, id);
+                var model = await investigationDetailService.GetCaseDetails(currentUserEmail, id);
 
                 return View(model);
             }

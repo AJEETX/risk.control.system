@@ -19,12 +19,12 @@ namespace risk.control.system.Controllers.Company
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
         private readonly ILogger<ManagerController> logger;
-        private readonly IInvestigationService investigativeService;
+        private readonly IInvestigationDetailService investigativeService;
 
         public ManagerController(INotyfService notifyService,
             IInvoiceService invoiceService,
             ILogger<ManagerController> logger,
-            IInvestigationService investigativeService)
+            IInvestigationDetailService investigativeService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;

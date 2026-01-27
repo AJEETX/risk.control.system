@@ -36,6 +36,7 @@ namespace risk.control.system.Controllers
         private readonly IAgencyCreateEditService agencyCreateEditService;
         private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
         private readonly INotyfService notifyService;
+        private readonly IInvestigationDetailService investigationDetailService;
         private readonly IInvestigationService service;
         private readonly IFeatureManager featureManager;
         private readonly ILogger<VendorsController> logger;
@@ -46,6 +47,7 @@ namespace risk.control.system.Controllers
             IAgencyCreateEditService agencyCreateEditService,
             IAgencyUserCreateEditService agencyUserCreateEditService,
             INotyfService notifyService,
+            IInvestigationDetailService investigationDetailService,
             IInvestigationService service,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
@@ -55,6 +57,7 @@ namespace risk.control.system.Controllers
             this.agencyCreateEditService = agencyCreateEditService;
             this.agencyUserCreateEditService = agencyUserCreateEditService;
             this.notifyService = notifyService;
+            this.investigationDetailService = investigationDetailService;
             this.service = service;
             this.featureManager = featureManager;
             this.logger = logger;
@@ -275,7 +278,7 @@ namespace risk.control.system.Controllers
                 var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
 
                 // HACKY
-                var currentCases = service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
+                var currentCases = investigationDetailService.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
                 vendor.SelectedCountryId = vendorUserCount;
                 vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
                 vendor.SelectedDistrictId = vendorAllCasesCount;

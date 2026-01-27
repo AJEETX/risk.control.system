@@ -60,7 +60,9 @@ $(document).ready(function () {
         responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
         serverSide: true,
+        deferRender: true,  
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
