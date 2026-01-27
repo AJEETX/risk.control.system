@@ -25,6 +25,7 @@ namespace risk.control.system.Controllers.Api
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IVendorInvestigationDetailService vendorInvestigationDetailService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IAnswerService answerService;
         private readonly IMediaIdfyService mediaIdfyService;
@@ -46,6 +47,7 @@ namespace risk.control.system.Controllers.Api
 
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context,
+            IVendorInvestigationDetailService vendorInvestigationDetailService,
             RoleManager<ApplicationRole> roleManager,
             IAnswerService answerService,
             IMediaIdfyService mediaIdfyService,
@@ -67,6 +69,7 @@ namespace risk.control.system.Controllers.Api
             IMailService mailboxService)
         {
             this._context = context;
+            this.vendorInvestigationDetailService = vendorInvestigationDetailService;
             this.roleManager = roleManager;
             this.answerService = answerService;
             this.mediaIdfyService = mediaIdfyService;
@@ -812,7 +815,7 @@ namespace risk.control.system.Controllers.Api
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var (vendor, contract) = await service.SubmitToVendorSupervisor(data.Email, data.CaseId, data.Remarks);
+                var (vendor, contract) = await vendorInvestigationDetailService.SubmitToVendorSupervisor(data.Email, data.CaseId, data.Remarks);
 
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportSubmitToVendorSupervisor(data.Email, data.CaseId, portal_base_url));
 

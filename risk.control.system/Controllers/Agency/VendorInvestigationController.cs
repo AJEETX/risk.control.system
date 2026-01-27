@@ -21,18 +21,21 @@ namespace risk.control.system.Controllers.Agency
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
         private readonly IVendorInvestigationService vendorInvestigationService;
+        private readonly IVendorInvestigationDetailService vendorInvestigationDetailService;
         private readonly ILogger<VendorInvestigationController> logger;
         private readonly ICaseVendorService vendorService;
 
         public VendorInvestigationController(INotyfService notifyService,
             IInvoiceService invoiceService,
             IVendorInvestigationService vendorInvestigationService,
+            IVendorInvestigationDetailService vendorInvestigationDetailService,
             ILogger<VendorInvestigationController> logger,
             ICaseVendorService vendorService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
             this.vendorInvestigationService = vendorInvestigationService;
+            this.vendorInvestigationDetailService = vendorInvestigationDetailService;
             this.logger = logger;
             this.vendorService = vendorService;
         }
@@ -95,7 +98,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorInvestigationService.SelectVendorAgent(currentUserEmail, selectedcase);
+                var model = await vendorInvestigationDetailService.SelectVendorAgent(currentUserEmail, selectedcase);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -125,7 +128,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorInvestigationService.SelectVendorAgent(currentUserEmail, selectedcase);
+                var model = await vendorInvestigationDetailService.SelectVendorAgent(currentUserEmail, selectedcase);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -209,7 +212,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorInvestigationService.GetClaimDetails(currentUserEmail, id);
+                var model = await vendorInvestigationDetailService.GetClaimDetails(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
@@ -237,7 +240,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorInvestigationService.GetClaimDetails(currentUserEmail, id);
+                var model = await vendorInvestigationDetailService.GetClaimDetails(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
@@ -278,7 +281,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorInvestigationService.GetClaimDetailsReport(currentUserEmail, id);
+                var model = await vendorInvestigationDetailService.GetClaimDetailsReport(currentUserEmail, id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);

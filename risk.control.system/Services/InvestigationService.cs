@@ -20,12 +20,15 @@ namespace risk.control.system.Services
     internal class InvestigationService : IInvestigationService
     {
         private readonly ApplicationDbContext context;
+        private readonly IBase64FileService base64FileService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public InvestigationService(ApplicationDbContext context,
+            IBase64FileService base64FileService,
             IWebHostEnvironment webHostEnvironment)
         {
             this.context = context;
+            this.base64FileService = base64FileService;
             this.webHostEnvironment = webHostEnvironment;
         }
 
@@ -125,9 +128,9 @@ namespace risk.control.system.Services
                 var culture = Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper());
 
                 // Run file operations in parallel for this specific row
-                var documentTask = GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = GetBase64FileAsync(a.CustomerDetail?.ImagePath, Applicationsettings.NO_USER);
-                var beneficiaryTask = GetBase64FileAsync(a.BeneficiaryDetail?.ImagePath, Applicationsettings.NO_USER);
+                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
+                var customerTask = base64FileService.GetBase64FileAsync(a.CustomerDetail?.ImagePath, Applicationsettings.NO_USER);
+                var beneficiaryTask = base64FileService.GetBase64FileAsync(a.BeneficiaryDetail?.ImagePath, Applicationsettings.NO_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
                 var policyId = a.PolicyDetail.ContractNumber;
@@ -195,57 +198,6 @@ namespace risk.control.system.Services
                 recordsFiltered,
                 data = finalData
             };
-        }
-        private async Task<string> GetBase64FileAsync(string relativePath, string fallback = "")
-        {
-            if (string.IsNullOrEmpty(relativePath)) return fallback;
-
-            var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, relativePath);
-            if (!File.Exists(fullPath)) return fallback;
-
-            // Use the async version of file reading
-            byte[] bytes = await File.ReadAllBytesAsync(fullPath);
-            return $"data:image/*;base64,{Convert.ToBase64String(bytes)}";
-        }
-        private static string GetMapUrl(InvestigationTask a)
-        {
-            var pinName = ClaimsInvestigationExtension.GetPincodeName(
-                a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail);
-
-            if (pinName == "...") return Applicationsettings.NO_MAP;
-
-            return a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                ? a.CustomerDetail.CustomerLocationMap
-                : a.BeneficiaryDetail.BeneficiaryLocationMap;
-        }
-        private static string GetDraftedTimePending(InvestigationTask a)
-        {
-            if (a.CreatorSla == 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} days since created!\"></i>");
-            }
-            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
-
-            else if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
-            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
-
-            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours < 24 &&
-                DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours} hr </span>");
-            }
-            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Minutes > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Minutes} min </span>");
-            }
-            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Seconds > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Seconds} sec </span>");
-            }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
         public async Task<object> GetActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
@@ -334,9 +286,9 @@ namespace risk.control.system.Services
                 var isUW = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
 
                 // Fetch files in parallel for this row
-                var docTask = GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
-                var custTask = GetBase64FileAsync(a.CustomerDetail.ImagePath, Applicationsettings.NO_USER);
-                var beneTask = GetBase64FileAsync(a.BeneficiaryDetail.ImagePath, Applicationsettings.NO_USER);
+                var docTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
+                var custTask = base64FileService.GetBase64FileAsync(a.CustomerDetail.ImagePath, Applicationsettings.NO_USER);
+                var beneTask = base64FileService.GetBase64FileAsync(a.BeneficiaryDetail.ImagePath, Applicationsettings.NO_USER);
                 var ownerImageTask = GetOwnerImage(a.Id);
                 var ownerDetailTask = GetOwner(a.Id);
                 var policyNumber = a.GetPolicyNum();
@@ -395,81 +347,7 @@ namespace risk.control.system.Services
                 data 
             };
         }
-        private async Task<string> GetOwnerImage(long id)
-        {
-            string base64StringImage;
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
-            var caseTask =await  context.Investigations.FirstOrDefaultAsync(c => c.Id == id);
-            if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
-            {
-                var agencyUser =await context.Vendor.FirstOrDefaultAsync(u => u.VendorId == caseTask.VendorId);
-                if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser.DocumentUrl))
-                {
-                    var agentImagePath = Path.Combine(webHostEnvironment.ContentRootPath, agencyUser.DocumentUrl);
-                    var agentImageByte =await System.IO.File.ReadAllBytesAsync(agentImagePath);
-                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(agentImageByte));
-                }
-            }
-            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
-            {
-                var agent =await context.ApplicationUser.FirstOrDefaultAsync(v => v.Email == caseTask.TaskedAgentEmail);
-                if (agent != null && !string.IsNullOrWhiteSpace(agent.ProfilePictureUrl))
-                {
-                    var agentImagePath = Path.Combine(webHostEnvironment.ContentRootPath, agent.ProfilePictureUrl);
-                    var agentImageByte =  await File.ReadAllBytesAsync(agentImagePath);
-                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(agentImageByte));
-
-                }
-            }
-            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
-                )
-            {
-                var company =await context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
-                if (company != null && !string.IsNullOrWhiteSpace(company.DocumentUrl))
-                {
-                    var companyImagePath = Path.Combine(webHostEnvironment.ContentRootPath, company.DocumentUrl);
-                    var companyImageByte = await File.ReadAllBytesAsync(companyImagePath);
-                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(companyImageByte));
-                }
-            }
-            return noDataImagefilePath;
-        }
-        private async Task< string> GetOwner(long caseId)
-        {
-            var caseTask = await context.Investigations.FirstOrDefaultAsync(c => c.Id == caseId);
-
-            if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
-            {
-                return caseTask.Vendor.Email;
-            }
-            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
-            {
-                return caseTask.TaskedAgentEmail;
-            }
-            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
-                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
-                )
-            {
-                var company =await context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
-                if (company != null)
-                {
-                    return company.Email;
-                }
-            }
-            return string.Empty;
-        }
+        
         public async Task<int> GetAutoCount(string currentUserEmail)
         {
             var companyUser = await context.ApplicationUser.Include(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
@@ -652,6 +530,121 @@ namespace risk.control.system.Services
                 TimeTaken = file.TimeTakenSeconds > 0 ? $" {file.TimeTakenSeconds} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
             };//<i class='fas fa-sync fa-spin'></i>
             return (new { result }, maxAssignReadyAllowedByCompany >= totalForAssign);
+        }
+        private static string GetMapUrl(InvestigationTask a)
+        {
+            var pinName = ClaimsInvestigationExtension.GetPincodeName(
+                a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail);
+
+            if (pinName == "...") return Applicationsettings.NO_MAP;
+
+            return a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
+                ? a.CustomerDetail.CustomerLocationMap
+                : a.BeneficiaryDetail.BeneficiaryLocationMap;
+        }
+        private static string GetDraftedTimePending(InvestigationTask a)
+        {
+            if (a.CreatorSla == 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} days since created!\"></i>");
+            }
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
+
+            else if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
+
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours < 24 &&
+                DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
+        private async Task<string> GetOwnerImage(long id)
+        {
+            string base64StringImage;
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+            var caseTask = await context.Investigations.FirstOrDefaultAsync(c => c.Id == id);
+            if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
+            {
+                var agencyUser = await context.Vendor.FirstOrDefaultAsync(u => u.VendorId == caseTask.VendorId);
+                if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser.DocumentUrl))
+                {
+                    var agentImagePath = Path.Combine(webHostEnvironment.ContentRootPath, agencyUser.DocumentUrl);
+                    var agentImageByte = await System.IO.File.ReadAllBytesAsync(agentImagePath);
+                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(agentImageByte));
+                }
+            }
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
+            {
+                var agent = await context.ApplicationUser.FirstOrDefaultAsync(v => v.Email == caseTask.TaskedAgentEmail);
+                if (agent != null && !string.IsNullOrWhiteSpace(agent.ProfilePictureUrl))
+                {
+                    var agentImagePath = Path.Combine(webHostEnvironment.ContentRootPath, agent.ProfilePictureUrl);
+                    var agentImageByte = await File.ReadAllBytesAsync(agentImagePath);
+                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(agentImageByte));
+
+                }
+            }
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
+                )
+            {
+                var company = await context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
+                if (company != null && !string.IsNullOrWhiteSpace(company.DocumentUrl))
+                {
+                    var companyImagePath = Path.Combine(webHostEnvironment.ContentRootPath, company.DocumentUrl);
+                    var companyImageByte = await File.ReadAllBytesAsync(companyImagePath);
+                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(companyImageByte));
+                }
+            }
+            return noDataImagefilePath;
+        }
+        private async Task<string> GetOwner(long caseId)
+        {
+            var caseTask = await context.Investigations.FirstOrDefaultAsync(c => c.Id == caseId);
+
+            if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
+            {
+                return caseTask.Vendor.Email;
+            }
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
+            {
+                return caseTask.TaskedAgentEmail;
+            }
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
+                caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
+                )
+            {
+                var company = await context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
+                if (company != null)
+                {
+                    return company.Email;
+                }
+            }
+            return string.Empty;
         }
     }
 }

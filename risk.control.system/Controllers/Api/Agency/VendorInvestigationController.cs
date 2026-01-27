@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var response = await vendorInvestigationService.GetReport(userEmail);
+                var response = await vendorInvestigationService.GetAgentReports(userEmail);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var response = await vendorInvestigationService.GetCompleted(userEmail, userClaim);
+                var response = await vendorInvestigationService.GetCompletedCases(userEmail, userClaim);
                 return Ok(response);
             }
             catch (Exception ex)

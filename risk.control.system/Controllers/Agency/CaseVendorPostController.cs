@@ -26,6 +26,7 @@ namespace risk.control.system.Controllers.Agency
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly IProcessCaseService processCaseService;
         private readonly IVendorInvestigationService vendorInvestigationService;
+        private readonly IVendorInvestigationDetailService vendorInvestigationDetailService;
         private readonly INotyfService notifyService;
         private readonly IMailService mailboxService;
         private readonly ILogger<CaseVendorPostController> logger;
@@ -36,6 +37,7 @@ namespace risk.control.system.Controllers.Agency
         public CaseVendorPostController(
             IProcessCaseService processCaseService,
             IVendorInvestigationService vendorInvestigationService,
+            IVendorInvestigationDetailService vendorInvestigationDetailService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
@@ -45,6 +47,7 @@ namespace risk.control.system.Controllers.Agency
         {
             this.processCaseService = processCaseService;
             this.vendorInvestigationService = vendorInvestigationService;
+            this.vendorInvestigationDetailService = vendorInvestigationDetailService;
             this.notifyService = notifyService;
             this.mailboxService = mailboxService;
             this.logger = logger;
@@ -78,7 +81,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var claim = await vendorInvestigationService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId);
+                var claim = await vendorInvestigationDetailService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error occurred.");
@@ -116,7 +119,7 @@ namespace risk.control.system.Controllers.Agency
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var (vendor, contract) = await vendorInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
+                var (vendor, contract) = await vendorInvestigationDetailService.SubmitToVendorSupervisor(currentUserEmail, claimId,
                     WebUtility.HtmlDecode(remarks));
                 if (vendor == null)
                 {
