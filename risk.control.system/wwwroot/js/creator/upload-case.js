@@ -44,8 +44,10 @@
                         }
                     });
                 }
-                if (!json.isManager) {
-                    table.column(5).visible(false); // hide uploadedBy
+                if (json.isManager === true) {
+                    table.column(4).visible(true);   // Show UploadedBy
+                } else {
+                    table.column(4).visible(false);  // Hide UploadedBy
                 }
                 console.log(json.data[0]);
 
@@ -84,13 +86,6 @@
             },
             {
                 "data": "name",
-                "mRender": function (data, type, row) {
-                    return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
-                }
-            },
-            {
-                "data": "fileType",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
                 }
@@ -191,24 +186,20 @@
                 "targets": 4
             },
             {
-                className: 'max-width-column-name', // ✅ Apply CSS class
+                className: 'max-width-column-email', // ✅ Apply CSS class
                 targets: 5
             },
             {
-                className: 'max-width-column-email', // ✅ Apply CSS class
-                targets: 6
-            },
-            {
                 className: 'max-width-column-email', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
+                targets: 6                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
+                targets: 7                      // Index of the column to style
             },
             {
                 className: 'max-width-column-status', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
+                targets: 8                      // Index of the column to style
             }
         ],
         rowCallback: function (row, data, index) {
@@ -233,15 +224,6 @@
         },
         initComplete: function () {
             var api = this.api();
-
-            // ✅ Correct index for `isManager` column is `9`
-            var isManager = api.column(8).data().toArray().every(function (value) {
-                return value === true;
-            });
-
-            if (!isManager) {
-                api.column(5).visible(false); // ✅ Hide 'uploadedBy' if all are managers
-            }
 
             var tableData = api.rows().data().toArray(); // ✅ Get all rows' data
 
@@ -322,7 +304,7 @@
     //});
 
     // Delete file with jConfirm
-    $('#customerTableAuto tbody').on('click', '.delete-file', function () {
+    $('#customerTableAuto tbody').on('click', '.upload-delete', function () {
         var fileId = $(this).data('id');
 
         $.confirm({

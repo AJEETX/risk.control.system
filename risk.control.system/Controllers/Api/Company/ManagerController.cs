@@ -1,5 +1,4 @@
-﻿using AngleSharp.Css.Values;
-
+﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -70,7 +69,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("GetRejectedCases")]
-        public async Task<IActionResult> GetRejectedCases()
+        public async Task<IActionResult> GetRejectedCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -80,7 +79,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var response = await managerService.GetRejectedCases(userEmail);
+                var response = await managerService.GetRejectedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
                 return Ok(response);
             }
             catch (Exception ex)

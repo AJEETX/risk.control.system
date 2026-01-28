@@ -10,7 +10,8 @@ namespace risk.control.system.Services
     {
         Task StartProcess(ApplicationUser companyUser, List<UploadCase> validRecords, byte[] zipFileByteData, FileOnFileSystemModel uploadFileData, int totalClaimsCreated, string url, bool uploadAndAssign = false);
     }
-    internal class UploadFileInitiator: IUploadFileInitiator
+
+    internal class UploadFileInitiator : IUploadFileInitiator
     {
         private readonly ApplicationDbContext _context;
         private readonly IFileUploadProcessor processor;
@@ -41,7 +42,13 @@ namespace risk.control.system.Services
         {
             try
             {
-                var uploadedCaseResult = await uploadService.FileUpload(companyUser, validRecords, zipFileByteData, uploadFileData.FileOrFtp);
+                var uploadedCaseResult = await uploadService.FileUploadAsync(companyUser, validRecords, zipFileByteData, uploadFileData.FileOrFtp);
+                if (uploadedCaseResult == null || uploadedCaseResult.Count == 0)
+                {
+                    uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
+                    await _context.SaveChangesAsync();
+                    await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                }
                 var totalAddedAndExistingCount = uploadedCaseResult.Count + totalClaimsCreated;
                 if (companyUser.ClientCompany.LicenseType == LicenseType.Trial && totalAddedAndExistingCount > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
@@ -79,12 +86,10 @@ namespace risk.control.system.Services
                 if (uploadedCases == null || uploadedCases.Count == 0)
                 {
                     uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
-
                     await _context.SaveChangesAsync();
                     await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
                     return;
                 }
-                
 
                 var totalReadyToAssign = await investigationService.GetAutoCount(companyUser.Email);
                 if (uploadedCases.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
@@ -99,13 +104,11 @@ namespace risk.control.system.Services
 
                 await _context.SaveChangesAsync();
 
-                await processor.ProcessloadFile(companyUser.Email, uploadedCases, uploadFileData, companyUser, url, uploadAndAssign);
-
+                await processor.ProcessloadFile(companyUser.Email, uploadedCases, uploadFileData, url, uploadAndAssign);
             }
-
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred");
+                logger.LogError(ex, "Error occurred for {UserEmail}", companyUser.Email);
                 uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
                 await _context.SaveChangesAsync();
                 await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);

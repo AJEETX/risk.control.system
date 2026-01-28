@@ -6,6 +6,9 @@ $(document).ready(function () {
             url: '/api/Manager/GetActiveCases',
             type: 'GET',
             dataType: 'json',
+            dataSrc: function (json) {
+                return json.data; // Return table data
+            },
             data: function (d) {
                 console.log("Data before sending:", d); // Debugging
 
@@ -24,6 +27,9 @@ $(document).ready(function () {
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
                     window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+                if (xhr.status === 500) {
+                    window.location.href = '/VendorInvestigation/Open'; // Refresh page
                 }
             }
         },
@@ -88,7 +94,12 @@ $(document).ready(function () {
                 "data": "agent",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.agent + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    var img = '<span title="' + row.ownerDetail + '" data-bs-toggle="tooltip">';
+                    img += '<img class="profile-image doc-profile-image" src="' + data + '" />'; // Thumbnail image with class 'thumbnail'
+                    img += '</span>';
+                    return img;
+
+                    //return '<span title="' + row.ownerDetail + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
                 ///<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },

@@ -5,9 +5,10 @@ namespace risk.control.system.Services
 {
     public interface IFileUploadProcessor
     {
-        Task ProcessloadFile(string userEmail, List<InvestigationTask> uploadedCases, FileOnFileSystemModel uploadFileData, ApplicationUser companyUser, string url,  bool uploadAndAssign = false);
+        Task ProcessloadFile(string userEmail, List<InvestigationTask> uploadedCases, FileOnFileSystemModel uploadFileData, string url, bool uploadAndAssign = false);
     }
-    internal class FileUploadProcessor: IFileUploadProcessor
+
+    internal class FileUploadProcessor : IFileUploadProcessor
     {
         private readonly ApplicationDbContext _context;
         private readonly IUploadFileStatusService uploadFileStatusService;
@@ -30,7 +31,8 @@ namespace risk.control.system.Services
             this.mailService = mailService;
             this.processCaseService = processCaseService;
         }
-        public async Task ProcessloadFile(string userEmail, List<InvestigationTask> uploadedCases, FileOnFileSystemModel uploadFileData, ApplicationUser companyUser, string url, bool uploadAndAssign = false)
+
+        public async Task ProcessloadFile(string userEmail, List<InvestigationTask> uploadedCases, FileOnFileSystemModel uploadFileData, string url, bool uploadAndAssign = false)
         {
             try
             {
@@ -55,7 +57,6 @@ namespace risk.control.system.Services
                     await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
                 }
                 await _context.SaveChangesAsync();
-
             }
             catch (Exception ex)
             {

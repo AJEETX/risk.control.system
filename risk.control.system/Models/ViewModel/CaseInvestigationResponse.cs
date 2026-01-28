@@ -38,6 +38,7 @@
         public string? Distance { get; set; }
         public string? Duration { get; set; }
         public bool CanDownload { get; set; } = true;
+        public bool IsNewSubmittedToCompany { get; set; }
 
     }
 }

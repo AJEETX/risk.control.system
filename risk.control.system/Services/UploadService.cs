@@ -5,46 +5,55 @@ namespace risk.control.system.Services
 {
     public interface IUploadService
     {
-        Task<List<UploadResult>> FileUpload(ApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP);
+        Task<IReadOnlyList<UploadResult>> FileUploadAsync(ApplicationUser companyUser, IReadOnlyList<UploadCase> uploadCases, byte[] model, ORIGIN source);
     }
+
     internal class UploadService : IUploadService
     {
-        private readonly ICaseCreationService _caseCreationService;
+        private readonly ICaseDetailCreationService _caseCreationService;
         private readonly ILogger<UploadService> logger;
 
-        public UploadService(ICaseCreationService caseCreationService,
+        public UploadService(ICaseDetailCreationService caseCreationService,
             ILogger<UploadService> logger)
         {
             _caseCreationService = caseCreationService;
             this.logger = logger;
         }
 
-        public async Task<List<UploadResult>> FileUpload(ApplicationUser companyUser, List<UploadCase> customData, byte[] model, ORIGIN fileOrFTP)
+        public async Task<IReadOnlyList<UploadResult>> FileUploadAsync(ApplicationUser companyUser, IReadOnlyList<UploadCase> uploadCases, byte[] model, ORIGIN source)
         {
-            var uploadedClaims = new List<UploadResult>();
-            try
+            if (uploadCases == null || uploadCases.Count == 0)
             {
-                if (customData == null || customData.Count == 0)
+                logger.LogWarning("No upload data provided for user {Email}", companyUser.Email);
+                return Array.Empty<UploadResult>();
+            }
+
+            var results = new List<UploadResult>(uploadCases.Count);
+
+            for (int i = 0; i < uploadCases.Count; i++)
+            {
+                var row = uploadCases[i];
+
+                try
                 {
-                    return null; // Return 0 if no CSV data is found
-                }
-                var totalCount = customData.Count;
-                foreach (var row in customData)
-                {
-                    var claimUploaded = await _caseCreationService.FileUpload(companyUser, row, model, fileOrFTP);
-                    if (claimUploaded == null)
+                    var result = await _caseCreationService.AddCaseDetail(row, companyUser, model, source);
+
+                    if (result == null)
                     {
-                        return null!;
+                        logger.LogWarning("Upload failed for row {RowNumber} (User: {Email})", i + 1, companyUser.Email);
+
+                        continue;
                     }
-                    uploadedClaims.Add(claimUploaded);
+
+                    results.Add(result);
                 }
-                return uploadedClaims;
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error uploading row {RowNumber} for user {Email}", i + 1, companyUser.Email);
+                }
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred.");
-                return uploadedClaims;
-            }
+
+            return results;
         }
     }
 }

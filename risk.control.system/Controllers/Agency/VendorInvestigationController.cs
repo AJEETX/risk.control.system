@@ -20,21 +20,18 @@ namespace risk.control.system.Controllers.Agency
     {
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
-        private readonly IVendorInvestigationService vendorInvestigationService;
         private readonly IVendorInvestigationDetailService vendorInvestigationDetailService;
         private readonly ILogger<VendorInvestigationController> logger;
         private readonly ICaseVendorService vendorService;
 
         public VendorInvestigationController(INotyfService notifyService,
             IInvoiceService invoiceService,
-            IVendorInvestigationService vendorInvestigationService,
             IVendorInvestigationDetailService vendorInvestigationDetailService,
             ILogger<VendorInvestigationController> logger,
             ICaseVendorService vendorService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
-            this.vendorInvestigationService = vendorInvestigationService;
             this.vendorInvestigationDetailService = vendorInvestigationDetailService;
             this.logger = logger;
             this.vendorService = vendorService;
@@ -86,7 +83,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (selectedcase < 1)
+                if (!ModelState.IsValid || selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
                     return RedirectToAction(nameof(SelectVendorAgent), new { selectedcase = selectedcase });
@@ -112,12 +109,12 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [HttpGet]
-        [Breadcrumb("Re-Allocate", FromAction = "ClaimReport")]
+        [Breadcrumb("Re-Allocate", FromAction = "CaseReport")]
         public async Task<IActionResult> ReSelectVendorAgent(long selectedcase)
         {
             try
             {
-                if (selectedcase < 1)
+                if (!ModelState.IsValid || selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
                     return RedirectToAction(nameof(SelectVendorAgent), new { selectedcase = selectedcase });
@@ -142,7 +139,7 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb("Submit(report)")]
-        public IActionResult ClaimReport()
+        public IActionResult CaseReport()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(currentUserEmail))
@@ -153,15 +150,15 @@ namespace risk.control.system.Controllers.Agency
             return View();
         }
 
-        [Breadcrumb("Submit", FromAction = "ClaimReport")]
+        [Breadcrumb("Submit", FromAction = "CaseReport")]
         public async Task<IActionResult> GetInvestigateReport(long selectedcase)
         {
             try
             {
-                if (selectedcase < 1)
+                if (!ModelState.IsValid || selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case.");
-                    return RedirectToAction(nameof(ClaimReport));
+                    return RedirectToAction(nameof(CaseReport));
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
@@ -201,7 +198,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (id < 1)
+                if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -229,7 +226,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (id < 1)
+                if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -268,7 +265,7 @@ namespace risk.control.system.Controllers.Agency
 
         public async Task<IActionResult> CompletedDetail(long id)
         {
-            if (id < 1)
+            if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -303,7 +300,7 @@ namespace risk.control.system.Controllers.Agency
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            if (id < 1)
+            if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -321,7 +318,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (id < 1)
+                if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -357,7 +354,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (id < 1)
+                if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");

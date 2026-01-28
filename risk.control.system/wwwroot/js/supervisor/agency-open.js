@@ -3,12 +3,30 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetOpenCases',
-            dataSrc: '',
+            type: 'GET',
+            dataSrc: function (json) {
+                return json.data; // Return table data
+            },
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 14, // Default to column 15
+                    orderDir: d.order?.[0]?.dir || "desc"
+                };
+            },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
                     window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+                if (xhr.status === 500) {
+                    window.location.href = '/VendorInvestigation/Allocate'; // Refresh page
                 }
             }
         },
@@ -26,8 +44,12 @@
                 targets: 8                      // Index of the column to style
             }],
         order: [[14, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
+        serverSide: true,
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',

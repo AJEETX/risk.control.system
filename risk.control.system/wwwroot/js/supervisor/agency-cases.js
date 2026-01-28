@@ -43,6 +43,7 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetNewCases',
+            type: 'GET',
             dataSrc: function (json) {
                 return json.data; // Return table data
             },

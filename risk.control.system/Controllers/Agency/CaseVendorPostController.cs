@@ -25,7 +25,6 @@ namespace risk.control.system.Controllers.Agency
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly IProcessCaseService processCaseService;
-        private readonly IVendorInvestigationService vendorInvestigationService;
         private readonly IVendorInvestigationDetailService vendorInvestigationDetailService;
         private readonly INotyfService notifyService;
         private readonly IMailService mailboxService;
@@ -36,7 +35,6 @@ namespace risk.control.system.Controllers.Agency
 
         public CaseVendorPostController(
             IProcessCaseService processCaseService,
-            IVendorInvestigationService vendorInvestigationService,
             IVendorInvestigationDetailService vendorInvestigationDetailService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
@@ -46,7 +44,6 @@ namespace risk.control.system.Controllers.Agency
             ApplicationDbContext context)
         {
             this.processCaseService = processCaseService;
-            this.vendorInvestigationService = vendorInvestigationService;
             this.vendorInvestigationDetailService = vendorInvestigationDetailService;
             this.notifyService = notifyService;
             this.mailboxService = mailboxService;
@@ -63,7 +60,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (!ModelState.IsValid || string.IsNullOrWhiteSpace(selectedcase) || claimId < 1)
+                if (!ModelState.IsValid || claimId < 1)
                 {
                     notifyService.Error($"No case selected!!!. Please select case to be allocate.", 3);
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
@@ -134,37 +131,14 @@ namespace risk.control.system.Controllers.Agency
 
                 notifyService.Custom($"Case <b> #{contract}</b> report submitted", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(AgentController.Index), "Agent");
+                return RedirectToAction(nameof(AgentController.Agent), "Agent");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.",claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
             }
-        }
-        private string GetSelectedOptionText(CaseInvestigationVendorsModel model, int questionId)
-        {
-            var question = model.QuestionFormViewModel.Questions.FirstOrDefault(q => q.Id == questionId);
-            if (question == null) return "N/A";
-            if (question.QuestionType == "text")
-                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
-
-            if (question.QuestionType == "file")
-                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
-            if (question.QuestionType == "date")
-                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
-            if (question.QuestionType == "checkbox")
-                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
-            if (question.QuestionType == "radio")
-                return model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var _val) ? _val : "N/A";
-            if (question.QuestionType == "dropdown")
-            {
-                var selectedValue = model.QuestionFormViewModel.Answers.TryGetValue(questionId, out var value) ? value : "N/A";
-                var options = question.Options?.Split(',') ?? Array.Empty<string>();
-                return options.Contains(selectedValue) ? selectedValue : "N/A";
-            }
-            return "N/A";
         }
 
         [HttpPost]
@@ -223,7 +197,7 @@ namespace risk.control.system.Controllers.Agency
                 {
                     notifyService.Custom($"Case <b> #{success.PolicyDetail.ContractNumber}</b>  Report sent to review", 3, "orange", "far fa-file-powerpoint");
                 }
-                return RedirectToAction(nameof(VendorInvestigationController.ClaimReport), "VendorInvestigation");
+                return RedirectToAction(nameof(VendorInvestigationController.CaseReport), "VendorInvestigation");
             }
             catch (Exception ex)
             {
@@ -244,14 +218,12 @@ namespace risk.control.system.Controllers.Agency
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
-
                 }
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
-
                 }
                 var agency = await processCaseService.WithdrawCase(userEmail, model, claimId);
 
@@ -270,9 +242,9 @@ namespace risk.control.system.Controllers.Agency
                 logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
-
             }
         }
+
         [HttpPost]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
         [ValidateAntiForgeryToken]
@@ -284,14 +256,12 @@ namespace risk.control.system.Controllers.Agency
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
-
                 }
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
-
                 }
                 var agency = await processCaseService.WithdrawCaseFromAgent(userEmail, model, claimId);
 
@@ -310,7 +280,6 @@ namespace risk.control.system.Controllers.Agency
                 logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
-
             }
         }
 
@@ -375,7 +344,6 @@ namespace risk.control.system.Controllers.Agency
                 }
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
-
             }
             catch (Exception ex)
             {

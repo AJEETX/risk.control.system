@@ -20,6 +20,7 @@ using risk.control.system.Permission;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Extensions;
+
 namespace risk.control.system.StartupExtensions;
 
 public static class BusinessServiceExtension
@@ -28,7 +29,7 @@ public static class BusinessServiceExtension
     {
         services.AddMemoryCache(options =>
         {
-            options.SizeLimit = 1024; // Arbitrary units
+            options.SizeLimit = 2048; // Arbitrary units
         });
         services.AddHsts(options =>
         {
@@ -128,6 +129,7 @@ public static class BusinessServiceExtension
             options.KnownProxies.Clear();
         });
         services.AddHttpClient();
+        services.AddScoped<IDateParserService, DateParserService>();
         services.AddScoped<IBase64FileService, Base64FileService>();
         services.AddScoped<IVendorInvestigationDetailService, VendorInvestigationDetailService>();
         services.AddScoped<IInvestigationDetailService, InvestigationDetailService>();
@@ -194,7 +196,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IProcessCaseService, ProcessCaseService>();
         services.AddScoped<IInvestigationService, InvestigationService>();
         services.AddScoped<IHangfireJobService, HangfireJobService>();
-        services.AddScoped<ICaseCreationService, CaseCreationService>();
         services.AddScoped<ICaseDetailCreationService, CaseDetailCreationService>();
         services.AddScoped<ICustomerCreationService, CustomerCreationService>();
         services.AddScoped<IBeneficiaryCreationService, BeneficiaryCreationService>();
@@ -226,7 +227,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IHttpClientService, HttpClientService>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-        //services.AddTransient<CustomCookieAuthenticationEvents>();
 
         var connectionString = "Data Source=" + Environment.GetEnvironmentVariable("COUNTRY") + "_" + configuration.GetConnectionString("Database");
         services.AddDbContext<ApplicationDbContext>(options =>

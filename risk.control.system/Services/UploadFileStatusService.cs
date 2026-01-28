@@ -6,10 +6,13 @@ namespace risk.control.system.Services
     public interface IUploadFileStatusService
     {
         void SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims, List<long> autoAllocated);
+
         void SetUploadSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims);
+
         void SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long> claimsIds = null);
     }
-    internal class UploadFileStatusService: IUploadFileStatusService
+
+    internal class UploadFileStatusService : IUploadFileStatusService
     {
         private readonly ApplicationDbContext context;
 
@@ -17,6 +20,7 @@ namespace risk.control.system.Services
         {
             this.context = context;
         }
+
         public void SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims, List<long> autoAllocated)
         {
             var uploadedClaimCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.CLAIM);

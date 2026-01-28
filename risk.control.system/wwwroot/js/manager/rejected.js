@@ -3,12 +3,29 @@
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Manager/GetRejectedCases',
-            dataSrc: '',
+            type: 'GET',
+            dataType: 'json',
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 15,
+                    orderDir: d.order?.[0]?.dir || "asc"
+                };
+            },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
                     window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+                if (xhr.status === 500) {
+                    window.location.href = '/Manager/Rejected'; // // Refresh page
                 }
             }
         },

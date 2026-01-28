@@ -126,13 +126,7 @@ namespace risk.control.system.Services
             {
                 var isUnderwriting = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
                 var culture = Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper());
-
-                // Run file operations in parallel for this specific row
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = base64FileService.GetBase64FileAsync(a.CustomerDetail?.ImagePath, Applicationsettings.NO_USER);
-                var beneficiaryTask = base64FileService.GetBase64FileAsync(a.BeneficiaryDetail?.ImagePath, Applicationsettings.NO_USER);
-
-                await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
+                
                 var policyId = a.PolicyDetail.ContractNumber;
                 var amount = string.Format(culture, "{0:C}", a.PolicyDetail.SumAssuredValue);
                 var pincodeCode = ClaimsInvestigationExtension.GetPincodeCode(isUnderwriting, a.CustomerDetail, a.BeneficiaryDetail);
@@ -147,6 +141,12 @@ namespace risk.control.system.Services
                 var beneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-light\">beneficiary name</span>" : a.BeneficiaryDetail.Name;
                 var timeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds;
                 var personMapAddressUrl = GetMapUrl(a);
+                // Run file operations in parallel for this specific row
+                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
+                var customerTask = base64FileService.GetBase64FileAsync(a.CustomerDetail?.ImagePath, Applicationsettings.NO_USER);
+                var beneficiaryTask = base64FileService.GetBase64FileAsync(a.BeneficiaryDetail?.ImagePath, Applicationsettings.NO_USER);
+
+                await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
                 return new CaseAutoAllocationResponse
                 {
                     Id = a.Id,
@@ -235,7 +235,7 @@ namespace risk.control.system.Services
                 query = query.Where(c => c.PolicyDetail.InsuranceType == Enum.Parse<InsuranceType>(caseType));  // Assuming CaseType is the field in your data model
             }
 
-            int recordsFiltered = query.Count();
+            int recordsFiltered = await query.CountAsync();
 
             bool isAsc = orderDir == "asc";
             query = orderColumn switch
@@ -284,6 +284,15 @@ namespace risk.control.system.Services
             // 6. Transform & Async File I/O
             var finalTasks = pagedList.Select(async a => {
                 var isUW = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
+                var culture = Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper());
+                var policyNumber = a.GetPolicyNum();
+                var investigationService = a.PolicyDetail.InvestigationServiceType.Name;
+                var serviceType = $"{a.PolicyDetail.InsuranceType.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})";
+                var personMapAddressUrl = isUW ? string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") : string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400");
+                var pincode = ClaimsInvestigationExtension.GetPincode(isUW, a.CustomerDetail, a.BeneficiaryDetail);
+                var pincodeName = ClaimsInvestigationExtension.GetPincodeName(isUW, a.CustomerDetail, a.BeneficiaryDetail);
+                var customerName = a.CustomerDetail.Name ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>";
+                var beneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" : a.BeneficiaryDetail.Name;
 
                 // Fetch files in parallel for this row
                 var docTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
@@ -291,8 +300,7 @@ namespace risk.control.system.Services
                 var beneTask = base64FileService.GetBase64FileAsync(a.BeneficiaryDetail.ImagePath, Applicationsettings.NO_USER);
                 var ownerImageTask = GetOwnerImage(a.Id);
                 var ownerDetailTask = GetOwner(a.Id);
-                var policyNumber = a.GetPolicyNum();
-                var investigationService = a.PolicyDetail.InvestigationServiceType.Name;
+                
                 await Task.WhenAll(docTask, custTask, beneTask, ownerImageTask, ownerDetailTask);
                 return new ActiveCaseResponse
                 {
@@ -301,14 +309,14 @@ namespace risk.control.system.Services
                     Id = a.Id,
                     IsNew = a.IsNew,
                     PolicyId = a.PolicyDetail.ContractNumber,
-                    Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
+                    Amount = string.Format(culture, "{0:c}", a.PolicyDetail.SumAssuredValue),
                     CustomerFullName = a.CustomerDetail.Name ?? "",
                     BeneficiaryFullName = a.BeneficiaryDetail.Name?? "",
                     Document = await docTask,
                     Customer = await custTask,
                     AssignedToAgency = a.AssignedToAgency,
-                    Agent = (await ownerDetailTask),
-                    OwnerDetail = (await ownerImageTask),
+                    Agent = await ownerDetailTask,
+                    OwnerDetail = await ownerImageTask,
                     CaseWithPerson = a.CaseOwner,
                     BeneficiaryPhoto = await beneTask,
                     SubStatus = a.SubStatus,
@@ -317,12 +325,12 @@ namespace risk.control.system.Services
                     TimePending = a.GetCreatorTimePending(),
                     TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
                     Service = investigationService,
-                    ServiceType = $"{a.PolicyDetail.InsuranceType.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})",
-                    PersonMapAddressUrl = isUW ? string.Format(a.CustomerDetail.CustomerLocationMap, "400", "400") : string.Format(a.BeneficiaryDetail.BeneficiaryLocationMap, "400", "400"),
-                    Pincode = ClaimsInvestigationExtension.GetPincode(isUW, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(isUW, a.CustomerDetail, a.BeneficiaryDetail),
-                    Name = a.CustomerDetail.Name?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>",
-                    BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" : a.BeneficiaryDetail.Name,
+                    ServiceType = serviceType,
+                    PersonMapAddressUrl = personMapAddressUrl,
+                    Pincode = pincode,
+                    PincodeName = pincodeName,
+                    Name = customerName,
+                    BeneficiaryName = beneficiaryName,
                     Policy = a.PolicyDetail.InsuranceType.GetEnumDisplayName(),
                     Status = a.ORIGIN.GetEnumDisplayName(),
                 };
@@ -425,17 +433,17 @@ namespace risk.control.system.Services
                 3 => asc ? query.OrderBy(f => f.Name)
                         : query.OrderByDescending(f => f.Name),
 
-                6 => asc ? query.OrderBy(f => f.CreatedOn)
+                5 => asc ? query.OrderBy(f => f.CreatedOn)
                          : query.OrderByDescending(f => f.CreatedOn),
 
-                7 => asc
+                6 => asc
                         ? query.OrderBy(f => f.TimeTakenSeconds)
                         : query.OrderByDescending(f => f.TimeTakenSeconds),
 
-                8 => asc ? query.OrderBy(f => f.DirectAssign)
+                7 => asc ? query.OrderBy(f => f.DirectAssign)
                          : query.OrderByDescending(f => f.DirectAssign),
 
-                9 => asc ? query.OrderBy(f => f.Message)
+                8 => asc ? query.OrderBy(f => f.Message)
                         : query.OrderByDescending(f => f.Message),
 
                 _ => query.OrderByDescending(f => f.CreatedOn)
