@@ -1,14 +1,10 @@
 ﻿using System.Security.Claims;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
-using risk.control.system.Services;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api.Company
 {
@@ -21,16 +17,12 @@ namespace risk.control.system.Controllers.Api.Company
         private readonly ApplicationDbContext _context;
         private readonly ILogger<CompanyController> logger;
         private readonly IUserService userService;
-        private readonly IFeatureManager featureManager;
-        private readonly IPhoneService phoneService;
         private readonly IVendorService vendorService;
         private readonly ICompanyService companyService;
 
         public CompanyController(ApplicationDbContext context,
             ILogger<CompanyController> logger,
             IUserService userService,
-            IFeatureManager featureManager,
-            IPhoneService phoneService,
             IVendorService vendorService,
             ICompanyService companyService
             )
@@ -38,8 +30,6 @@ namespace risk.control.system.Controllers.Api.Company
             _context = context;
             this.logger = logger;
             this.userService = userService;
-            this.featureManager = featureManager;
-            this.phoneService = phoneService;
             this.vendorService = vendorService;
             this.companyService = companyService;
         }
@@ -113,6 +103,7 @@ namespace risk.control.system.Controllers.Api.Company
                 return null;
             }
         }
+
         [HttpGet("GetEmpanelledVendors")]
         public async Task<IActionResult> GetEmpanelledVendors()
         {
@@ -140,6 +131,7 @@ namespace risk.control.system.Controllers.Api.Company
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpGet("GetEmpanelledAgency")]
         public async Task<IActionResult> GetEmpanelledAgency(long caseId)
         {

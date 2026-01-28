@@ -23,13 +23,14 @@ namespace risk.control.system.Models.ViewModel
         public string UploadedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? CompletedOn { get; set; }
-        public int TimeTakenSeconds { get; set; } = 1;
+        public int TimeTakenSeconds { get; set; } = 0;
 
         public int CompanySequenceNumber { get; set; } // Company-specific sequence number
         public int UserSequenceNumber { get; set; } // Company-specific sequence number
         public bool Deleted { get; set; } = false;
         public bool DirectAssign { get; set; } = false;
     }
+
     public class CaseListModel
     {
         [Key] // Add this

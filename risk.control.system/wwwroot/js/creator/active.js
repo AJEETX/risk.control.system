@@ -25,6 +25,9 @@
                 if (xhr.status === 401 || xhr.status === 403) {
                     window.location.href = '/Account/Login'; // Or session timeout handler
                 }
+                if (xhr.status === 500) {
+                    window.location.href = '/Investigation/Active'; // Refresh page
+                }
             }
         },
         columnDefs: [

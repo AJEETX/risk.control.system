@@ -90,7 +90,8 @@ namespace risk.control.system.Controllers.Api.Company
                     recordsTotal = result.RecordsTotal,
                     recordsFiltered = result.RecordsFiltered,
                     maxAssignReadyAllowed = result.MaxAssignReadyAllowed,
-                    data = result.Data
+                    data = result.Data,
+                    IsManager = isManager
                 });
             }
             catch (Exception ex)

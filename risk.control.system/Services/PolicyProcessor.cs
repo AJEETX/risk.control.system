@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using Microsoft.EntityFrameworkCore;
-using risk.control.system.AppConstant;
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -17,11 +15,13 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IVerifierProcessor verifierProcessor;
+        private readonly IDateParserService dateParserService;
 
-        public PolicyProcessor(ApplicationDbContext context, IVerifierProcessor verifierProcessor)
+        public PolicyProcessor(ApplicationDbContext context, IVerifierProcessor verifierProcessor, IDateParserService dateParserService)
         {
             _context = context;
             this.verifierProcessor = verifierProcessor;
+            this.dateParserService = dateParserService;
         }
 
         public async Task<(PolicyDetail Policy, List<UploadError> Errors, List<string> Summaries)> ProcessPolicy(UploadCase uc, ApplicationUser user, byte[] zipData)
@@ -33,20 +33,20 @@ namespace risk.control.system.Services
             var insuranceType = uc.InsuranceType == InsuranceType.CLAIM.GetEnumDisplayName() ? InsuranceType.CLAIM : InsuranceType.UNDERWRITING;
 
             // 2. Validate Dates & Amount
-            var (issueDate, incidentDate) = ValidateDates(uc, errs, sums);
+            var (issueDate, incidentDate) = dateParserService.ValidateDates(uc, errs, sums);
             decimal.TryParse(uc.Amount, out var amount);
 
             // 3. Lookups (Service Type, Enabler, Cost Centre)
             var serviceTypeTask = GetServiceType(uc.ServiceType, insuranceType);
             var enablerTask = GetCaseEnabler(uc.Reason);
             var costCentreTask = GetCostCentre(uc.Department);
-            await Task.WhenAll(serviceTypeTask, enablerTask,  costCentreTask);
+            await Task.WhenAll(serviceTypeTask, enablerTask, costCentreTask);
 
             var serviceType = await serviceTypeTask;
             var enabler = await enablerTask;
             var costCentre = await costCentreTask;
             // 4. Image Processing
-            var (imgPath, ext) = await verifierProcessor.ProcessImage(uc, zipData, errs, sums, POLICY_IMAGE,"CaseDetail");
+            var (imgPath, ext) = await verifierProcessor.ProcessImage(uc, zipData, errs, sums, POLICY_IMAGE, "CaseDetail");
 
             var policy = new PolicyDetail
             {
@@ -66,32 +66,6 @@ namespace risk.control.system.Services
             };
 
             return (policy, errs, sums);
-        }
-
-        private static (DateTime IssueDate, DateTime IncidentDate) ValidateDates(UploadCase uc, List<UploadError> errs, List<string> sums)
-        {
-            bool isIssueValid = DateTime.TryParseExact(uc.IssueDate, CONSTANTS.ValidDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var issueDate);
-            bool isIncidentValid = DateTime.TryParseExact(uc.IncidentDate, CONSTANTS.ValidDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var incidentDate);
-
-            if (!isIssueValid || issueDate > DateTime.Today)
-            {
-                AddError("Issue Date", uc.IssueDate, errs, sums);
-                issueDate = DateTime.Now;
-            }
-
-            if (!isIncidentValid || incidentDate > DateTime.Today)
-            {
-                AddError("Incident Date", uc.IncidentDate, errs, sums);
-                incidentDate = DateTime.Now;
-            }
-
-            if (isIssueValid && isIncidentValid && issueDate > incidentDate)
-            {
-                errs.Add(new UploadError { UploadData = "Date Comparison", Error = "Issue date must be before incident date" });
-                sums.Add("[Chronology Error: Issue date is after Incident date]");
-            }
-
-            return (issueDate, incidentDate);
         }
 
         private async Task<InvestigationServiceType> GetServiceType(string code, InsuranceType type)
@@ -120,12 +94,6 @@ namespace risk.control.system.Services
 
             return await _context.CostCentre.FirstOrDefaultAsync(c => c.Code.ToLower() == department.Trim().ToLower())
                 ?? await _context.CostCentre.FirstOrDefaultAsync();
-        }
-
-        private static void AddError(string field, string value, List<UploadError> errs, List<string> sums)
-        {
-            errs.Add(new UploadError { UploadData = $"[{field}: {value}]", Error = "Invalid/Null" });
-            sums.Add($"[{field}={value} is invalid]");
         }
     }
 }

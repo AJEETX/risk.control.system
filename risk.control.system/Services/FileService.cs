@@ -33,16 +33,17 @@ namespace risk.control.system.Services
             this.logger = logger;
         }
 
-
         [AutomaticRetry(Attempts = 0)]
         public async Task StartFileUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false)
         {
             try
             {
                 var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
+
                 var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
 
-                var (zipFileByteData, validRecords, errors) = await csvFileReaderService.ReadPipeDelimitedCsvFromZip(uploadFileData); // Read the first CSV file from the ZIP archive
+                var (zipFileByteData, validRecords, errors) = await csvFileReaderService.ReadPipeDelimitedCsvFromZip(uploadFileData);
+
                 var totalClaimsCreated = await _context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
 
                 await uploadFileDataProcessor.Process(companyUser, validRecords, totalClaimsCreated, uploadFileData, url, errors, uploadAndAssign);

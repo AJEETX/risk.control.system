@@ -14,7 +14,7 @@ namespace risk.control.system.Services
     public interface IAgencyService
     {
         Task<bool> CreateAgency(Vendor vendor, string userEmail, string domainAddress, string portal_base_url);
-        Task<bool> EditAgency(Vendor vendor, string currentUserEmail, string portal_base_url);
+        Task<bool> EditAgency(Vendor vendor, string userEmail, string portal_base_url);
     }
     internal class AgencyService : IAgencyService
     {

@@ -8,11 +8,19 @@ namespace risk.control.system.Services
     public interface IBeneficiaryValidator
     {
         (DateTime Dob, Income Income) ValidateDetails(UploadCase uc, List<UploadError> errs, List<string> sums);
+
         void ValidateRequiredFields(UploadCase uc, List<UploadError> errs, List<string> sums);
     }
 
     internal class BeneficiaryValidator : IBeneficiaryValidator
     {
+        private readonly IDateParserService dateParserService;
+
+        public BeneficiaryValidator(IDateParserService dateParserService)
+        {
+            this.dateParserService = dateParserService;
+        }
+
         public void ValidateRequiredFields(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
             if (string.IsNullOrWhiteSpace(uc.BeneficiaryName) || uc.BeneficiaryName.Length < 2)
@@ -24,20 +32,9 @@ namespace risk.control.system.Services
 
         public (DateTime Dob, Income Income) ValidateDetails(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
-            var dob = ValidateDateOfBirth(uc, errs, sums);
+            var dob = dateParserService.ParseDate(uc.BeneficiaryDob, errs, sums, "Beneficiary");
             var income = ValidateIncome(uc, errs, sums);
             return (dob, income);
-        }
-
-        private DateTime ValidateDateOfBirth(UploadCase uc, List<UploadError> errs, List<string> sums)
-        {
-            bool isValid = DateTime.TryParseExact(uc.BeneficiaryDob, CONSTANTS.ValidDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dob);
-            if (!isValid || dob > DateTime.Now || dob < DateTime.Now.AddYears(-120))
-            {
-                AddError("Date of Birth", uc.BeneficiaryDob, errs, sums);
-                return DateTime.MinValue;
-            }
-            return dob;
         }
 
         private Income ValidateIncome(UploadCase uc, List<UploadError> errs, List<string> sums)

@@ -8,11 +8,19 @@ namespace risk.control.system.Services
     public interface ICustomerValidator
     {
         void ValidateRequiredFields(UploadCase uc, List<UploadError> errs, List<string> sums);
+
         (DateTime Dob, Gender Gen, Education Edu, Occupation Occ, Income Inc) ValidateDetails(UploadCase uc, List<UploadError> errs, List<string> sums);
     }
 
     internal class CustomerValidator : ICustomerValidator
     {
+        private readonly IDateParserService dateParserService;
+
+        public CustomerValidator(IDateParserService dateParserService)
+        {
+            this.dateParserService = dateParserService;
+        }
+
         public void ValidateRequiredFields(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
             if (string.IsNullOrWhiteSpace(uc.CaseId)) AddError("CaseId", "Empty", errs, sums);
@@ -22,7 +30,7 @@ namespace risk.control.system.Services
 
         public (DateTime Dob, Gender Gen, Education Edu, Occupation Occ, Income Inc) ValidateDetails(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
-            var dob = ParseDate(uc.CustomerDob, errs, sums);
+            var dob = dateParserService.ParseDate(uc.CustomerDob, errs, sums, "Customer");
             var gender = ParseEnum<Gender>(uc.Gender, "Gender", errs, sums);
             var edu = ParseEnum<Education>(uc.Education, "Education", errs, sums);
             var occ = ParseEnum<Occupation>(uc.Occupation, "Occupation", errs, sums);
@@ -36,17 +44,6 @@ namespace risk.control.system.Services
             if (Enum.TryParse<T>(value, true, out var result)) return result;
             AddError(field, value, errs, sums);
             return default;
-        }
-
-        private DateTime ParseDate(string value, List<UploadError> errs, List<string> sums)
-        {
-            bool isValid = DateTime.TryParseExact(value, CONSTANTS.ValidDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dob);
-            if (!isValid || dob > DateTime.Now || dob < DateTime.Now.AddYears(-120))
-            {
-                AddError("Date of Birth", value, errs, sums);
-                return DateTime.MinValue;
-            }
-            return dob;
         }
 
         private void AddError(string field, string value, List<UploadError> errs, List<string> sums)

@@ -9,8 +9,6 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers.Agency
 {
     [Breadcrumb(" Cases")]
@@ -27,6 +25,7 @@ namespace risk.control.system.Controllers.Agency
             this.vendorService = vendorService;
             this.logger = logger;
         }
+
         public IActionResult Index()
         {
             return RedirectToAction("Agent");
@@ -49,7 +48,7 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (selectedcase < 1)
+                if (!ModelState.IsValid || selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be investigate.");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -86,10 +85,11 @@ namespace risk.control.system.Controllers.Agency
             }
             return View();
         }
+
         [Breadcrumb(title: " Detail", FromAction = "Submitted")]
         public async Task<IActionResult> SubmittedDetail(long id)
         {
-            if (id == 0)
+            if (!ModelState.IsValid || id == 0)
             {
                 notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
