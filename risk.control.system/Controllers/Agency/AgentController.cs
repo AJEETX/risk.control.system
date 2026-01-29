@@ -38,7 +38,7 @@ namespace risk.control.system.Controllers.Agency
             if (currentUserEmail == null)
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             return View();
         }
@@ -51,18 +51,18 @@ namespace risk.control.system.Controllers.Agency
                 if (!ModelState.IsValid || selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be investigate.");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var model = await vendorService.GetInvestigate(currentUserEmail, selectedcase, uploaded);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {UserName}.", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers.Agency
             if (currentUserEmail == null)
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             return View();
         }
@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers.Agency
             if (!ModelState.IsValid || id == 0)
             {
                 notifyService.Error("NOT FOUND !!!..");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
@@ -100,10 +100,10 @@ namespace risk.control.system.Controllers.Agency
                 if (currentUserEmail == null)
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var model = await vendorService.GetInvestigatedForAgent(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {UserName}.", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

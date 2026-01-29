@@ -15,11 +15,17 @@ namespace risk.control.system.Services
     public interface IVendorService
     {
         Task<object[]> AllAgencies();
+
         Task<object[]> GetEmpanelledVendorsAsync(ApplicationUser companyUser);
+
         Task<object[]> GetEmpanelledAgency(ApplicationUser companyUser, long caseId);
+
         Task<object[]> GetAvailableVendors(string userEmail);
+
         Task<List<AgencyServiceResponse>> GetAgencyService(long id);
+
         Task<List<AgencyServiceResponse>> AllServices(string userEmail);
+
         Task<ConcurrentBag<AgentData>> GetAgentWithCases(string userEmail, long id);
     }
 
@@ -31,9 +37,16 @@ namespace risk.control.system.Services
         private readonly IWebHostEnvironment env;
         private readonly IFeatureManager featureManager;
         private readonly IDashboardService dashboardService;
+        private readonly IBase64FileService base64FileService;
         private readonly ICustomApiClient customApiClient;
 
-        public VendorService(ApplicationDbContext context, IWebHostEnvironment env, IFeatureManager featureManager, IDashboardService dashboardService, ICustomApiClient customApiClient)
+        public VendorService(
+            ApplicationDbContext context,
+            IWebHostEnvironment env,
+            IFeatureManager featureManager,
+            IDashboardService dashboardService,
+            IBase64FileService base64FileService,
+            ICustomApiClient customApiClient)
         {
             noUserImagefilePath = "/img/no-user.png";
             noDataImagefilePath = "/img/no-image.png";
@@ -41,6 +54,7 @@ namespace risk.control.system.Services
             this.env = env;
             this.featureManager = featureManager;
             this.dashboardService = dashboardService;
+            this.base64FileService = base64FileService;
             this.customApiClient = customApiClient;
         }
 
@@ -64,6 +78,7 @@ namespace risk.control.system.Services
 
             return result;
         }
+
         private static bool IsActiveVendor(Vendor v) => !v.Deleted && v.Status == VendorStatus.ACTIVE;
 
         private static string[] GetValidStatuses() => new[]
@@ -91,12 +106,14 @@ namespace risk.control.system.Services
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.ratings)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyId);
 
-        private object MapVendor(Vendor u, ApplicationUser companyUser, List<InvestigationTask> caseTasks)
+        private async Task<object> MapVendor(Vendor u, ApplicationUser companyUser, List<InvestigationTask> caseTasks)
         {
+            var document = base64FileService.GetBase64FileAsync(u.DocumentUrl, Applicationsettings.NO_IMAGE);
+
             return new
             {
                 Id = u.VendorId,
-                Document = GetVendorDocument(u.DocumentUrl),
+                Document = await document,
                 Domain = GetDomain(u, companyUser),
                 Name = u.Name,
                 Code = u.Code,
@@ -123,17 +140,6 @@ namespace risk.control.system.Services
             user.Role == AppRoles.COMPANY_ADMIN
                 ? $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>"
                 : u.Email;
-
-        private string GetVendorDocument(string? documentUrl)
-        {
-            if (string.IsNullOrWhiteSpace(documentUrl))
-                return Applicationsettings.NO_IMAGE;
-
-            var path = Path.Combine(env.ContentRootPath, documentUrl);
-            return System.IO.File.Exists(path)
-                ? $"data:image/*;base64,{Convert.ToBase64String(System.IO.File.ReadAllBytes(path))}"
-                : Applicationsettings.NO_IMAGE;
-        }
 
         private static void ResetVendorUpdateFlags(IEnumerable<Vendor> vendors)
         {
@@ -162,38 +168,45 @@ namespace risk.control.system.Services
             {
                 return null!;
             }
-            var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE).OrderBy(u => u.Name).Select(async  u => new
-            {
-                Id = u.VendorId,
-                Document = u.DocumentUrl != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(
-                    Path.Combine(env.ContentRootPath, u.DocumentUrl)))) : Applicationsettings.NO_IMAGE,
-                Domain = u.Email,
-                Name = u.Name,
-                Code = u.Code,
-                Phone = $"(+{u.Country.ISDCode}) {u.PhoneNumber}",
-                Address = $"{u.Addressline}",
-                District = u.District.Name,
-                State = u.State.Code,
-                Country = u.Country.Code,
-                Flag = $"/flags/{u.Country.Code.ToLower()}.png",
-                Updated = u.Updated?.ToString("dd-MM-yyyy") ?? u.Created.ToString("dd-MM-yyyy"),
-                UpdateBy = u.UpdatedBy,
-                CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
-                RateCount = u.RateCount,
-                RateTotal = u.RateTotal,
-                RawAddress = $"{u.Addressline}, {u.District.Name}, {u.State.Code}, {u.Country.Code}",
-                IsUpdated = u.IsUpdated,
-                LastModified = u.Updated,
-                HasService =(await GetPinCodeAndServiceForTheCase(caseId, u.VendorId)),
-            }).ToArray();
+            var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE).OrderBy(u => u.Name)
+                .Select(async u =>
+                {
+                    var hasService = GetPinCodeAndServiceForTheCase(caseId, u.VendorId);
+                    var document = base64FileService.GetBase64FileAsync(u.DocumentUrl, Applicationsettings.NO_IMAGE);
+                    await Task.WhenAll(document, hasService);
+                    return new
+                    {
+                        Id = u.VendorId,
+                        Document = await document,
+                        Domain = u.Email,
+                        Name = u.Name,
+                        Code = u.Code,
+                        Phone = $"(+{u.Country.ISDCode}) {u.PhoneNumber}",
+                        Address = $"{u.Addressline}",
+                        District = u.District.Name,
+                        State = u.State.Code,
+                        Country = u.Country.Code,
+                        Flag = $"/flags/{u.Country.Code.ToLower()}.png",
+                        Updated = u.Updated?.ToString("dd-MM-yyyy") ?? u.Created.ToString("dd-MM-yyyy"),
+                        UpdateBy = u.UpdatedBy,
+                        CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
+                        RateCount = u.RateCount,
+                        RateTotal = u.RateTotal,
+                        RawAddress = $"{u.Addressline}, {u.District.Name}, {u.State.Code}, {u.Country.Code}",
+                        IsUpdated = u.IsUpdated,
+                        LastModified = u.Updated,
+                        HasService = await hasService
+                    };
+                }).ToList();
+            var awaitedResults = await Task.WhenAll(result);
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync(null, false);
-            return result;
+            return awaitedResults;
         }
 
         private async Task<bool> GetPinCodeAndServiceForTheCase(long caseId, long vendorId)
         {
-            var selectedCase =await _context.Investigations
+            var selectedCase = await _context.Investigations
                 .Include(p => p.PolicyDetail)
                 .Include(p => p.CustomerDetail)
                 .Include(p => p.BeneficiaryDetail)
@@ -218,7 +231,7 @@ namespace risk.control.system.Services
                 districtId = selectedCase.BeneficiaryDetail.DistrictId;
             }
 
-            var vendor =await _context.Vendor
+            var vendor = await _context.Vendor
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .FirstOrDefaultAsync(v => v.VendorId == vendorId);
 
@@ -234,13 +247,12 @@ namespace risk.control.system.Services
                             v.CountryId == countryId
                             );
             return hasService ?? false;
-
         }
 
         public async Task<object[]> GetAvailableVendors(string userEmail)
         {
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var company =await _context.ClientCompany
+            var company = await _context.ClientCompany
                 .Include(c => c.EmpanelledVendors)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
@@ -290,7 +302,7 @@ namespace risk.control.system.Services
 
         public async Task<List<AgencyServiceResponse>> GetAgencyService(long id)
         {
-            var vendor =await _context.Vendor
+            var vendor = await _context.Vendor
                 .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
                  .Include(i => i.VendorInvestigationServiceTypes)
@@ -326,7 +338,7 @@ namespace risk.control.system.Services
                     Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
                     Pincodes = pincodes,
                     RawPincodes = rawPincodes,
-                    Rate = string.Format(Extensions.GetCultureByCountry(service.Country.Code.ToUpper()), "{0:c}", service.Price),
+                    Rate = string.Format(CustomExtensions.GetCultureByCountry(service.Country.Code.ToUpper()), "{0:c}", service.Price),
                     UpdatedBy = service.UpdatedBy,
                     Updated = service.Updated.HasValue ? service.Updated.Value.ToString("dd-MM-yyyy") : service.Created.ToString("dd-MM-yyyy"),
                     IsUpdated = service.IsUpdated,
@@ -348,7 +360,8 @@ namespace risk.control.system.Services
          .Include(v => v.PinCode)
          .Where(v => !v.Deleted)
          .OrderBy(a => a.Name)
-         .Select(u => new {
+         .Select(u => new
+         {
              u.VendorId,
              u.DocumentUrl,
              u.Email,
@@ -454,7 +467,7 @@ namespace risk.control.system.Services
                         .Select(id => districtDict.TryGetValue(id, out var name) ? name : null)
                         .Where(n => n != null) ?? Enumerable.Empty<string>());
 
-                var culture = Extensions.GetCultureByCountry(service.Country.Code.ToUpper());
+                var culture = CustomExtensions.GetCultureByCountry(service.Country.Code.ToUpper());
 
                 return new AgencyServiceResponse
                 {
@@ -538,7 +551,7 @@ namespace risk.control.system.Services
             {
                 LocationLongitude = caseTask.BeneficiaryDetail.Longitude;
             }
-                
+
             var agentList = new ConcurrentBag<AgentData>(); // Using a thread-safe collection
 
             await Task.WhenAll(vendorAgents.Select(async agent =>
@@ -597,7 +610,6 @@ namespace risk.control.system.Services
                 };
 
                 agentList.Add(agentInfo);
-
             }));
             return agentList;
         }

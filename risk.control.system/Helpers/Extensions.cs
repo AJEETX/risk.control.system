@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace risk.control.system.Helpers
 {
-    public static class Extensions
+    public static class CustomExtensions
     {
         private static readonly Dictionary<string, string> FileSignatures = new Dictionary<string, string>
         {
@@ -48,6 +48,7 @@ namespace risk.control.system.Helpers
             // Return CultureInfo based on country code, or default to "en-US"
             return new CultureInfo(countryToCulture.ContainsKey(countryCode) ? countryToCulture[countryCode] : "en-US");
         }
+
         public static string GetFileExtension(this byte[] fileBytes)
         {
             if (fileBytes == null || fileBytes.Length < 4)
@@ -87,6 +88,7 @@ namespace risk.control.system.Helpers
 
             return null; // Unknown format
         }
+
         public static string GetEnumDisplayName(this Enum value)
         {
             FieldInfo fi = value.GetType().GetField(value.ToString());
@@ -120,6 +122,7 @@ namespace risk.control.system.Helpers
             return Convert.TryFromBase64String(base64, buffer, out int bytesParsed);
         }
     }
+
     public static class HtmlHelperExtensions
     {
         public static TEnum? GetEnumFromDisplayName<TEnum>(string displayName) where TEnum : struct, Enum
@@ -134,7 +137,6 @@ namespace risk.control.system.Helpers
             }
             return null; // Return null if no match is found
         }
-
 
         public static IEnumerable<SelectListItem> GetEnumSelectList<TEnum>() where TEnum : Enum
         {
@@ -155,6 +157,7 @@ namespace risk.control.system.Helpers
                                         .FirstOrDefault() as System.ComponentModel.DataAnnotations.DisplayAttribute;
             return displayAttribute != null ? displayAttribute.Name : value.ToString();
         }
+
         public static IEnumerable<SelectListItem> GetEnumSelectListWithDefaultValue<TEnum>(this IHtmlHelper htmlHelper, TEnum defaultValue)
             where TEnum : struct
         {

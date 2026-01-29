@@ -10,8 +10,6 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers.Agency
 {
     [Breadcrumb(" Cases")]
@@ -36,6 +34,7 @@ namespace risk.control.system.Controllers.Agency
             this.logger = logger;
             this.vendorService = vendorService;
         }
+
         public IActionResult Index()
         {
             try
@@ -44,7 +43,7 @@ namespace risk.control.system.Controllers.Agency
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 return RedirectToAction("Allocate");
             }
@@ -52,12 +51,12 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {UserName}.", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-
         }
+
         [Breadcrumb(" Allocate/Enquiry")]
-        public ActionResult Allocate()
+        public IActionResult Allocate()
         {
             try
             {
@@ -65,7 +64,7 @@ namespace risk.control.system.Controllers.Agency
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 return View();
             }
@@ -73,7 +72,7 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {UserName}.", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -93,10 +92,10 @@ namespace risk.control.system.Controllers.Agency
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var model = await vendorInvestigationDetailService.SelectVendorAgent(currentUserEmail, selectedcase);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -104,7 +103,7 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {SelectedCase} for {UserName}.", selectedcase, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -123,10 +122,10 @@ namespace risk.control.system.Controllers.Agency
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var model = await vendorInvestigationDetailService.SelectVendorAgent(currentUserEmail, selectedcase);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -134,7 +133,7 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {SelectedCase} for {UserName}.", selectedcase, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -145,7 +144,7 @@ namespace risk.control.system.Controllers.Agency
             if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             return View();
         }
@@ -164,11 +163,11 @@ namespace risk.control.system.Controllers.Agency
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var model = await vendorService.GetInvestigateReport(currentUserEmail, selectedcase);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -176,9 +175,8 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {SelectedCase} for {UserName}.", selectedcase, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-
         }
 
         [Breadcrumb(" Active")]
@@ -188,7 +186,7 @@ namespace risk.control.system.Controllers.Agency
             if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             return View();
         }
@@ -201,23 +199,23 @@ namespace risk.control.system.Controllers.Agency
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var model = await vendorInvestigationDetailService.GetClaimDetails(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -229,23 +227,23 @@ namespace risk.control.system.Controllers.Agency
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var model = await vendorInvestigationDetailService.GetClaimDetails(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -256,19 +254,18 @@ namespace risk.control.system.Controllers.Agency
             if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             return View();
         }
 
         [Breadcrumb(" Details", FromAction = "Completed")]
-
         public async Task<IActionResult> CompletedDetail(long id)
         {
             if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("NOT FOUND !!!..");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
@@ -276,10 +273,10 @@ namespace risk.control.system.Controllers.Agency
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var model = await vendorInvestigationDetailService.GetClaimDetailsReport(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -287,26 +284,26 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
-        [Breadcrumb(" Reply Enquiry", FromAction = "Allocate")]
 
+        [Breadcrumb(" Reply Enquiry", FromAction = "Allocate")]
         public async Task<IActionResult> ReplyEnquiry(long id)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("NOT FOUND !!!..");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var model = await vendorService.GetInvestigateReport(currentUserEmail, id);
-            ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+            ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
             ViewData["claimId"] = id;
 
@@ -321,16 +318,16 @@ namespace risk.control.system.Controllers.Agency
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("Allocate", "SuperVisor", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("Completed", "SuperVisor", "Completed") { Parent = claimsPage, };
@@ -344,9 +341,8 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-
         }
 
         [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
@@ -357,17 +353,17 @@ namespace risk.control.system.Controllers.Agency
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail) || 1 > id)
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(invoice);
             }
@@ -375,7 +371,7 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {CaseId} for {UserName}.", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

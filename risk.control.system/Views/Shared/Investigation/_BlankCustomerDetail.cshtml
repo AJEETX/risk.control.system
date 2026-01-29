@@ -72,11 +72,11 @@
                     if (Model.ClaimsInvestigation?.CustomerDetail != null)
                     {
                         <input type="hidden" asp-for="ClaimsInvestigation.Id" />
-                        <a id="edit-customer" class="btn btn-warning" asp-action="EditCustomer" asp-route-id="@Model.ClaimsInvestigation.Id"><i class="fa fa-user-plus"></i>  Edit Customer</a>
+                        <a id="edit-customer" class="btn btn-warning" asp-controller="Customer" asp-action="EditCustomer" asp-route-id="@Model.ClaimsInvestigation.Id"><i class="fa fa-user-plus"></i>  Edit Customer</a>
                     }
                     else
                     {
-                        <a id="add-customer" class="btn btn-success" asp-action="CreateCustomer" asp-route-id="@Model.ClaimsInvestigation.Id"><i class="fa fa-user-plus"></i> Add Customer</a>
+                        <a id="add-customer" class="btn btn-success" asp-controller="Customer" asp-action="CreateCustomer" asp-route-id="@Model.ClaimsInvestigation.Id"><i class="fa fa-user-plus"></i> Add Customer</a>
                     }
                 }
             </div>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -34,6 +35,30 @@ namespace risk.control.system.Helpers
                 await viewResult.View.RenderAsync(viewContext);
                 return writer.GetStringBuilder().ToString();
             }
+        }
+
+        public static IActionResult RedirectToAction<TController>(
+            this Controller controller,
+            Expression<Action<TController>> action)
+            where TController : Controller
+        {
+            if (controller == null)
+                throw new ArgumentNullException(nameof(controller));
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            // Get action name
+            if (!(action.Body is MethodCallExpression methodCall))
+                throw new ArgumentException("Expression must be a method call", nameof(action));
+
+            string actionName = methodCall.Method.Name;
+
+            // Get controller name without "Controller" suffix
+            string controllerName = typeof(TController).Name;
+            if (controllerName.EndsWith("Controller"))
+                controllerName = controllerName.Substring(0, controllerName.Length - 10);
+
+            return controller.RedirectToAction(actionName, controllerName);
         }
     }
 }

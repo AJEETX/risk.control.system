@@ -125,7 +125,7 @@ namespace risk.control.system.Services
             var finalDataTasks = pagedRawData.Select(async a =>
             {
                 var isUnderwriting = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper());
+                var culture = CustomExtensions.GetCultureByCountry(companyUser.Country.Code.ToUpper());
                 
                 var policyId = a.PolicyDetail.ContractNumber;
                 var amount = string.Format(culture, "{0:C}", a.PolicyDetail.SumAssuredValue);
@@ -284,7 +284,7 @@ namespace risk.control.system.Services
             // 6. Transform & Async File I/O
             var finalTasks = pagedList.Select(async a => {
                 var isUW = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper());
+                var culture = CustomExtensions.GetCultureByCountry(companyUser.Country.Code.ToUpper());
                 var policyNumber = a.GetPolicyNum();
                 var investigationService = a.PolicyDetail.InvestigationServiceType.Name;
                 var serviceType = $"{a.PolicyDetail.InsuranceType.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})";

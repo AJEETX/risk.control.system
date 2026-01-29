@@ -4,7 +4,6 @@ using System.Reflection;
 using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,25 +18,16 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class VendorsController : Controller
     {
-        private readonly AppRoles[] agencyRoles =
-                [
-                    AppRoles.AGENCY_ADMIN,
-                    AppRoles.SUPERVISOR,
-                    AppRoles.AGENT
-                ];
         private readonly ApplicationDbContext _context;
         private readonly IAgencyCreateEditService agencyCreateEditService;
         private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationDetailService investigationDetailService;
-        private readonly IInvestigationService service;
         private readonly IFeatureManager featureManager;
         private readonly ILogger<VendorsController> logger;
         private readonly string portal_base_url = string.Empty;
@@ -48,7 +38,6 @@ namespace risk.control.system.Controllers
             IAgencyUserCreateEditService agencyUserCreateEditService,
             INotyfService notifyService,
             IInvestigationDetailService investigationDetailService,
-            IInvestigationService service,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
             ILogger<VendorsController> logger)
@@ -58,7 +47,6 @@ namespace risk.control.system.Controllers
             this.agencyUserCreateEditService = agencyUserCreateEditService;
             this.notifyService = notifyService;
             this.investigationDetailService = investigationDetailService;
-            this.service = service;
             this.featureManager = featureManager;
             this.logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
@@ -77,6 +65,7 @@ namespace risk.control.system.Controllers
         {
             return View();
         }
+
         [Breadcrumb("Empanelled Agencies", FromAction = "Index")]
         public IActionResult EmpanelledVendors()
         {
@@ -101,7 +90,7 @@ namespace risk.control.system.Controllers
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found. Try again.");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var company = await _context.ClientCompany
                     .Include(c => c.EmpanelledVendors)
@@ -112,7 +101,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction("EmpanelledVendors", "Vendors");
                 }
                 var agenciesToDepanel = company.EmpanelledVendors.Where(v => vendors.Contains(v.VendorId)).ToList();
-                foreach(var agency in agenciesToDepanel)
+                foreach (var agency in agenciesToDepanel)
                 {
                     company.EmpanelledVendors.Remove(agency);
                 }
@@ -136,6 +125,7 @@ namespace risk.control.system.Controllers
         {
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AvailableVendors(List<long> vendors)
@@ -180,8 +170,8 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Error occurred depanelling Agencies. Try again.");
                 return RedirectToAction("AvailableVendors", "Vendors");
             }
-
         }
+
         public async Task<JsonResult> PostRating(int rating, long mid)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -296,7 +286,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Error getting Agency. Try again.");
                 return RedirectToAction("AvailableVendors", "Vendors");
             }
-
         }
 
         [Breadcrumb(" Manage Users", FromAction = "Details")]
@@ -319,7 +308,7 @@ namespace risk.control.system.Controllers
             if (id <= 0)
             {
                 notifyService.Custom($"OOPs !!!..Error creating user.", 3, "red", "fa fa-user");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             List<SelectListItem> allRoles = null;
             AppRoles? role = null;
@@ -327,7 +316,7 @@ namespace risk.control.system.Controllers
             if (vendor == null)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var currentVendorUserCount = await _context.ApplicationUser.CountAsync(v => v.VendorId == id);
             bool status = false;
@@ -335,7 +324,7 @@ namespace risk.control.system.Controllers
             {
                 role = AppRoles.AGENCY_ADMIN;
                 status = true;
-                allRoles = agencyRoles
+                allRoles = RoleGroups.AgencyAppRoles
                 .Where(r => r == AppRoles.AGENCY_ADMIN) // Include ADMIN if already taken
                 .Select(r => new SelectListItem
                 {
@@ -349,7 +338,7 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                allRoles = agencyRoles
+                allRoles = RoleGroups.AgencyAppRoles
                 .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude ADMIN if already taken
                 .Select(r => new SelectListItem
                 {
@@ -380,6 +369,7 @@ namespace risk.control.system.Controllers
 
             return View(model);
         }
+
         private async Task LoadModel(ApplicationUser model)
         {
             List<SelectListItem> allRoles = null;
@@ -392,7 +382,7 @@ namespace risk.control.system.Controllers
             {
                 role = AppRoles.AGENCY_ADMIN;
                 status = true;
-                allRoles = agencyRoles
+                allRoles = RoleGroups.AgencyAppRoles
                 .Where(r => r == AppRoles.AGENCY_ADMIN) // Include ADMIN if already taken
                 .Select(r => new SelectListItem
                 {
@@ -406,7 +396,7 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                allRoles = agencyRoles
+                allRoles = RoleGroups.AgencyAppRoles
                 .Where(r => r != AppRoles.AGENCY_ADMIN) // Include ADMIN if already taken
                 .Select(r => new SelectListItem
                 {
@@ -428,6 +418,7 @@ namespace risk.control.system.Controllers
             model.AvailableRoles = allRoles;
             model.Role = role;
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(ApplicationUser model, string emailSuffix)
@@ -458,7 +449,6 @@ namespace risk.control.system.Controllers
                     return View(model);
                 }
                 return RedirectToAction(nameof(Users), "Vendors", new { id = model.VendorId });
-
             }
             catch (Exception ex)
             {
@@ -471,18 +461,18 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Edit User", FromAction = "Users")]
         public async Task<IActionResult> EditUser(long userId)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
-                var vendorApplicationUser =await _context.ApplicationUser.Include(v => v.Country)?.Include(v => v.Vendor)?.FirstOrDefaultAsync(v => v.Id == userId);
+                var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Country)?.Include(v => v.Vendor)?.FirstOrDefaultAsync(v => v.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
@@ -498,7 +488,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {UserId} by {UserName}.",userId, User?.Identity?.Name);
+                logger.LogError(ex, "Error getting {UserId} by {UserName}.", userId, User?.Identity?.Name);
                 notifyService.Error("Error getting User. Try again.");
                 return RedirectToAction(nameof(Users));
             }
@@ -588,16 +578,16 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Error deleting User. Try again.");
                 return RedirectToAction(nameof(Users));
             }
-
         }
+
         [HttpPost, ActionName("DeleteUser")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteUser(string email, long vendorId)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
@@ -607,7 +597,7 @@ namespace risk.control.system.Controllers
                 if (model == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 model.Updated = DateTime.Now;
@@ -624,7 +614,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Error deleting User. Try again.");
                 return RedirectToAction(nameof(Users));
             }
-
         }
 
         [Breadcrumb("Manage Service", FromAction = "Details")]
@@ -633,7 +622,7 @@ namespace risk.control.system.Controllers
             if (id == null || string.IsNullOrWhiteSpace(id))
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
@@ -772,7 +761,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {AgencyId} by {UserName}.",vendorId, User?.Identity?.Name);
+                logger.LogError(ex, "Error editing {AgencyId} by {UserName}.", vendorId, User?.Identity?.Name);
                 logger.LogError(ex, "Error editing Agency.");
                 notifyService.Error("Error editing Agency. Try again.");
             }
@@ -786,7 +775,7 @@ namespace risk.control.system.Controllers
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
@@ -806,7 +795,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var agencySubStatuses = new[]{
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
@@ -832,7 +821,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting {AgencyId} by {UserName}.", id, User?.Identity?.Name);
                 notifyService.Error("Error getting agency. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -840,10 +829,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long VendorId)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
@@ -853,7 +842,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Agency Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var vendorUser = await _context.ApplicationUser.Where(v => v.VendorId == VendorId).ToListAsync();
@@ -876,7 +865,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error deleting {AgencyId} by {UserName}.", VendorId, User?.Identity?.Name);
                 notifyService.Error("Error deleting agency. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

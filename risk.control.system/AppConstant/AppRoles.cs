@@ -1,4 +1,5 @@
 ﻿using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.AppConstant
 {
     public enum AppRoles
@@ -13,8 +14,24 @@ namespace risk.control.system.AppConstant
         AGENT,
         GUEST
     }
+
     public static class RoleGroups
     {
+        public static AppRoles[] CompanyAppRoles = new[]
+                {
+                    AppRoles.COMPANY_ADMIN,
+                    AppRoles.CREATOR,
+                    AppRoles.MANAGER,
+                    AppRoles.ASSESSOR
+                };
+
+        public static AppRoles[] AgencyAppRoles = new[]
+                {
+                    AppRoles.AGENCY_ADMIN,
+                    AppRoles.SUPERVISOR,
+                    AppRoles.AGENT
+                };
+
         public static readonly string[] CompanyRoles =
         {
             PORTAL_ADMIN.DISPLAY_NAME,
@@ -31,6 +48,7 @@ namespace risk.control.system.AppConstant
             AGENT.DISPLAY_NAME
         };
     }
+
     public static class PORTAL_ADMIN
     {
         public const string DISPLAY_NAME = "PORTAL_ADMIN";

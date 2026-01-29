@@ -127,7 +127,7 @@ namespace risk.control.system.Controllers
             if (id < 1 || _context.ClientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             var clientCompany = await _context.ClientCompany
@@ -138,7 +138,7 @@ namespace risk.control.system.Controllers
             if (clientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
 
             }
             var hasClaims = await _context.Investigations.AnyAsync(c => c.ClientCompanyId == id && !c.Deleted);
@@ -154,7 +154,7 @@ namespace risk.control.system.Controllers
             if (ClientCompanyId <= 0)
             {
                 notifyService.Error("Company not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var clientCompany = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == ClientCompanyId);
             if (clientCompany != null)
@@ -181,7 +181,7 @@ namespace risk.control.system.Controllers
             }
 
             notifyService.Error("Company not found!");
-            return RedirectToAction(nameof(Index), "Dashboard");
+                            return this.RedirectToAction<DashboardController>(x => x.Index());
         }
 
         // GET: ClientCompanies/Details/5
@@ -191,7 +191,7 @@ namespace risk.control.system.Controllers
             if (id < 1 || _context.ClientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             var clientCompany = await _context.ClientCompany
@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers
             if (clientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             return View(clientCompany);
@@ -216,14 +216,14 @@ namespace risk.control.system.Controllers
             if (id <= 0)
             {
                 notifyService.Error("Company not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             var clientCompany = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == id);
             if (clientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
@@ -438,7 +438,7 @@ namespace risk.control.system.Controllers
             if (id < 1 || _context.Vendor == null)
             {
                 notifyService.Error("Agency not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             var vendor = await _context.Vendor
@@ -456,7 +456,7 @@ namespace risk.control.system.Controllers
             if (vendor == null)
             {
                 notifyService.Error("Agency not found!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             ViewBag.CompanyId = companyId;
             ViewBag.Backurl = backurl;

@@ -25,29 +25,23 @@ namespace risk.control.system.Controllers.Company
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly ApplicationDbContext _context;
-        private readonly IUploadFileService uploadFileService;
         private readonly IProcessCaseService processCaseService;
         private readonly IMailService mailboxService;
-        private readonly IFileService ftpService;
         private readonly INotyfService notifyService;
         private readonly ILogger<InvestigationPostController> logger;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public InvestigationPostController(ApplicationDbContext context,
-            IUploadFileService uploadFileService,
             IProcessCaseService processCaseService,
             IMailService mailboxService,
-            IFileService ftpService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<InvestigationPostController> logger,
             IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
-            this.uploadFileService = uploadFileService;
             this.processCaseService = processCaseService;
             this.mailboxService = mailboxService;
-            this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.logger = logger;
             this.backgroundJobClient = backgroundJobClient;
@@ -55,76 +49,31 @@ namespace risk.control.system.Controllers.Company
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> New(IFormFile postedFile, CreateClaims model)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    notifyService.Custom($"Invalid File Upload Error. ", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
-                }
-                if (postedFile == null || model == null ||
-                string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
-                string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
-                Path.GetExtension(Path.GetFileName(postedFile.FileName)) != ".zip"
-                )
-                {
-                    notifyService.Custom($"Invalid File Upload Error. ", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
-                }
-
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                var uploadId = await uploadFileService.UploadFile(currentUserEmail, postedFile, CREATEDBY.AUTO, model.UploadAndAssign);
-                var jobId = backgroundJobClient.Enqueue(() => ftpService.StartFileUpload(currentUserEmail, uploadId, baseUrl, model.UploadAndAssign));
-                if (!model.UploadAndAssign)
-                {
-                    notifyService.Custom($"Uploading ...", 3, "#17A2B8", "fa fa-upload");
-                }
-                else
-                {
-                    notifyService.Custom($"Assigning ...", 5, "#dc3545", "fa fa-upload");
-
-                }
-
-                return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload", new { uploadId = uploadId });
-
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "File Upload Error");
-                notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
-                return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
-            }
-        }
-
 
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAutoConfirmed(long id)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return Json(new { success = false, message = "Invalid request." });
             }
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 if (id <= 0)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var claimsInvestigation = await _context.Investigations.FindAsync(id);
                 if (claimsInvestigation == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 claimsInvestigation.Updated = DateTime.Now;
@@ -136,7 +85,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting case");
+                logger.LogError(ex, "Error deleting case {Id}. {UserEmail}", id, currentUserEmail);
                 notifyService.Error("Error deleting case. Try again.");
                 return Json(new { success = false, message = "Error deleting case. Try again." });
             }
@@ -147,6 +96,7 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCases([FromBody] DeleteRequestModel request)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid)
@@ -158,15 +108,13 @@ namespace risk.control.system.Controllers.Company
                     return Json(new { success = false, message = "No cases selected for deletion." });
                 }
 
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 foreach (var claim in request.claims)
                 {
                     var claimsInvestigation = await _context.Investigations.FindAsync(claim);
                     if (claimsInvestigation == null)
                     {
                         notifyService.Error("Not Found!!!..Contact Admin");
-                        return RedirectToAction(nameof(Index), "Dashboard");
+                                        return this.RedirectToAction<DashboardController>(x => x.Index());
                     }
 
                     claimsInvestigation.Updated = DateTime.Now;
@@ -182,7 +130,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting cases");
+                logger.LogError(ex, "Error deleting cases. {UserEmail}", currentUserEmail);
                 notifyService.Error("Error deleting cases. Try again.");
                 return Json(new { success = false, message = ex.Message });
             }
@@ -193,15 +141,14 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAuto(List<long> claims)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid || claims == null || claims.Count == 0)
                 {
                     notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                    return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
                 }
-
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 // AUTO ALLOCATION COUNT
                 var distinctClaims = claims.Distinct().ToList();
@@ -209,7 +156,7 @@ namespace risk.control.system.Controllers.Company
                 if (affectedRows < distinctClaims.Count)
                 {
                     notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                    return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
                 }
                 var jobId = backgroundJobClient.Enqueue(() => processCaseService.BackgroundAutoAllocation(distinctClaims, currentUserEmail, baseUrl));
                 notifyService.Custom($"Assignment of <b> {distinctClaims.Count}</b> Case(s) started", 3, "orange", "far fa-file-powerpoint");
@@ -217,31 +164,32 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error assigning case");
+                logger.LogError(ex, "Error deleting cases. {UserEmail}", currentUserEmail);
                 notifyService.Error("Error assigning case. Try again.");
             }
-            return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+            return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
         }
+
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> AllocateSingle2Vendor(long selectedcase, long caseId)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid || selectedcase < 1 || caseId < 1)
                 {
                     notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                    return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var (policy, status) = await processCaseService.AllocateToVendor(currentUserEmail, caseId, selectedcase, false);
 
                 if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
                 {
                     notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                    return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
                 }
 
                 var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == selectedcase);
@@ -254,38 +202,39 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error assigning case");
+                logger.LogError(ex, "Error assigning case {Id} to {Agency}. {UserEmail}", selectedcase, caseId, currentUserEmail);
                 notifyService.Error("Error assigning case. Try again.");
-                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
             }
         }
+
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAutoSingle(long claims)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid || claims < 1)
                 {
                     notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                    return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var allocatedCaseNumber = await processCaseService.ProcessAutoSingleAllocation(claims, currentUserEmail, baseUrl);
                 if (string.IsNullOrWhiteSpace(allocatedCaseNumber))
                 {
                     notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                    return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
                 }
                 notifyService.Custom($"Case <b>#:{allocatedCaseNumber}</b> Assigned<sub>auto</b>", 3, "green", "far fa-file-powerpoint");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error assigning case");
+                logger.LogError(ex, "Error assigning cases. {UserEmail}", currentUserEmail);
                 notifyService.Error("Error assigning case. Try again.");
-                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
             }
             return RedirectToAction(nameof(CaseActiveController.Active), "CaseActive");
         }
@@ -295,29 +244,28 @@ namespace risk.control.system.Controllers.Company
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> WithdrawCase(CaseTransactionModel model, long claimId, string policyNumber)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid || model == null || claimId < 1)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var (company, vendorId) = await processCaseService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
 
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
 
                 notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "orange", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
-
+                return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error withdrawing case");
+                logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, currentUserEmail);
                 notifyService.Error("Error withdrawing case. Try again.");
-                return RedirectToAction(nameof(InvestigationController.New), "Investigation");
+                return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
             }
         }
 
@@ -326,15 +274,14 @@ namespace risk.control.system.Controllers.Company
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, long claimId, string reportAiSummary = "")
         {
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
+            {
+                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+            }
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (!ModelState.IsValid || string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
-                {
-                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
-                }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 if (Enum.TryParse<AssessorRemarkType>(assessorRemarkType, true, out var reportUpdateStatus))
                 {
                     assessorRemarks = WebUtility.HtmlEncode(assessorRemarks);
@@ -365,11 +312,10 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error processing case");
+                logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, currentUserEmail);
                 notifyService.Error("Error processing case. Try again.");
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
-
         }
 
         [HttpPost]
@@ -377,6 +323,7 @@ namespace risk.control.system.Controllers.Company
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> SubmitQuery(long claimId, string reply, CaseInvestigationVendorsModel request, IFormFile? document)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid)
@@ -409,8 +356,6 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 request.InvestigationReport.EnquiryRequest.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
 
                 var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
@@ -424,13 +369,13 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
                 }
                 notifyService.Error("OOPs !!!..Error sending query");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error submitting query");
+                logger.LogError(ex, "Error submitting query case {Id}", claimId, currentUserEmail);
                 notifyService.Error("Error submitting query. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -439,6 +384,7 @@ namespace risk.control.system.Controllers.Company
         [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> SubmitNotes(long claimId, string name)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid || claimId < 1 || string.IsNullOrWhiteSpace(name))
@@ -446,7 +392,6 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("Bad Request..");
                     return Ok();
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var model = await processCaseService.SubmitNotes(currentUserEmail, claimId, name);
                 if (model)
@@ -459,11 +404,10 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error submitting notes");
+                logger.LogError(ex, "Error submitting notes case {Id}", claimId, currentUserEmail);
                 notifyService.Error("Error submitting notes. Try again.");
                 return StatusCode(500);
             }
         }
-        
     }
 }

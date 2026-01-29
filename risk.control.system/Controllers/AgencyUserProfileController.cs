@@ -1,16 +1,14 @@
-﻿using Amazon.Rekognition.Model;
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
@@ -23,7 +21,7 @@ namespace risk.control.system.Controllers
         private readonly IAccountService accountService;
         private readonly INotyfService notifyService;
         private readonly ILogger<AgencyUserProfileController> logger;
-        private string portal_base_url = string.Empty;
+        private readonly string portal_base_url = string.Empty;
 
         public AgencyUserProfileController(ApplicationDbContext context,
             IVendorUserService vendorUserService,
@@ -60,7 +58,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -72,14 +70,14 @@ namespace risk.control.system.Controllers
                 if (userId == null || _context.ApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var country = _context.Country.OrderBy(o => o.Name);
@@ -98,7 +96,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting {UserId} for {UserName}", userId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -116,7 +114,7 @@ namespace risk.control.system.Controllers
                 if (id != model.Id.ToString())
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var result = await vendorUserService.UpdateUserAsync(id, model, User?.Identity?.Name, portal_base_url);
 
@@ -138,7 +136,7 @@ namespace risk.control.system.Controllers
                 logger.LogError(ex, "Error editing {UserId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
             }
-            return RedirectToAction(nameof(Index), "Dashboard");
+            return this.RedirectToAction<DashboardController>(x => x.Index());
         }
 
         [HttpGet]
@@ -158,10 +156,10 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             notifyService.Error("OOPS !!!..Contact Admin");
-            return RedirectToAction(nameof(Index), "Dashboard");
+            return this.RedirectToAction<DashboardController>(x => x.Index());
         }
 
         [HttpPost]
@@ -191,7 +189,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error for changing password by {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 

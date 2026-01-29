@@ -10,7 +10,7 @@ namespace risk.control.system.Services
     public interface ICaseCreateEditService
     {
         Task<InvestigationCreateModel> Create(string userEmail);
-        Task<CreateCaseViewModel> AddCasePolicy(string userEmail);
+        Task<CreateCaseViewModel> AddCaseDetail(string userEmail);
         Task<(bool Success, long? Id, string? CaseId, Dictionary<string, string> Errors)> CreateAsync(string userEmail, CreateCaseViewModel model);
         Task<EditPolicyDto> GetEditPolicyDetail(long id);
         Task<(bool Success, string? CaseId, Dictionary<string, string> Errors)> EditAsync(string userEmail, EditPolicyDto model);
@@ -63,7 +63,7 @@ namespace risk.control.system.Services
             };
             return model;
         }
-        public async Task<CreateCaseViewModel> AddCasePolicy(string userEmail)
+        public async Task<CreateCaseViewModel> AddCaseDetail(string userEmail)
         {
             var contractNumber = await numberService.GetNumberSequence("PX");
             var caseEnabler = await context.CaseEnabler.FirstOrDefaultAsync();

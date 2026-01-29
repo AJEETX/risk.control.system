@@ -69,20 +69,20 @@ namespace risk.control.system.Controllers.Agency
                 if (currentUserEmail == null)
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var vendorAgent = await _context.ApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Id.ToString() == selectedcase);
                 if (vendorAgent == null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var claim = await vendorInvestigationDetailService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error occurred.");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers.Agency
             {
                 logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 

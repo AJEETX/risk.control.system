@@ -165,7 +165,7 @@
     </div>
     <div class="card-footer">
         <div class="text-right">
-            <a id="cancel" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
+            <a id="cancel" asp-controller="Investigation" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
                 @Applicationsettings.CANCEL
             </a>

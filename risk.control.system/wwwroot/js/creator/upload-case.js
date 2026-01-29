@@ -22,7 +22,7 @@
                     length: d.length,
                     orderColumn: d.order[0].column ?? 0,
                     orderDir: d.order[0].dir ?? "asc",
-                    searchValue: d.search?.value ?? ""  
+                    searchValue: d.search?.value ?? ""
                 };
             },
             "dataSrc": function (json) {
@@ -69,7 +69,7 @@
         processing: true,
         autoWidth: false,
         serverSide: true,
-        deferRender: true,  
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -128,16 +128,16 @@
                             <small><strong> ${data}</strong></small>
                         </span>`;
                     } else if (row.status == 'Error') {
-                            return `
+                        return `
                         <span class="custom-message-badge i-red" title="${data}" data-toggle="tooltip">
                             <small><strong> ${data}</strong></small>
                         </span>`;
-                        } else {
-                            return `
+                    } else {
+                        return `
                         <span class="custom-message-badge i-grey" title="${data}" data-toggle="tooltip">
                             <small><strong> ${data}</strong></small>
                         </span>`;
-                        }
+                    }
                 }
             },
             {
@@ -152,11 +152,11 @@
                     else if (row.hasError && row.message == "Error uploading the file") {
                         img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger upload-err' title='Download Error file' data-bs-toggle='tooltip'> <i class='fa fa-download'></i> Error File</a>`;
                     }
-                    
+
                     else if (!row.hasError && row.status == 'Completed') {
                         img += `<div class='btn btn-xs i-green upload-success' title='${title} Successfully' data-bs-toggle='tooltip'><i class='fa fa-check'></i> ${title} </div> `;
-                    } 
-                    else if (row.status == 'Processing'){
+                    }
+                    else if (row.status == 'Processing') {
                         img += `<div class='upload-progress' title='Action in-progress' data-bs-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </div>`;
                     }
 
@@ -204,7 +204,7 @@
         ],
         rowCallback: function (row, data, index) {
             var $row = $(row);
-            
+
             if (data.status === "Processing" && data.id == uploadId) {
                 $row.addClass('processing-row');
                 startPolling(data.id);
@@ -252,7 +252,6 @@
                 url: `/api/Investigation/GetFileById/${uploadId}`, // Call the API to check status
                 type: 'GET',
                 success: function (updatedRowData) {
-
                     var icon = updatedRowData.data.result.directAssign ? 'fas fa-random' : 'fas fa-upload';  // Dynamic icon based on checkbox
                     var popType = updatedRowData.data.result.directAssign ? 'red' : 'blue';  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
                     var title = updatedRowData.data.result.directAssign ? "Assign" : "Upload";
@@ -292,16 +291,6 @@
             row.data(updatedRowData).draw(false); // Update the row with the new data
         }
     }
-
-   
-    //// Enable tooltips
-    //table.on('draw.dt', function () {
-    //    $('[data-toggle="tooltip"]').tooltip({
-    //        animated: 'fade',
-    //        placement: 'top',
-    //        html: true
-    //    });
-    //});
 
     // Delete file with jConfirm
     $('#customerTableAuto tbody').on('click', '.upload-delete', function () {
@@ -398,7 +387,6 @@
 
         if (extn == "zip") {
             if (typeof (FileReader) != "undefined") {
-
                 //loop for each file selected for uploaded.
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
@@ -420,7 +408,6 @@
                         );
                     }
                 }
-
             } else {
                 $.alert(
                     {
@@ -514,7 +501,6 @@
             }
         });
     }
-
 
     // Apply confirmation to both forms
     handleUploadConfirmation("#upload-claims", "#UploadFileButton", "#uploadAssignCheckbox");

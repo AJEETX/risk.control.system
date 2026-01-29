@@ -129,6 +129,7 @@ public static class BusinessServiceExtension
             options.KnownProxies.Clear();
         });
         services.AddHttpClient();
+        services.AddScoped<IVendorDetailService, VendorDetailService>();
         services.AddScoped<IDateParserService, DateParserService>();
         services.AddScoped<IBase64FileService, Base64FileService>();
         services.AddScoped<IVendorInvestigationDetailService, VendorInvestigationDetailService>();

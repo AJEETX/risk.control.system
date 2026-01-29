@@ -133,7 +133,7 @@ namespace risk.control.system.Services
 
         public async Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes, string url, string key, string host)
         {
-            var extension = risk.control.system.Helpers.Extensions.GetImageExtension(imageBytes);
+            var extension = risk.control.system.Helpers.CustomExtensions.GetImageExtension(imageBytes);
             // Convert the byte array to a Base64 string
 
             string filePath = $"{Guid.NewGuid()}.{extension}";

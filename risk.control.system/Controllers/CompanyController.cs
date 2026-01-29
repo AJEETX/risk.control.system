@@ -18,26 +18,12 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace risk.control.system.Controllers
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class CompanyController : Controller
     {
-        private AppRoles[] companyRoles = new[]
-                {
-                    AppRoles.COMPANY_ADMIN,
-                    AppRoles.CREATOR,
-                    AppRoles.MANAGER,
-                    AppRoles.ASSESSOR
-                };
-        private AppRoles[] agencyRoles = new[]
-                {
-                    AppRoles.AGENCY_ADMIN,
-                    AppRoles.SUPERVISOR,
-                    AppRoles.AGENT
-                };
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> userManager;
@@ -50,6 +36,7 @@ namespace risk.control.system.Controllers
         private readonly IInvestigationDetailService service;
         private readonly ILogger<CompanyController> logger;
         private readonly string portal_base_url;
+
         public CompanyController(ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             ICompanyService companyService,
@@ -97,7 +84,7 @@ namespace risk.control.system.Controllers
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var clientCompany = await _context.ClientCompany
                     .Include(c => c.Country)
@@ -108,7 +95,7 @@ namespace risk.control.system.Controllers
                 if (clientCompany == null)
                 {
                     notifyService.Error("OOPs !!!..Company Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 return View(clientCompany);
@@ -117,9 +104,8 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting Company for {UserName}.", HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting Company. Try again");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-
         }
 
         [Breadcrumb("Edit Company", FromAction = "CompanyProfile")]
@@ -185,7 +171,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {CompanyId} for {UserName}.",model.ClientCompanyId, HttpContext.User?.Identity?.Name);
+                logger.LogError(ex, "Error editing {CompanyId} for {UserName}.", model.ClientCompanyId, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error editing Company. Try again.");
                 return RedirectToAction(nameof(CompanyProfile));
             }
@@ -209,7 +195,7 @@ namespace risk.control.system.Controllers
             if (currentUserEmail == null)
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             return View();
         }
@@ -225,13 +211,13 @@ namespace risk.control.system.Controllers
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var usersInCompany = _context.ApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
                 bool isManagerTaken = false;
@@ -245,7 +231,7 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                var availableRoles = companyRoles
+                var availableRoles = RoleGroups.CompanyAppRoles
                     .Where(r => r != AppRoles.COMPANY_ADMIN && r != AppRoles.MANAGER || !isManagerTaken) // Exclude MANAGER if already taken
                     .Select(r => new SelectListItem
                     {
@@ -257,7 +243,6 @@ namespace risk.control.system.Controllers
                     })
                     .ToList();
 
-
                 var model = new ApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId, AvailableRoles = availableRoles };
                 return View(model);
             }
@@ -265,10 +250,10 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error creating user for {UserName}.", HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error creating user. Try again");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-
         }
+
         private async Task LoadModel(ApplicationUser model, string currentUserEmail)
         {
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
@@ -285,7 +270,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            var availableRoles = companyRoles
+            var availableRoles = RoleGroups.CompanyAppRoles
                 .Where(r => r != AppRoles.COMPANY_ADMIN && r != AppRoles.MANAGER || !isManagerTaken) // Exclude MANAGER if already taken
                 .Select(r => new SelectListItem
                 {
@@ -306,6 +291,7 @@ namespace risk.control.system.Controllers
             model.PinCodeId = model.SelectedPincodeId;
             model.AvailableRoles = availableRoles;
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(ApplicationUser model, string emailSuffix)
@@ -378,7 +364,7 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                var availableRoles = companyRoles
+                var availableRoles = RoleGroups.CompanyAppRoles
                     .Where(r => r != AppRoles.COMPANY_ADMIN && r != AppRoles.MANAGER || !isManagerTaken) // Exclude MANAGER if already taken
                     .Select(r => new SelectListItem
                     {
@@ -396,7 +382,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {UserId} for {UserName}.",userId, HttpContext.User?.Identity?.Name);
+                logger.LogError(ex, "Error editing {UserId} for {UserName}.", userId, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error editing user. Try again");
             }
             return RedirectToAction(nameof(CompanyController.Users), "Company");
@@ -467,8 +453,8 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Error getting user. Try again");
                 return RedirectToAction(nameof(Users));
             }
-
         }
+
         [HttpPost, ActionName("DeleteUser")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteUser(string email)
@@ -508,10 +494,11 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             return View();
         }
+
         [Breadcrumb("Available Agencies", FromAction = "Agencies")]
         public IActionResult AvailableVendors()
         {
@@ -526,7 +513,7 @@ namespace risk.control.system.Controllers
                 if (id <= 0)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -541,7 +528,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -568,10 +555,10 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting {AgencyId} for {UserName}.", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting Agency. Try again");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-
         }
+
         [Breadcrumb(" Edit Agency", FromAction = "AgencyDetail")]
         public async Task<IActionResult> EditAgency(long id)
         {
@@ -589,7 +576,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Agency Not Found");
                     return RedirectToAction("EmpanelledVendors", "Vendors");
                 }
-                //vendor.SelectedByCompany = true; // THIS IS TO NOT SHOW EDIT PROFILE 
+                //vendor.SelectedByCompany = true; // THIS IS TO NOT SHOW EDIT PROFILE
                 var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "Company", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
@@ -603,8 +590,8 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Agency Not Found. Try again.");
                 return RedirectToAction("EmpanelledVendors", "Vendors");
             }
-
         }
+
         private async Task Load(Vendor model)
         {
             var vendor = await _context.Vendor.Include(c => c.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
@@ -614,6 +601,7 @@ namespace risk.control.system.Controllers
             model.DistrictId = model.SelectedDistrictId;
             model.PinCodeId = model.SelectedPincodeId;
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditAgency(long vendorId, Vendor model)
@@ -661,15 +649,16 @@ namespace risk.control.system.Controllers
 
             return View();
         }
+
         [Breadcrumb(" Add User", FromAction = "AgencyUsers")]
         public async Task<IActionResult> CreateAgencyUser(long id)
         {
             if (id <= 0)
             {
                 notifyService.Error("OOPS !!!..Error creating user");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-            var availableRoles = agencyRoles
+            var availableRoles = RoleGroups.AgencyAppRoles
                 .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
                 .Select(r => new SelectListItem
                 {
@@ -698,6 +687,7 @@ namespace risk.control.system.Controllers
 
             return View(model);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAgencyUser(ApplicationUser model, string emailSuffix)
@@ -730,7 +720,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Creating AgencyUser by {UserName}.",HttpContext.User?.Identity?.Name);
+                logger.LogError(ex, "Error Creating AgencyUser by {UserName}.", HttpContext.User?.Identity?.Name);
                 notifyService.Error("OOPS !!!..Error Creating User. Try again.");
             }
             return RedirectToAction(nameof(AgencyUsers), "Company", new { id = model.VendorId });
@@ -739,7 +729,7 @@ namespace risk.control.system.Controllers
         private async Task LoadModel(ApplicationUser model)
         {
             var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
-            var availableRoles = agencyRoles
+            var availableRoles = RoleGroups.AgencyAppRoles
                 .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
                 .Select(r => new SelectListItem
                 {
@@ -767,7 +757,7 @@ namespace risk.control.system.Controllers
                 if (userId == null || userId <= 0)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var vendorApplicationUser = await _context.ApplicationUser.Include(u => u.Vendor).Include(v => v.Country).FirstOrDefaultAsync(v => v.Id == userId);
@@ -775,7 +765,7 @@ namespace risk.control.system.Controllers
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 vendorApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
 
@@ -789,7 +779,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {AgencyId} by {UserName}.",userId, HttpContext.User?.Identity?.Name);
+                logger.LogError(ex, "Error getting {AgencyId} by {UserName}.", userId, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting user. Try again");
                 return RedirectToAction(nameof(AgencyUsers));
             }
@@ -847,14 +837,14 @@ namespace risk.control.system.Controllers
                 if (userId < 1 || userId == 0)
                 {
                     notifyService.Error("OOPS!!!.Id Not Found.Try Again");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var agencySubStatuses = new[]{
@@ -882,8 +872,8 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Error getting user. Try again");
                 return RedirectToAction(nameof(AgencyUsers));
             }
-
         }
+
         [HttpPost, ActionName("DeleteAgencyUser")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAgencyUser(string email, long vendorId)
@@ -895,13 +885,13 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 model.Updated = DateTime.Now;
@@ -918,7 +908,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Error deleting user. Try again");
                 return RedirectToAction(nameof(AgencyUsers));
             }
-
         }
 
         [Breadcrumb("Manage Service", FromAction = "AgencyDetail")]
@@ -927,7 +916,7 @@ namespace risk.control.system.Controllers
             if (id == null || string.IsNullOrWhiteSpace(id))
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             ViewData["vendorId"] = id;
@@ -940,6 +929,7 @@ namespace risk.control.system.Controllers
 
             return View();
         }
+
         [Breadcrumb(" Add Service", FromAction = "Service")]
         public async Task<IActionResult> CreateService(long id)
         {
@@ -947,7 +937,7 @@ namespace risk.control.system.Controllers
             {
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
-                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
@@ -960,11 +950,12 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred creating Service for {AgencyId} by {UserName}",id, HttpContext.User.Identity.Name);
+                logger.LogError(ex, "Error occurred creating Service for {AgencyId} by {UserName}", id, HttpContext.User.Identity.Name);
                 notifyService.Error("Error occurred. Try again");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateService(VendorInvestigationServiceType service, long VendorId)
@@ -1000,11 +991,11 @@ namespace risk.control.system.Controllers
                 if (id <= 0)
                 {
                     notifyService.Error("OOPs !!!..Agency Id Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
@@ -1027,7 +1018,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred getting Service for {ServiceId} by {UserName}", id, HttpContext.User.Identity.Name);
                 notifyService.Error("Error occurred. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -1065,11 +1056,11 @@ namespace risk.control.system.Controllers
                 if (id <= 0)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.State)
@@ -1080,7 +1071,7 @@ namespace risk.control.system.Controllers
                 if (vendorInvestigationServiceType == null)
                 {
                     notifyService.Error("OOPs !!!..Service Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var claimsPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Empanelled Agencies") { Parent = claimsPage, };
@@ -1095,7 +1086,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting agency {ServiceId} by {UserName}", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting agency service. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -1108,7 +1099,7 @@ namespace risk.control.system.Controllers
                 if (id == 0 || _context.VendorInvestigationServiceType == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
@@ -1129,14 +1120,14 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error deleting agency {ServiceId} by {UserName}", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error deleting agency service. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AvailableVendors(List<string> vendors)
         {
-
             try
             {
                 if (!ModelState.IsValid || vendors is null || vendors.Count == 0)
@@ -1150,14 +1141,14 @@ namespace risk.control.system.Controllers
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var company = await _context.ClientCompany.Include(c => c.EmpanelledVendors).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var vendors2Empanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
                 company.EmpanelledVendors.AddRange(vendors2Empanel.ToList());
@@ -1174,9 +1165,8 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error empanelling agency(s)");
                 notifyService.Error("Error empanelling agency(s). Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-
         }
 
         [Breadcrumb("Empanelled Agencies", FromAction = "Index", FromController = typeof(VendorsController))]
@@ -1194,7 +1184,7 @@ namespace risk.control.system.Controllers
                 if (!ModelState.IsValid || vendors is null || vendors.Count == 0)
                 {
                     notifyService.Error("OOPs !!!..Not Agency Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -1203,7 +1193,7 @@ namespace risk.control.system.Controllers
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var company = await _context.ClientCompany
                     .Include(c => c.EmpanelledVendors)
@@ -1211,7 +1201,7 @@ namespace risk.control.system.Controllers
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var empanelledVendors2Depanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
 
@@ -1231,7 +1221,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error de-panelling  agency(s)");
                 notifyService.Error("Error de-panelling  agency(s). Try again");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -1268,7 +1258,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {AgencyId} by {UserName}",id, HttpContext.User.Identity.Name);
+                logger.LogError(ex, "Error getting {AgencyId} by {UserName}", id, HttpContext.User.Identity.Name);
                 notifyService.Error("Error getting agency. Try again");
                 return RedirectToAction(nameof(AvailableVendors));
             }

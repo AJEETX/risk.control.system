@@ -117,7 +117,7 @@ namespace risk.control.system.Services
 
 
             data.FirstBlockName = "ADD/ASSIGN";
-            data.FirstBlockUrl = "/Investigation/New";
+            data.FirstBlockUrl = "/CaseCreateEdit/New";
 
             var claimCount = await GetCreatorAssignAuto(userEmail, InsuranceType.CLAIM);
             var underWritingCount = await GetCreatorAssignAuto(userEmail, InsuranceType.UNDERWRITING);

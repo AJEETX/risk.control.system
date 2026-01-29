@@ -164,7 +164,7 @@ namespace risk.control.system.Services
             var data = await Task.WhenAll(pageCases.Select(async a =>
             {
                 var isUnderWriting = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = Extensions.GetCultureByCountry(vendorUser.Country.Code);
+                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country.Code);
                 var pincode = ClaimsInvestigationExtension.GetPincode(isUnderWriting, a.CustomerDetail, a.BeneficiaryDetail);
                 var pincodeName = ClaimsInvestigationExtension.GetPincodeName(isUnderWriting, a.CustomerDetail, a.BeneficiaryDetail);
                 var personName = isUnderWriting ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name;
@@ -348,7 +348,7 @@ namespace risk.control.system.Services
             var data = await Task.WhenAll(pageCases.Select(async a =>
             {
                 var isUnderWriting = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = Extensions.GetCultureByCountry(vendorUser.Country.Code);
+                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country.Code);
                 var pinCode = ClaimsInvestigationExtension.GetPincode(isUnderWriting, a.CustomerDetail, a.BeneficiaryDetail);
                 var pincodeName = ClaimsInvestigationExtension.GetPincodeName(isUnderWriting, a.CustomerDetail, a.BeneficiaryDetail);
                 var policy = $"<span class='badge badge-light'>{a.PolicyDetail.InsuranceType.GetEnumDisplayName()}</span>";
@@ -542,7 +542,7 @@ namespace risk.control.system.Services
             var data = await Task.WhenAll(pageCases.Select(async a =>
             {
                 var isUnderWriting = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = Extensions.GetCultureByCountry(vendorUser.Country.Code);
+                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country.Code);
                 var pincode = ClaimsInvestigationExtension.GetPincode(isUnderWriting, a.CustomerDetail, a.BeneficiaryDetail);
                 var pincodeName = ClaimsInvestigationExtension.GetPincodeName(isUnderWriting, a.CustomerDetail, a.BeneficiaryDetail);
                 var personName = isUnderWriting ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name;
@@ -728,7 +728,7 @@ namespace risk.control.system.Services
             var data = await Task.WhenAll(pageCases.Select(async a =>
             {
                 var isUnderWriting = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = Extensions.GetCultureByCountry(vendorUser.Country.Code);
+                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country.Code);
                 var pincode = ClaimsInvestigationExtension.GetPincode(isUnderWriting, a.CustomerDetail, a.BeneficiaryDetail);
                 var pincodeName = ClaimsInvestigationExtension.GetPincodeName(isUnderWriting, a.CustomerDetail, a.BeneficiaryDetail);
                 var personName = isUnderWriting ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name;

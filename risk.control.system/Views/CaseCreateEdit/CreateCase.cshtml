@@ -1,0 +1,19 @@
+﻿@model risk.control.system.Models.ViewModel.CreateCaseViewModel
+@{
+    ViewData["Title"] = @Applicationsettings.CREATE;
+}
+
+<section class="content">
+    <form id="create-form" asp-action="CreateCase" method="post" enctype="multipart/form-data">
+        <partial name="Investigation/_CreateCase" model="Model" />
+    </form>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/creator/case.js"></script>
+    <script src="~/js/common/image-upload.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
+}

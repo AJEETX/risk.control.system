@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
@@ -27,7 +27,6 @@ namespace risk.control.system.Controllers
             this.investigationService = investigationService;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> PrintPdfReport(long id)
         {
@@ -36,14 +35,14 @@ namespace risk.control.system.Controllers
                 if (id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var claim = await investigationService.GetClaimPdfReport(currentUserEmail, id);
@@ -60,7 +59,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred to Print Pdf for {CaseId} by {UserName}", id, HttpContext.User.Identity.Name);
                 notifyService.Error("Error occurred. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

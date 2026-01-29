@@ -22,19 +22,16 @@ namespace risk.control.system.Controllers.Company
     {
         private readonly ApplicationDbContext context;
         private readonly ILicenseService licenseService;
-        private readonly IInvestigationService service;
         private readonly ILogger<CaseUploadController> logger;
         private readonly INotyfService notifyService;
 
         public CaseUploadController(ApplicationDbContext context,
             ILicenseService licenseService,
-            IInvestigationService service,
             ILogger<CaseUploadController> logger,
             INotyfService notifyService)
         {
             this.context = context;
             this.licenseService = licenseService;
-            this.service = service;
             this.logger = logger;
             this.notifyService = notifyService;
         }
@@ -43,13 +40,12 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var currentUserEmail = User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                var userEmail = User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     return HandleUnauthorizedAccess("User identity not found.");
                 }
 
-                // Get the primary role name
                 var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
                 return role switch
@@ -77,17 +73,21 @@ namespace risk.control.system.Controllers.Company
         [Breadcrumb(" Upload File")]
         public async Task<IActionResult> Uploads(int uploadId = 0)
         {
-            if(!ModelState.IsValid)
-                {
+            var userEmail = User.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                return HandleUnauthorizedAccess("User identity not found.");
+            }
+            if (!ModelState.IsValid)
+            {
                 return RedirectToDashboard("Invalid request.");
             }
             try
             {
-                var currentUserEmail = User.Identity?.Name;
                 var companyUser = await context.ApplicationUser
                     .Include(u => u.ClientCompany)
                     .Include(u => u.Country)
-                    .FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                    .FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 if (companyUser == null) return RedirectToDashboard("User not found.");
 
@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error loading Uploads page for {User}", User.Identity?.Name);
+                logger.LogError(ex, "Error loading Uploads page for {User}", userEmail);
                 return RedirectToDashboard("An unexpected error occurred.");
             }
         }
@@ -123,6 +123,7 @@ namespace risk.control.system.Controllers.Company
             else
                 notifyService.Information($"Limit available = <b>{status.AvailableCount}</b>");
         }
+
         private IActionResult RedirectToDashboard(string errorMessage, string logDetail = null)
         {
             if (!string.IsNullOrEmpty(logDetail))
