@@ -51,7 +51,7 @@ namespace risk.control.system.Controllers
                 if (id < 1)
                 {
                     notifyService.Error("OOPs !!!..Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers
                 if (vendorInvestigationServiceType == null)
                 {
                     notifyService.Error("OOPs !!!..Service Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 return View(vendorInvestigationServiceType);
@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting agency {ServiceId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error getting agency service. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
 
@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting {AgencyId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error getting agency service. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -139,11 +139,11 @@ namespace risk.control.system.Controllers
                 if (id <= 0)
                 {
                     notifyService.Error("OOPs !!!..Agency Id Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting service for {ServiceId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error getting agency service. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -205,11 +205,11 @@ namespace risk.control.system.Controllers
                 if (id < 1)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
@@ -221,7 +221,7 @@ namespace risk.control.system.Controllers
                 if (vendorInvestigationServiceType == null)
                 {
                     notifyService.Error("OOPs !!!..Service Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var agencysPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Available Agencies") { Parent = agencysPage };
@@ -236,7 +236,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting service for {ServiceId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error getting agency service. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -249,7 +249,7 @@ namespace risk.control.system.Controllers
                 if (id == 0 || _context.VendorInvestigationServiceType == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
@@ -270,7 +270,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error deleting service for {ServiceId} by {UserName}", id, User.Identity.Name);
                 notifyService.Error("Error deleting agency service. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

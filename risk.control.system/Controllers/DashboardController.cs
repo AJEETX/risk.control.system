@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services;
 
@@ -48,7 +49,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("NOT FOUND!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
@@ -56,51 +57,41 @@ namespace risk.control.system.Controllers
                 {
                     var model = await dashboardCountService.GetCreatorCount(currentUserEmail, userRole.Value);
                     return View(model);
-
                 }
                 else if (userRole.Value.Contains(PORTAL_ADMIN.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetSuperAdminCount(currentUserEmail, userRole.Value);
                     return View(model);
-
                 }
                 else if (userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetCompanyAdminCount(currentUserEmail, userRole.Value);
                     return View(model);
-
                 }
                 else if (userRole.Value.Contains(ASSESSOR.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetAssessorCount(currentUserEmail, userRole.Value);
                     return View(model);
-
                 }
-
                 else if (userRole.Value.Contains(MANAGER.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetManagerCount(currentUserEmail, userRole.Value);
                     return View(model);
-
                 }
                 else if (userRole.Value.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Value.Contains(SUPERVISOR.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetSupervisorCount(currentUserEmail, userRole.Value);
                     return View(model);
-
                 }
                 else if (userRole.Value.Contains(AGENT.DISPLAY_NAME))
                 {
                     var model = await dashboardCountService.GetAgentCount(currentUserEmail, userRole.Value);
                     return View(model);
-
                 }
                 else
                 {
-
                     return View();
                 }
-
             }
             catch (Exception ex)
             {

@@ -113,7 +113,7 @@ namespace risk.control.system.Services
 
             var finalDataTasks = pagedRawData.Select(async a =>
             {
-                var culture = Extensions.GetCultureByCountry(companyUser.CountryCode.ToUpper());
+                var culture = CustomExtensions.GetCultureByCountry(companyUser.CountryCode.ToUpper());
 
                 // Run file operations in parallel for this specific row
                 var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
@@ -217,7 +217,7 @@ namespace risk.control.system.Services
                     CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "" : a.CustomerDetail.Name,
                     BeneficiaryFullName = a.BeneficiaryDetail?.Name ?? "",
                     PolicyId = a.PolicyDetail.ContractNumber,
-                    Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
+                    Amount = string.Format(CustomExtensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                     AssignedToAgency = a.AssignedToAgency,
                     Agent = a.Vendor.Email,
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwnerImage(a))),
@@ -339,7 +339,7 @@ namespace risk.control.system.Services
 
             var responseList = pagedData.Select(async a =>
             {
-                var culture = Extensions.GetCultureByCountry(companyUser.CountryCode.ToUpper());
+                var culture = CustomExtensions.GetCultureByCountry(companyUser.CountryCode.ToUpper());
 
                 // Run file operations in parallel for this specific row
                 var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);

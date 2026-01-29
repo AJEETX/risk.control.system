@@ -20,7 +20,6 @@
                     <li>
                         <i class='fa fa-hand-peace-o'></i><b> Assign</b> to Agency
                     </li>
-
                 </span>
             </span>
         </h3>
@@ -83,8 +82,6 @@
                 </div>
 
                 <partial name="Investigation/_BeneficiaryPhoneNumber" model="@Model" />
-
-
             </div>
             <div class="col-md-6">
 
@@ -125,8 +122,6 @@
                         <span asp-validation-for="Addressline" class="text-danger"></span>
                     </div>
                 </div>
-
-                
             </div>
         </div>
     </div>
@@ -135,7 +130,7 @@
             @* <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
             <i class="fas fa-undo"></i> Reset
             </button> *@
-            <a id="cancel" asp-action="Details" asp-route-id="@Model.InvestigationTaskId" class="btn btn-secondary">
+            <a id="cancel" asp-controller="Investigation" asp-action="Details" asp-route-id="@Model.InvestigationTaskId" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
                 @Applicationsettings.CANCEL
             </a>

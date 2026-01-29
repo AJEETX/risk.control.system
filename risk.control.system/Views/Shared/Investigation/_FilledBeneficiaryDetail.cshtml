@@ -14,7 +14,7 @@
     {
         beneficiaryProgressColor = beneficiaryExists ? "progress-bar-green" : "progress-bar-grey";
     }
-    
+
     var beneficiaryAddress = $"{Model.Location.Addressline} {Model.Location.District?.Name} {Model.Location.State?.Name} {Model.Location.Country?.Name} {Model.Location.PinCode?.Code}";
     var beneficiaryAgeInYears =$"{(int)(DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
     var imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
@@ -96,13 +96,13 @@
                     if (beneficiaryExists)
                     {
                         <input type="hidden" asp-for="ClaimsInvestigation.Id" />
-                        <a id="edit-beneficiary" class="btn btn-warning" asp-action="EditBeneficiary" asp-route-id="@Model.Location.BeneficiaryDetailId">
+                        <a id="edit-beneficiary" class="btn btn-warning" asp-controller="Beneficiary" asp-action="EditBeneficiary" asp-route-id="@Model.Location.BeneficiaryDetailId">
                             <i class="fas fa-user-tie"></i> Edit Beneficiary
                         </a>
                     }
                     else
                     {
-                        <a id="add-beneficiary" class="btn btn-success" asp-action="CreateBeneficiary" asp-route-id="@Model.ClaimsInvestigation.Id">
+                        <a id="add-beneficiary" class="btn btn-success" asp-controller="Beneficiary" asp-action="CreateBeneficiary" asp-route-id="@Model.ClaimsInvestigation.Id">
                             <i class="fas fa-user-tie"></i> Add Beneficiary
                         </a>
                     }

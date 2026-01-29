@@ -8,8 +8,8 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
@@ -48,10 +48,10 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> DownloadLog(long id)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPs !!!.. Download error");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
@@ -61,7 +61,7 @@ namespace risk.control.system.Controllers
                 if (file == null || string.IsNullOrWhiteSpace(file.FilePath))
                 {
                     notifyService.Error("OOPs !!!.. Download error");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 string fullPath = Path.Combine(webHostEnvironment.ContentRootPath, file.FilePath);
@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers
                 if (!System.IO.File.Exists(fullPath))
                 {
                     notifyService.Error("File not found on server");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error downloading ZIP");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -91,7 +91,7 @@ namespace risk.control.system.Controllers
             if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPs !!!.. Download error");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers
                 if (file == null)
                 {
                     notifyService.Error("OOPs !!!.. Download error");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var fileBytes = file.ErrorByteData;
                 var fileName = $"{file.Name}_UploadError_{id}.csv"; // Or use a timestamp
@@ -110,9 +110,10 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("Error occurred. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteLog(int id)
@@ -120,11 +121,11 @@ namespace risk.control.system.Controllers
             if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPs !!!.. Download error");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = await _context.ApplicationUser.Include(u=>u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-            var file = await _context.FilesOnFileSystem.Include(c=>c.CaseIds).FirstOrDefaultAsync(f => f.Id == id);
+            var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+            var file = await _context.FilesOnFileSystem.Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == id);
             if (file == null)
             {
                 return NotFound(new { success = false, message = "File not found." });
@@ -137,7 +138,7 @@ namespace risk.control.system.Controllers
                     System.IO.File.Delete(file.FilePath); // Delete the file from storage
                 }
                 file.Deleted = true;
-                _context.FilesOnFileSystem.Update(file); 
+                _context.FilesOnFileSystem.Update(file);
                 await _context.SaveChangesAsync();
 
                 return Ok(new { success = true, message = "File deleted successfully." });
@@ -156,7 +157,7 @@ namespace risk.control.system.Controllers
             if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPs !!!.. Download error");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var currentUserEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
@@ -174,7 +175,7 @@ namespace risk.control.system.Controllers
             if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPs !!!.. Download error");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var currentUserEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
@@ -192,7 +193,7 @@ namespace risk.control.system.Controllers
             if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPs !!!.. Download error");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             if (Image == null || Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
@@ -229,7 +230,7 @@ namespace risk.control.system.Controllers
             if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPs !!!.. Download error");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             foreach (var question in Questions)
             {

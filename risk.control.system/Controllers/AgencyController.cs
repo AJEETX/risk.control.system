@@ -87,7 +87,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null)
                 {
                     notifyService.Error("Agency Not Found! Contact ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 return View(vendor);
@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!...Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -111,13 +111,13 @@ namespace risk.control.system.Controllers
                 if (vendorUser == null)
                 {
                     notifyService.Error("User Not found !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
                 if (vendor == null)
                 {
                     notifyService.Custom($"Agency Not found.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 if (vendorUser.IsVendorAdmin)
                 {
@@ -463,7 +463,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Agency Not Found!!!..Try again");
                     return RedirectToAction(nameof(AgencyController.Service), "Agency");
                 }
-                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var model = new VendorInvestigationServiceType
                 {
@@ -516,11 +516,11 @@ namespace risk.control.system.Controllers
                 if (id <= 0)
                 {
                     notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = await _context.ApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.Country)
                     .Include(v => v.District)
@@ -536,7 +536,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error editing {SserviceId} for {UserName}",id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Custom($"Error editing service. Try again", 3, "red", "fas fa-truck");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -579,7 +579,7 @@ namespace risk.control.system.Controllers
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = await _context.ApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -188,7 +189,7 @@ namespace risk.control.system.Controllers
             catch (Exception)
             {
                 notifyService.Error("Error !!. The user con't be edited!");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -203,7 +204,7 @@ namespace risk.control.system.Controllers
                 if (id <= 0)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var appUser = await context.ApplicationUser.FindAsync(id);
                 context.ApplicationUser.Remove(appUser!);

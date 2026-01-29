@@ -116,7 +116,7 @@ namespace risk.control.system.Services
 
             var transformedData = pagedList.Select(async a => {
                     var isUW = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
-                    var culture = Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper());
+                    var culture = CustomExtensions.GetCultureByCountry(companyUser.Country.Code.ToUpper());
                     var policyNumber = a.GetPolicyNum();
                     var investigationService = a.PolicyDetail.InvestigationServiceType.Name;
                     var serviceType = $"{a.PolicyDetail.InsuranceType.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})";
@@ -283,7 +283,7 @@ namespace risk.control.system.Services
 
             var responseList = pagedData.Select(async a =>
             {
-                var culture = Extensions.GetCultureByCountry(companyUser.CountryCode.ToUpper());
+                var culture = CustomExtensions.GetCultureByCountry(companyUser.CountryCode.ToUpper());
 
                 // Run file operations in parallel for this specific row
                 var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);

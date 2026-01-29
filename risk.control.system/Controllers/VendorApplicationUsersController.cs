@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -25,20 +26,15 @@ namespace risk.control.system.Controllers
         private readonly IFileStorageService fileStorageService;
         private readonly ILogger<VendorApplicationUsersController> logger;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
         private readonly IFeatureManager featureManager;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private string portal_base_url = string.Empty;
+        private readonly string portal_base_url = string.Empty;
 
         public VendorApplicationUsersController(ApplicationDbContext context,
             IFileStorageService fileStorageService,
             ILogger<VendorApplicationUsersController> logger,
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
@@ -48,12 +44,9 @@ namespace risk.control.system.Controllers
             this.fileStorageService = fileStorageService;
             this.logger = logger;
             this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.roleManager = roleManager;
             this.notifyService = notifyService;
             smsService = SmsService;
             this.featureManager = featureManager;
-            this.httpContextAccessor = httpContextAccessor;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -72,7 +65,7 @@ namespace risk.control.system.Controllers
                 if (id == null || id == 0 || _context.ApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
@@ -100,7 +93,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -111,7 +104,7 @@ namespace risk.control.system.Controllers
                 if (id == 0 || _context.ApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
@@ -130,7 +123,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -145,12 +138,12 @@ namespace risk.control.system.Controllers
                 if (user == null)
                 {
                     notifyService.Error("OOPs !!!..User not found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 if (string.IsNullOrWhiteSpace(emailSuffix))
                 {
                     notifyService.Error("OOPs !!!..Email suffix not found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
@@ -204,7 +197,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -217,14 +210,14 @@ namespace risk.control.system.Controllers
                 if (userId == null || _context.ApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Vendor).Include(v => v.Country)?.FirstOrDefaultAsync(v => v.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..User Not found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
@@ -240,7 +233,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -324,7 +317,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             notifyService.Error("Error !!. The user can't be edited!");
@@ -384,7 +377,7 @@ namespace risk.control.system.Controllers
             {
                 logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

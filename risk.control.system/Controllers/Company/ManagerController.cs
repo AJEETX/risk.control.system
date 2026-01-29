@@ -31,210 +31,215 @@ namespace risk.control.system.Controllers.Company
             this.logger = logger;
             this.investigativeService = investigativeService;
         }
+
         public IActionResult Index()
         {
             return RedirectToAction("Assessor");
         }
+
         [Breadcrumb(" Assess(new)", FromAction = "Index")]
         public IActionResult Assessor()
         {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                return View();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error getting case(s).");
-                notifyService.Error("Error getting case(s). Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
+            return View();
         }
+
         [Breadcrumb(title: " Details", FromAction = "Assessor")]
         public async Task<IActionResult> AssessorDetail(long id)
         {
+            var userEmail = User.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Error("Oops! Unauthenticated access.");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+
+            if (!ModelState.IsValid || id <= 0)
+            {
+                notifyService.Error("Case not found.");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id < 1)
-                {
-                    notifyService.Error("Case Not Found !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                var model = await investigativeService.GetClaimDetailsReport(userEmail, id);
 
-                var model = await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var countryCode = model?.ClaimsInvestigation?
+                    .ClientCompany?
+                    .Country?
+                    .Code?
+                    .ToUpperInvariant();
+
+                if (!string.IsNullOrWhiteSpace(countryCode))
+                {
+                    ViewData["Currency"] = CustomExtensions
+                        .GetCultureByCountry(countryCode)
+                        .NumberFormat
+                        .CurrencySymbol;
+                }
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting case detail.");
-                notifyService.Error("Error getting case detail. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(
+                    ex,
+                    "Error getting case detail for user {UserEmail}, CaseId {CaseId}",
+                    userEmail,
+                    id);
+
+                notifyService.Error("Error getting case detail. Please try again.");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
+
         [Breadcrumb(title: "Active")]
         public IActionResult Active()
         {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                return View();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error getting case(s).");
-                notifyService.Error("Error getting case(s). Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
+            return View();
         }
+
         [Breadcrumb(title: " Details", FromAction = "Active")]
         public async Task<IActionResult> ActiveDetail(long id)
         {
+            if (!ModelState.IsValid || id <= 0)
+            {
+                notifyService.Error("Case not found.");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+
+            var userEmail = User.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Error("Oops! Unauthenticated access.");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id < 1)
-                {
-                    notifyService.Error("Case Not Found !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                var model = await investigativeService.GetClaimDetailsReport(userEmail, id);
 
-                var model = await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var countryCode = model?.ClaimsInvestigation?
+                    .ClientCompany?
+                    .Country?
+                    .Code?
+                    .ToUpperInvariant();
+
+                if (!string.IsNullOrWhiteSpace(countryCode))
+                {
+                    ViewData["Currency"] = CustomExtensions
+                        .GetCultureByCountry(countryCode)
+                        .NumberFormat
+                        .CurrencySymbol;
+                }
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting case detail.");
-                notifyService.Error("Error getting case detail. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                logger.LogError(
+                    ex,
+                    "Error getting active case detail. User: {UserEmail}, CaseId: {CaseId}",
+                    userEmail,
+                    id);
+
+                notifyService.Error("Error getting case detail. Please try again.");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
+
         [Breadcrumb(title: " Approved")]
         public IActionResult Approved()
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(currentUserEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
             return View();
         }
+
         [Breadcrumb(title: " Details", FromAction = "Approved")]
         public async Task<IActionResult> ApprovedDetail(long id)
         {
+            if (!ModelState.IsValid || id < 1)
+            {
+                notifyService.Error("Case Not Found !!!..");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id < 1)
-                {
-                    notifyService.Error("Case Not Found !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var model = await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var model = await investigativeService.GetClaimDetailsReport(userEmail, id);
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting case detail.");
+                logger.LogError(ex, "Error getting approved case detail.User: {UserEmail}, CaseId: {CaseId}",
+                    userEmail,
+                    id);
                 notifyService.Error("Error getting case detail. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
         [Breadcrumb(title: " Rejected")]
         public IActionResult Rejected()
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(currentUserEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
             return View();
         }
 
         [Breadcrumb(" Details", FromAction = "Rejected")]
         public async Task<IActionResult> RejectDetail(long id)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+            if (!ModelState.IsValid || id < 1)
+            {
+                notifyService.Error("Case Not Found !!!..");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id < 1)
-                {
-                    notifyService.Error("Case Not Found !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var model = await investigativeService.GetClaimDetailsReport(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var model = await investigativeService.GetClaimDetailsReport(userEmail, id);
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting case detail.");
+                logger.LogError(ex, "Error getting rejected case detail.User: {UserEmail}, CaseId: {CaseId}",
+                    userEmail,
+                    id);
                 notifyService.Error("Error getting case detail. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
         [Breadcrumb(title: "Invoice", FromAction = "ApprovedDetail")]
         public async Task<IActionResult> ShowInvoice(long id)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+            if (!ModelState.IsValid || id < 1)
+            {
+                notifyService.Error("Case Not Found !!!..");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id < 1)
-                {
-                    notifyService.Error("Case Not Found !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "Manager", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("Approved", "Manager", "Approved") { Parent = claimsPage, };
@@ -246,39 +251,43 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting invoice detail.");
+                logger.LogError(ex, "Error getting invoice case detail.User: {UserEmail}, CaseId: {CaseId}",
+                   userEmail,
+                   id);
                 notifyService.Error("Error getting invoice detail. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
         [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
         public async Task<IActionResult> PrintInvoice(long id)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+            if (!ModelState.IsValid || id <= 0)
+            {
+                notifyService.Error("Case Not Found !!!..");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id == 0)
-                {
-                    notifyService.Error("Case Not Found !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(invoice);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error printing invoice.");
+                logger.LogError(ex, "Error getting printing invoice case detail.User: {UserEmail}, CaseId: {CaseId}",
+                   userEmail,
+                   id);
                 notifyService.Error("Error printing invoice. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

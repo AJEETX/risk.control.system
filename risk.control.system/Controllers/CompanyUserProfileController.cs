@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -22,7 +23,7 @@ namespace risk.control.system.Controllers
         private readonly ICompanyUserService companyUserService;
         private readonly IAccountService accountService;
         private readonly ILogger<CompanyUserProfileController> logger;
-        private string portal_base_url = string.Empty;
+        private readonly string portal_base_url = string.Empty;
 
         public CompanyUserProfileController(ApplicationDbContext context,
             ICompanyUserService companyUserService,
@@ -43,9 +44,9 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
                 var companyUser = await _context.ApplicationUser
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
@@ -57,51 +58,48 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting user Profile.");
+                logger.LogError(ex, "Error getting user Profile. {UserEmail}", userEmail);
                 notifyService.Error("Error getting user Profile. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
         [Breadcrumb("Edit Profile")]
         public async Task<IActionResult> Edit(long? userId)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (userId == null)
                 {
                     notifyService.Error("USER NOT FOUND");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 var clientCompanyApplicationUser = await _context.ApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
                 if (clientCompanyApplicationUser == null)
                 {
                     notifyService.Error("USER NOT FOUND");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
                 return View(clientCompanyApplicationUser);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting user Profile.");
+                logger.LogError(ex, "Error editing user Profile. {UserEmail}", userEmail);
                 notifyService.Error("Error getting user Profile. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
-        // POST: ClientCompanyApplicationUser/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, ApplicationUser model)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
-
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error($"Correct the error(s)");
@@ -122,15 +120,15 @@ namespace risk.control.system.Controllers
                     return View(model); // 🔥 fields now highlight
                 }
                 notifyService.Success(result.Message);
-
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting user Profile.");
+                logger.LogError(ex, "Error editing user Profile. {UserEmail}", userEmail);
                 notifyService.Error("Error getting user Profile. Try again.");
             }
-            return RedirectToAction(nameof(Index), "Dashboard");
+            return this.RedirectToAction<DashboardController>(x => x.Index());
         }
+
         private async Task LoadModel(ApplicationUser model, string currentUserEmail)
         {
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
@@ -148,28 +146,27 @@ namespace risk.control.system.Controllers
         [HttpGet]
         public async Task<IActionResult> ChangePassword()
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrEmpty(userEmail))
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 return View();
-
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error to user password. {UserEmail}", userEmail);
                 notifyService.Error("Error occurred. Try again.");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -178,7 +175,7 @@ namespace risk.control.system.Controllers
         {
             if (!ModelState.IsValid)
                 return View(model);
-
+            var userEmail = HttpContext.User.Identity.Name;
             try
             {
                 var result = await accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, portal_base_url);
@@ -197,9 +194,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while changing password");
+                logger.LogError(ex, "Error change user password. {UserEmail}", userEmail);
                 notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
