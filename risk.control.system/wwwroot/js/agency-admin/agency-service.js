@@ -1,5 +1,4 @@
-﻿
-var ALL_DISTRICTS = "All Districts";
+﻿var ALL_DISTRICTS = "All Districts";
 $(document).ready(function () {
     // Utility to disable all buttons, links, and inputs
     function disableAllElements() {
@@ -16,7 +15,6 @@ $(document).ready(function () {
 
     // Function to handle the Edit button
     function showedit(id) {
-
         // Sanitize the ID to prevent scanner warnings
         id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
 
@@ -27,13 +25,12 @@ $(document).ready(function () {
         const selector = `a#edit${id}.btn.btn-warning`;
         showSpinnerOnButton(selector, "Edit");
 
-        const editUrl = `/Agency/EditService?id=${encodeURIComponent(id)}`;
+        const editUrl = `/AgencyService/EditService?id=${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
         }, 1000);
     }
-
 
     // Function to handle the Delete button
     function getdetails(id) {
@@ -43,7 +40,7 @@ $(document).ready(function () {
         showSpinnerOnButton(`a#delete${id}.btn.btn-danger`, "Delete");
 
         // Navigate after showing spinner
-        const editUrl = `/Agency/DeleteService?id=${id}`;
+        const editUrl = `/AgencyService/DeleteService?id=${id}`;
         setTimeout(() => {
             window.location.href = editUrl;
         }, 1000);
@@ -84,7 +81,8 @@ $(document).ready(function () {
                 if (xhr.status === 401 || xhr.status === 403) {
                     window.location.href = '/Account/Login'; // Or session timeout handler
                 }
-            } },
+            }
+        },
         order: [[10, 'desc'], [11, 'desc']],
         columnDefs: [
             { className: 'max-width-column-number', targets: 1 },
@@ -140,8 +138,8 @@ $(document).ready(function () {
                 bSortable: false,
                 mRender: function (data, type, row) {
                     return `
-                        <a id="edit${row.id}" href="/Agency/EditService?id=${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>
-                        <a id="delete${row.id}" href="/Agency/DeleteService?id=${row.id}" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>`;
+                        <a id="edit${row.id}" href="/AgencyService/EditService?id=${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>
+                        <a id="delete${row.id}" href="/AgencyService/DeleteService?id=${row.id}" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>`;
                 }
             },
             { data: "isUpdated", bVisible: false },

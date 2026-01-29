@@ -49,13 +49,13 @@
                 <partial name="Vendor/_CreateUser" model="Model" />
             </div>
             <div class="card-footer">
-            <div class="row">
+                <div class="row">
                     <div class="col-md-12">
                         <div class="form-group text-right">
                             @* <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                                 <i class="fas fa-undo"></i> Reset
                             </button> *@
-                            <a id="cancel" asp-controller="Agency" asp-action="Users" class="btn btn-secondary">
+                            <a id="cancel" asp-controller="AgencyUser" asp-action="Users" class="btn btn-secondary">
                                 <i class="fa fa-window-close"></i>
                                 @Applicationsettings.CANCEL
                             </a>
@@ -64,8 +64,8 @@
                             </button>
                         </div>
                     </div>
-                    </div>
                 </div>
+            </div>
         </form>
     </div>
 </section>

@@ -144,9 +144,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = '';
-                    buttons += '<a id="edit' + row.id + '" href="/Agency/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;';
+                    buttons += '<a id="edit' + row.id + '" href="/AgencyUser/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;';
                     if (row.role !== "AGENCY_ADMIN") {
-                        buttons += '<a id="details' + row.id + '" href="/Agency/DeleteUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>';
+                        buttons += '<a id="details' + row.id + '" href="/AgencyUser/DeleteUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>';
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</button>';
                     }

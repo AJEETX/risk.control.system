@@ -101,25 +101,25 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group text-right">
-                        <a id="back" asp-action="Users" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                        <input type="hidden" asp-for="Email" name="email" />
-                        @if (Model.HasClaims)
-                        {
-                            <span id="withdraw-information-popup" class="badge badge-light">
+                            <a id="back" asp-controller="AgencyUser" asp-action="Users" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                            <input type="hidden" asp-for="Email" name="email" />
+                            @if (Model.HasClaims)
+                            {
+                                <span id="withdraw-information-popup" class="badge badge-light">
                                     <div class="btn btn-outline-danger" data-bs-toggle="tooltip" title="The user can't be deleted as the Agency has case (s)">
-                                    <i class="fa fa-trash"></i>  @Applicationsettings.DELETE <span class="badge badge-danger">
-                                        <i class="fas fa-info"></i>
-                                    </span>
-                                </div>
-                            </span>
-                        }
-                        else
-                        {
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-trash me-1"></i> Delete
-                            </button>
-                        }
-                    </div>
+                                        <i class="fa fa-trash"></i>  @Applicationsettings.DELETE <span class="badge badge-danger">
+                                            <i class="fas fa-info"></i>
+                                        </span>
+                                    </div>
+                                </span>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-1"></i> Delete
+                                </button>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
