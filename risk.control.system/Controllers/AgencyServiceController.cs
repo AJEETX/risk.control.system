@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating service for {UserName}", userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error creating service for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("Error creating service.Try again.");
                 return RedirectToAction(nameof(Service), "AgencyService");
             }
@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating service for {UserName}", userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error creating service for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("Error creating service. Try again.");
             }
             return RedirectToAction(nameof(Service), "AgencyService");
@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {SserviceId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error editing {SserviceId} for {UserEmail}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Custom($"Error editing service. Try again", 3, "red", "fas fa-truck");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
@@ -159,115 +159,33 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {ServiceId} for {UserName}", vendorInvestigationServiceTypeId, userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error editing {ServiceId} for {UserEmail}", vendorInvestigationServiceTypeId, userEmail ?? "Anonymous");
                 notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-truck");
             }
             return RedirectToAction(nameof(Service), "AgencyService");
         }
 
-        [Breadcrumb("Delete Service", FromAction = "Service")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteService(long id)
         {
             try
             {
-                if (id <= 0)
-                {
-                    notifyService.Custom($"Invalid Data.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Service), "AgencyService");
-                }
+                var service = await _context.VendorInvestigationServiceType
+                    .FirstOrDefaultAsync(x => x.VendorInvestigationServiceTypeId == id);
 
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await _context.ApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                if (service == null)
+                    return NotFound();
 
-                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
-                    .Include(v => v.InvestigationServiceType)
-                    .Include(v => v.Country)
-                    .Include(v => v.State)
-                    .Include(v => v.District)
-                    .Include(v => v.Vendor)
-                    .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
-                if (vendorInvestigationServiceType == null)
-                {
-                    notifyService.Error($"Service Not Found. Try again");
-                    return RedirectToAction(nameof(Service), "AgencyService");
-                }
+                _context.VendorInvestigationServiceType.Remove(service);
+                await _context.SaveChangesAsync();
 
-                return View(vendorInvestigationServiceType);
+                return Ok(new { success = true, message = "Service deleted successfully." });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {ServiceId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
-                notifyService.Error($"Error deleting service. Try again");
-                return RedirectToAction(nameof(Service), "AgencyService");
-            }
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (id <= 0)
-                {
-                    notifyService.Custom($"Service Not Found.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Service), "AgencyService");
-                }
-                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
-                if (vendorInvestigationServiceType != null)
-                {
-                    vendorInvestigationServiceType.Updated = DateTime.Now;
-                    vendorInvestigationServiceType.UpdatedBy = currentUserEmail;
-                    _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
-                    await _context.SaveChangesAsync();
-                    notifyService.Custom($"Service deleted successfully.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Service), "AgencyService");
-                }
-                notifyService.Error($"Err Service delete.", 3);
-                return RedirectToAction(nameof(Service), "AgencyService");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error deleting {ServiceId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
-                notifyService.Error($"Error deleting service. Try again");
-                return RedirectToAction(nameof(Service), "AgencyService");
-            }
-        }
-
-        [Breadcrumb("Services", FromAction = "Service")]
-        public async Task<IActionResult> ServiceDetail(long id)
-        {
-            try
-            {
-                if (id <= 0)
-                {
-                    notifyService.Error("Service Not Found.");
-                    return RedirectToAction(nameof(Service));
-                }
-
-                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
-                    .Include(v => v.InvestigationServiceType)
-                    .Include(v => v.State)
-                    .Include(v => v.District)
-                    .Include(v => v.Country)
-                    .Include(v => v.Vendor)
-                    .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
-                if (vendorInvestigationServiceType == null)
-                {
-                    notifyService.Error("Service Not Found.");
-                    return RedirectToAction(nameof(Service));
-                }
-
-                return View(vendorInvestigationServiceType);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error getting {ServiceId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
-                notifyService.Error("Service Not Found.");
-                return RedirectToAction(nameof(Service));
+                logger.LogError(ex, "Error deleting service {ServiceId}", id);
+                return StatusCode(500, new { success = false, message = "Delete failed." });
             }
         }
     }

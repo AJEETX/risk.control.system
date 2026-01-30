@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error getting Agency for {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!...Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error getting Agency for {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Profile));
             }
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error getting Agency for {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error Editing Agency. Try again.");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }

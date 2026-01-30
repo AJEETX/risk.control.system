@@ -137,9 +137,16 @@ $(document).ready(function () {
                 sDefaultContent: "",
                 bSortable: false,
                 mRender: function (data, type, row) {
-                    return `
-                        <a id="edit${row.id}" href="/AgencyService/EditService?id=${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>
-                        <a id="delete${row.id}" href="/AgencyService/DeleteService?id=${row.id}" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>`;
+                    var buttons = "";
+                    buttons += '<a id="edit${row.id}" href="/AgencyService/EditService?id=${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>';
+                    buttons += `
+                        <a href="#" 
+                           class="btn btn-xs btn-danger js-delete"
+                           data-id="${row.id}">
+                           <i class="fas fa-trash"></i> Delete
+                        </a>`;
+
+                    return buttons;
                 }
             },
             { data: "isUpdated", bVisible: false },
@@ -156,7 +163,79 @@ $(document).ready(function () {
             });
         }
     });
+    $('#customerTable').on('click', '.js-delete', function (e) {
+        e.preventDefault();
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+        var $btn = $(this);
+        const id = $btn.data('id');
+        const token = $('input[name="__RequestVerificationToken"]').val();
 
+        $.confirm({
+            title: 'Confirm Delete',
+            content: 'Are you sure you want to delete this service?',
+            type: 'red',
+            icon: 'fas fa-trash',
+            buttons: {
+                confirm: {
+                    text: 'Yes, Delete',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
+                        $.ajax({
+                            url: '/AgencyService/DeleteService',
+                            type: 'POST',
+                            data: {
+                                __RequestVerificationToken: token,
+                                id: id
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    $.alert({
+                                        title: 'Deleted!',
+                                        content: response.message,
+                                        closeIcon: true,
+                                        type: 'red',
+                                        icon: 'fas fa-trash',
+                                        buttons: {
+                                            ok: {
+                                                text: 'Close',
+                                                btnClass: 'btn-default',
+                                            }
+                                        }
+                                    });
+                                    $('#customerTable').DataTable().ajax.reload(null, false);
+                                } else {
+                                    toastr.error(response.message || 'Delete failed');
+                                }
+                            },
+                            error: function (xhr) {
+                                $.alert({
+                                    title: 'Error!',
+                                    content: 'Failed to delete the service.',
+                                    type: 'red'
+                                });
+                                if (xhr.status === 401 || xhr.status === 403) {
+                                    window.location.href = '/Account/Login';
+                                } else {
+                                    toastr.error('Unexpected error occurred');
+                                }
+                            },
+                            complete: function () {
+                                $spinner.addClass("hidden");
+                                // ✅ Re-enable button and restore text
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Cancel',
+                    btnClass: 'btn-secondary'
+                }
+            }
+        });
+    });
     // Highlight rows based on `isUpdated` flag
     table.on('draw', function () {
         table.rows().every(function () {

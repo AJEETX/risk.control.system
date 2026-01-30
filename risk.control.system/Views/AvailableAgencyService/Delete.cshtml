@@ -33,7 +33,7 @@
                         <dt class="col-sm-5">
                             @Html.DisplayNameFor(model => model.District)
                         </dt>
-                        
+
                         <dd class="col-sm-5">
                             @Html.DisplayFor(model => @district)
                         </dd>
@@ -83,14 +83,13 @@
                     </dl>
                 </div>
             </div>
-
         </div>
         <div class="card-footer">
             <div class="row">
                 <div class="col-md-12 text-right">
                     <form id="create-form" asp-action="Delete">
                         <input type="hidden" asp-for="VendorInvestigationServiceTypeId" name="id" />
-                        <a id="back" asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                        <a id="back" asp-controller="AvailableAgencyService" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                             <i class="fa fa-window-close"></i>
                             @Applicationsettings.CANCEL
                         </a>
@@ -106,6 +105,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/common/delete-user.js">
-
     </script>
 }

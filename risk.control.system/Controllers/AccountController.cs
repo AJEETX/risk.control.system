@@ -17,134 +17,34 @@ namespace risk.control.system.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IFeatureManager featureManager;
         private readonly ILoginService loginService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IAccountService accountService;
         private readonly ILogger<AccountController> _logger;
-        private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
-        private readonly ApplicationDbContext _context;
         private readonly string BaseUrl;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
+            IFeatureManager featureManager,
             ILoginService loginService,
             SignInManager<ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             IAccountService accountService,
             ILogger<AccountController> logger,
-            IFeatureManager featureManager,
-            INotyfService notifyService,
-            ApplicationDbContext context)
+            INotyfService notifyService)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
+            this.featureManager = featureManager;
             this.loginService = loginService;
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.accountService = accountService;
-            this._context = context;
             _logger = logger;
-            this.featureManager = featureManager;
             this.notifyService = notifyService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
-
-        [Authorize]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> KeepSessionAlive([FromBody] KeepSessionRequest request)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(new { message = "Invalid request." });
-                }
-                if (User is null || User.Identity is null)
-                {
-                    return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
-                }
-
-                if (User.Identity.IsAuthenticated)
-                {
-                    var user = await _signInManager.UserManager.GetUserAsync(User);
-
-                    if (user != null)
-                    {
-                        await _signInManager.RefreshSignInAsync(user);
-                        var userDetails = new
-                        {
-                            name = user.UserName,
-                            role = user.Role != null ? user.Role.GetEnumDisplayName() : null!,
-                            cookieExpiry = user.LastActivityDate ?? user.Updated,
-                            currentPage = request.CurrentPage
-                        };
-
-                        var userSessionAlive = new UserSessionAlive
-                        {
-                            Updated = DateTime.Now,
-                            ActiveUser = user,
-                            CurrentPage = request.CurrentPage,
-                        };
-                        _context.UserSessionAlive.Add(userSessionAlive);
-                        await _context.SaveChangesAsync(null, false);
-                        return Ok(userDetails);
-                    }
-                }
-                await _signInManager.SignOutAsync();
-                return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in KeepSessionAlive for {UserName}", User.Identity.Name ?? "Anonymous");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
-            }
-        }
-
-        [HttpGet]
-        public async Task StreamTypingUpdates(string email, CancellationToken cancellationToken)
-        {
-            Response.ContentType = "text/event-stream";
-
-            // Fetch user details for password change
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                await Response.WriteAsync($"data: ERROR_UserNotFound\n");
-                await Response.WriteAsync($"data: done\n");
-                await Response.Body.FlushAsync(cancellationToken);
-                return;
-            }
-
-            // Send user details first
-            var credentialModelJson = System.Text.Json.JsonSerializer.Serialize(new
-            {
-                email = user.Email,
-                currentPassword = user.Password
-            });
-
-            await Response.WriteAsync($"data: CREDENTIAL|{credentialModelJson}\n");
-            await Response.Body.FlushAsync(cancellationToken);
-            await Task.Delay(1000, cancellationToken); // Small delay to ensure UI updates first
-
-            // Now, stream messages one by one
-            var messages = new List<string>
-            {
-                $"Welcome ! {user.Email} First time user.",
-                "Please update credential to continue.",
-                "Remember credential for later."
-            };
-
-            foreach (var message in messages)
-            {
-                await Response.WriteAsync($"data: {message}\n");
-                await Response.Body.FlushAsync(cancellationToken);
-                await Task.Delay(1500, cancellationToken); // Simulate delay between messages
-            }
-
-            // Indicate completion
-            await Response.WriteAsync($"data: done\n");
-            await Response.Body.FlushAsync(cancellationToken);
         }
 
         [HttpGet]
@@ -192,11 +92,11 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in KeepSessionAlive for {UserName}", User.Identity.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error in KeepSessionAlive for {UserEmail}", User.Identity.Name ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
             }
-
         }
+
         [HttpGet]
         [AllowAnonymous]
         public IActionResult AzureLogin(string returnUrl = "/")
@@ -205,7 +105,7 @@ namespace risk.control.system.Controllers
                 new AuthenticationProperties { RedirectUri = returnUrl },
                 OpenIdConnectDefaults.AuthenticationScheme);
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
@@ -213,6 +113,7 @@ namespace risk.control.system.Controllers
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(Login));
         }
+
         [HttpGet]
         public async Task<IActionResult> ChangePassword(string email)
         {
@@ -261,11 +162,12 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while changing password for {UserName}", User.Identity.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", User.Identity.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Login));
             }
         }
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -301,11 +203,11 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in Forgot Password for {UserName}", input?.Email ?? "Anonymous"); ;
+                _logger.LogError(ex, "Error in Forgot Password for {UserEmail}", input?.Email ?? "Anonymous"); ;
                 throw;
             }
-            
         }
+
         private async Task<IActionResult> PrepareInvalidView(LoginViewModel model, string error)
         {
             model.LoginError = error;

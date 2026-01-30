@@ -20,22 +20,22 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            //{
-            //    className: 'max-width-column-name', // Apply the CSS class,
-            //    targets: 3                      // Index of the column to style
-            //},
-            {
-                className: 'max-width-column', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
-            }],
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        //{
+        //    className: 'max-width-column-name', // Apply the CSS class,
+        //    targets: 3                      // Index of the column to style
+        //},
+        {
+            className: 'max-width-column', // Apply the CSS class,
+            targets: 4                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
+        }],
         order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
@@ -88,7 +88,7 @@
                     img += '<br /> <span class="result"></span>';
 
                     // Return the domain with the appended rating images and information
-                    return '<span title="' + row.name + '" data-bs-toggle="tooltip"><a id="edit' + row.id + '" href="/Company/AgencyDetail?Id=' + row.id + '"> ' + data +'</a></span>' + '<br /> ' + img;
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip"><a id="edit' + row.id + '" href="/EmpanelledAgency/AgencyDetail?Id=' + row.id + '"> ' + data + '</a></span>' + '<br /> ' + img;
                 }
             },
             //{
@@ -189,7 +189,7 @@
             }
         });
     });
-    
+
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
         // Get all rows with search applied
@@ -243,7 +243,7 @@
                 title: "Depanel Agency !!!",
                 content: "Please select agency to depanel?",
                 icon: 'fas fa-exclamation-triangle',
-    
+
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
@@ -260,7 +260,7 @@
                 title: "Confirm Agency Depanel",
                 content: "Are you sure?",
                 icon: 'fas fa-hand-pointer',
-    
+
                 type: 'orange',
                 closeIcon: true,
                 buttons: {

@@ -51,7 +51,6 @@
 });
 
 $(document).ready(function () {
-
     const currentpassword = $('#CurrentPassword');
     if (currentpassword) {
         currentpassword.focus()
@@ -68,7 +67,6 @@ $(document).ready(function () {
         $('#editButton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> User Profile");
     });
     $("#edit-form").validate();
-
 });
 document.addEventListener('DOMContentLoaded', function () {
     // Add event listeners to all elements with class `toggle-password-visibility`
@@ -94,12 +92,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-
-
     var pwdModal = document.getElementById('passwordModal');
     var closeTermsButton = document.getElementById('closeterms');
     var pwdLinks = document.querySelectorAll('.update-password-description');
-
 
     if (pwdLinks) {
         pwdLinks.forEach(function (termsLink) {
@@ -121,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-
     // Optionally, you can close the modal if clicked outside the modal content
     window.addEventListener('click', function (e) {
         if (e.target === pwdModal) {
@@ -129,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function () {
             pwdModal.classList.remove('show'); // Close the modal if clicked outside
         }
     });
-
 });
 let typingInProgress = false;
 let messageQueue = [];
@@ -137,12 +130,11 @@ const chatGPTMessage = document.getElementById('password-advise');
 
 if (chatGPTMessage) {
     var userEmail = document.getElementById('Email').value;
-    const eventSource = new EventSource(`/Account/StreamTypingUpdates?email=${encodeURIComponent(userEmail)}`);
+    const eventSource = new EventSource(`/Rating/StreamTypingUpdates?email=${encodeURIComponent(userEmail)}`);
 
     eventSource.addEventListener('message', (event) => {
-
         // 🔐 Origin check — prevent DOM-based injection
-        if (event.origin !== window.location.origin || event.target.url !== window.location.origin + "/Account/StreamTypingUpdates") {
+        if (event.origin !== window.location.origin || event.target.url !== window.location.origin + "/Rating/StreamTypingUpdates") {
             console.warn("⚠️ Blocked message from unknown origin:", event.origin);
             return;
         }

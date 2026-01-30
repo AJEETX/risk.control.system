@@ -13,6 +13,7 @@ namespace risk.control.system.Services
     public interface ISmsService
     {
         Task DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false);
+
         Task<string> SendSmsAsync(string countryCode, string mobile = "+61432854196", string message = "Testing fom Azy");
     }
 

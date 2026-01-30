@@ -21,7 +21,7 @@ $(document).ready(function () {
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Company/AllServices?id=' + $('#vendorId').val(),
+            url: '/api/Company/AllServices?id=' + $('#Id').val(),
             dataSrc: '',
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
@@ -76,8 +76,22 @@ $(document).ready(function () {
                     if (fullText == ALL_DISTRICTS) {
                         return `<span title="${fullText}" data-toggle="tooltip"> ${fullText} </span>`;
                     } else {
-                        const shortText = fullText.length > 50 ? fullText.substring(0, 50) + '...' : fullText;
-                        return `<span title="${fullText}" data-toggle="tooltip"><small> ${shortText} </small></span>`;
+                        let display = '';
+                        try {
+                            let obj = JSON.parse(data);
+                            // convert to "key: value" pairs without {}
+                            display = Object.entries(obj)
+                                .map(([k, v]) => `${k}: ${v}`)
+                                .join(', ');
+                        } catch {
+                            display = data;
+                        }
+
+                        let encoded = $('<div/>').text(display).html();
+
+                        return data.length > 50
+                            ? `<div title="${encoded}"><small>${data.substring(0, 50)}...</small></div>`
+                            : `<small>${encoded}</small>`;
                     }
                 }
             },
@@ -110,8 +124,13 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + ' href="/Company/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a id=details' + row.id + ' href="/Company/DeleteService?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                    buttons += '<a id=edit' + row.id + ' href="/EmpanelledAgencyService/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += `
+                        <a href="#" 
+                           class="btn btn-xs btn-danger js-delete"
+                           data-id="${row.id}">
+                           <i class="fas fa-trash"></i> Delete
+                        </a>`;
                     return buttons;
                 }
             },
@@ -125,13 +144,6 @@ $(document).ready(function () {
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-            // Event delegation for .btn-danger elements
-            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getdelete(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
             $('#customerTable tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
@@ -148,7 +160,79 @@ $(document).ready(function () {
             });
         }
     });
+    $('#customerTable').on('click', '.js-delete', function (e) {
+        e.preventDefault();
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+        var $btn = $(this);
+        const id = $btn.data('id');
+        const token = $('input[name="__RequestVerificationToken"]').val();
 
+        $.confirm({
+            title: 'Confirm Delete',
+            content: 'Are you sure you want to delete this service?',
+            type: 'red',
+            icon: 'fas fa-trash',
+            buttons: {
+                confirm: {
+                    text: 'Yes, Delete',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
+                        $.ajax({
+                            url: '/EmpanelledAgencyService/DeleteService',
+                            type: 'POST',
+                            data: {
+                                __RequestVerificationToken: token,
+                                id: id
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    $.alert({
+                                        title: 'Deleted!',
+                                        content: response.message,
+                                        closeIcon: true,
+                                        type: 'red',
+                                        icon: 'fas fa-trash',
+                                        buttons: {
+                                            ok: {
+                                                text: 'Close',
+                                                btnClass: 'btn-default',
+                                            }
+                                        }
+                                    });
+                                    $('#customerTable').DataTable().ajax.reload(null, false);
+                                } else {
+                                    toastr.error(response.message || 'Delete failed');
+                                }
+                            },
+                            error: function (xhr) {
+                                $.alert({
+                                    title: 'Error!',
+                                    content: 'Failed to delete the service.',
+                                    type: 'red'
+                                });
+                                if (xhr.status === 401 || xhr.status === 403) {
+                                    window.location.href = '/Account/Login';
+                                } else {
+                                    toastr.error('Unexpected error occurred');
+                                }
+                            },
+                            complete: function () {
+                                $spinner.addClass("hidden");
+                                // ✅ Re-enable button and restore text
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Cancel',
+                    btnClass: 'btn-secondary'
+                }
+            }
+        });
+    });
     table.on('draw', function () {
         table.rows().every(function () {
             const data = this.data();
@@ -168,7 +252,6 @@ $(document).ready(function () {
             }
 
             if (data.isUpdated) {
-
                 $(rowNode).addClass('highlight-new-user');
 
                 setTimeout(() => {

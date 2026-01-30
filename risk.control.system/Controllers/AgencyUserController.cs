@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Amazon;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -94,7 +93,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency for {UserName}", userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error getting Agency for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error creating user. Try again.");
                 return RedirectToAction(nameof(Users), "AgencyUser");
             }
@@ -155,7 +154,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency {Id} user. {UserName}", vendorId, userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error getting Agency {Id} user. {UserEmail}", vendorId, userEmail ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error Creating User. Try again.");
             }
             return RedirectToAction(nameof(Users), "AgencyUser");
@@ -260,7 +259,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting AgencyUser {UserId} for {UserName}", userId, userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error getting AgencyUser {UserId} for {UserEmail}", userId, userEmail ?? "Anonymous");
                 notifyService.Error("OOPS!!!..Error deleting user. Try again");
                 return RedirectToAction(nameof(Users), "AgencyUser");
             }
@@ -276,13 +275,13 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     notifyService.Error("User Not Found!!!..Try again");
-                    return RedirectToAction(nameof(User), "AgencyUser");
+                    return RedirectToAction(nameof(Users), "AgencyUser");
                 }
                 var model = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("User Not Found!!!..Try again");
-                    return RedirectToAction(nameof(User), "AgencyUser");
+                    return RedirectToAction(nameof(Users), "AgencyUser");
                 }
 
                 model.Updated = DateTime.Now;
@@ -291,13 +290,13 @@ namespace risk.control.system.Controllers
                 _context.ApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"User <b> {model.Email}</b> deleted successfully", 3, "red", "fas fa-user-minus");
-                return RedirectToAction(nameof(Users), "AgencyUser");
+                return RedirectToAction(nameof(Users), "AgencyUser", new { id = model.VendorId });
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error deleting AgencyUser {email}. {UserEmail}", email, userEmail);
                 notifyService.Error("OOPS!!!..Error deleting user. Try again");
-                return RedirectToAction(nameof(User), "AgencyUser");
+                return RedirectToAction(nameof(Users), "AgencyUser");
             }
         }
     }

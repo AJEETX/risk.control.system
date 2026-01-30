@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {ClaimId} for {UserEmail}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {ClaimId} for {UserEmail}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
             }
@@ -201,7 +201,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {ClaimId} for {UserEmail}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), "VendorInvestigation", new { selectedcase = claimId });
             }
@@ -239,7 +239,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {ClaimId} for {UserEmail}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
             }
@@ -277,7 +277,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {ClaimId} for {UserEmail}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
             }
@@ -347,7 +347,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {ClaimId} for {UserName}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {ClaimId} for {UserEmail}.", claimId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
             }

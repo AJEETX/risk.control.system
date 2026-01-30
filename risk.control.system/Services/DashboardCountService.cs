@@ -9,11 +9,17 @@ namespace risk.control.system.Services
     public interface IDashboardCountService
     {
         Task<DashboardData> GetCreatorCount(string userEmail, string role);
+
         Task<DashboardData> GetAssessorCount(string userEmail, string role);
+
         Task<DashboardData> GetCompanyAdminCount(string userEmail, string role);
+
         Task<DashboardData> GetManagerCount(string userEmail, string role);
+
         Task<DashboardData> GetSupervisorCount(string userEmail, string role);
+
         Task<DashboardData> GetAgentCount(string userEmail, string role);
+
         Task<DashboardData> GetSuperAdminCount(string userEmail, string role);
     }
 
@@ -30,6 +36,7 @@ namespace risk.control.system.Services
         private const string rejectd = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
         private const string approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
         private const string finished = CONSTANTS.CASE_STATUS.FINISHED;
+
         public DashboardCountService(ApplicationDbContext context)
         {
             this._context = context;
@@ -38,11 +45,11 @@ namespace risk.control.system.Services
         public async Task<DashboardData> GetAgentCount(string userEmail, string role)
         {
             var vendorUser = await _context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
-            var taskCount =await GetCases().CountAsync(c => c.VendorId == vendorUser.VendorId &&
+            var taskCount = await GetCases().CountAsync(c => c.VendorId == vendorUser.VendorId &&
             c.SubStatus == assigned2Agent &&
             c.TaskedAgentEmail == userEmail);
 
-            var agentSubmittedCount =await GetCases().Distinct().CountAsync(t => t.TaskedAgentEmail == userEmail && t.SubStatus != assigned2Agent);
+            var agentSubmittedCount = await GetCases().Distinct().CountAsync(t => t.TaskedAgentEmail == userEmail && t.SubStatus != assigned2Agent);
 
             var data = new DashboardData();
             data.FirstBlockName = "Tasks";
@@ -55,6 +62,7 @@ namespace risk.control.system.Services
 
             return data;
         }
+
         public async Task<DashboardData> GetSuperAdminCount(string userEmail, string role)
         {
             var allCompaniesCount = await _context.ClientCompany.CountAsync(c => !c.Deleted);
@@ -79,7 +87,6 @@ namespace risk.control.system.Services
 
         public async Task<DashboardData> GetSupervisorCount(string userEmail, string role)
         {
-
             var claimsAllocate = await GetAgencyAllocateCount(userEmail);
             var claimsVerified = await GetAgencyVerifiedCount(userEmail);
             var claimsActiveCount = await GetSuperVisorActiveCount(userEmail);
@@ -105,6 +112,7 @@ namespace risk.control.system.Services
 
             return data;
         }
+
         public async Task<DashboardData> GetCreatorCount(string userEmail, string role)
         {
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -114,7 +122,6 @@ namespace risk.control.system.Services
                 AutoAllocation = company.AutoAllocation,
                 BulkUpload = company.BulkUpload
             };
-
 
             data.FirstBlockName = "ADD/ASSIGN";
             data.FirstBlockUrl = "/CaseCreateEdit/New";
@@ -140,7 +147,6 @@ namespace risk.control.system.Services
             data.LastBlockCount = underWritingActive;
             data.ThirdBlockUrl = "/CaseActive/Active";
 
-
             return data;
         }
 
@@ -159,12 +165,11 @@ namespace risk.control.system.Services
             var availableAgenciesCount = await GetAvailableAgencies(userEmail);
 
             var data = new DashboardData();
-            
+
             data.SecondBBlockName = "Active";
             data.SecondBBlockUrl = "/Manager/Active";
             data.SecondBBlockCount = activeClaims;
             data.SecondBlockCount = activeUnderwritings;
-
 
             data.ThirdBlockName = "Approved";
             data.ThirdBlockCount = claimsCompleted;
@@ -178,23 +183,22 @@ namespace risk.control.system.Services
 
             data.FifthBlockName = "Empanelled Agencies";
             data.FifthBlockCount = empanelledAgenciesCount;
-            data.FifthBlockUrl = "/Vendors/EmpanelledVendors";
+            data.FifthBlockUrl = "/EmpanelledAgency/EmpanelledVendors";
 
             data.SixthBlockName = "Available Agencies";
             data.SixthBlockCount = availableAgenciesCount;
-            data.SixthBlockUrl = "/Vendors/AvailableVendors";
+            data.SixthBlockUrl = "/AvailableAgency/AvailableVendors";
 
             return data;
         }
+
         public async Task<DashboardData> GetAssessorCount(string userEmail, string role)
         {
-
             var claimsAssessor = await GetAssessorAssess(userEmail, InsuranceType.CLAIM);
             var underwritingAssessor = await GetAssessorAssess(userEmail, InsuranceType.UNDERWRITING);
 
             var claimsReview = await GetAssessorReview(userEmail, InsuranceType.CLAIM);
             var underwritingReview = await GetAssessorReview(userEmail, InsuranceType.UNDERWRITING);
-
 
             var claimsReject = await GetAssessorReject(userEmail, InsuranceType.CLAIM);
             var underwritingReject = await GetAssessorReject(userEmail, InsuranceType.UNDERWRITING);
@@ -237,6 +241,7 @@ namespace risk.control.system.Services
 
             return data;
         }
+
         private async Task<int> GetAvailableAgencies(string userEmail)
         {
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
@@ -244,10 +249,11 @@ namespace risk.control.system.Services
                .Include(c => c.EmpanelledVendors)
                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-            var availableVendors =await _context.Vendor
+            var availableVendors = await _context.Vendor
                 .CountAsync(v => !company.EmpanelledVendors.Contains(v) && v.CountryId == companyUser.CountryId && !v.Deleted);
             return availableVendors;
         }
+
         private async Task<int> GetEmpanelledAgencies(string userEmail)
         {
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
@@ -255,6 +261,7 @@ namespace risk.control.system.Services
             var count = empAgencies.EmpanelledVendors.Count(v => v.Status == VendorStatus.ACTIVE && !v.Deleted);
             return count;
         }
+
         private async Task<int> GetCompanyUsers(string userEmail)
         {
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
@@ -263,6 +270,7 @@ namespace risk.control.system.Services
 
             return allCompanyUserCount;
         }
+
         private async Task<int> GetSuperVisorActiveCount(string userEmail)
         {
             var claims = GetAgencyClaims();
@@ -275,7 +283,7 @@ namespace risk.control.system.Services
                 a.SubStatus == submitted2Assessor ||
                  a.SubStatus == reply2Assessor));
             }
-            var count =await claims.CountAsync(a => a.VendorId == vendorUser.VendorId &&
+            var count = await claims.CountAsync(a => a.VendorId == vendorUser.VendorId &&
             a.Status != finished &&
                  ((a.SubStatus == assigned2Agent && a.AllocatingSupervisordEmail == userEmail) ||
                 (a.SubStatus == submitted2Assessor && a.SubmittingSupervisordEmail == userEmail) ||
@@ -289,16 +297,16 @@ namespace risk.control.system.Services
 
             var vendorUser = await _context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count =await agencyCases.CountAsync(i => i.VendorId == vendorUser.VendorId &&
+            var count = await agencyCases.CountAsync(i => i.VendorId == vendorUser.VendorId &&
             i.SubStatus == submitted2Supervisor);
             return count;
         }
+
         private async Task<int> GetAgencyAllocateCount(string userEmail)
         {
             var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var agencyCases = GetAgencyClaims().Where(i => i.VendorId == vendorUser.VendorId);
-
 
             var count = await agencyCases
                     .CountAsync(i => i.SubStatus == allocated ||
@@ -306,19 +314,21 @@ namespace risk.control.system.Services
 
             return count;
         }
+
         private async Task<int> GetAssessorAssess(string userEmail, InsuranceType insuranceType)
         {
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
 
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count =await cases.CountAsync(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
             i.SubStatus == submitted2Assessor ||
             i.SubStatus == reply2Assessor
              );
 
             return count;
         }
+
         private async Task<int> GetAgencyyCompleted(string userEmail)
         {
             var agencyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -341,7 +351,6 @@ namespace risk.control.system.Services
             }
             else
             {
-
                 var claimsSubmitted = 0;
                 foreach (var item in applicationDbContext)
                 {
@@ -355,15 +364,14 @@ namespace risk.control.system.Services
                 }
                 return claimsSubmitted;
             }
-
         }
+
         private async Task<int> GetCompanyManagerApproved(string userEmail, InsuranceType insuranceType)
         {
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-
-            var count =await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.Status == finished &&
                 c.SubStatus == approved
                 );
@@ -376,7 +384,7 @@ namespace risk.control.system.Services
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count =await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.SubmittedAssessordEmail == userEmail &&
                 c.Status == finished &&
                 (c.SubStatus == approved)
@@ -384,24 +392,25 @@ namespace risk.control.system.Services
 
             return count;
         }
+
         private async Task<int> GetAssessorReject(string userEmail, InsuranceType insuranceType)
         {
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-
-            var count =await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.SubStatus == rejectd && c.Status == finished && c.SubmittedAssessordEmail == userEmail
                 );
 
             return count;
         }
+
         private async Task<int> GetManagerReject(string userEmail, InsuranceType insuranceType)
         {
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count =await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.SubStatus == rejectd && c.Status == finished);
 
             return count;
@@ -412,7 +421,7 @@ namespace risk.control.system.Services
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
 
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var count =await cases.CountAsync(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
             a.SubStatus == requestedAssessor && a.RequestedAssessordEmail == userEmail);
             return count;
         }
@@ -434,19 +443,20 @@ namespace risk.control.system.Services
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count =await cases.CountAsync(a => !a.Deleted && a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
+            var count = await cases.CountAsync(a => !a.Deleted && a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                             a.ClientCompanyId == companyUser.ClientCompanyId && a.CreatedUser == userEmail &&
                             !subStatus
                             .Contains(a.SubStatus));
 
             return count;
         }
+
         private async Task<int> GetManagerActive(string userEmail, InsuranceType insuranceType)
         {
             var cases = GetCases().Where(c => c.PolicyDetail.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count =await cases.CountAsync(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
                     a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                     (a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
                     a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR ||
@@ -461,7 +471,7 @@ namespace risk.control.system.Services
 
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count =await claims.CountAsync(a => !a.Deleted &&
+            var count = await claims.CountAsync(a => !a.Deleted &&
                 a.ClientCompanyId == companyUser.ClientCompanyId &&
                      a.CreatedUser == companyUser.Email &&
                          (
