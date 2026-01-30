@@ -31,6 +31,7 @@ namespace risk.control.system.Controllers.Mobile
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
         private readonly string baseUrl;
+
         public SecureController(UserManager<Models.ApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
             IPdfGenerativeService generateService,
@@ -179,6 +180,7 @@ namespace risk.control.system.Controllers.Mobile
             var token = tokenService.GenerateJwtToken(user);
             return Ok(new { token });
         }
+
         // This endpoint requires JWT authentication.
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("test-2-access-secure-api")]

@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-
     const countryCode = $('#countryCode').val();
     const isdCode = $('#Isd').val();
 
@@ -54,7 +53,7 @@
         var vendorId = $('#vendorId').val();
 
         console.log('Rated ' + starId + ' stars for vendor ' + vendorId);
-        var url = "/Vendors/PostRating?rating=" + starId + "&mid=" + vendorId;
+        var url = "/Rating/PostRating?rating=" + starId + "&mid=" + vendorId;
 
         $.post(url, null, function (data) {
             $("#rating-result-data").text(data);

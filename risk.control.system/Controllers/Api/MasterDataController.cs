@@ -13,8 +13,6 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers.Api
 {
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -60,7 +58,6 @@ namespace risk.control.system.Controllers.Api
             return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
         }
 
-
         [HttpGet("CheckUserEmail")]
         public async Task<int?> CheckUserEmail(string input)
         {
@@ -69,10 +66,11 @@ namespace risk.control.system.Controllers.Api
                 return null;
             }
 
-            var userCount = await userManager.Users.CountAsync(u => u.Email == input && !u.Deleted);
+            var userCount = await userManager.Users.CountAsync(u => u.Email == input.ToLower());
 
             return userCount == 0 ? 0 : 1;
         }
+
         [HttpGet("GetInvestigationServicesByInsuranceType")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetInvestigationServicesByInsuranceType(string insuranceType)
@@ -99,6 +97,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpGet("GetUserBySearch")]
         [AllowAnonymous]
         public async Task<IActionResult> GetUserBySearch(string search = "")
@@ -207,7 +206,6 @@ namespace risk.control.system.Controllers.Api
                         })?
                         .ToList();
                 return Ok(states);
-
             }
             catch (Exception ex)
             {
@@ -370,7 +368,6 @@ namespace risk.control.system.Controllers.Api
                         DistrictName = Applicationsettings.ALL_DISTRICT
                     };
                     return Ok(result);
-
                 }
                 var pincode = context.District.Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
                     .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
@@ -542,6 +539,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpGet("GetCountrySuggestions")]
         public IActionResult GetCountrySuggestions(string term = "")
         {
@@ -586,6 +584,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [AllowAnonymous]
         [HttpGet("GetCountryIsdCode")]
         public IActionResult GetCountryIsdCode(string term = "")
@@ -627,6 +626,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [AllowAnonymous]
         [HttpGet("GetIsdCode")]
         public IActionResult GetIsdCode(string term = "")
@@ -714,6 +714,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpGet("IsValidMobileNumber")]
         public async Task<IActionResult> IsValidMobileNumber(string phone, int countryCode)
         {

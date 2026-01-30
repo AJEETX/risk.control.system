@@ -69,7 +69,7 @@
                 }
             }
         },
-        
+
         columnDefs: [{
             'targets': 0,
             'searchable': false,
@@ -98,18 +98,18 @@
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 9                      // Index of the column to style
-            },
-            {
-                'targets': 15, // Index for the "Case Type" column
-                'name': 'policy' // Name for the "Case Type" column
-            }],
+        },
+        {
+            'targets': 15, // Index for the "Case Type" column
+            'name': 'policy' // Name for the "Case Type" column
+        }],
         order: [[14, 'asc']],
         responsive: true,
         fixedHeader: true,
         processing: true,
         autoWidth: false,
         serverSide: true,
-        deferRender: true,  
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -283,14 +283,14 @@
             if (rowCount > 0 && hasAssignedRows()) {
                 $('#deletecase').prop('disabled', false);
                 $('.top-info').prop('disabled', false);
-                    $('#allocatedcase').prop('disabled', false);
+                $('#allocatedcase').prop('disabled', false);
             }
             else {
                 $('.top-info').prop('disabled', true);
                 $('#deletecase').prop('disabled', true);
                 $('#allocatedcase').prop('disabled', true);
             }
-            
+
             $('#customerTableAuto tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('assign', ''); // Extract the ID from the button's ID attribute
@@ -406,6 +406,11 @@
                                     content: 'Failed to delete the case.',
                                     type: 'red'
                                 });
+                                if (xhr.status === 401 || xhr.status === 403) {
+                                    window.location.href = '/Account/Login';
+                                } else {
+                                    toastr.error('Unexpected error occurred');
+                                }
                             },
                             complete: function () {
                                 $spinner.addClass("hidden");
@@ -499,7 +504,6 @@
                         text: "Assign <sub>auto</sub>",
                         btnClass: 'btn-warning',
                         action: function () {
-
                             askConfirmation = true;
                             $("body").addClass("submit-progress-bg");
 
@@ -527,7 +531,6 @@
                     }
                 }
             });
-
         }
     });
 
@@ -604,7 +607,6 @@
                     // Refresh DataTable
                     $('#customerTableAuto').DataTable().ajax.reload(null, false);
                     $('#checkall').prop('checked', false);
-
                 }
                 else {
                     $.alert({
@@ -636,7 +638,6 @@
 
         if (extn == "zip") {
             if (typeof (FileReader) != "undefined") {
-
                 //loop for each file selected for uploaded.
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
@@ -658,7 +659,6 @@
                         );
                     }
                 }
-
             } else {
                 $.alert(
                     {
@@ -763,7 +763,7 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    
+
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     disableAllInteractiveElements();
@@ -783,7 +783,6 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-   
 
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
     disableAllInteractiveElements();
@@ -802,7 +801,6 @@ function assign(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-
 
     $('a#assign' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Assign");
     disableAllInteractiveElements();

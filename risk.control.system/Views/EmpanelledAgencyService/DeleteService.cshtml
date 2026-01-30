@@ -2,12 +2,15 @@
 @model risk.control.system.Models.VendorInvestigationServiceType
 
 @{
-    ViewData["Title"] = Applicationsettings.DETAILS;
+    ViewData["Title"] = @Applicationsettings.DELETE;
+    var data = Model.Price;
+    var district = Model.District == null ? "ALL DISTRICTS" : Model.District.Name;
+    var type = Model.InsuranceType.GetEnumDisplayName();
 }
 <section class="content">
     <div class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title"><i class="fas fa-truck"></i> Manage Service</h3>
+            <h3 class="card-title"><i class="fas fa-truck"></i> Delete Service</h3>
         </div>
         <div class="card-body">
             <div class="submit-progress hidden">
@@ -20,7 +23,7 @@
                             @Html.DisplayNameFor(model => model.InsuranceType)
                         </dt>
                         <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.InsuranceType.GetEnumDisplayName())
+                            @Html.DisplayFor(model => @type)
                         </dd>
                         <dt class="col-sm-5">
                             @Html.DisplayNameFor(model => model.InvestigationServiceType)
@@ -33,7 +36,7 @@
                             @Html.DisplayNameFor(model => model.District)
                         </dt>
                         <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.District.Name)
+                            @Html.DisplayFor(model => @district)
                         </dd>
 
                         <dt class="col-sm-5">
@@ -54,7 +57,7 @@
                     <dl class="row">
 
                         <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.Price)
+                            @Html.DisplayNameFor(model => model.Price) (@ViewBag.Currency)
                         </dt>
                         <dd class="col-sm-5">
                             @Html.DisplayFor(model => model.Price)
@@ -81,16 +84,27 @@
                     </dl>
                 </div>
             </div>
+        </div>
+        <div class="card-footer">
             <div class="row">
                 <div class="col-md-12 text-right">
-                    <a id="back" asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
-                        <i class="fa fa-window-close"></i>
-                        @Applicationsettings.CANCEL
-                    </a>
-                    <a asp-action="Edit" class="btn btn-warning" asp-route-id="@Model.VendorInvestigationServiceTypeId"><i class="fas fa-truck"></i> Manage Service</a>
+                    <form id="create-form" asp-action="DeleteService">
+                        <input type="hidden" asp-for="VendorInvestigationServiceTypeId" name="id" />
+                        <a id="back" asp-controller="EmpanelledAgencyService" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                            <i class="fa fa-window-close"></i>
+                            @Applicationsettings.CANCEL
+                        </a>
+                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-    
 </section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/common/delete-user.js">
+    </script>
+}

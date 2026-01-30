@@ -17,12 +17,12 @@
             <div class="row justify-content-center">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="input-group-label" for="emailAddress" > Email:<small>(minimum 5 character)</small></label>
+                        <label class="input-group-label" for="emailAddress"> Email:<small>(minimum 5 character)</small></label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                             </div>
-                            <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address remarks" required placeholder="email" title="Enter unique email with 5 minimum character" maxlength="15" autocomplete="name"  data-bs-toggle="tooltip" />
+                            <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address remarks" required placeholder="email" title="Enter unique email with 5 minimum character" maxlength="15" autocomplete="name" data-bs-toggle="tooltip" />
                             <div class="input-group-append">
                                 <span class="input-group-text" id="Email">@@@email</span>
                             </div>
@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <form id="create-form"  asp-action="CreateAgencyUser" enctype="multipart/form-data" autocomplete="off">
+        <form id="create-form" asp-action="CreateAgencyUser" enctype="multipart/form-data" autocomplete="off">
             <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
             <input type="hidden" id="txn" name="txn" value="company" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -55,7 +55,7 @@
                             @*  <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                             <i class="fas fa-undo"></i> Reset
                             </button> *@
-                            <a id="cancel" asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                            <a id="cancel" asp-controller="EmpanelledAgencyUser" asp-action="AgencyUsers" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                                 <i class="fa fa-window-close"></i>
                                 @Applicationsettings.CANCEL
                             </a>

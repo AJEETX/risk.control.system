@@ -61,17 +61,17 @@ namespace risk.control.system.Services
         public async Task<object[]> GetEmpanelledVendorsAsync(ApplicationUser companyUser)
         {
             var statuses = GetValidStatuses();
-
             var claimsCases = await GetCasesAsync(statuses);
 
             var company = await GetCompanyAsync(companyUser.ClientCompanyId.Value);
             if (company == null) return Array.Empty<object>();
 
-            var result = company.EmpanelledVendors
+            var vendorTasks = company.EmpanelledVendors
                 .Where(IsActiveVendor)
                 .OrderBy(v => v.Name)
-                .Select(v => MapVendor(v, companyUser, claimsCases))
-                .ToArray();
+                .Select(v => MapVendor(v, companyUser, claimsCases));
+
+            var result = await Task.WhenAll(vendorTasks);
 
             ResetVendorUpdateFlags(company.EmpanelledVendors);
             await _context.SaveChangesAsync(null, false);
@@ -108,12 +108,11 @@ namespace risk.control.system.Services
 
         private async Task<object> MapVendor(Vendor u, ApplicationUser companyUser, List<InvestigationTask> caseTasks)
         {
-            var document = base64FileService.GetBase64FileAsync(u.DocumentUrl, Applicationsettings.NO_IMAGE);
-
+            var document = await base64FileService.GetBase64FileAsync(u.DocumentUrl, Applicationsettings.NO_IMAGE);
             return new
             {
                 Id = u.VendorId,
-                Document = await document,
+                Document = document,
                 Domain = GetDomain(u, companyUser),
                 Name = u.Name,
                 Code = u.Code,

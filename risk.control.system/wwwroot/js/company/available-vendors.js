@@ -26,15 +26,15 @@
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 3                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
-            }],
+        },
+        {
+            className: 'max-width-column', // Apply the CSS class,
+            targets: 5                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 10                      // Index of the column to style
+        }],
         order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -124,13 +124,13 @@
             },
             {
                 "sDefaultContent": '<button disabled class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>',
-                "data":"deletable",
+                "data": "deletable",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit </a>&nbsp;';
+                    buttons += '<a id="edit' + row.id + '" href="/AvailableAgency/Details?Id=' + row.id + '"  class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit </a>&nbsp;';
                     if (data) {
-                        buttons += '<a id="delete' + row.id + '" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger" data-bs-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i> Delete</a>'
+                        buttons += '<a id="delete' + row.id + '" href="/AvailableAgency/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger" data-bs-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i> Delete</a>'
                     }
                     else {
                         buttons += '<button disabled class="btn btn-xs btn-danger" data-bs-toggle="tooltip" title="Delete Disabled"><i class="fas fa-trash"></i> Delete</a>';
@@ -148,7 +148,6 @@
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-
             $('#customerTable tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('delete', ''); // Extract the ID from the button's ID attribute
@@ -209,7 +208,7 @@
         // Check/uncheck checkboxes for all rows in the table
         $('input[type="checkbox"]', rows).prop('checked', this.checked);
     });
-   
+
     // Handle click on checkbox to set state of "Select all" control
     $('#customerTable tbody').on('change', 'input[type="checkbox"]', function () {
         // If checkbox is not checked
@@ -254,7 +253,7 @@
                 title: "Agency Empanelment !!!",
                 content: "Please select agency to empanel?",
                 icon: 'fas fa-exclamation-triangle',
-    
+
                 type: 'green',
                 closeIcon: true,
                 buttons: {
@@ -271,7 +270,7 @@
                 title: "Confirm Agency Empanel",
                 content: "Are you sure?",
                 icon: 'fas fa-handshake',
-    
+
                 type: 'green',
                 closeIcon: true,
                 buttons: {

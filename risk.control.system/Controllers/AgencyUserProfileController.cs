@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {UserId} for {UserName}", userId, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error getting {UserId} for {UserEmail}", userId, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
@@ -133,7 +133,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {UserId} for {UserName}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error editing {UserId} for {UserEmail}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
             }
             return this.RedirectToAction<DashboardController>(x => x.Index());
@@ -154,7 +154,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error for {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error for {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error for changing password by {UserName}", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error for changing password . {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }

@@ -118,7 +118,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {UserName}.", agentEmail);
+                logger.LogError(ex, "Error occurred for {UserEmail}.", agentEmail);
                 return BadRequest($"Agent does not exist or Error");
             }
         }

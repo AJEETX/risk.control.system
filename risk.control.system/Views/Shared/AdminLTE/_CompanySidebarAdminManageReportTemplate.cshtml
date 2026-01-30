@@ -6,62 +6,62 @@
 @inject UserManager<ApplicationUser> UserManager
 @model ClientCompany
 @{
-    if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME))
-    {
-        <li class="nav-item">
-            <a is-active-page class="navlink-border nav-link
-                                                    @Url.MakeActiveClass("Questionaire","")
-                                                        @Url.MakeActiveClass("ServiceReportTemplates","")
-                                                @Url.MakeActiveClass("Template","")
-                                            @Url.MakeActiveClass("DigitalIdReports","")
-                                            @Url.MakeActiveClass("DocumentIdReports","")">
-                <i class="nav-icon fas fa-file-invoice"></i>
-                <p class="sidebar-menu-header-label">
-                    REPORT TEMPLATE
-                    <i class="right fas fa-angle-down"></i>
-                </p>
-            </a>
-        </li>
+	if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME))
+	{
+		<li class="nav-item">
+			<a is-active-page class="navlink-border nav-link
+						                                                    @Url.MakeActiveClass("Questionaire", "")
+						                                                        @Url.MakeActiveClass("ServiceReportTemplates", "")
+						                                                @Url.MakeActiveClass("Template", "")
+						                                            @Url.MakeActiveClass("DigitalIdReports", "")
+						                                            @Url.MakeActiveClass("DocumentIdReports", "")">
+				<i class="nav-icon fas fa-file-invoice"></i>
+				<p class="sidebar-menu-header-label">
+					REPORT TEMPLATE
+					<div class="right"><i class="fas fa-angle-down"></i></div>
+				</p>
+			</a>
+		</li>
 
-        <li class="nav-item">
-            <a is-active-page asp-controller="Questionaire" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Questionaire","")">
-                <i class="fas fa-info nav-icon"></i>
-                <p>
-                    Questionaire
-                </p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="DigitalIdReports" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("DigitalIdReports","")">
-                <i class="fas fa-portrait nav-icon"></i>
-                <p>
-                    Digital Id Template
-                </p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="DocumentIdReports" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("DocumentIdReports","")">
-                <i class="fas fa-mobile-alt nav-icon"></i>
-                <p>
-                    Document Id Template
-                </p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="Template" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Template","")">
-                <i class="fas fa-clipboard-check nav-icon"></i>
-                <p>
-                    Investigation Template
-                </p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="ServiceReportTemplates" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ServiceReportTemplates","")">
-                <i class="fas fa-film nav-icon"></i>
-                <p>
-                    Service Template
-                </p>
-            </a>
-        </li>
-    }
+		<li class="nav-item">
+			<a is-active-page asp-controller="Questionaire" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Questionaire", "")">
+				<i class="fas fa-info nav-icon"></i>
+				<p>
+					Questionaire
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="DigitalIdReports" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("DigitalIdReports", "")">
+				<i class="fas fa-portrait nav-icon"></i>
+				<p>
+					Digital Id Template
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="DocumentIdReports" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("DocumentIdReports", "")">
+				<i class="fas fa-mobile-alt nav-icon"></i>
+				<p>
+					Document Id Template
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="Template" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Template", "")">
+				<i class="fas fa-clipboard-check nav-icon"></i>
+				<p>
+					Investigation Template
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="ServiceReportTemplates" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ServiceReportTemplates", "")">
+				<i class="fas fa-film nav-icon"></i>
+				<p>
+					Service Template
+				</p>
+			</a>
+		</li>
+	}
 }
