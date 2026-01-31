@@ -1209,10 +1209,10 @@ table.dataTable thead tr {
     background-color: whitesmoke;
 }
 
-table#customerTable {
+table#dataTable {
 }
 
-    table#customerTable thead tr {
+    table#dataTable thead tr {
         background-color: whitesmoke;
     }
 

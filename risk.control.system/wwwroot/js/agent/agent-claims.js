@@ -20,7 +20,7 @@ $(document).ready(function () {
         
     });
 
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/agent/GetNewCases',
             dataSrc: '',
@@ -188,8 +188,8 @@ $(document).ready(function () {
     });
 
 
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
 
     if ($("input[type='radio'].selected-case:checked").length) {
         $("#allocatedcase").prop('disabled', false);
@@ -209,7 +209,7 @@ $(document).ready(function () {
     });
 
     // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
+    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked
         if (this.checked) {
             $("#allocatedcase").prop('disabled', false);

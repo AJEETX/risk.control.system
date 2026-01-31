@@ -1,0 +1,134 @@
+﻿@model risk.control.system.Models.ClientCompany
+
+@{
+    ViewData["Title"] = "Manage Company";
+}
+<section class="content">
+    <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+    <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+
+            <h3 class="card-title"><i class="fas fa-building"></i> Company Profile</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <div class="form-group text-center">
+                        <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-bs-toggle="tooltip" title="Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")"> Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</label>
+                    </div>
+
+                    <div class="profile-img-container">
+                        <img src="/Document/GetCompanyDocument/@Model.ClientCompanyId" class="shadow-lg border profile-img" alt="Company Profile" title="@Model.Email" data-bs-toggle="tooltip" />
+                    </div>
+                    <h5 class="mt-3">@Model.Name</h5>
+
+                    <div class="dropdown-divider"></div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <a id="edit-company" asp-controller="ManageCompany" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Edit Company</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-primary"><i class="fas fa-envelope"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Domain</span>
+                            <span class="info-box-number"><a href="#">@Model.Email</a></span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="info-box-icon bg-success"><i class="fas fa-phone"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Mobile #</span>
+                            <span class="info-box-number">+@Model.Country.ISDCode (0) @Model.PhoneNumber</span>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <span class="info-box-icon bg-info"><i class="fas fa-landmark"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Bank Name </span>
+                            <span class="info-box-number">@Model.BankName</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"><i class="fas fa-code"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">IFSC Code</span>
+                            <span class="info-box-number">@Model.IFSCCode</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"><i class="fab fa-btc"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Bank Account #</span>
+                            <span class="info-box-number">@Model.BankAccountNumber</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-md-4">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-info"><i class="fas fa-map-marker-alt"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Address</span>
+                            <span class="info-box-number">@Model.Addressline</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"><i class="fas fa-map-pin"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Pin Code</span>
+                            <span class="info-box-number">@Model.PinCode.Code</span>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <span class="info-box-icon bg-secondary"><i class="fas fa-city"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">District</span>
+                            <span class="info-box-number">@Model.District.Name</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="info-box-icon bg-danger"><i class="fas fa-flag"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">State</span>
+                            <span class="info-box-number">@Model.State.Name</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="info-box-icon bg-dark"><i class="fas fa-globe"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Country</span>
+                            <span class="info-box-number">@Model.Country.Name</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/common/companies.js"></script>
+
+}

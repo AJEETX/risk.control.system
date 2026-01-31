@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Services;
 

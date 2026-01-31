@@ -4,7 +4,7 @@
     ViewData["Title"] = " Send Enquiry";
 }
 <section class="content">
-    <form id="query-form" method="post" asp-controller="CaseVendorPost" asp-action="ReplyQuery" enctype="multipart/form-data" autocomplete="off">
+    <form id="query-form" method="post" asp-controller="VendorQuery" asp-action="ReplyQuery" enctype="multipart/form-data" autocomplete="off">
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
         <div id="article" class="shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
@@ -28,7 +28,6 @@
                             <li>
                                 <i class='far fa-thumbs-up'></i> <button class='btn btn-warning btn-xs'><i class='fa fa-edit'></i> <b>Reply Enquiry</b> </button>
                             </li>
-
                         </span>
                     </span>
                 </h3>
@@ -130,8 +129,8 @@
                             <div class="card-body">
                             @for (int i = 0; i < Model.InvestigationReport.EnquiryRequests.Count; i++)
                             {
-                                <input type="hidden" name="InvestigationReport.EnquiryRequests[@i].QueryRequestId" asp-for="InvestigationReport.EnquiryRequests[@i].QueryRequestId" value="@Model.InvestigationReport.EnquiryRequests[i].QueryRequestId"/>
-                                
+                                <input type="hidden" name="InvestigationReport.EnquiryRequests[@i].QueryRequestId" asp-for="InvestigationReport.EnquiryRequests[@i].QueryRequestId" value="@Model.InvestigationReport.EnquiryRequests[i].QueryRequestId" />
+
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
@@ -181,7 +180,7 @@
                                             name="InvestigationReport.EnquiryRequests[@i].AnswerSelected"
                                                    class="form-check-input selected-case"
                                                    type="radio"
-                                                   value="@Model.InvestigationReport.EnquiryRequests[i].AnswerC"  />
+                                                   value="@Model.InvestigationReport.EnquiryRequests[i].AnswerC" />
                                             <label class="form-check-label">
                                                 @Model.InvestigationReport.EnquiryRequests[i].AnswerC
                                             </label>
@@ -204,11 +203,9 @@
                                 <hr />
                             }
                         </div>
-
                         </div>
                     </div>
                     }
-                    
                 </div>
             </div>
 
@@ -228,7 +225,6 @@
                 </div>
             </div>
         </div>
-
     </form>
 </section>
 

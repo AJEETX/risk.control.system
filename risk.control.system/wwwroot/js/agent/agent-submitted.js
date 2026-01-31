@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
    
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/agent/GetSubmittedCases',
             dataSrc: '',

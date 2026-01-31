@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    $('#datatable').DataTable({
+    $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
@@ -31,7 +31,6 @@
             {
                 data: 'oldValues', // or newValues
                 render: function (data, type, row) {
-
                     if (!data) return '';
 
                     let display = '';
@@ -87,14 +86,12 @@
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-
-            $('#datatable tbody').on('click', '.btn-info', function (e) {
+            $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
                 getaudit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-
         }
     });
 });
@@ -122,4 +119,3 @@ function getaudit(id) {
         }
     }
 }
-

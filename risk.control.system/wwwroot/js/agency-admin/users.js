@@ -5,7 +5,7 @@
         placement: 'bottom',
         html: true // Enables HTML content in the tooltip
     });
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Agency/GetUsers',
             dataSrc: '',
@@ -199,14 +199,14 @@
             }
         });
     });
-    $('#customerTable').on('draw.dt', function () {
-        $('#customerTable .btn-warning').on('click', function (e) {
+    $('#dataTable').on('draw.dt', function () {
+        $('#dataTable .btn-warning').on('click', function (e) {
             var id = $(this).attr('id').replace('edit', '');
             showedit(id);  // Call showedit function with the ID
         });
 
         // Bind the "Delete" button click event
-        $('#customerTable .btn-danger').on('click', function (e) {
+        $('#dataTable .btn-danger').on('click', function (e) {
             var id = $(this).attr('id').replace('details', '');
             getdetails(id);  // Call getdetails function with the ID
         });

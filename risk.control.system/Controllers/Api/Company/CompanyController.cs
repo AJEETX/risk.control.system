@@ -18,67 +18,17 @@ namespace risk.control.system.Controllers.Api.Company
         private readonly ILogger<CompanyController> logger;
         private readonly IUserService userService;
         private readonly IVendorService vendorService;
-        private readonly ICompanyService companyService;
 
         public CompanyController(ApplicationDbContext context,
             ILogger<CompanyController> logger,
             IUserService userService,
-            IVendorService vendorService,
-            ICompanyService companyService
+            IVendorService vendorService
             )
         {
             _context = context;
             this.logger = logger;
             this.userService = userService;
             this.vendorService = vendorService;
-            this.companyService = companyService;
-        }
-
-        [HttpGet("AllCompanies")]
-        public async Task<IActionResult> AllCompanies()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
-            try
-            {
-                var result = await companyService.GetCompanies();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error getting companies for user {UserEmail}", userEmail ?? "Anonymous");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet("CompanyUsers")]
-        public async Task<IActionResult> CompanyUsers(long id)
-        {
-            if (id <= 0)
-            {
-                return BadRequest("Invalid company ID.");
-            }
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
-            try
-            {
-                var result = await userService.GetCompanyUsers(userEmail, id);
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail ?? "Anonymous");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
         }
 
         [HttpGet("AllUsers")]
@@ -100,7 +50,7 @@ namespace risk.control.system.Controllers.Api.Company
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail ?? "Anonymous");
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 

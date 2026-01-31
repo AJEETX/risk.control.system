@@ -449,7 +449,7 @@ $(document).ready(function () {
             $(this).val(""); // clear the input
         }
     });
-    $('#customerTable').on('draw.dt', function () {
+    $('#dataTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',

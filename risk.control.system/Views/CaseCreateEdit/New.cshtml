@@ -25,10 +25,10 @@
 				</button>
 			</div>
 		</div>
-		<form id="checkboxes" asp-action="AssignAuto" asp-controller="InvestigationPost" method="post">
+		<form id="checkboxes" asp-action="AssignAuto" asp-controller="AssignCase" method="post">
 			@Html.AntiForgeryToken()
 			<div class="card-body">
-				<table id="customerTableAuto" class="table table-bordered table-hover dt-responsive nowrap w-100">
+				<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
 					<thead>
 						<tr>
 							<th data-toggle="tooltip" title="Select Case(s) to Assign/delete"><input type="checkbox" name="select_all" id="checkall" value="0" /></th>

@@ -19,7 +19,6 @@
 </head>
 
 <body class="hold-transition sidebar-mini">
-	@Html.AntiForgeryToken() <!-- Add this line -->
 	@{
 		var timeout = Context.Items["timeout"];
 		var userEmail = User?.Identity?.Name;
@@ -93,6 +92,7 @@
 					<breadcrumb class="no-print"></breadcrumb>
 					<div id="main-content" class="content">
 						<main>
+							@Html.AntiForgeryToken()
 							@RenderBody()
 						</main>
 					</div>

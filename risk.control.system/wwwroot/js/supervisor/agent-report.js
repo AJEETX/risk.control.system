@@ -21,7 +21,7 @@
         }
     });
     
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetReport',
             type: 'GET',
@@ -247,8 +247,8 @@
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
     table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -274,7 +274,7 @@
     });
 
     // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
+    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked
         if (this.checked) {
             $("#allocatedcase").prop('disabled', false);

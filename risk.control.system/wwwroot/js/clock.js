@@ -4,7 +4,7 @@ var defaultTimeoutSeconds = parseInt(document.getElementById('timeout')?.value |
 var sessionTimer = localStorage.getItem("sessionTimer")
     ? parseInt(localStorage.getItem("sessionTimer"), 10)
     : defaultTimeoutSeconds;
-const refreshSessionPath = "/Account/KeepSessionAlive"; // Path to refresh session
+const refreshSessionPath = "/Rating/KeepSessionAlive"; // Path to refresh session
 
 async function refreshSession() {
     const currentPageUrl = window.location.href;
@@ -32,6 +32,7 @@ async function refreshSession() {
         if (!response.ok) {
             const errorText = await response.text(); // Extract error message from response
             console.error(`Failed to refresh session. Status: ${response.status}, Response: ${errorText}`);
+            window.location.href = "/Account/Login"; // Redirect to the login page
             return;
         }
 
@@ -41,9 +42,13 @@ async function refreshSession() {
             console.log("User Identity Details:", userDetails);
         } catch (error) {
             console.error("Failed to parse user identity details as JSON:", error);
+            window.location.href = "/Account/Login"; // Redirect to the login page
+
         }
     } catch (error) {
         console.error("Error during session refresh request:", error);
+        window.location.href = "/Account/Login"; // Redirect to the login page
+
     }
 }
 

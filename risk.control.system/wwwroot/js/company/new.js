@@ -30,7 +30,7 @@
             }
         }
     });
-    var table = $("#customerTableAuto").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Investigation/GetAuto',
             type: 'GET',
@@ -62,9 +62,21 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
+                    $.alert({
+                        title: 'Session Expired!',
+                    });
                     window.location.href = '/Account/Login'; // Or session timeout handler
                 }
                 if (xhr.status === 500) {
+                    $.alert({
+                        title: 'Error Occurred!',
+                    });
+                    window.location.href = '/Investigation/New'; // // Refresh page
+                }
+                if (xhr.status === 400) {
+                    $.alert({
+                        title: 'Bad Request! Try valid data',
+                    });
                     window.location.href = '/Investigation/New'; // // Refresh page
                 }
             }
@@ -126,7 +138,7 @@
                         return '<i class="fas fa-exclamation-triangle" data-bs-toggle="tooltip" title="Incomplete"></i>';
                     }
                     else {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign<sub>auto</sub>/delete" />';
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign <sub>auto</sub> / delete" />';
                         return img;
                     }
                 }
@@ -291,13 +303,13 @@
                 $('#allocatedcase').prop('disabled', true);
             }
 
-            $('#customerTableAuto tbody').on('click', '.btn-info', function (e) {
+            $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('assign', ''); // Extract the ID from the button's ID attribute
                 assign(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-            $('#customerTableAuto tbody').on('click', '.btn-warning', function (e) {
+            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
@@ -326,7 +338,7 @@
         $('input[name="select_all"]').prop('checked', false);
     });
     function hasAssignedRows() {
-        var table = $("#customerTableAuto").DataTable();
+        var table = $("#dataTable").DataTable();
         var assignedExists = false;
 
         table.rows().every(function () {
@@ -352,13 +364,13 @@
         $('#refreshIcon').removeClass('fa-spin');
     });
 
-    $('#customerTableAuto tbody').on('click', '.btn-danger', function (e) {
+    $('#dataTable tbody').on('click', '.btn-danger', function (e) {
         e.preventDefault();
         var $btn = $(this);
         var $spinner = $(".submit-progress"); // global spinner (you already have this)
 
         var id = $(this).attr('id').replace('details', '');
-        var url = '/InvestigationPost/Delete/' + id; // Replace with your actual API URL
+        var url = '/DeleteCase/Delete/' + id; // Replace with your actual API URL
 
         $.confirm({
             title: 'Confirm Deletion',
@@ -397,7 +409,7 @@
                                 });
 
                                 // Reload the DataTable
-                                $('#customerTableAuto').DataTable().ajax.reload(null, false); // false = don't reset paging
+                                $('#dataTable').DataTable().ajax.reload(null, false); // false = don't reset paging
                             },
                             error: function (xhr, status, error) {
                                 console.error("Delete failed:", xhr.responseText);
@@ -409,7 +421,11 @@
                                 if (xhr.status === 401 || xhr.status === 403) {
                                     window.location.href = '/Account/Login';
                                 } else {
-                                    toastr.error('Unexpected error occurred');
+                                    $.alert({
+                                        title: 'Error!',
+                                        content: 'Unexpected error occurred.',
+                                        type: 'red'
+                                    });
                                 }
                             },
                             complete: function () {
@@ -427,8 +443,8 @@
         });
     });
 
-    $('#customerTableAuto tbody').hide();
-    $('#customerTableAuto tbody').fadeIn(2000);
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
 
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
@@ -439,7 +455,7 @@
     });
 
     // Handle click on checkbox to set state of "Select all" control
-    $('#customerTableAuto tbody').on('change', 'input[type="checkbox"]', function () {
+    $('#dataTable tbody').on('change', 'input[type="checkbox"]', function () {
         // If checkbox is not checked
         if (!this.checked) {
             var el = $('#checkall').get(0);
@@ -478,8 +494,8 @@
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
-                title: "ASSIGN<sub>auto</sub> !",
-                content: "Please select Case(s) to Assign<sub>auto</sub>",
+                title: "ASSIGN <sub>auto</sub> !",
+                content: "Please select Case(s) to Assign <sub>auto</sub>",
                 icon: 'fas fa-random fa-sync',
                 type: 'orange',
                 closeIcon: true,
@@ -494,8 +510,8 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Assign<sub>auto</sub>",
-                content: "Are you sure to Assign<sub>auto</sub> ?",
+                title: "Confirm Assign <sub>auto</sub>",
+                content: "Are you sure to Assign <sub>auto</sub> ?",
                 icon: 'fas fa-random',
                 type: 'orange',
                 closeIcon: true,
@@ -511,7 +527,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin'></i> Assign<sub>auto</sub>");
+                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin'></i> Assign <sub>auto</sub>");
 
                             disableAllInteractiveElements();
 
@@ -582,7 +598,7 @@
     });
     function deleteSelectedCases(claims) {
         $.ajax({
-            url: "/InvestigationPost/DeleteCases", // Update with your actual delete endpoint
+            url: "/DeleteCase/DeleteCases", // Update with your actual delete endpoint
             type: "POST",
             data: JSON.stringify({ claims: claims }),
             headers: {
@@ -605,7 +621,7 @@
                     });
 
                     // Refresh DataTable
-                    $('#customerTableAuto').DataTable().ajax.reload(null, false);
+                    $('#dataTable').DataTable().ajax.reload(null, false);
                     $('#checkall').prop('checked', false);
                 }
                 else {
@@ -614,7 +630,7 @@
                         content: response.message || "Failed to delete cases.",
                         type: 'red'
                     });
-                    $("#customerTableAuto").DataTable().ajax.reload(null, false);
+                    $("#dataTable").DataTable().ajax.reload(null, false);
                 }
             },
             error: function (err) {
@@ -623,7 +639,7 @@
                     content: "Something went wrong. Please try again.",
                     type: 'red'
                 });
-                $("#customerTableAuto").DataTable().ajax.reload(null, false);
+                $("#dataTable").DataTable().ajax.reload(null, false);
             }
         });
     }

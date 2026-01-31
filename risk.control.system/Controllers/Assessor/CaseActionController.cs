@@ -1,0 +1,158 @@
+﻿using System.Net;
+using System.Web;
+using AspNetCoreHero.ToastNotification.Abstractions;
+using Hangfire;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Common;
+using risk.control.system.Helpers;
+using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
+
+namespace risk.control.system.Controllers.Assessor
+{
+    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
+    public class CaseActionController : Controller
+    {
+        private readonly string baseUrl;
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
+        private readonly ApplicationDbContext _context;
+        private readonly IProcessCaseService processCaseService;
+        private readonly IMailService mailboxService;
+        private readonly INotyfService notifyService;
+        private readonly ILogger<CaseActionController> logger;
+        private readonly IBackgroundJobClient backgroundJobClient;
+
+        public CaseActionController(ApplicationDbContext context,
+            IProcessCaseService processCaseService,
+            IMailService mailboxService,
+            INotyfService notifyService,
+            IHttpContextAccessor httpContextAccessor,
+            ILogger<CaseActionController> logger,
+            IBackgroundJobClient backgroundJobClient)
+        {
+            _context = context;
+            this.processCaseService = processCaseService;
+            this.mailboxService = mailboxService;
+            this.notifyService = notifyService;
+            this.logger = logger;
+            this.backgroundJobClient = backgroundJobClient;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, long claimId, string reportAiSummary = "")
+        {
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
+            {
+                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+            }
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            try
+            {
+                if (Enum.TryParse<AssessorRemarkType>(assessorRemarkType, true, out var reportUpdateStatus))
+                {
+                    assessorRemarks = WebUtility.HtmlEncode(assessorRemarks);
+                    reportAiSummary = WebUtility.HtmlEncode(reportAiSummary);
+
+                    var (company, contract) = await processCaseService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
+
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportProcess(currentUserEmail, claimId, baseUrl));
+                    if (reportUpdateStatus == AssessorRemarkType.OK)
+                    {
+                        notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
+                    }
+                    else if (reportUpdateStatus == AssessorRemarkType.REJECT)
+                    {
+                        notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
+                    }
+                    else
+                    {
+                        notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
+                    }
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                }
+                else
+                {
+                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, currentUserEmail);
+                notifyService.Error("Error processing case. Try again.");
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitQuery(long claimId, string reply, CaseInvestigationVendorsModel request, IFormFile? document)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    notifyService.Error("Bad Request..");
+                    return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                }
+                if (document != null && document.Length > 0)
+                {
+                    if (document.Length > MAX_FILE_SIZE)
+                    {
+                        notifyService.Error($"Document image Size exceeds the max size: 5MB");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                    var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
+                    if (!AllowedExt.Contains(ext))
+                    {
+                        notifyService.Error($"Invalid Document image type");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                    if (!AllowedMime.Contains(document.ContentType))
+                    {
+                        notifyService.Error($"Invalid Document Image content type");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                    if (!ImageSignatureValidator.HasValidSignature(document))
+                    {
+                        notifyService.Error($"Invalid or corrupted Document Image ");
+                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    }
+                }
+
+                request.InvestigationReport.EnquiryRequest.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
+
+                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
+                if (model != null)
+                {
+                    var company = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId, baseUrl));
+
+                    notifyService.Success("Enquiry Sent to Agency");
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                }
+                notifyService.Error("OOPs !!!..Error sending query");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error submitting query case {Id}", claimId, currentUserEmail);
+                notifyService.Error("Error submitting query. Try again.");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
+        }
+    }
+}

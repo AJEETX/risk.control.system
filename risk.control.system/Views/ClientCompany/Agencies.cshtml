@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = @Applicationsettings.VENDOR;
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title"><i class="fas fa-building"></i> All  Agencies</h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                <thead>
+                    <tr>
+                        <th>
+                            Id
+                        </th>
+                        <th>
+                            <i class="far fa-file-word"></i>
+                        </th>
+                        <th>
+                            Domain
+                        </th>
+
+                        <th>
+                            Mobile #
+                        </th>
+
+                        <th>
+                            Address
+                        </th>
+                        <th>
+                            Country
+                        </th>
+                        <th>
+                            Pincode
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                        <th>
+                            Updated
+                        </th>
+                        <th>
+                            UpdatedBy
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script src="~/js/company-admin/all-vendors.js">
+    </script>
+}

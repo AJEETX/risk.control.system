@@ -1,6 +1,5 @@
 ﻿$(document).ready(function () {
-
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Company/AllUsers',
             dataSrc: '',
@@ -8,11 +7,20 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
+                    $.alert({
+                        title: 'Session Expired!',
+                    });
                     window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+                if (xhr.status === 500) {
+                    $.alert({
+                        title: 'Error Occurred!',
+                    });
+                    window.location.href = '/Dashboard/Index'; // Or session timeout handler
                 }
             }
         },
-        order: [[1, 'desc'],[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[1, 'desc'], [12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [{
             'targets': 0,
             'searchable': false,
@@ -33,11 +41,11 @@
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 8                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
-            }],
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 10                      // Index of the column to style
+        }],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -158,11 +166,11 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + '  href="/Company/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    if (row.role != "COMPANY_ADMIN") {
-                        buttons += '<a id="details' + row.id + '" href="/Company/DeleteUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    buttons += '<a id=edit' + row.id + '  href="/ManageCompanyUser/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    if (row.role !== "COMPANY_ADMIN") {
+                        buttons += '<button class="btn btn-xs btn-danger btn-delete" data-id="' + row.id + '"><i class="fa fa-trash"></i> Delete</button>';
                     } else {
-                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</button>';
                     }
                     return buttons;
                 }
@@ -184,14 +192,7 @@
             }
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-
-            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
-            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
@@ -206,13 +207,86 @@
                 });
             });
         }
-        
     });
+    $(document).on('click', '.btn-delete', function (e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var $spinner = $(".submit-progress"); // global spinner (you already have this
+        const userId = $(this).data('id');
+        const url = '/ManageCompanyUser/DeleteUser';
+        $.confirm({
+            title: 'Confirm Deletion',
+            content: 'Are you sure you want to delete this case?',
+            type: 'red',
+            icon: 'fas fa-trash',
+            buttons: {
+                confirm: {
+                    text: 'Yes, delete it',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
 
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                                userId: userId
+                            },
+                            success: function (response) {
+                                // Show success message
+                                $.alert({
+                                    title: 'Deleted!',
+                                    content: response.message,
+                                    closeIcon: true,
+                                    type: 'red',
+                                    icon: 'fas fa-trash',
+                                    buttons: {
+                                        ok: {
+                                            text: 'Close',
+                                            btnClass: 'btn-default',
+                                        }
+                                    }
+                                });
+
+                                // Reload the DataTable
+                                $('#dataTable').DataTable().ajax.reload(null, false); // false = don't reset paging
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Delete failed:", xhr.responseText);
+                                $.alert({
+                                    title: 'Error!',
+                                    content: 'Failed to delete the case.',
+                                    type: 'red'
+                                });
+                                if (xhr.status === 401 || xhr.status === 403) {
+                                    window.location.href = '/Account/Login';
+                                } else {
+                                    $.alert({
+                                        title: 'Error!',
+                                        content: 'Unexpected error occurred.',
+                                        type: 'red'
+                                    });
+                                }
+                            },
+                            complete: function () {
+                                $spinner.addClass("hidden");
+                                // ✅ Re-enable button and restore text
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
+                            }
+                        });
+                    }
+                },
+                cancel: function () {
+                    // Do nothing
+                }
+            }
+        });
+    });
     table.on('draw', function () {
         table.rows().every(function () {
             var data = this.data(); // Get row data
-            console.log(data); // Debug row data
 
             if (data.isUpdated) { // Check if the row should be highlighted
                 var rowNode = this.node();
@@ -289,7 +363,7 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    var editbtn = $('a#edit' + id +'.btn.btn-xs.btn-warning')
+    var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-warning')
     $('.btn.btn-xs.btn-warning').attr('disabled', 'disabled');
     editbtn.html("<i class='fas fa-sync fa-spin'></i> Edit");
 

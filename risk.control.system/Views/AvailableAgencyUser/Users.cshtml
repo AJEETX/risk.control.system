@@ -1,4 +1,5 @@
-﻿@{
+﻿@model ServiceModel
+@{
 	ViewData["Title"] = @Applicationsettings.USER;
 }
 
@@ -11,8 +12,8 @@
 			<div class="submit-progress hidden">
 				<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 			</div>
-			<input type="hidden" id="vendorId" value="@ViewData["vendorId"]" />
-			<table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+			<input type="hidden" asp-for="Id" />
+			<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
 				<thead>
 					<tr>
 						<th>Id</th>
@@ -34,9 +35,9 @@
 			<div class="row">
 				<div class="col-md-12">
 					<div class="form-group">
-						<a id="back" asp-controller="AvailableAgency" asp-action="Details" asp-route-id="@ViewData["vendorId"]" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+						<a id="back" asp-controller="AvailableAgency" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
-						<a class="create-agency-user btn btn-success" asp-controller="AvailableAgencyUser" asp-action="CreateUser" asp-route-id="@ViewData["vendorId"]"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
+						<a class="create-agency-user btn btn-success" asp-controller="AvailableAgencyUser" asp-action="CreateUser" asp-route-id="@Model.Id"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
 					</div>
 				</div>
 			</div>
@@ -45,5 +46,5 @@
 </section>
 @section Scripts
 {
-	<script src="~/js/common/company-agency-users.js"></script>
+	<script src="~/js/manager/available-agency-users.js"></script>
 }

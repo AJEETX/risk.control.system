@@ -1,8 +1,6 @@
 ﻿using Google.Cloud.Vision.V1;
 
 using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;

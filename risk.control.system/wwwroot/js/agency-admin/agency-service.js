@@ -71,7 +71,7 @@ $(document).ready(function () {
     });
 
     // Initialize DataTable with enhanced configurations
-    const table = $("#customerTable").DataTable({
+    const table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Agency/AllServices',
             dataSrc: '',
@@ -163,7 +163,7 @@ $(document).ready(function () {
             });
         }
     });
-    $('#customerTable').on('click', '.js-delete', function (e) {
+    $('#dataTable').on('click', '.js-delete', function (e) {
         e.preventDefault();
         var $spinner = $(".submit-progress"); // global spinner (you already have this)
         var $btn = $(this);
@@ -204,7 +204,7 @@ $(document).ready(function () {
                                             }
                                         }
                                     });
-                                    $('#customerTable').DataTable().ajax.reload(null, false);
+                                    $('#dataTable').DataTable().ajax.reload(null, false);
                                 } else {
                                     toastr.error(response.message || 'Delete failed');
                                 }
@@ -264,7 +264,7 @@ $(document).ready(function () {
     });
 
     // Initialize tooltips after each DataTable draw
-    $('#customerTable').on('draw.dt', function () {
+    $('#dataTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'bottom',

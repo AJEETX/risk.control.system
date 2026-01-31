@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     var jobId = $('#jobId').val(); // Get the job ID from the hidden input field
     var pendingCount = $('#pendingCount').val(); // Get the pending allocations from the hidden input field
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Investigation/GetActive',
             type: 'GET',
@@ -235,7 +235,7 @@
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
 
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+            $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
                 getdetails(id); // Call the getdetails function with the ID
@@ -277,8 +277,8 @@
         $("#mapModalLabel").text(title || "Map Preview");
     });
 
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
 
 
     if (jobId) {
