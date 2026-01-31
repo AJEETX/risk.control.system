@@ -11,7 +11,7 @@
         }
     });
     var uploadId = $('#uploadId').val();
-    var table = $('#customerTableAuto').DataTable({
+    var table = $('#dataTable').DataTable({
         "ajax": {
             "url": `/api/Investigation/GetFilesData/${uploadId}`,
             "type": "GET",
@@ -150,7 +150,7 @@
                         img += `<div class='btn-xs upload-exceed' title='Limit exceeded' data-bs-toggle='tooltip'> <i class='fas fa-times-circle i-orangered'></i> Limit exceed</div>`;
                     }
                     else if (row.hasError && row.message == "Error uploading the file") {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger upload-err' title='Download Error file' data-bs-toggle='tooltip'> <i class='fa fa-download'></i> Error File</a>`;
+                        img += `<a href='/CaseUpload/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger upload-err' title='Download Error file' data-bs-toggle='tooltip'> <i class='fa fa-download'></i> Error File</a>`;
                     }
 
                     else if (!row.hasError && row.status == 'Completed') {
@@ -160,7 +160,14 @@
                         img += `<div class='upload-progress' title='Action in-progress' data-bs-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </div>`;
                     }
 
-                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary upload-download" title="Download upload file" data-bs-toggle="tooltip"><i class="nav-icon fa fa-download"></i> Download</a> ';
+                    img += `
+                            <button class="btn btn-xs btn-primary upload-download"
+                                    data-id="${row.id}"
+                                    data-url="/CaseUpload/DownloadLog"
+                                    data-bs-toggle="tooltip"
+                                    title="Download upload file">
+                                <i class="fa fa-download"></i> Download
+                            </button>`;
 
                     img += '<button class="btn-xs btn-danger upload-delete" data-id="' + row.id + '" title="Delete" data-bs-toggle="tooltip"><i class="fas fa-trash"></i> Delete </button>';
                     return img;
@@ -293,7 +300,7 @@
     }
 
     // Delete file with jConfirm
-    $('#customerTableAuto tbody').on('click', '.upload-delete', function () {
+    $('#dataTable tbody').on('click', '.upload-delete', function () {
         var fileId = $(this).data('id');
 
         $.confirm({
@@ -306,7 +313,7 @@
                     btnClass: 'btn-red',
                     action: function () {
                         $.ajax({
-                            url: '/Uploads/DeleteLog/' + fileId,
+                            url: '/CaseUpload/DeleteLog/' + fileId,
                             type: 'POST',
                             headers: {
                                 __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
@@ -364,8 +371,8 @@
         $('#refreshIcon').removeClass('fa-spin');
     });
 
-    $('#customerTableAuto tbody').hide();
-    $('#customerTableAuto tbody').fadeIn(2000);
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
 
     $('#uploadAssignCheckbox').on('change', function () {
         let isChecked = $(this).is(':checked');
@@ -504,6 +511,52 @@
 
     // Apply confirmation to both forms
     handleUploadConfirmation("#upload-claims", "#UploadFileButton", "#uploadAssignCheckbox");
+    $(document).on('click', '.upload-download', function (e) {
+        e.preventDefault();
+
+        const btn = $(this);
+        const id = btn.data('id');
+        const url = btn.data('url');
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        btn.prop('disabled', true);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: { id },
+            headers: {
+                'RequestVerificationToken': token
+            },
+            xhrFields: {
+                responseType: 'blob'   // ⭐ critical
+            },
+            success: function (blob, status, xhr) {
+                // Get filename from response headers
+                let fileName =
+                    xhr.getResponseHeader('X-File-Name') ||
+                    'download.file';
+
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
+            error: function (xhr) {
+                let msg = xhr.responseText || 'Download failed';
+                alert(msg);
+            },
+            complete: function () {
+                btn.prop('disabled', false);
+            }
+        });
+    });
 });
 
 if (window.location.search.includes("uploadId")) {

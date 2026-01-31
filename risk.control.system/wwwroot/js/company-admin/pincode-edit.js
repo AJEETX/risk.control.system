@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
 
-    $('#customerTable').DataTable({
+    $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
@@ -43,7 +43,7 @@
             }
         ],
         "drawCallback": function (setting) {
-            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
@@ -242,7 +242,7 @@
         var $spinner = $(".submit-progress"); // global spinner (you already have this)
         var id = $(this).data("id");
         var row = $(this).closest("tr");
-        var table = $('#customerTable').DataTable();
+        var table = $('#dataTable').DataTable();
 
         $.confirm({
             title: 'Confirm Deletion',

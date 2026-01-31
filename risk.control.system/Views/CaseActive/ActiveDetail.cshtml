@@ -107,7 +107,7 @@
         <div class="card-footer">
             @if (Model.Withdrawable)
             {
-                <form id="withdraw-form" method="post" asp-action="WithdrawCase" asp-controller="InvestigationPost">
+                <form id="withdraw-form" method="post" asp-action="Perform" asp-controller="WithdrawCase">
                     <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
                     <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
                     <div class="row">
@@ -141,7 +141,6 @@
                 </div>
             }
         </div>
-
     </div>
 </section>
 

@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    var table = $('#customerTable').DataTable({
+    var table = $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {

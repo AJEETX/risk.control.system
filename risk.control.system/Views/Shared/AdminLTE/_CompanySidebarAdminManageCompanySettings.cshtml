@@ -3,12 +3,16 @@
     if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME))
     {
         <li class="nav-item">
-            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Audit", "")
-                       @Url.MakeActiveClass("ReportTemplate", "") @Url.MakeActiveClass("CaseEnabler", "") @Url.MakeActiveClass("Costcentre", "")
-                                            @Url.MakeActiveClass("OccupationType","")
-                                            @Url.MakeActiveClass("EducationType","")
-                                            @Url.MakeActiveClass("AnnualIncome","")
-                                        @Url.MakeActiveClass("BeneficiaryRelation","")">
+            <a is-active-page
+            class="navlink-border nav-link
+                        @Url.MakeActiveClass("Audit", "")
+                        @Url.MakeActiveClass("ReportTemplate", "")
+                        @Url.MakeActiveClass("CaseEnabler", "")
+                        @Url.MakeActiveClass("Costcentre", "")
+                        @Url.MakeActiveClass("OccupationType","")
+                        @Url.MakeActiveClass("EducationType","")
+                        @Url.MakeActiveClass("AnnualIncome","")
+                        @Url.MakeActiveClass("BeneficiaryRelation","")">
                 <i class="nav-icon fas fa-cog"></i>
                 <p class="sidebar-menu-header-label">
                     @Applicationsettings.COMPANY_SETTINGS
@@ -42,7 +46,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a is-active-page asp-controller="ReportTemplate" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplate", "")">
+            <a is-active-page asp-controller="ReportTemplate" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplate", "")">
                 <i class="nav-icon far fa-file-powerpoint"></i>
                 <p>
                     Report <sub class="i-green">template</sub>
@@ -57,38 +61,6 @@
                 </p>
             </a>
         </li>
-        //<li class="nav-item">
-        //    <a is-active-page asp-controller="InvestigationCaseOutcome" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationCaseOutcome","")">
-        //        <i class="fas fa-clipboard-check nav-icon"></i>
-        //        <p>
-        //            @Applicationsettings.CASE_OUTCOME
-        //        </p>
-        //    </a>
-        //</li>
 
-        //<li class="nav-item">
-        //    <a is-active-page asp-controller="InvestigationCaseStatus" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationCaseStatus","")">
-        //        <i class="fas fa-battery-full nav-icon"></i>
-        //        <p>
-        //            @Applicationsettings.INVESTIGATION_CASE_STATUS
-        //        </p>
-        //    </a>
-        //</li>
-        //<li class="nav-item">
-        //    <a is-active-page asp-controller="InvestigationCaseSubStatus" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationCaseSubStatus","")">
-        //        <i class="fas fa-battery-half nav-icon"></i>
-        //        <p>
-        //            @Applicationsettings.CASE_SUBSTATUS
-        //        </p>
-        //    </a>
-        //</li>
-        // <li class="nav-item">
-        //     <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
-        //         <i class="nav-icon fa fa-align-center"></i>
-        //         <p>
-        //             @Applicationsettings.AUDIT_LOG
-        //         </p>
-        //     </a>
-        // </li>
     }
 }

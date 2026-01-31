@@ -1,7 +1,7 @@
 ﻿$(function () {
     var claimId = $('#claimId').val();
     var vendorId = $('#vendorId').val();
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Company/GetEmpanelledAgency?caseId=' + claimId,
             dataSrc: '',
@@ -167,7 +167,7 @@
                 $("input[type='radio'][name='selectedcase'][value='" + selectedVendorId + "']").prop('checked', true);
                 $('#allocatedcase').prop("disabled", false);
             }
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+            $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
                 getdetails(id); // Call the getdetails function with the ID
@@ -214,7 +214,7 @@
         });
     table.on('draw', function () {
         // Loop through each row of the table after it has been redrawn
-        $("#customerTable > tbody > tr").each(function () {
+        $("#dataTable > tbody > tr").each(function () {
             var av = parseFloat($(this).find("span.avr").text()); // Get the average rating
             if (!isNaN(av) && av > 0) {  // Ensure it's a valid rating
                 var stars = $(this).find("img.rating");  // Get all star images in the row
@@ -237,9 +237,9 @@
     // Initial draw to set the stars when the table first loads
     table.draw();
 
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
-    $('#customerTable tbody').on('mouseover', 'img.rating', function () {
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
+    $('#dataTable tbody').on('mouseover', 'img.rating', function () {
         var starImage = $(this);
 
         if (!starImage.data('bs.tooltip')) {
@@ -267,7 +267,7 @@
             tooltip.show();
         }
     });
-    $('#customerTable tbody').on('mouseleave', 'img.rating', function () {
+    $('#dataTable tbody').on('mouseleave', 'img.rating', function () {
         var starImage = $(this);
 
         // Dispose of the tooltip only if it has been initialized
@@ -281,7 +281,7 @@
         giveRating(starImage, "StarFade.gif");
         refilRating(starImage);
     });
-    $('#customerTable tbody').on('click', 'img.rating', function (e) {
+    $('#dataTable tbody').on('click', 'img.rating', function (e) {
         var starId = $(this).attr('id');
         var vendorId = $(this).attr('vendorId');
         console.log('Rated ' + starId + ' stars for vendor ' + vendorId);
@@ -314,7 +314,7 @@
         }
     });
     // Handle click on checkbox to set state of "Select all" control   
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
+    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked       
         if (this.checked) {
             $("#allocatedcase").prop('disabled', false);
@@ -322,7 +322,7 @@
             $("#allocatedcase").prop('disabled', true);
         }
     });
-    $("#customerTable > tbody  > tr").each(function () {
+    $("#dataTable > tbody  > tr").each(function () {
         var av = $(this).find("span.avr").text();
         if (av != "" || av != null) {
             var img = $(this).find("img[id='" + parseInt(av) + "']");
@@ -334,13 +334,13 @@
     $('#radioButtons').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault(); $.confirm({
-                title: "Confirm Assign<sub>manual</sub>",
+                title: "Confirm Assign <sub>manual</sub>",
                 content: "Are you sure ?",
                 icon: 'fas fa-external-link-alt',
                 type: 'blue',
                 closeIcon: true, buttons: {
                     confirm: {
-                        text: "Assign<sub>manual</sub>",
+                        text: "Assign <sub>manual</sub>",
                         btnClass: 'btn-info', action: function () {
                             askConfirmation = false;
                             $("body").addClass("submit-progress-bg");

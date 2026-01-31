@@ -44,7 +44,7 @@
                 render: function (data) {
                     if (!data) return '';
                     let date = new Date(data);
-                    var dateCreated= date.toLocaleString('en-IN', {
+                    var dateCreated = date.toLocaleString('en-IN', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
@@ -379,7 +379,7 @@
                             },
                             error: function () {
                                 $.alert({
-                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                    title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
                                     content: 'An error occurred while deleting.',
                                     type: 'red'
                                 });
@@ -715,61 +715,61 @@
             type: 'green',
             buttons: {
                 confirm: {
-                text: 'Yes, Activate',
-                btnClass: 'btn-green',
-                action: function () {
+                    text: 'Yes, Activate',
+                    btnClass: 'btn-green',
+                    action: function () {
                         $spinner.removeClass("hidden");
-                    $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Activate');
-                    $.ajax({
-                        url: '/ReportTemplate/Activate',
-                        type: 'POST',
-                        data: {
-                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
-                            id: id
-                        },
-                        success: function (response) {
-                            if (response.success) {
-                                $.alert({
-                                    title: '<span class="i-green"> <i class="fas fas fa-flash"></i> </span> Activated!',
-                                    content: response.message,
-                                    type: 'green',
-                                    buttons: {
-                                        OK: {
-                                            btnClass: 'btn-green',
-                                            icon: 'fa-flash',
-                                            action: function () {
-                                                $('#reportTemplatesTable').DataTable().ajax.reload();
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Activate');
+                        $.ajax({
+                            url: '/ReportTemplate/Activate',
+                            type: 'POST',
+                            data: {
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                                id: id
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    $.alert({
+                                        title: '<span class="i-green"> <i class="fas fas fa-flash"></i> </span> Activated!',
+                                        content: response.message,
+                                        type: 'green',
+                                        buttons: {
+                                            OK: {
+                                                btnClass: 'btn-green',
+                                                icon: 'fa-flash',
+                                                action: function () {
+                                                    $('#reportTemplatesTable').DataTable().ajax.reload();
+                                                }
                                             }
                                         }
-                                    }
-                                });
-                            } else {
+                                    });
+                                } else {
+                                    $.alert({
+                                        title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
+                                        content: response.message,
+                                        type: 'red'
+                                    });
+                                }
+                            },
+                            error: function () {
                                 $.alert({
                                     title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
-                                    content: response.message,
+                                    content: 'Something went wrong while activating the report.',
                                     type: 'red'
                                 });
-                            }
-                        },
-                        error: function () {
-                            $.alert({
-                                title: '<span class="i-orangered"> <i class="fas fa-exclamation-triangle"></i> </span> Error!',
-                                content: 'Something went wrong while activating the report.',
-                                type: 'red'
-                            });
-                        },
-                        complete: function () {
-                            // ✅ Re-enable button and restore text
+                            },
+                            complete: function () {
+                                // ✅ Re-enable button and restore text
                                 $spinner.addClass("hidden");
-                            $btn.prop("disabled", false).html('<i class="fas fa-flash"></i> Activate');
-                        }
-                     });
+                                $btn.prop("disabled", false).html('<i class="fas fa-flash"></i> Activate');
+                            }
+                        });
                     }
                 },
                 cancel: {
                     text: 'Cancel',
-                            btnClass: 'btn-default'
-                    }
+                    btnClass: 'btn-default'
+                }
             }
         });
     });
@@ -939,7 +939,7 @@
                 },
                 cancel: {
                     text: 'Cancel',
-                        btnClass: 'btn-default'
+                    btnClass: 'btn-default'
                 }
             }
         });
@@ -991,7 +991,6 @@
                                                 btnClass: 'btn-green',
                                                 icon: 'fa-flash',
                                                 action: function () {
-                                                    
                                                 }
                                             }
                                         }

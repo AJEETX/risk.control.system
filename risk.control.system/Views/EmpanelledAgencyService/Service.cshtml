@@ -12,7 +12,7 @@
 				<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 			</div>
 			<input type="hidden" asp-for="Id" />
-			<table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+			<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
 				<thead>
 					<tr>
 						<th></th>
@@ -33,9 +33,9 @@
 			<div class="row">
 				<div class="col-md-12">
 					<div class="form-group">
-						<a id="back" asp-controller="EmpanelledAgency" asp-action="AgencyDetail" asp-route-id="@Model.Id" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+						<a id="back" asp-controller="EmpanelledAgency" asp-action="Detail" asp-route-id="@Model.Id" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
-						<a class="create-agency-service btn btn-success" asp-controller="EmpanelledAgencyService" asp-action="CreateService" asp-route-id="@Model.Id"><i class="fas fa-truck"></i> @Applicationsettings.CREATE Service</a>
+						<a class="create-agency-service btn btn-success" asp-controller="EmpanelledAgencyService" asp-action="Create" asp-route-id="@Model.Id"><i class="fas fa-truck"></i> @Applicationsettings.CREATE Service</a>
 					</div>
 				</div>
 			</div>
@@ -43,6 +43,6 @@
 	</div>
 </section>
 @section Scripts {
-	<script src="~/js/company-admin/agency-services.js">
+	<script src="~/js/manager/empanelled-agency-services.js">
 	</script>
 }

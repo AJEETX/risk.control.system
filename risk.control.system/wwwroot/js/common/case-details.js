@@ -1,7 +1,6 @@
 ﻿$(document).ready(function () {
-
     // Load the customer details
-     $('#customerGoogleMap').click(function () {
+    $('#customerGoogleMap').click(function () {
         var data;
         $.confirm({
             type: 'green',
@@ -47,7 +46,7 @@
     });
 
     // Load the bdeneficiary details
-     $('#beneficiaryGoogleMap').click(function () {
+    $('#beneficiaryGoogleMap').click(function () {
         var data;
         $.confirm({
             type: 'green',
@@ -91,8 +90,7 @@
         })
     })
 
-
-     $('#policy-detail').click(function () {
+    $('#policy-detail').click(function () {
         $.confirm({
             title: "Policy details",
             closeIcon: true,
@@ -148,7 +146,7 @@
                     self.setContentAppend('</p');
                     self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Case Document</b>:');
                     var policyDataUrl = '/Document/GetPolicyDocument/' + $('#claimId').val();
-                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="'+policyDataUrl + '" /> ');
+                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + policyDataUrl + '" /> ');
                     self.setContentAppend('</p');
                     self.setContentAppend('</div>');
                     self.setContentAppend('</div>');
@@ -164,7 +162,6 @@
 
     $('#customer-detail').click(function () {
         $.confirm({
-
             title: "Customer detail",
             icon: 'fa fa-user-plus',
             closeIcon: true,
@@ -210,7 +207,6 @@
 
     $('#beneficiary-detail').click(function () {
         $.confirm({
-
             title: "Beneficiary details",
             icon: 'fas fa-user-tie',
             closeIcon: true,
@@ -296,7 +292,6 @@
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 }).always(function () {
-                    
                 });
             }
         })
@@ -311,7 +306,7 @@
             type: 'green',
             icon: 'far fa-file-powerpoint',
             content: '' +
-                '<form method="post" action="Confirm/AddNotes?claimId="' + claimId + ' class="formName">' +
+                '<form class="formName">' +
                 '<div class="form-group">' +
                 '<hr>' +
                 '<label>Enter note on Policy</label>' +
@@ -335,10 +330,14 @@
                             return false;
                         }
                         else {
-                            
                             return $.ajax({
-                                url: '/Confirm/AddNotes?claimId=' + $('#claimId').val() + '&name=' + name,
-                                method: 'get'
+                                url: '/Confirm/AddNotes',
+                                method: 'POST',
+                                data: {
+                                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                                    caseId: claimId,
+                                    message: name
+                                }
                             }).done(function (response) {
                                 $.alert({
                                     title: 'Policy notes added!',
@@ -408,7 +407,6 @@
                                                 }).fail(function () {
                                                     self.setContent('Something went wrong.');
                                                 }).always(function () {
-
                                                 });
                                             }
                                         });
@@ -435,6 +433,7 @@
             }
         });
     })
+
     var ready = false;
     $('#customer-comments').click(function (e) {
         var claimId = $('#claimId').val();
@@ -444,7 +443,7 @@
             type: 'green',
             icon: 'fa fa-user-plus',
             content: '' +
-                '<form method="post" action="Confirm/Sms2Customer?claimId="' + claimId + ' class="formName">' +
+                '<form class="formName">' +
                 '<div class="form-group">' +
                 '<hr>' +
                 '<label>Enter message</label>' +
@@ -471,8 +470,13 @@
                         }
                         else {
                             return $.ajax({
-                                url: '/Confirm/Sms2Customer?claimId=' + claimId + '&name=' + name,
-                                method: 'get'
+                                url: '/Confirm/Sms2Customer',
+                                method: 'POST',
+                                data: {
+                                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                                    caseId: claimId,
+                                    message: name
+                                }
                             }).done(function (response) {
                                 $.alert({
                                     title: 'Message Status!',
@@ -493,10 +497,8 @@
                                     content: 'Status: failed',
                                 });
                             }).always(function () {
-
                             });
                         }
-
                     }
                 },
                 cancel: function () {
@@ -522,13 +524,14 @@
 
     $('#beneficiary-comments').click(function () {
         var claimId = $('#claimId').val();
+        const token = $('input[name="__RequestVerificationToken"]').val();
         $.confirm({
             title: 'SMS Beneficiary !!!',
             icon: 'fas fa-user-tie',
             closeIcon: true,
             type: 'green',
             content: '' +
-                '<form method="post" action="Confirm/Sms2Beneficiary?claimId="' + claimId + ' class="formName">' +
+                '<form class="formName">' +
                 '<div class="form-group">' +
                 '<hr>' +
                 '<label>Enter message</label>' +
@@ -553,8 +556,13 @@
                         }
                         else {
                             return $.ajax({
-                                url: '/Confirm/Sms2Beneficiary?claimId=' + claimId + '&name=' + name,
-                                method: 'get'
+                                url: '/Confirm/Sms2Beneficiary',
+                                method: 'POST',
+                                data: {
+                                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                                    caseId: claimId,
+                                    message: name
+                                }
                             }).done(function (response) {
                                 $.alert({
                                     title: 'Message Status!',
@@ -575,7 +583,6 @@
                                     content: 'Status: failed',
                                 });
                             }).always(function () {
-
                             });
                         }
                     }
@@ -585,7 +592,6 @@
                 },
             },
             onContentReady: function () {
-
                 // bind to events
                 var jc = this;
                 var input = this.$content.find('.name.form-control.remarks');
@@ -630,5 +636,4 @@
             }
         }
     });
-
 });

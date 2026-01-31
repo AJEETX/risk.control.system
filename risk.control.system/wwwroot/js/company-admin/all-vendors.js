@@ -1,6 +1,5 @@
 ﻿$(document).ready(function () {
-
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Agency/AllAgencies',
             dataSrc: '',
@@ -111,8 +110,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=details' + row.id + ' href="/Vendors/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
-                    buttons += '<a id=delete' + row.id + ' href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
+                    buttons += '<a id=details' + row.id + ' href="/ClientCompany/AgencyDetails?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
                     return buttons;
                 }
             },
@@ -126,14 +124,7 @@
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-            // Event delegation for .btn-danger elements
-            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('delete', ''); // Extract the ID from the button's ID attribute
-                getdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+            $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
                 showdetails(id); // Call the getdetails function with the ID

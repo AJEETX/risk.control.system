@@ -1,0 +1,82 @@
+﻿@model risk.control.system.Models.ApplicationUser
+
+@{
+	ViewData["Title"] = Applicationsettings.CREATE;
+	var email = Model.Vendor.Email;
+}
+
+<section class="content">
+	<div class="card shadow-lg border-1 rounded-lg">
+		<div class="card-header bg-secondary text-white text-center">
+			<h3 class="card-title"><i class="fas fa-user-plus"></i>  Add User</h3>
+		</div>
+		<div class="card-body">
+			<div class="submit-progress hidden">
+				<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="input-group-label" for="emailAddress"> Email:<small>(minimum 5 character)</small></label>
+						<div class="input-group mb-3">
+							<div class="input-group-append">
+								<span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
+							</div>
+							<input type="text" asp-for="Email" id="emailAddress" class="form-control email-address remarks" required placeholder="email" maxlength="15" autocomplete="name" title="Enter unique email with 5 minimum character" data-bs-toggle="tooltip" />
+							<div class="input-group-append" title="domain name">
+								<span class="input-group-text" id="Email">@@@email</span>
+							</div>
+							<div class="input-group-append" data-bs-toggle="tooltip" title="Click to validate email">
+								<button disabled id="check-email" class="input-group-text disabled-btn validate-user">
+									<i class="far fa-question-circle"></i>
+								</button>
+							</div>
+							<div class="input-group-append">
+								<span id="result"></span>
+							</div>
+							<span asp-validation-for="Email" class="text-danger"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<form id="create-form" asp-action="Create" enctype="multipart/form-data" autocomplete="off">
+			<input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
+			<input type="hidden" id="txn" name="txn" value="vendor" />
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="card-body">
+				<partial name="Vendor/_CreateUser" model="Model" />
+			</div>
+			<div class="card-footer">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group text-right">
+							@*  <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
+                            <i class="fas fa-undo"></i> Reset
+                            </button> *@
+							<a id="cancel" asp-controller="AvailableAgencyUser" asp-action="Users" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+								<i class="fa fa-window-close"></i>
+								@Applicationsettings.CANCEL
+							</a>
+							<button disabled id="create" type="submit" class="btn btn-success">
+								<i class="fas fa-user-plus"></i> Add User
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~/js/common/manage-user.js"></script>
+	<script src="~/js/company-admin/pincode.js"></script>
+	<script src="~/js/company-admin/phone-bank-validate.js"></script>
+	<script src="~/js/common/profile-image-upload.js"></script>
+	<script src="~/js/common/form-validation.js"></script>
+}

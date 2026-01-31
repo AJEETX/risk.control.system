@@ -1,0 +1,45 @@
+﻿@model risk.control.system.Models.VendorInvestigationServiceType
+
+@{
+	ViewData["Title"] = @Applicationsettings.EDIT;
+}
+<section class="content">
+	<form id="edit-form" asp-action="Edit" method="post" enctype="multipart/form-data">
+		<div class="card shadow-lg border-1 rounded-lg">
+			<div class="card-header bg-secondary text-white text-center">
+				<h3 class="card-title"><i class="fas fa-truck"></i> @Applicationsettings.EDIT @Applicationsettings.SERVICE</h3>
+			</div>
+			<div class="card-body">
+				<div class="submit-progress hidden">
+					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+				</div>
+				<partial name="Vendor/_EditService" model="Model" />
+			</div>
+			<div class="card-footer">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group text-right">
+							<a id="cancel" asp-controller="EmpanelledAgencyService" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+								<i class="fa fa-window-close"></i>
+								@Applicationsettings.CANCEL
+							</a>
+							<button id="edit" type="submit" class="btn btn-warning">
+								<i class="fas fa-truck"></i> Save Service
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</section>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~/js/common/pincode-service.js"></script>
+	<script src="~/js/agency-admin/manage-service.js">
+	</script>
+	<script src="~/js/common/form-validation.js"></script>
+}

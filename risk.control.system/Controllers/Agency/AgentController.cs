@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Services;
 
@@ -28,90 +29,67 @@ namespace risk.control.system.Controllers.Agency
 
         public IActionResult Index()
         {
-            return RedirectToAction("Agent");
+            return RedirectToAction(nameof(Agent));
         }
 
         [Breadcrumb(" Tasks")]
         public IActionResult Agent()
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (currentUserEmail == null)
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
             return View();
         }
 
         [Breadcrumb("Submit", FromAction = "Agent")]
         public async Task<IActionResult> GetInvestigate(long selectedcase, bool uploaded = false)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid || selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be investigate.");
-                                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-
-                var model = await vendorService.GetInvestigate(currentUserEmail, selectedcase, uploaded);
+                var model = await vendorService.GetInvestigate(userEmail, selectedcase, uploaded);
                 ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {UserEmail}.", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", selectedcase, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
         [Breadcrumb(title: " Submitted")]
         public IActionResult Submitted()
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (currentUserEmail == null)
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
             return View();
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Submitted")]
         public async Task<IActionResult> SubmittedDetail(long id)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             if (!ModelState.IsValid || id == 0)
             {
                 notifyService.Error("NOT FOUND !!!..");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-                var model = await vendorService.GetInvestigatedForAgent(currentUserEmail, id);
+                var model = await vendorService.GetInvestigatedForAgent(userEmail, id);
                 ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {UserEmail}.", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

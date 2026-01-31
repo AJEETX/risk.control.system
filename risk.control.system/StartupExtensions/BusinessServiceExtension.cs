@@ -13,8 +13,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
-
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Models;
 using risk.control.system.Permission;
 using risk.control.system.Services;
@@ -129,6 +127,7 @@ public static class BusinessServiceExtension
             options.KnownProxies.Clear();
         });
         services.AddHttpClient();
+        services.AddScoped<IVendorAgentAllocationService, VendorAgentAllocationService>();
         services.AddScoped<IVendorDetailService, VendorDetailService>();
         services.AddScoped<IDateParserService, DateParserService>();
         services.AddScoped<IBase64FileService, Base64FileService>();

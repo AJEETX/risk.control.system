@@ -76,7 +76,6 @@
                                         <i class='fa fa-user-plus'></i> Customer details.
                                     </li>
                                     <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
-
                                 </span>
                             </span>
                         </h3>
@@ -130,12 +129,12 @@
         <div class="card shadow-lg border-1 rounded-lg">
             <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
         </div>
-        <form id="radioButtons" method="post" asp-controller="InvestigationPost" asp-action="AllocateSingle2Vendor">
+        <form id="radioButtons" method="post" asp-controller="AssignCase" asp-action="AllocateSingle2Vendor">
             <div class="card-body">
-                
+
                 <input type="hidden" id="caseId" name="caseId" value="@Model.ClaimsInvestigation.Id" />
                 <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
-                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                <table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
                         <tr>
                             <th data-orderable="false">
@@ -162,7 +161,7 @@
                         @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                         {
                             <a id="back"
-                               asp-controller="Investigation"
+                               asp-controller="@(Model.FromEditPage ? "Investigation" : "CaseCreateEdit")"
                                asp-action="@(Model.FromEditPage ? "Details" : "New")"
                                asp-route-id="@(Model.FromEditPage ? Model.ClaimsInvestigation.Id : null)"
                                class="btn btn-outline-secondary">
@@ -172,7 +171,7 @@
                         else
                         {
                             <a id="back"
-                               asp-controller="Investigation"
+                               asp-controller="@(Model.FromEditPage ? "Investigation" : "CaseCreateEdit")"
                                asp-action="@(Model.FromEditPage ? "Details" : "New")"
                                asp-route-id="@(Model.FromEditPage ? Model.ClaimsInvestigation.Id : null)"
                                class="btn btn-outline-secondary">

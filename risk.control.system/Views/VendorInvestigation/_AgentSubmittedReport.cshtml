@@ -38,7 +38,6 @@
                 </span>
             </span>
         </h3>
-        
     </div>
     <div class="card-body">
         <div class="submit-progress hidden">
@@ -65,7 +64,7 @@
         </div>
     </div>
     <div class="card-footer">
-        <form id="withdraw-form" method="post" asp-action="WithdrawCaseFromAgent" asp-controller="CaseVendorPost">
+        <form id="withdraw-form" method="post" asp-action="WithdrawCaseFromAgent" asp-controller="DeclineCase">
             <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
             <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
             <div class="row">

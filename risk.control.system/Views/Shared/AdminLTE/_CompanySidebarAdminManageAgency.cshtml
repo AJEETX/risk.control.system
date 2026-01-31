@@ -12,8 +12,9 @@
 																			@Url.MakeActiveClass("EmpanelledAgencyUser", "")
 																			@Url.MakeActiveClass("EmpanelledAgencyService", "")
 																			@Url.MakeActiveClass("AvailableAgency", "")
-																					@Url.MakeActiveClass("AvailableAgencyUser", "")
-																					@Url.MakeActiveClass("AvailableAgencyService", "")">
+																			@Url.MakeActiveClass("AvailableAgencyUser", "")
+																			@Url.MakeActiveClass("AvailableAgencyService", "")
+																			@Url.MakeActiveClass("Vendors", "")">
 				<i class="nav-icon fas fa-shield-alt"></i>
 				<p class="sidebar-menu-header-label">
 					MANAGE AGENCY(s)
@@ -23,19 +24,19 @@
 		</li>
 
 		<li class="nav-item">
-			<a asp-controller="EmpanelledAgency" asp-action="EmpanelledVendors" is-active-page
+			<a asp-controller="EmpanelledAgency" asp-action="Agencies" is-active-page
 			   class="actual-link nav-link
-																		@Url.MakeActiveClass("EmpanelledAgency", "EmpanelledVendors")
-																		@Url.MakeActiveClass("EmpanelledAgency", "AgencyDetail")
-																		@Url.MakeActiveClass("EmpanelledAgency", "EditAgency")
+																				@Url.MakeActiveClass("EmpanelledAgency", "Agencies")
+																		@Url.MakeActiveClass("EmpanelledAgency", "Detail")
+																		@Url.MakeActiveClass("EmpanelledAgency", "Edit")
 																		@Url.MakeActiveClass("EmpanelledAgencyService", "Service")
-																		@Url.MakeActiveClass("EmpanelledAgencyService", "EditService")
-																		@Url.MakeActiveClass("EmpanelledAgencyService", "CreateService")
-																		@Url.MakeActiveClass("EmpanelledAgencyService", "DeleteService")
-																		@Url.MakeActiveClass("EmpanelledAgencyUser", "AgencyUsers")
-																		@Url.MakeActiveClass("EmpanelledAgencyUser", "CreateAgencyUser")
-																		@Url.MakeActiveClass("EmpanelledAgencyUser", "EditAgencyUser")
-																		@Url.MakeActiveClass("EmpanelledAgencyUser", "DeleteAgencyUser")">
+																		@Url.MakeActiveClass("EmpanelledAgencyService", "Edit")
+																		@Url.MakeActiveClass("EmpanelledAgencyService", "Create")
+																		@Url.MakeActiveClass("EmpanelledAgencyService", "Delete")
+																		@Url.MakeActiveClass("EmpanelledAgencyUser", "Users")
+																		@Url.MakeActiveClass("EmpanelledAgencyUser", "Create")
+																		@Url.MakeActiveClass("EmpanelledAgencyUser", "Edit")
+																		@Url.MakeActiveClass("EmpanelledAgencyUser", "Delete")">
 				<i class="nav-icon fas fa-handshake"></i>
 				<p>
 					Empanelled Agencies
@@ -43,9 +44,9 @@
 			</a>
 		</li>
 		<li class="nav-item">
-			<a asp-controller="AvailableAgency" asp-action="AvailableVendors" is-active-page
+			<a asp-controller="AvailableAgency" asp-action="Agencies" is-active-page
 			   class="actual-link nav-link
-																	@Url.MakeActiveClass("AvailableAgency", "AvailableVendors")
+																			@Url.MakeActiveClass("AvailableAgency", "Agencies")
 																	@Url.MakeActiveClass("AvailableAgency", "Details")
 																	@Url.MakeActiveClass("AvailableAgency", "Edit")
 																	@Url.MakeActiveClass("AvailableAgency", "Delete")
@@ -54,9 +55,9 @@
 																	@Url.MakeActiveClass("AvailableAgencyService", "Edit")
 																	@Url.MakeActiveClass("AvailableAgencyService", "Delete")
 																	@Url.MakeActiveClass("AvailableAgencyUser", "Users")
-																	@Url.MakeActiveClass("AvailableAgencyUser", "CreateUser")
-																	@Url.MakeActiveClass("AvailableAgencyUser", "EditUser")
-																	@Url.MakeActiveClass("AvailableAgencyUser", "DeleteUser")">
+																	@Url.MakeActiveClass("AvailableAgencyUser", "Create")
+																	@Url.MakeActiveClass("AvailableAgencyUser", "Edit")
+																	@Url.MakeActiveClass("AvailableAgencyUser", "Delete")">
 				<i class="nav-icon fas fa-hand-pointer"></i>
 				<p>
 					Available Agencies

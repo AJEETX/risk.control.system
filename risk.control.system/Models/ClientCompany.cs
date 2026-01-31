@@ -39,7 +39,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
-        
+
         public string? BankName { get; set; } = default!;
 
         [Display(Name = "Bank Account Number")]
@@ -70,19 +70,19 @@ namespace risk.control.system.Models
         public string PanIdfyUrl { get; set; } = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         public string PanAPIData { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         public string PanAPIHost { get; set; } = "pan-card-verification-at-lowest-price.p.rapidapi.com";
-        public string? RapidAPIPanRemainCount { get; set; }
         public string? PassportApiUrl { get; set; } = "https://document-ocr1.p.rapidapi.com/idr";
         public string? PassportApiData { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
         public bool CanChangePassword { get; set; } = false;
         public bool BulkUpload { get; set; } = false;
-        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.53";
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
 
         [DataType(DataType.DateTime)]
         public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(10);
+
         [Range(1, 500)]
         public int TotalCreatedClaimAllowed { get; set; } = 100;
+
         public int TotalToAssignMaxAllowed { get; set; } = 100;
         public bool Deleted { get; set; } = false;
         public bool HasClaims { get; set; } = false;
@@ -95,16 +95,22 @@ namespace risk.control.system.Models
         public bool UpdateAgentAnswer { get; set; } = true;
 
         public bool HasSampleData { get; set; } = true;
+
         [NotMapped]
         public IFormFile? Document { get; set; }
+
         [NotMapped]
         public long SelectedPincodeId { get; set; }
+
         [NotMapped]
         public long SelectedDistrictId { get; set; }
+
         [NotMapped]
         public long SelectedStateId { get; set; }
+
         [NotMapped]
         public long SelectedCountryId { get; set; }
+
         public override string ToString()
         {
             return $"Insurance Company Information:\n" +
@@ -133,13 +139,13 @@ namespace risk.control.system.Models
                 $"- Pan IDfy URL: {PanIdfyUrl}\n" +
                 $"- Rapid API Key: {PanAPIData}\n" +
                 $"- Rapid API Host: {PanAPIHost}\n" +
-                $"- Rapid API Pan Remain Count: {RapidAPIPanRemainCount}\n" +
                 $"- Passport API URL: {PassportApiUrl}\n" +
                 $"- Passport API Key: {PassportApiData}\n" +
                 $"- Passport API Host: {PassportApiHost}\n" +
                 $"- Can Change Password: {CanChangePassword}\n";
         }
     }
+
     public enum CompanyStatus
     {
         ACTIVE,

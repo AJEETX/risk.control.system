@@ -76,7 +76,7 @@ namespace risk.control.system.Services
 
             data.SecondBlockName = "Agencies";
             data.SecondBlockCount = allAgenciesCount;
-            data.SecondBlockUrl = "/Vendors/Agencies";
+            data.SecondBlockUrl = "/ClientCompany/Agencies";
 
             data.ThirdBlockName = "Users";
             data.ThirdBlockCount = AllUsersCount;
@@ -237,7 +237,7 @@ namespace risk.control.system.Services
             var data = new DashboardData();
             data.FirstBlockName = "All Users";
             data.FirstBlockCount = companyUsersCount;
-            data.FirstBlockUrl = "/Company/Users";
+            data.FirstBlockUrl = "/ManageCompanyUser/Users";
 
             return data;
         }

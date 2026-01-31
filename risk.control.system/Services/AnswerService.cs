@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Models;
 
 namespace risk.control.system.Services;

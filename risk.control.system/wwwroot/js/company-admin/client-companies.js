@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Company/AllCompanies',
+            url: '/api/PortalCompany/AllCompanies',
             dataSrc: '',
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
@@ -129,13 +129,13 @@
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Event delegation for .btn-danger elements
-            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+            $('#dataTable tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('delete', ''); // Extract the ID from the button's ID attribute
                 getdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+            $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('detail', ''); // Extract the ID from the button's ID attribute
                 showdetails(id); // Call the getdetails function with the ID
@@ -161,7 +161,7 @@
             }
         });
     });
-    $('#customerTable').on('draw.dt', function () {
+    $('#dataTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -193,7 +193,6 @@ function getdetails(id) {
             nodes[i].disabled = true;
         }
     }
-    
 }
 function showdetails(id) {
     $("body").addClass("submit-progress-bg");
@@ -233,7 +232,7 @@ function showedit(id) {
     $('a').addClass('disabled-anchor').on('click', function (e) {
         e.preventDefault(); // Prevent default action for anchor clicks
     });
-    $('a#edit ' +id + '.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
+    $('a#edit ' + id + '.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var tbl = document.getElementById("customerTable");
     if (tbl) {

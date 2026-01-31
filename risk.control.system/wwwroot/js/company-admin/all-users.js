@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/User/AllUsers',
             dataSrc: '',
@@ -153,7 +153,7 @@
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Event delegation for .btn-danger elements
             
-            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
@@ -180,14 +180,14 @@
         });
     });
 
-    $('#customerTable').on('draw.dt', function () {
+    $('#dataTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
             html: true
         });
     });
-    $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+    $('#dataTable tbody').on('click', '.btn-danger', function (e) {
         e.preventDefault();
         var $btn = $(this);
         var $spinner = $(".submit-progress"); // global spinner (you already have this)
@@ -232,7 +232,7 @@
                                 });
 
                                 // Reload the DataTable
-                                $('#customerTable').DataTable().ajax.reload(null, false); // false = don't reset paging
+                                $('#dataTable').DataTable().ajax.reload(null, false); // false = don't reset paging
                             },
                             error: function (xhr, status, error) {
                                 console.error("Delete failed:", xhr.responseText);

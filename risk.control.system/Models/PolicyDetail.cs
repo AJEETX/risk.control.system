@@ -58,12 +58,8 @@ namespace risk.control.system.Models
 
         [Display(Name = "Case Document")]
         public string? DocumentImageExtension { get; set; }
-        public string? DocumentPath { get; set; }
 
-        [Display(Name = "Case remarks")]
-        [StringLength(500)]
-        public string? Comments { get; set; }
-        [Display(Name = "Case Document")]
+        public string? DocumentPath { get; set; }
 
         public override string ToString()
         {
@@ -75,8 +71,7 @@ namespace risk.control.system.Models
            $"- Cause Of Loss: {CauseOfLoss}\n" +
            $"- Sum Assured Value: {SumAssuredValue}\n" +
            $"- Cost Centre: {CostCentre}\n" +
-           $"- Case Enabler: {CaseEnabler}\n" +
-           $"- Remarks: {Comments}";
+           $"- Case Enabler: {CaseEnabler}";
         }
     }
 }

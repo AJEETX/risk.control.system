@@ -203,4 +203,3 @@ function displayBankCodeLabels(countryCode, isdCode) {
         $('.info-box-text:contains("IFSC Code")').text('Bank Code');
     }
 }
-
