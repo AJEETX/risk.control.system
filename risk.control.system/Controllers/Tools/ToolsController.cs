@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Caching.Memory;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
+using risk.control.system.Services.Agent;
+using risk.control.system.Services.Common;
+using risk.control.system.Services.Tool;
 
 namespace risk.control.system.Controllers.Tools
 {
@@ -36,8 +38,8 @@ namespace risk.control.system.Controllers.Tools
             {
                 return BadRequest(ModelState);
             }
-            var originalFace = await AgentVerificationHelper.GetBytesFromIFormFile(data.OriginalFaceImage);
-            var secondayFace = await AgentVerificationHelper.GetBytesFromIFormFile(data.MatchFaceImage);
+            var originalFace = await VerificationHelper.GetBytesFromIFormFile(data.OriginalFaceImage);
+            var secondayFace = await VerificationHelper.GetBytesFromIFormFile(data.MatchFaceImage);
             var (file, path) = await fileStorageService.SaveAsync(data.OriginalFaceImage, "tool");
             var faceMatchData = await faceMatchService.GetFaceMatchAsync(originalFace, secondayFace, Path.GetExtension(file));
 

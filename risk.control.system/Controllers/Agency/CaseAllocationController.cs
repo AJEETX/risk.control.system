@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
-using risk.control.system.Services;
+using risk.control.system.Services.Agency;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Agency
 {
@@ -13,14 +14,14 @@ namespace risk.control.system.Controllers.Agency
     public class CaseAllocationController : Controller
     {
         private readonly string baseUrl;
-        private readonly IVendorAgentAllocationService vendorAgentAllocationService;
+        private readonly IAgencyAgentAllocationService vendorAgentAllocationService;
         private readonly INotyfService notifyService;
         private readonly IMailService mailboxService;
         private readonly ILogger<CaseAllocationController> logger;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public CaseAllocationController(
-            IVendorAgentAllocationService vendorAgentAllocationService,
+            IAgencyAgentAllocationService vendorAgentAllocationService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,

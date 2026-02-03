@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
-using risk.control.system.Services;
+using risk.control.system.Services.Api;
+using risk.control.system.Services.Company;
 
 namespace risk.control.system.Controllers.Api.PortalAdmin
 {
@@ -14,21 +15,18 @@ namespace risk.control.system.Controllers.Api.PortalAdmin
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<PortalCompanyController> logger;
-        private readonly IUserService userService;
-        private readonly IVendorService vendorService;
+        private readonly ICompanyUserApiService companyUserApiService;
         private readonly ICompanyService companyService;
 
         public PortalCompanyController(ApplicationDbContext context,
             ILogger<PortalCompanyController> logger,
-            IUserService userService,
-            IVendorService vendorService,
+            ICompanyUserApiService companyUserApiService,
             ICompanyService companyService
             )
         {
             _context = context;
             this.logger = logger;
-            this.userService = userService;
-            this.vendorService = vendorService;
+            this.companyUserApiService = companyUserApiService;
             this.companyService = companyService;
         }
 
@@ -68,7 +66,7 @@ namespace risk.control.system.Controllers.Api.PortalAdmin
             }
             try
             {
-                var result = await userService.GetCompanyUsers(userEmail, id);
+                var result = await companyUserApiService.GetCompanyUsers(userEmail, id);
 
                 return Ok(result);
             }

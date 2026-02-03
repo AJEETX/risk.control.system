@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
-using risk.control.system.Services;
+using risk.control.system.Services.Api;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {

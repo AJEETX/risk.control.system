@@ -11,8 +11,7 @@ using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
-
+using risk.control.system.Services.Creator;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Creator
@@ -142,6 +141,8 @@ namespace risk.control.system.Controllers.Creator
                 return NotFound();
 
             var fileName = $"{file.Name}_UploadError_{id}.csv";
+            Response.Headers.Append("X-File-Name", fileName);
+            Response.Headers.Append("Access-Control-Expose-Headers", "X-File-Name");
             return File(file.ErrorByteData, "text/csv", fileName);
         }
 

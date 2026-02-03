@@ -10,7 +10,9 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
+using risk.control.system.Services.Api;
+using risk.control.system.Services.Common;
+using risk.control.system.Services.Report;
 
 namespace risk.control.system.Controllers.Api
 {

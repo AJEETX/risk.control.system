@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
-using risk.control.system.Services;
-
+using risk.control.system.Services.Agent;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Agency
@@ -17,13 +16,13 @@ namespace risk.control.system.Controllers.Agency
     public class AgentController : Controller
     {
         private readonly INotyfService notifyService;
-        private readonly ICaseVendorService vendorService;
+        private readonly IAgentCaseDetailService agentCaseDetailService;
         private readonly ILogger<AgentController> logger;
 
-        public AgentController(INotyfService notifyService, ICaseVendorService vendorService, ILogger<AgentController> logger)
+        public AgentController(INotyfService notifyService, IAgentCaseDetailService agentCaseDetailService, ILogger<AgentController> logger)
         {
             this.notifyService = notifyService;
-            this.vendorService = vendorService;
+            this.agentCaseDetailService = agentCaseDetailService;
             this.logger = logger;
         }
 
@@ -50,7 +49,7 @@ namespace risk.control.system.Controllers.Agency
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var model = await vendorService.GetInvestigate(userEmail, selectedcase, uploaded);
+                var model = await agentCaseDetailService.GetInvestigate(userEmail, selectedcase, uploaded);
                 ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
@@ -80,7 +79,7 @@ namespace risk.control.system.Controllers.Agency
             }
             try
             {
-                var model = await vendorService.GetInvestigatedForAgent(userEmail, id);
+                var model = await agentCaseDetailService.GetInvestigatedForAgent(userEmail, id);
                 ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Services;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Creator
 {
@@ -14,14 +15,14 @@ namespace risk.control.system.Controllers.Creator
     {
         private readonly string baseUrl;
         private readonly ApplicationDbContext _context;
-        private readonly IProcessCaseService processCaseService;
+        private readonly ICaseAllocationService caseAllocationService;
         private readonly IMailService mailboxService;
         private readonly INotyfService notifyService;
         private readonly ILogger<AssignCaseController> logger;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public AssignCaseController(ApplicationDbContext context,
-            IProcessCaseService processCaseService,
+            ICaseAllocationService caseAllocationService,
             IMailService mailboxService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
@@ -29,7 +30,7 @@ namespace risk.control.system.Controllers.Creator
             IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
-            this.processCaseService = processCaseService;
+            this.caseAllocationService = caseAllocationService;
             this.mailboxService = mailboxService;
             this.notifyService = notifyService;
             this.logger = logger;
@@ -54,13 +55,13 @@ namespace risk.control.system.Controllers.Creator
 
                 // AUTO ALLOCATION COUNT
                 var distinctClaims = claims.Distinct().ToList();
-                var affectedRows = await processCaseService.UpdateCaseAllocationStatus(userEmail, distinctClaims);
+                var affectedRows = await caseAllocationService.UpdateCaseAllocationStatus(userEmail, distinctClaims);
                 if (affectedRows < distinctClaims.Count)
                 {
                     notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
                 }
-                var jobId = backgroundJobClient.Enqueue(() => processCaseService.BackgroundAutoAllocation(distinctClaims, userEmail, baseUrl));
+                var jobId = backgroundJobClient.Enqueue(() => caseAllocationService.BackgroundAutoAllocation(distinctClaims, userEmail, baseUrl));
                 notifyService.Custom($"Assignment of <b> {distinctClaims.Count}</b> Case(s) started", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CaseActiveController.Active), "CaseActive", new { jobId });
             }
@@ -85,7 +86,7 @@ namespace risk.control.system.Controllers.Creator
                     return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
                 }
 
-                var (policy, status) = await processCaseService.AllocateToVendor(userEmail, caseId, selectedcase, false);
+                var (policy, status) = await caseAllocationService.AllocateToVendor(userEmail, caseId, selectedcase, false);
 
                 if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
                 {
@@ -122,7 +123,7 @@ namespace risk.control.system.Controllers.Creator
                     return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
                 }
 
-                var allocatedCaseNumber = await processCaseService.ProcessAutoSingleAllocation(claims, userEmail, baseUrl);
+                var allocatedCaseNumber = await caseAllocationService.ProcessAutoSingleAllocation(claims, userEmail, baseUrl);
                 if (string.IsNullOrWhiteSpace(allocatedCaseNumber))
                 {
                     notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");

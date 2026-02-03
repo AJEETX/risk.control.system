@@ -1,16 +1,14 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-
 using Hangfire;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
-
-using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Common;
+using risk.control.system.Services.Common;
+using risk.control.system.Services.Creator;
 
 namespace risk.control.system.Controllers.Creator
 {
@@ -19,14 +17,14 @@ namespace risk.control.system.Controllers.Creator
     {
         private readonly string baseUrl;
         private readonly ApplicationDbContext _context;
-        private readonly IProcessCaseService processCaseService;
+        private readonly IWithdrawCaseService withdrawCaseService;
         private readonly IMailService mailboxService;
         private readonly INotyfService notifyService;
         private readonly ILogger<WithdrawCaseController> logger;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public WithdrawCaseController(ApplicationDbContext context,
-            IProcessCaseService processCaseService,
+            IWithdrawCaseService withdrawCaseService,
             IMailService mailboxService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
@@ -34,7 +32,7 @@ namespace risk.control.system.Controllers.Creator
             IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
-            this.processCaseService = processCaseService;
+            this.withdrawCaseService = withdrawCaseService;
             this.mailboxService = mailboxService;
             this.notifyService = notifyService;
             this.logger = logger;
@@ -47,7 +45,7 @@ namespace risk.control.system.Controllers.Creator
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> Perform(CaseTransactionModel model, long claimId, string policyNumber)
+        public async Task<IActionResult> Withdraw(CaseTransactionModel model, long claimId, string policyNumber)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
@@ -58,7 +56,7 @@ namespace risk.control.system.Controllers.Creator
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var (company, vendorId) = await processCaseService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
+                var (company, vendorId) = await withdrawCaseService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
 
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
 

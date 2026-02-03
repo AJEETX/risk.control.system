@@ -8,8 +8,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Services;
-
+using risk.control.system.Services.Agency;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.AgencyAdmin
@@ -19,12 +18,12 @@ namespace risk.control.system.Controllers.AgencyAdmin
     public class AgencyServiceController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IVendorServiceTypeManager vendorServiceTypeManager;
+        private readonly IAgencyServiceTypeManager vendorServiceTypeManager;
         private readonly INotyfService notifyService;
         private readonly ILogger<AgencyServiceController> logger;
 
         public AgencyServiceController(ApplicationDbContext context,
-            IVendorServiceTypeManager vendorServiceTypeManager,
+            IAgencyServiceTypeManager vendorServiceTypeManager,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<AgencyServiceController> logger)

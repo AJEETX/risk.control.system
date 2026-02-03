@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
-using risk.control.system.Services;
+using risk.control.system.Services.Api;
 
 namespace risk.control.system.Controllers.Api.Company
 {
@@ -16,17 +16,20 @@ namespace risk.control.system.Controllers.Api.Company
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<CompanyController> logger;
+        private readonly ICompanyUserApiService companyUserApiService;
         private readonly IUserService userService;
-        private readonly IVendorService vendorService;
+        private readonly IAgencyService vendorService;
 
         public CompanyController(ApplicationDbContext context,
             ILogger<CompanyController> logger,
+            ICompanyUserApiService companyUserApiService,
             IUserService userService,
-            IVendorService vendorService
+            IAgencyService vendorService
             )
         {
             _context = context;
             this.logger = logger;
+            this.companyUserApiService = companyUserApiService;
             this.userService = userService;
             this.vendorService = vendorService;
         }
@@ -43,7 +46,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var result = await userService.GetCompanyUsers(userEmail);
+                var result = await companyUserApiService.GetCompanyUsers(userEmail);
 
                 return Ok(result);
             }

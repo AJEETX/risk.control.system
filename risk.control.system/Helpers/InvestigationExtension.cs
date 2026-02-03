@@ -5,7 +5,6 @@ namespace risk.control.system.Helpers
 {
     public static class InvestigationExtension
     {
-
         public static string GetPincode(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             if (claimType)
@@ -21,7 +20,8 @@ namespace risk.control.system.Helpers
                 return string.Join("", "<span class='badge badge-light'>" + beneficiary.PinCode.Code + "</span>");
             }
         }
-        public static string GetPolicyNum(this InvestigationTask caseTask)
+
+        public static string GetPolicyNum(this InvestigationTask caseTask, string contractNumber = "")
         {
             string title = $"";
             string style = "-none";
@@ -43,7 +43,7 @@ namespace risk.control.system.Helpers
                     title = $"Agency ({caseTask.UpdatedBy}) Reply";
                 }
             }
-            return string.Join("", caseTask.PolicyDetail?.ContractNumber + $"<i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i>");
+            return string.Join("", contractNumber + $"<i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i>");
         }
 
         public static string GetPolicyNumForAgency(this InvestigationTask caseTask, string id)
@@ -56,7 +56,6 @@ namespace risk.control.system.Helpers
                 {
                     return string.Join("", caseTask.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY\"></i>");
                 }
-
             }
             return string.Join("", caseTask.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style-none\"></i>");
         }
@@ -69,7 +68,6 @@ namespace risk.control.system.Helpers
                 timeToCompare = caseTask.SubmittedToSupervisorTime.Value;
                 if (DateTime.Now.Subtract(timeToCompare).Days >= caseTask.AgentSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
-
                 else if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= caseTask.AgentSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
             }
@@ -77,7 +75,6 @@ namespace risk.control.system.Helpers
             {
                 if (DateTime.Now.Subtract(timeToCompare).Days >= caseTask.AgentSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(caseTask.Created).Days} days since created!\"></i>");
-
                 else if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= caseTask.AgentSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(caseTask.Created).Days} day since created.\"></i>");
             }

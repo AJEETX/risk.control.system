@@ -8,19 +8,19 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
+using risk.control.system.Services.Agency;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Agency
 {
-    [Authorize(Roles = $"{AGENT.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{AGENT.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class AgencyReportController : Controller
     {
         private readonly string baseUrl;
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private readonly IProcessCaseService processCaseService;
-        private readonly IVendorInvestigationDetailService vendorInvestigationDetailService;
+        private IProcessSubmittedReportService processSubmittedReportService;
         private readonly INotyfService notifyService;
         private readonly IMailService mailboxService;
         private readonly ILogger<AgencyReportController> logger;
@@ -28,8 +28,7 @@ namespace risk.control.system.Controllers.Agency
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public AgencyReportController(
-            IProcessCaseService processCaseService,
-            IVendorInvestigationDetailService vendorInvestigationDetailService,
+            IProcessSubmittedReportService processSubmittedReportService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
@@ -37,8 +36,7 @@ namespace risk.control.system.Controllers.Agency
             ILogger<AgencyReportController> logger,
             ApplicationDbContext context)
         {
-            this.processCaseService = processCaseService;
-            this.vendorInvestigationDetailService = vendorInvestigationDetailService;
+            this.processSubmittedReportService = processSubmittedReportService;
             this.notifyService = notifyService;
             this.mailboxService = mailboxService;
             this.logger = logger;
@@ -62,7 +60,7 @@ namespace risk.control.system.Controllers.Agency
 
             try
             {
-                var (vendor, contract) = await vendorInvestigationDetailService.SubmitToVendorSupervisor(userEmail, claimId,
+                var (vendor, contract) = await processSubmittedReportService.SubmitToVendorSupervisor(userEmail, claimId,
                     WebUtility.HtmlDecode(remarks));
                 if (vendor == null)
                 {
@@ -121,7 +119,7 @@ namespace risk.control.system.Controllers.Agency
                 }
                 var reportUpdateStatus = SupervisorRemarkType.OK;
 
-                var success = await processCaseService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, reportUpdateStatus, supervisorAttachment, remarks);
+                var success = await processSubmittedReportService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, reportUpdateStatus, supervisorAttachment, remarks);
 
                 if (success != null)
                 {

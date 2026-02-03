@@ -1,124 +1,119 @@
 ﻿@model CaseInvestigationVendorsModel
 
 @{
-    ViewData["Title"] = " Send Enquiry";
+	ViewData["Title"] = " Send Enquiry";
 }
 <section class="content">
-    <form id="query-form" method="post" asp-controller="CaseAction" asp-action="SubmitQuery" enctype="multipart/form-data" autocomplete="off">
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
-        <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
-        <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-        <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
-        <input type="hidden" id="reply" name="reply" value="OK" />
-        <input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
-        <div id="article" class="shadow-lg border-1 rounded-lg">
-            <div class="card-header bg-secondary text-white text-center">
-                <h3 class="card-title">
-                    <i class="fas fa-newspaper"></i> Send Enquiry
-                    <span class="hover-text">
-                        <i class="fas fa-info-circle"></i>
-                        <span class="tooltip-text" id="information">
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Complete Enquiry info</b> </button>
-                            </li>
-                            <li>
-                                <i class='far fa-thumbs-up'></i> <button class='btn btn-warning btn-xs'><i class="fa fa-edit"></i>  ENQUIRE</b> </button>
-                            </li>
-                        </span>
-                    </span>
-                </h3>
-            </div>
-            <partial name="_PolicyDetails" model="@Model" />
+	<form id="query-form" method="post" asp-controller="Enquiry" asp-action="SubmitEnquiry" enctype="multipart/form-data" autocomplete="off">
+		@Html.AntiForgeryToken()
+		<input type="hidden" name="claimId" value="@Model.ClaimsInvestigation.Id" />
+		<div id="article" class="shadow-lg border-1 rounded-lg">
+			<div class="card-header bg-secondary text-white text-center">
+				<h3 class="card-title">
+					<i class="fas fa-newspaper"></i> Send Enquiry
+					<span class="hover-text">
+						<i class="fas fa-info-circle"></i>
+						<span class="tooltip-text" id="information">
+							<li>
+								<i class='far fa-hand-point-right'></i><button><b> Complete Enquiry info</b> </button>
+							</li>
+							<li>
+								<i class='far fa-thumbs-up'></i> <button class='btn btn-warning btn-xs'><i class="fa fa-edit"></i> <b> ENQUIRE</b> </button>
+							</li>
+						</span>
+					</span>
+				</h3>
+			</div>
+			<partial name="_PolicyDetails" model="@Model" />
 
-            <partial name="_AgencyReport" model="@Model" />
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-            <div class="card shadow-lg border-1 rounded-lg">
-                <div class="card-header bg-light text-white text-center">
-                    <h3 class="card-title">
-                        <i class="fa fa-edit"></i>  Enquiry details
-                        <span class="hover-text">
-                            <i class="fas fa-info-circle"></i>
-                            <span class="tooltip-text" id="information">
-                                <li>
+			<partial name="_AgencyReport" model="@Model" />
+			<div class="submit-progress hidden">
+				<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+			</div>
+			<div class="card shadow-lg border-1 rounded-lg">
+				<div class="card-header bg-light text-white text-center">
+					<h3 class="card-title">
+						<i class="fa fa-edit"></i>  Enquiry details
+						<span class="hover-text">
+							<i class="fas fa-info-circle"></i>
+							<span class="tooltip-text" id="information">
+								<li>
 
-                                    <i class='far fa-hand-point-right'></i> Enquiry Info  <i class="fas fa-newspaper"></i>
-                                </li>
-                                <li>
+									<i class='far fa-hand-point-right'></i> Enquiry Info  <i class="fas fa-newspaper"></i>
+								</li>
+								<li>
 
-                                    <i class='far fa-hand-point-right'></i>  Request Description <i class="far fa-file-powerpoint"></i>
-                                </li>
-                            </span>
-                        </span>
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-12 d-flex align-items-stretch flex-column">
-                            <div class="card bg-light d-flex flex-fill">
-                                <div class="card-footer text-muted border-bottom-0">
-                                    <i class="far fa-file-powerpoint"></i> <strong> Enquiry Descriptive question </strong>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-10">
-                                            <div class="form-group">
-                                                <textarea id="description" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.DescriptiveQuestion"
-                                                          placeholder="Enquiry Description" rows="3" required>this is test </textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-1">
-                                            <div class="btn btn-default btn-file">
-                                                <i class="fas fa-paperclip"></i><small>Attachment</small>
-                                                <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
-                                                <input id="document" name="document" asp-for="InvestigationReport.EnquiryRequest.QuestionImageAttachment" type="file" accept=".png, .jpg, .jpeg, image/png, image/jpeg" class="form-control remarks" />
-                                            </div>
-                                            <div class="help-block text-center" title="Max. size 2MB"><small>Max. size 2MB</small> </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12 d-flex align-items-stretch flex-column">
-                            <div class="card bg-light d-flex flex-fill">
-                                <div class="card-footer text-muted border-bottom-0">
-                                    <i class="fas fa-newspaper"></i> <strong> Enquiry Info </strong>
-                                </div>
-                                <div class="card-body">
+									<i class='far fa-hand-point-right'></i>  Request Description <i class="far fa-file-powerpoint"></i>
+								</li>
+							</span>
+						</span>
+					</h3>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-sm-12 d-flex align-items-stretch flex-column">
+							<div class="card bg-light d-flex flex-fill">
+								<div class="card-footer text-muted border-bottom-0">
+									<i class="far fa-file-powerpoint"></i> <strong> Enquiry Descriptive question </strong>
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-md-10">
+											<div class="form-group">
+												<textarea id="description" class="form-control remarks" asp-for="InvestigationReport.EnquiryRequest.DescriptiveQuestion"
+														  placeholder="Enquiry Description" rows="3" required>this is test </textarea>
+											</div>
+										</div>
+										<div class="col-md-1">
+											<div class="btn btn-default btn-file">
+												<i class="fas fa-paperclip"></i><small>Attachment</small>
+												<img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
+												<input id="document" name="document" asp-for="InvestigationReport.EnquiryRequest.QuestionImageAttachment" type="file" accept=".png, .jpg, .jpeg, image/png, image/jpeg" class="form-control remarks" />
+											</div>
+											<div class="help-block text-center" title="Max. size 2MB"><small>Max. size 2MB</small> </div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-12 d-flex align-items-stretch flex-column">
+							<div class="card bg-light d-flex flex-fill">
+								<div class="card-footer text-muted border-bottom-0">
+									<i class="fas fa-newspaper"></i> <strong> Enquiry Info </strong>
+								</div>
+								<div class="card-body">
 
-                                    <span id="question-added"></span>
-                                    <button id="add-question" type="button" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-plus"></i> Add Question
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="float-right">
-                                <a id="back" asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> @Applicationsettings.CANCEL
-                                </a>
-                                <button id="send-query" type="submit" class="btn btn-warning">
-                                    <i class="fa fa-edit"></i>  Send Enquiry
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
+									<span id="question-added"></span>
+									<button id="add-question" type="button" class="btn btn-sm btn-primary">
+										<i class="fas fa-plus"></i> Add Question
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="float-right">
+								<a id="back" asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-secondary">
+									<i class="fas fa-times"></i> @Applicationsettings.CANCEL
+								</a>
+								<button id="send-query" type="submit" class="btn btn-warning">
+									<i class="fa fa-edit"></i>  Send Enquiry
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
 </section>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script src="~/js/case-map.js"></script>
-    <script src="~/js/assessor/get-report.js"></script>
-    <script src="~/js/common/case-details.js"></script>
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~/js/case-map.js"></script>
+	<script src="~/js/assessor/get-report.js"></script>
+	<script src="~/js/common/case-details.js"></script>
 }

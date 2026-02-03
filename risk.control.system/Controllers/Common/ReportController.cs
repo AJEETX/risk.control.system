@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
-using risk.control.system.Services;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Common
 {

@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
-using risk.control.system.Services;
-
+using risk.control.system.Services.Agency;
+using risk.control.system.Services.Report;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
@@ -19,15 +19,15 @@ namespace risk.control.system.Controllers.Agency
     {
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
-        private readonly IVendorInvestigationDetailService vendorInvestigationDetailService;
+        private readonly IAgencyInvestigationDetailService vendorInvestigationDetailService;
         private readonly ILogger<VendorInvestigationController> logger;
-        private readonly ICaseVendorService vendorService;
+        private readonly ICaseReportService vendorService;
 
         public VendorInvestigationController(INotyfService notifyService,
             IInvoiceService invoiceService,
-            IVendorInvestigationDetailService vendorInvestigationDetailService,
+            IAgencyInvestigationDetailService vendorInvestigationDetailService,
             ILogger<VendorInvestigationController> logger,
-            ICaseVendorService vendorService)
+            ICaseReportService vendorService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;

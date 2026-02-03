@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Common
 {
@@ -10,9 +10,9 @@ namespace risk.control.system.Controllers.Common
     public class ConfirmController : Controller
     {
         private readonly INotificationService notificationService;
-        private readonly ICaseInvestigationService claimsInvestigationService;
+        private readonly ICaseNotesService claimsInvestigationService;
 
-        public ConfirmController(INotificationService notificationService, ICaseInvestigationService claimsInvestigationService)
+        public ConfirmController(INotificationService notificationService, ICaseNotesService claimsInvestigationService)
         {
             this.notificationService = notificationService;
             this.claimsInvestigationService = claimsInvestigationService;

@@ -2,8 +2,7 @@
 
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
-using risk.control.system.Services;
-
+using risk.control.system.Services.Common;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Seeds
