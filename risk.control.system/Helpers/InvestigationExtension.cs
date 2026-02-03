@@ -42,6 +42,14 @@ namespace risk.control.system.Helpers
                     style = "";
                     title = $"Agency ({caseTask.UpdatedBy}) Reply";
                 }
+                else if (caseTask is not null)
+                {
+                    var isRequested = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
+                    if (isRequested)
+                    {
+                        return string.Join("", contractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY\"></i>");
+                    }
+                }
             }
             return string.Join("", contractNumber + $"<i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i>");
         }
