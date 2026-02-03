@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("GetReviewCases")]
-        public async Task<IActionResult> GetReviewCases()
+        public async Task<IActionResult> GetReviewCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var response = await assesorService.GetReviews(userEmail);
+                var response = await assesorService.GetReviews(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }

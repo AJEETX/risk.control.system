@@ -328,7 +328,7 @@ namespace risk.control.system.Services.Api
 
             // 6. Memory Processing (Images, Formatting, Methods)
 
-            var responseList = pagedData.Select(async a =>
+            var finalDataTasks = pagedData.Select(async a =>
             {
                 var culture = CustomExtensions.GetCultureByCountry(companyUser.CountryCode.ToUpper());
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
@@ -346,6 +346,7 @@ namespace risk.control.system.Services.Api
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
                 return new CaseInvestigationResponse
                 {
+                    PolicyNum = a.PolicyNum,
                     Id = a.Id,
                     AutoAllocated = a.IsAutoAllocated,
                     PolicyId = a.ContractNumber,
@@ -379,14 +380,15 @@ namespace risk.control.system.Services.Api
                     TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
                     CanDownload = CanDownload(a.Id, userEmail)
                 };
-            }).ToList();
+            });
+            var finalData = (await Task.WhenAll(finalDataTasks));
 
             return new
             {
                 Draw = draw,
                 RecordsTotal = recordsTotal,
                 RecordsFiltered = recordsFiltered,
-                Data = responseList
+                Data = finalData.ToArray()
             };
         }
 

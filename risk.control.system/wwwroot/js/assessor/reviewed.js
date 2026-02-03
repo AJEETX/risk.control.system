@@ -1,38 +1,55 @@
 ﻿$(document).ready(function () {
-
-
     var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Assessor/GetReviewCases',
-            dataSrc: '',
+            type: 'GET',
+            dataSrc: function (json) {
+                return json.data; // Return table data
+            },
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 16, // Default to column 15
+                    orderDir: d.order?.[0]?.dir || "desc"
+                };
+            },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
                     window.location.href = '/Account/Login'; // Or session timeout handler
                 }
+                if (xhr.status === 500) {
+                    window.location.href = '/Assessor/Review'; // Refresh page
+                }
             }
         },
         columnDefs: [
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 0                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column-number', // Apply the CSS class,
-            targets: 1                      // Index of the column to style
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 0                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
             },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 8                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 10                      // Index of the column to style
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -43,8 +60,12 @@
                 'name': 'policy' // Name for the "Case Type" column
             }],
         order: [[16, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
+        serverSide: true,
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -173,7 +194,7 @@
                     } else {
                         buttons += '<span class="badge badge-light">...</span>';
                     }
-                    
+
                     return buttons;
                 }
             },
@@ -201,7 +222,6 @@
             { "data": "policy", bVisible: false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-
             $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
@@ -232,13 +252,13 @@
         $('#refreshIcon').removeClass('fa-spin');
     });
     table.on('mouseenter', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+        const $this = $(this); // Cache the current element
 
-            // Set a timeout to show the full map after 1 second
-            hoverTimeout = setTimeout(function () {
-                $this.find('.full-map').show(); // Show full map
-            }, 1000); // Delay of 1 second
-        })
+        // Set a timeout to show the full map after 1 second
+        hoverTimeout = setTimeout(function () {
+            $this.find('.full-map').show(); // Show full map
+        }, 1000); // Delay of 1 second
+    })
         .on('mouseleave', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -257,7 +277,7 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    
+
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
     disableAllInteractiveElements();
 
@@ -276,7 +296,7 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    
+
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
     disableAllInteractiveElements();
 
@@ -288,4 +308,3 @@ function showedit(id) {
         }
     }
 }
-

@@ -5,7 +5,7 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        
+
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate");
         disableAllInteractiveElements();
 
@@ -26,7 +26,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         // Disable all buttons, submit inputs, and anchors
-        
+
         $('#investigatecase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Investigate");
         disableAllInteractiveElements();
 
@@ -55,7 +55,7 @@
                     start: d.start || 0,
                     length: d.length || 10,
                     search: d.search?.value || "", // Instead of empty string, send "all"
-                    orderColumn: d.order?.[0]?.column ?? 14, // Default to column 15
+                    orderColumn: d.order?.[0]?.column ?? 12, // Default to column 15
                     orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
@@ -79,39 +79,39 @@
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 11                      // Index of the column to style
-            }],
-        order: [[14, 'asc']],
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 3                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 7                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 8                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 10                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 11                      // Index of the column to style
+        }],
+        order: [[12, 'asc']],
         responsive: true,
         fixedHeader: true,
         processing: true,
@@ -131,7 +131,6 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (!row.isQueryCase) {
-
                         var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Select Case to Allocate" />';
                         return img;
                     }
@@ -155,7 +154,6 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
-
                 }
             },
             {
@@ -219,9 +217,10 @@
                     return '<span title="' + row.service + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
-            
+
             {
                 "data": "addressLocationInfo",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.addressLocationInfo + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
@@ -267,7 +266,6 @@
             }
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-
             $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
@@ -311,7 +309,7 @@
         $("#modalMapImage").attr("src", imageUrl);
         $("#mapModalLabel").text(title || "Map Preview");
     });
-   
+
     $('#dataTable tbody').hide();
     $('#dataTable tbody').fadeIn(2000);
     table.on('draw.dt', function () {
@@ -334,11 +332,11 @@
     $("input[type='radio'].selected-case").change(function (e) {
         if ($(this).is(":checked")) {
             $("#allocatedcase").prop('disabled', false);
-        $("#investigatecase").prop('disabled', false);
+            $("#investigatecase").prop('disabled', false);
         }
         else {
             $("#allocatedcase").prop('disabled', true);
-        $("#investigatecase").prop('disabled', true);
+            $("#investigatecase").prop('disabled', true);
         }
     });
 
@@ -350,7 +348,7 @@
             $("#investigatecase").prop('disabled', false);
         } else {
             $("#allocatedcase").prop('disabled', true);
-        $("#investigatecase").prop('disabled', true);
+            $("#investigatecase").prop('disabled', true);
         }
     });
     let askConfirmation = false;
@@ -376,7 +374,6 @@
             }
         });
     });
-
 });
 
 function showdetails(id) {
@@ -386,7 +383,7 @@ function showdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    
+
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
     disableAllInteractiveElements();
 
@@ -399,7 +396,6 @@ function showdetails(id) {
     }
 }
 
-
 function showenquiry(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
@@ -407,7 +403,7 @@ function showenquiry(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    
+
     $('a#details' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Enquiry");
     disableAllInteractiveElements();
 

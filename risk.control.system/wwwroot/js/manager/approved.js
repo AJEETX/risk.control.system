@@ -4,7 +4,9 @@
         ajax: {
             url: '/api/Manager/GetApprovedCases',
            type: 'GET',
-           dataType: 'json',
+           dataSrc: function (json) {
+               return json.data; // Return table data
+           },
            data: function (d) {
                console.log("Data before sending:", d); // Debugging
 
