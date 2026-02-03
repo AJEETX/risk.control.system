@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
-using risk.control.system.Services;
+using risk.control.system.Services.Common;
+using risk.control.system.Services.Report;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
@@ -15,13 +16,13 @@ namespace risk.control.system.Controllers.Assessor
     public class AssessorController : Controller
     {
         private readonly INotyfService notifyService;
-        private readonly ICaseVendorService caseVendorService;
+        private readonly ICaseReportService caseVendorService;
         private readonly IInvoiceService invoiceService;
         private readonly IInvestigationDetailService investigationService;
         private readonly ILogger<AssessorController> logger;
 
         public AssessorController(INotyfService notifyService,
-            ICaseVendorService caseVendorService,
+            ICaseReportService caseVendorService,
             IInvoiceService invoiceService,
             IInvestigationDetailService investigationService,
             ILogger<AssessorController> logger)

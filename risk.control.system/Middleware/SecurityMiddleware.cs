@@ -1,7 +1,7 @@
 ﻿using Microsoft.FeatureManagement;
 
 using risk.control.system.Models;
-using risk.control.system.Services;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Middleware
 {
@@ -10,12 +10,12 @@ namespace risk.control.system.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<WhitelistListMiddleware> _logger;
         private readonly IFeatureManager featureManager;
-        private readonly IValidationService tokenService;
+        private readonly IJwtService tokenService;
         private readonly IConfiguration config;
         private string[] errStatusCodes;
         public SecurityMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger,
             string httpStatusErrorCodes, IFeatureManager featureManager,
-            IValidationService tokenService,
+            IJwtService tokenService,
             IConfiguration config)
         {
             _next = next;

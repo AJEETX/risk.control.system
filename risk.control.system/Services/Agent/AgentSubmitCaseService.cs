@@ -1,0 +1,65 @@
+﻿using risk.control.system.Models.ViewModel;
+
+namespace risk.control.system.Services.Agent
+{
+    public interface IAgentSubmitCaseService
+    {
+        Task<AppiCheckifyResponse> PostAgentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long faceId, string latitude, string longitude, bool isAgent, IFormFile Image);
+
+        Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long docId, string latitude, string longitude, IFormFile Image);
+    }
+
+    internal class AgentSubmitCaseService : IAgentSubmitCaseService
+    {
+        private readonly IFaceIdfyService agentIdService;
+        private readonly IAgentFaceIdfyService agentFaceIdfyService;
+        private readonly IDocumentIdfyService documentIdfyService;
+
+        public AgentSubmitCaseService(IFaceIdfyService agentIdService, IAgentFaceIdfyService agentFaceIdfyService, IDocumentIdfyService documentIdfyService)
+        {
+            this.agentIdService = agentIdService;
+            this.agentFaceIdfyService = agentFaceIdfyService;
+            this.documentIdfyService = documentIdfyService;
+        }
+
+        public async Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long docId, string latitude, string longitude, IFormFile Image)
+        {
+            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
+
+            var data = new DocumentData
+            {
+                LocationName = locationName,
+                ReportName = reportName,
+                Email = userEmail,
+                CaseId = claimId,
+                Image = Image,
+                LocationLatLong = locationLongLat
+            };
+            var result = await documentIdfyService.CaptureDocumentId(data);
+            return result;
+        }
+
+        public async Task<AppiCheckifyResponse> PostAgentId(string userEmail, string reportName, string locationName, long locationId, long claimId, long faceId, string latitude, string longitude, bool isAgent, IFormFile Image)
+        {
+            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
+
+            var data = new FaceData
+            {
+                LocationName = locationName,
+                ReportName = reportName,
+                Email = userEmail,
+                CaseId = claimId,
+                Image = Image,
+                LocationLatLong = locationLongLat
+            };
+            if (isAgent)
+            {
+                return await agentFaceIdfyService.CaptureAgentId(data);
+            }
+            else
+            {
+                return await agentIdService.CaptureFaceId(data);
+            }
+        }
+    }
+}

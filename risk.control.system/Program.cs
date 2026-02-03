@@ -1,5 +1,6 @@
-﻿using Serilog;
-using risk.control.system.StartupExtensions;
+﻿using risk.control.system.StartupExtensions;
+using Serilog;
+
 AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
 //QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
@@ -20,15 +21,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
-//var logDirectory = LogSetup.CreateLogging(builder.Environment.ContentRootPath);
-//builder.Logging.ClearProviders();
-//builder.Logging.SetMinimumLevel(LogLevel.Error); // Optional global filter
-//builder.Logging.AddProvider(new CsvLoggerProvider(logDirectory, LogLevel.Error));
-
-
-
-
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 

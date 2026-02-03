@@ -1,16 +1,12 @@
 ﻿using System.Net;
-using System.Web;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Common;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
+using risk.control.system.Services.Assessor;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Assessor
 {
@@ -23,6 +19,7 @@ namespace risk.control.system.Controllers.Assessor
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly ApplicationDbContext _context;
         private readonly IProcessCaseService processCaseService;
+        private readonly IAssessorQueryService assessorQueryService;
         private readonly IMailService mailboxService;
         private readonly INotyfService notifyService;
         private readonly ILogger<CaseActionController> logger;
@@ -30,6 +27,7 @@ namespace risk.control.system.Controllers.Assessor
 
         public CaseActionController(ApplicationDbContext context,
             IProcessCaseService processCaseService,
+            IAssessorQueryService assessorQueryService,
             IMailService mailboxService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
@@ -38,6 +36,7 @@ namespace risk.control.system.Controllers.Assessor
         {
             _context = context;
             this.processCaseService = processCaseService;
+            this.assessorQueryService = assessorQueryService;
             this.mailboxService = mailboxService;
             this.notifyService = notifyService;
             this.logger = logger;
@@ -92,66 +91,6 @@ namespace risk.control.system.Controllers.Assessor
                 logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, currentUserEmail);
                 notifyService.Error("Error processing case. Try again.");
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitQuery(long claimId, string reply, CaseInvestigationVendorsModel request, IFormFile? document)
-        {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    notifyService.Error("Bad Request..");
-                    return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
-                }
-                if (document != null && document.Length > 0)
-                {
-                    if (document.Length > MAX_FILE_SIZE)
-                    {
-                        notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
-                    }
-                    var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
-                    if (!AllowedExt.Contains(ext))
-                    {
-                        notifyService.Error($"Invalid Document image type");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
-                    }
-                    if (!AllowedMime.Contains(document.ContentType))
-                    {
-                        notifyService.Error($"Invalid Document Image content type");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
-                    }
-                    if (!ImageSignatureValidator.HasValidSignature(document))
-                    {
-                        notifyService.Error($"Invalid or corrupted Document Image ");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
-                    }
-                }
-
-                request.InvestigationReport.EnquiryRequest.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
-
-                var model = await processCaseService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
-                if (model != null)
-                {
-                    var company = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId, baseUrl));
-
-                    notifyService.Success("Enquiry Sent to Agency");
-                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
-                }
-                notifyService.Error("OOPs !!!..Error sending query");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error submitting query case {Id}", claimId, currentUserEmail);
-                notifyService.Error("Error submitting query. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

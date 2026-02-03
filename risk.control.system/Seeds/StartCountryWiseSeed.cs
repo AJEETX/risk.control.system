@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
 using risk.control.system.Models;
-using risk.control.system.Services;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Seeds
 {

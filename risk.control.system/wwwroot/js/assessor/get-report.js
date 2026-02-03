@@ -1,7 +1,6 @@
 $(document).ready(function () {
-  
     let askConfirmation = false;
-    let approve= false;
+    let approve = false;
     let review = false;
     let reject = false;
 
@@ -32,7 +31,6 @@ $(document).ready(function () {
 
         if (extn == "png" || extn == "jpg" || extn == "jpeg") {
             if (typeof (FileReader) != "undefined") {
-
                 //loop for each file selected for uploaded.
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
@@ -61,7 +59,6 @@ $(document).ready(function () {
                         document.getElementById('documentImage0').src = window.URL.createObjectURL($(this)[0].files[i]);
                     }
                 }
-
             } else {
                 $.alert(
                     {
@@ -100,7 +97,6 @@ $(document).ready(function () {
         }
     });
 
-
     $('#create-form').on('submit', function (e) {
         var report = $('#assessorRemarks').val();
 
@@ -110,7 +106,7 @@ $(document).ready(function () {
                 title: "Claim Remarks !!!",
                 content: "Please enter remarks?",
                 icon: 'fas fa-exclamation-triangle',
-    
+
                 type: 'red',
                 closeIcon: true,
                 buttons: {
@@ -130,7 +126,7 @@ $(document).ready(function () {
                 title: "Confirm APPROVE",
                 content: "Are you sure?",
                 icon: 'far fa-thumbs-up',
-    
+
                 type: 'green',
                 closeIcon: true,
                 buttons: {
@@ -159,7 +155,6 @@ $(document).ready(function () {
                                     nodes[i].disabled = true;
                                 }
                             }
-                            
                         }
                     },
                     cancel: {
@@ -175,7 +170,7 @@ $(document).ready(function () {
                 title: "Confirm REVIEW",
                 content: "Are you sure?",
                 icon: 'fas fa-sync',
-    
+
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
@@ -269,7 +264,7 @@ $(document).ready(function () {
                     <i class="fas fa-trash"></i> Delete
                 </button>
             </div>
-            
+
             <div class="form-group">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -277,12 +272,12 @@ $(document).ready(function () {
                             <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
                         </span>
                     </div>
-                    <input class="form-control remarks" 
-                           name="InvestigationReport.EnquiryRequests[${questionIndex}].MultipleQuestionText" 
+                    <input class="form-control remarks"
+                           name="InvestigationReport.EnquiryRequests[${questionIndex}].MultipleQuestionText"
                            placeholder="Enter Enquiry subject detail" required value="Sample question ${questionIndex + 1}?">
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -293,8 +288,8 @@ $(document).ready(function () {
                                     <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
                                 </span>
                             </div>
-                            <input class="form-control remarks" 
-                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerA" 
+                            <input class="form-control remarks"
+                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerA"
                                    placeholder="Answer A" required value="Answer A.">
                         </div>
                     </div>
@@ -308,14 +303,14 @@ $(document).ready(function () {
                                     <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
                                 </span>
                             </div>
-                            <input class="form-control remarks" 
-                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerB" 
+                            <input class="form-control remarks"
+                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerB"
                                    placeholder="Answer B" required value="Answer B.">
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -326,8 +321,8 @@ $(document).ready(function () {
                                     <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
                                 </span>
                             </div>
-                            <input class="form-control remarks" 
-                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerC" 
+                            <input class="form-control remarks"
+                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerC"
                                    placeholder="Answer C" required value="Answer C.">
                         </div>
                     </div>
@@ -341,8 +336,8 @@ $(document).ready(function () {
                                     <i class="far fa-comment-alt"></i><i class="fa fa-asterisk asterik-style"></i>
                                 </span>
                             </div>
-                            <input class="form-control remarks" 
-                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerD" 
+                            <input class="form-control remarks"
+                                   name="InvestigationReport.EnquiryRequests[${questionIndex}].AnswerD"
                                    placeholder="Answer D" required value="Answer D.">
                         </div>
                     </div>
@@ -379,71 +374,64 @@ $(document).ready(function () {
     });
 
     $('#query-form').on('submit', function (e) {
-        var enquiry = $('#description').val();
+        if (askConfirmation) {
+            return true; // ✅ allow normal POST
+        }
 
-        if (enquiry == '') {
-            e.preventDefault();
+        e.preventDefault();
+
+        var enquiry = $('#description').val().trim();
+
+        if (!enquiry) {
             $.alert({
                 title: "Enquiry Detail !!!",
                 content: "Please enter enquiry information?",
                 icon: 'fas fa-exclamation-triangle',
-
                 type: 'red',
                 closeIcon: true,
                 buttons: {
-                    cancel: {
+                    ok: {
                         text: "OK",
-                        btnClass: 'btn-danger', action: function () {
-                            $.alert('Canceled!');
+                        btnClass: 'btn-danger',
+                        action: function () {
                             $('#description').focus();
                         }
                     }
                 }
             });
+            return;
         }
-        else if (!askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Enquiry",
-                content: "Are you sure?",
-                icon: 'far fa-thumbs-up',
 
-                type: 'orange',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Send Enquiry",
-                        btnClass: 'btn-warning',
-                        action: function () {
-                            askConfirmation = true;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
+        $.confirm({
+            title: "Confirm Enquiry",
+            content: "Are you sure?",
+            icon: 'far fa-thumbs-up',
+            type: 'orange',
+            closeIcon: true,
+            buttons: {
+                confirm: {
+                    text: "Send Enquiry",
+                    btnClass: 'btn-warning',
+                    action: function () {
+                        askConfirmation = true;
 
-                            $('#send-query').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Enquiring...");
-                            disableAllInteractiveElements();
+                        $("body").addClass("submit-progress-bg");
+                        $(".submit-progress").removeClass("hidden");
 
-                            $('#query-form').submit();
+                        $('#send-query')
+                            .html("<i class='fas fa-sync fa-spin'></i> Enquiring...")
+                            .prop("disabled", true);
 
-                            var createForm = document.getElementById("query-form");
-                            if (createForm) {
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
+                        document.getElementById('query-form').submit();
+                        disableAllInteractiveElements();
                     }
+                },
+                cancel: {
+                    text: "Cancel",
+                    btnClass: 'btn-default'
                 }
-            });
-        }
+            }
+        });
     });
 
     $('#approve-case').click(function () {
@@ -469,7 +457,6 @@ $(document).ready(function () {
     $('#enquire-case').on('click', function (e) {
         showenquiry();
     });
-
 });
 
 function showenquiry() {
@@ -479,7 +466,7 @@ function showenquiry() {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    
+
     $('#enquire-case').html("<i class='fas fa-sync fa-spin'></i> ENQUIRE");
     disableAllInteractiveElements();
 

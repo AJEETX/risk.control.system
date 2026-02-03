@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Services;
+using risk.control.system.Services.Api;
 
 namespace risk.control.system.Controllers.Api.Agency
 {
@@ -13,15 +13,18 @@ namespace risk.control.system.Controllers.Api.Agency
     public class AgencyController : ControllerBase
     {
         private readonly ILogger<AgencyController> logger;
+        private readonly IAgencyUserApiService agencyUserApiService;
         private readonly IUserService userService;
-        private readonly IVendorService vendorService;
+        private readonly IAgencyService vendorService;
 
         public AgencyController(
             ILogger<AgencyController> logger,
+            IAgencyUserApiService agencyUserApiService,
             IUserService userService,
-            IVendorService vendorService)
+            IAgencyService vendorService)
         {
             this.logger = logger;
+            this.agencyUserApiService = agencyUserApiService;
             this.userService = userService;
             this.vendorService = vendorService;
         }
@@ -84,7 +87,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var result = await userService.GetCompanyAgencyUsers(userEmail, id);
+                var result = await agencyUserApiService.GetCompanyAgencyUsers(userEmail, id);
 
                 return Ok(result);
             }
@@ -106,7 +109,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var agentWithLoad = await userService.GetAgencyUsers(userEmail);
+                var agentWithLoad = await agencyUserApiService.GetAgencyUsers(userEmail);
                 return Ok(agentWithLoad);
             }
             catch (Exception ex)
@@ -115,7 +118,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
 
         [HttpGet("GetAgentWithCases")]
         public async Task<IActionResult> GetAgentWithCases(long id)

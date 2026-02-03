@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using risk.control.system.AppConstant;
+using risk.control.system.Services.Report;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {

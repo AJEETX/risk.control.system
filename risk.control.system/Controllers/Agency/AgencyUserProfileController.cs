@@ -8,7 +8,8 @@ using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
+using risk.control.system.Services.Agency;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Agency
@@ -18,14 +19,14 @@ namespace risk.control.system.Controllers.Agency
     public class AgencyUserProfileController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IVendorUserService vendorUserService;
+        private readonly IAgencyUserService vendorUserService;
         private readonly IAccountService accountService;
         private readonly INotyfService notifyService;
         private readonly ILogger<AgencyUserProfileController> logger;
         private readonly string portal_base_url = string.Empty;
 
         public AgencyUserProfileController(ApplicationDbContext context,
-            IVendorUserService vendorUserService,
+            IAgencyUserService vendorUserService,
             IAccountService accountService,
              IHttpContextAccessor httpContextAccessor,
             INotyfService notifyService,

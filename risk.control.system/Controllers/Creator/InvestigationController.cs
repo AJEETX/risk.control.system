@@ -7,7 +7,8 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services;
-
+using risk.control.system.Services.Common;
+using risk.control.system.Services.Creator;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
@@ -19,14 +20,14 @@ namespace risk.control.system.Controllers.Creator
     {
         private readonly ILogger<InvestigationController> logger;
         private readonly ApplicationDbContext context;
-        private readonly IVendorDetailService vendorDetailService;
+        private readonly IAgencyDetailService vendorDetailService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationDetailService investigationDetailService;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
 
         public InvestigationController(ILogger<InvestigationController> logger,
             ApplicationDbContext context,
-            IVendorDetailService vendorDetailService,
+            IAgencyDetailService vendorDetailService,
             INotyfService notifyService,
             IInvestigationDetailService investigationDetailService,
             IEmpanelledAgencyService empanelledAgencyService)

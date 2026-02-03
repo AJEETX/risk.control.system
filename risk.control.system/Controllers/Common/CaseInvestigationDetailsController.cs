@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Services;
-
+using risk.control.system.Services.Agent;
+using risk.control.system.Services.Common;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Common
@@ -19,13 +19,13 @@ namespace risk.control.system.Controllers.Common
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<CaseInvestigationDetailsController> logger;
-        private readonly ICaseService caseService;
+        private readonly IAgentCaseDetailService caseService;
         private readonly IWeatherInfoService weatherInfoService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public CaseInvestigationDetailsController(ApplicationDbContext context,
             ILogger<CaseInvestigationDetailsController> logger,
-            ICaseService caseService,
+            IAgentCaseDetailService caseService,
             IWeatherInfoService weatherInfoService,
             IWebHostEnvironment webHostEnvironment)
         {
@@ -52,10 +52,6 @@ namespace risk.control.system.Controllers.Common
                 .Include(p => p.CostCentre)
                 .Include(p => p.CaseEnabler)
                 .FirstOrDefaultAsync(p => p.PolicyDetailId == id);
-
-                var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
-
-                var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
                 var response = new
                 {
@@ -131,9 +127,6 @@ namespace risk.control.system.Controllers.Common
                 {
                     customer.PhoneNumber = new string('*', customer.PhoneNumber.Length - 4) + customer.PhoneNumber.Substring(customer.PhoneNumber.Length - 4);
                 }
-                var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
-
-                var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
                 return Ok(
                     new
@@ -157,7 +150,7 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetBeneficiaryDetail")]
-        public async Task<IActionResult> GetBeneficiaryDetail(long id, long claimId)
+        public async Task<IActionResult> GetBeneficiaryDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -173,12 +166,7 @@ namespace risk.control.system.Controllers.Common
                 .Include(c => c.State)
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
-                .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.InvestigationTask.Id == claimId);
-                var currentUserEmail = HttpContext.User.Identity.Name;
-
-                var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
-
-                var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+                .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id);
 
                 return Ok(new
                 {
@@ -241,7 +229,7 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetBeneficiaryMap")]
-        public async Task<IActionResult> GetBeneficiaryMap(long id, long claimId)
+        public async Task<IActionResult> GetBeneficiaryMap(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -257,7 +245,7 @@ namespace risk.control.system.Controllers.Common
                                .Include(c => c.State)
                                .Include(c => c.District)
                                .Include(c => c.PinCode)
-                               .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.InvestigationTaskId == claimId);
+                               .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id);
 
                 var latitude = beneficiary.Latitude;
                 var longitude = beneficiary.Longitude.Trim();

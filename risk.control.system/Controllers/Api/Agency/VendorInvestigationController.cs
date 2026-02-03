@@ -4,8 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Services;
-
+using risk.control.system.Services.Api;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 
@@ -18,10 +17,10 @@ namespace risk.control.system.Controllers.Api.Agency
     public class VendorInvestigationController : ControllerBase
     {
         private readonly ILogger<VendorInvestigationController> logger;
-        private readonly IVendorInvestigationService vendorInvestigationService;
+        private readonly IAgencyInvestigationService vendorInvestigationService;
 
         public VendorInvestigationController(ILogger<VendorInvestigationController> logger,
-            IVendorInvestigationService vendorInvestigationService)
+            IAgencyInvestigationService vendorInvestigationService)
         {
             this.logger = logger;
             this.vendorInvestigationService = vendorInvestigationService;

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 
 using risk.control.system.Middleware;
 using risk.control.system.Permission;
+
 namespace risk.control.system.StartupExtensions;
 
 public static class AppUseExtenstion

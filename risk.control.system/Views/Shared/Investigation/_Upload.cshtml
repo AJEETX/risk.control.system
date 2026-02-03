@@ -1,7 +1,7 @@
 ﻿@model CreateClaims
 
 <div class="container mt-3">
-    <form id="upload-claims" asp-controller="UploadFile" asp-action="New" method="post" enctype="multipart/form-data">
+    <form id="upload-claims" asp-controller="UploadZipFile" asp-action="New" method="post" enctype="multipart/form-data">
         <div class="card shadow-lg border-1 rounded-lg p-3">
             @if (Model.AutoAllocation)
             {

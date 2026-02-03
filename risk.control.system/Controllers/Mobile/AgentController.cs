@@ -7,33 +7,35 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Operations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
+using risk.control.system.Services.Agency;
+using risk.control.system.Services.Agent;
+using risk.control.system.Services.Api;
+using risk.control.system.Services.Common;
+using risk.control.system.Services.Report;
 
 namespace risk.control.system.Controllers.Mobile
 {
     [Route("api/[controller]")]
     [ApiController]
-
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly IVendorInvestigationDetailService vendorInvestigationDetailService;
+        private readonly IAgencyInvestigationDetailService vendorInvestigationDetailService;
         private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly IAnswerService answerService;
+        private readonly IAgentAnswerService answerService;
         private readonly IMediaIdfyService mediaIdfyService;
         private readonly IDocumentIdfyService documentIdfyService;
         private readonly IAgentFaceIdfyService agentFaceIdfyService;
         private readonly ILogger<AgentController> logger;
         private readonly ICloneReportService cloneReportService;
-        private readonly IAgentIdfyService agentIdService;
-        private readonly IVendorInvestigationService service;
+        private readonly IFaceIdfyService agentIdService;
+        private readonly IAgencyInvestigationService service;
         private readonly IAmazonApiService compareFaces;
         private readonly UserManager<ApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
@@ -46,17 +48,17 @@ namespace risk.control.system.Controllers.Mobile
 
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context,
-            IVendorInvestigationDetailService vendorInvestigationDetailService,
+            IAgencyInvestigationDetailService vendorInvestigationDetailService,
             RoleManager<ApplicationRole> roleManager,
-            IAnswerService answerService,
+            IAgentAnswerService answerService,
             IMediaIdfyService mediaIdfyService,
             IDocumentIdfyService documentIdfyService,
             IAgentFaceIdfyService agentFaceIdfyService,
             ILogger<AgentController> logger,
             ICloneReportService cloneReportService,
             IConfiguration configuration,
-            IAgentIdfyService agentIdService,
-            IVendorInvestigationService service,
+            IFaceIdfyService agentIdService,
+            IAgencyInvestigationService service,
             IAmazonApiService compareFaces,
             UserManager<ApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
@@ -198,7 +200,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Mobile}.",request.Mobile);
+                logger.LogError(ex, "Error occurred for {Mobile}.", request.Mobile);
                 return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
@@ -304,7 +306,6 @@ namespace risk.control.system.Controllers.Mobile
 
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-
         [HttpGet("agent")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> GetAll(string email)
@@ -479,7 +480,6 @@ namespace risk.control.system.Controllers.Mobile
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-
         [HttpGet("get")]
         public async Task<IActionResult> Get(long caseId, string email)
         {
@@ -592,7 +592,6 @@ namespace risk.control.system.Controllers.Mobile
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-
         [HttpGet("get-template")]
         public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email)
         {
@@ -619,7 +618,6 @@ namespace risk.control.system.Controllers.Mobile
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
@@ -669,7 +667,6 @@ namespace risk.control.system.Controllers.Mobile
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
@@ -709,7 +706,6 @@ namespace risk.control.system.Controllers.Mobile
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-
         [HttpPost("media")]
         public async Task<IActionResult> Media(DocumentData data)
         {
@@ -755,7 +751,6 @@ namespace risk.control.system.Controllers.Mobile
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-
         [HttpPost("answers")]
         public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
         {
@@ -773,7 +768,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Some answers are missing.");
                 }
-                var answerSubmitted = await answerService.CaptureAnswers(locationName, caseId, Questions);
+                var answerSubmitted = await answerService.CaptureAnswers(email, locationName, caseId, Questions);
                 if (answerSubmitted)
                     return Ok(new { success = answerSubmitted });
                 else
@@ -781,13 +776,12 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {CaseId} for {Email}.",caseId, email);
+                logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
                 return StatusCode(500);
             }
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
         {

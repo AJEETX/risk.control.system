@@ -150,7 +150,14 @@
                         img += `<div class='btn-xs upload-exceed' title='Limit exceeded' data-bs-toggle='tooltip'> <i class='fas fa-times-circle i-orangered'></i> Limit exceed</div>`;
                     }
                     else if (row.hasError && row.message == "Error uploading the file") {
-                        img += `<a href='/CaseUpload/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger upload-err' title='Download Error file' data-bs-toggle='tooltip'> <i class='fa fa-download'></i> Error File</a>`;
+                        img += `
+                            <button class="btn btn-xs btn-danger upload-err"
+                                    data-id="${row.id}"
+                                    data-url="/CaseUpload/DownloadErrorLog"
+                                    data-bs-toggle="tooltip"
+                                    title="Download Error file">
+                                <i class="fa fa-download"></i> Error File
+                            </button>`;
                     }
 
                     else if (!row.hasError && row.status == 'Completed') {
@@ -524,9 +531,62 @@
         $.ajax({
             url: url,
             type: 'POST',
-            data: { id },
+            data: {
+                id: id,
+                __RequestVerificationToken: token
+            },
             headers: {
-                'RequestVerificationToken': token
+                __RequestVerificationToken: token,
+            },
+            xhrFields: {
+                responseType: 'blob'   // ⭐ critical
+            },
+            success: function (blob, status, xhr) {
+                // Get filename from response headers
+                let fileName =
+                    xhr.getResponseHeader('X-File-Name') ||
+                    'download.file';
+
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
+            error: function (xhr) {
+                let msg = xhr.responseText || 'Download failed';
+                alert(msg);
+            },
+            complete: function () {
+                btn.prop('disabled', false);
+            }
+        });
+    });
+
+    $(document).on('click', '.upload-err', function (e) {
+        e.preventDefault();
+
+        const btn = $(this);
+        const id = btn.data('id');
+        const url = btn.data('url');
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        btn.prop('disabled', true);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                id: id,
+                __RequestVerificationToken: token
+            },
+            headers: {
+                __RequestVerificationToken: token,
             },
             xhrFields: {
                 responseType: 'blob'   // ⭐ critical

@@ -1,12 +1,10 @@
 ﻿$(document).ready(function () {
-    
     var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Assessor/GetInvestigations',
             type: 'GET',
             dataType: 'json',
             dataSrc: function (json) {
-
                 return json.data; // Return table data
             },
             data: function (d) {
@@ -42,30 +40,30 @@
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets:11                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 12                      // Index of the column to style
-            },
-            {
-                'targets': 17, // Index for the "Case Type" column
-                'name': 'policy' // Name for the "Case Type" column
-            }],
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 11                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 12                      // Index of the column to style
+        },
+        {
+            'targets': 17, // Index for the "Case Type" column
+            'name': 'policy' // Name for the "Case Type" column
+        }],
         order: [[16, 'asc']],
         responsive: true,
         fixedHeader: true,
@@ -252,13 +250,13 @@
         $('#refreshIcon').removeClass('fa-spin');
     });
     table.on('mouseenter', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+        const $this = $(this); // Cache the current element
 
-            // Set a timeout to show the full map after 1 second
-            hoverTimeout = setTimeout(function () {
-                $this.find('.full-map').show(); // Show full map
-            }, 1000); // Delay of 1 second
-        })
+        // Set a timeout to show the full map after 1 second
+        hoverTimeout = setTimeout(function () {
+            $this.find('.full-map').show(); // Show full map
+        }, 1000); // Delay of 1 second
+    })
         .on('mouseleave', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -283,13 +281,12 @@
         $('#checkboxes').submit();
 
         var checkboxes = document.getElementById("checkboxes");
-        if(checkboxes) {
+        if (checkboxes) {
             var nodes = checkboxes.getElementsByTagName('*');
             for (var i = 0; i < nodes.length; i++) {
                 nodes[i].disabled = true;
             }
         }
-
     });
     table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
@@ -346,5 +343,4 @@
             }
         });
     });
-    
 });

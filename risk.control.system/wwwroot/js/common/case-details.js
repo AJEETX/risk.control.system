@@ -224,7 +224,7 @@
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/CaseInvestigationDetails/GetBeneficiaryDetail?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    url: '/api/CaseInvestigationDetails/GetBeneficiaryDetail?id=' + $('#beneficiaryId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
@@ -285,7 +285,7 @@
                         self.setContentAppend('<hr>');
                         self.setContentAppend('<b><i class="fas fa-clock"></i> Notes added date</b>: ' + formattedDate);
                         self.setContentAppend('<br><b><i class="fas fa-clock"></i> Notes added time</b>: ' + formattedTime);
-                        self.setContentAppend('<br><b><i class="fas fa-user-tag"></i>  Sender</b> : ' + note.sender);
+                        self.setContentAppend('<br><b><i class="fas fa-user-tag"></i>  Sender</b> : ' + note.senderEmail);
                         self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Note</b>: ' + note.comment);
                         self.setContentAppend('<hr>');
                     })
@@ -404,7 +404,8 @@
                                                         self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Note</b>: ' + note.comment);
                                                         self.setContentAppend('<hr>');
                                                     })
-                                                }).fail(function () {
+                                                }).fail(function (err) {
+                                                    console.log(err);
                                                     self.setContent('Something went wrong.');
                                                 }).always(function () {
                                                 });

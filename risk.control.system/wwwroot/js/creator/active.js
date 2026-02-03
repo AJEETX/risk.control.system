@@ -63,7 +63,7 @@
                 'targets': 16, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
-        order: [[15, 'asc']],
+        order: [[15, 'desc']],
         responsive: true,
         fixedHeader: true,
         processing: true,
