@@ -632,6 +632,7 @@ namespace risk.control.system.Services.Api
                     a.ORIGIN,
                     a.IsNewAssignedToAgency,
                     a.AssignedToAgency,
+                    a.ProcessedByAssessorTime,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
                     customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
                     CustomerLocationMap = a.CustomerDetail.CustomerLocationMap,
@@ -670,7 +671,7 @@ namespace risk.control.system.Services.Api
                 var policy = a.InsuranceType.GetEnumDisplayName();
                 var serviceType = a.InsuranceType.GetEnumDisplayName();
                 var service = a.ServiceTypeName;
-                var timePending = GetSupervisorNewTimePending(a.investigation);
+                var timePending = GetSupervisorCompletedTime(a.investigation);
                 var policyNum = a.PolicyNum;
                 var beneficiaryName = a.BeneficiaryName;
                 var timeElapsed = a.AllocatedToAgencyTime.HasValue ? DateTime.Now.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds : 0;
@@ -801,10 +802,10 @@ namespace risk.control.system.Services.Api
                 10 => asc ? query.OrderBy(x => x.Created)
                 : query.OrderByDescending(x => x.Created),
                 11 => asc
-                        ? query.OrderBy(x => x.AllocatedToAgencyTime == null)
-                               .ThenByDescending(x => x.AllocatedToAgencyTime)
-                        : query.OrderBy(x => x.AllocatedToAgencyTime == null)
-                               .ThenBy(x => x.AllocatedToAgencyTime),
+                        ? query.OrderBy(x => x.SubmittedToSupervisorTime == null)
+                               .ThenByDescending(x => x.SubmittedToSupervisorTime)
+                        : query.OrderBy(x => x.SubmittedToSupervisorTime == null)
+                               .ThenBy(x => x.SubmittedToSupervisorTime),
                 _ => query.OrderByDescending(x => x.Created)
             };
             var pagedRawData = await query
@@ -821,16 +822,13 @@ namespace risk.control.system.Services.Api
                     ContractNumber = a.PolicyDetail.ContractNumber,
                     PolicyDocumentPath = a.PolicyDetail.DocumentPath,
                     SumAssuredValue = a.PolicyDetail.SumAssuredValue,
-                    a.IsNew,
-                    a.IsReady2Assign,
-                    a.IsUploaded,
                     a.Status,
                     a.SubStatus,
                     a.Created,
-                    a.Updated,
                     a.ORIGIN,
                     a.IsNewAssignedToAgency,
                     a.AssignedToAgency,
+                    a.SubmittedToSupervisorTime,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
                     customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
                     CustomerLocationMap = a.CustomerDetail.CustomerLocationMap,
@@ -851,7 +849,6 @@ namespace risk.control.system.Services.Api
                     BeneficiaryDetailLatitude = a.BeneficiaryDetail.Latitude,
                     BeneficiaryDetailLongitude = a.BeneficiaryDetail.Longitude,
                     BeneficiaryAddressLocationInfo = a.BeneficiaryDetail.AddressLocationInfo,
-                    a.AllocatedToAgencyTime,
                     ClientCompanyDocumentUrl = a.ClientCompany.DocumentUrl,
                     ClientCompanyName = a.ClientCompany.Name,
                     a.SelectedAgentDrivingDistance,
@@ -870,10 +867,10 @@ namespace risk.control.system.Services.Api
                 var policy = a.InsuranceType.GetEnumDisplayName();
                 var serviceType = a.InsuranceType.GetEnumDisplayName();
                 var service = a.ServiceTypeName;
-                var timePending = GetSupervisorNewTimePending(a.investigation);
+                var timePending = GetSupervisorSubmittedByAgent(a.investigation);
                 var policyNum = a.PolicyNum;
                 var beneficiaryName = a.BeneficiaryName;
-                var timeElapsed = a.AllocatedToAgencyTime.HasValue ? DateTime.Now.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds : 0;
+                var timeElapsed = a.SubmittedToSupervisorTime.HasValue ? DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds : 0;
                 var isQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
                 var personMapAddressUrl = isUW ?
                         string.Format(a.CustomerLocationMap, "400", "400") : string.Format(a.BeneficiaryLocationMap, "400", "400");
@@ -942,6 +939,52 @@ namespace risk.control.system.Services.Api
                 RecordsFiltered = recordsFiltered,
                 Data = data.ToList()
             };
+        }
+
+        private static string GetSupervisorCompletedTime(InvestigationTask caseTask)
+        {
+            DateTime timeToCompare = caseTask.ProcessedByAssessorTime.Value;
+
+            if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(timeToCompare).Hours < 24 &&
+                DateTime.Now.Subtract(timeToCompare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Hours == 0 && DateTime.Now.Subtract(timeToCompare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Minutes == 0 && DateTime.Now.Subtract(timeToCompare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
+
+        private static string GetSupervisorSubmittedByAgent(InvestigationTask caseTask)
+        {
+            DateTime timeToCompare = caseTask.SubmittedToSupervisorTime.Value;
+
+            if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(timeToCompare).Hours < 24 &&
+                DateTime.Now.Subtract(timeToCompare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Hours == 0 && DateTime.Now.Subtract(timeToCompare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Minutes == 0 && DateTime.Now.Subtract(timeToCompare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
         private static string GetSupervisorNewTimePending(InvestigationTask caseTask)
