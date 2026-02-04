@@ -54,13 +54,6 @@ $(document).ready(function () {
         showedit(id);
     });
 
-    $('body').on('click', 'a.btn-danger', function (e) {
-        e.preventDefault();
-        const deleteUrl = $(this).attr('href');
-        const id = new URL(deleteUrl, window.location.origin).searchParams.get("id");
-        getdetails(id);
-    });
-
     // Event handler for Add Service button
     $('body').on('click', 'a.create-agency-service', function () {
         $("body").addClass("submit-progress-bg");

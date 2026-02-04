@@ -44,19 +44,21 @@ namespace risk.control.system.Services.Common
         public async Task<DashboardData> GetAgentCount(string userEmail, string role)
         {
             var vendorUser = await _context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
-            var taskCount = await GetCases().CountAsync(c => c.VendorId == vendorUser.VendorId &&
+            var taskCountTask = GetCases().CountAsync(c => c.VendorId == vendorUser.VendorId &&
             c.SubStatus == assigned2Agent &&
             c.TaskedAgentEmail == userEmail);
 
-            var agentSubmittedCount = await GetCases().Distinct().CountAsync(t => t.TaskedAgentEmail == userEmail && t.SubStatus != assigned2Agent);
+            var agentSubmittedCountTask = GetCases().Distinct().CountAsync(t => t.TaskedAgentEmail == userEmail && t.SubStatus != assigned2Agent);
+
+            await Task.WhenAll(taskCountTask, agentSubmittedCountTask);
 
             var data = new DashboardData();
             data.FirstBlockName = "Tasks";
-            data.FirstBlockCount = taskCount;
+            data.FirstBlockCount = await taskCountTask;
             data.FirstBlockUrl = "/Agent/Index";
 
             data.SecondBlockName = "Submitted";
-            data.SecondBlockCount = agentSubmittedCount;
+            data.SecondBlockCount = await agentSubmittedCountTask;
             data.SecondBlockUrl = "/Agent/Submitted";
 
             return data;
@@ -64,21 +66,23 @@ namespace risk.control.system.Services.Common
 
         public async Task<DashboardData> GetSuperAdminCount(string userEmail, string role)
         {
-            var allCompaniesCount = await _context.ClientCompany.CountAsync(c => !c.Deleted);
-            var allAgenciesCount = await _context.Vendor.CountAsync(v => !v.Deleted);
-            var AllUsersCount = await _context.ApplicationUser.CountAsync(u => !u.Deleted && u.Email != userEmail);
+            var allCompaniesCountTask = _context.ClientCompany.CountAsync(c => !c.Deleted);
+            var allAgenciesCountTask = _context.Vendor.CountAsync(v => !v.Deleted);
+            var AllUsersCountTask = _context.ApplicationUser.CountAsync(u => !u.Deleted && u.Email != userEmail);
+
+            await Task.WhenAll(allCompaniesCountTask, allAgenciesCountTask, AllUsersCountTask);
 
             var data = new DashboardData();
             data.FirstBlockName = "Companies";
-            data.FirstBlockCount = allCompaniesCount;
+            data.FirstBlockCount = await allCompaniesCountTask;
             data.FirstBlockUrl = "/ClientCompany/Companies";
 
             data.SecondBlockName = "Agencies";
-            data.SecondBlockCount = allAgenciesCount;
+            data.SecondBlockCount = await allAgenciesCountTask;
             data.SecondBlockUrl = "/ClientCompany/Agencies";
 
             data.ThirdBlockName = "Users";
-            data.ThirdBlockCount = AllUsersCount;
+            data.ThirdBlockCount = await AllUsersCountTask;
             data.ThirdBlockUrl = "/User";
 
             return data;
@@ -86,27 +90,28 @@ namespace risk.control.system.Services.Common
 
         public async Task<DashboardData> GetSupervisorCount(string userEmail, string role)
         {
-            var claimsAllocate = await GetAgencyAllocateCount(userEmail);
-            var claimsVerified = await GetAgencyVerifiedCount(userEmail);
-            var claimsActiveCount = await GetSuperVisorActiveCount(userEmail);
+            var claimsAllocateTask = GetAgencyAllocateCount(userEmail);
+            var claimsVerifiedTask = GetAgencyVerifiedCount(userEmail);
+            var claimsActiveCountTask = GetSuperVisorActiveCount(userEmail);
+            var claimsCompletedTask = GetAgencyyCompleted(userEmail);
 
-            var claimsCompleted = await GetAgencyyCompleted(userEmail);
+            await Task.WhenAll(claimsAllocateTask, claimsVerifiedTask, claimsActiveCountTask, claimsCompletedTask);
 
             var data = new DashboardData();
             data.FirstBlockName = "Allocate/Enquiry";
-            data.FirstBlockCount = claimsAllocate;
+            data.FirstBlockCount = await claimsAllocateTask;
             data.FirstBlockUrl = "/VendorInvestigation/Allocate";
 
             data.SecondBlockName = "Submit(report)";
-            data.SecondBlockCount = claimsVerified;
+            data.SecondBlockCount = await claimsVerifiedTask;
             data.SecondBlockUrl = "/VendorInvestigation/CaseReport";
 
             data.ThirdBlockName = "Active";
-            data.ThirdBlockCount = claimsActiveCount;
+            data.ThirdBlockCount = await claimsActiveCountTask;
             data.ThirdBlockUrl = "/VendorInvestigation/Open";
 
             data.LastBlockName = "Completed";
-            data.LastBlockCount = claimsCompleted;
+            data.LastBlockCount = await claimsCompletedTask;
             data.LastBlockUrl = "/VendorInvestigation/Completed";
 
             return data;
@@ -122,28 +127,31 @@ namespace risk.control.system.Services.Common
                 BulkUpload = company.BulkUpload
             };
 
+            var claimCountTask = GetCreatorAssignAuto(userEmail, InsuranceType.CLAIM);
+            var underWritingCountTask = GetCreatorAssignAuto(userEmail, InsuranceType.UNDERWRITING);
+            var filesUploadCountTask = _context.FilesOnFileSystem.CountAsync(f => f.CompanyId == company.ClientCompanyId && !f.Deleted && f.UploadedBy == companyUser.Email && !f.DirectAssign);
+            var filesUploadAssignCountTask = _context.FilesOnFileSystem.CountAsync(f => f.CompanyId == company.ClientCompanyId && !f.Deleted && f.UploadedBy == companyUser.Email && f.DirectAssign);
+            var claimsActiveTask = GetCreatorActive(userEmail, InsuranceType.CLAIM);
+            var underWritingActiveTask = GetCreatorActive(userEmail, InsuranceType.UNDERWRITING);
+
+            await Task.WhenAll(claimCountTask, underWritingCountTask, filesUploadCountTask, filesUploadAssignCountTask, claimsActiveTask, underWritingActiveTask);
+
             data.FirstBlockName = "ADD/ASSIGN";
             data.FirstBlockUrl = "/CaseCreateEdit/New";
+            data.FirstBlockCount = await claimCountTask;
+            data.SecondBlockCount = await underWritingCountTask;
 
-            var claimCount = await GetCreatorAssignAuto(userEmail, InsuranceType.CLAIM);
-            var underWritingCount = await GetCreatorAssignAuto(userEmail, InsuranceType.UNDERWRITING);
-            data.FirstBlockCount = claimCount;
-            data.SecondBlockCount = underWritingCount;
-
-            var filesUploadCount = await _context.FilesOnFileSystem.CountAsync(f => f.CompanyId == company.ClientCompanyId && !f.Deleted && f.UploadedBy == companyUser.Email && !f.DirectAssign);
-            var filesUploadAssignCount = await _context.FilesOnFileSystem.CountAsync(f => f.CompanyId == company.ClientCompanyId && !f.Deleted && f.UploadedBy == companyUser.Email && f.DirectAssign);
             data.BulkUploadBlockName = "UPLOAD  ";
 
             data.BulkUploadBlockUrl = "/CaseUpload/Uploads";
 
-            data.BulkUploadBlockCount = filesUploadCount;
-            data.BulkUploadAssignCount = filesUploadAssignCount;
+            data.BulkUploadBlockCount = await filesUploadCountTask;
+            data.BulkUploadAssignCount = await filesUploadAssignCountTask;
 
             data.ThirdBlockName = "ACTIVE";
-            var claimsActive = await GetCreatorActive(userEmail, InsuranceType.CLAIM);
-            var underWritingActive = await GetCreatorActive(userEmail, InsuranceType.UNDERWRITING);
-            data.ThirdBlockCount = claimsActive;
-            data.LastBlockCount = underWritingActive;
+
+            data.ThirdBlockCount = await claimsActiveTask;
+            data.LastBlockCount = await underWritingActiveTask;
             data.ThirdBlockUrl = "/CaseActive/Active";
 
             return data;
@@ -151,79 +159,83 @@ namespace risk.control.system.Services.Common
 
         public async Task<DashboardData> GetManagerCount(string userEmail, string role)
         {
-            var claimsReject = await GetManagerReject(userEmail, InsuranceType.CLAIM);
-            var undewrwritingReject = await GetManagerReject(userEmail, InsuranceType.UNDERWRITING);
+            var claimsRejectTask = GetManagerReject(userEmail, InsuranceType.CLAIM);
 
-            var claimsCompleted = await GetCompanyManagerApproved(userEmail, InsuranceType.CLAIM);
-            var underwritingCompleted = await GetCompanyManagerApproved(userEmail, InsuranceType.UNDERWRITING);
+            var undewrwritingRejectTask = GetManagerReject(userEmail, InsuranceType.UNDERWRITING);
 
-            var activeClaims = await GetManagerActive(userEmail, InsuranceType.CLAIM);
-            var activeUnderwritings = await GetManagerActive(userEmail, InsuranceType.UNDERWRITING);
+            var claimsCompletedTask = GetCompanyManagerApproved(userEmail, InsuranceType.CLAIM);
+            var underwritingCompletedTask = GetCompanyManagerApproved(userEmail, InsuranceType.UNDERWRITING);
 
-            var empanelledAgenciesCount = await GetEmpanelledAgencies(userEmail);
-            var availableAgenciesCount = await GetAvailableAgencies(userEmail);
+            var activeClaimsTask = GetManagerActive(userEmail, InsuranceType.CLAIM);
+            var activeUnderwritingsTask = GetManagerActive(userEmail, InsuranceType.UNDERWRITING);
+
+            var empanelledAgenciesCountTask = GetEmpanelledAgencies(userEmail);
+            var availableAgenciesCountTask = GetAvailableAgencies(userEmail);
+
+            await Task.WhenAll(claimsRejectTask, undewrwritingRejectTask, claimsCompletedTask, underwritingCompletedTask, activeClaimsTask, activeUnderwritingsTask, empanelledAgenciesCountTask, availableAgenciesCountTask);
 
             var data = new DashboardData();
 
             data.SecondBBlockName = "Active";
             data.SecondBBlockUrl = "/Manager/Active";
-            data.SecondBBlockCount = activeClaims;
-            data.SecondBlockCount = activeUnderwritings;
+            data.SecondBBlockCount = await activeClaimsTask;
+            data.SecondBlockCount = await activeUnderwritingsTask;
 
             data.ThirdBlockName = "Approved";
-            data.ThirdBlockCount = claimsCompleted;
-            data.ApprovedUnderwritingCount = underwritingCompleted;
+            data.ThirdBlockCount = await claimsCompletedTask;
+            data.ApprovedUnderwritingCount = await underwritingCompletedTask;
             data.ThirdBlockUrl = "/Manager/Approved";
 
             data.LastBlockName = "Rejected";
-            data.LastBlockCount = claimsReject;
-            data.RejectedUnderwritingCount = undewrwritingReject;
+            data.LastBlockCount = await claimsRejectTask;
+            data.RejectedUnderwritingCount = await undewrwritingRejectTask;
             data.LastBlockUrl = "/Manager/Rejected";
 
             data.FifthBlockName = "Empanelled Agencies";
-            data.FifthBlockCount = empanelledAgenciesCount;
-            data.FifthBlockUrl = "/EmpanelledAgency/EmpanelledVendors";
+            data.FifthBlockCount = await empanelledAgenciesCountTask;
+            data.FifthBlockUrl = "/EmpanelledAgency/Agencies";
 
             data.SixthBlockName = "Available Agencies";
-            data.SixthBlockCount = availableAgenciesCount;
-            data.SixthBlockUrl = "/AvailableAgency/AvailableVendors";
+            data.SixthBlockCount = await availableAgenciesCountTask;
+            data.SixthBlockUrl = "/AvailableAgency/Agencies";
 
             return data;
         }
 
         public async Task<DashboardData> GetAssessorCount(string userEmail, string role)
         {
-            var claimsAssessor = await GetAssessorAssess(userEmail, InsuranceType.CLAIM);
-            var underwritingAssessor = await GetAssessorAssess(userEmail, InsuranceType.UNDERWRITING);
+            var claimsAssessorTask = GetAssessorAssess(userEmail, InsuranceType.CLAIM);
+            var underwritingAssessorTask = GetAssessorAssess(userEmail, InsuranceType.UNDERWRITING);
 
-            var claimsReview = await GetAssessorReview(userEmail, InsuranceType.CLAIM);
-            var underwritingReview = await GetAssessorReview(userEmail, InsuranceType.UNDERWRITING);
+            var claimsReviewTask = GetAssessorReview(userEmail, InsuranceType.CLAIM);
+            var underwritingReviewTask = GetAssessorReview(userEmail, InsuranceType.UNDERWRITING);
 
-            var claimsReject = await GetAssessorReject(userEmail, InsuranceType.CLAIM);
-            var underwritingReject = await GetAssessorReject(userEmail, InsuranceType.UNDERWRITING);
+            var claimsRejectTask = GetAssessorReject(userEmail, InsuranceType.CLAIM);
+            var underwritingRejectTask = GetAssessorReject(userEmail, InsuranceType.UNDERWRITING);
 
-            var claimsCompleted = await GetCompanyCompleted(userEmail, InsuranceType.CLAIM);
-            var underwritingCompleted = await GetCompanyCompleted(userEmail, InsuranceType.UNDERWRITING);
+            var claimsCompletedTask = GetCompanyCompleted(userEmail, InsuranceType.CLAIM);
+            var underwritingCompletedTask = GetCompanyCompleted(userEmail, InsuranceType.UNDERWRITING);
 
+            await Task.WhenAll(claimsAssessorTask, underwritingAssessorTask, claimsReviewTask, underwritingReviewTask, claimsRejectTask, underwritingRejectTask, claimsCompletedTask, underwritingCompletedTask);
             var data = new DashboardData();
             data.FirstBlockName = "Assess (report)";
-            data.FirstBlockCount = claimsAssessor;
-            data.UnderwritingCount = underwritingAssessor;
+            data.FirstBlockCount = await claimsAssessorTask;
+            data.UnderwritingCount = await underwritingAssessorTask;
             data.FirstBlockUrl = "/Assessor/Assessor";
 
             data.SecondBlockName = "Enquiry";
-            data.SecondBlockCount = claimsReview;
-            data.SecondBBlockCount = underwritingReview;
+            data.SecondBlockCount = await claimsReviewTask;
+            data.SecondBBlockCount = await underwritingReviewTask;
             data.SecondBlockUrl = "/Assessor/Review";
 
             data.ThirdBlockName = "Approved";
-            data.ApprovedClaimgCount = claimsCompleted;
-            data.ApprovedUnderwritingCount = underwritingCompleted;
+            data.ApprovedClaimgCount = await claimsCompletedTask;
+            data.ApprovedUnderwritingCount = await underwritingCompletedTask;
             data.ThirdBlockUrl = "/Assessor/Approved";
 
             data.LastBlockName = "Rejected";
-            data.RejectedClaimCount = claimsReject;
-            data.RejectedUnderwritingCount = underwritingReject;
+            data.RejectedClaimCount = await claimsRejectTask;
+            data.RejectedUnderwritingCount = await underwritingRejectTask;
             data.LastBlockUrl = "/Assessor/Rejected";
 
             return data;
