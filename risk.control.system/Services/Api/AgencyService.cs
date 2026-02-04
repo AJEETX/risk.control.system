@@ -195,7 +195,7 @@ namespace risk.control.system.Services.Api
                         LastModified = u.Updated,
                         HasService = await hasService
                     };
-                }).ToList();
+                });
             var awaitedResults = await Task.WhenAll(result);
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync(null, false);
@@ -254,7 +254,7 @@ namespace risk.control.system.Services.Api
                 .Include(c => c.EmpanelledVendors)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-            var availableVendors = _context.Vendor
+            var availableVendors = await _context.Vendor
                 .Where(v => !company.EmpanelledVendors.Contains(v) && !v.Deleted && v.CountryId == company.CountryId)
                 .Include(v => v.ApplicationUser)
                 .Include(v => v.Country)
@@ -262,40 +262,42 @@ namespace risk.control.system.Services.Api
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .OrderBy(u => u.Name)
-                .AsQueryable();
+                .OrderBy(u => u.Name).ToListAsync();
 
             var result =
-                availableVendors?.Select(u =>
-                new
+                availableVendors?.Select(async u =>
                 {
-                    Id = u.VendorId,
-                    Document = u.DocumentUrl != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(env.ContentRootPath, u.DocumentUrl)))) : Applicationsettings.NO_IMAGE,
-                    Domain = u.Email,
-                    Name = u.Name,
-                    Code = u.Code,
-                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
-                    Address = u.Addressline,
-                    District = u.District.Name,
-                    State = u.State.Name,
-                    Country = u.Country.Code,
-                    Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy,
-                    CanOnboard = u.Status == VendorStatus.ACTIVE &&
+                    var documentImage = await base64FileService.GetBase64FileAsync(u.DocumentUrl, Applicationsettings.NO_IMAGE);
+                    return new
+                    {
+                        Id = u.VendorId,
+                        Document = documentImage,
+                        Domain = u.Email,
+                        Name = u.Name,
+                        Code = u.Code,
+                        Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
+                        Address = u.Addressline,
+                        District = u.District.Name,
+                        State = u.State.Name,
+                        Country = u.Country.Code,
+                        Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
+                        Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                        UpdateBy = u.UpdatedBy,
+                        CanOnboard = u.Status == VendorStatus.ACTIVE &&
                         u.VendorInvestigationServiceTypes != null &&
                         u.ApplicationUser != null &&
                         u.ApplicationUser.Count > 0 &&
                         u.VendorInvestigationServiceTypes.Count > 0,
-                    VendorName = u.Email,
-                    IsUpdated = u.IsUpdated,
-                    LastModified = u.Updated,
-                    Deletable = u.CreatedUser == userEmail
-                })?.ToArray();
+                        VendorName = u.Email,
+                        IsUpdated = u.IsUpdated,
+                        LastModified = u.Updated,
+                        Deletable = u.CreatedUser == userEmail
+                    };
+                });
+            var awaitedResult = await Task.WhenAll(result);
             availableVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync(null, false);
-            return result;
+            return awaitedResult;
         }
 
         public async Task<List<AgencyServiceResponse>> GetAgencyService(long id)
