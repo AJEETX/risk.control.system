@@ -138,7 +138,7 @@ namespace risk.control.system.Services.Agent
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (caseTask is null) return null;
 
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
             var timeTaken = endTIme - caseTask.Created;
@@ -179,7 +179,7 @@ namespace risk.control.system.Services.Agent
                 CaseIsValidToAssign = caseTask.IsValidCaseData(),
                 Location = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
+                AutoAllocation = company.AutoAllocation,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,

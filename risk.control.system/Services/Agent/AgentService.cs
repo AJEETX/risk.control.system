@@ -24,18 +24,21 @@ namespace risk.control.system.Services.Agent
     internal class AgentService : IAgentService
     {
         private readonly ApplicationDbContext context;
+        private readonly IBase64FileService base64FileService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment env;
         private readonly ISmsService smsService;
         private readonly UserManager<ApplicationUser> userVendorManager;
 
         public AgentService(ApplicationDbContext context,
+            IBase64FileService base64FileService,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment env,
              ISmsService smsService,
             UserManager<ApplicationUser> userVendorManager)
         {
             this.context = context;
+            this.base64FileService = base64FileService;
             this.roleManager = roleManager;
             this.env = env;
             this.smsService = smsService;
@@ -125,40 +128,48 @@ namespace risk.control.system.Services.Agent
                     !i.Deleted &&
                     i.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).ToListAsync();
 
-            var response = claims
-                   .Select(a => new CaseInvestigationAgencyResponse
+            var finalDataTasks = claims
+                   .Select(async a =>
                    {
-                       Id = a.Id,
-                       PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(CustomExtensions.GetCultureByCountry(agentUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       AssignedToAgency = a.AssignedToAgency,
-                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                       Company = a.ClientCompany.Name,
-                       Document = a.PolicyDetail.DocumentPath != null ? (a.PolicyDetail.DocumentPath) : Applicationsettings.NO_POLICY_IMAGE,
-                       Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                       Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
-                       Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
-                       Status = a.SubStatus,
-                       ServiceType = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
-                       Service = a.PolicyDetail.InvestigationServiceType.Name,
-                       Location = a.SubStatus,
-                       Created = a.Created.ToString("dd-MM-yyyy"),
-                       timePending = a.GetAgentTimePending(true),
-                       PolicyNum = a.PolicyDetail.ContractNumber,
-                       BeneficiaryPhoto = a.BeneficiaryDetail.ImagePath != null ?
-                                       a.BeneficiaryDetail.ImagePath :
-                                      Applicationsettings.NO_USER,
-                       BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
-                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
-                       PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
-                       Distance = a.SelectedAgentDrivingDistance,
-                       Duration = a.SelectedAgentDrivingDuration
-                   })
-                    ?.ToList();
-            return response;
+                       var culture = CustomExtensions.GetCultureByCountry(agentUser.Country.Code.ToUpper());
+                       var isUW = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
+
+                       var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
+                       var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.CustomerDetail.ImagePath : a.BeneficiaryDetail.ImagePath);
+                       var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.BeneficiaryDetail.ImagePath, Applicationsettings.NO_USER);
+                       await Task.WhenAll(documentTask, customerPhotoTask, beneficiaryPhotoTask);
+
+                       return new CaseInvestigationAgencyResponse
+                       {
+                           Id = a.Id,
+                           PolicyId = a.PolicyDetail.ContractNumber,
+                           Amount = string.Format(culture, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                           AssignedToAgency = a.AssignedToAgency,
+                           Pincode = ClaimsInvestigationExtension.GetPincode(isUW, a.CustomerDetail, a.BeneficiaryDetail),
+                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(isUW, a.CustomerDetail, a.BeneficiaryDetail),
+                           Company = a.ClientCompany.Name,
+                           Document = await documentTask,
+                           Customer = await customerPhotoTask,
+                           Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
+                           Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
+                           Status = a.SubStatus,
+                           ServiceType = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
+                           Service = a.PolicyDetail.InvestigationServiceType.Name,
+                           Location = a.SubStatus,
+                           Created = a.Created.ToString("dd-MM-yyyy"),
+                           timePending = a.GetAgentTimePending(true),
+                           PolicyNum = a.PolicyDetail.ContractNumber,
+                           BeneficiaryPhoto = await beneficiaryPhotoTask,
+                           BeneficiaryName = a.BeneficiaryDetail.Name,
+                           TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
+                           PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
+                           Distance = a.SelectedAgentDrivingDistance,
+                           Duration = a.SelectedAgentDrivingDuration
+                       };
+                   });
+            var finalData = (await Task.WhenAll(finalDataTasks));
+
+            return finalData.ToList();
         }
 
         public async Task<ApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false)
