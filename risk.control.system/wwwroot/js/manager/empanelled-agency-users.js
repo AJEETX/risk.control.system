@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
- 
     $('a.create-agency-user').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -33,22 +32,56 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    $.alert({
-                        title: 'Session Expired! Login again',
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
                     });
-                    window.location.href = '/Account/Login'; // Or session timeout handler
                 }
-                if (xhr.status === 500) {
-                    $.alert({
-                        title: 'Server Error Occurred! Try again.',
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Empanelled Agency User page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Server error. Try again
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Server error. Try again
+                        }
                     });
-                    window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Server error. Try again
                 }
-                if (xhr.status === 400) {
-                    $.alert({
-                        title: 'Bad Request occurred!',
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Agencies!',
+                        content: 'Try with valid data. You will be redirected to Available Agencies page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Bad request. Try with valid data
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Bad request. Try with valid data
+                        }
                     });
-                    window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Bad request. Try with valid data
                 }
             }
         },
@@ -88,7 +121,7 @@
                     var colorClass = getColorClass(data); // Class for the color
                     var tooltip = row.onlineStatusName || 'User status unknown'; // Tooltip text
                     var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-bs-toggle="tooltip"></i>`;
-                    
+
                     var img;
                     if (row.agentOnboarded) {
                         img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-bs-toggle="tooltip"/>';
@@ -172,9 +205,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="edit' + row.id + '" href="/EmpanelledAgencyUser/EditAgencyUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id="edit' + row.id + '" href="/EmpanelledAgencyUser/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a>&nbsp;'
                     if (row.role != "AGENCY_ADMIN") {
-                        buttons += '<a id="details' + row.id + '" href="/EmpanelledAgencyUser/DeleteAgencyUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                        buttons += '<a id="details' + row.id + '" href="/EmpanelledAgencyUser/Delete?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     }
@@ -199,7 +232,6 @@
             }
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-            
             $('#dataTable tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
@@ -221,7 +253,6 @@
                 });
             });
         }
-        
     });
     table.on('draw', function () {
         table.rows().every(function () {
@@ -320,7 +351,7 @@ function showroles(id) {
     $('a').addClass('disabled-anchor').on('click', function (e) {
         e.preventDefault(); // Prevent default action for anchor clicks
     });
-    var rolebtn = $('a#role' + id +'.btn.btn-xs.btn-info')
+    var rolebtn = $('a#role' + id + '.btn.btn-xs.btn-info')
     rolebtn.html("<i class='fas fa-sync fa-spin'></i> Role");
 
     var article = document.getElementById("article");

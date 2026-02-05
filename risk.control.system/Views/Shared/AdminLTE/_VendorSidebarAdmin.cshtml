@@ -41,8 +41,8 @@
 </li>
 <li class="nav-item">
 	<a is-active-page asp-controller="AgencyUser" asp-action="Users" class="actual-link nav-link @Url.MakeActiveClass("AgencyUser","Users")
-                                                                                             @Url.MakeActiveClass("AgencyUser","EditUser")
-                                                                                             @Url.MakeActiveClass("AgencyUser","DeleteUser")">
+                                                                                             @Url.MakeActiveClass("AgencyUser","Edit")
+                                                                                             @Url.MakeActiveClass("AgencyUser","Delete")">
 		<i class="fas fa-user-friends nav-icon"></i>
 		<p>
 			@Applicationsettings.MANAGE_USERS
@@ -50,7 +50,7 @@
 	</a>
 </li>
 <li class="nav-item">
-	<a is-active-page asp-controller="AgencyUser" asp-action="CreateUser" class="actual-link nav-link @Url.MakeActiveClass("AgencyUser", "CreateUser")
+	<a is-active-page asp-controller="AgencyUser" asp-action="CreateUser" class="actual-link nav-link @Url.MakeActiveClass("AgencyUser", "Create")
                                 ">
 		<i class="fas fa-user-plus nav-icon"></i>
 		<p>

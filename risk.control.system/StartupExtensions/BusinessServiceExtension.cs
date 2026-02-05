@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
+using risk.control.system.Controllers.Api.PortalAdmin;
 using risk.control.system.Models;
 using risk.control.system.Permission;
 using risk.control.system.Services;
@@ -142,6 +143,8 @@ public static class BusinessServiceExtension
             options.KnownProxies.Clear();
         });
         services.AddHttpClient();
+        services.AddScoped<IAdminDashBoardService, AdminDashBoardService>();
+        services.AddScoped<ICompanyDashboardService, CompanyDashboardService>();
         services.AddScoped<IAssessorQueryService, AssessorQueryService>();
         services.AddScoped<IAgencyUserApiService, AgencyUserApiService>();
         services.AddScoped<ICompanyUserApiService, CompanyUserApiService>();
@@ -213,7 +216,7 @@ public static class BusinessServiceExtension
         services.AddScoped<IFaceIdfyService, FaceIdfyService>();
         services.AddScoped<ICaseReportService, CaseReportService>();
         services.AddScoped<IAgencyInvestigationService, AgencyInvestigationService>();
-        services.AddScoped<IDashboardCountService, DashboardCountService>();
+        services.AddScoped<IAgencyDashboardService, AgencyDashboardService>();
         services.AddScoped<ITimelineService, TimelineService>();
         services.AddScoped<IMailService, MailService>();
         services.AddScoped<IProcessCaseService, ProcessCaseService>();

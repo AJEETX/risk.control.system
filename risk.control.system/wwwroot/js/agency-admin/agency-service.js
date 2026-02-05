@@ -14,7 +14,7 @@ $(document).ready(function () {
     }
 
     // Function to handle the Edit button
-    function showedit(id) {
+    function showedit(id, element) {
         // Sanitize the ID to prevent scanner warnings
         id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
 
@@ -22,8 +22,7 @@ $(document).ready(function () {
         setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
         disableAllElements();
 
-        const selector = `a#edit${id}.btn.btn-warning`;
-        showSpinnerOnButton(selector, "Edit");
+        showSpinnerOnButton(element, "Edit");
 
         const editUrl = `/AgencyService/EditService?id=${encodeURIComponent(id)}`;
 
@@ -32,26 +31,11 @@ $(document).ready(function () {
         }, 1000);
     }
 
-    // Function to handle the Delete button
-    function getdetails(id) {
-        $("body").addClass("submit-progress-bg");
-        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
-        disableAllElements();
-        showSpinnerOnButton(`a#delete${id}.btn.btn-danger`, "Delete");
-
-        // Navigate after showing spinner
-        const editUrl = `/AgencyService/DeleteService?id=${id}`;
-        setTimeout(() => {
-            window.location.href = editUrl;
-        }, 1000);
-    }
-
     // Event delegation for dynamically generated Edit and Delete buttons
     $('body').on('click', 'a.btn-warning', function (e) {
         e.preventDefault();
-        const editUrl = $(this).attr('href');
-        const id = new URL(editUrl, window.location.origin).searchParams.get("id");
-        showedit(id);
+        const id = $(this).data('id');
+        showedit(id, this);
     });
 
     // Event handler for Add Service button
@@ -72,7 +56,24 @@ $(document).ready(function () {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
                 }
             }
         },
@@ -131,13 +132,13 @@ $(document).ready(function () {
                 bSortable: false,
                 mRender: function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="edit${row.id}" href="/AgencyService/EditService?id=${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>';
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a>`;
                     buttons += `
-                        <a href="#" 
+                        <button
                            class="btn btn-xs btn-danger js-delete"
                            data-id="${row.id}">
                            <i class="fas fa-trash"></i> Delete
-                        </a>`;
+                        </button>`;
 
                     return buttons;
                 }

@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Api.PortalAdmin;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Services.Common;
+using risk.control.system.Services.Api;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Common
@@ -19,71 +20,79 @@ namespace risk.control.system.Controllers.Common
     [DefaultBreadcrumb("Home")]
     public class DashboardController : Controller
     {
-        private readonly IDashboardService dashboardService;
-        private readonly ILogger<DashboardController> logger;
-        private readonly IDashboardCountService dashboardCountService;
+        private readonly ILogger<DashboardController> _logger;
+        private readonly IAgencyDashboardService agencyDashboardService;
+        private readonly IAdminDashBoardService adminDashBoardService;
+        private readonly ICompanyDashboardService companyDashboardService;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly INotyfService notifyService;
 
-        public DashboardController(IDashboardService dashboardService,
-            ILogger<DashboardController> logger,
-            IDashboardCountService dashboardCountService,
-            SignInManager<Models.ApplicationUser> signInManager,
+        public DashboardController(ILogger<DashboardController> logger,
+            IAgencyDashboardService agencyDashboardService,
+            IAdminDashBoardService adminDashBoardService,
+            ICompanyDashboardService companyDashboardService,
+            SignInManager<ApplicationUser> signInManager,
             INotyfService notifyService
             )
         {
-            this.dashboardService = dashboardService;
-            this.logger = logger;
-            this.dashboardCountService = dashboardCountService;
+            _logger = logger;
+            this.agencyDashboardService = agencyDashboardService;
+            this.adminDashBoardService = adminDashBoardService;
+            this.companyDashboardService = companyDashboardService;
             this.signInManager = signInManager;
             this.notifyService = notifyService;
         }
 
         public async Task<IActionResult> Index()
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Error("NOT FOUND!!!..Contact Admin");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                if (string.IsNullOrEmpty(userRole))
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    _logger.LogWarning("User {UserEmail} has no role claim.", userEmail);
+                    return new JsonResult(null);
                 }
-                var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
-                if (userRole.Value.Contains(CREATOR.DISPLAY_NAME))
+                if (userRole.Contains(CREATOR.DISPLAY_NAME))
                 {
-                    var model = await dashboardCountService.GetCreatorCount(currentUserEmail, userRole.Value);
+                    var model = await companyDashboardService.GetCreatorCount(userEmail, userRole);
                     return View(model);
                 }
-                else if (userRole.Value.Contains(PORTAL_ADMIN.DISPLAY_NAME))
+                else if (userRole.Contains(PORTAL_ADMIN.DISPLAY_NAME))
                 {
-                    var model = await dashboardCountService.GetSuperAdminCount(currentUserEmail, userRole.Value);
+                    var model = await adminDashBoardService.GetSuperAdminCount(userEmail, userRole);
                     return View(model);
                 }
-                else if (userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME))
+                else if (userRole.Contains(COMPANY_ADMIN.DISPLAY_NAME))
                 {
-                    var model = await dashboardCountService.GetCompanyAdminCount(currentUserEmail, userRole.Value);
+                    var model = await companyDashboardService.GetCompanyAdminCount(userEmail, userRole);
                     return View(model);
                 }
-                else if (userRole.Value.Contains(ASSESSOR.DISPLAY_NAME))
+                else if (userRole.Contains(ASSESSOR.DISPLAY_NAME))
                 {
-                    var model = await dashboardCountService.GetAssessorCount(currentUserEmail, userRole.Value);
+                    var model = await companyDashboardService.GetAssessorCount(userEmail, userRole);
                     return View(model);
                 }
-                else if (userRole.Value.Contains(MANAGER.DISPLAY_NAME))
+                else if (userRole.Contains(MANAGER.DISPLAY_NAME))
                 {
-                    var model = await dashboardCountService.GetManagerCount(currentUserEmail, userRole.Value);
+                    var model = await companyDashboardService.GetManagerCount(userEmail, userRole);
                     return View(model);
                 }
-                else if (userRole.Value.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Value.Contains(SUPERVISOR.DISPLAY_NAME))
+                else if (userRole.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Contains(SUPERVISOR.DISPLAY_NAME))
                 {
-                    var model = await dashboardCountService.GetSupervisorCount(currentUserEmail, userRole.Value);
+                    var model = await agencyDashboardService.GetSupervisorCount(userEmail, userRole);
                     return View(model);
                 }
-                else if (userRole.Value.Contains(AGENT.DISPLAY_NAME))
+                else if (userRole.Contains(AGENT.DISPLAY_NAME))
                 {
-                    var model = await dashboardCountService.GetAgentCount(currentUserEmail, userRole.Value);
+                    var model = await agencyDashboardService.GetAgentCount(userEmail, userRole);
                     return View(model);
                 }
                 else
@@ -93,105 +102,12 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                _logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!...Contact Admin");
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await signInManager.SignOutAsync();
                 return RedirectToAction(nameof(AccountController.Login), "Account");
             }
-        }
-
-        public async Task<JsonResult> GetAgentClaim()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            if (userRole != null)
-            {
-                if (userRole.Value.Contains(MANAGER.DISPLAY_NAME)
-                                || userRole.Value.Contains(ASSESSOR.DISPLAY_NAME)
-                                || userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME)
-                                || userRole.Value.Contains(CREATOR.DISPLAY_NAME)
-                                )
-                {
-                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgencyClaimStatus(userEmail);
-                    return new JsonResult(monthlyExpense);
-                }
-                else if (userRole.Value.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Value.Contains(SUPERVISOR.DISPLAY_NAME))
-                {
-                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgentCaseStatus(userEmail);
-                    return new JsonResult(monthlyExpense);
-                }
-            }
-
-            return new JsonResult(null);
-        }
-
-        public async Task<JsonResult> GetAgentUnderwriting()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            if (userRole != null)
-            {
-                if (userRole.Value.Contains(MANAGER.DISPLAY_NAME)
-                                || userRole.Value.Contains(ASSESSOR.DISPLAY_NAME)
-                                || userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME)
-                                || userRole.Value.Contains(CREATOR.DISPLAY_NAME)
-                                )
-                {
-                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgencyUnderwritingStatus(userEmail);
-                    return new JsonResult(monthlyExpense);
-                }
-                else if (userRole.Value.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Value.Contains(SUPERVISOR.DISPLAY_NAME))
-                {
-                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgentCaseStatus(userEmail);
-                    return new JsonResult(monthlyExpense);
-                }
-            }
-
-            return new JsonResult(null);
-        }
-
-        public async Task<JsonResult> GetMonthlyClaim()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            var monthlyExpense = await dashboardService.CalculateMonthlyCaseStatus(userEmail);
-            return new JsonResult(monthlyExpense);
-        }
-
-        public async Task<JsonResult> GetWeeklyClaim()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = await dashboardService.CalculateWeeklyCaseStatus(userEmail);
-            return new JsonResult(monthlyExpense);
-        }
-
-        public async Task<JsonResult> GetWeeklyPieClaim()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = await dashboardService.CalculateWeeklyCaseStatusPieClaims(userEmail);
-            return new JsonResult(monthlyExpense);
-        }
-
-        public async Task<JsonResult> GetWeeklyPieUnderwriting()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = await dashboardService.CalculateWeeklyCaseStatusPieUnderwritings(userEmail);
-            return new JsonResult(monthlyExpense);
-        }
-
-        public async Task<JsonResult> GetClaimChart()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = await dashboardService.CalculateCaseChart(userEmail);
-            return new JsonResult(monthlyExpense);
-        }
-
-        public async Task<JsonResult> GetClaimWeeklyTat()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var monthlyExpense = await dashboardService.CalculateTimespan(userEmail);
-            return new JsonResult(monthlyExpense);
         }
     }
 }

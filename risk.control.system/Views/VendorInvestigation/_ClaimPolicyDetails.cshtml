@@ -104,7 +104,18 @@
                     <p class="text-muted text-sm">
                         @if (Model.ClaimsInvestigation.CaseNotes.Count > 0)
                         {
-                            <img id="notesDetail" class="img-fluid form-Image" src="@Applicationsettings.POLICY_BLANK_IMAGE" data-bs-toggle="tooltip" title="Display notes" />
+                            <div class="position-relative d-inline-block">
+                                <img id="notesDetail"
+                                     class="img-fluid form-Image notes-active"
+                                     src="/img/blank-document.png"
+                                     data-bs-toggle="tooltip"
+                                     title="Display notes">
+
+                                <span class="position-absolute top-0 start-100 translate-middle
+                             badge rounded-pill bg-danger">
+                                    @Model.ClaimsInvestigation.CaseNotes.Count
+                                </span>
+                            </div>
                         }
                         else
                         {

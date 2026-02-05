@@ -1,301 +1,193 @@
 ﻿$(document).ready(function () {
-    // Load the customer details
-    $('#customerGoogleMap').click(function () {
-        var data;
+    $('#customerGoogleMap').on('click', function () {
+        const customerId = $('#customerDetailId').val();
+
+        if (!customerId) {
+            $.alert('Customer details not found.');
+            return;
+        }
+
         $.confirm({
             type: 'green',
             closeIcon: true,
             columnClass: 'medium',
-
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
+            title: '<i class="fas fa-map-marked-alt"></i> Customer Address Location',
             content: function () {
-                var self = this;
+                const self = this;
+
                 return $.ajax({
-                    url: '/api/CaseInvestigationDetails/GetCustomerMap?id=' + $('#customerDetailId').val(),
+                    url: '/api/CaseInvestigationDetails/GetCustomerMap',
+                    method: 'GET',
                     dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    data = response;
-                    self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Customer Address Location</b>');
-                    self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
-                    self.setContentAppend('<br><img class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
-                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
-                    self.setContentAppend('<br><i>' + response.address + '</i>');
-                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> :');
-                    self.setContentAppend('<br><i>' + response.weatherData + '</i>');
-                    showCustomerMap = true;
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
+                    data: { id: customerId }
+                })
+                    .done(function (res) {
+                        self.setContent(renderMapHtml(res));
+                    })
+                    .fail(function (xhr) {
+                        if (xhr.status === 401 || xhr.status === 403) {
+                            handleSessionExpired();
+                        } else {
+                            self.setContent('<span class="text-danger">Unable to load map details.</span>');
+                        }
+                    });
             },
-            //onContentReady: function () {
-            //    if (showCustomerMap) {
-            //        showCustomerMap = false;
-            //        initPopMap(data.position, data.address);
-            //    }
-            //}
-        })
+            buttons: {
+                ok: {
+                    text: 'Ok',
+                    btnClass: 'btn-secondary'
+                }
+            }
+        });
     });
 
-    // Load the bdeneficiary details
-    $('#beneficiaryGoogleMap').click(function () {
-        var data;
+    $('#beneficiaryGoogleMap').on('click', function () {
+
+        const beneficiaryId = $('#beneficiaryId').val();
+
+        if (!beneficiaryId) {
+            $.alert('Beneficiary details not found.');
+            return;
+        }
+
         $.confirm({
             type: 'green',
             closeIcon: true,
             columnClass: 'medium',
-            buttons: {
-                confirm: {
-                    text: "Ok",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/CaseInvestigationDetails/GetBeneficiaryMap?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    data = response;
-                    self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Beneficiary Address Location</b>');
-                    self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
-                    self.setContentAppend('<br><img class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
-                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
-                    self.setContentAppend('<br><i>' + response.address + '</i>');
-                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> :');
-                    self.setContentAppend('<br><i>' + response.weatherData + '</i>');
-                    showBeneficiaryMap = true;
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            },
-            //onContentReady: function () {
-            //    if (showBeneficiaryMap) {
-            //        showBeneficiaryMap = false;
-            //        initPopMap(data.position, data.address);
-            //    }
-            //}
-        })
-    })
+            title: '<i class="fas fa-map-marked-alt"></i> Beneficiary Address Location',
 
-    $('#policy-detail').click(function () {
+            content: function () {
+                const self = this;
+
+                return $.ajax({
+                    url: '/api/CaseInvestigationDetails/GetBeneficiaryMap',
+                    method: 'GET',
+                    dataType: 'json',
+                    data: {
+                        id: beneficiaryId
+                    }
+                })
+                    .done(function (res) {
+                        self.setContent(renderMapHtml(res));
+                    })
+                    .fail(function (xhr) {
+                        if (xhr.status === 401 || xhr.status === 403) {
+                            handleSessionExpired();   // from idle/session logic
+                        } else {
+                            self.setContent('<span class="text-danger">Unable to load beneficiary map details.</span>');
+                        }
+                    });
+            },
+
+            buttons: {
+                ok: {
+                    text: 'Ok',
+                    btnClass: 'btn-secondary'
+                }
+            }
+        });
+    });
+
+    $('#policy-detail').on('click', function () {
+
+        const policyId = $('#policyDetailId').val();
+        const claimId = $('#claimId').val();
+
+        if (!policyId || !claimId) {
+            $.alert('Policy details not found.');
+            return;
+        }
+
         $.confirm({
-            title: "Policy details",
+            title: '<i class="far fa-file-alt"></i> Policy Details',
             closeIcon: true,
             type: 'blue',
-            buttons: {
-                confirm: {
-                    text: "Close",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    'type': 'GET',
-                    'url': '/api/CaseInvestigationDetails/GetPolicyDetail?id=' + $('#policyDetailId').val(),
-                    'dataType': 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    self.setTitle('<i class="far fa-file-powerpoint"></i> Policy details ');
-                    self.setContent('<article>');
-                    self.setContent('<div class="bb-blog-inner">');
+            columnClass: 'large',
 
-                    self.setContentAppend('<div class="card card-solid">');
-                    self.setContentAppend('<header class="bb-blog-header">');
-                    self.setContentAppend('<h5 class="bb-blog-title" itemprop="name">Policy #: ' + response.contractNumber);
-                    self.setContentAppend('</header>');
-                    self.setContentAppend('<div class="card-body pb-0">');
-                    self.setContentAppend('<div class="row">');
-                    self.setContentAppend('<b> Claim Type: </b>' + response.claimType);
-                    self.setContentAppend('<br><p class="fa-li">');
-                    self.setContentAppend('<b><i class="fa fa-money"></i> Assured Amount</b>:  ' + response.sumAssuredValue);
-                    self.setContentAppend('</p');
-                    self.setContentAppend('<br><p class="fa-li">');
-                    self.setContentAppend('<b><i class="far fa-clock"></i> Policy Issue Date</b>:  ' + response.contractIssueDate);
-                    self.setContentAppend('</p');
-                    self.setContentAppend('<br><p class="fa-li">');
-                    self.setContentAppend('<b><i class="fas fa-clock"></i>  Incident Date</b>: ' + response.dateOfIncident);
-                    self.setContentAppend('</p');
-                    self.setContentAppend('<br><p class="fa-li">');
-                    self.setContentAppend('<b><i class="fas fa-tools"></i> Service Type</b>:  ' + response.investigationServiceType);
-                    self.setContentAppend('</p');
-                    self.setContentAppend('<br><p class="fa-li">');
-                    self.setContentAppend('<b> <i class="fas fa-bolt"></i> Reason to verify</b>: ' + response.caseEnabler);
-                    self.setContentAppend('</p');
-                    self.setContentAppend('<br><p class="fa-li">');
-                    self.setContentAppend('<b><i class="far fa-check-circle"></i> Cause of Incidence</b>:  ' + response.causeOfLoss);
-                    self.setContentAppend('</p');
-                    self.setContentAppend('<br><p class="fa-li">');
-                    self.setContentAppend('<b><i class="fas fa-building"></i> Budget Centre</b>:  ' + response.costCentre);
-                    self.setContentAppend('</p');
-                    self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Case Document</b>:');
-                    var policyDataUrl = '/Document/GetPolicyDocument/' + $('#claimId').val();
-                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + policyDataUrl + '" /> ');
-                    self.setContentAppend('</p');
-                    self.setContentAppend('</div>');
-                    self.setContentAppend('</div>');
-                    self.setContentAppend('</div>');
-                    self.setContentAppend('</div>');
-                    self.setContentAppend('</article>');
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
+            content: function () {
+                const self = this;
+
+                return $.ajax({
+                    url: '/api/CaseInvestigationDetails/GetPolicyDetail',
+                    method: 'GET',
+                    dataType: 'json',
+                    data: { id: policyId }
+                })
+                    .done(function (res) {
+                        self.setContent(renderPolicyDetailHtml(res, claimId));
+                    })
+                    .fail(function (xhr) {
+                        if (xhr.status === 401 || xhr.status === 403) {
+                            handleSessionExpired();
+                        } else {
+                            self.setContent('<span class="text-danger">Unable to load policy details.</span>');
+                        }
+                    });
+            },
+
+            buttons: {
+                close: {
+                    text: 'Close',
+                    btnClass: 'btn-secondary'
+                }
             }
-        })
+        });
     });
 
-    $('#customer-detail').click(function () {
-        $.confirm({
-            title: "Customer detail",
-            icon: 'fa fa-user-plus',
-            closeIcon: true,
+    $('#customer-detail').on('click', function () {
 
+        const customerId = $('#customerDetailId').val();
+
+        if (!customerId) {
+            $.alert('Customer details not found.');
+            return;
+        }
+
+        openDetailPopup({
+            title: '<i class="fa fa-user"></i> Customer Details',
             type: 'orange',
-            buttons: {
-                confirm: {
-                    text: "Close",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/CaseInvestigationDetails/GetCustomerDetail?id=' + $('#customerDetailId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    self.setContent('<hr>');
-                    self.setContentAppend('<header>');
-                    self.setContentAppend('<b><i class="fa fa-user-plus"></i> Customer Name</b>: ' + response.customerName);
-                    self.setContentAppend('</header>');
-                    self.setContentAppend('<br><b><i class="far fa-clock"></i> Date of birth</b> : ' + response.dateOfBirth);
-                    self.setContentAppend('<br><b><i class="fas fa-tools"></i> Occupation</b> : ' + response.occupation);
-                    self.setContentAppend('<br><b><i class="fa fa-money"></i> Annual Income</b> : ' + response.income);
-                    self.setContentAppend('<br><b><i class="fas fa-user-graduate"></i> Education</b> : ' + response.education);
-                    self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b> : ' + response.address);
-                    self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b> : ' + response.phoneNumber);
-                    self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Customer Image</b>:');
-                    var customerUrl = '/Document/GetCustomerDocument/' + $('#customerDetailId').val();
+            url: '/api/CaseInvestigationDetails/GetCustomerDetail',
+            data: { id: customerId },
+            render: (res) => renderCustomerDetailHtml(res, customerId)
+        });
+    });
 
-                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + customerUrl + '" />');
-                    self.setTitle('Customer details');
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            }
-        })
-    })
+    $('#beneficiary-detail').on('click', function () {
 
-    $('#beneficiary-detail').click(function () {
-        $.confirm({
-            title: "Beneficiary details",
-            icon: 'fas fa-user-tie',
-            closeIcon: true,
+        const beneficiaryId = $('#beneficiaryId').val();
 
+        if (!beneficiaryId) {
+            $.alert('Beneficiary details not found.');
+            return;
+        }
+
+        openDetailPopup({
+            title: '<i class="fas fa-user-tie"></i> Beneficiary Details',
             type: 'green',
-            buttons: {
-                confirm: {
-                    text: "Close",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                return $.ajax({
-                    url: '/api/CaseInvestigationDetails/GetBeneficiaryDetail?id=' + $('#beneficiaryId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    self.setContent('<header>');
-                    self.setContentAppend('<hr>');
-                    self.setContentAppend('<b><i class="fas fa-user-tie"></i> Beneficiary Name</b>: ' + response.beneficiaryName);
-                    self.setContentAppend('</header>');
-                    self.setContentAppend('<br><b><i class="fas fa-user-tag"></i>  Relation</b> : ' + response.beneficiaryRelation);
-                    self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b>: ' + response.phoneNumber);
-                    self.setContentAppend('<br><b><i class="fa fa-money"></i> Annual Income</b>: ' + response.income);
-                    self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b>: ' + response.address);
-                    self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Beneficiary Image</b>:');
-                    var beneficiaryUrl = '/Document/GetBeneficiaryDocument/' + $('#beneficiaryId').val();
-                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + beneficiaryUrl + '" /> ');
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                });
-            }
-        })
-    })
+            url: '/api/CaseInvestigationDetails/GetBeneficiaryDetail',
+            data: { id: beneficiaryId },
+            render: (res) => renderBeneficiaryDetailHtml(res, beneficiaryId)
+        });
+    });
 
-    $('#notesDetail').click(function () {
-        $.confirm({
-            title: 'Policy Note!!!',
-            closeIcon: true,
+    $('#notesDetail').on('click', function () {
+
+        const claimId = $('#claimId').val();
+
+        if (!claimId) {
+            $.alert('Claim details not found.');
+            return;
+        }
+
+        openDetailPopup({
+            title: '<i class="far fa-file-alt"></i> Policy Notes',
             type: 'green',
-            icon: 'far fa-file-powerpoint',
-            buttons: {
-                confirm: {
-                    text: "Close",
-                    btnClass: 'btn-secondary',
-                    action: function () {
-                        askConfirmation = false;
-                    }
-                }
-            },
-            content: function () {
-                var self = this;
-                const date = new Date();
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                const year = date.getFullYear();
-                const formattedDate = `${day}-${month}-${year}`;
-
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                const seconds = String(date.getSeconds()).padStart(2, '0');
-                const formattedTime = `${hours}:${minutes}:${seconds}`;
-
-                return $.ajax({
-                    url: '/api/CaseInvestigationDetails/GetPolicyNotes?claimId=' + $('#claimId').val(),
-                    dataType: 'json',
-                    method: 'get'
-                }).done(function (response) {
-                    self.setContent('<header>');
-                    self.setContentAppend('</header>');
-                    $.each(response.notes, function (index, note) {
-                        self.setContentAppend('<hr>');
-                        self.setContentAppend('<b><i class="fas fa-clock"></i> Notes added date</b>: ' + formattedDate);
-                        self.setContentAppend('<br><b><i class="fas fa-clock"></i> Notes added time</b>: ' + formattedTime);
-                        self.setContentAppend('<br><b><i class="fas fa-user-tag"></i>  Sender</b> : ' + note.senderEmail);
-                        self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Note</b>: ' + note.comment);
-                        self.setContentAppend('<hr>');
-                    })
-                }).fail(function () {
-                    self.setContent('Something went wrong.');
-                }).always(function () {
-                });
-            }
-        })
-    })
+            columnClass: 'large',
+            url: '/api/CaseInvestigationDetails/GetPolicyNotes',
+            data: { claimId: claimId },
+            render: renderPolicyNotesHtml
+        });
+    });
 
     $('#policy-comments').click(function () {
         var claimId = $('#claimId').val();
@@ -638,3 +530,238 @@
         }
     });
 });
+
+function renderPolicyNotesHtml(data) {
+
+    if (!data || !data.notes || data.notes.length === 0) {
+        return `<div class="text-muted text-center">No notes available.</div>`;
+    }
+
+    return `
+        <article>
+            ${data.notes.map(renderSingleNote).join('')}
+        </article>
+    `;
+}
+
+function renderSingleNote(note) {
+
+    const created = note.created
+        ? formatDateTime(note.created)
+        : { date: '-', time: '-' };
+
+    return `
+        <div class="card card-outline card-success mb-3">
+            <div class="card-body">
+
+                ${detailRow('<i class="fas fa-calendar-alt"></i>', 'Date', created.date)}
+                ${detailRow('<i class="fas fa-clock"></i>', 'Time', created.time)}
+                ${detailRow('<i class="fas fa-user-tag"></i>', 'Sender', note.senderEmail)}
+                ${detailRow('<i class="far fa-sticky-note"></i>', 'Note', note.comment)}
+
+            </div>
+        </div>
+    `;
+}
+
+function formatDateTime(dateValue) {
+
+    const date = new Date(dateValue);
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return {
+        date: `${day}-${month}-${year}`,
+        time: `${hours}:${minutes}:${seconds}`
+    };
+}
+
+function renderBeneficiaryDetailHtml(data, beneficiaryId) {
+
+    const beneficiaryImageUrl = `/Document/GetBeneficiaryDocument/${beneficiaryId}`;
+
+    return `
+        <article>
+            <div class="card card-solid">
+                <div class="card-body">
+
+                    ${detailRow('<i class="fas fa-user-tie"></i>', 'Beneficiary Name', data.beneficiaryName)}
+                    ${detailRow('<i class="fas fa-user-tag"></i>', 'Relation', data.beneficiaryRelation)}
+                    ${detailRow('<i class="fas fa-phone"></i>', 'Phone', data.phoneNumber)}
+                    ${detailRow('<i class="fa fa-money"></i>', 'Annual Income', data.income)}
+                    ${detailRow('<i class="fas fa-home"></i>', 'Address', data.address)}
+
+                    <hr />
+
+                    <div class="mb-2">
+                        <strong><i class="far fa-id-badge"></i> Beneficiary Image</strong>
+                    </div>
+
+                    <img class="img-fluid w-50 rounded border"
+                         src="${beneficiaryImageUrl}"
+                         alt="Beneficiary Image" />
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function openDetailPopup(options) {
+
+    $.confirm({
+        title: options.title,
+        type: options.type || 'blue',
+        closeIcon: true,
+        columnClass: options.columnClass || 'medium',
+
+        content: function () {
+            const self = this;
+
+            return $.ajax({
+                url: options.url,
+                method: 'GET',
+                dataType: 'json',
+                data: options.data
+            })
+                .done(res => self.setContent(options.render(res)))
+                .fail(xhr => {
+                    if (xhr.status === 401 || xhr.status === 403) {
+                        handleSessionExpired();
+                    } else {
+                        self.setContent('<span class="text-danger">Unable to load details.</span>');
+                    }
+                });
+        },
+
+        buttons: {
+            close: {
+                text: 'Close',
+                btnClass: 'btn-secondary'
+            }
+        }
+    });
+}
+
+function renderCustomerDetailHtml(data, customerId) {
+
+    const customerImageUrl = `/Document/GetCustomerDocument/${customerId}`;
+
+    return `
+        <article>
+        <div class="bb-blog-inner">
+            <div class="card card-solid">
+                <div class="card-body">
+
+                    ${detailRow('<i class="fa fa-user-plus"></i>', 'Customer Name', data.customerName)}
+                    ${detailRow('<i class="far fa-clock"></i>', 'Date of Birth', data.dateOfBirth)}
+                    ${detailRow('<i class="fas fa-tools"></i>', 'Occupation', data.occupation)}
+                    ${detailRow('<i class="fa fa-money"></i>', 'Annual Income', data.income)}
+                    ${detailRow('<i class="fas fa-user-graduate"></i>', 'Education', data.education)}
+                    ${detailRow('<i class="fas fa-home"></i>', 'Address', data.address)}
+                    ${detailRow('<i class="fas fa-phone"></i>', 'Phone', data.phoneNumber)}
+
+                    <hr />
+
+                    <div class="mb-2">
+                        <strong><i class="far fa-id-badge"></i> Customer Image</strong>
+                    </div>
+
+                    <img class="img-fluid w-50 rounded border"
+                         src="${customerImageUrl}"
+                         alt="Customer Image" />
+                </div>
+            </div>
+            </div>
+        </article>
+    `;
+}
+
+function detailRow(icon, label, value) {
+    return `
+        <div class="mb-2">
+            <strong>${icon} ${label}:</strong>
+            <span class="ml-1">${value || '-'}</span>
+        </div>
+    `;
+}
+
+function renderPolicyDetailHtml(data, claimId) {
+
+    const policyDocUrl = `/Document/GetPolicyDocument/${claimId}`;
+
+    return `
+    <article>
+        <div class="bb-blog-inner">
+        <div class="card card-solid">
+            <header class="card-header">
+                <h5 class="mb-0">
+                    <i class="far fa-id-card"></i>
+                    Policy #: ${data.contractNumber}
+                </h5>
+            </header>
+
+            <div class="card-body">
+                ${renderPolicyRow('<i class="fas fa-clipboard-list"></i>', 'Case Type', data.claimType)}
+                ${renderPolicyRow('<i class="fa fa-money"></i>', 'Assured Amount', data.sumAssuredValue)}
+                ${renderPolicyRow('<i class="far fa-clock"></i>', 'Policy Issue Date', data.contractIssueDate)}
+                ${renderPolicyRow('<i class="fas fa-clock"></i>', 'Incident Date', data.dateOfIncident)}
+                ${renderPolicyRow('<i class="fas fa-tools"></i>', 'Service Type', data.investigationServiceType)}
+                ${renderPolicyRow('<i class="fas fa-bolt"></i>', 'Reason to Verify', data.caseEnabler)}
+                ${renderPolicyRow('<i class="far fa-check-circle"></i>', 'Cause of Incidence', data.causeOfLoss)}
+                ${renderPolicyRow('<i class="fas fa-building"></i>', 'Budget Centre', data.costCentre)}
+
+                <hr />
+
+                <div class="mb-2">
+                    <strong><i class="far fa-id-badge"></i> Case Document</strong>
+                </div>
+
+                <img id="agentLocationPicture" class="img-fluid w-50 rounded border"
+                     src="${policyDocUrl}"
+                     alt="Policy Document" />
+            </div>
+        </div>
+        </div>
+    </article>
+    `;
+}
+
+function renderPolicyRow(icon, label, value) {
+    return `
+        <div class="mb-2">
+            <strong>${icon} ${label}:</strong>
+            <span class="ml-1">${value || '-'}</span>
+        </div>
+    `;
+}
+function renderMapHtml(data) {
+    return `
+        <div class="mb-2">
+            <span class="badge badge-light">
+                <i class="fas fa-map-pin"></i> Map Location
+            </span>
+        </div>
+
+        <img class="img-fluid investigation-actual-image mb-2" src="${data.profileMap}" />
+
+        <div class="mb-2">
+            <span class="badge badge-light">
+                <i class="fas fa-map-marker-alt"></i> Address
+            </span><br/>
+            <i>${data.address}</i>
+        </div>
+
+        <div>
+            <span class="badge badge-light">
+                <i class="fas fa-info"></i> Location Info
+            </span><br/>
+            <i>${data.weatherData}</i>
+        </div>
+    `;
+}

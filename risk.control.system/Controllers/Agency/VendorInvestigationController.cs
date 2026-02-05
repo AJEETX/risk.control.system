@@ -38,22 +38,7 @@ namespace risk.control.system.Controllers.Agency
 
         public IActionResult Index()
         {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-                return RedirectToAction("Allocate");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred for {UserEmail}.", HttpContext.User?.Identity?.Name ?? "Anonymous");
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+            return RedirectToAction(nameof(Allocate));
         }
 
         [Breadcrumb(" Allocate/Enquiry")]

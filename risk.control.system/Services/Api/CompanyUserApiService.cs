@@ -4,6 +4,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Api
 {
@@ -18,218 +19,221 @@ namespace risk.control.system.Services.Api
     {
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IBase64FileService base64FileService;
         private readonly DateTime cutoffTime;
         private readonly IFeatureManager featureManager;
 
-        public CompanyUserApiService(IConfiguration config, ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IFeatureManager featureManager)
+        public CompanyUserApiService(
+            IConfiguration config,
+            ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
+            IBase64FileService base64FileService,
+            IFeatureManager featureManager)
         {
             cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
+            this.base64FileService = base64FileService;
             this.featureManager = featureManager;
         }
 
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail)
         {
-            // Fetch user session data from the database
-            var userSessions = await context.UserSessionAlive
-                .Where(u => u.Updated >= cutoffTime) // Filter sessions within the last 15 minutes
-                .Include(u => u.ActiveUser)? // Include ActiveUser to access email
-                .ToListAsync(); // Materialize data into memory
+            var now = DateTime.Now;
 
-            var activeUsers = userSessions
-                    .GroupBy(u => u.ActiveUser.Email)? // Group by email
-                    .Select(g => g.OrderByDescending(u => u.Updated).FirstOrDefault())? // Get the latest session
-                    .Where(u => u != null && !u.LoggedOut)?
-                     .Select(u => u.ActiveUser.Email)? // Select the user email
-                     .ToList(); // Exclude users who have logged out
+            // 1️⃣ Get the current company user
+            var companyUser = await context.ApplicationUser
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var companyUser = await context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            if (companyUser == null) return new List<UserDetailResponse>();
 
-            var companyUsers = context.ApplicationUser
+            // 2️⃣ Pre-fetch latest sessions per user (active in last 15 min)
+            var latestSessions = await context.UserSessionAlive
+                .Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime)
+                .Include(s => s.ActiveUser)
+                .GroupBy(s => s.ActiveUser.Email)
+                .Select(g => new
+                {
+                    Email = g.Key,
+                    LastSeen = g.Max(x => x.Updated ?? x.Created),
+                    LoggedOut = g.All(x => x.LoggedOut)
+                })
+                .ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
+
+            // 3️⃣ Fetch company users
+            var companyUsers = await context.ApplicationUser
+                .Where(u => u.ClientCompanyId == companyUser.ClientCompanyId && !u.Deleted && u.Email != userEmail)
                 .Include(u => u.PinCode)
-                .Include(c => c.District)
-                .Include(c => c.State)
+                .Include(u => u.District)
+                .Include(u => u.State)
                 .ThenInclude(u => u.Country)
-                .Where(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-            var users = companyUsers
-                .Where(u => !u.Deleted && u.Email != userEmail);
-
-            var allUsers = users?
                 .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName);
-            var activeUsersDetails = new List<UserDetailResponse>();
+                .ThenBy(u => u.LastName)
+                .ToListAsync();
 
-            foreach (var user in allUsers)
+            var photoTasks = new List<Task<byte[]>>();
+            foreach (var user in companyUsers)
             {
-                var currentOnlineTime = context.UserSessionAlive
-                    .Where(a => a.ActiveUser.Email == user.Email && activeUsers.Contains(a.ActiveUser.Email))?
-                    .AsEnumerable()? // Brings the data into memory
-                    .Select(d => (DateTime?)d.Created) // Use nullable DateTime
-                    .DefaultIfEmpty(null) // Provide a default value if no records exist
-                    .Max();
+                photoTasks.Add(user.ProfilePictureUrl != null
+                    ? System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl))
+                    : Task.FromResult(Array.Empty<byte>()));
+            }
+            var photoResults = await Task.WhenAll(photoTasks);
 
-                string status = "#DED5D5";
-                string statusIcon = "fa fa-circle-o";
-                string statusName = "Offline";
-                if (currentOnlineTime == null)
+            // 4️⃣ Map users to UserDetailResponse
+            var activeUsersDetails = new List<UserDetailResponse>();
+            for (int i = 0; i < companyUsers.Count; i++)
+            {
+                var user = companyUsers[i];
+                var photoBytes = photoResults[i];
+
+                // Lookup last session
+                latestSessions.TryGetValue(user.Email, out var session);
+
+                string status, statusName, icon;
+                if (session == null || session.LoggedOut || session.LastSeen == null)
                 {
+                    status = "#DED5D5";
+                    statusName = "Offline";
+                    icon = "fa fa-circle-o";
                 }
-                else if (currentOnlineTime != null && DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 5 && DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 15)
+                else
                 {
-                    status = "orange";
-                    statusName = $"Away for {DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
-                    statusIcon = "far fa-clock";
-                }
-                else if (DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 1 && DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 5)
-                {
-                    status = "orange";
-                    statusName = $"Inactive for {DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
-                    statusIcon = "fas fa-clock";
-                }
-                else if (DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 0 && DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 1)
-                {
-                    status = "green";
-                    statusName = $"Online now";
-                    statusIcon = "fas fa-circle";
+                    var minutesAway = (int)(now - session.LastSeen).TotalMinutes;
+                    (status, statusName, icon) = minutesAway switch
+                    {
+                        < 1 => ("green", "Online now", "fas fa-circle"),
+                        < 5 => ("orange", $"Inactive for {minutesAway} minutes", "fas fa-clock"),
+                        < 15 => ("orange", $"Away for {minutesAway} minutes", "far fa-clock"),
+                        _ => ("#DED5D5", "Offline", "fa fa-circle-o")
+                    };
                 }
 
-                var activeUser = new UserDetailResponse
+                activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
-                    Name = user.FirstName + " " + user.LastName,
-                    Email = "<a href=/Company/EditUser?userId=" + user.Id + ">" + user.Email + "</a>",
+                    Name = $"{user.FirstName} {user.LastName}",
+                    Email = $"<a href=/Company/EditUser?userId={user.Id}>{user.Email}</a>",
                     RawEmail = user.Email,
-                    Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
+                    Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
+                    Photo = photoBytes.Length > 0 ? $"data:image/*;base64,{Convert.ToBase64String(photoBytes)}" : Applicationsettings.NO_USER,
                     Active = user.Active,
-                    Addressline = user.Addressline + ", " + user.District.Name,
+                    Addressline = $"{user.Addressline}, {user.District.Name}",
                     District = user.District.Name,
                     State = user.State.Code,
                     StateName = user.State.Name,
                     Country = user.Country.Code,
-                    Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
+                    Flag = $"/flags/{user.Country.Code.ToLower()}.png",
                     Role = user.Role.GetEnumDisplayName(),
                     Pincode = user.PinCode.Code,
-                    PincodeName = user.PinCode.Name + " - " + user.PinCode.Code,
+                    PincodeName = $"{user.PinCode.Name} - {user.PinCode.Code}",
                     OnlineStatus = status,
                     OnlineStatusName = statusName,
-                    OnlineStatusIcon = statusIcon,
+                    OnlineStatusIcon = icon,
                     IsUpdated = user.IsUpdated,
-                    LastModified = user.Updated.GetValueOrDefault(),
-                    Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
+                    LastModified = user.Updated ?? user.Created,
+                    Updated = (user.Updated ?? user.Created).ToString("dd-MM-yyyy"),
                     UpdatedBy = user.UpdatedBy,
-                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !user.IsPasswordChangeRequired : true
-                };
-                activeUsersDetails.Add(activeUser);
+                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION)
+                        ? !user.IsPasswordChangeRequired
+                        : true
+                });
             }
 
-            users?.ToList().ForEach(u => u.IsUpdated = false);
-            await context.SaveChangesAsync(null, false);
+            // 5️⃣ Bulk reset IsUpdated
+            await context.ApplicationUser
+                .Where(u => u.ClientCompanyId == companyUser.ClientCompanyId)
+                .ExecuteUpdateAsync(u => u.SetProperty(x => x.IsUpdated, false));
+
             return activeUsersDetails;
         }
 
-        public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail, long id)
+        public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail, long companyId)
         {
-            // Fetch user session data from the database
-            var userSessions = await context.UserSessionAlive
-                .Where(u => u.Updated >= cutoffTime) // Filter sessions within the last 15 minutes
-                .Include(u => u.ActiveUser)? // Include ActiveUser to access email
-                .ToListAsync(); // Materialize data into memory
+            // Get the company user
+            var companyUser = await context.ApplicationUser
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
+            if (companyUser == null) return new List<UserDetailResponse>();
 
-            var activeUsers = userSessions
-                    .GroupBy(u => u.ActiveUser.Email)? // Group by email
-                    .Select(g => g.OrderByDescending(u => u.Updated).FirstOrDefault())? // Get the latest session
-                    .Where(u => u != null && !u.LoggedOut)?
-                     .Select(u => u.ActiveUser.Email)? // Select the user email
-                     .ToList(); // Exclude users who have logged out
+            // Get all active sessions in one query
+            var sessionLookup = await context.UserSessionAlive
+                .Where(s => s.Updated >= cutoffTime && !s.LoggedOut)
+                .Include(s => s.ActiveUser)
+                .ToListAsync();
 
-            var companyUser = await context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            // Dictionary of last seen per email
+            var lastSeenDict = sessionLookup
+                .GroupBy(s => s.ActiveUser.Email)
+                .ToDictionary(g => g.Key, g => g.Max(s => s.Updated));
 
-            var companyUsers = context.ApplicationUser
-                .Include(c => c.PinCode)
+            // Fetch all users for the company (excluding deleted and current user)
+            var users = await context.ApplicationUser
+                .Include(u => u.PinCode)
                 .Include(u => u.District)
                 .Include(u => u.State)
                 .Include(u => u.Country)
-                .Where(c => c.ClientCompanyId == id);
-
-            var users = companyUsers
-                .Where(u => !u.Deleted && u.Email != userEmail);
-
-            var allUsers = users?
+                .Where(u => u.ClientCompanyId == companyId && !u.Deleted && u.Email != userEmail)
                 .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName);
+                .ThenBy(u => u.LastName)
+                .ToListAsync();
+
+            var loginVerificationEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+
+            var now = DateTime.Now;
             var activeUsersDetails = new List<UserDetailResponse>();
 
-            foreach (var user in allUsers)
+            foreach (var user in users)
             {
-                var currentOnlineTime = context.UserSessionAlive
-                    .Where(a => a.ActiveUser.Email == user.Email && activeUsers.Contains(a.ActiveUser.Email))?
-                    .AsEnumerable()? // Brings the data into memory
-                    .Select(d => (DateTime?)d.Created) // Use nullable DateTime
-                    .DefaultIfEmpty(null) // Provide a default value if no records exist
-                    .Max();
+                // Compute online status
+                lastSeenDict.TryGetValue(user.Email, out var lastSeen);
+                var minutesAway = lastSeen.HasValue ? (int)(now - lastSeen.Value).TotalMinutes : int.MaxValue;
 
-                string status = "#DED5D5";
-                string statusIcon = "fa fa-circle-o";
-                string statusName = "Offline";
-                if (currentOnlineTime == null)
+                var (status, statusName, icon) = minutesAway switch
                 {
-                }
-                else if (currentOnlineTime != null && DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 5 && DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 15)
-                {
-                    status = "orange";
-                    statusName = $"Away for {DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
-                    statusIcon = "far fa-clock";
-                }
-                else if (DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 1 && DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 5)
-                {
-                    status = "orange";
-                    statusName = $"Inactive for {DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
-                    statusIcon = "fas fa-clock";
-                }
-                else if (DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 0 && DateTime.Now.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 1)
-                {
-                    status = "green";
-                    statusName = $"Online now";
-                    statusIcon = "fas fa-circle";
-                }
+                    < 1 => ("green", "Online now", "fas fa-circle"),
+                    < 5 => ("orange", $"Inactive for {minutesAway} minutes", "fas fa-clock"),
+                    < 15 => ("orange", $"Away for {minutesAway} minutes", "far fa-clock"),
+                    _ => ("#DED5D5", "Offline", "fa fa-circle-o")
+                };
 
-                var activeUser = new UserDetailResponse
+                // Convert photo to base64 (optional: cache this for performance)
+                var photo = string.IsNullOrWhiteSpace(user.ProfilePictureUrl)
+                    ? Applicationsettings.NO_USER
+                    : $"data:image/*;base64,{Convert.ToBase64String(File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))}";
+
+                activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
-                    Name = user.FirstName + " " + user.LastName,
+                    Name = $"{user.FirstName} {user.LastName}",
                     Email = $"<a href='/CompanyUser/Edit?userId={user.Id}'>{user.Email}</a>",
                     RawEmail = user.Email,
-                    Phone = "(+" + user.Country.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
+                    Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
+                    Photo = photo,
                     Active = user.Active,
-                    Addressline = user.Addressline + ", " + user.District.Name,
+                    Addressline = $"{user.Addressline}, {user.District.Name}",
                     District = user.District.Name,
                     State = user.State.Code,
                     StateName = user.State.Name,
                     Country = user.Country.Code,
-                    Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
+                    Flag = $"/flags/{user.Country.Code.ToLower()}.png",
                     Roles = user.Role.GetEnumDisplayName(),
                     Pincode = user.PinCode.Code,
-                    PincodeName = user.PinCode.Name + " - " + user.PinCode.Code,
+                    PincodeName = $"{user.PinCode.Name} - {user.PinCode.Code}",
                     OnlineStatus = status,
                     OnlineStatusName = statusName,
-                    OnlineStatusIcon = statusIcon,
+                    OnlineStatusIcon = icon,
                     IsUpdated = user.IsUpdated,
-                    LastModified = user.Updated.GetValueOrDefault(),
-                    Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
+                    LastModified = user.Updated ?? user.Created,
+                    Updated = (user.Updated ?? user.Created).ToString("dd-MM-yyyy"),
                     UpdatedBy = user.UpdatedBy,
-                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !user.IsPasswordChangeRequired : true
-                };
-                activeUsersDetails.Add(activeUser);
+                    LoginVerified = loginVerificationEnabled ? !user.IsPasswordChangeRequired : true
+                });
             }
 
-            users?.ToList().ForEach(u => u.IsUpdated = false);
-            await context.SaveChangesAsync(null, false);
+            // Batch update IsUpdated flag
+            users.ForEach(u => u.IsUpdated = false);
+            await context.SaveChangesAsync(false);
+
             return activeUsersDetails;
         }
     }

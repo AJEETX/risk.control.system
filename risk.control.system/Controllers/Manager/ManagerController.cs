@@ -34,7 +34,7 @@ namespace risk.control.system.Controllers.Manager
 
         public IActionResult Index()
         {
-            return RedirectToAction("Assessor");
+            return RedirectToAction(nameof(Assessor));
         }
 
         [Breadcrumb(" Assess(new)", FromAction = "Index")]
@@ -51,13 +51,13 @@ namespace risk.control.system.Controllers.Manager
             if (string.IsNullOrWhiteSpace(userEmail))
             {
                 notifyService.Error("Oops! Unauthenticated access.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             if (!ModelState.IsValid || id <= 0)
             {
                 notifyService.Error("Case not found.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             try
@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers.Manager
                     id);
 
                 notifyService.Error("Error getting case detail. Please try again.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -105,14 +105,14 @@ namespace risk.control.system.Controllers.Manager
             if (!ModelState.IsValid || id <= 0)
             {
                 notifyService.Error("Case not found.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             var userEmail = User.Identity?.Name;
             if (string.IsNullOrWhiteSpace(userEmail))
             {
                 notifyService.Error("Oops! Unauthenticated access.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             try
@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers.Manager
                     id);
 
                 notifyService.Error("Error getting case detail. Please try again.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -160,13 +160,13 @@ namespace risk.control.system.Controllers.Manager
             if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("Case Not Found !!!..");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var userEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(userEmail))
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
@@ -181,7 +181,7 @@ namespace risk.control.system.Controllers.Manager
                     userEmail,
                     id);
                 notifyService.Error("Error getting case detail. Try again.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -198,12 +198,12 @@ namespace risk.control.system.Controllers.Manager
             if (string.IsNullOrWhiteSpace(userEmail))
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("Case Not Found !!!..");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
@@ -218,7 +218,7 @@ namespace risk.control.system.Controllers.Manager
                     userEmail,
                     id);
                 notifyService.Error("Error getting case detail. Try again.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -229,12 +229,12 @@ namespace risk.control.system.Controllers.Manager
             if (string.IsNullOrWhiteSpace(userEmail))
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("Case Not Found !!!..");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
@@ -255,7 +255,7 @@ namespace risk.control.system.Controllers.Manager
                    userEmail,
                    id);
                 notifyService.Error("Error getting invoice detail. Try again.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
@@ -266,12 +266,12 @@ namespace risk.control.system.Controllers.Manager
             if (string.IsNullOrWhiteSpace(userEmail))
             {
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             if (!ModelState.IsValid || id <= 0)
             {
                 notifyService.Error("Case Not Found !!!..");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             try
@@ -287,7 +287,7 @@ namespace risk.control.system.Controllers.Manager
                    userEmail,
                    id);
                 notifyService.Error("Error printing invoice. Try again.");
-                                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

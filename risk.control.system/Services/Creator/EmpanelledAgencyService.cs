@@ -23,6 +23,7 @@ namespace risk.control.system.Services.Creator
         public async Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase)
         {
             var claimsInvestigation = await _context.Investigations
+                .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)

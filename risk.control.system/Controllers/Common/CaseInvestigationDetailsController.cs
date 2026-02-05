@@ -18,22 +18,19 @@ namespace risk.control.system.Controllers.Common
     public class CaseInvestigationDetailsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<CaseInvestigationDetailsController> logger;
-        private readonly IAgentCaseDetailService caseService;
-        private readonly IWeatherInfoService weatherInfoService;
-        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ILogger<CaseInvestigationDetailsController> _logger;
+        private readonly IAgentCaseDetailService _caseService;
+        private readonly IWeatherInfoService _weatherInfoService;
 
         public CaseInvestigationDetailsController(ApplicationDbContext context,
             ILogger<CaseInvestigationDetailsController> logger,
             IAgentCaseDetailService caseService,
-            IWeatherInfoService weatherInfoService,
-            IWebHostEnvironment webHostEnvironment)
+            IWeatherInfoService weatherInfoService)
         {
             _context = context;
-            this.logger = logger;
-            this.caseService = caseService;
-            this.weatherInfoService = weatherInfoService;
-            this.webHostEnvironment = webHostEnvironment;
+            _logger = logger;
+            _caseService = caseService;
+            _weatherInfoService = weatherInfoService;
         }
 
         [HttpGet("GetPolicyDetail")]
@@ -71,13 +68,13 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting case detail {PolicyId} for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting case detail {PolicyId} for user {UserEmail}", id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetPolicyNotes")]
-        public IActionResult GetPolicyNotes(long claimId)
+        public async Task<IActionResult> GetPolicyNotes(long claimId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -87,9 +84,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var claim = caseService.GetCasesWithDetail()
-                    .Include(c => c.CaseNotes)
-                    .FirstOrDefault(c => c.Id == claimId);
+                var claim = await _caseService.GetNotesOfCase(claimId);
 
                 var response = new
                 {
@@ -99,7 +94,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting case notes for {ClaimId} for user {UserEmail}", claimId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting case notes for {ClaimId} for user {UserEmail}", claimId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -144,7 +139,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting {CustomerId} for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting {CustomerId} for user {UserEmail}", id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -182,7 +177,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting {BeneficiaryId} for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting {BeneficiaryId} for user {UserEmail}", id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -209,7 +204,7 @@ namespace risk.control.system.Controllers.Common
                 var longitude = customer.Longitude.Trim();
                 var latLongString = latitude + "," + longitude;
 
-                string weatherCustomData = await weatherInfoService.GetWeatherAsync(latitude, longitude); ;
+                string weatherCustomData = await _weatherInfoService.GetWeatherAsync(latitude, longitude); ;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
                 var data = new
@@ -223,7 +218,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting {CustomerId} address map for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting {CustomerId} address map for user {UserEmail}", id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -249,7 +244,7 @@ namespace risk.control.system.Controllers.Common
 
                 var latitude = beneficiary.Latitude;
                 var longitude = beneficiary.Longitude.Trim();
-                string weatherCustomData = await weatherInfoService.GetWeatherAsync(latitude, longitude); ;
+                string weatherCustomData = await _weatherInfoService.GetWeatherAsync(latitude, longitude); ;
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 var data = new
@@ -263,7 +258,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting {BeneficiaryId} address map for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting {BeneficiaryId} address map for user {UserEmail}", id, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -279,8 +274,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var claim = caseService.GetCasesWithDetail()
-                                .FirstOrDefault(c => c.Id == caseId);
+                var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
                 var agentReport = await _context.AgentIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
 
                 var longLat = agentReport.LongLat.IndexOf(",");
@@ -335,7 +329,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting {CaseId} and {FaceId} for user {UserEmail}", caseId, faceId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting {CaseId} and {FaceId} for user {UserEmail}", caseId, faceId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -351,8 +345,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var claim = caseService.GetCasesWithDetail()
-                    .FirstOrDefault(c => c.Id == caseId);
+                var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
                 var faceReport = await _context.DigitalIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
 
                 var longLat = faceReport.LongLat.IndexOf(",");
@@ -407,7 +400,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting {CaseId} and {FaceId} for user {UserEmail}", caseId, faceId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting {CaseId} and {FaceId} for user {UserEmail}", caseId, faceId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -423,8 +416,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var claim = caseService.GetCasesWithDetail()
-                .FirstOrDefault(c => c.Id == caseId);
+                var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
                 var docReport = await _context.DocumentIdReport.FirstOrDefaultAsync(l => l.Id == docId);
 
                 var longLat = docReport.LongLat.IndexOf(",");
@@ -479,7 +471,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting {CaseId} and {DocumentId} for user {UserEmail}", caseId, docId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting {CaseId} and {DocumentId} for user {UserEmail}", caseId, docId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -495,10 +487,8 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var currentUserEmail = HttpContext.User.Identity.Name;
-                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-                var claim = caseService.GetCasesWithDetail()
-                    .FirstOrDefault(c => c.Id == caseId);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
                 var docReport = await _context.MediaReport.FirstOrDefaultAsync(l => l.Id == docId);
 
                 var longLat = docReport.LongLat.IndexOf(",");
@@ -553,7 +543,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting {CaseId} and {MediaId} for user {UserEmail}", caseId, docId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting {CaseId} and {MediaId} for user {UserEmail}", caseId, docId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

@@ -13,85 +13,104 @@ namespace risk.control.system.Services.Agent
 
         Task<CaseTransactionModel> GetInvestigatedForAgent(string currentUserEmail, long id);
 
-        IQueryable<InvestigationTask> GetCasesWithDetail();
-
         Task<InvestigationTask> GetCaseById(long id);
 
         Task<InvestigationTask> GetCaseByIdForMedia(long id);
 
         Task<InvestigationTask> GetCaseByIdForQuestions(long id);
+
+        Task<InvestigationTask> GetNotesOfCase(long id);
+
+        Task<InvestigationTask> GetCaseDetailForAgentDetail(long id);
     }
 
     internal class AgentCaseDetailService : IAgentCaseDetailService
     {
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger<AgentCaseDetailService> _logger;
 
-        public AgentCaseDetailService(ApplicationDbContext context)
+        public AgentCaseDetailService(ApplicationDbContext context, ILogger<AgentCaseDetailService> logger)
         {
-            this.context = context;
+            _context = context;
+            _logger = logger;
         }
 
-        public async Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false)
+        public async Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedCaseId, bool uploaded = false)
         {
-            var caseTask = await context.Investigations
+            _logger.LogInformation("Fetching investigation case {CaseId} for user {UserEmail}", selectedCaseId, userEmail);
+
+            var caseTask = await _context.Investigations
                 .Include(c => c.ClientCompany)
-                .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c.Country)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
+                    .ThenInclude(p => p.InvestigationServiceType)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
+                    .ThenInclude(p => p.CostCentre)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
+                    .ThenInclude(p => p.CaseEnabler)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
+                    .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                    .ThenInclude(c => c.District)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                    .ThenInclude(c => c.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
+                    .ThenInclude(b => b.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                    .ThenInclude(b => b.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                    .ThenInclude(b => b.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
+                    .ThenInclude(b => b.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
+                    .ThenInclude(b => b.BeneficiaryRelation)
                 .Include(c => c.CaseNotes)
-                .Include(t => t.InvestigationReport)
-                .FirstOrDefaultAsync(c => c.Id == selectedcase);
-            if (caseTask is null)
+                .Include(c => c.InvestigationReport)
+                .FirstOrDefaultAsync(c => c.Id == selectedCaseId);
+
+            if (caseTask == null)
             {
+                _logger.LogWarning("Investigation case {CaseId} not found", selectedCaseId);
                 return null;
             }
-            var customerContactMasked = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.CustomerDetail.PhoneNumber = customerContactMasked;
 
-            var beneficairyContactMasked = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            // Mask sensitive phone numbers
+            caseTask.CustomerDetail.PhoneNumber = MaskPhoneNumber(caseTask.CustomerDetail?.PhoneNumber);
+            caseTask.BeneficiaryDetail.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber);
+            _logger.LogInformation("Masked phone numbers for case {CaseId}", selectedCaseId);
 
-            caseTask.BeneficiaryDetail.PhoneNumber = beneficairyContactMasked;
-
+            // Assign agent email
             caseTask.InvestigationReport.AgentEmail = userEmail;
 
-            var templates = await context.ReportTemplates
+            // Load report templates
+            var templates = await _context.ReportTemplates
                 .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.AgentIdReport)
-               .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.FaceIds)
-               .Include(r => r.LocationReport)
-               .ThenInclude(l => l.MediaReports)
-               .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.Questions)
-                   .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
+                    .ThenInclude(l => l.AgentIdReport)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.FaceIds)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.MediaReports)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.DocumentIds)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.Questions)
+                .FirstOrDefaultAsync(r => r.Id == caseTask.ReportTemplateId);
 
-            caseTask.InvestigationReport.ReportTemplate = templates;
-            context.Investigations.Update(caseTask);
-            var rows = await context.SaveChangesAsync(null, false);
+            if (templates == null)
+            {
+                _logger.LogWarning("Report template {TemplateId} not found for case {CaseId}", caseTask.ReportTemplateId, selectedCaseId);
+            }
+            else
+            {
+                caseTask.InvestigationReport.ReportTemplate = templates;
+                _logger.LogInformation("Loaded report template {TemplateId} for case {CaseId}", templates.Id, selectedCaseId);
+            }
+
+            _context.Investigations.Update(caseTask);
+            var rowsAffected = await _context.SaveChangesAsync();
+            _logger.LogInformation("{RowsAffected} rows updated for case {CaseId}", rowsAffected, selectedCaseId);
 
             var model = new CaseInvestigationVendorsModel
             {
@@ -99,79 +118,108 @@ namespace risk.control.system.Services.Agent
                 Location = caseTask.BeneficiaryDetail,
                 ClaimsInvestigation = caseTask
             };
+
+            _logger.LogInformation("Returning investigation model for case {CaseId}", selectedCaseId);
             return model;
         }
 
         public async Task<CaseTransactionModel> GetInvestigatedForAgent(string currentUserEmail, long id)
         {
-            var caseTask = await context.Investigations
+            _logger.LogInformation("Fetching investigation case {CaseId} for agent {UserEmail}", id, currentUserEmail);
+
+            // Fetch case with related entities
+            var caseTask = await _context.Investigations
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
+                    .ThenInclude(p => p.CaseEnabler)
+                .Include(c => c.PolicyDetail)
+                    .ThenInclude(p => p.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                    .ThenInclude(p => p.CostCentre)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
+                    .ThenInclude(b => b.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                    .ThenInclude(b => b.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                    .ThenInclude(b => b.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
+                    .ThenInclude(b => b.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
+                    .ThenInclude(b => b.BeneficiaryRelation)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                    .ThenInclude(c => c.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                    .ThenInclude(c => c.District)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
+                    .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (caseTask is null) return null;
 
-            var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
-            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
-            var timeTaken = endTIme - caseTask.Created;
-            var totalTimeTaken = timeTaken != TimeSpan.Zero
-                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
-              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
-              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
-              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
-            : "-";
-
-            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
-            var templates = await context.ReportTemplates
-               .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.AgentIdReport)
-              .Include(r => r.LocationReport)
-               .ThenInclude(l => l.MediaReports)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.FaceIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.DocumentIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.Questions)
-                  .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
-
-            caseTask.InvestigationReport.ReportTemplate = templates;
-
-            var tracker = context.PdfDownloadTracker
-                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == currentUserEmail);
-            bool canDownload = true;
-            if (tracker != null)
+            if (caseTask == null)
             {
-                canDownload = tracker.DownloadCount <= 3;
+                _logger.LogWarning("Investigation case {CaseId} not found for agent {UserEmail}", id, currentUserEmail);
+                return null;
             }
+
+            _logger.LogInformation("Investigation case {CaseId} found. Fetching related data...", id);
+
+            // Fetch company
+            var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
+            if (company == null)
+            {
+                _logger.LogWarning("ClientCompany {CompanyId} not found for case {CaseId}", caseTask.ClientCompanyId, id);
+            }
+
+            // Calculate last timeline and total time
+            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+            var endTime = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED
+                ? caseTask.ProcessedByAssessorTime.GetValueOrDefault()
+                : DateTime.Now;
+            var totalTimeTaken = FormatTime(endTime - caseTask.Created);
+
+            _logger.LogInformation("Total time taken for case {CaseId}: {TotalTime}", id, totalTimeTaken);
+
+            // Fetch invoice
+            var invoice = await _context.VendorInvoice
+                .FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
+            if (invoice != null)
+            {
+                _logger.LogInformation("Vendor invoice {InvoiceId} found for case {CaseId}", invoice.VendorInvoiceId, id);
+            }
+
+            // Fetch report templates
+            var templates = await _context.ReportTemplates
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.AgentIdReport)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.MediaReports)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.FaceIds)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.DocumentIds)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.Questions)
+                .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
+
+            if (templates != null)
+            {
+                caseTask.InvestigationReport.ReportTemplate = templates;
+                _logger.LogInformation("Loaded report template {TemplateId} for case {CaseId}", templates.Id, id);
+            }
+            else
+            {
+                _logger.LogWarning("Report template {TemplateId} not found for case {CaseId}", caseTask.ReportTemplateId, id);
+            }
+
+            // Check PDF download permissions
+            bool canDownload = await CanDownloadPdf(currentUserEmail, id);
+            _logger.LogInformation("User {UserEmail} can download PDF for case {CaseId}: {CanDownload}", currentUserEmail, id, canDownload);
 
             var model = new CaseTransactionModel
             {
@@ -179,19 +227,20 @@ namespace risk.control.system.Services.Agent
                 CaseIsValidToAssign = caseTask.IsValidCaseData(),
                 Location = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = company.AutoAllocation,
+                AutoAllocation = company?.AutoAllocation ?? false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                Withdrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
             };
 
+            _logger.LogInformation("Returning CaseTransactionModel for case {CaseId}", id);
             return model;
         }
 
         public async Task<InvestigationTask> GetCaseById(long id)
         {
-            var _case = await context.Investigations
+            var _case = await _context.Investigations
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.ReportTemplate)
                 .ThenInclude(c => c.LocationReport)
@@ -219,7 +268,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseByIdForMedia(long id)
         {
-            var claim = await context.Investigations
+            var claim = await _context.Investigations
                  .Include(c => c.PolicyDetail)
                  .Include(c => c.CustomerDetail)
                  .Include(c => c.BeneficiaryDetail)
@@ -232,7 +281,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseByIdForQuestions(long id)
         {
-            var claim = await context.Investigations
+            var claim = await _context.Investigations
                     .Include(c => c.InvestigationReport)
                     .ThenInclude(c => c.ReportTemplate)
                     .ThenInclude(c => c.LocationReport)
@@ -240,39 +289,51 @@ namespace risk.control.system.Services.Agent
             return claim;
         }
 
-        public IQueryable<InvestigationTask> GetCasesWithDetail()
+        public async Task<InvestigationTask> GetCaseDetailForAgentDetail(long id)
         {
-            IQueryable<InvestigationTask> applicationDbContext = context.Investigations
+            var caseDetail = await _context.Investigations
                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.ClientCompany)
-               .ThenInclude(c => c.Country)
                .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.BeneficiaryRelation)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.Vendor)
+                .Where(c => !c.Deleted)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            return caseDetail;
+        }
+
+        public async Task<InvestigationTask> GetNotesOfCase(long id)
+        {
+            var caseInvestigation = await _context.Investigations
                .Include(c => c.CaseNotes)
-                .Where(c => !c.Deleted);
-            return applicationDbContext.OrderByDescending(o => o.Created);
+                .Where(c => !c.Deleted)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            return caseInvestigation;
+        }
+
+        private static string FormatTime(TimeSpan time)
+        {
+            if (time == TimeSpan.Zero) return "-";
+
+            return $"{(time.Days > 0 ? $"{time.Days}d " : "")}" +
+                   $"{(time.Hours > 0 ? $"{time.Hours}h " : "")}" +
+                   $"{(time.Minutes > 0 ? $"{time.Minutes}m " : "")}" +
+                   $"{(time.Seconds > 0 ? $"{time.Seconds}s" : "less than a sec")}";
+        }
+
+        // Helper to check PDF download eligibility
+        private async Task<bool> CanDownloadPdf(string userEmail, long reportId)
+        {
+            var tracker = await _context.PdfDownloadTracker
+                .FirstOrDefaultAsync(t => t.ReportId == reportId && t.UserEmail == userEmail);
+
+            return tracker == null || tracker.DownloadCount <= 3;
+        }
+
+        private static string MaskPhoneNumber(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber) || phoneNumber.Length <= 4)
+                return phoneNumber;
+
+            return new string('*', phoneNumber.Length - 4) + phoneNumber[^4..];
         }
     }
 }

@@ -1,35 +1,80 @@
 ﻿$(document).ready(function () {
-
-   var table = $("#dataTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Manager/GetApprovedCases',
-           type: 'GET',
-           dataSrc: function (json) {
-               return json.data; // Return table data
-           },
-           data: function (d) {
-               console.log("Data before sending:", d); // Debugging
+            type: 'GET',
+            dataSrc: function (json) {
+                return json.data; // Return table data
+            },
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
 
-               return {
-                   draw: d.draw || 1,
-                   start: d.start || 0,
-                   length: d.length || 10,
-                   caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
-                   search: d.search?.value || "", // Instead of empty string, send "all"
-                   orderColumn: d.order?.[0]?.column ?? 15,
-                   orderDir: d.order?.[0]?.dir || "asc"
-               };
-           },
-           error: function (xhr, status, error) {
-               console.error("AJAX Error:", status, error);
-               console.error("Response:", xhr.responseText);
-               if (xhr.status === 401 || xhr.status === 403) {
-                   window.location.href = '/Account/Login'; // Or session timeout handler
-               }
-               if (xhr.status === 500) {
-                   window.location.href = '/Manager/Approved'; // // Refresh page
-               }
-           }
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 15,
+                    orderDir: d.order?.[0]?.dir || "asc"
+                };
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Approved page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/Manager/Approved';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Manager/Approved';
+                        }
+                    });
+                }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to Approved page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/Manager/Approved';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Manager/Approved';
+                        }
+                    });
+                }
+            }
         },
         columnDefs: [
             {
@@ -89,7 +134,6 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span class="badge badge-light" title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
-
                 }
                 ///<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
@@ -99,11 +143,11 @@
                     if (row.pincodeName != '...') {
                         return `
             <div class="map-thumbnail profile-image doc-profile-image">
-                <img src="${row.personMapAddressUrl}" title='${row.pincodeName}' 
-                     class="thumbnail profile-image doc-profile-image preview-map-image" 
-                     data-toggle="modal" 
-                     data-target="#mapModal" 
-                     data-img='${row.personMapAddressUrl}' 
+                <img src="${row.personMapAddressUrl}" title='${row.pincodeName}'
+                     class="thumbnail profile-image doc-profile-image preview-map-image"
+                     data-toggle="modal"
+                     data-target="#mapModal"
+                     data-img='${row.personMapAddressUrl}'
                      data-title='${row.pincodeName}' />
             </div>`;
                     } else {
@@ -218,7 +262,6 @@
             { "data": "policy", bVisible: false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-
             $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
@@ -234,7 +277,7 @@
                 });
             });
         }
-   });
+    });
     $('#caseTypeFilter').on('change', function () {
         table.ajax.reload(); // Reload the table when the filter is changed
     });
@@ -274,7 +317,7 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    
+
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
     disableAllInteractiveElements();
 
@@ -286,4 +329,3 @@ function getdetails(id) {
         }
     }
 }
-

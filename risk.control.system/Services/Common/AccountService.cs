@@ -11,8 +11,12 @@ namespace risk.control.system.Services.Common
     public interface IAccountService
     {
         Task<ForgotPasswordResult> ForgotPassword(string useremail, string mobile, string countryCode);
+
         Task<ServiceResult> ChangePasswordAsync(ChangePasswordViewModel model, ClaimsPrincipal userPrincipal, bool isAuthenticated, string portal_base_url);
+
         Task<ForgotPassword> CreateDefaultForgotPasswordModel(string email);
+
+        Task Logout(string email);
     }
 
     internal class AccountService : IAccountService
@@ -39,9 +43,10 @@ namespace risk.control.system.Services.Common
             this.webHostEnvironment = webHostEnvironment;
             this.httpContextAccessor = httpContextAccessor;
         }
+
         public async Task<ServiceResult> ChangePasswordAsync(ChangePasswordViewModel model, ClaimsPrincipal userPrincipal, bool isAuthenticated, string portal_base_url)
         {
-            if (userPrincipal == null) 
+            if (userPrincipal == null)
             {
                 throw new ArgumentNullException(nameof(userPrincipal));
             }
@@ -118,7 +123,7 @@ namespace risk.control.system.Services.Common
 
         public async Task<ForgotPasswordResult> ForgotPassword(string useremail, string mobile, string countryCode)
         {
-            if(string.IsNullOrEmpty(useremail) || string.IsNullOrEmpty(mobile) || string.IsNullOrEmpty(countryCode))
+            if (string.IsNullOrEmpty(useremail) || string.IsNullOrEmpty(mobile) || string.IsNullOrEmpty(countryCode))
             {
                 return null!;
             }
@@ -138,7 +143,7 @@ namespace risk.control.system.Services.Common
             message += $"{passwordString}\n";
             message += $"{BaseUrl}";
             await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
-            var profileImageByte =await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl));
+            var profileImageByte = await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl));
 
             return new ForgotPasswordResult
             {
@@ -148,6 +153,7 @@ namespace risk.control.system.Services.Common
                 ProfilePicture = profileImageByte ?? new byte[] { }
             };
         }
+
         public async Task<ForgotPassword> CreateDefaultForgotPasswordModel(string email)
         {
             var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
@@ -167,6 +173,28 @@ namespace risk.control.system.Services.Common
                 ProfilePicture = profilePicture,
                 Email = email
             };
+        }
+
+        public async Task Logout(string email)
+        {
+            if (!string.IsNullOrEmpty(email))
+            {
+                var session = await context.UserSessionAlive
+                    .Include(x => x.ActiveUser)
+                    .Where(x => x.ActiveUser.Email == email && !x.LoggedOut)
+                    .OrderByDescending(x => x.Updated ?? x.Created)
+                    .FirstOrDefaultAsync();
+
+                if (session != null)
+                {
+                    session.LoggedOut = true;
+                    session.Updated = DateTime.Now;
+                    session.UpdatedBy = email;
+                    await context.SaveChangesAsync();
+                }
+            }
+
+            await signInManager.SignOutAsync();
         }
     }
 }

@@ -14,19 +14,16 @@ namespace risk.control.system.Controllers.Api.Agency
     {
         private readonly ILogger<AgencyController> logger;
         private readonly IAgencyUserApiService agencyUserApiService;
-        private readonly IUserService userService;
-        private readonly IAgencyService vendorService;
+        private readonly IAgencyService agencyService;
 
         public AgencyController(
             ILogger<AgencyController> logger,
             IAgencyUserApiService agencyUserApiService,
-            IUserService userService,
-            IAgencyService vendorService)
+            IAgencyService agencyService)
         {
             this.logger = logger;
             this.agencyUserApiService = agencyUserApiService;
-            this.userService = userService;
-            this.vendorService = vendorService;
+            this.agencyService = agencyService;
         }
 
         [HttpGet("AllAgencies")]
@@ -40,7 +37,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var response = await vendorService.AllAgencies();
+                var response = await agencyService.AllAgencies();
 
                 return Ok(response);
             }
@@ -62,7 +59,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var response = await vendorService.AllServices(userEmail);
+                var response = await agencyService.AllServices(userEmail);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -134,7 +131,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var agentList = await vendorService.GetAgentWithCases(userEmail, id);
+                var agentList = await agencyService.GetAgentWithCases(userEmail, id);
                 return Ok(agentList);
             }
             catch (Exception ex)

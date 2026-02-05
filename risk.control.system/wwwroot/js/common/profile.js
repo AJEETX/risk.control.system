@@ -130,11 +130,11 @@ const chatGPTMessage = document.getElementById('password-advise');
 
 if (chatGPTMessage) {
     var userEmail = document.getElementById('Email').value;
-    const eventSource = new EventSource(`/Rating/StreamTypingUpdates?email=${encodeURIComponent(userEmail)}`);
+    const eventSource = new EventSource(`/Session/StreamTypingUpdates?email=${encodeURIComponent(userEmail)}`);
 
     eventSource.addEventListener('message', (event) => {
         // 🔐 Origin check — prevent DOM-based injection
-        if (event.origin !== window.location.origin || event.target.url !== window.location.origin + "/Rating/StreamTypingUpdates") {
+        if (event.origin !== window.location.origin || event.target.url !== window.location.origin + "/Session/StreamTypingUpdates") {
             console.warn("⚠️ Blocked message from unknown origin:", event.origin);
             return;
         }

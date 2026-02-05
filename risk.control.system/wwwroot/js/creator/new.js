@@ -62,22 +62,56 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    $.alert({
+                    $.confirm({
                         title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
                     });
-                    window.location.href = '/Account/Login'; // Or session timeout handler
                 }
-                if (xhr.status === 500) {
-                    $.alert({
-                        title: 'Error Occurred!',
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to the Main page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/CaseCreateEdit/New';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/CaseCreateEdit/New';
+                        }
                     });
-                    window.location.href = '/CaseCreateEdit/New'; // // Refresh page
                 }
-                if (xhr.status === 400) {
-                    $.alert({
-                        title: 'Bad Request! Try valid data',
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to the Main page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/CaseCreateEdit/New';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/CaseCreateEdit/New';
+                        }
                     });
-                    window.location.href = '/CaseCreateEdit/New'; // // Refresh page
                 }
             }
         },
@@ -270,7 +304,7 @@
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
                     }
 
-                    buttons += '<a id="edit' + row.id + '" href="/Investigation/Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;';
+                    buttons += '<a id="edit' + row.id + '" href="/Investigation/Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a>&nbsp;';
 
                     buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
 
