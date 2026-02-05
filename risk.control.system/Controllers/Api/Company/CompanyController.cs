@@ -17,21 +17,18 @@ namespace risk.control.system.Controllers.Api.Company
         private readonly ApplicationDbContext _context;
         private readonly ILogger<CompanyController> logger;
         private readonly ICompanyUserApiService companyUserApiService;
-        private readonly IUserService userService;
-        private readonly IAgencyService vendorService;
+        private readonly IAgencyService agencyService;
 
         public CompanyController(ApplicationDbContext context,
             ILogger<CompanyController> logger,
             ICompanyUserApiService companyUserApiService,
-            IUserService userService,
-            IAgencyService vendorService
+            IAgencyService agencyService
             )
         {
             _context = context;
             this.logger = logger;
             this.companyUserApiService = companyUserApiService;
-            this.userService = userService;
-            this.vendorService = vendorService;
+            this.agencyService = agencyService;
         }
 
         [HttpGet("AllUsers")]
@@ -74,7 +71,7 @@ namespace risk.control.system.Controllers.Api.Company
                 {
                     return NotFound("Company user not found.");
                 }
-                var vendors = await vendorService.GetEmpanelledVendorsAsync(companyUser);
+                var vendors = await agencyService.GetEmpanelledVendorsAsync(companyUser);
 
                 return Ok(vendors);
             }
@@ -107,7 +104,7 @@ namespace risk.control.system.Controllers.Api.Company
                     return NotFound("Company user not found.");
                 }
 
-                var result = await vendorService.GetEmpanelledAgency(companyUser, caseId);
+                var result = await agencyService.GetEmpanelledAgency(companyUser, caseId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -128,7 +125,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var result = await vendorService.GetAvailableVendors(userEmail);
+                var result = await agencyService.GetAvailableVendors(userEmail);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -149,7 +146,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var result = await vendorService.GetAgencyService(id);
+                var result = await agencyService.GetAgencyService(id);
                 return Ok(result);
             }
             catch (Exception ex)

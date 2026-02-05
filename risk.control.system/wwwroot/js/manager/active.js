@@ -1,7 +1,5 @@
-﻿
-$(document).ready(function () {
-
-    var table  = $("#dataTable").DataTable({
+﻿$(document).ready(function () {
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Manager/GetActiveCases',
             type: 'GET',
@@ -26,10 +24,56 @@ $(document).ready(function () {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
                 }
-                if (xhr.status === 500) {
-                    window.location.href = '/VendorInvestigation/Open'; // Refresh page
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Active page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/Manager/Active';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Manager/Active';
+                        }
+                    });
+                }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to Active page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/Manager/Active';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Manager/Active';
+                        }
+                    });
                 }
             }
         },
@@ -68,7 +112,7 @@ $(document).ready(function () {
         processing: true,
         autoWidth: false,
         serverSide: true,
-        deferRender: true,  
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -110,17 +154,16 @@ $(document).ready(function () {
                         return `
             <div class="map-thumbnail profile-image doc-profile-image">
                 <img src="${row.personMapAddressUrl}"  title="${row.pincodeName}"
-                     class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal" 
+                     class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
                      data-bs-toggle="tooltip"
                      data-bs-placement="top"
-                     data-img='${row.personMapAddressUrl}' 
+                     data-img='${row.personMapAddressUrl}'
                      data-title='Addresss: ${row.pincodeName}' />
             </div>`;
                     } else {
                         return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
                     }
                 }
-
             },
             {
                 "sDefaultContent": "",
@@ -182,7 +225,7 @@ $(document).ready(function () {
                     return '<span title="' + row.created + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
-            
+
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -227,7 +270,6 @@ $(document).ready(function () {
             }
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-
             $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
@@ -272,7 +314,6 @@ $(document).ready(function () {
 
     $('#dataTable tbody').hide();
     $('#dataTable tbody').fadeIn(2000);
-    
 });
 
 function getdetails(id) {
@@ -282,7 +323,7 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-   
+
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
     disableAllInteractiveElements();
 
@@ -301,7 +342,7 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    
+
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
     disableAllInteractiveElements();
 
@@ -313,4 +354,3 @@ function showedit(id) {
         }
     }
 }
-

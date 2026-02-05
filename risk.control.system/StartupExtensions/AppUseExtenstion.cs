@@ -58,8 +58,8 @@ public static class AppUseExtenstion
         app.UseMiddleware<RequirePasswordChangeMiddleware>();
         app.UseMiddleware<CookieConsentMiddleware>();
         app.UseMiddleware<WhitelistListMiddleware>();
-        //app.UseMiddleware<LicensingMiddleware>();
-        //app.UseMiddleware<UpdateUserLastActivityMiddleware>();
+        app.UseMiddleware<LicensingMiddleware>();
+        app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
         app.UseNotyf();
         app.UseFileServer();

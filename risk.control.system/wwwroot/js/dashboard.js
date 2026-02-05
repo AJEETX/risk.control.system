@@ -1,12 +1,11 @@
 ﻿$(document).ready(function () {
-    GetWeekly('Case', 'GetWeeklyClaim', 'container-claim');
-    GetWeeklyTat('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
-    GetWeeklyPie('Claim', 'GetWeeklyPieClaim', 'container-claim-pie');
-    GetWeeklyPie('Underwriting', 'GetWeeklyPieUnderwriting', 'container-underwriting-pie');
-    GetWeeklyAgencyPie('Agency-wise Claim ', 'GetAgentClaim', 'container-agency-claim-pie');
-    GetWeeklyAgencyPie('Agency-wise Underwriting ', 'GetAgentUnderwriting', 'container-agency-underwriting-pie');
+    GetWeekly('Case', '/DashboardGraph/GetWeeklyClaim', 'container-claim');
+    GetWeeklyTat('Case', '/DashboardGraph/GetClaimWeeklyTat', 'container-claim-tat');
+    GetWeeklyPie('Claim', '/DashboardGraph/GetWeeklyPieClaim', 'container-claim-pie');
+    GetWeeklyPie('Underwriting', '/DashboardGraph/GetWeeklyPieUnderwriting', 'container-underwriting-pie');
+    GetWeeklyAgencyPie('Agency-wise Claim ', '/DashboardGraph/GetAgentClaim', 'container-agency-claim-pie');
+    GetWeeklyAgencyPie('Agency-wise Underwriting ', '/DashboardGraph/GetAgentUnderwriting', 'container-agency-underwriting-pie');
 });
-
 
 function createCharts(container, txn, sum1, sum2, titleText, totalspent) {
     Highcharts.chart(container, {
@@ -46,7 +45,6 @@ function createCharts(container, txn, sum1, sum2, titleText, totalspent) {
                 data: sum1,
                 colorByPoint: true,
                 color: '#1f77b4' // Blue
-
             },
             {
                 name: 'underwriting',
@@ -54,7 +52,6 @@ function createCharts(container, txn, sum1, sum2, titleText, totalspent) {
                 data: sum2,
                 colorByPoint: true,
                 color: '#ff7f0e' // Orange
-
             }
         ]
     });
@@ -160,12 +157,11 @@ function createMonthChart(container, titleText, data1, data2, keys, total) {
     });
 }
 
-
 function GetChart(title, url, container) {
     var titleMessage = "Last 12 month " + title + ":Count";
     $.ajax({
         type: "GET",
-        url: "/Dashboard/" + url,
+        url: url,
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
@@ -194,7 +190,7 @@ function GetWeekly(title, url, container) {
     var titleMessage = title + ": Grouped by status";
     $.ajax({
         type: "GET",
-        url: "/Dashboard/" + url,
+        url: url,
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
@@ -223,7 +219,7 @@ function GetWeeklyPie(title, url, container) {
     var titleMessage = title + ":Count";
     $.ajax({
         type: "GET",
-        url: "/Dashboard/" + url,
+        url: url,
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
@@ -287,66 +283,6 @@ function createPieCharts(container, txn, sum, titleText, totalspent) {
         }]
     });
 }
-function GetMonthly(title, url, container) {
-    var titleMessage = title + "Count by status";
-
-    $.ajax({
-        type: "GET",
-        url: "/Dashboard/" + url,
-        contentType: "application/json",
-        dataType: "json",
-        success: function (result) {
-            if (result) {
-                var keys = Object.keys(result);
-                var weeklydata1 = [];
-                var weeklydata2 = [];
-                var totalspent = 0.0;
-
-                Object.keys(result).forEach(key => {
-                    var count1 = result[key].item1 || 0; // Extract count1
-                    var count2 = result[key].item2 || 0; // Extract count2
-
-                    weeklydata1.push([key, count1]);
-                    weeklydata2.push([key, count2]);
-
-                    totalspent += count1 + count2;
-                });
-
-                createChartColumn(container, title, weeklydata1, weeklydata2, titleMessage, totalspent);
-            }
-        }
-    })
-}
-
-function GetMonthlyPie(title, url, container) {
-    var titleMessage = title + "Count by status";
-
-    $.ajax({
-        type: "GET",
-        url: "/Dashboard/" + url,
-        contentType: "application/json",
-        dataType: "json",
-        success: function (result) {
-            if (result) {
-                var keys = Object.keys(result);
-                var weeklydata1 = [];
-                var weeklydata2 = [];
-                var totalspent = 0.0;
-                Object.keys(result).forEach(key => {
-                    var count1 = result[key].item1 || 0; // Extract count1
-                    var count2 = result[key].item2 || 0; // Extract count2
-
-                    weeklydata1.push([key, count1]);
-                    weeklydata2.push([key, count2]);
-
-                    totalspent += count1 + count2;
-                });
-
-                createCharts(container, title, weeklydata1, weeklydata2, titleMessage, totalspent);
-            }
-        }
-    })
-}
 
 function createChartTat(container, txn, sum, titleText, totalspent) {
     Highcharts.chart(container, {
@@ -385,7 +321,7 @@ function GetWeeklyTat(title, url, container) {
     var titleMessage = title + ":Status changes";
     $.ajax({
         type: "GET",
-        url: "/Dashboard/" + url,
+        url: url,
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
@@ -460,7 +396,7 @@ function GetWeeklyAgencyPie(title, url, container) {
     var titleMessage = title + ":Count";
     $.ajax({
         type: "GET",
-        url: "/Dashboard/" + url,
+        url: url,
         contentType: "application/json",
         dataType: "json",
         success: function (result) {

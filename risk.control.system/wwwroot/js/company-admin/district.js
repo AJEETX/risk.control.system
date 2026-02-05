@@ -10,6 +10,30 @@
                 d.search = d.search.value; // Pass the search term
                 d.orderColumn = d.order[0].column; // Column index
                 d.orderDirection = d.order[0].dir; // "asc" or "desc"
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
             }
         },
         order: [[0, 'asc']],
@@ -32,7 +56,7 @@
                     return `
                                         <a id="edit${data}" class="btn btn-xs btn-warning" href="/District/Edit/${data}">
                                             <i class="fas fa-city"></i> Edit
-                                        </a> 
+                                        </a>
                                         <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
                                             <i class="fas fa-trash"></i> Delete
                                         </a>`;
@@ -48,7 +72,6 @@
             });
         }
     });
-
 
     $("#Code").on("input", function () {
         this.value = this.value.toUpperCase();

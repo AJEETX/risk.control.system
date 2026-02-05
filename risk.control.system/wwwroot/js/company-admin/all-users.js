@@ -7,7 +7,24 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
                 }
             }
         },
@@ -50,7 +67,7 @@
 
                     // Render the online status icon
                     var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
-                    
+
                     var img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
                     var buttons = "";
                     buttons += '<span class="user-verified">';
@@ -61,7 +78,7 @@
                     }
                     buttons += '</span>';
                     img += ' ' + buttons + '</div>';  // Close image container
-                    return onlineStatusIcon + ' '+img;
+                    return onlineStatusIcon + ' ' + img;
                 }
             },
             {
@@ -133,7 +150,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.roles == "GUEST" || row.roles == undefined || row.roles == '' || row.roles == null) {
-                    buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
+                        buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
                     else {
                         buttons += '<a id=edit' + row.id + ' href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-user-minus"></i> Edit</a>&nbsp;'
@@ -152,7 +169,7 @@
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Event delegation for .btn-danger elements
-            
+
             $('#dataTable tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
@@ -256,7 +273,6 @@
             }
         });
     });
-
 });
 
 function getColorClass(color) {

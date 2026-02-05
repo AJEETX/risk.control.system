@@ -4,7 +4,7 @@
     ViewData["Title"] = Applicationsettings.DELETE;
 }
 <section class="content">
-    <form id="create-form" asp-action="DeleteUser" method="post">
+    <form id="create-form" asp-action="Delete" method="post">
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title"><i class="fas fa-user-minus"></i> Delete User </h3>
@@ -92,7 +92,6 @@
                             <dd class="col-sm-5">
                                 @Html.DisplayFor(model => model.PinCode.Code)
                             </dd>
-
                         </dl>
                     </div>
                 </div>
@@ -131,6 +130,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/common/delete-user.js">
-
     </script>
 }

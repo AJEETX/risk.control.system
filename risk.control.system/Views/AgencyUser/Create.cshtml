@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <form id="create-form" asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
+        <form id="create-form" asp-action="Create" enctype="multipart/form-data" autocomplete="off">
             <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
             <input type="hidden" id="txn" name="txn" value="agency" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>

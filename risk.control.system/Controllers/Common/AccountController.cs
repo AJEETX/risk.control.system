@@ -108,10 +108,14 @@ namespace risk.control.system.Controllers.Common
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            var email = User?.Identity?.Name;
+
+            await accountService.Logout(email);
+
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(Login));
         }
+
 
         [HttpGet]
         public async Task<IActionResult> ChangePassword(string email)

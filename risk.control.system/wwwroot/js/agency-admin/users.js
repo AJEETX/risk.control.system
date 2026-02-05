@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-
     $('[data-toggle="tooltip"]').tooltip({
         animated: 'fade',
         placement: 'bottom',
@@ -13,7 +12,40 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to the Users page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/AgencyUser/Users';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/AgencyUser/Users';
+                        }
+                    });
                 }
             }
         },
@@ -23,9 +55,9 @@
                 className: 'max-width-column', // Apply the CSS class,
                 targets: 2                      // Index of the column to style
             },
-        {
-            className: 'max-width-column', // Apply the CSS class,
-            targets: 4                      // Index of the column to style
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-claim', // Apply the CSS class,
@@ -57,7 +89,7 @@
                     var colorClass = getColorClass(data); // Class for the color
                     var tooltip = row.onlineStatusName || 'User status unknown'; // Tooltip text
                     var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-bs-toggle="tooltip"></i>`;
-                    
+
                     var img;
                     if (row.agentOnboarded && row.active) {
                         img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-bs-toggle="tooltip"/>';
@@ -77,7 +109,7 @@
                     }
                     buttons += '</span>';
                     img += ' ' + buttons + '</div>';  // Close image container
-                    return onlineStatusIcon +' '+ img;
+                    return onlineStatusIcon + ' ' + img;
                 }
             },
             {
@@ -103,7 +135,8 @@
                 "data": "state",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.stateName + '" data-bs-toggle="tooltip">' + data + '</span>'
-                } },
+                }
+            },
             {
                 "data": "pincode",
                 bSortable: false,
@@ -144,15 +177,15 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = '';
-                    buttons += '<a id="edit' + row.id + '" href="/AgencyUser/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;';
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;` ;
                     if (row.role !== "AGENCY_ADMIN") {
-                        buttons += '<a id="details' + row.id + '" href="/AgencyUser/DeleteUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>';
+                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>`;
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</button>';
                     }
                     return buttons;
                 }
-            }, 
+            },
             {
                 "data": "isUpdated",
                 bVisible: false
@@ -165,9 +198,12 @@
         "rowCallback": function (row, data, index) {
             if (!data.agentOnboarded || !data.active || !data.loginVerified) {
                 $('td', row).addClass('lightgrey');
+                $('.btn-warning', row).css('color', '#000');
             } else {
                 $('td', row).removeClass('lightgrey');
             }
+            $('.btn-danger', row).css('color', '#fff');
+
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Reinitialize Bootstrap 5 tooltips
@@ -200,22 +236,52 @@
         });
     });
     $('#dataTable').on('draw.dt', function () {
-        $('#dataTable .btn-warning').on('click', function (e) {
-            var id = $(this).attr('id').replace('edit', '');
-            showedit(id);  // Call showedit function with the ID
-        });
-
-        // Bind the "Delete" button click event
-        $('#dataTable .btn-danger').on('click', function (e) {
-            var id = $(this).attr('id').replace('details', '');
-            getdetails(id);  // Call getdetails function with the ID
-        });
-
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
             html: true
         });
+    });
+
+    function showedit(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Edit");
+
+        const editUrl = `/AgencyUser/Edit?userId=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = editUrl;
+        }, 1000);
+    }
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Edit");
+
+        const editUrl = `/AgencyUser/Delete?userId=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = editUrl;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
+    // Event delegation for dynamically generated Edit and Delete buttons
+    $('body').on('click', 'a.btn-warning', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showedit(id, this);
+    });
+    $('body').on('click', 'a.btn-danger', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
     });
 });
 
@@ -228,48 +294,5 @@ function getColorClass(color) {
             return "online-status-orange";
         default:
             return "online-icon-default"; // Fallback class
-    }
-}
-function getdetails(id) {
-    // Same logic for getdetails
-    $("body").addClass("submit-progress-bg");
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-
-    $('button, input[type="submit"], a').prop('disabled', true);
-    $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault();
-    });
-    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
-
-function showedit(id) {
-    // Same logic for showedit
-    $("body").addClass("submit-progress-bg");
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-
-    $('button, input[type="submit"], a').prop('disabled', true);
-    $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault();
-    });
-    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
     }
 }

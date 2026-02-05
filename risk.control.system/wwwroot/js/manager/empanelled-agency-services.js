@@ -27,7 +27,24 @@ $(document).ready(function () {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
                 }
             }
         },
@@ -124,9 +141,9 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + ' href="/EmpanelledAgencyService/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=edit' + row.id + ' href="/EmpanelledAgencyService/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a>&nbsp;'
                     buttons += `
-                        <a href="#" 
+                        <a href="#"
                            class="btn btn-xs btn-danger js-delete"
                            data-id="${row.id}">
                            <i class="fas fa-trash"></i> Delete

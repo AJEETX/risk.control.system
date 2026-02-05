@@ -71,7 +71,6 @@
                                     <i class='fa fa-user-plus'></i> Customer details.
                                 </li>
                                 <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
-
                             </span>
                         </span>
                     </h3>
@@ -97,25 +96,21 @@
                                         <span class="tooltip-text" id="policy-information">
                                             <li>
                                                 <i class='far fa-file-powerpoint'></i> Case details
-
                                             </li>
                                             <li>
                                                 <i class='far fa-hand-point-right'></i>
                                                 <div class="btn btn-xs bg-teal">
                                                     <i class="fas fa-edit"></i>
                                                 </div> Add Notes
-
                                             </li>
                                             <li>
                                                 <i class='far fa-hand-point-right'></i>
                                                 <div class="btn btn-xs btn-info">
                                                     <i class="far fa-file-powerpoint"></i> ...
                                                 </div> Show Case Detail
-
                                             </li>
                                         </span>
                                     </span>
-
                                 </div>
                                 <div class="progress">
                                     <i class="far fa-bookmark bookmark-green"></i>
@@ -131,7 +126,7 @@
                                                 <b>Case Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()
                                             </p>
                                             <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                
+
                                                 <li class="small">
                                                     <span class="fa-li">
                                                         <i class="fas fa-money-bill-wave"></i>
@@ -191,7 +186,18 @@
                                             <p class="text-muted text-sm">
                                                 @if (Model.ClaimsInvestigation.CaseNotes.Count > 0)
                                                 {
-                                                    <img id="notesDetail" class="img-fluid form-Image" src="@Applicationsettings.POLICY_BLANK_IMAGE" data-bs-toggle="tooltip" title="Display notes">
+                                                    <div class="position-relative d-inline-block">
+                                                        <img id="notesDetail"
+                                                             class="img-fluid form-Image notes-active"
+                                                             src="/img/blank-document.png"
+                                                             data-bs-toggle="tooltip"
+                                                             title="Display notes">
+
+                                                        <span class="position-absolute top-0 start-100 translate-middle
+                                         badge rounded-pill bg-danger">
+                                                            @Model.ClaimsInvestigation.CaseNotes.Count
+                                                        </span>
+                                                    </div>
                                                 }
                                                 else
                                                 {
@@ -212,7 +218,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                             <div class="card bg-light d-flex flex-fill">
@@ -230,14 +235,12 @@
                                                 <div class="btn btn-xs bg-teal">
                                                     <i class="fas fa-comments"></i>
                                                 </div> Send SMS to Customer
-
                                             </li>
                                             <li>
                                                 <i class='far fa-hand-point-right'></i>
                                                 <div class="btn btn-xs btn-warning">
                                                     <i class="fa fa-user-plus"></i> ...
                                                 </div> Show Customer Details
-
                                             </li>
                                         </span>
                                     </span>
@@ -256,7 +259,7 @@
                                                 <b>Occupation: </b> @Model.ClaimsInvestigation?.CustomerDetail?.Occupation
                                             </p>
                                             <ul class="ml-4 mb-0 fa-ul text-muted">
-                                               
+
                                                 <li class="small">
                                                     <span class="fa-li">
                                                         <i class="fa fa-money"></i>
@@ -323,7 +326,6 @@
                                             <i class="fa fa-user-plus"></i> ...
                                         </a>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -343,14 +345,12 @@
                                                 <div class="btn btn-xs bg-teal">
                                                     <i class="fas fa-comments"></i>
                                                 </div> Send SMS to Beneficiary
-
                                             </li>
                                             <li>
                                                 <i class='far fa-hand-point-right'></i>
                                                 <div class="btn btn-xs btn-success">
                                                     <i class="fas fa-user-tie"></i> ...
                                                 </div> Show Beneficiary Details
-
                                             </li>
                                         </span>
                                     </span>
@@ -410,7 +410,6 @@
                                             <p class="text-muted text-sm">
                                                 <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@bmap" data-bs-toggle="tooltip" title="Display Beneficiary Address in map">
                                             </p>
-
                                         </div>
                                     </div>
                                 </div>
@@ -428,7 +427,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>

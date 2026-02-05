@@ -14,22 +14,56 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    $.alert({
-                        title: 'Session Expired! Login again',
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
                     });
-                    window.location.href = '/Account/Login'; // Or session timeout handler
                 }
-                if (xhr.status === 500) {
-                    $.alert({
-                        title: 'Server Error Occurred! Try again.',
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Available Agencies page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/AvailableAgency/Agencies';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/AvailableAgency/Agencies';
+                        }
                     });
-                    window.location.href = '/AvailableAgency/AvailableVendors'; // Server error. Try again
                 }
-                if (xhr.status === 400) {
-                    $.alert({
-                        title: 'Bad Request occurred!',
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Agencies!',
+                        content: 'Try with valid data. You will be redirected to Available Agencies page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/AvailableAgency/Agencies';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/AvailableAgency/Agencies';
+                        }
                     });
-                    window.location.href = '/AvailableAgency/AvailableVendors'; // Bad request. Try with valid data
                 }
             }
         },

@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Add User")]
-        public async Task<IActionResult> CreateUser()
+        public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -124,7 +124,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(ApplicationUser model, string emailSuffix, string vendorId)
+        public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix, string vendorId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -161,7 +161,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Edit User", FromAction = "Users")]
-        public async Task<IActionResult> EditUser(long? userId)
+        public async Task<IActionResult> Edit(long? userId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -187,12 +187,12 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 logger.LogError(ex, "Error getting AgencyUser {Id}. {UserEmail}", userId, userEmail ?? "Anonymous");
             }
             notifyService.Error("OOPs !!!.Error creating User. Try again");
-            return RedirectToAction(nameof(CreateUser), "AgencyUser");
+            return RedirectToAction(nameof(Users), "AgencyUser");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(string id, ApplicationUser model)
+        public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -229,7 +229,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb(title: " Delete", FromAction = "Users")]
-        public async Task<IActionResult> DeleteUser(long userId)
+        public async Task<IActionResult> Delete(long userId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -265,9 +265,9 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
         }
 
-        [HttpPost, ActionName("DeleteUser")]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteUser(string email)
+        public async Task<IActionResult> Delete(string email)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
