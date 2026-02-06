@@ -71,7 +71,7 @@
 						<div class="col-md-12">
 							<a id="back" asp-controller="ClientCompany" asp-action="Agencies" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 							<a asp-controller="ClientCompany" asp-action="AgencyUsers" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="User count = @Model.SelectedCountryId"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
-							<a asp-controller="ClientCompany" asp-action="AgencyService" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
+							<a asp-controller="ClientCompany" asp-action="AgencyService" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-cog"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
 						</div>
 					</div>
 				</div>

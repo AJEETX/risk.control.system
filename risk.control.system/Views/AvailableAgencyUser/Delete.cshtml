@@ -1,134 +1,186 @@
 ﻿@model risk.control.system.Models.ApplicationUser
 
 @{
-	ViewData["Title"] = Applicationsettings.DELETE;
+    ViewData["Title"] = Applicationsettings.DELETE;
 }
+
 <section class="content">
-	<form id="create-form" asp-action="Delete" method="post">
-		<div class="card shadow-lg border-1 rounded-lg">
-			<div class="card-header bg-secondary text-white text-center">
-				<h3 class="card-title"><i class="fas fa-user-minus"></i> Delete User </h3>
-			</div>
-			<div class="card-body">
-				<div class="submit-progress hidden">
-					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-				</div>
-				<div class="row">
-					<div class="col-md-6">
-						<dl class="row">
-							<dt class="col-sm-5">
-								Profile photo
-							</dt>
-							<dd class="col-sm-5">
-								<img id="ProfileImage" class="form-Image" src="/Document/GetUserProfileImage/@Model?.Id" alt="Profile" />
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.FirstName)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.FirstName)
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.LastName)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.LastName)
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.Email)
-							</dt>
-							<dd class="col-sm-5">
-								<a href="#">  @Html.DisplayFor(model => model.Email)</a>
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.PhoneNumber)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.PhoneNumber)
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.Active)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.Active)
-							</dd>
-						</dl>
-					</div>
-					<div class="col-md-6">
-						<dl class="row">
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.Role)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.Role)
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.Addressline)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.Addressline)
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.District)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.District.Name)
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.State)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.State.Name)
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.Country)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.Country.Name)
-							</dd>
-							<dt class="col-sm-5">
-								@Html.DisplayNameFor(model => model.PinCode)
-							</dt>
-							<dd class="col-sm-5">
-								@Html.DisplayFor(model => model.PinCode.Code)
-							</dd>
-						</dl>
-					</div>
-				</div>
-			</div>
-			<div class="card-footer">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="form-group text-right">
-							<a id="back" href="Users/@Model.VendorId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-							<input type="hidden" asp-for="Email" name="email" />
-							@if (Model.HasClaims)
-							{
-								<span id="withdraw-information-popup" class="badge badge-light">
-									<div class="btn btn-outline-danger" data-bs-toggle="tooltip" title="The user can't be deleted as the Agency has case (s)">
-										<i class="fa fa-trash"></i>  @Applicationsettings.DELETE <span class="badge badge-danger">
-											<i class="fas fa-info"></i>
-										</span>
-									</div>
-								</span>
-							}
-							else
-							{
-								<button type="submit" class="btn btn-danger">
-									<i class="fas fa-trash me-1"></i> Delete
-								</button>
-							}
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</form>
+    <form id="delete-form" asp-action="Delete" method="post" novalidate>
+        <input type="hidden" asp-for="VendorId" />
+        <input type="hidden" asp-for="Email" name="email" />
+        <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        </div>
+        <div class="card shadow-sm border-0">
+            <!-- Header -->
+            <div class="card-header bg-danger text-white text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirm User Deletion
+                </h4>
+            </div>
+
+            <!-- Warning -->
+            <div class="alert alert-warning rounded-0 mb-0 text-center">
+                <i class="fas fa-info-circle me-1"></i>
+                This action <strong>cannot be undone</strong>. Please verify the user details before proceeding.
+            </div>
+
+            <!-- Body -->
+            <div class="card-body">
+                <div class="submit-progress d-none text-center mb-3" aria-hidden="true">
+                    <i class="fas fa-sync fa-spin fa-3x text-muted"></i>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Profile -->
+                    <div class="col-md-4 text-center">
+                        <img id="document-Image"
+                             class="img-thumbnail rounded-circle mb-3"
+                             src="/Document/GetUserProfileImage/@Model?.Id"
+                             alt="Profile photo of @Model?.FirstName" />
+
+                        <h5 class="mb-1">
+                            @Model?.FirstName @Model?.LastName
+                        </h5>
+
+                        <span class="badge bg-secondary">@Model?.Role</span>
+
+                        <div class="mt-3 small text-muted">
+                            <i class="fas fa-envelope me-1"></i>
+                            @Model?.Email
+                        </div>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="col-md-8">
+                        <!-- User Details -->
+                        <h6 class="text-uppercase text-muted mb-3">
+                            <i class="fas fa-user me-1"></i> User Details
+                        </h6>
+
+                        <div class="row mb-2">
+                            <div class="col-sm-4 fw-semibold">
+                                <i class="fas fa-phone-alt text-muted me-2"></i> Phone
+                            </div>
+                            <div class="col-sm-8">
+                                (0) @Html.DisplayFor(m => m.PhoneNumber)
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-semibold">
+                                <i class="fas fa-toggle-on text-muted me-2"></i> Active
+                            </div>
+                            <div class="col-sm-8">
+                                @if (Model.Active)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i> Yes
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-times-circle me-1"></i> No
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <!-- Address Details -->
+                        <h6 class="text-uppercase text-muted mb-3">
+                            <i class="fas fa-map-marked-alt me-1"></i> Address Details
+                        </h6>
+
+                        <div class="row mb-2">
+                            <div class="col-sm-4 fw-semibold">
+                                <i class="fas fa-home text-muted me-2"></i> Address Line
+                            </div>
+                            <div class="col-sm-8">
+                                @Html.DisplayFor(m => m.Addressline)
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-sm-4 fw-semibold">
+                                <i class="fas fa-city text-muted me-2"></i> District
+                            </div>
+                            <div class="col-sm-8">
+                                @Html.DisplayFor(m => m.District.Name)
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-sm-4 fw-semibold">
+                                <i class="fas fa-map text-muted me-2"></i> State
+                            </div>
+                            <div class="col-sm-8">
+                                @Html.DisplayFor(m => m.State.Name)
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-sm-4 fw-semibold">
+                                <i class="fas fa-flag text-muted me-2"></i> Country
+                            </div>
+                            <div class="col-sm-8">
+                                @Html.DisplayFor(m => m.Country.Name)
+                            </div>
+                        </div>
+
+                        <div class="row mb-0">
+                            <div class="col-sm-4 fw-semibold">
+                                <i class="fas fa-mail-bulk text-muted me-2"></i> Pin Code
+                            </div>
+                            <div class="col-sm-8">
+                                @Html.DisplayFor(m => m.PinCode.Code)
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-end align-items-center">
+                    <a asp-controller="AvailableAgencyUser"
+                       asp-action="Users"
+                       asp-route-id="@Model.VendorId"
+                       class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-1"></i> @Applicationsettings.BACK
+                    </a>
+                    <span class="mx-2"></span>
+                    @if (Model.HasClaims)
+                    {
+                        <button type="button"
+                                class="btn btn-outline-danger"
+                                disabled
+                                data-bs-toggle="tooltip"
+                                title="User cannot be deleted while associated cases exist">
+                            <i class="fas fa-lock me-1"></i> Deletion Disabled
+                        </button>
+                    }
+                    else
+                    {
+                        <button id="delete-user" type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i> Delete User
+                        </button>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </form>
 </section>
+
 @section Scripts {
-	@{
-		await Html.RenderPartialAsync("_ValidationScriptsPartial");
-	}
-	<script src="~/js/common/delete-user.js">
-	</script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/common/delete-user.js"></script>
 }

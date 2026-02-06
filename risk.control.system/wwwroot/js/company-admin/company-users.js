@@ -240,7 +240,7 @@
         const url = '/ManageCompanyUser/Delete';
         $.confirm({
             title: 'Confirm Deletion',
-            content: 'Are you sure you want to delete this case?',
+            content: 'Are you sure you want to delete this user?',
             type: 'red',
             icon: 'fas fa-trash',
             buttons: {

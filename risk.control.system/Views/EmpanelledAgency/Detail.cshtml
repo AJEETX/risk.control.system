@@ -73,7 +73,7 @@
 							<div class="form-group">
 								<a id="back" asp-controller="EmpanelledAgency" asp-action="Agencies" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 								<a asp-controller="EmpanelledAgencyUser" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="User count = @Model.SelectedCountryId"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
-								<a asp-controller="EmpanelledAgencyService" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
+								<a asp-controller="EmpanelledAgencyService" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-cogs"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
 							</div>
 						</div>
 					</div>

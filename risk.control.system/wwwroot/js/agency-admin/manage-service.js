@@ -85,7 +85,7 @@
         {
             title: "Confirm Add Service",
             content: "Are you sure to add?",
-            icon: 'fas fa-truck fa-sync',
+            icon: 'fas fa-cog fa-sync',
             type: 'green',
             confirmButtonText: "Add Service",
             buttonText: "Add Service",
@@ -100,7 +100,7 @@
         {
             title: "Confirm Edit Service",
             content: "Are you sure to save?",
-            icon: 'fas fa-truck fa-sync',
+            icon: 'fas fa-cog fa-sync',
             type: 'orange',
             confirmButtonText: "Save Service",
             buttonText: "Save Service",
