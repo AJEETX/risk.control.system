@@ -92,11 +92,11 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
                 if (!result.Success)
                 {
-                    notifyService.Custom(result.Message, 3, "orange", "fas fa-truck");
+                    notifyService.Custom(result.Message, 3, "orange", "fas fa-cog");
                 }
                 else
                 {
-                    notifyService.Custom(result.Message, 3, result.IsAllDistricts ? "orange" : "green", "fas fa-truck");
+                    notifyService.Custom(result.Message, 3, result.IsAllDistricts ? "orange" : "green", "fas fa-cog");
                 }
             }
             catch (Exception ex)
@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 if (id <= 0)
                 {
-                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-cog");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error editing {SserviceId} for {UserEmail}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
-                notifyService.Custom($"Error editing service. Try again", 3, "red", "fas fa-truck");
+                notifyService.Custom($"Error editing service. Try again", 3, "red", "fas fa-cog");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -149,17 +149,17 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 var result = await vendorServiceTypeManager.EditAsync(vendorInvestigationServiceTypeId, service, userEmail);
                 if (!result.Success)
                 {
-                    notifyService.Custom(result.Message, 3, "orange", "fas fa-truck");
+                    notifyService.Custom(result.Message, 3, "orange", "fas fa-cog");
                 }
                 else
                 {
-                    notifyService.Custom(result.Message, 3, result.Success ? "green" : "orange", "fas fa-truck");
+                    notifyService.Custom(result.Message, 3, result.Success ? "green" : "orange", "fas fa-cog");
                 }
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error editing {ServiceId} for {UserEmail}", vendorInvestigationServiceTypeId, userEmail ?? "Anonymous");
-                notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-truck");
+                notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-cog");
             }
             return RedirectToAction(nameof(Service), "AgencyService");
         }

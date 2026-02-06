@@ -112,7 +112,7 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateAgencyUser(ApplicationUser model, string emailSuffix)
+        public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -211,7 +211,7 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditAgencyUser(string id, ApplicationUser model)
+        public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try

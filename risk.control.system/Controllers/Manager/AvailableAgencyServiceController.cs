@@ -95,11 +95,11 @@ namespace risk.control.system.Controllers.Manager
 
                 if (!result.Success)
                 {
-                    notifyService.Custom(result.Message, 3, "orange", "fas fa-truck");
+                    notifyService.Custom(result.Message, 3, "orange", "fas fa-cog");
                 }
                 else
                 {
-                    notifyService.Custom(result.Message, 3, result.IsAllDistricts ? "orange" : "green", "fas fa-truck");
+                    notifyService.Custom(result.Message, 3, result.IsAllDistricts ? "orange" : "green", "fas fa-cog");
                 }
             }
             catch (Exception ex)
@@ -160,24 +160,24 @@ namespace risk.control.system.Controllers.Manager
                 var result = await vendorServiceTypeManager.EditAsync(VendorInvestigationServiceTypeId, service, userEmail);
                 if (!result.Success)
                 {
-                    notifyService.Custom(result.Message, 3, "orange", "fas fa-truck");
+                    notifyService.Custom(result.Message, 3, "orange", "fas fa-cog");
                 }
                 else
                 {
-                    notifyService.Custom(result.Message, 3, result.Success ? "green" : "orange", "fas fa-truck");
+                    notifyService.Custom(result.Message, 3, result.Success ? "green" : "orange", "fas fa-cog");
                 }
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error editing service for {ServiceId} . {UserEmail}", VendorInvestigationServiceTypeId, userEmail);
-                notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-truck");
+                notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-cog");
             }
             return RedirectToAction(nameof(Service), "AvailableAgencyService", new { id = service.VendorId });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteService(long id)
+        public async Task<IActionResult> Delete(long id)
         {
             try
             {

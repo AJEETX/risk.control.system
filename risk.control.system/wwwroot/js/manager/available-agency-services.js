@@ -223,7 +223,7 @@ $(document).ready(function () {
                         $spinner.removeClass("hidden");
                         $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
                         $.ajax({
-                            url: '/AvailableAgencyService/DeleteService',
+                            url: '/AvailableAgencyService/Delete',
                             type: 'POST',
                             data: {
                                 __RequestVerificationToken: token,
