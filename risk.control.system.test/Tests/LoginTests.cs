@@ -1,13 +1,15 @@
-﻿namespace risk.control.system.test.Tests
+﻿using risk.control.system.AppConstant;
+
+namespace risk.control.system.test.Tests
 {
     public class LoginTests : PlaywrightTestBase
     {
-        [TestCase("admin@insurer.com", "R1$kcontrol!", "Andy", "admin")]
-        [TestCase("manager@insurer.com", "R1$kcontrol!", "Manny", "manager")]
-        [TestCase("creator@insurer.com", "R1$kcontrol!", "Creaty", "creator")]
-        [TestCase("assessor@insurer.com", "R1$kcontrol!", "Assessy", "assessor")]
-        [TestCase("admin@verify.com", "R1$kcontrol!", "Mathew", "admin")]
-        [TestCase("supervisor@verify.com", "R1$kcontrol!", "Adam", "supervisor")]
+        [TestCase("admin@insurer.com", Applicationsettings.TestingData, COMPANY_ADMIN.FIRST_NAME, COMPANY_ADMIN.CODE)]
+        [TestCase("manager@insurer.com", Applicationsettings.TestingData, MANAGER.FIRST_NAME, MANAGER.CODE)]
+        [TestCase("creator@insurer.com", Applicationsettings.TestingData, CREATOR.FIRST_NAME, CREATOR.CODE)]
+        [TestCase("assessor@insurer.com", Applicationsettings.TestingData, ASSESSOR.FIRST_NAME, ASSESSOR.CODE)]
+        [TestCase("admin@verify.com", Applicationsettings.TestingData, AGENCY_ADMIN.FIRST_NAME, AGENCY_ADMIN.CODE)]
+        [TestCase("supervisor@verify.com", Applicationsettings.TestingData, SUPERVISOR.FIRST_NAME, SUPERVISOR.CODE)]
         public async Task Login_ShouldRedirectToHome_AndDisplayCorrectUserInfo(
             string email,
             string password,
@@ -50,4 +52,3 @@
         }
     }
 }
-
