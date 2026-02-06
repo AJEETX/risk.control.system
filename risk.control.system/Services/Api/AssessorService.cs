@@ -125,7 +125,9 @@ namespace risk.control.system.Services
                     a.SelectedAgentDrivingMap,
                     a.SelectedAgentDrivingDistance,
                     a.SelectedAgentDrivingDuration,
-                    a.IsNewSubmittedToCompany
+                    a.IsNewSubmittedToCompany,
+                    SubmittedToAssessorTime = a.SubmittedToAssessorTime.Value,
+                    a.AssessorSla
                 })
                 .ToListAsync();
 
@@ -174,7 +176,7 @@ namespace risk.control.system.Services
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
                     Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = CaseExtension.GetAssessorTimePending(a.investigation, true),
+                    timePending = GetAssessorSubmittedTimeReport(a.SubmittedToAssessorTime, a.AssessorSla),
                     BeneficiaryName = a.BeneficiaryName,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
@@ -201,6 +203,34 @@ namespace risk.control.system.Services
                 RecordsFiltered = recordsFiltered,
                 Data = finalData
             };
+        }
+
+        private static string GetAssessorSubmittedTimeReport(DateTime SubmittedToAssessorTime, int AssessorSla)
+        {
+            DateTime time2Compare = SubmittedToAssessorTime;
+            time2Compare = SubmittedToAssessorTime;
+            if (DateTime.Now.Subtract(time2Compare).Days >= AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(time2Compare).Days} days since created!\"></i>");
+            else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(time2Compare).Days} day since created.\"></i>");
+
+            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
+                DateTime.Now.Subtract(time2Compare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
         public async Task<object> GetReviews(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -286,6 +316,8 @@ namespace risk.control.system.Services
                     a.IsNewSubmittedToCompany,
                     a.AssignedToAgency,
                     a.IsReady2Assign,
+                    a.EnquiredByAssessorTime,
+                    a.AssessorSla
                 })
                 .AsNoTracking()
                 .ToListAsync();
@@ -329,7 +361,7 @@ namespace risk.control.system.Services
                         Service = a.ServiceTypeName,
                         Location = a.SubStatus,
                         Created = a.Created.ToString("dd-MM-yyyy"),
-                        timePending = a.investigation.GetAssessorTimePending(false, false, a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR, a.investigation.IsQueryCase),
+                        timePending = GetAssessorReviewTime(a.EnquiredByAssessorTime.Value, a.AssessorSla),
                         Withdrawable = false,
                         PolicyNum = a.PolicyNum,
                         BeneficiaryPhoto = await beneficiaryTask,
@@ -350,6 +382,32 @@ namespace risk.control.system.Services
                 recordsFiltered = recordsTotal,
                 Data = finalData
             };
+        }
+
+        public static string GetAssessorReviewTime(DateTime EnquiredByAssessorTime, int AssessorSla)
+        {
+            DateTime time2Compare = EnquiredByAssessorTime;
+            if (DateTime.Now.Subtract(time2Compare).Days >= AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
+                DateTime.Now.Subtract(time2Compare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
         public async Task<object> GetRejectedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -491,7 +549,7 @@ namespace risk.control.system.Services
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
                     Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = CaseExtension.GetAssessorTime(a.investigation, false, true),
+                    timePending = GetAssessorCompletedTime(a.ProcessedByAssessorTime.Value),
                     BeneficiaryName = a.BeneficiaryName,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
@@ -512,52 +570,27 @@ namespace risk.control.system.Services
             };
         }
 
-        private byte[] GetOwnerImage(InvestigationTask a)
+        public static string GetAssessorCompletedTime(DateTime ProcessedByAssessorTime)
         {
-            string ownerEmail = string.Empty;
-            string ownerDomain = string.Empty;
-            string profileImage = string.Empty;
-            var noDataImagefilePath = Path.Combine(env.WebRootPath, "img", "no-photo.jpg");
-            var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
+            DateTime time2Compare = ProcessedByAssessorTime;
 
-            if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
+            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
+                DateTime.Now.Subtract(time2Compare).Hours > 0)
             {
-                var agent = context.Vendor.FirstOrDefault(u => u.VendorId == a.VendorId);
-                if (agent != null && !string.IsNullOrWhiteSpace(agent.DocumentUrl))
-                {
-                    var agentImagePath = Path.Combine(env.ContentRootPath, agent.DocumentUrl);
-                    var agentProfile = System.IO.File.ReadAllBytes(agentImagePath);
-                    return agentProfile;
-                }
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
+            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
             {
-                var vendor = context.ApplicationUser.FirstOrDefault(v => v.Email == a.TaskedAgentEmail);
-                if (vendor != null && !string.IsNullOrWhiteSpace(vendor.ProfilePictureUrl))
-                {
-                    var vendorImagePath = Path.Combine(env.ContentRootPath, vendor.ProfilePictureUrl);
-                    var vendorImage = System.IO.File.ReadAllBytes(vendorImagePath);
-                    return vendorImage;
-                }
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
             }
-            else if (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY ||
-                a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
-                )
+            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
             {
-                var company = context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == a.ClientCompanyId);
-                if (company != null && !string.IsNullOrWhiteSpace(company.DocumentUrl))
-                {
-                    var companyImagePath = Path.Combine(env.ContentRootPath, company.DocumentUrl);
-                    var companyImage = System.IO.File.ReadAllBytes(companyImagePath);
-                    return companyImage;
-                }
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
             }
-            return noDataimage;
+            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
         private bool CanDownload(long id, string userEmail)

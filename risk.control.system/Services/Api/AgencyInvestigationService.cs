@@ -367,12 +367,12 @@ namespace risk.control.system.Services.Api
                 ? query.OrderBy(x =>
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ? x.TaskToAgentTime :
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ? x.SubmittedToAssessorTime :
-                    x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ? x.EnquiryReplyByAssessorTime :
+                    x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ? x.EnquiryReplyByAgencyTime :
                     x.Created)  // fallback
                 : query.OrderByDescending(x =>
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ? x.TaskToAgentTime :
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ? x.SubmittedToAssessorTime :
-                    x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ? x.EnquiryReplyByAssessorTime :
+                    x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ? x.EnquiryReplyByAgencyTime :
                     x.Created),  // fallback,
 
                 _ => query.OrderByDescending(x => x.Created)
@@ -525,7 +525,7 @@ namespace risk.control.system.Services.Api
                                                      caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ?
                                                      caseTask.SubmittedToAssessorTime.Value :
                                                      caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ?
-                                                     caseTask.EnquiryReplyByAssessorTime.Value : caseTask.Created).TotalSeconds;
+                                                     caseTask.EnquiryReplyByAgencyTime.Value : caseTask.Created).TotalSeconds;
             return timeElapsed;
         }
 
@@ -1025,6 +1025,10 @@ namespace risk.control.system.Services.Api
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)
             {
                 timeToCompare = caseTask.SubmittedToAssessorTime.GetValueOrDefault();
+            }
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
+            {
+                timeToCompare = caseTask.EnquiryReplyByAgencyTime.GetValueOrDefault();
             }
 
             if (DateTime.Now.Subtract(timeToCompare).Days >= 1)

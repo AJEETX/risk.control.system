@@ -4150,3 +4150,9 @@ img.img-contain {
         transform: scale(1.1);
         box-shadow: 0 0 16px rgba(13,110,253,.6);
     }
+.btn-white-color{
+    color:#fff !important;
+}
+.btn-black-color {
+    color: #000 !important;
+}

@@ -24,7 +24,7 @@ $(document).ready(function () {
 
         showSpinnerOnButton(element, "Edit");
 
-        const editUrl = `/AgencyService/EditService?id=${encodeURIComponent(id)}`;
+        const editUrl = `/AgencyService/Edit?id=${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
@@ -177,7 +177,7 @@ $(document).ready(function () {
                         $spinner.removeClass("hidden");
                         $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
                         $.ajax({
-                            url: '/AgencyService/DeleteService',
+                            url: '/AgencyService/Delete',
                             type: 'POST',
                             data: {
                                 __RequestVerificationToken: token,

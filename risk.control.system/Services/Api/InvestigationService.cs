@@ -309,6 +309,8 @@ namespace risk.control.system.Services.Api
                     a.Updated,
                     a.ORIGIN,
                     a.CaseOwner,
+                    a.AllocatedToAgencyTime,
+                    a.CreatorSla,
                     CustomerName = a.CustomerDetail.Name,
                     customerImagePath = a.CustomerDetail.ImagePath,
                     customerAddressline = a.CustomerDetail.Addressline,
@@ -370,7 +372,7 @@ namespace risk.control.system.Services.Api
                     SubStatus = a.SubStatus,
                     Created = a.Created.ToString("dd-MM-yyyy"),
                     Location = a.SubStatus,
-                    TimePending = a.investigation.GetCreatorTimePending(),
+                    TimePending = GetCreatorTimePending(a.AllocatedToAgencyTime.Value, a.CreatorSla),
                     TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
                     Service = investigationService,
                     ServiceType = serviceType,
@@ -691,6 +693,35 @@ namespace risk.control.system.Services.Api
                 }
             }
             return string.Empty;
+        }
+
+        public static string GetCreatorTimePending(DateTime AllocatedToAgencyTime, int CreatorSla)
+        {
+            if (CreatorSla == 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(AllocatedToAgencyTime).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(AllocatedToAgencyTime).Days} days since created!\"></i>");
+            }
+            if (DateTime.Now.Subtract(AllocatedToAgencyTime).Days >= CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(AllocatedToAgencyTime).Days} day</span>");
+            else if (DateTime.Now.Subtract(AllocatedToAgencyTime).Days >= 3 || DateTime.Now.Subtract(AllocatedToAgencyTime).Days >= CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(AllocatedToAgencyTime).Days} day</span>");
+            if (DateTime.Now.Subtract(AllocatedToAgencyTime).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(AllocatedToAgencyTime).Days} day</span>");
+
+            if (DateTime.Now.Subtract(AllocatedToAgencyTime).Hours < 24 &&
+                DateTime.Now.Subtract(AllocatedToAgencyTime).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(AllocatedToAgencyTime).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(AllocatedToAgencyTime).Hours == 0 && DateTime.Now.Subtract(AllocatedToAgencyTime).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(AllocatedToAgencyTime).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(AllocatedToAgencyTime).Minutes == 0 && DateTime.Now.Subtract(AllocatedToAgencyTime).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(AllocatedToAgencyTime).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
     }
 }

@@ -1,19 +1,22 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
+
 @{
-	ViewData["Title"] = "Edit Service";
+	ViewData["Title"] = "Add Service";
 }
+
 <section class="content">
-	<form id="edit-form" asp-action="EditService" method="post" enctype="multipart/form-data">
+	<form id="create-form" asp-action="Create" enctype="multipart/form-data">
 		<div class="card shadow-lg border-1 rounded-lg">
 			<div class="card-header bg-secondary text-white text-center">
-				<h3 class="card-title"><i class="fas fa-truck"></i> Edit Service</h3>
+				<h3 class="card-title"><i class="fas fa-cog"></i> Add Service</h3>
 			</div>
 			<div class="card-body">
 				<div class="submit-progress hidden">
 					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 				</div>
-				<partial name="Vendor/_EditService" model="Model" />
+				<partial name="Vendor/_CreateService" model="Model" />
 			</div>
+			<br />
 			<div class="card-footer">
 				<div class="row">
 					<div class="col-md-12">
@@ -22,8 +25,8 @@
 								<i class="fa fa-window-close"></i>
 								@Applicationsettings.CANCEL
 							</a>
-							<button id="edit" type="submit" class="btn btn-warning">
-								<i class="fas fa-truck"></i> Save Service
+							<button disabled id="create" type="submit" class="btn btn-success">
+								<i class="fas fa-truck"></i> Add Service
 							</button>
 						</div>
 					</div>

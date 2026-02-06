@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Add Service")]
-        public async Task<IActionResult> CreateService()
+        public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateService(VendorInvestigationServiceType service)
+        public async Task<IActionResult> Create(VendorInvestigationServiceType service)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Edit Service", FromAction = "Service")]
-        public async Task<IActionResult> EditService(long id)
+        public async Task<IActionResult> Edit(long id)
         {
             try
             {
@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditService(long vendorInvestigationServiceTypeId, VendorInvestigationServiceType service)
+        public async Task<IActionResult> Edit(long vendorInvestigationServiceTypeId, VendorInvestigationServiceType service)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -166,7 +166,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteService(long id)
+        public async Task<IActionResult> Delete(long id)
         {
             try
             {

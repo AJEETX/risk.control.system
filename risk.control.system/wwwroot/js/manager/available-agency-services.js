@@ -41,42 +41,6 @@ $(document).ready(function () {
         }
     }
 
-    // Event delegation for actions (edit, delete, detail)
-    $(document).on('click', 'a.action-btn', function (e) {
-        e.preventDefault();
-        const actionType = $(this).data('action');
-        const id = $(this).data('id');
-        let targetUrl = '';
-        if (actionType === 'delete') {
-            return; // <-- IMPORTANT
-        }
-        switch (actionType) {
-            case 'details':
-                showLoadingState(this, 'Detail');
-                targetUrl = `/AvailableAgencyService/Details?id=${id}`; // Redirect to details page
-                break;
-
-            case 'edit':
-                showLoadingState(this, 'Edit');
-                targetUrl = `/AvailableAgencyService/Edit?id=${id}`; // Redirect to edit page
-                break;
-
-            case 'delete':
-                showLoadingState(this, 'Delete');
-                // Perform your delete logic here, then redirect if necessary
-                targetUrl = `/AvailableAgencyService/Delete?id=${id}`; // For deleting, you may want to confirm before navigating
-                break;
-
-            default:
-                console.warn(`Unknown action: ${actionType}`);
-        }
-
-        // Navigate to the respective URL (edit or detail page)
-        if (targetUrl) {
-            window.location.href = targetUrl; // Navigate to the page
-        }
-    });
-
     // Initialize DataTable
     const table = $("#dataTable").DataTable({
         ajax: {
@@ -187,16 +151,15 @@ $(document).ready(function () {
                 defaultContent: '',
                 orderable: false,
                 render: function (data, type, row) {
-                    return `
-                        <a href="#" data-id="${row.id}" data-action="edit"
-                           class="action-btn btn btn-xs btn-warning">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                        <a href="#" data-id="${row.id}" data-action="delete"
-                           class="action-btn btn btn-xs btn-danger">
-                            <i class="fas fa-trash"></i> Delete
-                        </a>
-                    `;
+                    var buttons = "";
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
+                    buttons += `
+                        <button
+                           class="btn btn-xs btn-danger js-delete"
+                           data-id="${row.id}">
+                           <i class="fas fa-trash"></i> Delete
+                        </button>`;
+                    return buttons;
                 }
             },
             { data: "isUpdated", visible: false },
@@ -218,7 +181,29 @@ $(document).ready(function () {
             });
         }
     });
-    $('#dataTable').on('click', 'a[data-action="delete"]', function (e) {
+    $('body').on('click', 'a.btn-warning', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showedit(id, this);
+    });
+    function showedit(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Edit");
+
+        const url = `/AvailableAgencyService/Edit?id=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
+
+    $('#dataTable').on('click', '.js-delete', function (e) {
         e.preventDefault();
         var $btn = $(this);
         var $spinner = $(".submit-progress"); // global spinner (you already have this)

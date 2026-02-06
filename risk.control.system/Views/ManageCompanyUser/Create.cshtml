@@ -47,7 +47,7 @@
 			</div>
 		</div>
 
-		<form id="create-form" asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
+		<form id="create-form" asp-action="Create" enctype="multipart/form-data" autocomplete="off">
 			<input type="hidden" asp-for="Email" id="mailAddress" />
 			<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
 			<input type="hidden" id="countryCode" value="@Model?.Country.Code" />

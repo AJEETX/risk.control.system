@@ -42,7 +42,7 @@ namespace risk.control.system.Services.Agency
                 caseTask.SubStatus = replyByAgency;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.AssignedToAgency = false;
-                caseTask.EnquiryReplyByAssessorTime = DateTime.Now;
+                caseTask.EnquiryReplyByAgencyTime = DateTime.Now;
                 caseTask.SubmittedToAssessorTime = DateTime.Now;
                 var enquiryRequest = caseTask.InvestigationReport.EnquiryRequest;
                 enquiryRequest.DescriptiveAnswer = request.DescriptiveAnswer;
