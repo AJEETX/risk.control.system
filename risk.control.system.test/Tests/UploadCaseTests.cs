@@ -3,6 +3,7 @@
     internal class UploadCaseTests : PlaywrightTestBase
     {
         private static string url = $"{MvcServerFixture.BaseUrl}/CaseUpload/Uploads";
+
         [TestCase("creator@insurer.com", "R1$kcontrol!")]
         public async Task UploadCaseFile_ShouldUploadMultipleCaseAndDisplayUploadFileInfo(string email, string password)
         {
@@ -21,7 +22,7 @@
 
             // Upload file
             await _page.ClickAsync("#UploadFileButton");
-            await _page.ClickAsync("button:has-text(\"File Upload\")");
+            await _page.ClickAsync("button:has-text(\"Upload\")");
 
             Assert.That(_page.Url.StartsWith(url));
             //Assert.That(_page.Url, Does.Match($"{url}?uploadid=\\d+"));
